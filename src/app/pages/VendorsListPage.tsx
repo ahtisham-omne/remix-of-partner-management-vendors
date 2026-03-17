@@ -687,7 +687,7 @@ export function VendorsListPage() {
       const f = advFilters;
 
       // Partner Type (multiselect)
-      if (f.partnerTypes.length > 0 && !f.partnerTypes.some((t) => (v.partnerTypes || []).includes(t))) return false;
+      if (f.partnerTypes.length > 0 && !f.partnerTypes.some((t) => (v.partnerTypes || []).includes(t as PartnerType))) return false;
 
       // Vendor Type (multiselect)
       if (f.vendorTypes.length > 0 && !f.vendorTypes.includes(v.vendorType)) return false;
