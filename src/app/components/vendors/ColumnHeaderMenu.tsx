@@ -1127,7 +1127,7 @@ export function applyColumnFilters(
           break;
         }
         case "partner_type": {
-          if (filter.values.length > 0 && !filter.values.some((t) => (v.partnerTypes || []).includes(t))) return false;
+          if (filter.values.length > 0 && !filter.values.some((t) => (v.partnerTypes || []).includes(t as PartnerType))) return false;
           break;
         }
         case "vendor_type": {

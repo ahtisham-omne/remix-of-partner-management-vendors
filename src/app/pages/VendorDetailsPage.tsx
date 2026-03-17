@@ -5005,7 +5005,7 @@ function ContactsTab({ vendor, cfg }: { vendor: Vendor; cfg?: VendorConfigData }
       <CreatePocModal
         open={showCreateModal}
         onOpenChange={setShowCreateModal}
-        contextName={vendor.displayName || vendor.name}
+        contextName={vendor.displayName || vendor.companyName}
         newPocName={newPocName}
         onNewPocNameChange={setNewPocName}
         newPocDepartment={newPocDepartment}

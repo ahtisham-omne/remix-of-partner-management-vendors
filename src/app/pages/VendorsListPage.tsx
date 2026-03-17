@@ -1727,8 +1727,8 @@ export function VendorsListPage() {
                                           </div>); })()}
                                           <div className="min-w-0">
                                             <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate block max-w-[90px]`}>{highlightText(globalPointOfContacts[0]?.name)}</span>
-                                            {isRelaxed && globalPointOfContacts[0]?.role && (
-                                              <span className="text-xs text-muted-foreground/60 truncate block max-w-[90px]">{globalPointOfContacts[0]?.role}</span>
+                                            {isRelaxed && (globalPointOfContacts[0] as any)?.role && (
+                                              <span className="text-xs text-muted-foreground/60 truncate block max-w-[90px]">{(globalPointOfContacts[0] as any)?.role}</span>
                                             )}
                                           </div>
                                           {extraContacts > 0 && (

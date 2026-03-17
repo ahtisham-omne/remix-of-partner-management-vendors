@@ -3580,7 +3580,7 @@ function ConfigPageContent({
         name: createPrName,
         category: createPrCategory,
         basis: createPrBasis,
-        tierType: createPrTiers.length > 1 ? "multi" : "single",
+        tierType: createPrTiers.length > 1 ? "multiple" : "single",
         totalTiers: createPrTiers.length,
         description: createPrDescription || `${createPrCategory === "discount" ? "Discount" : "Premium"} rule: ${createPrName}`,
         tiers: tierData,
