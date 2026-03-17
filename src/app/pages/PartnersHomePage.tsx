@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import { useState, useEffect, useCallback, useRef, type ComponentType, type CSSProperties, type MouseEvent as ReactMouseEvent } from "react";
 import { useVendors } from "../context/VendorContext";
 import { Input } from "../components/ui/input";

@@ -1,4 +1,4 @@
-import { Outlet } from "react-router";
+import { Outlet } from "react-router-dom";
 import { AppSidebar } from "./AppSidebar";
 import { Toaster } from "sonner";
 import { VendorProvider } from "../../context/VendorContext";

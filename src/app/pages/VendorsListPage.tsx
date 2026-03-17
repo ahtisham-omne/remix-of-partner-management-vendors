@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback, useEffect, cloneElement, useRef } from "react";
 import { createPortal } from "react-dom";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import { useVendors } from "../context/VendorContext";
 import { VendorStatusBadge } from "../components/vendors/VendorStatusBadge";
 import { ColumnSelector, ColumnSelectorTrigger, type ColumnConfig } from "../components/vendors/ColumnSelector";

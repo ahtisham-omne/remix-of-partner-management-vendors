@@ -1,8 +1,8 @@
-import { NavLink, useLocation } from "react-router";
+import { NavLink, useLocation } from "react-router-dom";
 import type { ComponentType, MouseEvent as ReactMouseEvent } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import logoWordmark from "figma:asset/2d714e5c28dc2bd9f7623aa6a3775402653c048e.png";
-import logoIcon from "figma:asset/62fad9647d1ac360c4b31106f9625b8201efb089.png";
+import logoWordmark from "@/assets/2d714e5c28dc2bd9f7623aa6a3775402653c048e.png";
+import logoIcon from "@/assets/62fad9647d1ac360c4b31106f9625b8201efb089.png";
 import {
   ChevronDown,
   ChevronsLeft,

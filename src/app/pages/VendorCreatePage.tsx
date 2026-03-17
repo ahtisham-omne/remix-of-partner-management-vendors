@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import { useVendors } from "../context/VendorContext";
 import { VendorForm } from "../components/vendors/VendorForm";
 import {
