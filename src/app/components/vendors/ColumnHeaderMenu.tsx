@@ -1,7 +1,7 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import type { ReactNode } from "react";
 import React from "react";
-import type { Vendor } from "../../data/vendors";
+import type { Vendor, PartnerType } from "../../data/vendors";
 import {
   Popover,
   PopoverContent,
