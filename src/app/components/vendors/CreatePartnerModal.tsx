@@ -1,0 +1,8330 @@
+import React, { useState, useMemo, useCallback, useRef, useEffect, type ReactNode } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from "../ui/dialog";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import { Switch } from "../ui/switch";
+import { Textarea } from "../ui/textarea";
+import { Checkbox } from "../ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "../ui/popover";
+import {
+  Search,
+  X,
+  Check,
+  ChevronRight,
+  ChevronDown,
+  ChevronUp,
+  ArrowLeft,
+  Pencil,
+  Globe,
+  MapPin,
+  Phone,
+  Users,
+  Truck,
+  ShoppingCart,
+  Store,
+  Wrench,
+  Cog,
+  Info,
+  CreditCard,
+  DollarSign,
+  Receipt,
+  ChartColumn,
+  Ship,
+  UserPlus,
+  Building2,
+  ExternalLink,
+  Plus,
+  Settings2,
+  Eye,
+  Maximize2,
+  Minimize2,
+  Paperclip,
+  Upload,
+  FileText,
+  FolderOpen,
+  Trash2,
+  Briefcase,
+  Handshake,
+  HeartHandshake,
+  UserCheck,
+  Landmark,
+  Banknote,
+  Wallet,
+  CircleDollarSign,
+  Clock,
+  Copy,
+  Tag,
+  Sparkles,
+  ChevronLeft,
+  Mail,
+  PhoneCall,
+  ChevronsLeft,
+  ChevronsRight,
+  Camera,
+  Star,
+  AlertTriangle,
+  Zap,
+  Package,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
+  CalendarDays,
+  Trash,
+  Lock,
+  TrendingDown,
+  TrendingUp,
+  Archive,
+  SlidersHorizontal,
+  MoreHorizontal,
+} from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "../ui/alert-dialog";
+import { toast } from "sonner";
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from "../ui/tooltip";
+import { HoverCard, HoverCardTrigger, HoverCardContent } from "../ui/hover-card";
+import { getAvatarTint } from "../../utils/avatarTints";
+import { GroupChipsRow } from "./GroupChipsRow";
+import { PaymentTermDetailModal } from "./PaymentTermDetailModal";
+import { PaymentMethodsSection } from "./PaymentMethodsSection";
+import {
+  PillOption,
+  RadioOption,
+  IconCardOption,
+  SearchablePartnerDropdown,
+  CurrencyDropdown,
+  FundedByDropdown,
+  createEmptyPaymentEntry,
+} from "./config-helpers";
+import {
+  type PartnerGroup,
+  type GroupVendor,
+  type VendorSubType,
+  type ConfigSection,
+  type PartnerLocationItem,
+  type PaymentMethodType,
+  type PaymentTypeCategory,
+  type PaymentTermPreset,
+  type PaymentTermCategory,
+  type PricingRuleCategory,
+  type PricingRuleBasis,
+  type PricingRuleTier,
+  type PricingRulePreset,
+  type PaymentMethodEntry,
+  PARTNER_GROUPS,
+  GROUP_VENDORS,
+  VENDOR_SUB_TYPES,
+  CUSTOMER_SUB_TYPES,
+  VENDOR_CONFIG_SECTIONS,
+  CUSTOMER_CONFIG_SECTIONS,
+  PARTNER_LOCATION_ITEMS,
+  FUNDED_BY_ITEMS,
+  CURRENCY_OPTIONS,
+  PAYMENT_TYPE_CARDS,
+  PAYMENT_TERM_PRESETS,
+  CREATE_PT_TYPES,
+  CREATE_PT_TRIGGERS,
+  CREATE_PT_DURATIONS,
+  CREATE_PT_DISCOUNT_PERIODS,
+  PRICING_RULE_PRESETS,
+  CONTACT_DICTIONARY,
+  type ContactPerson,
+} from "./partnerConstants";
+import { SelectPocDictionaryModal, CreatePocModal } from "./PocModals";
+import { PocPillsRow } from "./PocPillComponents";
+
+/** Props for multi-step partner creation modal */
+interface CreatePartnerModalProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onPartnerCreated?: (data: Record<string, unknown>) => void;
+}
+
+export function CreatePartnerModal({ open, onOpenChange, onPartnerCreated }: CreatePartnerModalProps) {
+  // Steps: 1 = Partner Group Selection, 2 = Partner Form, 3 = Configuration Sub-page
+  const [step, setStep] = useState<1 | 2 | 3>(1);
+  const [configType, setConfigType] = useState<"vendor" | "customer">("vendor");
+  const [isFullScreen, setIsFullScreen] = useState(false);
+  const [showCancelConfirmation, setShowCancelConfirmation] = useState(false);
+
+  // Step 1 state
+  const [groupSearch, setGroupSearch] = useState("");
+  const [selectedGroups, setSelectedGroups] = useState<PartnerGroup[]>([]);
+  const [primaryGroupId, setPrimaryGroupId] = useState<string | null>(null);
+
+  // Derived: the primary group object (for downstream Step 2/3 references)
+  const primaryGroup = useMemo(
+    () => selectedGroups.find((g) => g.id === primaryGroupId) ?? selectedGroups[0] ?? null,
+    [selectedGroups, primaryGroupId]
+  );
+
+  // Step 2 state
+  const [partnerName, setPartnerName] = useState("");
+  const [partnerPhone, setPartnerPhone] = useState("");
+  const [phoneCountryCode, setPhoneCountryCode] = useState("+1");
+  const [website, setWebsite] = useState("");
+  const [address, setAddress] = useState("");
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [selectedPartnerTypes, setSelectedPartnerTypes] = useState<Set<string>>(new Set());
+  const [selectedVendorSubTypes, setSelectedVendorSubTypes] = useState<Set<string>>(new Set());
+  const [selectedCustomerSubTypes, setSelectedCustomerSubTypes] = useState<Set<string>>(new Set());
+  const [activeConfigTab, setActiveConfigTab] = useState<"vendor" | "customer">("vendor");
+  const [activeConfigSection, setActiveConfigSection] = useState<string>("billing_shipping");
+  const [activeCustomerConfigSection, setActiveCustomerConfigSection] = useState<string>("customer_billing");
+  const [activeSubTypeTab, setActiveSubTypeTab] = useState<string>("seller_items");
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Ref for collecting Step 3 config data from ConfigPageContent
+  const configDataRef = useRef<Record<string, unknown>>({});
+
+  // Filter partner groups
+  const filteredGroups = useMemo(() => {
+    if (!groupSearch.trim()) return PARTNER_GROUPS;
+    const q = groupSearch.toLowerCase();
+    return PARTNER_GROUPS.filter(
+      (g) =>
+        g.name.toLowerCase().includes(q) ||
+        g.id.toLowerCase().includes(q) ||
+        g.description.toLowerCase().includes(q) ||
+        g.country.toLowerCase().includes(q)
+    );
+  }, [groupSearch]);
+
+  const handleSelectGroup = useCallback((group: PartnerGroup) => {
+    setSelectedGroups((prev) => {
+      const exists = prev.some((g) => g.id === group.id);
+      if (exists) {
+        const next = prev.filter((g) => g.id !== group.id);
+        // If removed group was the primary, clear primary
+        setPrimaryGroupId((pid) => (pid === group.id ? null : pid));
+        return next;
+      }
+      const next = [...prev, group];
+      // Auto-set primary if first selection
+      if (next.length === 1) setPrimaryGroupId(group.id);
+      return next;
+    });
+  }, []);
+
+  const handleSetPrimaryGroup = useCallback((groupId: string) => {
+    setPrimaryGroupId(groupId);
+  }, []);
+
+  const handleContinueToForm = useCallback(() => {
+    if (!primaryGroupId || selectedGroups.length === 0) return;
+    setStep(2);
+  }, [selectedGroups, primaryGroupId]);
+
+  const handleSkipGroup = useCallback(() => {
+    setSelectedGroups([]);
+    setPrimaryGroupId(null);
+    setStep(2);
+  }, []);
+
+  const handleBackToGroupSelection = useCallback(() => {
+    setStep(1);
+  }, []);
+
+  const handleToggleVendorSubType = useCallback((id: string) => {
+    setSelectedVendorSubTypes((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  }, []);
+
+  const handleToggleCustomerSubType = useCallback((id: string) => {
+    setSelectedCustomerSubTypes((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  }, []);
+
+  const handlePartnerTypeToggle = useCallback((type: "vendor" | "customer") => {
+    setSelectedPartnerTypes((prev) => {
+      const next = new Set(prev);
+      if (next.has(type)) {
+        next.delete(type);
+      } else {
+        next.add(type);
+      }
+      return next;
+    });
+  }, []);
+
+  const handleDiscard = useCallback(() => {
+    // Reset all state
+    setStep(1);
+    setConfigType("vendor");
+    setIsFullScreen(false);
+    setShowCancelConfirmation(false);
+    setGroupSearch("");
+    setSelectedGroups([]);
+    setPrimaryGroupId(null);
+    setPartnerName("");
+    setPartnerPhone("");
+    setPhoneCountryCode("+1");
+    setWebsite("");
+    setAddress("");
+    setProfileImage(null);
+    setSelectedPartnerTypes(new Set());
+    setSelectedVendorSubTypes(new Set());
+    setSelectedCustomerSubTypes(new Set());
+    setActiveConfigTab("vendor");
+    setActiveConfigSection("billing_shipping");
+    setActiveCustomerConfigSection("customer_billing");
+    setActiveSubTypeTab("seller_items");
+    setErrors({});
+    onOpenChange(false);
+  }, [onOpenChange]);
+
+  const handleSave = useCallback(() => {
+    const newErrors: Record<string, string> = {};
+    if (!partnerName.trim()) newErrors.partnerName = "Partner name is required";
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    // Build the first vendor sub-type label for vendorType
+    const firstSubType = Array.from(selectedVendorSubTypes)[0] || "";
+    const SUBTYPE_MAP: Record<string, string> = {
+      seller_items: "Seller",
+      carrier: "Carrier",
+      online_vendor: "Online Vendor",
+      in_store_vendor: "In-Store Vendor",
+      sub_contractor: "Sub Contractor",
+      service_provider: "Service Provider",
+    };
+
+    const data = {
+      partnerGroup: primaryGroup?.id || "",
+      partnerGroupName: primaryGroup?.name || "",
+      partnerGroups: selectedGroups.map((g) => g.id),
+      partnerName: partnerName.trim(),
+      partnerPhone: partnerPhone ? `${phoneCountryCode} ${partnerPhone}` : "",
+      website,
+      address,
+      profileImage,
+      partnerTypes: Array.from(selectedPartnerTypes) as ("vendor" | "customer")[],
+      vendorSubTypes: Array.from(selectedVendorSubTypes),
+      customerSubTypes: Array.from(selectedCustomerSubTypes),
+      vendorType: SUBTYPE_MAP[firstSubType] || "Seller",
+      // Include Step 3 config data
+      ...(configDataRef.current || {}),
+    };
+
+    if (onPartnerCreated) {
+      onPartnerCreated(data);
+    }
+
+    // Reset and close
+    handleDiscard();
+  }, [partnerName, primaryGroup, selectedGroups, phoneCountryCode, partnerPhone, website, address, profileImage, selectedPartnerTypes, selectedVendorSubTypes, selectedCustomerSubTypes, onPartnerCreated, handleDiscard]);
+
+  // Determine if user has made any progress worth protecting
+  const hasAnyProgress = useMemo(() => {
+    return selectedGroups.length > 0 || step > 1 || partnerName.trim().length > 0;
+  }, [selectedGroups, step, partnerName]);
+
+  const handleCancelAttempt = useCallback(() => {
+    if (!hasAnyProgress) {
+      // No selections made — close immediately without confirmation
+      handleDiscard();
+      return;
+    }
+    setShowCancelConfirmation(true);
+  }, [hasAnyProgress, handleDiscard]);
+
+  const handleConfirmCancel = useCallback(() => {
+    setShowCancelConfirmation(false);
+    handleDiscard();
+  }, [handleDiscard]);
+
+  const handleOpenChange = useCallback((val: boolean) => {
+    if (!val) {
+      if (!hasAnyProgress) {
+        // No selections made — close immediately without confirmation
+        handleDiscard();
+      } else {
+        setShowCancelConfirmation(true);
+      }
+    } else {
+      onOpenChange(val);
+    }
+  }, [onOpenChange, hasAnyProgress, handleDiscard]);
+
+  const handleOpenConfigure = useCallback((type: "vendor" | "customer") => {
+    setConfigType(type);
+    setActiveConfigSection("billing_shipping");
+    setActiveCustomerConfigSection("customer_billing");
+    // Auto-select default sub-type and set as active tab
+    if (type === "vendor") {
+      let firstSelected = "seller_items";
+      setSelectedVendorSubTypes((prev) => {
+        if (prev.size === 0) return new Set(["seller_items"]);
+        firstSelected = Array.from(prev)[0];
+        return prev;
+      });
+      setActiveSubTypeTab(firstSelected);
+    } else {
+      let firstSelected = "retail_buyer";
+      setSelectedCustomerSubTypes((prev) => {
+        if (prev.size === 0) return new Set(["retail_buyer"]);
+        firstSelected = Array.from(prev)[0];
+        return prev;
+      });
+      setActiveSubTypeTab(firstSelected);
+    }
+    setStep(3);
+  }, []);
+
+  const handleBackFromConfig = useCallback(() => {
+    setStep(2);
+  }, []);
+
+  const modalBaseClass = "!fixed !inset-0 !translate-x-0 !translate-y-0 !m-auto !w-full !h-full transition-[max-width,max-height,border-radius] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]";
+
+  const modalSizeClass = isFullScreen
+    ? `${modalBaseClass} !max-w-[calc(100%-1rem)] sm:!max-w-[calc(100%-1.5rem)] lg:!max-w-[calc(100%-2rem)] !max-h-[calc(100%-1rem)] sm:!max-h-[calc(100%-1.5rem)] lg:!max-h-[calc(100%-2rem)] !rounded-2xl`
+    : `${modalBaseClass} !max-w-[100%] sm:!max-w-[960px] lg:!max-w-[1040px] !max-h-[100dvh] sm:!max-h-[88vh] rounded-none sm:!rounded-2xl`;
+
+  return (
+    <>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogContent
+        className={`flex flex-col p-0 gap-0 border-0 sm:border ${modalSizeClass}`}
+        hideCloseButton
+        style={{ boxShadow: "0 24px 48px -12px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.05)" }}
+      >
+        <DialogTitle className="sr-only">Create New Partner</DialogTitle>
+        <DialogDescription className="sr-only">Configure the details and settings for the new partner.</DialogDescription>
+        {step === 3 ? (
+          /* ───────── Configuration Sub-page ───────── */
+          <>
+            {/* Config header bar — clean, no tabs */}
+            <div className="shrink-0 bg-white rounded-t-none sm:rounded-t-2xl border-b border-[#EEF2F6]">
+              <div className="px-3 sm:px-4 lg:px-5 py-2.5 sm:py-3 flex items-center justify-between gap-3 sm:gap-4">
+                <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                  <button
+                    onClick={handleBackFromConfig}
+                    className="w-8 h-8 rounded-lg border border-[#E2E8F0] flex items-center justify-center hover:bg-[#F8FAFC] hover:border-[#CBD5E1] transition-all shrink-0"
+                  >
+                    <ArrowLeft className="w-4 h-4 text-[#64748B]" />
+                  </button>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-sm sm:text-[15px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>
+                        Configure {configType === "vendor" ? "Vendor" : "Customer"}
+                      </h3>
+                      <span className="hidden sm:inline-flex items-center px-1.5 py-0.5 rounded-md bg-[#F1F5F9] text-[10px] text-[#64748B] uppercase tracking-wide" style={{ fontWeight: 600 }}>
+                        Step 3
+                      </span>
+                    </div>
+                    <p className="text-[11px] sm:text-xs text-[#94A3B8] mt-0.5 truncate hidden sm:block">
+                      {primaryGroup
+                        ? `Inheriting from ${primaryGroup.name}`
+                        : "Select sub-types and configure details"}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
+                  <button
+                    onClick={() => setIsFullScreen(!isFullScreen)}
+                    className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#475569] hover:bg-[#F8FAFC] hover:border-[#CBD5E1] transition-all"
+                    style={{ fontWeight: 500 }}
+                  >
+                    {isFullScreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
+                    {isFullScreen ? "Exit full" : "Full view"}
+                  </button>
+                  <button
+                    onClick={handleCancelAttempt}
+                    className="w-8 h-8 rounded-lg flex items-center justify-center text-[#94A3B8] hover:text-[#64748B] hover:bg-[#F1F5F9] transition-all"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Config body: unified sidebar + content */}
+            <div className="flex-1 min-h-0 overflow-hidden flex flex-col sm:flex-row bg-[#FAFBFC] relative">
+              <ConfigUnifiedNav
+                subTypes={configType === "vendor" ? VENDOR_SUB_TYPES : CUSTOMER_SUB_TYPES}
+                sections={configType === "vendor" ? VENDOR_CONFIG_SECTIONS : CUSTOMER_CONFIG_SECTIONS}
+                selectedSubTypes={configType === "vendor" ? selectedVendorSubTypes : selectedCustomerSubTypes}
+                activeSubTypeTab={activeSubTypeTab}
+                activeSection={configType === "vendor" ? activeConfigSection : activeCustomerConfigSection}
+                onToggleSubType={configType === "vendor" ? handleToggleVendorSubType : handleToggleCustomerSubType}
+                onSetActiveSubType={setActiveSubTypeTab}
+                onActiveSectionChange={configType === "vendor" ? setActiveConfigSection : setActiveCustomerConfigSection}
+              />
+              {/* Content area */}
+              <div className="flex-1 min-w-0 overflow-y-auto bg-[#FAFBFC] relative">
+                {(() => {
+                  const isSubTypeEnabled = configType === "vendor" ? selectedVendorSubTypes.has(activeSubTypeTab) : selectedCustomerSubTypes.has(activeSubTypeTab);
+                  const isSeller = activeSubTypeTab === "seller_items";
+                  const subTypeLabel = (configType === "vendor" ? VENDOR_SUB_TYPES : CUSTOMER_SUB_TYPES).find(s => s.id === activeSubTypeTab)?.label;
+                  const subTypeIcon = (configType === "vendor" ? VENDOR_SUB_TYPES : CUSTOMER_SUB_TYPES).find(s => s.id === activeSubTypeTab)?.icon;
+
+                  // Educational descriptions for each sub-type profile
+                  const subTypeInfo: Record<string, string> = {
+                    seller_items: "Supplies products, goods, and inventory items to your organization. Configure purchasing terms, item catalogs, and pricing agreements.",
+                    carrier: "Provides freight, shipping, and logistics services for transporting goods. Manage shipping methods, transit times, rate tables, and delivery terms.",
+                    online_vendor: "Operates through digital channels and e-commerce platforms. Set up online ordering workflows, digital catalogs, and electronic invoicing.",
+                    in_store_vendor: "Supplies goods through physical retail locations and storefronts. Configure in-store pickup schedules, local delivery zones, and walk-in purchasing terms.",
+                    sub_contractor: "Provides specialized contract labor, project-based work, or outsourced manufacturing. Manage work orders, project milestones, and contract agreements.",
+                    service_provider: "Delivers professional, managed, or recurring services to your organization. Configure service-level agreements, billing schedules, and performance metrics.",
+                    retail_buyer: "Purchases products for personal use or small-scale retail operations. Manage consumer pricing, return policies, and loyalty programs.",
+                    wholesale_buyer: "Purchases goods in bulk at negotiated wholesale rates. Configure volume-based pricing tiers, minimum order quantities, and wholesale payment terms.",
+                    distributor: "Resells and distributes your products across markets and regions. Set up distribution agreements, territory mapping, and margin structures.",
+                    end_consumer: "The final user of your products or services. Manage direct-to-consumer pricing, warranty terms, and after-sales support channels.",
+                    b2b_client: "Business entity purchasing goods or services for commercial use. Configure enterprise agreements, purchase order workflows, and net payment terms.",
+                    reseller: "Authorized partner that resells your products under defined terms. Manage reseller discount structures, certification requirements, and co-branding guidelines.",
+                  };
+                  const profileDesc = subTypeInfo[activeSubTypeTab] || `Configure the ${subTypeLabel} profile settings.`;
+
+                  if (!isSubTypeEnabled) {
+                    // State 1: Not enabled — show enable CTA with educational copy
+                    return (
+                      <div className="absolute inset-0 z-10 flex items-center justify-center bg-[#FAFBFC]">
+                        <div className="flex flex-col items-center gap-4 text-center px-8 max-w-md animate-coming-soon-in">
+                          <div className="w-14 h-14 rounded-2xl bg-[#EDF4FF] border border-[#DBEAFE] flex items-center justify-center shadow-sm">
+                            {subTypeIcon ? React.cloneElement(subTypeIcon as React.ReactElement, { className: "w-6 h-6 text-[#0A77FF]" }) : <Settings2 className="w-6 h-6 text-[#0A77FF]" />}
+                          </div>
+                          <div>
+                            <p className="text-sm text-[#0F172A]" style={{ fontWeight: 600 }}>Enable {subTypeLabel}</p>
+                            <p className="text-[13px] text-[#64748B] mt-1.5 leading-relaxed max-w-sm">
+                              {profileDesc}
+                            </p>
+                          </div>
+                          <button
+                            onClick={() => {
+                              const toggleFn = configType === "vendor" ? handleToggleVendorSubType : handleToggleCustomerSubType;
+                              toggleFn(activeSubTypeTab);
+                            }}
+                            className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-lg bg-[#0A77FF] text-white text-[13px] shadow-md hover:bg-[#0862D0] hover:shadow-lg transition-all"
+                            style={{ fontWeight: 600 }}
+                          >
+                            <Check className="w-3.5 h-3.5" />
+                            Enable {subTypeLabel}
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  if (!isSeller) {
+                    // State 2: Enabled non-seller — Coming Soon with educational copy & Omne branding
+                    return (
+                      <div className="absolute inset-0 z-10 flex items-center justify-center bg-white overflow-hidden">
+                        {/* Orbiting rings in light blue tints */}
+                        <div className="absolute w-[320px] h-[320px] rounded-full border border-[#0A77FF]/[0.08] animate-coming-soon-orbit">
+                          <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-[#0A77FF]/20" />
+                        </div>
+                        <div className="absolute w-[480px] h-[480px] rounded-full border border-[#0A77FF]/[0.05] animate-coming-soon-orbit" style={{ animationDirection: "reverse", animationDuration: "12s" }}>
+                          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-1.5 h-1.5 rounded-full bg-[#3B9FFF]/20" />
+                        </div>
+                        {/* Pulse glow */}
+                        <div className="absolute w-48 h-48 rounded-full bg-[#0A77FF]/[0.04] animate-coming-soon-pulse blur-3xl" />
+                        {/* Content */}
+                        <div className="relative flex flex-col items-center gap-5 text-center px-8 max-w-md animate-coming-soon-in">
+                          <div className="w-16 h-16 rounded-2xl bg-[#EDF4FF] border border-[#DBEAFE] flex items-center justify-center">
+                            {subTypeIcon ? React.cloneElement(subTypeIcon as React.ReactElement, { className: "w-7 h-7 text-[#0A77FF]" }) : <Settings2 className="w-7 h-7 text-[#0A77FF]" />}
+                          </div>
+                          <div>
+                            <p className="text-[17px] text-[#0F172A] mb-2" style={{ fontWeight: 600 }}>Coming Soon</p>
+                            <p className="text-[13px] text-[#64748B] leading-relaxed max-w-sm">
+                              {profileDesc}
+                            </p>
+                          </div>
+                          <div className="h-[3px] w-24 rounded-full overflow-hidden bg-[#EDF4FF]">
+                            <div className="h-full w-full rounded-full bg-gradient-to-r from-[#0A77FF] via-[#3B9FFF] to-[#0A77FF] animate-coming-soon-shimmer" />
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  // State 3: Seller enabled — show full config
+                  return (
+                    <div className="p-4">
+                      <ConfigPageContent
+                        sectionId={configType === "vendor" ? activeConfigSection : activeCustomerConfigSection}
+                        configType={configType}
+                        selectedGroup={primaryGroup}
+                        partnerName={partnerName}
+                        configDataRef={configDataRef}
+                      />
+                    </div>
+                  );
+                })()}
+              </div>
+            </div>
+
+            {/* Config footer */}
+            <div className="shrink-0 border-t border-[#EEF2F6] bg-white px-3 sm:px-4 lg:px-5 py-2.5 sm:py-3 flex items-center justify-end gap-2 sm:gap-2.5 sm:rounded-b-2xl">
+              <button
+                onClick={handleBackFromConfig}
+                className="inline-flex items-center gap-1.5 text-xs sm:text-[13px] text-[#64748B] hover:text-[#0F172A] transition-colors mr-auto"
+                style={{ fontWeight: 500 }}
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Back</span>
+              </button>
+              <Button variant="outline" onClick={handleCancelAttempt} className="border-[#E2E8F0] text-[#64748B] hover:text-[#0F172A] hover:border-[#CBD5E1] rounded-lg text-xs sm:text-[13px] px-3 sm:px-4 h-8 sm:h-9">
+                Cancel
+              </Button>
+              <Button
+                onClick={() => {
+                  toast.success("Configuration saved");
+                  handleBackFromConfig();
+                }}
+                className="gap-1.5 rounded-lg text-xs sm:text-[13px] px-3 sm:px-4 h-8 sm:h-9 shadow-sm"
+              >
+                Save Configuration
+              </Button>
+            </div>
+          </>
+        ) : (
+          /* ───────── Steps 1 & 2 ───────── */
+          <>
+            {/* Header */}
+            <div className="px-3 sm:px-4 lg:px-5 pt-3 sm:pt-4 pb-0 shrink-0 bg-white rounded-t-none sm:rounded-t-2xl border-b border-[#EEF2F6]">
+              {/* Title row */}
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <h2 className="text-[15px] sm:text-[17px] text-[#0F172A]" style={{ fontWeight: 700 }}>Create New Partner</h2>
+                  <p className="text-[11px] sm:text-xs text-[#64748B] mt-0.5" style={{ fontWeight: 400 }}>
+                    Configure the details and settings for the new partner.
+                  </p>
+                </div>
+                <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
+                  <button
+                    onClick={() => setIsFullScreen(!isFullScreen)}
+                    className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#475569] hover:bg-[#F8FAFC] hover:border-[#CBD5E1] transition-all"
+                    style={{ fontWeight: 500 }}
+                  >
+                    {isFullScreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
+                    {isFullScreen ? "Exit full" : "Full view"}
+                  </button>
+                  <button
+                    onClick={handleCancelAttempt}
+                    className="w-8 h-8 rounded-lg flex items-center justify-center text-[#94A3B8] hover:text-[#64748B] hover:bg-[#F1F5F9] transition-all"
+                  >
+                    <X className="w-4.5 h-4.5" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Step tabs */}
+              <div className="flex items-center gap-4 sm:gap-6 mt-3 sm:mt-3.5 overflow-x-auto -mb-px">
+                {[
+                  { num: 1, label: "Partner Group Selection", shortLabel: "Group", active: step === 1, completed: step === 2 },
+                  { num: 2, label: "Partner Information", shortLabel: "Details", active: step === 2, completed: false },
+                ].map((tab) => (
+                  <div
+                    key={tab.num}
+                    className={`relative flex items-center gap-2 pb-2.5 sm:pb-3 ${
+                      tab.num < step ? "cursor-pointer" : "cursor-default"
+                    }`}
+                    onClick={() => {
+                      if (tab.num < step) setStep(tab.num as 1 | 2);
+                    }}
+                  >
+                    <div
+                      className={`w-[22px] h-[22px] sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-[11px] sm:text-[12px] shrink-0 transition-all duration-200 ${
+                        tab.completed
+                          ? "bg-[#10B981] text-white"
+                          : tab.active
+                          ? "bg-[#0A77FF] text-white"
+                          : "border-[1.5px] border-[#CBD5E1] text-[#64748B] bg-white"
+                      }`}
+                      style={{ fontWeight: 600 }}
+                    >
+                      {tab.completed ? <Check className="w-3 h-3" /> : tab.num}
+                    </div>
+                    <span
+                      className={`text-[12px] sm:text-[13px] whitespace-nowrap transition-colors ${
+                        tab.active
+                          ? "text-[#0A77FF]"
+                          : tab.completed
+                          ? "text-[#10B981]"
+                          : "text-[#334155]"
+                      }`}
+                      style={{ fontWeight: tab.active || tab.completed ? 600 : 500 }}
+                    >
+                      <span className="hidden sm:inline">{tab.label}</span>
+                      <span className="sm:hidden">{tab.shortLabel}</span>
+                    </span>
+                    {(tab.active || tab.completed) && (
+                      <div className={`absolute bottom-0 left-0 right-0 h-[2px] rounded-t-full ${tab.completed ? "bg-[#10B981]" : "bg-[#0A77FF]"}`} />
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Body */}
+            <div className="flex-1 min-h-0 overflow-y-auto bg-[#FAFBFC] scrollbar-hide">
+              <div className={`px-4 pt-4 transition-all duration-300 ease-out ${step === 1 ? 'pb-0' : 'pb-4'}`}>
+                {step === 1 && (
+                  <Step1GroupSelection
+                    search={groupSearch}
+                    onSearchChange={setGroupSearch}
+                    groups={filteredGroups}
+                    selectedGroups={selectedGroups}
+                    primaryGroupId={primaryGroupId}
+                    onSelectGroup={handleSelectGroup}
+                    onSetPrimary={handleSetPrimaryGroup}
+                  />
+                )}
+                {step === 2 && (
+                  <Step2PartnerForm
+                    selectedGroup={primaryGroup}
+                    allSelectedGroups={selectedGroups}
+                    primaryGroupId={primaryGroupId}
+                    onEditGroup={handleBackToGroupSelection}
+                    partnerName={partnerName}
+                    onPartnerNameChange={setPartnerName}
+                    partnerPhone={partnerPhone}
+                    onPartnerPhoneChange={setPartnerPhone}
+                    phoneCountryCode={phoneCountryCode}
+                    onPhoneCountryCodeChange={setPhoneCountryCode}
+                    website={website}
+                    onWebsiteChange={setWebsite}
+                    address={address}
+                    onAddressChange={setAddress}
+                    profileImage={profileImage}
+                    onProfileImageChange={setProfileImage}
+                    selectedPartnerTypes={selectedPartnerTypes}
+                    onPartnerTypeChange={handlePartnerTypeToggle}
+                    selectedVendorSubTypes={selectedVendorSubTypes}
+                    onToggleVendorSubType={handleToggleVendorSubType}
+                    selectedCustomerSubTypes={selectedCustomerSubTypes}
+                    onToggleCustomerSubType={handleToggleCustomerSubType}
+                    onOpenConfigure={handleOpenConfigure}
+                    errors={errors}
+                  />
+                )}
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="shrink-0 border-t border-[#EEF2F6] bg-white px-3 sm:px-4 lg:px-5 py-2.5 sm:py-3 flex items-center justify-end gap-2 sm:gap-2.5 sm:rounded-b-2xl">
+              {step === 1 ? (
+                <>
+                  <Button variant="outline" onClick={handleCancelAttempt} className="border-[#E2E8F0] text-[#64748B] hover:text-[#0F172A] hover:border-[#CBD5E1] rounded-lg px-3 sm:px-5 text-xs sm:text-[13px] h-8 sm:h-9">
+                    Cancel
+                  </Button>
+                  {!primaryGroupId ? (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span tabIndex={0} className="inline-flex">
+                          <Button disabled className="gap-1.5 rounded-lg px-3 sm:px-5 text-xs sm:text-[13px] h-8 sm:h-9 shadow-sm pointer-events-none">
+                            Continue
+                            <ChevronRight className="w-3.5 h-3.5" />
+                          </Button>
+                        </span>
+                      </TooltipTrigger>
+                      <TooltipContent side="top" sideOffset={6} className="max-w-[220px] text-center bg-[#1E293B] text-white border-[#1E293B]">
+                        {selectedGroups.length === 0
+                          ? "Select at least one partner group and mark it as primary to continue"
+                          : "Mark a partner group as primary to continue"}
+                      </TooltipContent>
+                    </Tooltip>
+                  ) : (
+                    <Button onClick={handleContinueToForm} className="gap-1.5 rounded-lg px-3 sm:px-5 text-xs sm:text-[13px] h-8 sm:h-9 shadow-sm">
+                      Continue
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </Button>
+                  )}
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={handleBackToGroupSelection}
+                    className="inline-flex items-center gap-1.5 text-xs sm:text-[13px] text-[#64748B] hover:text-[#0F172A] transition-colors mr-auto"
+                    style={{ fontWeight: 500 }}
+                  >
+                    <ArrowLeft className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">Back</span>
+                  </button>
+                  <Button variant="outline" onClick={handleCancelAttempt} className="border-[#E2E8F0] text-[#64748B] hover:text-[#0F172A] hover:border-[#CBD5E1] rounded-lg px-3 sm:px-5 text-xs sm:text-[13px] h-8 sm:h-9">
+                    Cancel
+                  </Button>
+                  <Button onClick={handleSave} className="gap-1.5 rounded-lg px-3 sm:px-5 text-xs sm:text-[13px] h-8 sm:h-9 shadow-sm">
+                    <Plus className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">Create Partner</span>
+                    <span className="sm:hidden">Create</span>
+                  </Button>
+                </>
+              )}
+            </div>
+          </>
+        )}
+      </DialogContent>
+    </Dialog>
+
+    {/* Cancel Confirmation Dialog — matches listing page modern centered layout */}
+    <AlertDialog open={showCancelConfirmation} onOpenChange={setShowCancelConfirmation}>
+      <AlertDialogContent
+        className="sm:max-w-[400px] p-0 gap-0 overflow-hidden rounded-2xl border-0 shadow-[0_24px_80px_-12px_rgba(0,0,0,0.25)]"
+        style={{ zIndex: 220 }}
+        onInteractOutside={() => setShowCancelConfirmation(false)}
+      >
+        {/* Colored glow header */}
+        <div className="relative flex flex-col items-center pt-10 pb-6" style={{ background: "linear-gradient(180deg, #FEF2F2 0%, rgba(254,242,242,0.3) 70%, transparent 100%)" }}>
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[180px] h-[80px] rounded-full blur-[50px] opacity-25" style={{ backgroundColor: "#EF4444" }} />
+          <div className="relative w-16 h-16 rounded-2xl flex items-center justify-center" style={{ backgroundColor: "#FEE2E2" }}>
+            <AlertTriangle className="w-8 h-8" style={{ color: "#DC2626" }} />
+          </div>
+          <span
+            className="mt-4 px-3 py-1 rounded-full text-[11px]"
+            style={{ fontWeight: 600, backgroundColor: "#FEF2F2", color: "#991B1B", textTransform: "uppercase" as const, letterSpacing: "0.05em" }}
+          >
+            Discard
+          </span>
+        </div>
+        {/* Body */}
+        <div className="flex flex-col items-center text-center px-8 pb-8">
+          <AlertDialogHeader className="p-0 gap-0 text-center">
+            <AlertDialogTitle className="text-[18px] tracking-[-0.02em]" style={{ fontWeight: 600, color: "#0F172A" }}>
+              Discard partner creation?
+            </AlertDialogTitle>
+          </AlertDialogHeader>
+          <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "#475569", lineHeight: "1.65" }}>
+            All the information you've entered will be lost. This action cannot be undone.
+          </AlertDialogDescription>
+          <div className="w-full mt-7 flex flex-col gap-2.5">
+            <button
+              onClick={handleConfirmCancel}
+              className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors hover:opacity-90"
+              style={{ fontWeight: 600, backgroundColor: "#DC2626", color: "#fff" }}
+            >
+              Discard changes
+            </button>
+            <button
+              onClick={() => setShowCancelConfirmation(false)}
+              className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors"
+              style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#334155" }}
+            >
+              Continue editing
+            </button>
+          </div>
+        </div>
+      </AlertDialogContent>
+    </AlertDialog>
+    </>
+  );
+}
+
+// ── Step Tab ──
+function StepTab({
+  stepNumber,
+  label,
+  shortLabel,
+  isActive,
+  isCompleted,
+}: {
+  stepNumber: number;
+  label: string;
+  shortLabel?: string;
+  isActive: boolean;
+  isCompleted: boolean;
+}) {
+  return (
+    <div className={`relative flex items-center gap-2 px-0.5 pb-2.5 sm:pb-3 mr-5 sm:mr-7 cursor-default`}>
+      {/* Circle indicator */}
+      <div
+        className={`w-5 h-5 sm:w-[22px] sm:h-[22px] rounded-full flex items-center justify-center text-[10px] sm:text-[11px] shrink-0 transition-all duration-200 ${
+          isCompleted
+            ? "bg-[#10B981] text-white shadow-[0_0_0_2px_rgba(16,185,129,0.15)]"
+            : isActive
+            ? "bg-[#0A77FF] text-white shadow-[0_0_0_2px_rgba(10,119,255,0.15)]"
+            : "bg-[#EEF2F6] text-[#94A3B8]"
+        }`}
+        style={{ fontWeight: 700 }}
+      >
+        {isCompleted ? <Check className="w-3 h-3" /> : stepNumber}
+      </div>
+      {/* Label */}
+      <span
+        className={`text-xs sm:text-[13px] whitespace-nowrap transition-colors ${
+          isCompleted
+            ? "text-[#10B981]"
+            : isActive
+            ? "text-[#0F172A]"
+            : "text-[#94A3B8]"
+        }`}
+        style={{ fontWeight: isActive || isCompleted ? 600 : 400 }}
+      >
+        <span className="hidden sm:inline">{label}</span>
+        <span className="sm:hidden">{shortLabel || label}</span>
+      </span>
+      {/* Active underline bar */}
+      {(isActive || isCompleted) && (
+        <div className={`absolute bottom-0 left-0 right-0 h-[2px] rounded-t-full transition-all ${
+          isCompleted ? "bg-[#10B981]" : "bg-[#0A77FF]"
+        }`} />
+      )}
+    </div>
+  );
+}
+
+// ── Step 1 Selected Chips Row — matches Step 2 GroupChipsRow design with remove buttons ──
+const STEP1_MAX_VISIBLE = 3;
+
+function Step1ChipWithPopover({
+  group,
+  isPrimary,
+  onRemove,
+}: {
+  group: PartnerGroup;
+  isPrimary: boolean;
+  onRemove: (group: PartnerGroup) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const leaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleEnter = useCallback(() => {
+    if (leaveTimer.current) {
+      clearTimeout(leaveTimer.current);
+      leaveTimer.current = null;
+    }
+    setOpen(true);
+  }, []);
+
+  const handleLeave = useCallback(() => {
+    leaveTimer.current = setTimeout(() => setOpen(false), 150);
+  }, []);
+
+  return (
+    <Popover open={open} onOpenChange={(o) => { if (!o) setOpen(false); }}>
+      <PopoverTrigger asChild>
+        <div
+          onMouseEnter={handleEnter}
+          onMouseLeave={handleLeave}
+          className={`inline-flex items-center gap-1.5 pl-2 pr-1 py-1 rounded-lg text-[11px] border transition-colors cursor-default shrink-0 ${
+            isPrimary
+              ? "bg-[#EDF4FF] text-[#0A77FF] border-[#0A77FF]/25"
+              : "bg-[#F8FAFC] text-[#475569] border-[#E2E8F0] hover:border-[#CBD5E1] hover:bg-[#F1F5F9]"
+          }`}
+          style={{ fontWeight: 500 }}
+        >
+          {isPrimary && (
+            <Star className="w-2.5 h-2.5 fill-[#0A77FF] text-[#0A77FF]" />
+          )}
+          {group.countryFlag} {group.name}
+          <span
+            className="text-[10px] text-[#94A3B8]"
+            style={{ fontWeight: 400 }}
+          >
+            · {group.memberCount}
+          </span>
+          <button
+            onClick={(e) => { e.stopPropagation(); onRemove(group); }}
+            className="w-4 h-4 rounded flex items-center justify-center hover:bg-black/10 transition-colors ml-0.5 cursor-pointer"
+          >
+            <X className="w-2.5 h-2.5" />
+          </button>
+        </div>
+      </PopoverTrigger>
+      <PopoverContent
+        side="bottom"
+        align="start"
+        sideOffset={6}
+        className="p-0 w-auto border-0 shadow-none bg-transparent z-[200]"
+        onMouseEnter={handleEnter}
+        onMouseLeave={handleLeave}
+        onOpenAutoFocus={(e) => e.preventDefault()}
+      >
+        <div className="w-[280px] rounded-xl overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-[#E2E8F0]/60">
+          <div className="bg-gradient-to-br from-[#1E293B] to-[#334155] px-3.5 py-3 relative overflow-hidden">
+            <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-white/[0.04]" />
+            <div className="flex items-center justify-between relative">
+              <div className="flex items-center gap-2 min-w-0">
+                <span className="text-base shrink-0">{group.countryFlag}</span>
+                <span className="text-white text-[13px] truncate" style={{ fontWeight: 600 }}>
+                  {group.name}
+                </span>
+              </div>
+              {isPrimary && (
+                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] bg-[#0A77FF]/25 text-[#60A5FA] shrink-0" style={{ fontWeight: 600 }}>
+                  <Star className="w-2.5 h-2.5 fill-[#60A5FA]" /> Primary
+                </span>
+              )}
+            </div>
+            <p className="text-[11px] text-[#94A3B8] mt-1.5 relative">
+              {group.country} Region
+            </p>
+          </div>
+          <div className="bg-white px-3.5 py-3 space-y-3">
+            <p className="text-[12px] text-[#475569] leading-relaxed line-clamp-3">
+              {group.description}
+            </p>
+            <div className="flex items-center gap-4 pt-2 border-t border-[#F1F5F9]">
+              <div className="flex items-center gap-1.5 text-[11px] text-[#64748B]">
+                <Users className="w-3 h-3 text-[#94A3B8]" />
+                <span style={{ fontWeight: 500 }}>{group.memberCount} partners</span>
+              </div>
+              <div className="flex items-center gap-1.5 text-[11px] text-[#64748B]">
+                <Globe className="w-3 h-3 text-[#94A3B8]" />
+                <span style={{ fontWeight: 500 }}>{group.country}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+function Step1OverflowChip({
+  overflowGroups,
+  primaryGroupId,
+  onRemove,
+}: {
+  overflowGroups: PartnerGroup[];
+  primaryGroupId: string | null;
+  onRemove: (group: PartnerGroup) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [hoveredGroup, setHoveredGroup] = useState<PartnerGroup | null>(null);
+  const leaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleEnter = useCallback(() => {
+    if (leaveTimer.current) {
+      clearTimeout(leaveTimer.current);
+      leaveTimer.current = null;
+    }
+    setOpen(true);
+  }, []);
+
+  const handleLeave = useCallback(() => {
+    leaveTimer.current = setTimeout(() => {
+      setOpen(false);
+      setHoveredGroup(null);
+    }, 200);
+  }, []);
+
+  return (
+    <Popover open={open} onOpenChange={(o) => { if (!o) { setOpen(false); setHoveredGroup(null); } }}>
+      <PopoverTrigger
+        onMouseEnter={handleEnter}
+        onMouseLeave={handleLeave}
+        className="inline-flex items-center px-2 py-1 rounded-lg text-[11px] border border-[#E2E8F0] bg-[#F8FAFC] text-[#64748B] hover:bg-[#F1F5F9] hover:text-[#475569] hover:border-[#CBD5E1] transition-colors cursor-default shrink-0"
+        style={{ fontWeight: 500 }}
+      >
+        +{overflowGroups.length} more
+      </PopoverTrigger>
+      <PopoverContent
+        side="bottom"
+        align="start"
+        sideOffset={6}
+        className="p-0 w-auto border-0 shadow-none bg-transparent z-[200]"
+        onMouseEnter={handleEnter}
+        onMouseLeave={handleLeave}
+        onOpenAutoFocus={(e) => e.preventDefault()}
+      >
+        <div className="flex items-start gap-2">
+          <div className="w-[240px] rounded-xl border border-[#E2E8F0]/60 bg-white shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden shrink-0">
+            <div className="px-3 py-2 border-b border-[#F1F5F9] bg-[#FAFBFC]">
+              <span className="text-[11px] text-[#64748B]" style={{ fontWeight: 600 }}>
+                +{overflowGroups.length} more group{overflowGroups.length !== 1 ? "s" : ""}
+              </span>
+            </div>
+            <div className="max-h-[220px] overflow-y-auto py-1">
+              {overflowGroups.map((g) => {
+                const isPrimary = g.id === primaryGroupId;
+                const isHovered = hoveredGroup?.id === g.id;
+                return (
+                  <div
+                    key={g.id}
+                    onMouseEnter={() => setHoveredGroup(g)}
+                    className={`w-full flex items-center gap-2 px-3 py-2 transition-colors text-left cursor-default ${
+                      isHovered ? "bg-[#EDF4FF]" : "hover:bg-[#F8FAFC]"
+                    }`}
+                  >
+                    <span className="shrink-0">{g.countryFlag}</span>
+                    <span
+                      className={`text-[12px] truncate ${isHovered ? "text-[#0A77FF]" : "text-[#334155]"}`}
+                      style={{ fontWeight: 500 }}
+                    >
+                      {g.name}
+                    </span>
+                    {isPrimary && (
+                      <Star className="w-2.5 h-2.5 fill-[#0A77FF] text-[#0A77FF] shrink-0" />
+                    )}
+                    <span className="text-[10px] text-[#94A3B8] ml-auto shrink-0">
+                      {g.memberCount}
+                    </span>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); onRemove(g); }}
+                      className="w-4 h-4 rounded flex items-center justify-center hover:bg-black/10 transition-colors shrink-0 cursor-pointer"
+                    >
+                      <X className="w-2.5 h-2.5 text-[#94A3B8]" />
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          {hoveredGroup && (
+            <div className="shrink-0 animate-in fade-in-0 slide-in-from-left-2 duration-150">
+              <div className="w-[280px] rounded-xl overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-[#E2E8F0]/60">
+                <div className="bg-gradient-to-br from-[#1E293B] to-[#334155] px-3.5 py-3 relative overflow-hidden">
+                  <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-white/[0.04]" />
+                  <div className="flex items-center justify-between relative">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="text-base shrink-0">{hoveredGroup.countryFlag}</span>
+                      <span className="text-white text-[13px] truncate" style={{ fontWeight: 600 }}>
+                        {hoveredGroup.name}
+                      </span>
+                    </div>
+                    {hoveredGroup.id === primaryGroupId && (
+                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] bg-[#0A77FF]/25 text-[#60A5FA] shrink-0" style={{ fontWeight: 600 }}>
+                        <Star className="w-2.5 h-2.5 fill-[#60A5FA]" /> Primary
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-[11px] text-[#94A3B8] mt-1.5 relative">
+                    {hoveredGroup.country} Region
+                  </p>
+                </div>
+                <div className="bg-white px-3.5 py-3 space-y-3">
+                  <p className="text-[12px] text-[#475569] leading-relaxed line-clamp-3">
+                    {hoveredGroup.description}
+                  </p>
+                  <div className="flex items-center gap-4 pt-2 border-t border-[#F1F5F9]">
+                    <div className="flex items-center gap-1.5 text-[11px] text-[#64748B]">
+                      <Users className="w-3 h-3 text-[#94A3B8]" />
+                      <span style={{ fontWeight: 500 }}>{hoveredGroup.memberCount} partners</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-[11px] text-[#64748B]">
+                      <Globe className="w-3 h-3 text-[#94A3B8]" />
+                      <span style={{ fontWeight: 500 }}>{hoveredGroup.country}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+function Step1SelectedChipsRow({
+  selectedGroups,
+  primaryGroupId,
+  onRemove,
+}: {
+  selectedGroups: PartnerGroup[];
+  primaryGroupId: string | null;
+  onRemove: (group: PartnerGroup) => void;
+}) {
+  const visibleGroups = selectedGroups.slice(0, STEP1_MAX_VISIBLE);
+  const overflowGroups = selectedGroups.slice(STEP1_MAX_VISIBLE);
+
+  return (
+    <div className="flex items-center gap-1.5 mb-2 min-w-0 overflow-x-auto">
+      {visibleGroups.map((g) => (
+        <Step1ChipWithPopover
+          key={g.id}
+          group={g}
+          isPrimary={g.id === primaryGroupId}
+          onRemove={onRemove}
+        />
+      ))}
+      {overflowGroups.length > 0 && (
+        <Step1OverflowChip
+          overflowGroups={overflowGroups}
+          primaryGroupId={primaryGroupId}
+          onRemove={onRemove}
+        />
+      )}
+    </div>
+  );
+}
+
+// ── Step 1: Partner Group Selection ──
+function Step1GroupSelection({
+  search,
+  onSearchChange,
+  groups,
+  selectedGroups,
+  primaryGroupId,
+  onSelectGroup,
+  onSetPrimary,
+}: {
+  search: string;
+  onSearchChange: (val: string) => void;
+  groups: PartnerGroup[];
+  selectedGroups: PartnerGroup[];
+  primaryGroupId: string | null;
+  onSelectGroup: (group: PartnerGroup) => void;
+  onSetPrimary: (groupId: string) => void;
+}) {
+  const [quickViewGroup, setQuickViewGroup] = useState<PartnerGroup | null>(null);
+  const [groupPage, setGroupPage] = useState(1);
+  const [groupsPerPage, setGroupsPerPage] = useState(20);
+
+  // Reset page when search changes or groups list changes
+  useEffect(() => {
+    setGroupPage(1);
+  }, [search, groups.length]);
+
+  const totalGroupPages = Math.max(1, Math.ceil(groups.length / groupsPerPage));
+
+  // Clamp page
+  useEffect(() => {
+    if (groupPage > totalGroupPages) {
+      setGroupPage(totalGroupPages);
+    }
+  }, [groupPage, totalGroupPages]);
+
+  const pagedGroups = useMemo(() => {
+    const start = (groupPage - 1) * groupsPerPage;
+    return groups.slice(start, start + groupsPerPage);
+  }, [groups, groupPage, groupsPerPage]);
+
+  const getGroupPageNumbers = () => {
+    const pages: (number | "...")[] = [];
+    if (totalGroupPages <= 7) {
+      for (let i = 1; i <= totalGroupPages; i++) pages.push(i);
+    } else {
+      pages.push(1);
+      if (groupPage > 3) pages.push("...");
+      const start = Math.max(2, groupPage - 1);
+      const end = Math.min(totalGroupPages - 1, groupPage + 1);
+      for (let i = start; i <= end; i++) pages.push(i);
+      if (groupPage < totalGroupPages - 2) pages.push("...");
+      pages.push(totalGroupPages);
+    }
+    return pages;
+  };
+
+  const handleOpenQuickView = useCallback((e: React.MouseEvent, group: PartnerGroup) => {
+    e.stopPropagation();
+    setQuickViewGroup(group);
+  }, []);
+
+  const selectedIds = useMemo(() => new Set(selectedGroups.map((g) => g.id)), [selectedGroups]);
+
+  return (
+    <div>
+      {/* Sticky header: label + search + chips + results count */}
+      <div className="sticky top-0 z-10 bg-[#FAFBFC] pb-2 -mx-3 sm:-mx-4 lg:-mx-5 px-3 sm:px-4 lg:px-5 pt-1">
+        {/* Section label */}
+        <div className="mb-2">
+          <h4 className="text-[13px] sm:text-sm text-foreground" style={{ fontWeight: 600 }}>Select Partner Groups</h4>
+          <p className="text-[11px] sm:text-xs text-[#94A3B8] mt-0.5">
+            Choose one or more partner groups. Mark one as primary to inherit its configuration.
+          </p>
+        </div>
+
+        {/* Search */}
+        <div className="relative mb-2">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
+          <Input
+            placeholder="Search partner groups..."
+            value={search}
+            onChange={(e) => onSearchChange(e.target.value)}
+            className="pl-9 bg-white border-[#E2E8F0] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 h-8 sm:h-9 text-sm"
+          />
+          {search && (
+            <button
+              onClick={() => onSearchChange("")}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
+        </div>
+
+        {/* Selected chips — single line with +N more overflow, matching Step 2 GroupChipsRow design */}
+        {selectedGroups.length > 0 && (
+          <Step1SelectedChipsRow
+            selectedGroups={selectedGroups}
+            primaryGroupId={primaryGroupId}
+            onRemove={onSelectGroup}
+          />
+        )}
+
+        {/* Results count */}
+        <p className="text-xs text-muted-foreground">
+          {search.trim()
+            ? `${groups.length} result${groups.length !== 1 ? "s" : ""} for "${search}"`
+            : `${groups.length} group${groups.length !== 1 ? "s" : ""} available`}
+        </p>
+
+        {/* Bottom edge line */}
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-[#E2E8F0]/60" />
+      </div>
+
+      {/* Scrollable grid area */}
+      <div className="pt-2 relative z-0">
+        <div
+          className="grid gap-1.5 sm:gap-2"
+          style={{
+            gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+          }}
+        >
+          {pagedGroups.map((group) => {
+            const isSelected = selectedIds.has(group.id);
+            const isPrimary = group.id === primaryGroupId;
+            return (
+              <GroupCard
+                key={group.id}
+                group={group}
+                isSelected={isSelected}
+                isPrimary={isPrimary}
+                searchQuery={search}
+                onSelect={() => onSelectGroup(group)}
+                onSetPrimary={() => onSetPrimary(group.id)}
+                onQuickView={(e) => handleOpenQuickView(e, group)}
+              />
+            );
+          })}
+        </div>
+
+        {/* End of page indicator */}
+        {pagedGroups.length > 0 && (
+          <div className="flex flex-col items-center pt-5 pb-4">
+            <div className="flex items-center gap-2.5 w-full max-w-[200px]">
+              <div className="flex-1 h-px bg-[#E2E8F0]" />
+              <span className="text-[10px] text-[#94A3B8] whitespace-nowrap" style={{ fontWeight: 500 }}>
+                End of page {groupPage} of {totalGroupPages}
+              </span>
+              <div className="flex-1 h-px bg-[#E2E8F0]" />
+            </div>
+          </div>
+        )}
+
+        {groups.length === 0 && (
+          <div className="py-10 sm:py-14 text-center">
+            <div className="w-11 h-11 rounded-xl bg-[#F1F5F9] flex items-center justify-center mx-auto mb-3">
+              <Search className="w-5 h-5 text-[#94A3B8]" />
+            </div>
+            <p className="text-[13px] text-[#334155]" style={{ fontWeight: 600 }}>No groups found</p>
+            <p className="text-xs text-[#94A3B8] mt-1">
+              Try adjusting your search terms.
+            </p>
+          </div>
+        )}
+
+        {/* Pagination */}
+        {groups.length > 0 && (
+          <div className="sticky bottom-0 z-10 flex flex-col sm:flex-row items-center justify-center px-3 py-1.5 border-t border-[#E2E8F0] bg-white gap-1.5 sm:gap-3">
+            <div className="flex items-center gap-1.5 text-[11px] text-[#94A3B8]">
+              <span>Per page</span>
+              <Select
+                value={String(groupsPerPage)}
+                onValueChange={(val) => {
+                  setGroupsPerPage(Number(val));
+                  setGroupPage(1);
+                }}
+              >
+                <SelectTrigger className="w-[52px] h-6 text-[11px] px-2">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="z-[250]">
+                  <SelectItem value="10">10</SelectItem>
+                  <SelectItem value="20">20</SelectItem>
+                  <SelectItem value="50">50</SelectItem>
+                  <SelectItem value="100">100</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-center gap-0.5">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 w-6 p-0"
+                disabled={groupPage === 1}
+                onClick={() => setGroupPage(1)}
+              >
+                <ChevronsLeft className="w-3 h-3" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 px-1.5 gap-0.5 text-[11px] text-muted-foreground"
+                disabled={groupPage === 1}
+                onClick={() => setGroupPage((p) => Math.max(1, p - 1))}
+              >
+                <ChevronLeft className="w-3 h-3" />
+                Prev
+              </Button>
+
+              {getGroupPageNumbers().map((page, idx) =>
+                page === "..." ? (
+                  <span key={`dots-${idx}`} className="px-0.5 text-[11px] text-muted-foreground">
+                    ...
+                  </span>
+                ) : (
+                  <Button
+                    key={page}
+                    variant={groupPage === page ? "default" : "ghost"}
+                    size="sm"
+                    className={`h-6 w-6 p-0 text-[11px] ${
+                      groupPage === page
+                        ? "bg-primary text-primary-foreground"
+                        : "text-muted-foreground"
+                    }`}
+                    onClick={() => setGroupPage(page as number)}
+                  >
+                    {page}
+                  </Button>
+                )
+              )}
+
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 px-1.5 gap-0.5 text-[11px] text-muted-foreground"
+                disabled={groupPage === totalGroupPages}
+                onClick={() => setGroupPage((p) => Math.min(totalGroupPages, p + 1))}
+              >
+                Next
+                <ChevronRight className="w-3 h-3" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 w-6 p-0"
+                disabled={groupPage === totalGroupPages}
+                onClick={() => setGroupPage(totalGroupPages)}
+              >
+                <ChevronsRight className="w-3 h-3" />
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Quick View Overlay */}
+      {quickViewGroup && (
+        <GroupQuickViewOverlay
+          group={quickViewGroup}
+          onClose={() => setQuickViewGroup(null)}
+        />
+      )}
+    </div>
+  );
+}
+
+// ── Group Card with hover actions, multi-select checkmark, primary badge ──
+function highlightMatch(text: string, query: string): React.ReactNode {
+  if (!query || query.trim().length === 0) return text;
+  const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const regex = new RegExp(`(${escaped})`, "gi");
+  const parts = text.split(regex);
+  if (parts.length === 1) return text;
+  return parts.map((part, i) =>
+    regex.test(part) ? (
+      <mark key={i} className="bg-[#FDE68A] text-inherit rounded-[2px] px-[1px]">{part}</mark>
+    ) : (
+      part
+    )
+  );
+}
+
+function GroupCard({
+  group,
+  isSelected,
+  isPrimary,
+  searchQuery,
+  onSelect,
+  onSetPrimary,
+  onQuickView,
+}: {
+  group: PartnerGroup;
+  isSelected: boolean;
+  isPrimary: boolean;
+  searchQuery?: string;
+  onSelect: () => void;
+  onSetPrimary: () => void;
+  onQuickView: (e: React.MouseEvent) => void;
+}) {
+  const [isHovered, setIsHovered] = useState(false);
+
+  const handlePrimaryClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!isSelected) {
+      // Select first, then make primary
+      onSelect();
+      // Small delay to let the select propagate, then set primary
+      setTimeout(() => onSetPrimary(), 0);
+    } else {
+      onSetPrimary();
+    }
+  }, [isSelected, onSelect, onSetPrimary]);
+
+  return (
+    <button
+      onClick={onSelect}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      className="group relative text-left p-2.5 sm:p-3 rounded-lg border transition-all duration-150"
+      style={{
+        borderColor: isSelected ? "#0A77FF" : isHovered ? "#CBD5E1" : "#E2E8F0",
+        backgroundColor: isSelected ? "#F5F9FF" : isHovered ? "#FAFCFF" : "#FFFFFF",
+        boxShadow: isSelected
+          ? "0 0 0 1px rgba(10,119,255,0.15), 0 1px 3px rgba(10,119,255,0.06)"
+          : isHovered
+            ? "0 2px 8px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04)"
+            : "none",
+      }}
+    >
+      {/* Top-right actions row */}
+      <div className="absolute top-2 right-2 flex items-center gap-1 z-10">
+        {/* Hover actions for selected cards: eye, star, checkmark */}
+        {isSelected && isHovered && (
+          <>
+            <div
+              onClick={(e) => { e.stopPropagation(); onQuickView(e); }}
+              className="w-6 h-6 rounded-full flex items-center justify-center text-[#94A3B8] hover:text-[#64748B] hover:bg-white/80 transition-colors cursor-pointer"
+            >
+              <Eye className="w-3.5 h-3.5" />
+            </div>
+            <div
+              onClick={handlePrimaryClick}
+              className={`w-6 h-6 rounded-full flex items-center justify-center transition-colors cursor-pointer ${
+                isPrimary
+                  ? "text-[#0A77FF] hover:bg-white/80"
+                  : "text-[#94A3B8] hover:text-[#F59E0B] hover:bg-white/80"
+              }`}
+              title={isPrimary ? "Primary group" : "Set as primary"}
+            >
+              <Star className={`w-3.5 h-3.5 ${isPrimary ? "fill-[#0A77FF]" : ""}`} />
+            </div>
+          </>
+        )}
+
+        {/* Hover actions for unselected cards: eye + empty circle */}
+        {!isSelected && isHovered && (
+          <>
+            <div
+              onClick={(e) => { e.stopPropagation(); onQuickView(e); }}
+              className="w-6 h-6 rounded-full flex items-center justify-center text-[#94A3B8] hover:text-[#64748B] hover:bg-[#F1F5F9] transition-colors cursor-pointer"
+            >
+              <Eye className="w-3.5 h-3.5" />
+            </div>
+          </>
+        )}
+
+        {/* Primary badge (always visible when primary) */}
+        {isPrimary && !isHovered && (
+          <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-[#0A77FF] text-white text-[10px]" style={{ fontWeight: 600 }}>
+            Primary
+          </span>
+        )}
+
+        {/* Checkmark (always visible when selected) */}
+        {isSelected && (
+          <div className="w-5 h-5 rounded-full bg-[#0A77FF] flex items-center justify-center">
+            <Check className="w-3 h-3 text-white" />
+          </div>
+        )}
+
+        {/* Empty circle on hover for unselected */}
+        {!isSelected && isHovered && (
+          <div className="w-5 h-5 rounded-full border-2 border-[#CBD5E1] bg-white" />
+        )}
+      </div>
+
+      {/* Icon */}
+      <div className={`w-7 h-7 rounded-md flex items-center justify-center mb-1.5 transition-colors ${
+        isSelected ? "bg-[#D6E8FF]" : "bg-[#F1F5F9]"
+      }`}>
+        <Building2 className={`w-4 h-4 transition-colors ${
+          isSelected ? "text-primary" : "text-[#64748B]"
+        }`} />
+      </div>
+
+      {/* Name — no truncation, always show full text */}
+      <p className="text-[13px] text-foreground pr-16 break-words" style={{ fontWeight: isSelected ? 600 : 500 }}>{highlightMatch(group.name, searchQuery || "")}</p>
+
+      {/* Description — allow wrapping, show up to 2 lines */}
+      <p className="text-[11px] text-[#94A3B8] mt-0.5 line-clamp-2 pr-2 break-words">
+        {highlightMatch(group.description, searchQuery || "")}
+      </p>
+
+      {/* Footer: partner count */}
+      <div className="flex items-center gap-1 mt-1.5 text-[11px] text-[#94A3B8]">
+        <Users className="w-3 h-3" />
+        <span>{group.memberCount} partner{group.memberCount !== 1 ? "s" : ""}</span>
+      </div>
+    </button>
+  );
+}
+
+// ── Quick View Overlay (Associated Vendors) ──
+const STATUS_TABS = ["All", "Active", "Inactive"] as const;
+type StatusTab = (typeof STATUS_TABS)[number];
+
+const VENDOR_ROW_HEIGHT = 44;
+const VENDOR_PAGE_SIZE = 50;
+
+function GroupQuickViewOverlay({
+  group,
+  onClose,
+}: {
+  group: PartnerGroup;
+  onClose: () => void;
+}) {
+  const allVendors = GROUP_VENDORS[group.id] || [];
+  const overlayRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [search, setSearch] = useState("");
+  const [statusTab, setStatusTab] = useState<StatusTab>("All");
+  const [visibleCount, setVisibleCount] = useState(VENDOR_PAGE_SIZE);
+
+  const filtered = useMemo(() => {
+    const q = search.toLowerCase().trim();
+    return allVendors.filter((v) => {
+      if (statusTab !== "All" && v.status !== statusTab) return false;
+      if (!q) return true;
+      return (
+        v.id.toLowerCase().includes(q) ||
+        v.name.toLowerCase().includes(q) ||
+        v.address.toLowerCase().includes(q)
+      );
+    });
+  }, [allVendors, search, statusTab]);
+
+  const handleScroll = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    if (el.scrollTop + el.clientHeight >= el.scrollHeight - 200) {
+      setVisibleCount((prev) => Math.min(prev + VENDOR_PAGE_SIZE, filtered.length));
+    }
+  }, [filtered.length]);
+
+  useEffect(() => {
+    setVisibleCount(VENDOR_PAGE_SIZE);
+    if (scrollRef.current) scrollRef.current.scrollTop = 0;
+  }, [search, statusTab]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
+
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (overlayRef.current && !overlayRef.current.contains(e.target as Node)) {
+        onClose();
+      }
+    };
+    const timer = setTimeout(() => {
+      document.addEventListener("mousedown", handleClick);
+    }, 10);
+    return () => {
+      clearTimeout(timer);
+      document.removeEventListener("mousedown", handleClick);
+    };
+  }, [onClose]);
+
+  const statusStyles: Record<string, { bg: string; text: string; border: string; dot: string }> = {
+    Active: { bg: "#ECFDF5", text: "#065F46", border: "#A7F3D0", dot: "#059669" },
+    Inactive: { bg: "#FFFBEB", text: "#92400E", border: "#FDE68A", dot: "#D97706" },
+  };
+
+  const getStatusStyle = (status: GroupVendor["status"]) =>
+    statusStyles[status] ?? statusStyles["Inactive"];
+
+  const counts = useMemo(() => {
+    const c = { All: allVendors.length, Active: 0, Inactive: 0 };
+    for (const v of allVendors) c[v.status]++;
+    return c;
+  }, [allVendors]);
+
+  const visible = filtered.slice(0, visibleCount);
+
+  return (
+    <div className="fixed inset-0 z-[250] flex items-center justify-center bg-black/30 backdrop-blur-[1px]">
+      <div
+        ref={overlayRef}
+        className="bg-white rounded-xl shadow-2xl border border-[#E2E8F0] w-[calc(100%-1rem)] sm:w-full max-w-[700px] max-h-[85vh] sm:max-h-[600px] flex flex-col animate-in fade-in-0 zoom-in-95 duration-150 mx-auto"
+      >
+        {/* Header */}
+        <div className="px-4 sm:px-5 pt-4 sm:pt-5 pb-3 shrink-0">
+          <div className="flex items-center justify-between gap-3">
+            <div className="min-w-0">
+              <h3 className="text-[13px] sm:text-sm text-[#0F172A] truncate" style={{ fontWeight: 600 }}>
+                {group.name} — Associated Vendors
+              </h3>
+              <p className="text-[11px] sm:text-xs text-[#94A3B8] mt-0.5">
+                {allVendors.length} vendor{allVendors.length !== 1 ? "s" : ""} in this group
+              </p>
+            </div>
+            <button
+              onClick={onClose}
+              className="shrink-0 w-7 h-7 rounded-lg flex items-center justify-center hover:bg-[#F1F5F9] transition-colors cursor-pointer"
+            >
+              <X className="w-4 h-4 text-[#94A3B8]" />
+            </button>
+          </div>
+
+          {/* Search + Status Tabs */}
+          <div className="mt-3 flex flex-col sm:flex-row sm:items-center gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8] pointer-events-none" />
+              <input
+                type="text"
+                placeholder="Search…"
+                value={search}
+                readOnly
+                onPaste={(e) => {
+                  e.preventDefault();
+                  const text = e.clipboardData.getData("text").trim();
+                  if (text) setSearch(text);
+                }}
+                className="w-full h-8 pl-8 pr-8 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] text-xs text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 focus:outline-none transition-colors cursor-default"
+              />
+              {search && (
+                <button
+                  onClick={() => setSearch("")}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-[#E2E8F0] hover:bg-[#CBD5E1] flex items-center justify-center transition-colors cursor-pointer"
+                >
+                  <X className="w-2.5 h-2.5 text-[#64748B]" />
+                </button>
+              )}
+            </div>
+            <div className="flex items-center gap-1 shrink-0">
+              {STATUS_TABS.map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setStatusTab(tab)}
+                  className={`px-2 py-1 rounded-md text-[11px] border transition-colors cursor-pointer ${
+                    statusTab === tab
+                      ? "bg-[#EDF4FF] text-[#0A77FF] border-[#ADD1FF]"
+                      : "bg-[#F8FAFC] text-[#64748B] border-transparent hover:bg-[#F1F5F9]"
+                  }`}
+                  style={{ fontWeight: 500 }}
+                >
+                  {tab}
+                  <span className="ml-1 opacity-75">{counts[tab]}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Table header */}
+        <div className="shrink-0 border-y border-[#EEF2F6] bg-[#FAFBFC] px-4 sm:px-5">
+          <div className="grid grid-cols-[72px_1fr_72px] sm:grid-cols-[80px_1.2fr_1.5fr_76px] gap-2 h-8 items-center">
+            <span className="text-[10px] text-[#94A3B8] uppercase tracking-wider" style={{ fontWeight: 600 }}>ID</span>
+            <span className="text-[10px] text-[#94A3B8] uppercase tracking-wider" style={{ fontWeight: 600 }}>Vendor Name</span>
+            <span className="text-[10px] text-[#94A3B8] uppercase tracking-wider hidden sm:block" style={{ fontWeight: 600 }}>Address</span>
+            <span className="text-[10px] text-[#94A3B8] uppercase tracking-wider text-right" style={{ fontWeight: 600 }}>Status</span>
+          </div>
+        </div>
+
+        {/* Vendor list — scrollable */}
+        <div
+          ref={scrollRef}
+          onScroll={handleScroll}
+          className="flex-1 min-h-0 overflow-y-auto scrollbar-hide"
+        >
+          {visible.length > 0 ? (
+            <div className="px-4 sm:px-5">
+              {visible.map((vendor) => (
+                <div
+                  key={vendor.id}
+                  className="grid grid-cols-[72px_1fr_72px] sm:grid-cols-[80px_1.2fr_1.5fr_76px] gap-2 items-center py-2.5 border-b border-[#F1F5F9] last:border-b-0 hover:bg-[#F8FAFC] transition-colors -mx-4 sm:-mx-5 px-4 sm:px-5"
+                  style={{ minHeight: VENDOR_ROW_HEIGHT }}
+                >
+                  <span className="text-[11px] text-[#0A77FF] tabular-nums truncate" style={{ fontWeight: 600 }}>
+                    {vendor.id}
+                  </span>
+                  <div className="min-w-0 flex items-center gap-2">
+                    <div
+                      className="w-6 h-6 rounded-md flex items-center justify-center shrink-0 text-[9px]"
+                      style={{
+                        fontWeight: 700,
+                        backgroundColor: getAvatarTint(vendor.name).bg,
+                        color: getAvatarTint(vendor.name).fg,
+                      }}
+                    >
+                      {vendor.name.charAt(0)}
+                    </div>
+                    <span className="text-[12px] text-[#0F172A] truncate" style={{ fontWeight: 500 }}>
+                      {vendor.name}
+                    </span>
+                  </div>
+                  <span className="text-[11px] text-[#64748B] truncate hidden sm:block">
+                    {vendor.address}
+                  </span>
+                  <div className="flex justify-end">
+                    <span
+                      className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md border text-[10px] shrink-0"
+                      style={{
+                        fontWeight: 500,
+                        backgroundColor: getStatusStyle(vendor.status).bg,
+                        color: getStatusStyle(vendor.status).text,
+                        borderColor: getStatusStyle(vendor.status).border,
+                      }}
+                    >
+                      <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: getStatusStyle(vendor.status).dot }} />
+                      {vendor.status}
+                    </span>
+                  </div>
+                </div>
+              ))}
+              {visibleCount < filtered.length && (
+                <div className="py-3 text-center">
+                  <span className="text-[11px] text-[#94A3B8]">
+                    Showing {visibleCount} of {filtered.length} — scroll for more
+                  </span>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="py-10 text-center">
+              <div className="w-10 h-10 rounded-xl bg-[#F1F5F9] flex items-center justify-center mx-auto mb-2.5">
+                {search ? (
+                  <Search className="w-5 h-5 text-[#94A3B8]" />
+                ) : (
+                  <Users className="w-5 h-5 text-[#94A3B8]" />
+                )}
+              </div>
+              <p className="text-[13px] text-[#334155]" style={{ fontWeight: 600 }}>
+                {search ? "No matching vendors" : "No vendors yet"}
+              </p>
+              <p className="text-xs text-[#94A3B8] mt-1">
+                {search
+                  ? "Try adjusting your search or filter."
+                  : "This group doesn't have any associated vendors."}
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="shrink-0 border-t border-[#EEF2F6] px-4 sm:px-5 py-2.5 flex items-center justify-between bg-[#FAFBFC] rounded-b-xl">
+          <span className="text-[11px] text-[#94A3B8]">
+            {filtered.length === allVendors.length
+              ? `${allVendors.length} total`
+              : `${filtered.length} of ${allVendors.length} shown`}
+          </span>
+          <button
+            onClick={onClose}
+            className="px-3.5 py-1.5 rounded-lg text-xs text-[#0F172A] bg-white border border-[#E2E8F0] hover:bg-[#F1F5F9] transition-colors cursor-pointer"
+            style={{ fontWeight: 500 }}
+          >
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Step 2: Partner Form (restructured) ──
+function Step2PartnerForm({
+  selectedGroup,
+  allSelectedGroups,
+  primaryGroupId,
+  onEditGroup,
+  partnerName,
+  onPartnerNameChange,
+  partnerPhone,
+  onPartnerPhoneChange,
+  phoneCountryCode,
+  onPhoneCountryCodeChange,
+  website,
+  onWebsiteChange,
+  address,
+  onAddressChange,
+  profileImage,
+  onProfileImageChange,
+  selectedPartnerTypes,
+  onPartnerTypeChange,
+  selectedVendorSubTypes,
+  onToggleVendorSubType,
+  selectedCustomerSubTypes,
+  onToggleCustomerSubType,
+  onOpenConfigure,
+  errors,
+}: {
+  selectedGroup: PartnerGroup | null;
+  allSelectedGroups: PartnerGroup[];
+  primaryGroupId: string | null;
+  onEditGroup: () => void;
+  partnerName: string;
+  onPartnerNameChange: (val: string) => void;
+  partnerPhone: string;
+  onPartnerPhoneChange: (val: string) => void;
+  phoneCountryCode: string;
+  onPhoneCountryCodeChange: (val: string) => void;
+  website: string;
+  onWebsiteChange: (val: string) => void;
+  address: string;
+  onAddressChange: (val: string) => void;
+  profileImage: string | null;
+  onProfileImageChange: (val: string | null) => void;
+  selectedPartnerTypes: Set<string>;
+  onPartnerTypeChange: (type: "vendor" | "customer") => void;
+  selectedVendorSubTypes: Set<string>;
+  onToggleVendorSubType: (id: string) => void;
+  selectedCustomerSubTypes: Set<string>;
+  onToggleCustomerSubType: (id: string) => void;
+  onOpenConfigure: (type: "vendor" | "customer") => void;
+  errors: Record<string, string>;
+}) {
+  // Local state for fields not yet lifted to parent
+  const [status, setStatus] = useState<"Active" | "Inactive">("Active");
+  const [description, setDescription] = useState("");
+  const [countryPickerOpen, setCountryPickerOpen] = useState(false);
+  const [countrySearch, setCountrySearch] = useState("");
+  const [addressFocused, setAddressFocused] = useState(false);
+  const [addressSelected, setAddressSelected] = useState(false);
+  const addressRef = useRef<HTMLDivElement>(null);
+
+  // ── Global Point of Contact (partner-level) ──
+  const [globalPocContactDictionary, setGlobalPocContactDictionary] = useState<ContactPerson[]>([...CONTACT_DICTIONARY]);
+  const [showSelectGlobalPocModal, setShowSelectGlobalPocModal] = useState(false);
+  const [showCreateGlobalPocModal, setShowCreateGlobalPocModal] = useState(false);
+  const [globalPocSearch, setGlobalPocSearch] = useState("");
+  const [globalPocCategoryFilter, setGlobalPocCategoryFilter] = useState<"all" | "Sales" | "Supply Chain Management" | "Finance">("all");
+  const [globalPocPage, setGlobalPocPage] = useState(1);
+  const [globalPocTempSelected, setGlobalPocTempSelected] = useState<Set<string>>(new Set());
+  const [selectedGlobalPocIds, setSelectedGlobalPocIds] = useState<Set<string>>(new Set());
+  // Create new POC form state (for global POC)
+  const [gNewPocName, setGNewPocName] = useState("");
+  const [gNewPocDepartment, setGNewPocDepartment] = useState<"Sales" | "Supply Chain Management" | "Finance">("Sales");
+  const [gNewPocRole, setGNewPocRole] = useState("");
+  const [gNewPocLandline, setGNewPocLandline] = useState("");
+  const [gNewPocLandlineCode, setGNewPocLandlineCode] = useState("+1");
+  const [gNewPocExt, setGNewPocExt] = useState("");
+  const [gNewPocMobile, setGNewPocMobile] = useState("");
+  const [gNewPocMobileCode, setGNewPocMobileCode] = useState("+1");
+  const [gNewPocEmail, setGNewPocEmail] = useState("");
+  const [gSaveAndCreateAnother, setGSaveAndCreateAnother] = useState(false);
+
+  const AVATAR_COLORS_G = useMemo(() => [
+    "#0A77FF", "#7C3AED", "#059669", "#DC2626", "#D97706",
+    "#0891B2", "#4F46E5", "#BE185D", "#65A30D", "#EA580C",
+  ], []);
+
+  const globalPocDeptCounts = useMemo(() => {
+    const counts: Record<string, number> = { Sales: 0, "Supply Chain Management": 0, Finance: 0 };
+    globalPocContactDictionary.forEach((c) => { counts[c.department] = (counts[c.department] || 0) + 1; });
+    return counts;
+  }, [globalPocContactDictionary]);
+
+  const filteredGlobalPocContacts = useMemo(() => {
+    let list = globalPocContactDictionary;
+    if (globalPocCategoryFilter !== "all") list = list.filter((c) => c.department === globalPocCategoryFilter);
+    if (globalPocSearch.trim()) {
+      const q = globalPocSearch.toLowerCase();
+      list = list.filter((c) => c.name.toLowerCase().includes(q) || c.email.toLowerCase().includes(q) || c.company.toLowerCase().includes(q));
+    }
+    return list;
+  }, [globalPocCategoryFilter, globalPocSearch, globalPocContactDictionary]);
+
+  const GPOC_PER_PAGE = 20;
+  const globalPocTotalPages = Math.max(1, Math.ceil(filteredGlobalPocContacts.length / GPOC_PER_PAGE));
+  const globalPocPagedContacts = filteredGlobalPocContacts.slice((globalPocPage - 1) * GPOC_PER_PAGE, globalPocPage * GPOC_PER_PAGE);
+
+  const selectedGlobalPocContacts = useMemo(() => {
+    return globalPocContactDictionary.filter((c) => selectedGlobalPocIds.has(c.id));
+  }, [selectedGlobalPocIds, globalPocContactDictionary]);
+
+  const handleOpenSelectGlobalPoc = useCallback(() => {
+    setGlobalPocTempSelected(new Set(selectedGlobalPocIds));
+    setGlobalPocSearch("");
+    setGlobalPocCategoryFilter("all");
+    setGlobalPocPage(1);
+    setShowSelectGlobalPocModal(true);
+  }, [selectedGlobalPocIds]);
+
+  const handleConfirmGlobalPocSelection = useCallback(() => {
+    setSelectedGlobalPocIds(new Set(globalPocTempSelected));
+    setShowSelectGlobalPocModal(false);
+  }, [globalPocTempSelected]);
+
+  const handleToggleGlobalPocTemp = useCallback((id: string) => {
+    setGlobalPocTempSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  }, []);
+
+  const handleRemoveGlobalPoc = useCallback((id: string) => {
+    setSelectedGlobalPocIds((prev) => { const next = new Set(prev); next.delete(id); return next; });
+  }, []);
+
+  const resetGlobalNewPocForm = useCallback(() => {
+    setGNewPocName(""); setGNewPocDepartment("Sales"); setGNewPocRole("");
+    setGNewPocLandline(""); setGNewPocLandlineCode("+1"); setGNewPocExt("");
+    setGNewPocMobile(""); setGNewPocMobileCode("+1"); setGNewPocEmail("");
+  }, []);
+
+  const handleOpenCreateGlobalPoc = useCallback(() => {
+    resetGlobalNewPocForm();
+    setGSaveAndCreateAnother(false);
+    setShowCreateGlobalPocModal(true);
+  }, [resetGlobalNewPocForm]);
+
+  const handleSaveGlobalNewPoc = useCallback(() => {
+    if (!gNewPocName.trim()) return;
+    const newId = `C-GNEW-${Date.now()}`;
+    const avatarColor = AVATAR_COLORS_G[globalPocContactDictionary.length % AVATAR_COLORS_G.length];
+    const newContact: ContactPerson = {
+      id: newId, name: gNewPocName.trim(), company: partnerName || "New Partner",
+      department: gNewPocDepartment, phone: gNewPocLandline ? `${gNewPocLandlineCode} ${gNewPocLandline}` : "",
+      phoneExt: gNewPocExt, secondaryPhone: gNewPocMobile ? `${gNewPocMobileCode} ${gNewPocMobile}` : "",
+      secondaryPhoneExt: "", email: gNewPocEmail, avatarColor,
+    };
+    setGlobalPocContactDictionary((prev) => [newContact, ...prev]);
+    setGlobalPocTempSelected((prev) => { const next = new Set(prev); next.add(newId); return next; });
+    setSelectedGlobalPocIds((prev) => { const next = new Set(prev); next.add(newId); return next; });
+    if (gSaveAndCreateAnother) { resetGlobalNewPocForm(); } else { setShowCreateGlobalPocModal(false); }
+  }, [gNewPocName, gNewPocDepartment, gNewPocLandline, gNewPocLandlineCode, gNewPocExt, gNewPocMobile, gNewPocMobileCode, gNewPocEmail, partnerName, gSaveAndCreateAnother, resetGlobalNewPocForm, globalPocContactDictionary, AVATAR_COLORS_G]);
+
+  // Profile picture (state lifted to parent; only local UI state here)
+  const profileInputRef = useRef<HTMLInputElement>(null);
+  const [profileDragOver, setProfileDragOver] = useState(false);
+
+  const handleProfileFile = useCallback((file: File) => {
+    if (!file.type.startsWith("image/")) return;
+    if (file.size > 5 * 1024 * 1024) return; // 5MB limit
+    const reader = new FileReader();
+    reader.onload = (e) => onProfileImageChange(e.target?.result as string);
+    reader.readAsDataURL(file);
+  }, []);
+
+  const COUNTRY_CODES = useMemo(() => [
+    { code: "+1", flag: "🇺🇸", country: "United States" },
+    { code: "+1", flag: "🇨🇦", country: "Canada" },
+    { code: "+44", flag: "🇬🇧", country: "United Kingdom" },
+    { code: "+49", flag: "🇩🇪", country: "Germany" },
+    { code: "+33", flag: "🇫🇷", country: "France" },
+    { code: "+81", flag: "🇯🇵", country: "Japan" },
+    { code: "+86", flag: "🇨🇳", country: "China" },
+    { code: "+91", flag: "🇮🇳", country: "India" },
+    { code: "+61", flag: "🇦🇺", country: "Australia" },
+    { code: "+55", flag: "🇧🇷", country: "Brazil" },
+    { code: "+971", flag: "🇦🇪", country: "UAE" },
+    { code: "+65", flag: "🇸🇬", country: "Singapore" },
+    { code: "+82", flag: "🇰🇷", country: "South Korea" },
+    { code: "+52", flag: "🇲🇽", country: "Mexico" },
+    { code: "+31", flag: "🇳🇱", country: "Netherlands" },
+    { code: "+46", flag: "🇸🇪", country: "Sweden" },
+    { code: "+41", flag: "🇨🇭", country: "Switzerland" },
+    { code: "+34", flag: "🇪🇸", country: "Spain" },
+    { code: "+39", flag: "🇮🇹", country: "Italy" },
+    { code: "+48", flag: "🇵🇱", country: "Poland" },
+  ], []);
+
+  const filteredCountries = useMemo(() => {
+    if (!countrySearch.trim()) return COUNTRY_CODES;
+    const q = countrySearch.toLowerCase();
+    return COUNTRY_CODES.filter(
+      (c) => c.country.toLowerCase().includes(q) || c.code.includes(q)
+    );
+  }, [countrySearch, COUNTRY_CODES]);
+
+  const selectedCountry = useMemo(() => {
+    return COUNTRY_CODES.find((c) => c.code === phoneCountryCode) || COUNTRY_CODES[0];
+  }, [phoneCountryCode, COUNTRY_CODES]);
+
+  const MOCK_ADDRESS_SUGGESTIONS = useMemo(() => [
+    { main: "350 Fifth Avenue", secondary: "New York, NY 10118, USA" },
+    { main: "1600 Amphitheatre Parkway", secondary: "Mountain View, CA 94043, USA" },
+    { main: "1 Apple Park Way", secondary: "Cupertino, CA 95014, USA" },
+    { main: "One Microsoft Way", secondary: "Redmond, WA 98052, USA" },
+    { main: "410 Terry Ave North", secondary: "Seattle, WA 98109, USA" },
+    { main: "1 Hacker Way", secondary: "Menlo Park, CA 94025, USA" },
+    { main: "Unter den Linden 77", secondary: "10117 Berlin, Germany" },
+    { main: "1-7-1 Konan, Minato-ku", secondary: "Tokyo 108-0075, Japan" },
+    { main: "221B Baker Street", secondary: "London, NW1 6XE, United Kingdom" },
+    { main: "1 Infinite Loop", secondary: "Cupertino, CA 95014, USA" },
+    { main: "30 Hudson Yards", secondary: "New York, NY 10001, USA" },
+    { main: "233 S Wacker Dr", secondary: "Chicago, IL 60606, USA" },
+    { main: "4 Privet Drive", secondary: "Little Whinging, Surrey, UK" },
+    { main: "1313 Disneyland Dr", secondary: "Anaheim, CA 92802, USA" },
+    { main: "11 Wall Street", secondary: "New York, NY 10005, USA" },
+    { main: "1 World Trade Center", secondary: "New York, NY 10007, USA" },
+    { main: "500 Terry A Francois Blvd", secondary: "San Francisco, CA 94158, USA" },
+    { main: "2300 Traverwood Dr", secondary: "Ann Arbor, MI 48105, USA" },
+    { main: "8 Rue du Faubourg", secondary: "75008 Paris, France" },
+    { main: "Marienplatz 1", secondary: "80331 Munich, Germany" },
+    { main: "1 Harbourside Crescent", secondary: "Sydney, NSW 2000, Australia" },
+    { main: "Via Roma 28", secondary: "00184 Rome, Italy" },
+    { main: "Rua Augusta 274", secondary: "São Paulo, SP 01305-000, Brazil" },
+    { main: "100 Universal City Plaza", secondary: "Universal City, CA 91608, USA" },
+  ], []);
+
+  const addressSuggestions = useMemo(() => {
+    if (!address.trim() || address.length < 2 || addressSelected) return [];
+    const q = address.toLowerCase();
+    return MOCK_ADDRESS_SUGGESTIONS.filter(
+      (s) => s.main.toLowerCase().includes(q) || s.secondary.toLowerCase().includes(q)
+    ).slice(0, 5);
+  }, [address, addressSelected, MOCK_ADDRESS_SUGGESTIONS]);
+
+  // Close address dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (addressRef.current && !addressRef.current.contains(e.target as Node)) {
+        setAddressFocused(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const statusConfig = {
+    Active: { color: "#10B981", bg: "#ECFDF5", label: "Active" },
+    Inactive: { color: "#EF4444", bg: "#FEF2F2", label: "Inactive" },
+  } as const;
+
+  return (
+    <div className="space-y-3 sm:space-y-4">
+      {/* ── Selected Partner Groups Banner — sticky at top ── */}
+      {allSelectedGroups.length > 0 && (
+        <div className="sticky top-0 z-10 bg-[#FAFBFC] pb-2 -mt-1">
+          <div className="rounded-lg bg-white border border-[#0A77FF]/25 shadow-[0_1px_4px_rgba(10,119,255,0.06),0_4px_12px_-2px_rgba(0,0,0,0.06)] overflow-hidden">
+            {/* Header row */}
+            <div className="flex items-center justify-between gap-2 px-2.5 sm:px-3 py-2">
+              <div className="flex items-center gap-2 min-w-0">
+                <div className="w-6 h-6 rounded-md bg-[#0A77FF]/8 flex items-center justify-center shrink-0">
+                  <Users className="w-3.5 h-3.5 text-[#0A77FF]" />
+                </div>
+                <div className="min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>
+                      {allSelectedGroups.length} Group{allSelectedGroups.length !== 1 ? "s" : ""} Selected
+                    </span>
+                    {selectedGroup && (
+                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] bg-[#0A77FF]/8 text-[#0A77FF]" style={{ fontWeight: 600 }}>
+                        <Star className="w-2.5 h-2.5 fill-[#0A77FF]" />
+                        Primary: {selectedGroup.name}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-[11px] text-[#94A3B8] mt-0.5">
+                    Configuration inherits from the primary group
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={onEditGroup}
+                className="group inline-flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-[#475569] hover:border-[#0A77FF] hover:text-[#0A77FF] hover:bg-[#EDF4FF] transition-all shrink-0 text-[11px] sm:text-xs cursor-pointer"
+                style={{ fontWeight: 600 }}
+              >
+                <Pencil className="w-3 h-3" />
+                <span className="hidden min-[400px]:inline">Edit Groups</span>
+              </button>
+            </div>
+            {/* Group chips row — single line with +N more overflow */}
+            <GroupChipsRow
+              allSelectedGroups={allSelectedGroups}
+              primaryGroupId={primaryGroupId}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* ── Partner Details — boxed card ── */}
+      <div className="rounded-lg border border-[#E2E8F0] bg-white overflow-visible shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
+        <div className="px-3 sm:px-4 py-2 sm:py-2.5 border-b border-[#EEF2F6] flex items-center gap-2 bg-[#FAFBFC]">
+          <div className="w-6 h-6 rounded-md bg-[#0A77FF]/8 flex items-center justify-center shrink-0">
+            <Info className="w-3.5 h-3.5 text-[#0A77FF]" />
+          </div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Partner Details</span>
+            <span className="text-[9px] sm:text-[10px] text-[#94A3B8] tracking-wider uppercase hidden min-[480px]:inline" style={{ fontWeight: 500 }}>Required</span>
+          </div>
+        </div>
+        <div className="px-2.5 sm:px-3 pt-2 sm:pt-2.5 pb-1.5 sm:pb-2">
+
+          {/* Mobile: Compact profile photo row */}
+          <div className="flex sm:hidden items-center gap-3 mb-3">
+            <input
+              ref={profileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleProfileFile(file);
+                e.target.value = "";
+              }}
+            />
+            <div
+              onClick={() => profileInputRef.current?.click()}
+              className={`relative w-14 h-14 rounded-xl cursor-pointer shrink-0 transition-all ${
+                profileImage
+                  ? "ring-2 ring-[#E2E8F0]"
+                  : "border-2 border-dashed border-[#CBD5E1] bg-[#F8FAFC]"
+              }`}
+            >
+              {profileImage ? (
+                <img src={profileImage} alt="Profile" className="w-full h-full rounded-xl object-cover" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center">
+                  <Camera className="w-5 h-5 text-[#94A3B8]" />
+                </div>
+              )}
+            </div>
+            <div className="min-w-0">
+              <p className="text-xs text-[#0F172A]" style={{ fontWeight: 500 }}>
+                {profileImage ? "Profile photo" : "Add a photo"}
+              </p>
+              <div className="flex items-center gap-2 mt-0.5">
+                <button
+                  type="button"
+                  onClick={() => profileInputRef.current?.click()}
+                  className="text-[11px] text-[#0A77FF]"
+                  style={{ fontWeight: 500 }}
+                >
+                  {profileImage ? "Change" : "Upload"}
+                </button>
+                {profileImage && (
+                  <>
+                    <span className="text-[#E2E8F0] text-[11px]">·</span>
+                    <button
+                      type="button"
+                      onClick={() => onProfileImageChange(null)}
+                      className="text-[11px] text-[#EF4444]"
+                      style={{ fontWeight: 500 }}
+                    >
+                      Remove
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Photo on left, all fields in 2-col grid on right */}
+          <div className="grid grid-cols-1 sm:grid-cols-[auto_1fr] gap-3 sm:gap-4">
+            {/* Left — Profile Picture Upload (square, LinkedIn-style) — desktop only */}
+            <div className="hidden sm:flex flex-col items-center w-[120px]">
+              <input
+                ref={profileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) handleProfileFile(file);
+                  e.target.value = "";
+                }}
+              />
+              <div
+                onClick={() => profileInputRef.current?.click()}
+                onDragOver={(e) => { e.preventDefault(); setProfileDragOver(true); }}
+                onDragLeave={() => setProfileDragOver(false)}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  setProfileDragOver(false);
+                  const file = e.dataTransfer.files?.[0];
+                  if (file) handleProfileFile(file);
+                }}
+                className={`relative w-full aspect-square rounded-xl cursor-pointer group transition-all ${
+                  profileImage
+                    ? "ring-2 ring-[#E2E8F0] hover:ring-[#0A77FF]/30"
+                    : profileDragOver
+                    ? "border-2 border-dashed border-[#0A77FF] bg-[#EDF4FF]"
+                    : "border-2 border-dashed border-[#CBD5E1] hover:border-[#0A77FF]/50 bg-[#F8FAFC] hover:bg-[#EDF4FF]/50"
+                }`}
+              >
+                {profileImage ? (
+                  <>
+                    <img
+                      src={profileImage}
+                      alt="Partner profile"
+                      className="w-full h-full rounded-xl object-cover"
+                    />
+                    <div className="absolute inset-0 rounded-xl bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center">
+                      <Camera className="w-5 h-5 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </div>
+                  </>
+                ) : (
+                  <div className="w-full h-full flex flex-col items-center justify-center gap-1.5">
+                    <div className="w-10 h-10 rounded-lg bg-[#F1F5F9] group-hover:bg-[#EDF4FF] flex items-center justify-center transition-colors">
+                      <Camera className="w-5 h-5 text-[#94A3B8] group-hover:text-[#0A77FF] transition-colors" />
+                    </div>
+                    <span className="text-[11px] text-[#94A3B8] group-hover:text-[#0A77FF] transition-colors" style={{ fontWeight: 500 }}>Upload photo</span>
+                    <span className="text-[9px] text-[#CBD5E1]">Max 5 MB</span>
+                  </div>
+                )}
+              </div>
+              {profileImage && (
+                <div className="flex items-center gap-2 mt-2">
+                  <button
+                    type="button"
+                    onClick={() => profileInputRef.current?.click()}
+                    className="text-[11px] text-[#0A77FF] hover:text-[#0862D0] transition-colors cursor-pointer"
+                    style={{ fontWeight: 500 }}
+                  >
+                    Change
+                  </button>
+                  <span className="text-[#E2E8F0] text-[11px]">·</span>
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); onProfileImageChange(null); }}
+                    className="text-[11px] text-[#EF4444] hover:text-[#DC2626] transition-colors cursor-pointer"
+                    style={{ fontWeight: 500 }}
+                  >
+                    Remove
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Right — all fields in a 2-column grid */}
+            <div className="grid grid-cols-1 min-[480px]:grid-cols-2 gap-x-3 sm:gap-x-4 gap-y-2.5 sm:gap-y-3">
+              {/* Row 1 Left: Partner Name */}
+              <div>
+                <Label htmlFor="create-partner-name" className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>
+                  Partner Name<span className="text-[#EF4444]">*</span>
+                </Label>
+                <Input
+                  id="create-partner-name"
+                  placeholder="e.g. Acme Supply Co."
+                  value={partnerName}
+                  onChange={(e) => onPartnerNameChange(e.target.value)}
+                  className="mt-1 rounded-lg border-[#E2E8F0] bg-white h-9 sm:h-10 text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
+                />
+                {errors.partnerName && (
+                  <p className="text-[#EF4444] text-xs mt-1">{errors.partnerName}</p>
+                )}
+              </div>
+
+              {/* Row 1 Right: Status */}
+              <div>
+                <Label className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>Status</Label>
+                <Select value={status} onValueChange={(val: string) => setStatus(val as "Active" | "Inactive")}>
+                  <SelectTrigger className="mt-1 h-9 sm:h-10 rounded-lg border-[#E2E8F0] bg-white text-sm hover:border-[#CBD5E1] transition-colors focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 [&>svg]:text-[#94A3B8]">
+                    <SelectValue>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full" style={{ backgroundColor: statusConfig[status].color }} />
+                        <span className="text-[#0F172A]">{statusConfig[status].label}</span>
+                      </div>
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent className="z-[250] rounded-lg">
+                    <SelectItem value="Active">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-[#10B981]" />
+                        Active
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="Inactive">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-[#EF4444]" />
+                        Inactive
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Row 2 Left: Phone Number */}
+              <div>
+                <Label htmlFor="create-partner-phone" className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>
+                  Phone Number
+                </Label>
+                <div className="flex items-center gap-0 mt-1">
+                  <Popover open={countryPickerOpen} onOpenChange={setCountryPickerOpen}>
+                    <PopoverTrigger asChild>
+                      <button
+                        type="button"
+                        className="flex items-center gap-1.5 pl-2.5 pr-1.5 h-9 sm:h-10 rounded-l-lg border border-r-0 border-[#E2E8F0] bg-white text-sm shrink-0 cursor-pointer hover:border-[#CBD5E1] transition-colors focus:outline-none focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
+                      >
+                        <span className="text-base leading-none">{selectedCountry.flag}</span>
+                        <span className="text-xs text-[#334155]" style={{ fontWeight: 600 }}>{phoneCountryCode}</span>
+                        <ChevronDown className="w-3 h-3 text-[#94A3B8]" />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-64 p-0 z-[200] rounded-xl shadow-lg border border-[#E2E8F0]" align="start" sideOffset={4}>
+                      <div className="p-2 border-b border-[#F1F5F9]">
+                        <div className="relative">
+                          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8]" />
+                          <input
+                            type="text"
+                            placeholder="Search country..."
+                            value={countrySearch}
+                            onChange={(e) => setCountrySearch(e.target.value)}
+                            className="w-full pl-8 pr-3 py-2 text-sm rounded-lg border border-[#E2E8F0] bg-white text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-none focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
+                          />
+                        </div>
+                      </div>
+                      <div className="max-h-[200px] overflow-y-auto p-1">
+                        {filteredCountries.map((c, i) => (
+                          <button
+                            key={`${c.code}-${c.country}-${i}`}
+                            type="button"
+                            onClick={() => {
+                              onPhoneCountryCodeChange(c.code);
+                              setCountryPickerOpen(false);
+                              setCountrySearch("");
+                            }}
+                            className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-left transition-colors ${
+                              phoneCountryCode === c.code && selectedCountry.country === c.country
+                                ? "bg-[#EDF4FF] text-[#0A77FF]"
+                                : "hover:bg-[#F8FAFC] text-[#334155]"
+                            }`}
+                          >
+                            <span className="text-base">{c.flag}</span>
+                            <span className="text-sm flex-1 truncate" style={{ fontWeight: 500 }}>{c.country}</span>
+                            <span className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>{c.code}</span>
+                            {phoneCountryCode === c.code && selectedCountry.country === c.country && (
+                              <Check className="w-3.5 h-3.5 text-[#0A77FF] shrink-0" />
+                            )}
+                          </button>
+                        ))}
+                        {filteredCountries.length === 0 && (
+                          <p className="text-xs text-[#94A3B8] text-center py-4">No countries found</p>
+                        )}
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                  <Input
+                    id="create-partner-phone"
+                    placeholder="(555) 123-4567"
+                    value={partnerPhone}
+                    onChange={(e) => onPartnerPhoneChange(e.target.value)}
+                    className="rounded-l-none rounded-r-lg border-[#E2E8F0] bg-white h-9 sm:h-10 text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
+                  />
+                </div>
+              </div>
+
+              {/* Row 2 Right: Website */}
+              <div>
+                <Label htmlFor="create-partner-website" className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>
+                  Website
+                </Label>
+                <Input
+                  id="create-partner-website"
+                  placeholder="https://example.com"
+                  value={website}
+                  onChange={(e) => onWebsiteChange(e.target.value)}
+                  className="mt-1 rounded-lg border-[#E2E8F0] bg-white h-9 sm:h-10 text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
+                />
+              </div>
+
+              {/* Row 3 Left: Address */}
+              <div ref={addressRef} className="relative">
+                <Label htmlFor="create-partner-address" className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>
+                  Address
+                </Label>
+                <div className="relative mt-1">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8] pointer-events-none z-[1]" />
+                  <Input
+                    id="create-partner-address"
+                    placeholder="Search for an address..."
+                    value={address}
+                    onChange={(e) => {
+                      onAddressChange(e.target.value);
+                      setAddressSelected(false);
+                    }}
+                    onFocus={() => {
+                      setAddressFocused(true);
+                      if (addressSelected) setAddressSelected(false);
+                    }}
+                    className={`pl-9 pr-8 rounded-lg border-[#E2E8F0] bg-white h-9 sm:h-10 text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 ${
+                      addressFocused && addressSuggestions.length > 0 ? "rounded-b-none border-b-transparent" : ""
+                    }`}
+                  />
+                  {address.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => { onAddressChange(""); setAddressFocused(true); setAddressSelected(false); }}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#94A3B8] hover:text-[#64748B] transition-colors z-[1]"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+
+                {/* Google Places–style suggestions dropdown */}
+                {addressFocused && addressSuggestions.length > 0 && (
+                  <div className="absolute left-0 right-0 top-[calc(100%)] z-50 rounded-b-lg border border-t-0 border-[#0A77FF] bg-white shadow-[0_8px_24px_rgba(0,0,0,0.12)] overflow-hidden ring-1 ring-[#0A77FF]/20">
+                    {addressSuggestions.map((suggestion, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => {
+                          onAddressChange(`${suggestion.main}, ${suggestion.secondary}`);
+                          setAddressFocused(false);
+                          setAddressSelected(true);
+                        }}
+                        className="w-full flex items-start gap-3 px-3 py-2.5 text-left hover:bg-[#F8FAFC] transition-colors cursor-pointer border-b border-[#F1F5F9] last:border-b-0 group/addr"
+                      >
+                        <div className="w-8 h-8 rounded-full bg-[#F1F5F9] group-hover/addr:bg-[#EDF4FF] flex items-center justify-center shrink-0 mt-0.5 transition-colors">
+                          <MapPin className="w-3.5 h-3.5 text-[#64748B] group-hover/addr:text-[#0A77FF] transition-colors" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 500 }}>{suggestion.main}</div>
+                          <div className="text-[11px] text-[#94A3B8] truncate mt-0.5">{suggestion.secondary}</div>
+                        </div>
+                      </button>
+                    ))}
+                    <div className="px-3 py-2 flex justify-end border-t border-[#E2E8F0] bg-[#FAFBFC]">
+                      <div className="flex items-center gap-1">
+                        <span className="text-[10px] text-[#9CA3AF]">Powered by</span>
+                        <svg width="52" height="16" viewBox="0 0 272 92" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M115.75 47.18c0 12.77-9.99 22.18-22.25 22.18s-22.25-9.41-22.25-22.18C71.25 34.32 81.24 25 93.5 25s22.25 9.32 22.25 22.18zm-9.74 0c0-7.98-5.79-13.44-12.51-13.44S80.99 39.2 80.99 47.18c0 7.9 5.79 13.44 12.51 13.44s12.51-5.55 12.51-13.44z" fill="#EA4335"/>
+                          <path d="M163.75 47.18c0 12.77-9.99 22.18-22.25 22.18s-22.25-9.41-22.25-22.18c0-12.85 9.99-22.18 22.25-22.18s22.25 9.32 22.25 22.18zm-9.74 0c0-7.98-5.79-13.44-12.51-13.44s-12.51 5.46-12.51 13.44c0 7.9 5.79 13.44 12.51 13.44s12.51-5.55 12.51-13.44z" fill="#FBBC05"/>
+                          <path d="M209.75 26.34v39.82c0 16.38-9.66 23.07-21.08 23.07-10.75 0-17.22-7.19-19.66-13.07l8.48-3.53c1.51 3.61 5.21 7.87 11.17 7.87 7.31 0 11.84-4.51 11.84-13v-3.19h-.34c-2.18 2.69-6.38 5.04-11.68 5.04-11.09 0-21.25-9.66-21.25-22.09 0-12.52 10.16-22.26 21.25-22.26 5.29 0 9.49 2.35 11.68 4.96h.34v-3.61h9.25zm-8.56 20.92c0-7.81-5.21-13.52-11.84-13.52-6.72 0-12.35 5.71-12.35 13.52 0 7.73 5.63 13.36 12.35 13.36 6.63 0 11.84-5.63 11.84-13.36z" fill="#4285F4"/>
+                          <path d="M225 3v65h-9.5V3h9.5z" fill="#34A853"/>
+                          <path d="M262.02 54.48l7.56 5.04c-2.44 3.61-8.32 9.83-18.48 9.83-12.6 0-22.01-9.74-22.01-22.18 0-13.19 9.49-22.18 20.92-22.18 11.51 0 17.14 9.16 18.98 14.11l1.01 2.52-29.65 12.28c2.27 4.45 5.8 6.72 10.75 6.72 4.96 0 8.4-2.44 10.92-6.14zm-23.27-7.98l19.82-8.23c-1.09-2.77-4.37-4.7-8.23-4.7-4.95 0-11.84 4.37-11.59 12.93z" fill="#EA4335"/>
+                          <path d="M35.29 41.19V32H67.6c.32 1.68.48 3.67.48 5.83 0 7.23-1.97 16.17-8.32 22.51C53.65 66.67 46.01 70 35.29 70 15.82 70 0 54.73 0 35.26S15.82.52 35.29.52c10.8 0 18.52 4.25 24.27 9.74l-6.82 6.82c-4.1-3.86-9.66-6.82-17.45-6.82C22.47 10.27 10.11 23.02 10.11 35.27c0 12.25 12.36 25 25.18 25 9.19 0 14.4-3.69 17.72-7.02 2.7-2.7 4.46-6.56 5.15-11.84H35.29z" fill="#4285F4"/>
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Row 3 Right: Description */}
+              <div className="relative">
+                <Label className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>Description</Label>
+                <textarea
+                  placeholder="Brief summary of partner purpose or context."
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  className="mt-1 w-full h-[64px] sm:h-[72px] rounded-lg border border-[#E2E8F0] bg-white px-3 py-2 pb-5 text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 focus:outline-none resize-none transition-colors"
+                />
+                <p className="absolute bottom-1.5 right-2.5 text-[11px] text-[#94A3B8] pointer-events-none">{description.length}/500</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Partner Type Selection ── */}
+      <div>
+        <div className="flex items-center gap-2 mb-2.5">
+          <div className="w-6 h-6 rounded-md bg-[#0A77FF]/8 flex items-center justify-center shrink-0">
+            <Users className="w-3.5 h-3.5 text-[#0A77FF]" />
+          </div>
+          <div>
+            <span className="text-xs sm:text-[13px] text-[#0F172A] block" style={{ fontWeight: 600 }}>Partner Type</span>
+            <span className="text-[10px] sm:text-[11px] text-[#94A3B8] block mt-px">Select one or more partner classifications</span>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          {/* Vendor Card */}
+          <div
+            onClick={() => onPartnerTypeChange("vendor")}
+            className={`group relative rounded-xl overflow-hidden border transition-all duration-200 cursor-pointer ${
+              selectedPartnerTypes.has("vendor")
+                ? "border-[#93C5FD]/70 bg-white shadow-[0_1px_4px_rgba(10,119,255,0.06)]"
+                : "border-[#E2E8F0] bg-white hover:border-[#BFDBFE] hover:shadow-[0_4px_16px_-4px_rgba(10,119,255,0.12)]"
+            }`}
+          >
+            {/* Gradient hover overlay */}
+            <div className={`absolute inset-0 transition-all duration-300 pointer-events-none ${
+              selectedPartnerTypes.has("vendor")
+                ? "bg-gradient-to-br from-[#EFF6FF]/50 to-transparent"
+                : "bg-gradient-to-br from-[#EDF4FF]/0 to-[#EDF4FF]/0 group-hover:from-[#EDF4FF]/60 group-hover:to-transparent"
+            }`} />
+            <div className="relative flex items-center gap-3 pl-3.5 pr-3 py-3">
+              <div className={`w-9 h-9 rounded-[10px] flex items-center justify-center shrink-0 transition-all duration-200 ${
+                selectedPartnerTypes.has("vendor")
+                  ? "bg-gradient-to-br from-[#DBEAFE] to-[#BFDBFE] text-[#2563EB]"
+                  : "bg-gradient-to-br from-[#EDF4FF] to-[#DBEAFE] text-[#0A77FF] group-hover:scale-105"
+              }`}>
+                <Truck className="w-[18px] h-[18px]" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className={`text-[13px] transition-colors duration-150 ${
+                  selectedPartnerTypes.has("vendor") ? "text-[#1E40AF]" : "text-[#0F172A] group-hover:text-[#1E293B]"
+                }`} style={{ fontWeight: 600 }}>Vendor</p>
+                <p className={`text-[11px] mt-0.5 truncate transition-colors duration-150 ${
+                  selectedPartnerTypes.has("vendor") ? "text-[#60A5FA]" : "text-[#94A3B8]"
+                }`}>Supplies goods or services</p>
+              </div>
+              <div className="flex items-center gap-1.5 shrink-0">
+                {selectedPartnerTypes.has("vendor") && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onOpenConfigure("vendor");
+                    }}
+                    className="inline-flex items-center gap-1 px-2 py-[5px] rounded-md bg-white/80 border border-[#93C5FD]/40 text-[#2563EB] text-[11px] hover:bg-white hover:border-[#93C5FD]/70 hover:shadow-sm transition-all duration-150 shrink-0"
+                    style={{ fontWeight: 500 }}
+                  >
+                    <Settings2 className="w-3 h-3" />
+                    <span className="hidden min-[480px]:inline">Configure</span>
+                  </button>
+                )}
+                <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-all duration-200 shrink-0 ${
+                  selectedPartnerTypes.has("vendor")
+                    ? "bg-[#3B82F6] shadow-[0_0_0_2px_rgba(59,130,246,0.15)]"
+                    : "border-[1.5px] border-[#D1D5DB] bg-white group-hover:border-[#93C5FD]"
+                }`}>
+                  {selectedPartnerTypes.has("vendor") && <Check className="w-3 h-3 text-white" strokeWidth={2.5} />}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Customer Card */}
+          <div
+            onClick={() => onPartnerTypeChange("customer")}
+            className={`group relative rounded-xl overflow-hidden border transition-all duration-200 cursor-pointer ${
+              selectedPartnerTypes.has("customer")
+                ? "border-[#C4B5FD]/70 bg-white shadow-[0_1px_4px_rgba(139,92,246,0.06)]"
+                : "border-[#E2E8F0] bg-white hover:border-[#D5D3EC] hover:shadow-[0_4px_16px_-4px_rgba(124,58,237,0.10)]"
+            }`}
+          >
+            {/* Gradient hover overlay */}
+            <div className={`absolute inset-0 transition-all duration-300 pointer-events-none ${
+              selectedPartnerTypes.has("customer")
+                ? "bg-gradient-to-br from-[#F5F3FF]/50 to-transparent"
+                : "bg-gradient-to-br from-[#F5F3FF]/0 to-[#F5F3FF]/0 group-hover:from-[#F5F3FF]/60 group-hover:to-transparent"
+            }`} />
+            <div className="relative flex items-center gap-3 pl-3.5 pr-3 py-3">
+              <div className={`w-9 h-9 rounded-[10px] flex items-center justify-center shrink-0 transition-all duration-200 ${
+                selectedPartnerTypes.has("customer")
+                  ? "bg-gradient-to-br from-[#EDE9FE] to-[#DDD6FE] text-[#7C3AED]"
+                  : "bg-gradient-to-br from-[#F5F3FF] to-[#EDE9FE] text-[#8B5CF6] group-hover:scale-105"
+              }`}>
+                <ShoppingCart className="w-[18px] h-[18px]" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className={`text-[13px] transition-colors duration-150 ${
+                  selectedPartnerTypes.has("customer") ? "text-[#5B21B6]" : "text-[#0F172A] group-hover:text-[#1E293B]"
+                }`} style={{ fontWeight: 600 }}>Customer</p>
+                <p className={`text-[11px] mt-0.5 truncate transition-colors duration-150 ${
+                  selectedPartnerTypes.has("customer") ? "text-[#A78BFA]" : "text-[#94A3B8]"
+                }`}>Purchases goods or services</p>
+              </div>
+              <div className="flex items-center gap-1.5 shrink-0">
+                {selectedPartnerTypes.has("customer") && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onOpenConfigure("customer");
+                    }}
+                    className="inline-flex items-center gap-1 px-2 py-[5px] rounded-md bg-white/80 border border-[#C4B5FD]/40 text-[#7C3AED] text-[11px] hover:bg-white hover:border-[#C4B5FD]/70 hover:shadow-sm transition-all duration-150 shrink-0"
+                    style={{ fontWeight: 500 }}
+                  >
+                    <Settings2 className="w-3 h-3" />
+                    <span className="hidden min-[480px]:inline">Configure</span>
+                  </button>
+                )}
+                <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-all duration-200 shrink-0 ${
+                  selectedPartnerTypes.has("customer")
+                    ? "bg-[#8B5CF6] shadow-[0_0_0_2px_rgba(139,92,246,0.15)]"
+                    : "border-[1.5px] border-[#D1D5DB] bg-white group-hover:border-[#C4B5FD]"
+                }`}>
+                  {selectedPartnerTypes.has("customer") && <Check className="w-3 h-3 text-white" strokeWidth={2.5} />}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Global Point of Contact (Partner-Level) — compact card ── */}
+      <div>
+        <div className="flex items-center gap-2 mb-2.5">
+          <div className="w-6 h-6 rounded-md bg-[#0A77FF]/8 flex items-center justify-center shrink-0">
+            <Globe className="w-3.5 h-3.5 text-[#0A77FF]" />
+          </div>
+          <div>
+            <span className="text-xs sm:text-[13px] text-[#0F172A] block" style={{ fontWeight: 600 }}>Global Point of Contact</span>
+            <span className="text-[10px] sm:text-[11px] text-[#94A3B8] block mt-px">Assign partner-level contacts across all locations</span>
+          </div>
+        </div>
+        {selectedGlobalPocContacts.length > 0 ? (
+          <div className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden relative">
+            <PocPillsRow contacts={selectedGlobalPocContacts} onManage={handleOpenSelectGlobalPoc} />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {/* Select from Contact Directory */}
+            <button
+              onClick={handleOpenSelectGlobalPoc}
+              className="group relative rounded-xl overflow-hidden border border-[#E2E8F0] bg-white text-left transition-all duration-200 hover:border-[#BFDBFE] hover:shadow-[0_4px_16px_-4px_rgba(10,119,255,0.12)] cursor-pointer"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-[#EDF4FF]/0 to-[#EDF4FF]/0 group-hover:from-[#EDF4FF]/60 group-hover:to-transparent transition-all duration-300 pointer-events-none" />
+              <div className="relative flex items-center gap-3 pl-3.5 pr-3 py-3">
+                <div className="w-9 h-9 rounded-[10px] bg-gradient-to-br from-[#EDF4FF] to-[#DBEAFE] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform duration-200">
+                  <Users className="w-[18px] h-[18px] text-[#0A77FF]" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Select from Contact Directory</p>
+                  <p className="text-[11px] text-[#94A3B8] mt-0.5 truncate">Browse and pick from saved contacts</p>
+                </div>
+              </div>
+            </button>
+            {/* Create new contact */}
+            <button
+              onClick={handleOpenCreateGlobalPoc}
+              className="group relative rounded-xl overflow-hidden border border-[#E2E8F0] bg-white text-left transition-all duration-200 hover:border-[#D5D3EC] hover:shadow-[0_4px_16px_-4px_rgba(124,58,237,0.10)] cursor-pointer"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-[#F5F3FF]/0 to-[#F5F3FF]/0 group-hover:from-[#F5F3FF]/60 group-hover:to-transparent transition-all duration-300 pointer-events-none" />
+              <div className="relative flex items-center gap-3 pl-3.5 pr-3 py-3">
+                <div className="w-9 h-9 rounded-[10px] bg-gradient-to-br from-[#F5F3FF] to-[#EDE9FE] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform duration-200">
+                  <UserPlus className="w-[18px] h-[18px] text-[#7C3AED]" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Create new contact</p>
+                  <p className="text-[11px] text-[#94A3B8] mt-0.5 truncate">Add a new point of contact directly</p>
+                </div>
+              </div>
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Select Global POC Modal */}
+      <SelectPocDictionaryModal
+        open={showSelectGlobalPocModal}
+        onOpenChange={setShowSelectGlobalPocModal}
+        contactDictionary={globalPocContactDictionary}
+        pocSearch={globalPocSearch}
+        onPocSearchChange={(v) => { setGlobalPocSearch(v); setGlobalPocPage(1); }}
+        pocCategoryFilter={globalPocCategoryFilter}
+        onPocCategoryFilterChange={(v) => { setGlobalPocCategoryFilter(v); setGlobalPocPage(1); }}
+        pocDepartmentCounts={globalPocDeptCounts}
+        pocPagedContacts={globalPocPagedContacts}
+        pocPage={globalPocPage}
+        pocTotalPages={globalPocTotalPages}
+        onPocPageChange={setGlobalPocPage}
+        pocTempSelected={globalPocTempSelected}
+        onTogglePocTemp={handleToggleGlobalPocTemp}
+        onConfirm={handleConfirmGlobalPocSelection}
+        onOpenCreatePoc={handleOpenCreateGlobalPoc}
+        contextLabel="this partner"
+      />
+
+      {/* Create Global POC Modal */}
+      <CreatePocModal
+        open={showCreateGlobalPocModal}
+        onOpenChange={setShowCreateGlobalPocModal}
+        contextName={partnerName}
+        newPocName={gNewPocName}
+        onNewPocNameChange={setGNewPocName}
+        newPocDepartment={gNewPocDepartment}
+        onNewPocDepartmentChange={setGNewPocDepartment}
+        newPocRole={gNewPocRole}
+        onNewPocRoleChange={setGNewPocRole}
+        newPocLandline={gNewPocLandline}
+        onNewPocLandlineChange={setGNewPocLandline}
+        newPocLandlineCode={gNewPocLandlineCode}
+        onNewPocLandlineCodeChange={setGNewPocLandlineCode}
+        newPocExt={gNewPocExt}
+        onNewPocExtChange={setGNewPocExt}
+        newPocMobile={gNewPocMobile}
+        onNewPocMobileChange={setGNewPocMobile}
+        newPocMobileCode={gNewPocMobileCode}
+        onNewPocMobileCodeChange={setGNewPocMobileCode}
+        newPocEmail={gNewPocEmail}
+        onNewPocEmailChange={setGNewPocEmail}
+        saveAndCreateAnother={gSaveAndCreateAnother}
+        onSaveAndCreateAnotherChange={setGSaveAndCreateAnother}
+        onSave={handleSaveGlobalNewPoc}
+      />
+
+      {/* ── Attachments ── */}
+      <AttachmentsSection />
+    </div>
+  );
+}
+
+// ── Partner Type Card ──
+function PartnerTypeCard({
+  type,
+  label,
+  description,
+  icon,
+  isSelected,
+  onSelect,
+  onConfigure,
+}: {
+  type: "vendor" | "customer";
+  label: string;
+  description: string;
+  icon: React.ReactNode;
+  isSelected: boolean;
+  onSelect: () => void;
+  onConfigure: () => void;
+}) {
+  return (
+    <div
+      onClick={onSelect}
+      className={`rounded-lg border transition-all cursor-pointer ${
+        isSelected
+          ? "border-[#0A77FF] bg-[#F8FAFF] shadow-[0_0_0_3px_rgba(10,119,255,0.06)]"
+          : "border-[#E2E8F0] bg-white hover:border-[#CBD5E1] hover:bg-[#FAFBFC]"
+      }`}
+    >
+      <div className="flex items-center gap-2 sm:gap-2.5 px-2.5 sm:px-3 py-2.5 sm:py-2.5">
+        {/* Checkbox */}
+        <div
+          className={`w-[18px] h-[18px] rounded flex items-center justify-center border-[1.5px] transition-all duration-150 shrink-0 ${
+            isSelected ? "border-[#0A77FF] bg-[#0A77FF] shadow-[0_0_0_2px_rgba(10,119,255,0.12)]" : "border-[#CBD5E1] bg-white"
+          }`}
+        >
+          {isSelected && <Check className="w-3 h-3 text-white" />}
+        </div>
+        <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center shrink-0 ${
+          isSelected ? "bg-[#D6E8FF] text-[#0A77FF]" : "bg-[#F1F5F9] text-[#64748B]"
+        }`}>
+          {React.cloneElement(icon as React.ReactElement, { className: "w-4 h-4 sm:w-5 sm:h-5" })}
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+            <p className={`text-xs sm:text-[13px] ${isSelected ? "text-[#0A77FF]" : "text-[#0F172A]"}`} style={{ fontWeight: 600 }}>{label}</p>
+            {isSelected && (
+              <span className="inline-flex items-center px-1.5 py-px rounded-full bg-[#EDF4FF] text-[#0A77FF] text-[9px] sm:text-[10px]" style={{ fontWeight: 600 }}>
+                Selected
+              </span>
+            )}
+          </div>
+          <p className="text-[10px] sm:text-[11px] text-[#64748B] mt-px hidden min-[400px]:block">{description}</p>
+        </div>
+
+        {/* Compact Configure CTA — only visible when selected */}
+        {isSelected && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onConfigure();
+            }}
+            className="inline-flex items-center gap-1 px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-md border border-[#E2E8F0] text-[#0F172A] bg-white text-[11px] sm:text-xs hover:bg-[#F8FAFC] hover:border-[#CBD5E1] transition-colors shrink-0"
+            style={{ fontWeight: 500 }}
+          >
+            <Settings2 className="w-3 h-3 text-[#64748B]" />
+            <span className="hidden min-[480px]:inline">Configure</span>
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── Attachments Section ──
+function AttachmentsSection() {
+  const [files, setFiles] = useState<{ id: string; name: string; size: string; type: string }[]>([]);
+  const [dragActive, setDragActive] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1048576) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / 1048576).toFixed(1)} MB`;
+  };
+
+  const handleFiles = (fileList: FileList | null) => {
+    if (!fileList) return;
+    const newFiles = Array.from(fileList).map((f) => ({
+      id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      name: f.name,
+      size: formatFileSize(f.size),
+      type: f.type,
+    }));
+    setFiles((prev) => [...prev, ...newFiles]);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragActive(false);
+    handleFiles(e.dataTransfer.files);
+  };
+
+  const handleRemove = (id: string) => {
+    setFiles((prev) => prev.filter((f) => f.id !== id));
+  };
+
+  const getFileIcon = (type: string) => {
+    if (type.startsWith("image/")) return "🖼️";
+    if (type.includes("pdf")) return "📄";
+    if (type.includes("spreadsheet") || type.includes("excel") || type.includes("csv")) return "📊";
+    if (type.includes("word") || type.includes("document")) return "📝";
+    return "📎";
+  };
+
+  return (
+    <div>
+      <div className="flex items-center gap-2 mb-2.5">
+        <div className="w-6 h-6 rounded-md bg-[#0A77FF]/8 flex items-center justify-center shrink-0">
+          <Paperclip className="w-3.5 h-3.5 text-[#0A77FF]" />
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Attachments</span>
+          {files.length > 0 && (
+            <span className="text-[10px] text-[#64748B] bg-[#F1F5F9] px-1.5 py-0.5 rounded-full" style={{ fontWeight: 500 }}>{files.length}</span>
+          )}
+        </div>
+      </div>
+
+      {/* Drop zone */}
+      <div
+        onDragOver={(e) => { e.preventDefault(); setDragActive(true); }}
+        onDragLeave={() => setDragActive(false)}
+        onDrop={handleDrop}
+        onClick={() => fileInputRef.current?.click()}
+        className={`rounded-lg border-2 border-dashed p-3 sm:p-4 text-center cursor-pointer transition-all ${
+          dragActive
+            ? "border-[#0A77FF] bg-[#EDF4FF]/30"
+            : "border-[#E2E8F0] bg-white hover:border-[#CBD5E1] hover:bg-[#FAFBFC]"
+        }`}
+      >
+        <input
+          ref={fileInputRef}
+          type="file"
+          multiple
+          onChange={(e) => handleFiles(e.target.files)}
+          className="hidden"
+        />
+        <div className="flex flex-col items-center gap-2">
+          <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+            dragActive ? "bg-[#D6E8FF] text-[#0A77FF]" : "bg-[#F1F5F9] text-[#94A3B8]"
+          }`}>
+            <Upload className="w-5 h-5" />
+          </div>
+          <div>
+            <p className="text-xs sm:text-sm text-[#0F172A]" style={{ fontWeight: 500 }}>
+              <span className="text-[#0A77FF]">Click to upload</span><span className="hidden sm:inline"> or drag and drop</span>
+            </p>
+            <p className="text-[10px] sm:text-xs text-[#94A3B8] mt-0.5">PDF, DOC, XLS, PNG, JPG up to 10MB</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Uploaded files list */}
+      {files.length > 0 && (
+        <div className="mt-2.5 space-y-1.5">
+          {files.map((file) => (
+            <div
+              key={file.id}
+              className="flex items-center gap-2.5 px-3 py-2 rounded-md border border-[#E2E8F0] bg-white hover:bg-[#FAFBFC] transition-colors group"
+            >
+              <span className="text-base">{getFileIcon(file.type)}</span>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm text-[#0F172A] truncate" style={{ fontWeight: 500 }}>{file.name}</p>
+                <p className="text-[11px] text-[#94A3B8]">{file.size}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => handleRemove(file.id)}
+                className="w-7 h-7 rounded-md flex items-center justify-center text-[#94A3B8] hover:text-[#EF4444] hover:bg-[#FEF2F2] transition-colors sm:opacity-0 sm:group-hover:opacity-100"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Configuration Sub-page: Unified Sidebar Nav ──
+function ConfigUnifiedNav({
+  subTypes,
+  sections,
+  selectedSubTypes,
+  activeSubTypeTab,
+  activeSection,
+  onToggleSubType,
+  onSetActiveSubType,
+  onActiveSectionChange,
+}: {
+  subTypes: VendorSubType[];
+  sections: ConfigSection[];
+  selectedSubTypes: Set<string>;
+  activeSubTypeTab: string;
+  activeSection: string;
+  onToggleSubType: (id: string) => void;
+  onSetActiveSubType: (id: string) => void;
+  onActiveSectionChange: (id: string) => void;
+}) {
+  return (
+    <>
+      {/* Mobile: horizontal scrollable nav */}
+      <div className="sm:hidden shrink-0 border-b border-[#EEF2F6] bg-white overflow-x-auto scrollbar-hide">
+        <nav className="flex flex-col">
+          <div className="flex px-3 py-2 gap-1.5 min-w-max">
+            {subTypes.map((subType) => {
+              const isEnabled = selectedSubTypes.has(subType.id);
+              const isActive = activeSubTypeTab === subType.id;
+              return (
+                <button
+                  key={subType.id}
+                  onClick={() => {
+                    if (!isEnabled) onToggleSubType(subType.id);
+                    onSetActiveSubType(subType.id);
+                  }}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg text-left transition-all whitespace-nowrap shrink-0 ${
+                    isActive && isEnabled
+                      ? "bg-[#EDF4FF] text-[#0A77FF]"
+                      : isActive
+                      ? "bg-[#F8FAFC] text-[#475569]"
+                      : isEnabled
+                      ? "text-[#475569] hover:bg-[#F8FAFC]"
+                      : "text-[#94A3B8] hover:bg-[#F8FAFC]"
+                  }`}
+                >
+                  <div className={`w-6 h-6 rounded-md flex items-center justify-center shrink-0 ${
+                    isActive && isEnabled ? "bg-white text-[#0A77FF] shadow-sm" : isEnabled ? "bg-[#F1F5F9] text-[#64748B]" : "bg-[#F1F5F9] text-[#CBD5E1]"
+                  }`}>
+                    {React.cloneElement(subType.icon as React.ReactElement, { className: "w-3.5 h-3.5" })}
+                  </div>
+                  <span className="text-xs" style={{ fontWeight: isActive ? 600 : 500 }}>{subType.label}</span>
+                  {isEnabled && !isActive && <span className="w-1.5 h-1.5 rounded-full bg-[#0A77FF] shrink-0" />}
+                </button>
+              );
+            })}
+          </div>
+          {/* Mobile config section pills */}
+          {selectedSubTypes.has(activeSubTypeTab) && (
+            <div className="flex px-3 pb-2 gap-1 min-w-max overflow-x-auto scrollbar-hide border-t border-[#F1F5F9] pt-1.5">
+              {sections.map((section) => {
+                const isActive = section.id === activeSection;
+                return (
+                  <button
+                    key={section.id}
+                    onClick={() => onActiveSectionChange(section.id)}
+                    className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-[11px] transition-all whitespace-nowrap ${
+                      isActive ? "bg-[#0A77FF] text-white" : "text-[#64748B] hover:bg-[#F1F5F9]"
+                    }`}
+                    style={{ fontWeight: isActive ? 600 : 500 }}
+                  >
+                    {section.title}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </nav>
+      </div>
+
+      {/* Desktop: unified vertical accordion sidebar */}
+      <div className="hidden sm:flex sm:flex-col w-[252px] lg:w-[268px] shrink-0 border-r border-[#EEF2F6] bg-white overflow-y-auto">
+        <div className="px-3.5 pt-3.5 pb-1.5">
+          <p className="text-[10px] text-[#94A3B8] uppercase tracking-wider" style={{ fontWeight: 600 }}>Sub-types</p>
+        </div>
+        <nav className="flex flex-col px-1.5 pb-3 flex-1">
+          {subTypes.map((subType, index) => {
+            const isEnabled = selectedSubTypes.has(subType.id);
+            const isExpanded = activeSubTypeTab === subType.id;
+            const isSeller = subType.id === "seller_items";
+
+            return (
+              <div key={subType.id}>
+                {/* Sub-type header row */}
+                <div
+                  className={`group flex items-center gap-2 px-2 py-[7px] rounded-md cursor-pointer transition-colors duration-150 ${
+                    isExpanded ? "bg-transparent" : "hover:bg-[#F1F5F9]/60"
+                  }`}
+                  onClick={() => {
+                    onSetActiveSubType(subType.id);
+                    if (!isExpanded && isEnabled && isSeller) {
+                      onActiveSectionChange(sections[0]?.id || activeSection);
+                    }
+                  }}
+                >
+                  {/* Expand/collapse chevron */}
+                  <ChevronRight className={`w-3 h-3 shrink-0 transition-transform duration-150 ${
+                    isExpanded ? "rotate-90 text-[#64748B]" : "text-[#CBD5E1] group-hover:text-[#94A3B8]"
+                  }`} />
+
+                  {/* Icon */}
+                  <div className={`w-6 h-6 rounded-md flex items-center justify-center shrink-0 transition-colors duration-150 ${
+                    isExpanded
+                      ? "bg-[#0A77FF] text-white"
+                      : isEnabled
+                      ? "bg-[#DBEAFE] text-[#0A77FF]"
+                      : "bg-[#F1F5F9] text-[#94A3B8]"
+                  }`}>
+                    {React.cloneElement(subType.icon as React.ReactElement, { className: "w-3.5 h-3.5" })}
+                  </div>
+
+                  {/* Label */}
+                  <span className={`flex-1 min-w-0 text-[13px] truncate transition-colors duration-150 ${
+                    isExpanded
+                      ? "text-[#0F172A]"
+                      : isEnabled
+                      ? "text-[#1E293B]"
+                      : "text-[#64748B] group-hover:text-[#334155]"
+                  }`} style={{ fontWeight: isExpanded ? 600 : isEnabled ? 500 : 400 }}>
+                    {subType.label}
+                  </span>
+
+                  {/* Toggle checkbox */}
+                  <span
+                    role="checkbox"
+                    aria-checked={isEnabled}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onToggleSubType(subType.id);
+                    }}
+                    className={`relative w-4 h-4 rounded border-[1.5px] flex items-center justify-center shrink-0 transition-colors duration-150 cursor-pointer ${
+                      isEnabled
+                        ? "bg-[#0A77FF] border-[#0A77FF]"
+                        : "border-[#CBD5E1] bg-white hover:border-[#94A3B8]"
+                    }`}
+                  >
+                    {isEnabled && <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />}
+                  </span>
+                </div>
+
+                {/* Nested config sections — only for seller type */}
+                <div
+                  className="overflow-hidden transition-all duration-200 ease-out"
+                  style={{
+                    maxHeight: isExpanded && isSeller ? `${sections.length * 34 + 8}px` : "0px",
+                    opacity: isExpanded && isSeller ? 1 : 0,
+                  }}
+                >
+                  <div className="ml-[18px] pl-[14px] border-l-[1.5px] border-[#E2E8F0] py-0.5">
+                    {sections.map((section) => {
+                      const isSectionActive = isExpanded && isEnabled && section.id === activeSection;
+                      const isDisabledSection = !isEnabled;
+                      return (
+                        <button
+                          key={section.id}
+                          onClick={() => {
+                            if (isDisabledSection) return;
+                            onActiveSectionChange(section.id);
+                          }}
+                          className={`group/item w-full flex items-center gap-2 px-2 py-[6px] rounded-md text-left transition-colors duration-150 ${
+                            isSectionActive
+                              ? "bg-[#EDF4FF]"
+                              : isDisabledSection
+                              ? "opacity-30 cursor-not-allowed"
+                              : "hover:bg-[#F1F5F9]/60"
+                          }`}
+                        >
+                          <span className={`transition-colors duration-150 ${
+                            isSectionActive
+                              ? "text-[#0A77FF]"
+                              : isDisabledSection
+                              ? "text-[#CBD5E1]"
+                              : "text-[#94A3B8] group-hover/item:text-[#64748B]"
+                          }`}>
+                            {React.cloneElement(section.icon as React.ReactElement, { className: "w-3.5 h-3.5" })}
+                          </span>
+                          <span className={`text-[12.5px] truncate transition-colors duration-150 ${
+                            isSectionActive
+                              ? "text-[#0A77FF]"
+                              : isDisabledSection
+                              ? "text-[#94A3B8]"
+                              : "text-[#475569] group-hover/item:text-[#1E293B]"
+                          }`} style={{ fontWeight: isSectionActive ? 600 : 400 }}>
+                            {section.title}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </nav>
+      </div>
+    </>
+  );
+}
+
+
+// ── Configuration Sub-page: Content (matches reference image) ──
+function ConfigPageContent({
+  sectionId,
+  configType,
+  selectedGroup,
+  partnerName,
+  configDataRef,
+}: {
+  sectionId: string;
+  configType: "vendor" | "customer";
+  selectedGroup: PartnerGroup | null;
+  partnerName: string;
+  configDataRef: React.MutableRefObject<Record<string, unknown>>;
+}) {
+  const sections = configType === "vendor" ? VENDOR_CONFIG_SECTIONS : CUSTOMER_CONFIG_SECTIONS;
+  const currentSection = sections.find((s) => s.id === sectionId) || sections[0];
+
+  // Local interactive state for pill/radio selections
+  const [billingType, setBillingType] = useState("domestic");
+  const [shippingPref, setShippingPref] = useState("same_as_billing");
+  const [enforcement, setEnforcement] = useState("hard_block");
+  const [paymentTerm, setPaymentTerm] = useState("net_30");
+  const [pricingTier, setPricingTier] = useState("standard");
+  const [shippingMethod, setShippingMethod] = useState("ground");
+
+  // Payment Terms Presets state
+  const [selectedPaymentTermId, setSelectedPaymentTermId] = useState<string | null>(null);
+  const [paymentTermsModalOpen, setPaymentTermsModalOpen] = useState(false);
+  const [ptSidebarFilter, setPtSidebarFilter] = useState("all");
+  const [ptSearch, setPtSearch] = useState("");
+  const [ptSortBy, setPtSortBy] = useState<"name" | "vendorsApplied" | "duration" | "category">("name");
+  const [ptSortDir, setPtSortDir] = useState<"asc" | "desc">("asc");
+  const [ptSortOpen, setPtSortOpen] = useState(false);
+  const [previewPaymentTermId, setPreviewPaymentTermId] = useState<string | null>(null);
+  const [previewTab, setPreviewTab] = useState("items");
+  const [ptFullscreen, setPtFullscreen] = useState(false);
+  const [aboutPtOpen, setAboutPtOpen] = useState(true);
+  const [vendorsPtOpen, setVendorsPtOpen] = useState(true);
+  const [standalonePtDetailOpen, setStandalonePtDetailOpen] = useState(false);
+  const [standalonePtDetailTerm, setStandalonePtDetailTerm] = useState<PaymentTermPreset | null>(null);
+
+  // Create Payment Terms modal state
+  const [createPtModalOpen, setCreatePtModalOpen] = useState(false);
+  const [createPtFullscreen, setCreatePtFullscreen] = useState(false);
+  const [createPtName, setCreatePtName] = useState("");
+  const [createPtType, setCreatePtType] = useState<"net" | "prepayment" | "split">("net");
+  const [createPtTrigger, setCreatePtTrigger] = useState("order_confirmation");
+  const [createPtDuration, setCreatePtDuration] = useState("30");
+  const [createPtDescription, setCreatePtDescription] = useState("");
+  const [createPtApplyDiscount, setCreatePtApplyDiscount] = useState(false);
+  const [createPtDiscountPercent, setCreatePtDiscountPercent] = useState("");
+  const [createPtDiscountPeriod, setCreatePtDiscountPeriod] = useState("30");
+
+  function resetCreatePtForm() {
+    setCreatePtName("");
+    setCreatePtType("net");
+    setCreatePtTrigger("order_confirmation");
+    setCreatePtDuration("30");
+    setCreatePtDescription("");
+    setCreatePtApplyDiscount(false);
+    setCreatePtDiscountPercent("");
+    setCreatePtDiscountPeriod("30");
+  }
+
+  function handleDuplicatePaymentTerm(term: PaymentTermPreset) {
+    resetCreatePtForm();
+    setCreatePtName(`duplicate-${term.name}`);
+    const categoryToType = (c: PaymentTermCategory): "net" | "prepayment" | "split" =>
+      c === "net" ? "net" : c === "prepayment" ? "prepayment" : "split";
+    setCreatePtType(categoryToType(term.category));
+    // Map trigger label back to id
+    const triggerMatch = CREATE_PT_TRIGGERS.find((t) => t.label === term.trigger);
+    if (triggerMatch) setCreatePtTrigger(triggerMatch.id);
+    if (term.duration) setCreatePtDuration(term.duration);
+    setCreatePtDescription(term.description);
+    if (term.applyDiscount) {
+      setCreatePtApplyDiscount(true);
+      if (term.discountPercent) setCreatePtDiscountPercent(term.discountPercent);
+      if (term.discountPeriod) setCreatePtDiscountPeriod(term.discountPeriod);
+    }
+    setPaymentTermsModalOpen(false);
+    setCreatePtModalOpen(true);
+  }
+
+  function handleSaveNewPaymentTerm() {
+    if (!createPtName.trim()) {
+      toast.error("Please enter a payment term name.");
+      return;
+    }
+    const typeLabel = createPtType === "net" ? "NET" : createPtType === "prepayment" ? "Pre" : "Split";
+    const badgeColor = createPtType === "net" ? "#0A77FF" : createPtType === "prepayment" ? "#7C3AED" : "#D97706";
+    const triggerLabel = CREATE_PT_TRIGGERS.find((t) => t.id === createPtTrigger)?.label || createPtTrigger;
+
+    // Auto-generate a rich description if the user didn't provide one
+    let autoDescription = "";
+    if (createPtDescription.trim()) {
+      autoDescription = createPtDescription.trim();
+    } else {
+      const durationLabel = CREATE_PT_DURATIONS.find((d) => d.id === createPtDuration)?.label || `${createPtDuration} days`;
+      if (createPtType === "net") {
+        autoDescription = `Payment is due ${durationLabel} after ${triggerLabel.toLowerCase()}.`;
+      } else if (createPtType === "prepayment") {
+        autoDescription = `Prepayment required within ${durationLabel} of ${triggerLabel.toLowerCase()}.`;
+      } else {
+        autoDescription = `Split payment term triggered on ${triggerLabel.toLowerCase()}.`;
+      }
+      if (createPtApplyDiscount && createPtDiscountPercent) {
+        const discPeriodLabel = CREATE_PT_DURATIONS.find((d) => d.id === createPtDiscountPeriod)?.label || `${createPtDiscountPeriod} days`;
+        autoDescription += ` ${createPtDiscountPercent}% discount if paid within ${discPeriodLabel}.`;
+      }
+    }
+
+    const newPreset: PaymentTermPreset = {
+      id: `pt-custom-${Date.now()}`,
+      name: createPtName,
+      category: createPtType === "net" ? "net" : createPtType === "prepayment" ? "prepayment" : "split",
+      typeBadge: typeLabel,
+      badgeColor,
+      trigger: triggerLabel,
+      description: autoDescription,
+      vendorsApplied: 0,
+      duration: createPtDuration,
+      applyDiscount: createPtApplyDiscount,
+      discountPercent: createPtApplyDiscount ? createPtDiscountPercent : undefined,
+      discountPeriod: createPtApplyDiscount ? createPtDiscountPeriod : undefined,
+    };
+    setSelectedPaymentTermId(newPreset.id);
+    // We store a reference to show the selected card
+    customPaymentTermRef.current = newPreset;
+    setCreatePtModalOpen(false);
+    resetCreatePtForm();
+    toast.success("Payment term created and applied.");
+  }
+
+  const customPaymentTermRef = useRef<PaymentTermPreset | null>(null);
+
+  const selectedPaymentTermPreset = selectedPaymentTermId
+    ? (customPaymentTermRef.current?.id === selectedPaymentTermId
+        ? customPaymentTermRef.current
+        : PAYMENT_TERM_PRESETS.find((p) => p.id === selectedPaymentTermId)) || null
+    : null;
+
+  const filteredPaymentTermPresets = useMemo(() => {
+    let terms = PAYMENT_TERM_PRESETS;
+    if (ptSidebarFilter === "net") terms = terms.filter((t) => t.category === "net");
+    else if (ptSidebarFilter === "prepayment") terms = terms.filter((t) => t.category === "prepayment");
+    else if (ptSidebarFilter === "split") terms = terms.filter((t) => t.category === "split");
+    else if (ptSidebarFilter === "recent") terms = terms.slice(0, 3);
+    else if (ptSidebarFilter === "vendors_applied") terms = terms.filter((t) => t.vendorsApplied >= 4);
+    else if (ptSidebarFilter === "created_by_me") terms = terms.slice(0, 4);
+    else if (ptSidebarFilter === "created_by_others") terms = terms.slice(4, 8);
+    if (ptSearch.trim()) {
+      const q = ptSearch.toLowerCase();
+      terms = terms.filter((t) => t.name.toLowerCase().includes(q) || t.description.toLowerCase().includes(q));
+    }
+    // Sort
+    const sorted = [...terms].sort((a, b) => {
+      let cmp = 0;
+      if (ptSortBy === "name") cmp = a.name.localeCompare(b.name);
+      else if (ptSortBy === "vendorsApplied") cmp = a.vendorsApplied - b.vendorsApplied;
+      else if (ptSortBy === "duration") {
+        const da = parseInt(a.duration || a.name.match(/\d+/)?.[0] || "0", 10);
+        const db = parseInt(b.duration || b.name.match(/\d+/)?.[0] || "0", 10);
+        cmp = da - db;
+      } else if (ptSortBy === "category") cmp = a.category.localeCompare(b.category);
+      return ptSortDir === "asc" ? cmp : -cmp;
+    });
+    return sorted;
+  }, [ptSidebarFilter, ptSearch, ptSortBy, ptSortDir]);
+
+  // Pricing Rules state
+  const [selectedPricingRuleIds, setSelectedPricingRuleIds] = useState<string[]>([]);
+  const [pricingRulesModalOpen, setPricingRulesModalOpen] = useState(false);
+  const [prSidebarFilter, setPrSidebarFilter] = useState("all");
+  const [prSearch, setPrSearch] = useState("");
+  const [prSortBy, setPrSortBy] = useState<"name" | "vendorsApplied" | "category" | "basis">("name");
+  const [prSortDir, setPrSortDir] = useState<"asc" | "desc">("asc");
+  const [prSortOpen, setPrSortOpen] = useState(false);
+  const [previewPricingRuleId, setPreviewPricingRuleId] = useState<string | null>(null);
+  const [prPreviewTab, setPrPreviewTab] = useState("preview");
+  const [prFullscreen, setPrFullscreen] = useState(false);
+  const [createPrModalOpen, setCreatePrModalOpen] = useState(false);
+  const [createPrFullscreen, setCreatePrFullscreen] = useState(false);
+  const [createPrName, setCreatePrName] = useState("");
+  const [createPrDescription, setCreatePrDescription] = useState("");
+  const [createPrCategory, setCreatePrCategory] = useState<"discount" | "premium">("discount");
+  const [createPrBasis, setCreatePrBasis] = useState<PricingRuleBasis>("value");
+  const [createPrLimitDateRange, setCreatePrLimitDateRange] = useState(false);
+  const [createPrValidFrom, setCreatePrValidFrom] = useState("");
+  const [createPrValidTo, setCreatePrValidTo] = useState("");
+  const [createPrStep, setCreatePrStep] = useState<1 | 2>(1);
+  const [createPrItemsTab, setCreatePrItemsTab] = useState<"items" | "categories" | "attachments">("items");
+
+  interface CpmTierState { discount: string; fixRate: boolean; qtyLimits: boolean; minQty: string; maxQty: string; }
+  const makeCpmTier = (): CpmTierState => ({ discount: "", fixRate: false, qtyLimits: false, minQty: "", maxQty: "" });
+  const [createPrTiers, setCreatePrTiers] = useState<CpmTierState[]>([makeCpmTier()]);
+  function updateCpmTier(idx: number, patch: Partial<CpmTierState>) { setCreatePrTiers(prev => prev.map((t, i) => i === idx ? { ...t, ...patch } : t)); }
+  function addCpmTier() { setCreatePrTiers(prev => [...prev, makeCpmTier()]); }
+  function removeCpmTier(idx: number) { setCreatePrTiers(prev => prev.filter((_, i) => i !== idx)); }
+
+  const customPricingRulesRef = useRef<PricingRulePreset[]>([]);
+
+  // ── Create PR modal: mode + items/categories/attachments state ──
+  const [createPrMode, setCreatePrMode] = useState<"create" | "view">("create");
+  const [editingPrRuleId, setEditingPrRuleId] = useState<string | null>(null);
+
+  interface CpmItemRow { id: string; partNo: string; description: string; category: string; itemType: string; status: "Active" | "Inactive"; }
+  interface CpmCatRow { id: string; code: string; name: string; description: string; linkedItems: number; status: "Active" | "Inactive"; }
+  interface CpmAttachment { id: string; name: string; size: string; type: string; uploadedAt: string; }
+
+  const CPM_AVAILABLE_ITEMS: CpmItemRow[] = [
+    { id: "cpm-i1", partNo: "100219-42", description: "Front bulkhead cabinet lower cover", category: "Electronics", itemType: "Parts", status: "Active" },
+    { id: "cpm-i2", partNo: "100219-51", description: "Box walls inlay cabinet", category: "Hardware", itemType: "Parts", status: "Active" },
+    { id: "cpm-i3", partNo: "100219-51-01", description: "Box walls inlay cabinet with defibrillator", category: "Cabinet", itemType: "Equipment + Capital", status: "Active" },
+    { id: "cpm-i4", partNo: "100219-51-01RC", description: "Box walls inlay cabinet RC variant", category: "Electronics", itemType: "Equipment + Non-Capital", status: "Active" },
+    { id: "cpm-i5", partNo: "100219-51-02", description: "Box walls inlay cabinet extended", category: "Hardware", itemType: "Parts", status: "Inactive" },
+    { id: "cpm-i6", partNo: "100219-52", description: "Box closeout top cap inlay cabinet", category: "Electronics", itemType: "Equipment + Non-Capital", status: "Active" },
+    { id: "cpm-i7", partNo: "100219-52-02", description: "Box closeout top cap inlay cabinet v2", category: "Cabinet", itemType: "Parts", status: "Active" },
+    { id: "cpm-i8", partNo: "02901201000", description: "Foam padding RF1 - 3/8\" X 72\"", category: "Hardware", itemType: "Parts", status: "Active" },
+    { id: "cpm-i9", partNo: "100120-79", description: "Toyota long cut, emergency brake", category: "Electronics", itemType: "Equipment + Non-Capital", status: "Active" },
+    { id: "cpm-i10", partNo: "100120-70", description: "Toyota long cut, brake line bracket", category: "Hardware", itemType: "Parts", status: "Active" },
+    { id: "cpm-i11", partNo: "100120-71", description: "Standard floor with kneeling system", category: "Cabinet", itemType: "Parts", status: "Active" },
+    { id: "cpm-i12", partNo: "100150-20", description: "Phillips pan head screw steel black", category: "Fasteners", itemType: "Parts", status: "Active" },
+  ];
+
+  const CPM_AVAILABLE_CATS: CpmCatRow[] = [
+    { id: "cpm-c1", code: "CAT-101", name: "Ram Pro Master 2500", description: "Ambulance parts", linkedItems: 24, status: "Active" },
+    { id: "cpm-c2", code: "CAT-102", name: "Ram Pro Master 3500", description: "Electric platform", linkedItems: 18, status: "Active" },
+    { id: "cpm-c3", code: "CAT-103", name: "Ford Transit", description: "Interior panels", linkedItems: 31, status: "Active" },
+    { id: "cpm-c4", code: "CAT-104", name: "Sprinter Van", description: "Exterior panels", linkedItems: 12, status: "Active" },
+    { id: "cpm-c5", code: "CAT-105", name: "Ram Pro Master Default", description: "Default configuration", linkedItems: 9, status: "Inactive" },
+    { id: "cpm-c6", code: "CAT-106", name: "Toyota Chassis", description: "Chassis components", linkedItems: 22, status: "Active" },
+    { id: "cpm-c7", code: "CAT-107", name: "Honda Civic Parts", description: "OEM parts", linkedItems: 15, status: "Active" },
+    { id: "cpm-c8", code: "CAT-108", name: "BMW X Series", description: "Premium parts", linkedItems: 8, status: "Active" },
+  ];
+
+  const [cpmSelectedItems, setCpmSelectedItems] = useState<CpmItemRow[]>([]);
+  const [cpmSelectedCats, setCpmSelectedCats] = useState<CpmCatRow[]>([]);
+  const [cpmAttachments, setCpmAttachments] = useState<CpmAttachment[]>([]);
+  const [cpmItemSearch, setCpmItemSearch] = useState("");
+  const [cpmCatSearch, setCpmCatSearch] = useState("");
+  const [cpmShowItemPicker, setCpmShowItemPicker] = useState(false);
+  const [cpmShowCatPicker, setCpmShowCatPicker] = useState(false);
+  const [cpmItemPickerSearch, setCpmItemPickerSearch] = useState("");
+  const [cpmCatPickerSearch, setCpmCatPickerSearch] = useState("");
+
+  const cpmFilteredSelectedItems = useMemo(() => {
+    if (!cpmItemSearch.trim()) return cpmSelectedItems;
+    const q = cpmItemSearch.toLowerCase();
+    return cpmSelectedItems.filter(i => i.partNo.toLowerCase().includes(q) || i.description.toLowerCase().includes(q));
+  }, [cpmSelectedItems, cpmItemSearch]);
+
+  const cpmFilteredSelectedCats = useMemo(() => {
+    if (!cpmCatSearch.trim()) return cpmSelectedCats;
+    const q = cpmCatSearch.toLowerCase();
+    return cpmSelectedCats.filter(c => c.name.toLowerCase().includes(q) || c.code.toLowerCase().includes(q));
+  }, [cpmSelectedCats, cpmCatSearch]);
+
+  const cpmAvailableItemsFiltered = useMemo(() => {
+    const selectedIds = new Set(cpmSelectedItems.map(i => i.id));
+    let items = CPM_AVAILABLE_ITEMS.filter(i => !selectedIds.has(i.id));
+    if (cpmItemPickerSearch.trim()) {
+      const q = cpmItemPickerSearch.toLowerCase();
+      items = items.filter(i => i.partNo.toLowerCase().includes(q) || i.description.toLowerCase().includes(q) || i.category.toLowerCase().includes(q));
+    }
+    return items;
+  }, [cpmSelectedItems, cpmItemPickerSearch]);
+
+  const cpmAvailableCatsFiltered = useMemo(() => {
+    const selectedIds = new Set(cpmSelectedCats.map(c => c.id));
+    let cats = CPM_AVAILABLE_CATS.filter(c => !selectedIds.has(c.id));
+    if (cpmCatPickerSearch.trim()) {
+      const q = cpmCatPickerSearch.toLowerCase();
+      cats = cats.filter(c => c.name.toLowerCase().includes(q) || c.code.toLowerCase().includes(q));
+    }
+    return cats;
+  }, [cpmSelectedCats, cpmCatPickerSearch]);
+
+  function cpmAddItem(item: CpmItemRow) { setCpmSelectedItems(prev => [...prev, item]); }
+  function cpmRemoveItem(id: string) { setCpmSelectedItems(prev => prev.filter(i => i.id !== id)); }
+  function cpmAddCat(cat: CpmCatRow) { setCpmSelectedCats(prev => [...prev, cat]); }
+  function cpmRemoveCat(id: string) { setCpmSelectedCats(prev => prev.filter(c => c.id !== id)); }
+  function cpmAddAttachment() {
+    const names = ["Contract_Q4_2025.pdf", "Vendor_Agreement.pdf", "Pricing_Schedule.xlsx", "Approval_Form.docx", "Terms_Conditions.pdf"];
+    const sizes = ["245 KB", "1.2 MB", "89 KB", "342 KB", "567 KB"];
+    const types = ["PDF", "PDF", "XLSX", "DOCX", "PDF"];
+    const idx = cpmAttachments.length % names.length;
+    setCpmAttachments(prev => [...prev, { id: `att-${Date.now()}`, name: names[idx], size: sizes[idx], type: types[idx], uploadedAt: "Just now" }]);
+    toast.success("File uploaded successfully");
+  }
+  function cpmRemoveAttachment(id: string) { setCpmAttachments(prev => prev.filter(a => a.id !== id)); }
+
+  function handleOpenRuleDetails(rule: PricingRulePreset) {
+    setCreatePrMode("view");
+    setEditingPrRuleId(rule.id);
+    setCreatePrName(rule.name);
+    setCreatePrDescription(rule.description);
+    setCreatePrCategory(rule.category === "all" ? "discount" : rule.category);
+    setCreatePrBasis(rule.basis);
+    const tiers: CpmTierState[] = rule.tiers.map(t => {
+      const discVal = t.discount?.replace(/[%$]/g, "") || "";
+      const isFix = t.discount?.includes("$") || false;
+      return {
+        discount: discVal,
+        fixRate: isFix,
+        qtyLimits: t.minValue !== "-" || t.maxValue !== "-",
+        minQty: t.minValue === "-" ? "" : t.minValue.replace(/[,$]/g, ""),
+        maxQty: t.maxValue === "-" ? "" : t.maxValue.replace(/[,$]/g, ""),
+      };
+    });
+    setCreatePrTiers(tiers.length > 0 ? tiers : [makeCpmTier()]);
+    setCreatePrLimitDateRange(true);
+    setCreatePrValidFrom("2025-04-01");
+    setCreatePrValidTo("2025-12-31");
+    const isCustom = rule.id.startsWith("pr-custom-");
+    if (!isCustom) {
+      setCpmSelectedItems(CPM_AVAILABLE_ITEMS.slice(0, Math.min(3, Math.floor(rule.vendorsApplied / 2) + 1)));
+      setCpmSelectedCats(CPM_AVAILABLE_CATS.slice(0, Math.min(2, Math.floor(rule.vendorsApplied / 3) + 1)));
+    } else {
+      setCpmSelectedItems([]);
+      setCpmSelectedCats([]);
+    }
+    setCpmAttachments([]);
+    setCreatePrStep(1);
+    setCreatePrItemsTab("items");
+    setCpmItemSearch("");
+    setCpmCatSearch("");
+    setCpmShowItemPicker(false);
+    setCpmShowCatPicker(false);
+    setCreatePrFullscreen(false);
+    setCreatePrModalOpen(true);
+  }
+
+  // ── Preview-panel editable state ──
+  const [prvCategory, setPrvCategory] = useState<"discount" | "premium">("discount");
+  const [prvBasis, setPrvBasis] = useState<PricingRuleBasis>("value");
+  const [prvName, setPrvName] = useState("");
+  const [prvDesc, setPrvDesc] = useState("");
+  const [prvLimitDate, setPrvLimitDate] = useState(true);
+  const [prvValidFrom, setPrvValidFrom] = useState("2025-04-23");
+  const [prvValidTo, setPrvValidTo] = useState("2025-04-23");
+  const [prvDiscountPct, setPrvDiscountPct] = useState("");
+  const [prvFixRate, setPrvFixRate] = useState(false);
+  const [prvQtyLimits, setPrvQtyLimits] = useState(true);
+  const [prvMinQty, setPrvMinQty] = useState("");
+  const [prvMaxQty, setPrvMaxQty] = useState("");
+  const [prvItemsSearch, setPrvItemsSearch] = useState("");
+  const [prvItemsFilter, setPrvItemsFilter] = useState("All");
+  const [prvItemsCollapsed, setPrvItemsCollapsed] = useState(false);
+  const [prvItemsTab, setPrvItemsTab] = useState<"items" | "categories">("items");
+
+  const prevPreviewIdRef = useRef<string | null>(null);
+
+  function resetCreatePrForm() {
+    setCreatePrName("");
+    setCreatePrDescription("");
+    setCreatePrCategory("discount");
+    setCreatePrBasis("value");
+    setCreatePrLimitDateRange(false);
+    setCreatePrValidFrom("");
+    setCreatePrValidTo("");
+    setCreatePrStep(1);
+    setCreatePrItemsTab("items");
+    setCreatePrTiers([makeCpmTier()]);
+    setCreatePrMode("create");
+    setEditingPrRuleId(null);
+    setCpmSelectedItems([]);
+    setCpmSelectedCats([]);
+    setCpmAttachments([]);
+    setCpmItemSearch("");
+    setCpmCatSearch("");
+    setCpmShowItemPicker(false);
+    setCpmShowCatPicker(false);
+    setCpmItemPickerSearch("");
+    setCpmCatPickerSearch("");
+  }
+
+  function handleSaveNewPricingRule() {
+    if (!createPrName.trim()) return;
+    const tierData = createPrTiers.map((t) => ({ minValue: t.minQty || "-", maxValue: t.maxQty || "-", discount: t.discount ? `${t.discount}${t.fixRate ? "$" : "%"}` : "-" }));
+    if (editingPrRuleId) {
+      // Update existing custom rule
+      customPricingRulesRef.current = customPricingRulesRef.current.map((r) =>
+        r.id === editingPrRuleId ? {
+          ...r,
+          name: createPrName,
+          category: createPrCategory,
+          basis: createPrBasis,
+          tierType: createPrTiers.length > 1 ? "multi" : "single",
+          totalTiers: createPrTiers.length,
+          description: createPrDescription || r.description,
+          tiers: tierData,
+          aboutText: createPrDescription || undefined,
+        } : r
+      );
+      setCreatePrModalOpen(false);
+      resetCreatePrForm();
+      toast.success("Pricing rule updated successfully.");
+    } else {
+      const newPreset: PricingRulePreset = {
+        id: `pr-custom-${Date.now()}`,
+        name: createPrName,
+        category: createPrCategory,
+        basis: createPrBasis,
+        tierType: createPrTiers.length > 1 ? "multi" : "single",
+        totalTiers: createPrTiers.length,
+        description: createPrDescription || `${createPrCategory === "discount" ? "Discount" : "Premium"} rule: ${createPrName}`,
+        tiers: tierData,
+        vendorsApplied: 0,
+        aboutText: createPrDescription || undefined,
+      };
+      customPricingRulesRef.current = [...customPricingRulesRef.current, newPreset];
+      setSelectedPricingRuleIds((prev) => [...prev, newPreset.id]);
+      setCreatePrModalOpen(false);
+      resetCreatePrForm();
+      toast.success("Pricing rule created and applied.");
+    }
+  }
+
+  function handleDuplicatePricingRule(rule: PricingRulePreset) {
+    resetCreatePrForm();
+    setCreatePrName(`Copy of ${rule.name}`);
+    setCreatePrDescription(rule.description);
+    setCreatePrCategory(rule.category === "all" ? "discount" : rule.category);
+    setCreatePrBasis(rule.basis);
+    setPricingRulesModalOpen(false);
+    setPreviewPricingRuleId(null);
+    setPrPreviewTab("preview");
+    setCreatePrModalOpen(true);
+  }
+
+  function removePricingRule(id: string) {
+    setSelectedPricingRuleIds((prev) => prev.filter((r) => r !== id));
+    customPricingRulesRef.current = customPricingRulesRef.current.filter((r) => r.id !== id);
+  }
+
+  const allPricingRulePresets = useMemo(() => {
+    return [...PRICING_RULE_PRESETS, ...customPricingRulesRef.current];
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedPricingRuleIds]);
+
+  // Sync preview state when a preset is selected (must be after allPricingRulePresets)
+  if (previewPricingRuleId && previewPricingRuleId !== prevPreviewIdRef.current) {
+    prevPreviewIdRef.current = previewPricingRuleId;
+    const pr = allPricingRulePresets.find((r) => r.id === previewPricingRuleId);
+    if (pr) {
+      setPrvCategory(pr.category === "all" ? "discount" : pr.category);
+      setPrvBasis(pr.basis);
+      setPrvName(pr.name);
+      setPrvDesc(pr.description);
+      setPrvDiscountPct(pr.tiers[0]?.discount?.replace("%", "") || "10");
+      setPrvMinQty(pr.tiers[0]?.minValue === "-" ? "" : pr.tiers[0]?.minValue || "");
+      setPrvMaxQty(pr.tiers[0]?.maxValue === "-" ? "" : pr.tiers[0]?.maxValue || "");
+      setPrvLimitDate(true);
+      setPrvValidFrom("2025-04-23");
+      setPrvValidTo("2025-04-23");
+      setPrvFixRate(false);
+      setPrvQtyLimits(true);
+      setPrvItemsSearch("");
+      setPrvItemsFilter("All");
+      setPrvItemsCollapsed(false);
+      setPrvItemsTab("items");
+    }
+  }
+  if (!previewPricingRuleId && prevPreviewIdRef.current) {
+    prevPreviewIdRef.current = null;
+  }
+
+  const filteredPricingRulePresets = useMemo(() => {
+    let rules = allPricingRulePresets;
+    if (prSidebarFilter === "discount") rules = rules.filter((r) => r.category === "discount");
+    else if (prSidebarFilter === "premium") rules = rules.filter((r) => r.category === "premium");
+    else if (prSidebarFilter === "recent") rules = rules.slice(0, 3);
+    else if (prSidebarFilter === "favourites") rules = rules.slice(0, 4);
+    else if (prSidebarFilter === "vendors_applied") rules = rules.filter((r) => r.vendorsApplied >= 3);
+    else if (prSidebarFilter === "created_by_me") rules = rules.slice(0, 4);
+    else if (prSidebarFilter === "created_by_others") rules = rules.slice(4, 8);
+    if (prSearch.trim()) {
+      const q = prSearch.toLowerCase();
+      rules = rules.filter((r) => r.name.toLowerCase().includes(q) || r.description.toLowerCase().includes(q));
+    }
+    // Sort
+    const sorted = [...rules].sort((a, b) => {
+      let cmp = 0;
+      if (prSortBy === "name") cmp = a.name.localeCompare(b.name);
+      else if (prSortBy === "vendorsApplied") cmp = a.vendorsApplied - b.vendorsApplied;
+      else if (prSortBy === "category") cmp = a.category.localeCompare(b.category);
+      else if (prSortBy === "basis") cmp = a.basis.localeCompare(b.basis);
+      return prSortDir === "asc" ? cmp : -cmp;
+    });
+    return sorted;
+  }, [prSidebarFilter, prSearch, allPricingRulePresets, prSortBy, prSortDir]);
+
+  const selectedPricingRules = useMemo(() => {
+    return selectedPricingRuleIds.map((id) =>
+      allPricingRulePresets.find((r) => r.id === id)
+    ).filter(Boolean) as PricingRulePreset[];
+  }, [selectedPricingRuleIds, allPricingRulePresets]);
+
+  // Billing & Shipping state
+  const [currency, setCurrency] = useState("");
+  const [shipTo, setShipTo] = useState<string | null>("pl-1"); // FR Conversions, Westminster default
+  const [payTo, setPayTo] = useState<string | null>("pl-3"); // Toyota International default
+  const [fundedBy, setFundedBy] = useState<string | null>("pl-7"); // FR Conversions default
+  const [allowAltFunding, setAllowAltFunding] = useState(false);
+
+  // Payment Methods state
+  const [paymentEntries, setPaymentEntries] = useState<PaymentMethodEntry[]>([]);
+  const [activePaymentId, setActivePaymentId] = useState<string | null>(null);
+  const [isEditingPayment, setIsEditingPayment] = useState(false);
+  const [selectedPaymentType, setSelectedPaymentType] = useState<PaymentMethodType>("ach");
+
+  // Shipping Methods state
+  const [shippingTab, setShippingTab] = useState<"carrier" | "vendor">("carrier");
+  const [carrierServices, setCarrierServices] = useState<Array<{ id: string; name: string; description: string; minDuration: number; maxDuration: number; isDefault: boolean }>>([
+    { id: "cs-1", name: "Economical Shipping", description: "UPS Worldwide Economy® is our most econo...", minDuration: 3, maxDuration: 12, isDefault: true },
+  ]);
+  const [vendorShippingPrefs, setVendorShippingPrefs] = useState<Array<{ id: string; carrier: string; methods: string; isDefault: boolean }>>([
+    { id: "vsp-1", carrier: "", methods: "", isDefault: true },
+  ]);
+  const csCounter = useRef(1);
+  const vspCounter = useRef(1);
+
+  const activePaymentEntry = paymentEntries.find((e) => e.id === activePaymentId) || null;
+  const savedPaymentEntries = paymentEntries.filter((e) => e.isSaved);
+
+  function addPaymentEntry(type: PaymentMethodType) {
+    const newEntry = createEmptyPaymentEntry(type);
+    setPaymentEntries((prev) => [...prev, newEntry]);
+    setActivePaymentId(newEntry.id);
+    setIsEditingPayment(true);
+  }
+
+  function savePaymentEntry(id: string) {
+    setPaymentEntries((prev) => prev.map((e) => (e.id === id ? { ...e, isSaved: true } : e)));
+    setIsEditingPayment(false);
+  }
+
+  function editPaymentEntry(id: string) {
+    setActivePaymentId(id);
+    setIsEditingPayment(true);
+  }
+
+  function cancelPaymentEdit() {
+    if (activePaymentEntry && !activePaymentEntry.isSaved) {
+      setPaymentEntries((prev) => prev.filter((e) => e.id !== activePaymentEntry.id));
+    }
+    setIsEditingPayment(false);
+    setActivePaymentId(savedPaymentEntries.length > 0 ? savedPaymentEntries[savedPaymentEntries.length - 1].id : null);
+  }
+
+  function removePaymentEntry(id: string) {
+    setPaymentEntries((prev) => {
+      const next = prev.filter((e) => e.id !== id);
+      if (activePaymentId === id) {
+        const nextSaved = next.filter((e) => e.isSaved);
+        setActivePaymentId(nextSaved.length > 0 ? nextSaved[nextSaved.length - 1].id : null);
+        setIsEditingPayment(false);
+      }
+      return next;
+    });
+  }
+
+  function updatePaymentEntry(id: string, updates: Partial<PaymentMethodEntry>) {
+    setPaymentEntries((prev) => prev.map((e) => (e.id === id ? { ...e, ...updates } : e)));
+  }
+
+  // ── Point of Contact state ──
+  const [showSelectPocModal, setShowSelectPocModal] = useState(false);
+  const [showCreatePocModal, setShowCreatePocModal] = useState(false);
+  const [contactDictionary, setContactDictionary] = useState<ContactPerson[]>([...CONTACT_DICTIONARY]);
+  const [pocSearch, setPocSearch] = useState("");
+  const [pocCategoryFilter, setPocCategoryFilter] = useState<"all" | "Sales" | "Supply Chain Management" | "Finance">("all");
+  const [pocPage, setPocPage] = useState(1);
+  const [pocTempSelected, setPocTempSelected] = useState<Set<string>>(new Set());
+  const [selectedPocIds, setSelectedPocIds] = useState<Set<string>>(new Set());
+  const POC_PER_PAGE = 20;
+
+  // Create New POC form state
+  const [newPocName, setNewPocName] = useState("");
+  const [newPocDepartment, setNewPocDepartment] = useState<"Sales" | "Supply Chain Management" | "Finance">("Sales");
+  const [newPocRole, setNewPocRole] = useState("");
+  const [newPocLandline, setNewPocLandline] = useState("");
+  const [newPocLandlineCode, setNewPocLandlineCode] = useState("+1");
+  const [newPocExt, setNewPocExt] = useState("");
+  const [newPocMobile, setNewPocMobile] = useState("");
+  const [newPocMobileCode, setNewPocMobileCode] = useState("+1");
+  const [newPocEmail, setNewPocEmail] = useState("");
+  const [saveAndCreateAnother, setSaveAndCreateAnother] = useState(false);
+
+  const AVATAR_COLORS = ["#0A77FF", "#7C3AED", "#059669", "#DC2626", "#D97706", "#0891B2", "#4F46E5", "#BE185D", "#15803D", "#9333EA"];
+
+  const pocDepartmentCounts = useMemo(() => {
+    const counts: Record<string, number> = { Sales: 0, "Supply Chain Management": 0, Finance: 0 };
+    contactDictionary.forEach((c) => { counts[c.department] = (counts[c.department] || 0) + 1; });
+    return counts;
+  }, [contactDictionary]);
+
+  const filteredPocContacts = useMemo(() => {
+    let list = contactDictionary;
+    if (pocCategoryFilter !== "all") {
+      list = list.filter((c) => c.department === pocCategoryFilter);
+    }
+    if (pocSearch.trim()) {
+      const q = pocSearch.toLowerCase();
+      list = list.filter((c) =>
+        c.name.toLowerCase().includes(q) ||
+        c.company.toLowerCase().includes(q) ||
+        c.email.toLowerCase().includes(q) ||
+        c.phone.includes(q)
+      );
+    }
+    return list;
+  }, [pocCategoryFilter, pocSearch, contactDictionary]);
+
+  const pocTotalPages = Math.max(1, Math.ceil(filteredPocContacts.length / POC_PER_PAGE));
+  const pocPagedContacts = filteredPocContacts.slice((pocPage - 1) * POC_PER_PAGE, pocPage * POC_PER_PAGE);
+
+  const selectedPocContacts = useMemo(() => {
+    return contactDictionary.filter((c) => selectedPocIds.has(c.id));
+  }, [selectedPocIds, contactDictionary]);
+
+  function handleOpenSelectPoc() {
+    setPocTempSelected(new Set(selectedPocIds));
+    setPocSearch("");
+    setPocCategoryFilter("all");
+    setPocPage(1);
+    setShowSelectPocModal(true);
+  }
+
+  function handleConfirmPocSelection() {
+    setSelectedPocIds(new Set(pocTempSelected));
+    setShowSelectPocModal(false);
+    toast.success(`${pocTempSelected.size} point of contact${pocTempSelected.size !== 1 ? "s" : ""} selected`);
+  }
+
+  function handleTogglePocTemp(id: string) {
+    setPocTempSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function handleRemovePoc(id: string) {
+    setSelectedPocIds((prev) => {
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
+  }
+
+  function getInitials(name: string) {
+    return name.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2);
+  }
+
+  function resetNewPocForm() {
+    setNewPocName("");
+    setNewPocDepartment("Sales");
+    setNewPocRole("");
+    setNewPocLandline("");
+    setNewPocLandlineCode("+1");
+    setNewPocExt("");
+    setNewPocMobile("");
+    setNewPocMobileCode("+1");
+    setNewPocEmail("");
+  }
+
+  function handleOpenCreatePoc() {
+    resetNewPocForm();
+    setSaveAndCreateAnother(false);
+    setShowCreatePocModal(true);
+  }
+
+  function handleSaveNewPoc() {
+    if (!newPocName.trim()) {
+      toast.error("Name is required");
+      return;
+    }
+    const newId = `C-NEW-${Date.now()}`;
+    const avatarColor = AVATAR_COLORS[contactDictionary.length % AVATAR_COLORS.length];
+    const newContact: ContactPerson = {
+      id: newId,
+      name: newPocName.trim(),
+      company: partnerName || "New Partner",
+      department: newPocDepartment,
+      phone: newPocLandline ? `${newPocLandlineCode} ${newPocLandline}` : "",
+      phoneExt: newPocExt,
+      secondaryPhone: newPocMobile ? `${newPocMobileCode} ${newPocMobile}` : "",
+      secondaryPhoneExt: "",
+      email: newPocEmail,
+      avatarColor,
+    };
+    setContactDictionary((prev) => [newContact, ...prev]);
+    // Also auto-select in the temp selection if the select modal is open
+    setPocTempSelected((prev) => {
+      const next = new Set(prev);
+      next.add(newId);
+      return next;
+    });
+    toast.success(`"${newContact.name}" added to Contact Directory`);
+    if (saveAndCreateAnother) {
+      resetNewPocForm();
+    } else {
+      setShowCreatePocModal(false);
+    }
+  }
+
+  // ── Sync all config data to parent ref on every relevant state change ──
+  useEffect(() => {
+    const allSavedPayments = paymentEntries.filter((e) => e.isSaved).map((e) => ({
+      id: e.id, type: e.type, typeLabel: PAYMENT_TYPE_CARDS.find((t) => t.id === e.type)?.label || e.type,
+      bankName: e.bankName, accountNumber: e.accountNumber, routingNumber: e.routingNumber,
+      cardNumber: e.cardNumber, walletProvider: e.walletProvider, walletId: e.walletId,
+      nickname: e.nickname, isPrimary: e.isPrimary,
+      discountPercent: e.applyDiscount && e.discountPercent ? parseFloat(e.discountPercent) : undefined,
+      additionalChargesPercent: e.applyDiscount && e.additionalCharges ? parseFloat(e.additionalCharges) : undefined,
+      isSaved: e.isSaved,
+    }));
+    const ptPreset = selectedPaymentTermPreset;
+    const ptConfig = ptPreset ? {
+      id: ptPreset.id, name: ptPreset.name, type: ptPreset.typeBadge, trigger: ptPreset.trigger,
+      description: ptPreset.description, duration: ptPreset.duration,
+      discountPercent: ptPreset.discountPercent, discountPeriod: ptPreset.discountPeriod,
+    } : undefined;
+    const allPricingRules = selectedPricingRuleIds.map((id) => {
+      const preset = PRICING_RULE_PRESETS.find((p) => p.id === id) || customPricingRulesRef.current.find((p) => p.id === id);
+      return preset ? { id: preset.id, name: preset.name, type: preset.category, basis: preset.basis || "value", description: preset.description } : null;
+    }).filter(Boolean);
+    const pocData = selectedPocContacts.map((c) => ({
+      id: c.id, name: c.name, email: c.email, phone: c.phone,
+      secondaryPhone: c.secondaryPhone, extension: c.phoneExt,
+      department: c.department, avatarColor: c.avatarColor,
+    }));
+    const shippingData = {
+      carrierServices: carrierServices.map((cs) => ({
+        name: cs.name, description: cs.description, minDays: cs.minDuration, maxDays: cs.maxDuration, isDefault: cs.isDefault,
+      })),
+      vendorPreferences: vendorShippingPrefs.map((vp) => ({
+        carrier: vp.carrier, methods: vp.methods ? vp.methods.split(",").map((m: string) => m.trim()) : [], isDefault: vp.isDefault,
+      })),
+    };
+    configDataRef.current = {
+      configPaymentMethods: allSavedPayments,
+      configPaymentTerm: ptConfig,
+      configPricingRules: allPricingRules,
+      configPointsOfContact: pocData,
+      configCreditLimit: { currency, enforcement },
+      configShipping: shippingData,
+      configBillingType: billingType,
+    };
+  }, [paymentEntries, selectedPaymentTermPreset, selectedPricingRuleIds, selectedPocContacts, carrierServices, vendorShippingPrefs, currency, enforcement, billingType, configDataRef]);
+
+  if (sectionId === "billing_shipping" || sectionId === "customer_billing") {
+    const currencyObj = CURRENCY_OPTIONS.find((c) => c.id === currency);
+    const shipToObj = PARTNER_LOCATION_ITEMS.find((i) => i.id === shipTo);
+    const payToObj = PARTNER_LOCATION_ITEMS.find((i) => i.id === payTo);
+    const fundedByObj = FUNDED_BY_ITEMS.find((i) => i.id === fundedBy);
+
+    // Visual flow nodes
+    const flowNodes = [
+      {
+        icon: <DollarSign className="w-5 h-5" />,
+        label: "Currency",
+        sublabel: currencyObj ? currencyObj.id.toUpperCase() : null,
+        active: !!currencyObj,
+        color: "#0A77FF",
+        bgActive: "#EFF6FF",
+        dataKey: "currency" as const,
+      },
+      {
+        icon: <Truck className="w-5 h-5" />,
+        label: "Ship To",
+        sublabel: shipToObj ? shipToObj.name.split(",")[0] : null,
+        active: !!shipToObj,
+        color: "#22C55E",
+        bgActive: "#ECFDF5",
+        dataKey: "shipTo" as const,
+      },
+      {
+        icon: <Receipt className="w-5 h-5" />,
+        label: "Pay To",
+        sublabel: payToObj ? payToObj.name.split(",")[0] : null,
+        active: !!payToObj,
+        color: "#8B5CF6",
+        bgActive: "#F5F3FF",
+        dataKey: "payTo" as const,
+      },
+      {
+        icon: <Landmark className="w-5 h-5" />,
+        label: "Funded By",
+        sublabel: fundedByObj ? fundedByObj.name.split(",")[0] : null,
+        active: !!fundedByObj,
+        color: "#F59E0B",
+        bgActive: "#FFFBEB",
+        dataKey: "fundedBy" as const,
+      },
+    ];
+
+    return (
+      <div className="space-y-5">
+        {/* ── Heading ── */}
+        <div>
+          <h4 className="text-sm text-[#0F172A]" style={{ fontWeight: 700 }}>Billing & Shipping</h4>
+          <p className="text-xs text-[#64748B] mt-0.5 leading-relaxed">
+            Configure default transaction currency, delivery destination, payment recipient, and funding source for this partner.
+          </p>
+        </div>
+
+        {/* ── Visual Flow Header ── */}
+        <div className="flex items-center justify-center py-5 px-2 relative" style={{ overflow: "visible" }}>
+          {flowNodes.map((node, i) => {
+            const partnerObj = node.dataKey === "shipTo" ? shipToObj : node.dataKey === "payTo" ? payToObj : node.dataKey === "fundedBy" ? fundedByObj : null;
+            const isCurrency = node.dataKey === "currency";
+            const hasData = isCurrency ? !!currencyObj : !!partnerObj;
+
+            const renderFlowIcon = () => {
+              if (isCurrency && currencyObj) {
+                return <span className="text-[18px]" style={{ fontWeight: 700 }}>{currencyObj.symbol}</span>;
+              }
+              if (!isCurrency && partnerObj) {
+                return (
+                  <div
+                    className="w-full h-full rounded-xl flex items-center justify-center text-white text-[12px]"
+                    style={{ fontWeight: 700, backgroundColor: partnerObj.logoColor }}
+                  >
+                    {partnerObj.logoText}
+                  </div>
+                );
+              }
+              return node.icon;
+            };
+
+            const renderFlowHoverCard = () => {
+              if (isCurrency && currencyObj) {
+                const code = currencyObj.id.toUpperCase();
+                const name = currencyObj.label.split(" — ")[1] || currencyObj.label;
+                return (
+                  <div className="w-[200px] bg-white rounded-xl border border-[#E8ECF1] shadow-lg p-3">
+                    <div className="flex items-center gap-2.5 mb-2">
+                      <div className="w-9 h-9 rounded-lg bg-[#EFF6FF] flex items-center justify-center text-[#0A77FF] text-[18px]" style={{ fontWeight: 700 }}>
+                        {currencyObj.symbol}
+                      </div>
+                      <div>
+                        <p className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>{code}</p>
+                        <p className="text-[11px] text-[#64748B]">{name}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1.5 px-2 py-1 bg-[#EFF6FF] rounded-md">
+                      <div className="w-1.5 h-1.5 rounded-full bg-[#0A77FF]" />
+                      <span className="text-[10px] text-[#0A77FF]" style={{ fontWeight: 500 }}>Active transaction currency</span>
+                    </div>
+                  </div>
+                );
+              }
+              if (!isCurrency && partnerObj) {
+                const typeLabel = partnerObj.type === "location" ? "Location" : "Partner";
+                const roleLabel = node.dataKey === "shipTo" ? "Delivery Address" : node.dataKey === "payTo" ? "Payment Recipient" : "Funding Source";
+                return (
+                  <div className="w-[220px] bg-white rounded-xl border border-[#E8ECF1] shadow-lg p-3">
+                    <div className="flex items-center gap-2.5 mb-2.5">
+                      <div
+                        className="w-9 h-9 rounded-lg flex items-center justify-center text-white text-[13px] shrink-0"
+                        style={{ fontWeight: 700, backgroundColor: partnerObj.logoColor }}
+                      >
+                        {partnerObj.logoText}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{partnerObj.name}</p>
+                        <div className="flex items-center gap-1 mt-0.5">
+                          <MapPin className="w-3 h-3 text-[#94A3B8] shrink-0" />
+                          <span className="text-[11px] text-[#64748B] truncate">{partnerObj.location || typeLabel}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1.5 px-2 py-1 rounded-md" style={{ backgroundColor: node.bgActive }}>
+                      <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: node.color }} />
+                      <span className="text-[10px]" style={{ fontWeight: 500, color: node.color }}>{roleLabel}</span>
+                    </div>
+                    {partnerObj.isDefault && (
+                      <div className="flex items-center gap-1 mt-2 pt-2 border-t border-[#F1F5F9]">
+                        <Star className="w-3 h-3 text-[#F59E0B]" />
+                        <span className="text-[10px] text-[#64748B]" style={{ fontWeight: 500 }}>Default selection</span>
+                      </div>
+                    )}
+                  </div>
+                );
+              }
+              return null;
+            };
+
+            return (
+              <div key={node.label} className="flex items-center">
+                {hasData ? (
+                  <HoverCard openDelay={200} closeDelay={100}>
+                    <HoverCardTrigger asChild>
+                      <div className="relative flex flex-col items-center gap-1.5 cursor-pointer">
+                        <div
+                          className="w-[46px] h-[46px] rounded-xl flex items-center justify-center transition-all duration-200 overflow-hidden"
+                          style={{
+                            backgroundColor: node.active ? (isCurrency || !partnerObj ? node.bgActive : "transparent") : "#F8FAFC",
+                            border: `1.5px solid ${node.active ? node.color + "30" : "#E8ECF1"}`,
+                            color: node.active ? node.color : "#B0B8C4",
+                          }}
+                        >
+                          {renderFlowIcon()}
+                        </div>
+                        {node.sublabel ? (
+                          <span className="text-[10px] text-[#0F172A] max-w-[80px] truncate text-center" style={{ fontWeight: 600 }}>
+                            {node.sublabel}
+                          </span>
+                        ) : (
+                          <span className="text-[10px] text-[#94A3B8] max-w-[80px] truncate text-center" style={{ fontWeight: 500 }}>
+                            {node.label}
+                          </span>
+                        )}
+                      </div>
+                    </HoverCardTrigger>
+                    <HoverCardContent
+                      side="bottom"
+                      sideOffset={8}
+                      align="center"
+                      className="w-auto p-0 border-none bg-transparent shadow-none z-[300]"
+                    >
+                      {renderFlowHoverCard()}
+                    </HoverCardContent>
+                  </HoverCard>
+                ) : (
+                  <div className="relative flex flex-col items-center gap-1.5">
+                    <div
+                      className="w-[46px] h-[46px] rounded-xl flex items-center justify-center transition-all duration-200 overflow-hidden"
+                      style={{
+                        backgroundColor: "#F8FAFC",
+                        border: `1.5px solid #E8ECF1`,
+                        color: "#B0B8C4",
+                      }}
+                    >
+                      {renderFlowIcon()}
+                    </div>
+                    <span className="text-[10px] text-[#94A3B8] max-w-[80px] truncate text-center" style={{ fontWeight: 500 }}>
+                      {node.label}
+                    </span>
+                  </div>
+                )}
+                {i < flowNodes.length - 1 && (
+                  <ChevronRight className="w-4 h-4 text-[#CBD5E1] mx-3 sm:mx-5 shrink-0 -mt-4" />
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="border-t border-[#F1F5F9]" />
+
+        {/* ── Form Content: Two-column card layout ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+
+          {/* Left Column: Transaction Details */}
+          <div className="rounded-xl border border-[#E8ECF1] bg-white">
+            <div className="px-4 py-3 border-b border-[#F1F5F9] rounded-t-xl">
+              <span className="text-[12px] text-[#334155] tracking-wide" style={{ fontWeight: 700 }}>Transaction Details</span>
+            </div>
+            <div className="p-4 space-y-4">
+              <CurrencyDropdown selectedId={currency} onSelect={setCurrency} />
+              <SearchablePartnerDropdown
+                label="Pay To"
+                tooltip="The party receiving payment for this transaction. Ensure this matches the supplier or recipient's account details."
+                placeholder="Select payment recipient"
+                items={PARTNER_LOCATION_ITEMS}
+                selectedId={payTo}
+                onSelect={setPayTo}
+              />
+            </div>
+          </div>
+
+          {/* Right Column: Delivery & Funding */}
+          <div className="rounded-xl border border-[#E8ECF1] bg-white">
+            <div className="px-4 py-3 border-b border-[#F1F5F9] rounded-t-xl">
+              <span className="text-[12px] text-[#334155] tracking-wide" style={{ fontWeight: 700 }}>Delivery & Funding</span>
+            </div>
+            <div className="p-4 space-y-4">
+              <SearchablePartnerDropdown
+                label="Ship To"
+                tooltip="The destination where goods or services will be delivered. This may differ from the billing address."
+                placeholder="Select delivery destination"
+                items={PARTNER_LOCATION_ITEMS}
+                selectedId={shipTo}
+                onSelect={setShipTo}
+              />
+
+              {/* Funded By — stacked layout with toggle below */}
+              <div>
+                <div className="flex items-center gap-1.5 mb-1.5">
+                  <span className="text-xs text-[#0F172A]" style={{ fontWeight: 600 }}>Funded By</span>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button type="button" className="inline-flex" tabIndex={-1}>
+                        <Info className="w-3.5 h-3.5 text-[#94A3B8] cursor-help" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom" sideOffset={6} className="bg-[#1E293B] text-white text-[12px] leading-[1.5] rounded-lg max-w-[260px] px-3 py-2.5 shadow-lg z-[300]">
+                      The entity covering costs for this transaction. Enable the toggle to select a different funding source.
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+
+                {!allowAltFunding ? (
+                  <div className="space-y-2.5">
+                    <div className="h-10 px-3 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] flex items-center gap-2.5 text-sm">
+                      {fundedByObj && (
+                        <>
+                          <div
+                            className="w-6 h-6 rounded-md flex items-center justify-center text-white text-[9px] shrink-0"
+                            style={{ backgroundColor: fundedByObj.logoColor, fontWeight: 700 }}
+                          >
+                            {fundedByObj.logoText}
+                          </div>
+                          <span className="text-[#334155] truncate" style={{ fontWeight: 500 }}>{fundedByObj.name}</span>
+                          <span className="text-[9px] text-[#0A77FF] bg-[#EDF4FF] border border-[#0A77FF]/20 px-1.5 py-0.5 rounded shrink-0 ml-auto" style={{ fontWeight: 600 }}>Default</span>
+                        </>
+                      )}
+                    </div>
+                    <div
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => setAllowAltFunding(true)}
+                      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setAllowAltFunding(true); }}}
+                      className="flex items-center gap-2 cursor-pointer select-none"
+                    >
+                      <Switch
+                        checked={false}
+                        onCheckedChange={() => setAllowAltFunding(true)}
+                        className="data-[state=checked]:bg-[#0A77FF] h-[18px] w-[32px] pointer-events-none"
+                      />
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span className="text-[11px] text-[#64748B] cursor-help" style={{ fontWeight: 500 }}>Use alternative funding source</span>
+                        </TooltipTrigger>
+                        <TooltipContent side="right" sideOffset={8} className="bg-[#1E293B] text-white text-[11px] leading-[1.5] rounded-lg max-w-[200px] px-3 py-2 shadow-lg z-[300]">
+                          Enable to select a different funding source instead of the default partner.
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-2.5">
+                    <FundedByDropdown
+                      selectedId={fundedBy}
+                      onSelect={setFundedBy}
+                      hideLabel
+                    />
+                    <div
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => { setAllowAltFunding(false); setFundedBy("pl-7"); }}
+                      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setAllowAltFunding(false); setFundedBy("pl-7"); }}}
+                      className="flex items-center gap-2 cursor-pointer select-none"
+                    >
+                      <Switch
+                        checked={true}
+                        onCheckedChange={(checked) => { setAllowAltFunding(checked); if (!checked) setFundedBy("pl-7"); }}
+                        className="data-[state=checked]:bg-[#0A77FF] h-[18px] w-[32px] pointer-events-none"
+                      />
+                      <span className="text-[11px] text-[#0A77FF]" style={{ fontWeight: 500 }}>Override active — using alternative source</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (sectionId === "payment_methods" || sectionId === "customer_payment") {
+    return (
+      <PaymentMethodsSection
+        configType={configType}
+        paymentEntries={paymentEntries}
+        setPaymentEntries={setPaymentEntries}
+        savedPaymentEntries={savedPaymentEntries}
+        updatePaymentEntry={updatePaymentEntry}
+        savePaymentEntry={savePaymentEntry}
+        removePaymentEntry={removePaymentEntry}
+      />
+    );
+  }
+
+  /* Legacy payment methods code removed – now using PaymentMethodsSection component */
+  if (false as const) { void(0); }
+  if (false as const) {const typeLabel = (type: PaymentMethodType) => PAYMENT_TYPE_CARDS.find((t) => t.id === type)?.label || type;
+    const typeIcon = (type: PaymentMethodType) => PAYMENT_TYPE_CARDS.find((t) => t.id === type)?.icon || CreditCard;
+    const typeCategory = (type: PaymentMethodType) => PAYMENT_TYPE_CARDS.find((t) => t.id === type)?.category || "Other";
+    const entry = activePaymentEntry;
+
+    // Helper to render form fields for an entry
+    const renderFormFields = (e: PaymentMethodEntry) => (
+      <>
+        {/* ACH / Wire Transfer fields */}
+        {(e.type === "wire" || e.type === "ach") && (
+          <>
+            <div>
+              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Bank Name *</Label>
+              <Input value={e.bankName} onChange={(ev) => updatePaymentEntry(e.id, { bankName: ev.target.value })} placeholder="e.g. Chase Bank" className="mt-1.5 rounded-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+            </div>
+            <div>
+              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Account Title *</Label>
+              <Input value={e.accountTitle} onChange={(ev) => updatePaymentEntry(e.id, { accountTitle: ev.target.value })} placeholder="Enter account holder name" className="mt-1.5 rounded-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+            </div>
+            <div>
+              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>{e.type === "wire" ? "Account Number/IBAN *" : "Account Number *"}</Label>
+              <Input value={e.accountNumber} onChange={(ev) => updatePaymentEntry(e.id, { accountNumber: ev.target.value })} placeholder={e.type === "wire" ? "Enter account number/IBAN" : "••••••••1234"} className="mt-1.5 rounded-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+            </div>
+            {e.type === "ach" && (
+              <div>
+                <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Routing Number *</Label>
+                <Input value={e.routingNumber} onChange={(ev) => updatePaymentEntry(e.id, { routingNumber: ev.target.value })} placeholder="e.g. 021000021" className="mt-1.5 rounded-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+              </div>
+            )}
+            {e.type === "wire" && (
+              <div>
+                <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Swift Code *</Label>
+                <Input value={e.swiftCode} onChange={(ev) => updatePaymentEntry(e.id, { swiftCode: ev.target.value })} placeholder="Enter swift code" className="mt-1.5 rounded-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+              </div>
+            )}
+            <div>
+              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Phone Number for SMS Updates</Label>
+              <div className="flex gap-0 mt-1.5">
+                <div className="flex items-center gap-1.5 px-3 h-10 border border-r-0 border-[#E2E8F0] rounded-l-lg bg-white text-sm text-[#0F172A] shrink-0">
+                  <span className="text-base">🇺🇸</span>
+                  <span style={{ fontWeight: 500 }}>{e.countryCode}</span>
+                  <ChevronDown className="w-3 h-3 text-[#94A3B8]" />
+                </div>
+                <Input value={e.phone} onChange={(ev) => updatePaymentEntry(e.id, { phone: ev.target.value })} placeholder="xxx xxx xxxx" className="rounded-l-none rounded-r-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+              </div>
+            </div>
+            <div>
+              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Special Instructions</Label>
+              <Input value={e.specialInstructions} onChange={(ev) => updatePaymentEntry(e.id, { specialInstructions: ev.target.value })} placeholder="Enter any special instructions or notes..." className="mt-1.5 rounded-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+            </div>
+          </>
+        )}
+
+        {/* Check fields */}
+        {e.type === "check" && (
+          <>
+            <div>
+              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Payee Name *</Label>
+              <Input value={e.payeeName} onChange={(ev) => updatePaymentEntry(e.id, { payeeName: ev.target.value })} placeholder="Enter payee name" className="mt-1.5 rounded-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+            </div>
+            <div>
+              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Check Mailing Address *</Label>
+              <Input value={e.mailingAddress} onChange={(ev) => updatePaymentEntry(e.id, { mailingAddress: ev.target.value })} placeholder="Enter mailing address" className="mt-1.5 rounded-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+            </div>
+            <div>
+              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Bank Name</Label>
+              <Input value={e.bankName} onChange={(ev) => updatePaymentEntry(e.id, { bankName: ev.target.value })} placeholder="e.g. Chase Bank" className="mt-1.5 rounded-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+            </div>
+            <div>
+              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Account Number *</Label>
+              <Input value={e.accountNumber} onChange={(ev) => updatePaymentEntry(e.id, { accountNumber: ev.target.value })} placeholder="••••••••1234" className="mt-1.5 rounded-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+            </div>
+          </>
+        )}
+
+        {/* Credit/Debit Card fields */}
+        {e.type === "card" && (
+          <>
+            <div>
+              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Cardholder Name *</Label>
+              <Input value={e.cardholderName} onChange={(ev) => updatePaymentEntry(e.id, { cardholderName: ev.target.value })} placeholder="Enter cardholder name" className="mt-1.5 rounded-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+            </div>
+            <div>
+              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Card Number *</Label>
+              <Input value={e.cardNumber} onChange={(ev) => updatePaymentEntry(e.id, { cardNumber: ev.target.value })} placeholder="Enter card number" className="mt-1.5 rounded-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+            </div>
+            <div>
+              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Expiry Date *</Label>
+              <Input value={e.expiryDate} onChange={(ev) => updatePaymentEntry(e.id, { expiryDate: ev.target.value })} placeholder="MM/YY" className="mt-1.5 rounded-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+            </div>
+            <div>
+              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>CVV *</Label>
+              <Input value={e.cvv} onChange={(ev) => updatePaymentEntry(e.id, { cvv: ev.target.value })} placeholder="Enter CVV" className="mt-1.5 rounded-lg border-[#E2E8F0] h-10 bg-white max-w-[140px] text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+            </div>
+            <div>
+              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Billing Address</Label>
+              <Input value={e.billingAddress} onChange={(ev) => updatePaymentEntry(e.id, { billingAddress: ev.target.value })} placeholder="Enter billing address" className="mt-1.5 rounded-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+            </div>
+          </>
+        )}
+
+        {/* Digital Wallet fields */}
+        {e.type === "digital_wallet" && (
+          <>
+            <div>
+              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Wallet Provider *</Label>
+              <Input value={e.walletProvider} onChange={(ev) => updatePaymentEntry(e.id, { walletProvider: ev.target.value })} placeholder="e.g. PayPal, Venmo, Stripe" className="mt-1.5 rounded-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+            </div>
+            <div>
+              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Wallet ID/Email *</Label>
+              <Input value={e.walletId} onChange={(ev) => updatePaymentEntry(e.id, { walletId: ev.target.value })} placeholder="Enter wallet ID or email" className="mt-1.5 rounded-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+            </div>
+            <div>
+              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Phone Number</Label>
+              <div className="flex gap-0 mt-1.5">
+                <div className="flex items-center gap-1.5 px-3 h-10 border border-r-0 border-[#E2E8F0] rounded-l-lg bg-white text-sm text-[#0F172A] shrink-0">
+                  <span className="text-base">🇺🇸</span>
+                  <span style={{ fontWeight: 500 }}>{e.countryCode}</span>
+                  <ChevronDown className="w-3 h-3 text-[#94A3B8]" />
+                </div>
+                <Input value={e.phone} onChange={(ev) => updatePaymentEntry(e.id, { phone: ev.target.value })} placeholder="xxx xxx xxxx" className="rounded-l-none rounded-r-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* Cash fields */}
+        {e.type === "cash" && (
+          <>
+            <div>
+              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Recipient Name *</Label>
+              <Input value={e.recipientName} onChange={(ev) => updatePaymentEntry(e.id, { recipientName: ev.target.value })} placeholder="Enter recipient name" className="mt-1.5 rounded-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+            </div>
+            <div>
+              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Collection Point *</Label>
+              <Input value={e.collectionPoint} onChange={(ev) => updatePaymentEntry(e.id, { collectionPoint: ev.target.value })} placeholder="Enter collection point or location" className="mt-1.5 rounded-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+            </div>
+            <div>
+              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Phone Number</Label>
+              <div className="flex gap-0 mt-1.5">
+                <div className="flex items-center gap-1.5 px-3 h-10 border border-r-0 border-[#E2E8F0] rounded-l-lg bg-white text-sm text-[#0F172A] shrink-0">
+                  <span className="text-base">🇺🇸</span>
+                  <span style={{ fontWeight: 500 }}>{e.countryCode}</span>
+                  <ChevronDown className="w-3 h-3 text-[#94A3B8]" />
+                </div>
+                <Input value={e.phone} onChange={(ev) => updatePaymentEntry(e.id, { phone: ev.target.value })} placeholder="xxx xxx xxxx" className="rounded-l-none rounded-r-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* Special Instructions (for types that don't already show it) */}
+        {(e.type === "card" || e.type === "digital_wallet" || e.type === "cash") && (
+          <div>
+            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Special Instructions</Label>
+            <Input value={e.specialInstructions} onChange={(ev) => updatePaymentEntry(e.id, { specialInstructions: ev.target.value })} placeholder="Enter any special instructions or notes..." className="mt-1.5 rounded-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+          </div>
+        )}
+
+        {/* Discount / Additional Charges checkbox */}
+        <div className="pt-1 border-t border-[#E2E8F0]">
+          <label className="flex items-center gap-2.5 cursor-pointer select-none pt-3">
+            <div
+              onClick={() => updatePaymentEntry(e.id, { applyDiscount: !e.applyDiscount })}
+              className={`w-[18px] h-[18px] rounded flex items-center justify-center shrink-0 transition-colors cursor-pointer ${
+                e.applyDiscount ? "bg-[#0A77FF]" : "border-2 border-[#CBD5E1] bg-white"
+              }`}
+            >
+              {e.applyDiscount && <Check className="w-3 h-3 text-white" />}
+            </div>
+            <span className="text-xs text-[#0F172A]" style={{ fontWeight: 500 }}>Apply Discount Terms or Additional Charges</span>
+          </label>
+        </div>
+
+        {/* Discount fields */}
+        {e.applyDiscount && (
+          <>
+            <div>
+              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Discount Percentage (%)</Label>
+              <div className="relative mt-1.5">
+                <Input value={e.discountPercent} onChange={(ev) => updatePaymentEntry(e.id, { discountPercent: ev.target.value })} placeholder="e.g. 5" className="rounded-lg border-[#E2E8F0] h-10 pr-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+                <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-sm text-[#94A3B8]">%</span>
+              </div>
+            </div>
+            <div>
+              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Additional Charges (%)</Label>
+              <div className="relative mt-1.5">
+                <Input value={e.additionalCharges} onChange={(ev) => updatePaymentEntry(e.id, { additionalCharges: ev.target.value })} placeholder="e.g. 2" className="rounded-lg border-[#E2E8F0] h-10 pr-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+                <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-sm text-[#94A3B8]">%</span>
+              </div>
+            </div>
+          </>
+        )}
+      </>
+    );
+
+    return (
+      <div className="space-y-3">
+        {/* ── Heading + Helper Copy ── */}
+        <div className="mb-1">
+          <h4 className="text-sm text-[#0F172A]" style={{ fontWeight: 700 }}>Payment Methods</h4>
+          <p className="text-xs text-[#64748B] mt-0.5 leading-relaxed">
+            Specify payment methods such as ACH, Wire Transfer, or Credit Card, and input the relevant details required for each type. These settings can be applied at Partner level or customized for specific locations.{" "}
+            <span className="text-[#0A77FF] inline-flex items-center gap-0.5 cursor-pointer hover:underline" style={{ fontWeight: 500 }}>
+              Learn More <ExternalLink className="w-3 h-3" />
+            </span>
+          </p>
+        </div>
+
+        {/* ── Two Column Layout ── */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {/* ���─ Left Column: Payment Type Cards ── */}
+          <div className="rounded-lg border border-[#E8ECF1] bg-white p-3 space-y-3 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+            <h5 className="text-xs text-[#64748B]" style={{ fontWeight: 600 }}>Select payment type</h5>
+
+            {/* 6 Payment type interactive cards */}
+            <div className="space-y-2">
+              {PAYMENT_TYPE_CARDS.map((t) => {
+                const Icon = t.icon;
+                const isSelected = selectedPaymentType === t.id;
+                const count = savedPaymentEntries.filter((pe) => pe.type === t.id).length;
+                return (
+                  <button
+                    key={t.id}
+                    onClick={() => {
+                      setSelectedPaymentType(t.id);
+                      // If not editing, show the first saved entry of this type or clear
+                      if (!isEditingPayment) {
+                        const firstOfType = savedPaymentEntries.find((pe) => pe.type === t.id);
+                        setActivePaymentId(firstOfType?.id || null);
+                      }
+                    }}
+                    className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-left transition-all ${
+                      isSelected
+                        ? "bg-white border-[1.5px] border-[#0A77FF] shadow-[0_1px_4px_rgba(10,119,255,0.1)]"
+                        : "bg-white border border-[#E8ECF1] hover:border-[#CBD5E1]"
+                    }`}
+                  >
+                    <div className={`w-7 h-7 rounded-md flex items-center justify-center shrink-0 ${isSelected ? "bg-[#EDF4FF]" : "bg-[#F8FAFC]"}`}>
+                      <Icon className={`w-3.5 h-3.5 ${isSelected ? "text-[#0A77FF]" : "text-[#64748B]"}`} />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className={`text-[13px] truncate ${isSelected ? "text-[#0A77FF]" : "text-[#0F172A]"}`} style={{ fontWeight: 600 }}>{t.label}</p>
+                      <p className="text-[11px] text-[#94A3B8] truncate">{t.description}</p>
+                    </div>
+                    {count > 0 && (
+                      <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] shrink-0 ${
+                        isSelected ? "bg-[#0A77FF] text-white" : "bg-[#F1F5F9] text-[#64748B]"
+                      }`} style={{ fontWeight: 700 }}>
+                        {count}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Saved methods for selected type */}
+            {savedPaymentEntries.filter((pe) => pe.type === selectedPaymentType).length > 0 && (
+              <div>
+                <p className="text-[11px] text-[#64748B] mb-2" style={{ fontWeight: 600 }}>Saved — {typeLabel(selectedPaymentType)}</p>
+                <div className="space-y-1.5">
+                  {savedPaymentEntries
+                    .filter((pe) => pe.type === selectedPaymentType)
+                    .map((pe, idx) => {
+                      const PeIcon = typeIcon(pe.type);
+                      const isActive = pe.id === activePaymentId;
+                      return (
+                        <button
+                          key={pe.id}
+                          onClick={() => { setActivePaymentId(pe.id); setIsEditingPayment(false); }}
+                          className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-left transition-all ${
+                            isActive && !isEditingPayment
+                              ? "bg-[#EDF4FF] border border-[#0A77FF]/30 shadow-[0_1px_4px_rgba(10,119,255,0.08)]"
+                              : "bg-white border border-[#E8ECF1] hover:bg-[#F8FAFC]"
+                          }`}
+                        >
+                          <div className={`w-7 h-7 rounded-md flex items-center justify-center shrink-0 ${isActive && !isEditingPayment ? "bg-[#0A77FF]/10" : "bg-[#F1F5F9]"}`}>
+                            <PeIcon className={`w-3.5 h-3.5 ${isActive && !isEditingPayment ? "text-[#0A77FF]" : "text-[#64748B]"}`} />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <span className={`text-[12px] block truncate ${isActive && !isEditingPayment ? "text-[#0A77FF]" : "text-[#0F172A]"}`} style={{ fontWeight: 600 }}>
+                              #{idx + 1} {pe.bankName || pe.payeeName || pe.cardholderName || pe.walletProvider || pe.recipientName || typeLabel(pe.type)}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1 shrink-0">
+                            <button
+                              onClick={(ev) => { ev.stopPropagation(); editPaymentEntry(pe.id); }}
+                              className="p-1 rounded hover:bg-[#EDF4FF] transition-colors"
+                            >
+                              <Pencil className="w-3 h-3 text-[#94A3B8] hover:text-[#0A77FF]" />
+                            </button>
+                            <button
+                              onClick={(ev) => { ev.stopPropagation(); removePaymentEntry(pe.id); }}
+                              className="p-1 rounded hover:bg-[#FEF2F2] transition-colors"
+                            >
+                              <Trash2 className="w-3 h-3 text-[#94A3B8] hover:text-[#EF4444]" />
+                            </button>
+                          </div>
+                        </button>
+                      );
+                    })}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* ── Right Column: Details / Form ── */}
+          <div className="rounded-lg border border-[#E8ECF1] bg-white p-3 space-y-3 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+            {/* Editing / Adding new form */}
+            {isEditingPayment && entry ? (
+              <>
+                <div className="flex items-center justify-between">
+                  <h5 className="text-[13px] text-[#64748B]" style={{ fontWeight: 600 }}>
+                    {entry.isSaved ? "Edit" : "New"} {typeLabel(entry.type)}
+                  </h5>
+                  <button onClick={cancelPaymentEdit} className="text-xs text-[#64748B] hover:text-[#0F172A]" style={{ fontWeight: 500 }}>Cancel</button>
+                </div>
+                {renderFormFields(entry)}
+
+                {/* Save / Update CTA */}
+                <div className="pt-2 flex gap-2">
+                  <button
+                    onClick={() => savePaymentEntry(entry.id)}
+                    className="px-3.5 py-2 rounded-lg bg-[#0A77FF] text-white text-xs hover:bg-[#0960D0] transition-colors"
+                    style={{ fontWeight: 600 }}
+                  >
+                    {entry.isSaved ? "Update" : "Save"}
+                  </button>
+                  <button
+                    onClick={cancelPaymentEdit}
+                    className="px-3 py-2 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#64748B] hover:bg-[#F1F5F9] transition-colors"
+                    style={{ fontWeight: 500 }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </>
+            ) : entry && entry.isSaved ? (
+              /* Viewing a saved entry (read-only look) */
+              <>
+                <div className="flex items-center justify-between">
+                  <h5 className="text-[13px] text-[#64748B]" style={{ fontWeight: 600 }}>
+                    {typeLabel(entry.type)} details
+                  </h5>
+                  <button
+                    onClick={() => editPaymentEntry(entry.id)}
+                    className="flex items-center gap-1 text-[#0A77FF] text-xs hover:underline"
+                    style={{ fontWeight: 600 }}
+                  >
+                    <Pencil className="w-3 h-3" /> Edit
+                  </button>
+                </div>
+
+                {/* Summary fields */}
+                <div className="space-y-3">
+                  {(entry.type === "wire" || entry.type === "ach") && (
+                    <>
+                      {entry.bankName && <div><p className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Bank Name</p><p className="text-[13px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>{entry.bankName}</p></div>}
+                      {entry.accountTitle && <div><p className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Account Title</p><p className="text-[13px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>{entry.accountTitle}</p></div>}
+                      {entry.accountNumber && <div><p className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>{entry.type === "wire" ? "Account Number/IBAN" : "Account Number"}</p><p className="text-[13px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>•��••{entry.accountNumber.slice(-4)}</p></div>}
+                      {entry.type === "ach" && entry.routingNumber && <div><p className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Routing Number</p><p className="text-[13px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>{entry.routingNumber}</p></div>}
+                      {entry.type === "wire" && entry.swiftCode && <div><p className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Swift Code</p><p className="text-[13px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>{entry.swiftCode}</p></div>}
+                    </>
+                  )}
+                  {entry.type === "check" && (
+                    <>
+                      {entry.payeeName && <div><p className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Payee Name</p><p className="text-[13px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>{entry.payeeName}</p></div>}
+                      {entry.mailingAddress && <div><p className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Mailing Address</p><p className="text-[13px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>{entry.mailingAddress}</p></div>}
+                      {entry.accountNumber && <div><p className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Account Number</p><p className="text-[13px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>••••{entry.accountNumber.slice(-4)}</p></div>}
+                    </>
+                  )}
+                  {entry.type === "card" && (
+                    <>
+                      {entry.cardholderName && <div><p className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Cardholder</p><p className="text-[13px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>{entry.cardholderName}</p></div>}
+                      {entry.cardNumber && <div><p className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Card Number</p><p className="text-[13px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>••••{entry.cardNumber.slice(-4)}</p></div>}
+                      {entry.expiryDate && <div><p className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Expiry</p><p className="text-[13px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>{entry.expiryDate}</p></div>}
+                    </>
+                  )}
+                  {entry.type === "digital_wallet" && (
+                    <>
+                      {entry.walletProvider && <div><p className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Provider</p><p className="text-[13px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>{entry.walletProvider}</p></div>}
+                      {entry.walletId && <div><p className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Wallet ID/Email</p><p className="text-[13px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>{entry.walletId}</p></div>}
+                    </>
+                  )}
+                  {entry.type === "cash" && (
+                    <>
+                      {entry.recipientName && <div><p className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Recipient</p><p className="text-[13px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>{entry.recipientName}</p></div>}
+                      {entry.collectionPoint && <div><p className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Collection Point</p><p className="text-[13px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>{entry.collectionPoint}</p></div>}
+                    </>
+                  )}
+                  {entry.phone && <div><p className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Phone</p><p className="text-[13px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>{entry.countryCode} {entry.phone}</p></div>}
+                  {entry.applyDiscount && (
+                    <div className="flex gap-4">
+                      {entry.discountPercent && <div><p className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Discount</p><p className="text-[13px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>{entry.discountPercent}%</p></div>}
+                      {entry.additionalCharges && <div><p className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Add. Charges</p><p className="text-[13px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>{entry.additionalCharges}%</p></div>}
+                    </div>
+                  )}
+                </div>
+
+                {/* Add another */}
+                <div className="pt-2 border-t border-[#E2E8F0]">
+                  <button
+                    onClick={() => addPaymentEntry(selectedPaymentType)}
+                    className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#EDF4FF] text-[#0A77FF] text-xs hover:bg-[#DBEAFE] transition-colors border border-[#DBEAFE]"
+                    style={{ fontWeight: 600 }}
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    Add Method
+                  </button>
+                </div>
+              </>
+            ) : (
+              /* Empty state */
+              <>
+                <h5 className="text-xs text-[#64748B]" style={{ fontWeight: 600 }}>Payment details</h5>
+                <div className="flex flex-col items-center justify-center py-5 text-center">
+                  <div className="w-10 h-10 rounded-lg bg-[#F8FAFC] border border-[#E8ECF1] flex items-center justify-center mb-2">
+                    <CreditCard className="w-5 h-5 text-[#94A3B8]" />
+                  </div>
+                  <p className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>No payment method added yet</p>
+                  <p className="text-[11px] text-[#94A3B8] mt-0.5 max-w-[220px]">Select a type on the left, then add details.</p>
+                  <button
+                    onClick={() => addPaymentEntry(selectedPaymentType)}
+                    className="mt-3 px-3.5 py-2 rounded-lg bg-[#EDF4FF] text-[#0A77FF] text-xs hover:bg-[#DBEAFE] transition-colors flex items-center gap-1.5 border border-[#DBEAFE]"
+                    style={{ fontWeight: 600 }}
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    Add Method
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (sectionId === "credit_limit" || sectionId === "customer_credit") {
+    return (
+      <div className="space-y-3">
+        {/* Section header */}
+        <div className="mb-1">
+          <h4 className="text-sm text-[#0F172A]" style={{ fontWeight: 700 }}>Manage Credit Limit</h4>
+          <p className="text-xs text-[#64748B] mt-0.5 leading-relaxed">
+            Define the credit limit and utilization for this {configType}. These settings will guide purchase orders and notify relevant stakeholders when limits are reached or exceeded.{" "}
+            <span className="text-[#0A77FF] inline-flex items-center gap-0.5 cursor-pointer hover:underline" style={{ fontWeight: 500 }}>
+              Learn More <ExternalLink className="w-3 h-3" />
+            </span>
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {/* Left card – Credit Limit */}
+          <div className="rounded-lg border border-[#E8ECF1] bg-white p-3 space-y-3 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+            <h5 className="text-xs text-[#64748B]" style={{ fontWeight: 600 }}>Credit limit</h5>
+
+            {/* Currency */}
+            <CurrencyDropdown selectedId={currency} onSelect={setCurrency} />
+
+            {/* Maximum Credit Limit */}
+            <div>
+              <Label className="text-xs text-[#0F172A]" style={{ fontWeight: 600 }}>Maximum credit limit *</Label>
+              <div className="relative mt-1">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#64748B]">$</span>
+                <Input placeholder="50,000.00" className="pl-7 rounded-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+              </div>
+              <p className="text-[11px] text-[#94A3B8] mt-1">Set maximum credit amount for this {configType}.</p>
+            </div>
+
+            {/* Warning Threshold */}
+            <div>
+              <Label className="text-xs text-[#0F172A]" style={{ fontWeight: 600 }}>Warning threshold (%) *</Label>
+              <div className="relative mt-1">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#64748B]">%</span>
+                <Input placeholder="80" className="pl-7 rounded-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+              </div>
+              <p className="text-[11px] text-[#94A3B8] mt-1">Alert when utilization reaches this %.</p>
+            </div>
+
+            {/* Credit Utilization Indicator + KPIs */}
+            <div className="border-t border-[#E2E8F0] pt-3 space-y-3">
+              <div className="flex items-center justify-between">
+                <h5 className="text-xs text-[#64748B]" style={{ fontWeight: 600 }}>Credit utilization</h5>
+                <span className="text-xs text-[#94A3B8] inline-flex items-center gap-1">
+                  <Clock className="w-3 h-3" /> Last updated 10hrs ago
+                </span>
+              </div>
+
+              {/* Progress bar */}
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] text-[#64748B]">Used</span>
+                  <span className="text-[11px] text-[#16A34A] bg-[#F0FDF4] px-2 py-0.5 rounded-full" style={{ fontWeight: 600 }}>25%</span>
+                </div>
+                <div className="w-full h-2 bg-[#F1F5F9] rounded-full overflow-hidden">
+                  <div className="h-full bg-gradient-to-r from-[#16A34A] to-[#22C55E] rounded-full transition-all" style={{ width: "25%" }} />
+                </div>
+              </div>
+
+              {/* KPI Cards */}
+              <div className="space-y-1.5">
+                <div className="rounded-lg bg-[#F8FAFC] border border-[#E8ECF1] px-3 py-2 flex items-center justify-between">
+                  <span className="text-[11px] text-[#64748B] inline-flex items-center gap-1">Credit Limit <Info className="w-3 h-3 text-[#94A3B8]" /></span>
+                  <p className="text-[13px] text-[#0F172A] tabular-nums" style={{ fontWeight: 600 }}>$50,000.00</p>
+                </div>
+                <div className="rounded-lg bg-[#F8FAFC] border border-[#E8ECF1] px-3 py-2 flex items-center justify-between">
+                  <span className="text-[11px] text-[#64748B] inline-flex items-center gap-1">Current Balance <Info className="w-3 h-3 text-[#94A3B8]" /></span>
+                  <p className="text-[13px] text-[#0F172A] tabular-nums" style={{ fontWeight: 600 }}>$12,500.00</p>
+                </div>
+                <div className="rounded-lg bg-[#F0FDF4] border border-[#DCFCE7] px-3 py-2 flex items-center justify-between">
+                  <span className="text-[11px] text-[#15803D] inline-flex items-center gap-1">Available <Info className="w-3 h-3 text-[#86EFAC]" /></span>
+                  <p className="text-[13px] text-[#16A34A] tabular-nums" style={{ fontWeight: 600 }}>$37,500.00</p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          {/* Right card – Enforcement */}
+          <div className="rounded-lg border border-[#E8ECF1] bg-white p-3 space-y-3 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+            <h5 className="text-xs text-[#64748B]" style={{ fontWeight: 600 }}>Enforcement</h5>
+            <p className="text-xs text-[#94A3B8]">Define how the credit limit is enforced.</p>
+            <div className="space-y-2">
+              <RadioOption label="Hard Block" description="Prevent orders exceeding the limit." isSelected={enforcement === "hard_block"} onClick={() => setEnforcement("hard_block")} />
+              <RadioOption label="Soft Warning" description="Allow orders but show a warning." isSelected={enforcement === "soft_warning"} onClick={() => setEnforcement("soft_warning")} />
+              <RadioOption label="No Enforcement" description="No restrictions on credit." isSelected={enforcement === "none"} onClick={() => setEnforcement("none")} />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (sectionId === "payment_terms") {
+    const selectedTypeOption = CREATE_PT_TYPES.find((t) => t.id === createPtType);
+
+    return (
+      <div className="space-y-3">
+        {/* ── Heading + Helper Copy ── */}
+        <div className="mb-1">
+          <h4 className="text-sm text-[#0F172A]" style={{ fontWeight: 700 }}>Payment Terms</h4>
+          <p className="text-xs text-[#64748B] mt-0.5 leading-relaxed">
+            Set payment terms for this partner to apply as the default for all associated purchase orders, ensuring consistent payment processing.{" "}
+            <span className="text-[#0A77FF] inline-flex items-center gap-0.5 cursor-pointer hover:underline" style={{ fontWeight: 500 }}>
+              Learn More <ExternalLink className="w-3 h-3" />
+            </span>
+          </p>
+        </div>
+
+        {/* ── Content: Empty state or Selected term ── */}
+        {!selectedPaymentTermPreset ? (
+          /* ── Empty State ── */
+          <div className="rounded-lg border-2 border-dashed border-[#E2E8F0] bg-white py-6 px-4 flex flex-col items-center justify-center text-center">
+            {/* Icon */}
+            <div className="w-10 h-10 rounded-lg bg-[#F8FAFC] border border-[#E8ECF1] flex items-center justify-center mb-3">
+              <Receipt className="w-5 h-5 text-[#94A3B8]" />
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => { resetCreatePtForm(); setCreatePtModalOpen(true); }}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#0F172A] hover:bg-[#F8FAFC] transition-colors"
+                style={{ fontWeight: 500 }}
+              >
+                <Plus className="w-3.5 h-3.5 text-[#64748B]" /> Create terms
+              </button>
+              <button
+                onClick={() => { setPtSidebarFilter("all"); setPtSearch(""); setPaymentTermsModalOpen(true); }}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-[#DBEAFE] bg-[#EFF6FF] text-xs text-[#0A77FF] hover:bg-[#DBEAFE] transition-colors"
+                style={{ fontWeight: 500 }}
+              >
+                <Copy className="w-3.5 h-3.5" /> Explore presets
+              </button>
+            </div>
+          </div>
+        ) : (
+          /* ── Selected Payment Term Card ── */
+          <div className="rounded-lg border border-[#0A77FF] bg-white p-3 relative shadow-[0_1px_4px_rgba(10,119,255,0.08)]">
+            {/* Remove button */}
+            <button
+              onClick={() => { setSelectedPaymentTermId(null); customPaymentTermRef.current = null; }}
+              className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center shadow-sm hover:bg-red-600 transition-colors"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+
+            <div className="flex items-start gap-3">
+              {/* Type badge */}
+              <div
+                className="px-2 py-1 rounded text-xs text-white shrink-0 mt-0.5"
+                style={{ fontWeight: 700, backgroundColor: selectedPaymentTermPreset.badgeColor }}
+              >
+                {selectedPaymentTermPreset.typeBadge}
+              </div>
+
+              <div className="flex-1 min-w-0">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <h5 className="text-sm text-[#0F172A]" style={{ fontWeight: 600 }}>{selectedPaymentTermPreset.name}</h5>
+                    <span className="inline-block mt-1 px-2 py-0.5 rounded bg-[#F1F5F9] text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>
+                      {selectedPaymentTermPreset.trigger}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      onClick={() => toast.info("Duplicate flow coming soon.")}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#0F172A] hover:bg-[#F8FAFC] transition-colors"
+                      style={{ fontWeight: 500 }}
+                    >
+                      <Copy className="w-3.5 h-3.5" /> Duplicate
+                    </button>
+                    <button
+                      onClick={() => toast.info("Edit flow coming soon.")}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#0F172A] hover:bg-[#F8FAFC] transition-colors"
+                      style={{ fontWeight: 500 }}
+                    >
+                      <Pencil className="w-3.5 h-3.5" /> Edit
+                    </button>
+                    <button
+                      onClick={() => { setStandalonePtDetailTerm(selectedPaymentTermPreset); setStandalonePtDetailOpen(true); }}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#0F172A] hover:bg-[#F8FAFC] transition-colors"
+                      style={{ fontWeight: 500 }}
+                    >
+                      <Eye className="w-3.5 h-3.5" /> View
+                    </button>
+                  </div>
+                </div>
+                <p className="text-xs text-[#64748B] mt-1 leading-relaxed">{selectedPaymentTermPreset.description}</p>
+
+                {/* Vendors Applied footer */}
+                <div className="mt-2 pt-2 border-t border-[#F1F5F9] flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Vendors Applied</span>
+                    <Info className="w-3 h-3 text-[#94A3B8]" />
+                  </div>
+                  <div className="flex items-center -space-x-1.5">
+                    {Array.from({ length: Math.min(selectedPaymentTermPreset.vendorsApplied, 3) }).map((_, i) => (
+                      <div key={i} className="w-6 h-6 rounded-full border-2 border-white bg-[#94A3B8]" />
+                    ))}
+                    {selectedPaymentTermPreset.vendorsApplied > 3 && (
+                      <div className="w-6 h-6 rounded-full border-2 border-white bg-[#F1F5F9] flex items-center justify-center">
+                        <span className="text-[9px] text-[#64748B]" style={{ fontWeight: 600 }}>+{selectedPaymentTermPreset.vendorsApplied - 3}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── Create New Payment Terms Modal ── */}
+        <Dialog open={createPtModalOpen} onOpenChange={(open) => { setCreatePtModalOpen(open); if (!open) { resetCreatePtForm(); setCreatePtFullscreen(false); } }}>
+          <DialogContent
+            className="p-0 gap-0 overflow-hidden z-[210] flex flex-col transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
+            style={createPtFullscreen
+              ? { maxWidth: "calc(100% - 1rem)", width: "calc(100% - 1rem)", height: "calc(100dvh - 1rem)", maxHeight: "calc(100dvh - 1rem)", borderRadius: 16 }
+              : { maxWidth: 680, width: "95vw", borderRadius: 16 }
+            }
+            hideCloseButton
+          >
+            <DialogTitle className="sr-only">Create New Payment Terms</DialogTitle>
+            <DialogDescription className="sr-only">Fill in the form to create a new payment term.</DialogDescription>
+
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-[#E2E8F0] shrink-0">
+              <h3 className="text-[15px] text-[#0F172A]" style={{ fontWeight: 600 }}>Create New Payment Terms</h3>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setCreatePtFullscreen(!createPtFullscreen)}
+                  className="w-8 h-8 rounded-lg flex items-center justify-center text-[#94A3B8] hover:text-[#0F172A] hover:bg-[#F1F5F9] transition-all"
+                  title={createPtFullscreen ? "Exit full" : "Full view"}
+                >
+                  {createPtFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+                </button>
+                <button onClick={() => setCreatePtModalOpen(false)} className="text-[#94A3B8] hover:text-[#0F172A] transition-colors">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Form body */}
+            <div className="px-6 py-5 space-y-5 overflow-y-auto flex-1 min-h-0">
+              {/* Row 1: Payment Term Name + Payment Term Type */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-[13px] text-[#0F172A] mb-1.5 block" style={{ fontWeight: 600 }}>Payment term name</Label>
+                  <Input
+                    value={createPtName}
+                    onChange={(e) => setCreatePtName(e.target.value)}
+                    placeholder="Enter payment terms name"
+                    className="h-11 rounded-lg border-[#E2E8F0] bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
+                  />
+                </div>
+                <div>
+                  <Label className="text-[13px] text-[#0F172A] mb-1.5 block" style={{ fontWeight: 600 }}>Payment Term Type</Label>
+                  <Select value={createPtType} onValueChange={(v: "net" | "prepayment" | "split") => setCreatePtType(v)}>
+                    <SelectTrigger className="h-11 rounded-lg border-[#E2E8F0] bg-white">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="z-[250] rounded-lg">
+                      {CREATE_PT_TYPES.map((t) => (
+                        <SelectItem key={t.id} value={t.id} className="py-3 px-3">
+                          <span className="text-sm">{t.label}</span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-[#64748B] mt-1.5" style={{ fontWeight: 500 }}>Set the name for custom payment term.</p>
+                </div>
+              </div>
+
+              {/* Row 2: Trigger Event + NET Duration (visible for NET type) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-[13px] text-[#0F172A] mb-1.5 block" style={{ fontWeight: 600 }}>Trigger Event</Label>
+                  <Select value={createPtTrigger} onValueChange={setCreatePtTrigger}>
+                    <SelectTrigger className="h-11 rounded-lg border-[#E2E8F0] bg-white">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="z-[250] rounded-lg">
+                      {CREATE_PT_TRIGGERS.map((t) => (
+                        <SelectItem key={t.id} value={t.id} className="py-3 px-3">
+                          <span className="text-sm">{t.label}</span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-[#64748B] mt-1.5" style={{ fontWeight: 500 }}>Select the event that triggers the {createPtType === "net" ? "NET" : createPtType === "prepayment" ? "prepayment" : "split"} term.</p>
+                </div>
+                {createPtType === "net" && (
+                  <div>
+                    <Label className="text-[13px] text-[#0F172A] mb-1.5 block" style={{ fontWeight: 600 }}>NET Duration (Days)</Label>
+                    <Select value={createPtDuration} onValueChange={setCreatePtDuration}>
+                      <SelectTrigger className="h-11 rounded-lg border-[#E2E8F0] bg-white">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="z-[250] rounded-lg">
+                        {CREATE_PT_DURATIONS.map((d) => (
+                          <SelectItem key={d.id} value={d.id} className="py-3 px-3">
+                            <span className="text-sm">{d.label}</span>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <p className="text-xs text-[#64748B] mt-1.5" style={{ fontWeight: 500 }}>Enter days after the event for payment.</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Description */}
+              <div>
+                <Label className="text-[13px] text-[#0F172A] mb-1.5 block" style={{ fontWeight: 600 }}>Description</Label>
+                <div className="relative">
+                  <Textarea
+                    value={createPtDescription}
+                    onChange={(e) => {
+                      if (e.target.value.length <= 150) setCreatePtDescription(e.target.value);
+                    }}
+                    placeholder="type here..."
+                    className="rounded-lg border-[#E2E8F0] bg-white min-h-[100px] text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
+                  />
+                  <span className="absolute bottom-2.5 right-3 text-xs text-[#94A3B8]">{createPtDescription.length}/150</span>
+                </div>
+              </div>
+
+              {/* Apply Discount Terms */}
+              <div className={`rounded-xl border p-4 transition-colors ${createPtApplyDiscount ? "border-[#0A77FF] bg-[#F8FAFC]" : "border-[#E2E8F0] bg-[#F8FAFC]"}`}>
+                <div className="flex items-start gap-3">
+                  <Checkbox
+                    checked={createPtApplyDiscount}
+                    onCheckedChange={(v) => setCreatePtApplyDiscount(v === true)}
+                    className="mt-0.5"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <h5 className="text-sm text-[#0F172A]" style={{ fontWeight: 600 }}>Apply Discount Terms</h5>
+                    <p className="text-xs text-[#64748B] mt-0.5 leading-relaxed">
+                      Enable early payment discounts based on the selected NET terms. The discount will apply if payment is completed within the specified period.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Discount fields (shown when checked) */}
+                {createPtApplyDiscount && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 pt-4 border-t border-[#E2E8F0]">
+                    <div>
+                      <Label className="text-[13px] text-[#0F172A] mb-1.5 block" style={{ fontWeight: 600 }}>Discount Percentage (%)</Label>
+                      <div className="relative">
+                        <Input
+                          value={createPtDiscountPercent}
+                          onChange={(e) => setCreatePtDiscountPercent(e.target.value)}
+                          placeholder="Enter discount percentage (e.g., 5%)"
+                          className="h-11 rounded-lg border-[#E2E8F0] bg-white pr-8 text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
+                        />
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-[#94A3B8]">%</span>
+                      </div>
+                      <p className="text-xs text-[#64748B] mt-1.5" style={{ fontWeight: 500 }}>Specify the percentage discount applied for early payment.</p>
+                    </div>
+                    <div>
+                      <Label className="text-[13px] text-[#0F172A] mb-1.5 block" style={{ fontWeight: 600 }}>Eligible Payment Period (Days)</Label>
+                      <Select value={createPtDiscountPeriod} onValueChange={setCreatePtDiscountPeriod}>
+                        <SelectTrigger className="h-11 rounded-lg border-[#E2E8F0] bg-white">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="z-[250] rounded-lg">
+                          {CREATE_PT_DISCOUNT_PERIODS.map((d) => (
+                            <SelectItem key={d.id} value={d.id} className="py-3 px-3">
+                              <span className="text-sm">{d.label}</span>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <p className="text-xs text-[#64748B] mt-1.5" style={{ fontWeight: 500 }}>Set the payment deadline to apply the discount.</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-[#E2E8F0]">
+              <button
+                onClick={() => { setCreatePtModalOpen(false); resetCreatePtForm(); }}
+                className="px-5 py-2.5 rounded-lg border border-[#E2E8F0] bg-white text-sm text-[#0F172A] hover:bg-[#F8FAFC] transition-colors"
+                style={{ fontWeight: 600 }}
+              >
+                Discard
+              </button>
+              <button
+                onClick={handleSaveNewPaymentTerm}
+                disabled={!createPtName.trim()}
+                className="px-5 py-2.5 rounded-lg bg-[#0A77FF] text-white text-sm hover:bg-[#0862D0] transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#0A77FF]"
+                style={{ fontWeight: 600 }}
+              >
+                Save & Apply
+              </button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* ── Explore Presets Modal ── */}
+        <Dialog open={paymentTermsModalOpen} onOpenChange={(v) => { setPaymentTermsModalOpen(v); if (!v) { setPreviewPaymentTermId(null); setPreviewTab("items"); setPtFullscreen(false); setAboutPtOpen(true); setVendorsPtOpen(true); } }}>
+          <DialogContent
+            className="p-0 gap-0 overflow-hidden z-[210] border-0 shadow-[0_24px_80px_-12px_rgba(0,0,0,0.18)] transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] flex flex-col"
+            style={ptFullscreen
+              ? { maxWidth: "calc(100% - 1rem)", width: "calc(100% - 1rem)", height: "calc(100dvh - 1rem)", maxHeight: "calc(100dvh - 1rem)", borderRadius: 16 }
+              : { maxWidth: 980, width: "95vw", height: "85vh", maxHeight: "85vh", borderRadius: 16 }
+            }
+            hideCloseButton
+          >
+            <DialogTitle className="sr-only">Select payment terms</DialogTitle>
+            <DialogDescription className="sr-only">Browse and select a payment term preset to apply to this vendor.</DialogDescription>
+
+            {/* ── Header (changes based on preview vs list mode) ── */}
+            {previewPaymentTermId ? (() => {
+              const previewTerm = PAYMENT_TERM_PRESETS.find((t) => t.id === previewPaymentTermId) || (customPaymentTermRef.current?.id === previewPaymentTermId ? customPaymentTermRef.current : null);
+              if (!previewTerm) return null;
+              const ptDuration = previewTerm.duration || (previewTerm.name.match(/\d+/) ? previewTerm.name.match(/\d+/)![0] : "30");
+              const ptTypeLabel = CREATE_PT_TYPES.find((t) => t.id === previewTerm.category)?.label || previewTerm.typeBadge;
+              const PT_DETAIL_TABS = [
+                { id: "items", label: "Items", icon: Package },
+                { id: "vendors_applied", label: "Vendors", icon: Building2 },
+                { id: "notes", label: "Notes", icon: FileText },
+                { id: "attachments", label: "Files", icon: Paperclip },
+                { id: "audit_log", label: "Audit", icon: Clock },
+                { id: "recent_activity", label: "Activity", icon: ChartColumn },
+              ];
+              const PT_MOCK_ITEMS = [
+                { id: "ITM-001", name: "Steel Bolts M10x40", partNo: "SB-M10-40", category: "Fasteners", price: "$12.50", status: "Active" as const },
+                { id: "ITM-002", name: "Hex Nuts M10", partNo: "HN-M10", category: "Fasteners", price: "$4.20", status: "Active" as const },
+                { id: "ITM-003", name: "Flat Washers M10", partNo: "FW-M10", category: "Fasteners", price: "$2.80", status: "Active" as const },
+                { id: "ITM-004", name: "Spring Lock Washers M10", partNo: "SLW-M10", category: "Fasteners", price: "$3.40", status: "Inactive" as const },
+                { id: "ITM-005", name: "Threaded Rods M12x1m", partNo: "TR-M12-1M", category: "Rods", price: "$18.90", status: "Active" as const },
+                { id: "ITM-006", name: "Carriage Bolts 3/8x3", partNo: "CB-38-3", category: "Fasteners", price: "$8.60", status: "Active" as const },
+              ];
+              const PT_MOCK_VENDORS = [
+                { id: "V-1", name: "Acme Industrial Supply Co.", avatar: "AI", status: "Active" as const, itemCount: 12 },
+                { id: "V-2", name: "Global Fasteners Inc.", avatar: "GF", status: "Active" as const, itemCount: 8 },
+                { id: "V-3", name: "Berlin Technik GmbH", avatar: "BT", status: "Active" as const, itemCount: 15 },
+                { id: "V-4", name: "Tokyo Materials Corp.", avatar: "TM", status: "Inactive" as const, itemCount: 3 },
+              ];
+              const badgeColor = previewTerm.badgeColor;
+
+              return (
+                <>
+                  {/* ─── Header Bar (pricing rules style) ─── */}
+                  <div className="shrink-0 bg-white rounded-t-none sm:rounded-t-2xl border-b border-[#EEF2F6]">
+                    <div className="px-3 sm:px-5 py-3 sm:py-3.5 flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <button onClick={() => { setPreviewPaymentTermId(null); setPreviewTab("items"); }} className="w-8 h-8 rounded-lg border border-[#E2E8F0] flex items-center justify-center hover:bg-[#F8FAFC] hover:border-[#CBD5E1] transition-all shrink-0 cursor-pointer">
+                          <ArrowLeft className="w-4 h-4 text-[#64748B]" />
+                        </button>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2.5">
+                            <h3 className="text-[15px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{previewTerm.name}</h3>
+                            <span className="hidden sm:inline-flex items-stretch rounded-full overflow-hidden border shrink-0" style={{ borderColor: badgeColor + "40" }}>
+                              <span className="inline-flex items-center gap-1 px-2 py-[2px] text-[10px]" style={{ fontWeight: 600, color: badgeColor, backgroundColor: badgeColor + "15" }}>
+                                <Receipt className="w-3 h-3" />
+                                {previewTerm.typeBadge}
+                              </span>
+                              <span className="inline-flex items-center px-2 py-[2px] text-[10px] bg-white text-[#64748B] border-l" style={{ fontWeight: 500, borderColor: badgeColor + "40" }}>
+                                {previewTerm.trigger}
+                              </span>
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2 mt-0.5">
+                            <span className="text-[11px] text-[#64748B] truncate max-w-[340px]" style={{ fontWeight: 400 }}>{previewTerm.description}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        <button
+                          onClick={() => toast.info("Edit coming soon")}
+                          className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#475569] hover:bg-[#F8FAFC] hover:border-[#CBD5E1] transition-all cursor-pointer"
+                          style={{ fontWeight: 500 }}
+                        >
+                          <Pencil className="w-3.5 h-3.5" />
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => toast.info("Archive coming soon")}
+                          className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#475569] hover:bg-[#F8FAFC] hover:border-[#CBD5E1] transition-all cursor-pointer"
+                          style={{ fontWeight: 500 }}
+                        >
+                          <Archive className="w-3.5 h-3.5" />
+                          Archive
+                        </button>
+                        <div className="w-px h-5 bg-[#E2E8F0] mx-0.5 hidden sm:block" />
+                        <button
+                          onClick={() => setPtFullscreen(!ptFullscreen)}
+                          className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#475569] hover:bg-[#F8FAFC] hover:border-[#CBD5E1] transition-all cursor-pointer"
+                          style={{ fontWeight: 500 }}
+                        >
+                          {ptFullscreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
+                          {ptFullscreen ? "Exit full" : "Full view"}
+                        </button>
+                        <button onClick={() => setPaymentTermsModalOpen(false)} className="w-8 h-8 rounded-lg flex items-center justify-center text-[#94A3B8] hover:text-[#64748B] hover:bg-[#F1F5F9] transition-all cursor-pointer">
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* ─── Body: Split Layout ─── */}
+                  <div className="flex flex-1 overflow-hidden min-h-0">
+                    {/* ─── LEFT PANEL ─── */}
+                    <div className="w-[300px] border-r border-[#E8ECF1] flex flex-col bg-[#FAFBFC] shrink-0 overflow-y-auto">
+                      {/* Hero value + status */}
+                      <div className="px-4 pt-4 pb-3 border-b border-[#E8ECF1]">
+                        <div className="flex items-baseline justify-between gap-3">
+                          <div className="flex items-baseline gap-2">
+                            <span className="text-[28px] tabular-nums leading-none tracking-tight" style={{ fontWeight: 600, color: badgeColor }}>
+                              {ptDuration}
+                            </span>
+                            <span className="text-[12px] text-[#94A3B8]" style={{ fontWeight: 500 }}>
+                              days
+                            </span>
+                          </div>
+                          <span className="px-2 py-[3px] rounded-full text-[10px] border shrink-0" style={{ fontWeight: 500, color: "#059669", backgroundColor: "#ECFDF5", borderColor: "#A7F3D0" }}>
+                            Active
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-3 mt-3">
+                          {[
+                            { label: "Items", value: String(PT_MOCK_ITEMS.length) },
+                            { label: "Vendors", value: String(previewTerm.vendorsApplied) },
+                          ].map((s, i) => (
+                            <div key={s.label} className="flex items-center gap-3">
+                              {i > 0 && <div className="w-px h-4 bg-[#E8ECF1]" />}
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-[14px] text-[#0F172A] tabular-nums" style={{ fontWeight: 600 }}>{s.value}</span>
+                                <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>{s.label}</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Quick actions */}
+                      <div className="flex items-center gap-1.5 px-4 py-2.5 border-b border-[#E8ECF1]">
+                        {[
+                          { icon: Package, label: "Add item" },
+                          { icon: Building2, label: "Add vendor" },
+                          { icon: MoreHorizontal, label: "More actions" },
+                        ].map((a) => (
+                          <Tooltip key={a.label}>
+                            <TooltipTrigger asChild>
+                              <button
+                                onClick={() => toast.info(`${a.label} coming soon`)}
+                                className="w-8 h-8 rounded-lg border border-[#E2E8F0] bg-white flex items-center justify-center cursor-pointer transition-all duration-150 hover:bg-[#F8FAFC] hover:border-[#CBD5E1] active:scale-[0.97]"
+                              >
+                                <a.icon className="w-3.5 h-3.5 text-[#64748B]" />
+                              </button>
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom" sideOffset={6} className="z-[300] !bg-white !text-[#334155] !border !border-[#E2E8F0] !shadow-sm rounded-lg text-[11px] px-2.5 py-1.5" style={{ fontWeight: 500 }}>
+                              {a.label}
+                            </TooltipContent>
+                          </Tooltip>
+                        ))}
+                      </div>
+
+                      {/* About section (collapsible) */}
+                      <div className="border-b border-[#E8ECF1]">
+                        <button onClick={() => setAboutPtOpen(!aboutPtOpen)} className="w-full flex items-center justify-between px-4 py-2.5 text-[12px] text-[#0F172A] cursor-pointer hover:bg-white/60 transition-colors" style={{ fontWeight: 600 }}>
+                          About
+                          <ChevronDown className={`w-3.5 h-3.5 text-[#94A3B8] transition-transform duration-200 ${aboutPtOpen ? "rotate-180" : ""}`} />
+                        </button>
+                        <div className={`overflow-hidden transition-all duration-200 ${aboutPtOpen ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0"}`}>
+                          <div className="px-4 pb-3 space-y-3">
+                            <p className="text-[11px] text-[#475569] leading-relaxed" style={{ fontWeight: 400 }}>{previewTerm.description}</p>
+
+                            <div className="flex items-center justify-between rounded-lg border px-3 py-2 bg-white border-[#E8ECF1]">
+                              <div className="flex items-center gap-2">
+                                <Zap className="w-3.5 h-3.5 text-[#F59E0B]" />
+                                <span className="text-[11px] text-[#334155]" style={{ fontWeight: 500 }}>Trigger Event</span>
+                              </div>
+                              <span className="text-[11px] text-[#0F172A]" style={{ fontWeight: 600 }}>{previewTerm.trigger}</span>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-2">
+                              <div className="rounded-lg border border-[#E8ECF1] bg-white px-3 py-2">
+                                <p className="text-[9px] text-[#94A3B8] uppercase tracking-wide" style={{ fontWeight: 500 }}>Type</p>
+                                <p className="text-[12px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>{ptTypeLabel}</p>
+                              </div>
+                              <div className="rounded-lg border border-[#E8ECF1] bg-white px-3 py-2">
+                                <p className="text-[9px] text-[#94A3B8] uppercase tracking-wide" style={{ fontWeight: 500 }}>Duration</p>
+                                <p className="text-[12px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>{ptDuration} days</p>
+                              </div>
+                            </div>
+
+                            {(previewTerm.applyDiscount || previewTerm.discountPercent) && (
+                              <div className="grid grid-cols-2 gap-2">
+                                <div className="rounded-lg border border-[#E8ECF1] bg-white px-3 py-2">
+                                  <p className="text-[9px] text-[#94A3B8] uppercase tracking-wide" style={{ fontWeight: 500 }}>Discount %</p>
+                                  <p className="text-[12px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>{previewTerm.discountPercent || "2"}%</p>
+                                </div>
+                                <div className="rounded-lg border border-[#E8ECF1] bg-white px-3 py-2">
+                                  <p className="text-[9px] text-[#94A3B8] uppercase tracking-wide" style={{ fontWeight: 500 }}>Discount Period</p>
+                                  <p className="text-[12px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>{previewTerm.discountPeriod || "10"} days</p>
+                                </div>
+                              </div>
+                            )}
+
+                            <div className="grid grid-cols-2 gap-2">
+                              <div className="rounded-lg border border-[#E8ECF1] bg-white px-3 py-2">
+                                <p className="text-[9px] text-[#94A3B8] uppercase tracking-wide" style={{ fontWeight: 500 }}>Created by</p>
+                                <div className="flex items-center gap-1.5 mt-1">
+                                  {(() => { const cTint = getAvatarTint("John Doe"); return (
+                                    <div className="w-5 h-5 rounded-full flex items-center justify-center text-[8px] shrink-0" style={{ backgroundColor: cTint.bg, color: cTint.fg, fontWeight: 700 }}>JD</div>
+                                  ); })()}
+                                  <span className="text-[11px] text-[#0F172A] truncate" style={{ fontWeight: 500 }}>John Doe</span>
+                                </div>
+                              </div>
+                              <div className="rounded-lg border border-[#E8ECF1] bg-white px-3 py-2">
+                                <p className="text-[9px] text-[#94A3B8] uppercase tracking-wide" style={{ fontWeight: 500 }}>Created at</p>
+                                <p className="text-[11px] text-[#0F172A] mt-1" style={{ fontWeight: 500 }}>Dec 15, 2025</p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Vendors section (collapsible) */}
+                      <div className="flex-1">
+                        <button onClick={() => setVendorsPtOpen(!vendorsPtOpen)} className="w-full flex items-center justify-between px-4 py-2.5 text-[12px] text-[#0F172A] cursor-pointer hover:bg-white/60 transition-colors" style={{ fontWeight: 600 }}>
+                          <span>Vendors ({previewTerm.vendorsApplied})</span>
+                          <ChevronDown className={`w-3.5 h-3.5 text-[#94A3B8] transition-transform duration-200 ${vendorsPtOpen ? "rotate-180" : ""}`} />
+                        </button>
+                        <div className={`overflow-hidden transition-all duration-200 ${vendorsPtOpen ? "max-h-[2000px] opacity-100" : "max-h-0 opacity-0"}`}>
+                          <div className="px-4 pb-4 space-y-2">
+                            {PT_MOCK_VENDORS.map((v) => {
+                              const vTint = getAvatarTint(v.name);
+                              const vInitials = v.name.split(" ").map(w => w[0]).slice(0, 2).join("");
+                              return (
+                                <div key={v.id} className="rounded-xl border p-3 transition-all bg-white border-[#E8ECF1] hover:border-[#CBD5E1] hover:shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2.5">
+                                      <div className="w-7 h-7 rounded-md flex items-center justify-center text-[10px]" style={{ fontWeight: 700, backgroundColor: vTint.bg, color: vTint.fg }}>
+                                        {vInitials}
+                                      </div>
+                                      <div>
+                                        <span className="text-[12px] text-[#0F172A] block" style={{ fontWeight: 500 }}>{v.name}</span>
+                                        <span className="text-[10px] text-[#94A3B8]">{v.id}</span>
+                                      </div>
+                                    </div>
+                                    <span className={`px-2 py-0.5 rounded-full text-[10px] border ${
+                                      v.status === "Active" ? "bg-[#ECFDF5] text-[#059669] border-[#A7F3D0]" : "bg-[#F8FAFC] text-[#94A3B8] border-[#E2E8F0]"
+                                    }`} style={{ fontWeight: 500 }}>{v.status}</span>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* ─── RIGHT PANEL ─── */}
+                    <div className="flex-1 flex flex-col overflow-hidden bg-white">
+                      {/* Tabs row */}
+                      <div className="flex items-center border-b border-[#E8ECF1] shrink-0">
+                        <div className="flex items-center flex-1 overflow-x-auto px-2">
+                          {PT_DETAIL_TABS.map((t) => {
+                            const active = previewTab === t.id;
+                            const count = t.id === "items" ? PT_MOCK_ITEMS.length : t.id === "vendors_applied" ? previewTerm.vendorsApplied : 0;
+                            return (
+                              <button
+                                key={t.id}
+                                onClick={() => setPreviewTab(t.id)}
+                                className={`inline-flex items-center gap-1.5 px-3 py-2.5 text-[12px] border-b-2 transition-all cursor-pointer whitespace-nowrap ${
+                                  active ? "border-[#0A77FF] text-[#0A77FF] bg-white" : "border-transparent text-[#94A3B8] hover:text-[#64748B]"
+                                }`}
+                                style={{ fontWeight: active ? 600 : 500 }}
+                              >
+                                <t.icon className="w-3.5 h-3.5" />
+                                {t.label}
+                                {count > 0 && (
+                                  <span className={`text-[9px] rounded-full px-1.5 py-px min-w-[16px] text-center ${active ? "bg-[#0A77FF]/10 text-[#0A77FF]" : "bg-[#F1F5F9] text-[#94A3B8]"}`} style={{ fontWeight: 700 }}>
+                                    {count}
+                                  </span>
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Items tab */}
+                      {previewTab === "items" && (
+                        <div className="flex-1 flex flex-col overflow-hidden">
+                          <div className="flex items-center justify-between gap-3 px-4 pt-3 pb-2 shrink-0">
+                            <div className="flex items-center gap-2 flex-1 min-w-0">
+                              <div className="relative flex-1 max-w-[220px]">
+                                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8] pointer-events-none" />
+                                <input type="text" placeholder="Search items..." className="w-full pl-8 h-8 text-[12px] bg-white border border-[#E2E8F0] rounded-lg px-3 py-1.5 focus:outline-none focus:border-[#0A77FF] transition-colors placeholder:text-[#94A3B8]" />
+                              </div>
+                              <button className="h-8 px-2.5 rounded-lg border border-[#E2E8F0] bg-white text-[12px] text-[#475569] hover:bg-[#F8FAFC] cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 500 }}>
+                                <SlidersHorizontal className="w-3.5 h-3.5" /> Filters
+                              </button>
+                            </div>
+                            <button onClick={() => toast.info("Add item coming soon")} className="h-8 px-3 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-[12px] shadow-sm cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 600 }}>
+                              <Plus className="w-3.5 h-3.5" /> Add item
+                            </button>
+                          </div>
+
+                          <div className="h-px bg-[#E8ECF1] mx-4 shrink-0" />
+
+                          <div className="flex-1 overflow-auto">
+                            <table className="w-full text-[12px]">
+                              <thead className="sticky top-0 bg-[#F8FAFC] z-10">
+                                <tr>
+                                  <th className="text-left px-4 py-2.5 text-[#94A3B8] text-[11px] border-b border-[#E8ECF1]" style={{ fontWeight: 600 }}>Item</th>
+                                  <th className="text-left px-4 py-2.5 text-[#94A3B8] text-[11px] border-b border-[#E8ECF1]" style={{ fontWeight: 600 }}>Part No.</th>
+                                  <th className="text-left px-4 py-2.5 text-[#94A3B8] text-[11px] border-b border-[#E8ECF1]" style={{ fontWeight: 600 }}>Category</th>
+                                  <th className="text-right px-4 py-2.5 text-[#94A3B8] text-[11px] border-b border-[#E8ECF1]" style={{ fontWeight: 600 }}>Price</th>
+                                  <th className="text-left px-4 py-2.5 text-[#94A3B8] text-[11px] border-b border-[#E8ECF1]" style={{ fontWeight: 600 }}>Status</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {PT_MOCK_ITEMS.map((item) => (
+                                  <tr key={item.id} className="hover:bg-[#F8FBFF] transition-colors">
+                                    <td className="px-4 py-2.5">
+                                      <div className="flex items-center gap-2.5">
+                                        <div className="w-8 h-8 rounded-lg bg-[#F1F5F9] border border-[#E2E8F0] flex items-center justify-center shrink-0">
+                                          <Package className="w-3.5 h-3.5 text-[#94A3B8]" />
+                                        </div>
+                                        <span className="text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>{item.name}</span>
+                                      </div>
+                                    </td>
+                                    <td className="px-4 py-2.5">
+                                      <code className="text-[11px] text-[#64748B] bg-[#F1F5F9] px-1.5 py-0.5 rounded">{item.partNo}</code>
+                                    </td>
+                                    <td className="px-4 py-2.5">
+                                      <span className="px-2 py-0.5 rounded-md bg-[#F1F5F9] text-[#64748B] text-[11px]" style={{ fontWeight: 500 }}>{item.category}</span>
+                                    </td>
+                                    <td className="px-4 py-2.5 text-right text-[#0F172A] tabular-nums" style={{ fontWeight: 500 }}>{item.price}</td>
+                                    <td className="px-4 py-2.5">
+                                      <span className="inline-flex px-2 py-0.5 rounded-full text-[10px] border" style={{ fontWeight: 500, color: item.status === "Active" ? "#059669" : "#DC2626", backgroundColor: item.status === "Active" ? "#ECFDF5" : "#FEF2F2", borderColor: item.status === "Active" ? "#A7F3D0" : "#FECACA" }}>
+                                        {item.status}
+                                      </span>
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+
+                          <div className="flex items-center justify-between px-4 py-2 border-t border-[#E8ECF1] shrink-0 bg-[#FAFBFC]">
+                            <span className="text-[11px] text-[#94A3B8]">Showing {PT_MOCK_ITEMS.length} of {PT_MOCK_ITEMS.length} items</span>
+                            <div className="flex items-center gap-2 text-[11px] text-[#94A3B8]">
+                              <span>Records per page</span>
+                              <select className="h-6 px-1.5 rounded border border-[#E2E8F0] text-[11px] cursor-pointer outline-none">
+                                <option>20</option><option>50</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Vendors tab */}
+                      {previewTab === "vendors_applied" && (
+                        <div className="flex-1 flex flex-col overflow-hidden">
+                          <div className="flex items-center justify-between gap-3 px-4 pt-3 pb-2 shrink-0">
+                            <div className="flex items-center gap-2 flex-1 min-w-0">
+                              <div className="relative flex-1 max-w-[220px]">
+                                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8] pointer-events-none" />
+                                <input type="text" placeholder="Search vendors..." className="w-full pl-8 h-8 text-[12px] bg-white border border-[#E2E8F0] rounded-lg px-3 py-1.5 focus:outline-none focus:border-[#0A77FF] transition-colors placeholder:text-[#94A3B8]" />
+                              </div>
+                            </div>
+                            <button onClick={() => toast.info("Add vendor coming soon")} className="h-8 px-3 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-[12px] shadow-sm cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 600 }}>
+                              <Plus className="w-3.5 h-3.5" /> Add vendor
+                            </button>
+                          </div>
+
+                          <div className="h-px bg-[#E8ECF1] mx-4 shrink-0" />
+
+                          <div className="flex-1 overflow-auto">
+                            <table className="w-full text-[12px]">
+                              <thead className="sticky top-0 bg-[#F8FAFC] z-10">
+                                <tr>
+                                  <th className="text-left px-4 py-2.5 text-[#94A3B8] text-[11px] border-b border-[#E8ECF1]" style={{ fontWeight: 600 }}>Vendor Name</th>
+                                  <th className="text-left px-4 py-2.5 text-[#94A3B8] text-[11px] border-b border-[#E8ECF1]" style={{ fontWeight: 600 }}>Status</th>
+                                  <th className="text-right px-4 py-2.5 text-[#94A3B8] text-[11px] border-b border-[#E8ECF1]" style={{ fontWeight: 600 }}>No. of Items</th>
+                                  <th className="text-right px-4 py-2.5 text-[#94A3B8] text-[11px] border-b border-[#E8ECF1]" style={{ fontWeight: 600 }}>Actions</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {PT_MOCK_VENDORS.map((v) => {
+                                  const vTint = getAvatarTint(v.name);
+                                  const vInit = v.name.split(" ").map(w => w[0]).slice(0, 2).join("");
+                                  return (
+                                    <tr key={v.id} className="hover:bg-[#F8FBFF] transition-colors">
+                                      <td className="px-4 py-2.5">
+                                        <div className="flex items-center gap-2.5">
+                                          <div className="w-8 h-8 rounded-full flex items-center justify-center text-[11px] shrink-0" style={{ fontWeight: 600, backgroundColor: vTint.bg, color: vTint.fg }}>
+                                            {vInit}
+                                          </div>
+                                          <span className="text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>{v.name}</span>
+                                        </div>
+                                      </td>
+                                      <td className="px-4 py-2.5">
+                                        <span className="inline-flex px-2 py-0.5 rounded-full text-[10px] border" style={{ fontWeight: 500, color: v.status === "Active" ? "#059669" : "#DC2626", backgroundColor: v.status === "Active" ? "#ECFDF5" : "#FEF2F2", borderColor: v.status === "Active" ? "#A7F3D0" : "#FECACA" }}>
+                                          {v.status}
+                                        </span>
+                                      </td>
+                                      <td className="px-4 py-2.5 text-right">
+                                        <span className="text-[14px] text-[#0F172A] tabular-nums" style={{ fontWeight: 600 }}>{v.itemCount}</span>
+                                      </td>
+                                      <td className="px-4 py-2.5 text-right">
+                                        <button className="w-6 h-6 rounded flex items-center justify-center text-[#94A3B8] hover:text-[#475569] hover:bg-[#F1F5F9] cursor-pointer transition-colors">
+                                          <MoreHorizontal className="w-3.5 h-3.5" />
+                                        </button>
+                                      </td>
+                                    </tr>
+                                  );
+                                })}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Placeholder tabs */}
+                      {previewTab !== "items" && previewTab !== "vendors_applied" && (
+                        <div className="flex-1 flex items-center justify-center">
+                          <div className="text-center">
+                            <div className="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3" style={{ backgroundColor: badgeColor + "12", border: `1px solid ${badgeColor}30` }}>
+                              {(() => { const T = PT_DETAIL_TABS.find((x) => x.id === previewTab); return T ? <T.icon className="w-5 h-5" style={{ color: badgeColor }} /> : null; })()}
+                            </div>
+                            <p className="text-[13px] text-[#334155]" style={{ fontWeight: 500 }}>{PT_DETAIL_TABS.find((x) => x.id === previewTab)?.label || previewTab}</p>
+                            <p className="text-[11px] text-[#CBD5E1] mt-1" style={{ fontWeight: 400 }}>Coming soon</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* ── Detail footer ── */}
+                  <div className="flex items-center justify-between px-6 h-12 border-t border-[#EEF2F6] bg-card shrink-0">
+                    <div className="text-[11px] text-muted-foreground" style={{ fontWeight: 500 }}>
+                      Reviewing: <span className="text-[#475569]" style={{ fontWeight: 600 }}>{previewTerm.name}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleDuplicatePaymentTerm(previewTerm)}
+                      >
+                        <Copy className="w-3.5 h-3.5 mr-1.5" /> Duplicate
+                      </Button>
+                      <Button
+                        size="sm"
+                        onClick={() => {
+                          setSelectedPaymentTermId(previewTerm.id);
+                          setPaymentTermsModalOpen(false);
+                          setPreviewPaymentTermId(null);
+                          setPreviewTab("items");
+                        }}
+                        className="bg-primary text-primary-foreground"
+                      >
+                        <Check className="w-3.5 h-3.5 mr-1.5" /> Use Template
+                      </Button>
+                    </div>
+                  </div>
+                </>
+              );
+            })() : (
+            <>
+            {/* ── Header (list mode) ── */}
+            <div className="flex items-center justify-between px-6 h-12 border-b border-[#EEF2F6] bg-card shrink-0">
+              <div className="flex items-center gap-3">
+                <div>
+                  <h3 className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Payment Terms</h3>
+                  <p className="text-[11px] text-muted-foreground" style={{ fontWeight: 400 }}>Browse templates or create custom terms</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setPtFullscreen(!ptFullscreen)}
+                  className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#475569] hover:bg-[#F8FAFC] hover:border-[#CBD5E1] transition-all cursor-pointer"
+                  style={{ fontWeight: 500 }}
+                >
+                  {ptFullscreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
+                  {ptFullscreen ? "Exit full" : "Full view"}
+                </button>
+                <button
+                  onClick={() => setPaymentTermsModalOpen(false)}
+                  className="w-8 h-8 rounded-lg flex items-center justify-center text-[#94A3B8] hover:text-[#0F172A] hover:bg-[#F1F5F9] transition-all cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+            <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
+              {/* ── Main content (no sidebar) ── */}
+              <div className="flex-1 min-w-0 flex flex-col overflow-hidden bg-white">
+                {/* Sticky toolbar */}
+                <div className="shrink-0 bg-white border-b border-[#EEF2F6] px-5 pt-4 pb-3 space-y-3">
+                  {/* Search + sort row */}
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
+                      <Input
+                        value={ptSearch}
+                        onChange={(e) => setPtSearch(e.target.value)}
+                        placeholder="Search payment terms..."
+                        className="pl-9 pr-8 rounded-lg border-[#D0D7E1] h-9 bg-white text-[13px] w-[280px] placeholder:text-[#94A3B8] shadow-[0_1px_2px_rgba(0,0,0,0.05)] focus:border-[#0A77FF] focus:shadow-[0_0_0_3px_rgba(10,119,255,0.08)]"
+                      />
+                      {ptSearch && (
+                        <button onClick={() => setPtSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#94A3B8] hover:text-[#0F172A] transition-colors">
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="inline-flex items-center justify-center min-w-[22px] h-[20px] px-1.5 rounded-md bg-primary/[0.04] text-[11px] text-[#64748B]" style={{ fontWeight: 600 }}>
+                        {filteredPaymentTermPresets.length}
+                      </span>
+                    <Popover open={ptSortOpen} onOpenChange={setPtSortOpen}>
+                      <PopoverTrigger asChild>
+                        <button className={`inline-flex items-center gap-1 text-[12px] transition-colors px-2 py-1 rounded-md border ${ptSortOpen ? "text-[#0A77FF] bg-[#EFF6FF] border-[#DBEAFE]" : "text-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC] border-transparent hover:border-[#E2E8F0]"}`} style={{ fontWeight: 500 }}>
+                          <ArrowUpDown className="w-3 h-3" />
+                          {ptSortBy === "name" ? "Name" : ptSortBy === "vendorsApplied" ? "Vendors" : ptSortBy === "duration" ? "Duration" : "Type"}
+                          {ptSortDir === "asc" ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />}
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent align="end" className="w-[200px] p-1.5 rounded-lg z-[250]" sideOffset={6}>
+                        <div className="space-y-0.5">
+                          {([
+                            { key: "name", label: "Name", icon: <ArrowUpDown className="w-3.5 h-3.5" /> },
+                            { key: "vendorsApplied", label: "Vendors Applied", icon: <Building2 className="w-3.5 h-3.5" /> },
+                            { key: "duration", label: "Duration", icon: <Clock className="w-3.5 h-3.5" /> },
+                            { key: "category", label: "Type", icon: <Tag className="w-3.5 h-3.5" /> },
+                          ] as const).map((opt) => {
+                            const isActive = ptSortBy === opt.key;
+                            return (
+                              <button
+                                key={opt.key}
+                                onClick={() => {
+                                  if (isActive) {
+                                    setPtSortDir((d) => d === "asc" ? "desc" : "asc");
+                                  } else {
+                                    setPtSortBy(opt.key);
+                                    setPtSortDir("asc");
+                                  }
+                                  setPtSortOpen(false);
+                                }}
+                                className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[12px] transition-all ${
+                                  isActive
+                                    ? "bg-[#EFF6FF] text-[#0A77FF]"
+                                    : "text-[#475569] hover:bg-[#F8FAFC] hover:text-[#0F172A]"
+                                }`}
+                                style={{ fontWeight: isActive ? 600 : 500 }}
+                              >
+                                <span className={isActive ? "text-[#0A77FF]" : "text-[#94A3B8]"}>{opt.icon}</span>
+                                <span className="flex-1 text-left">{opt.label}</span>
+                                {isActive && (
+                                  ptSortDir === "asc"
+                                    ? <ArrowUp className="w-3 h-3 text-[#0A77FF]" />
+                                    : <ArrowDown className="w-3 h-3 text-[#0A77FF]" />
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                    <Button
+                      onClick={() => { setPaymentTermsModalOpen(false); resetCreatePtForm(); setCreatePtModalOpen(true); }}
+                      className="bg-primary text-primary-foreground shrink-0 h-8 px-3 text-[12px]"
+                    >
+                      <Plus className="w-3.5 h-3.5 mr-1" /> Create New
+                    </Button>
+                    </div>
+                  </div>
+
+                  {/* ── Filter tabs ── */}
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    {([
+                      { id: "all", label: "All Terms" },
+                      { id: "net", label: "NET" },
+                      { id: "prepayment", label: "Prepayment" },
+                      { id: "split", label: "Split" },
+                    ] as const).map((tab) => {
+                      const isActive = ptSidebarFilter === tab.id;
+                      return (
+                        <button
+                          key={tab.id}
+                          onClick={() => setPtSidebarFilter(tab.id)}
+                          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                            isActive
+                              ? "border-primary bg-[#EDF4FF] hover:bg-[#D6E8FF] active:bg-[#ADD1FF]"
+                              : "border-border text-muted-foreground hover:bg-muted/60 hover:text-foreground hover:border-muted-foreground/30 active:bg-muted"
+                          }`}
+                          style={{ fontWeight: isActive ? 500 : 400, color: isActive ? "#0A77FF" : undefined }}
+                        >
+                          {tab.label}
+                        </button>
+                      );
+                    })}
+                    <div className="w-px h-4 bg-[#E2E8F0] mx-0.5" />
+                    {([
+                      { id: "recent", label: "Recently Used" },
+                      { id: "vendors_applied", label: "Vendors Applied" },
+                      { id: "created_by_me", label: "Created by Me" },
+                      { id: "created_by_others", label: "Created by Others" },
+                    ] as const).map((tab) => {
+                      const isActive = ptSidebarFilter === tab.id;
+                      return (
+                        <button
+                          key={tab.id}
+                          onClick={() => setPtSidebarFilter(tab.id)}
+                          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                            isActive
+                              ? "border-primary bg-[#EDF4FF] hover:bg-[#D6E8FF] active:bg-[#ADD1FF]"
+                              : "border-border text-muted-foreground hover:bg-muted/60 hover:text-foreground hover:border-muted-foreground/30 active:bg-muted"
+                          }`}
+                          style={{ fontWeight: isActive ? 500 : 400, color: isActive ? "#0A77FF" : undefined }}
+                        >
+                          {tab.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Cards area */}
+                <div className="flex-1 min-h-0 overflow-y-auto p-5">
+                  {filteredPaymentTermPresets.length === 0 ? (
+                    <div className="py-20 text-center">
+                      <div className="w-12 h-12 rounded-lg bg-[#F1F5F9] border border-[#E8ECF1] flex items-center justify-center mx-auto mb-3">
+                        <Search className="w-5 h-5 text-[#94A3B8]" />
+                      </div>
+                      <p className="text-[13px] text-[#475569]" style={{ fontWeight: 600 }}>No payment terms found</p>
+                      <p className="text-[12px] text-[#94A3B8] mt-1">Try adjusting your search or filter</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {filteredPaymentTermPresets.map((term) => {
+                        const isSelected = selectedPaymentTermId === term.id;
+                        const ptDays = term.duration || (term.name.match(/\d+/) ? term.name.match(/\d+/)![0] : "30");
+                        return (
+                          <div
+                            key={term.id}
+                            tabIndex={0}
+                            onClick={() => setPreviewPaymentTermId(term.id)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setPreviewPaymentTermId(term.id); }
+                              if (e.key === "ArrowDown") { e.preventDefault(); const next = e.currentTarget.nextElementSibling as HTMLElement; next?.focus(); }
+                              if (e.key === "ArrowUp") { e.preventDefault(); const prev = e.currentTarget.previousElementSibling as HTMLElement; prev?.focus(); }
+                            }}
+                            className={`group relative flex items-center gap-3.5 rounded-xl border transition-all duration-200 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-[#0A77FF]/30 px-4 py-3.5 ${
+                              isSelected
+                                ? "border-[#0A77FF]/25 bg-[#F7FAFF] shadow-[0_2px_12px_rgba(10,119,255,0.10)]"
+                                : "border-[#E8ECF1] bg-white shadow-[0_1px_3px_rgba(0,0,0,0.03)] hover:border-[#0A77FF]/20 hover:shadow-[0_4px_16px_rgba(10,119,255,0.08)]"
+                            }`}
+                          >
+                              {/* Icon — neutral gray, blue when selected */}
+                              <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-colors ${
+                                isSelected
+                                  ? "bg-[#0A77FF]/10"
+                                  : "bg-[#F1F5F9] group-hover:bg-[#0A77FF]/8"
+                              }`}>
+                                <span className={`text-[11px] tracking-wide transition-colors ${
+                                  isSelected
+                                    ? "text-[#0A77FF]"
+                                    : "text-[#64748B] group-hover:text-[#0A77FF]"
+                                }`} style={{ fontWeight: 700 }}>{term.typeBadge}</span>
+                              </div>
+
+                              {/* Main info */}
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 mb-0.5">
+                                  <h5 className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{highlightMatch(term.name, ptSearch)}</h5>
+                                </div>
+                                <p className="text-[11px] text-[#94A3B8] truncate leading-relaxed">{highlightMatch(term.description, ptSearch)}</p>
+                              </div>
+
+                              {/* Meta badges — trigger in primary tint, duration neutral */}
+                              <div className="shrink-0 flex items-center gap-2">
+                                <span
+                                  className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10px] bg-[#EFF6FF] border border-[#0A77FF]/12 text-[#0A77FF]"
+                                  style={{ fontWeight: 600 }}
+                                >
+                                  <Zap className="w-2.5 h-2.5" />
+                                  {term.trigger}
+                                </span>
+                                <span className="inline-flex items-center gap-1 px-1.5 py-1 rounded-md bg-[#F8FAFC] border border-[#E8ECF1] text-[10px] text-[#64748B] tabular-nums" style={{ fontWeight: 500 }}>
+                                  <Clock className="w-2.5 h-2.5 text-[#94A3B8]" />
+                                  {ptDays}d
+                                </span>
+                              </div>
+
+                              {/* Vendor count — simple text */}
+                              {term.vendorsApplied > 0 && (
+                                <span className="shrink-0 text-[11px] text-[#94A3B8] hidden lg:block" style={{ fontWeight: 500 }}>
+                                  {term.vendorsApplied} vendor{term.vendorsApplied !== 1 ? "s" : ""}
+                                </span>
+                              )}
+
+                              {/* Actions — always visible */}
+                              <div className="shrink-0 flex items-center gap-1.5">
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDuplicatePaymentTerm(term);
+                                  }}
+                                  className="p-1.5 rounded-md border border-[#E8ECF1] bg-white text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#334155] transition-colors"
+                                  title="Duplicate"
+                                >
+                                  <Copy className="w-3 h-3" />
+                                </button>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedPaymentTermId(term.id);
+                                    setPaymentTermsModalOpen(false);
+                                  }}
+                                  className="px-3 py-1 rounded-md bg-[#0A77FF] text-white text-[11px] hover:bg-[#0862D0] transition-colors"
+                                  style={{ fontWeight: 600 }}
+                                >
+                                  Apply
+                                </button>
+                              </div>
+
+                              {/* Selected checkmark */}
+                              {isSelected && (
+                                <div className="w-5 h-5 rounded-full bg-[#0A77FF] flex items-center justify-center shrink-0">
+                                  <Check className="w-3 h-3 text-white" />
+                                </div>
+                              )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+            </>
+            )}
+          </DialogContent>
+        </Dialog>
+
+        {/* Standalone Payment Term Detail Modal (from selected card "View") */}
+        <PaymentTermDetailModal
+          term={standalonePtDetailTerm}
+          open={standalonePtDetailOpen}
+          onClose={() => { setStandalonePtDetailOpen(false); setStandalonePtDetailTerm(null); }}
+        />
+      </div>
+    );
+  }
+
+  if (sectionId === "pricing_rules") {
+    const PR_MOCK_ITEMS = [
+      { partNo: "100219-42", desc: "Front bulkhead ca...", category: "Ram Pro Master 2500...", type: "Parts", typeBg: "#DBEAFE", typeColor: "#0A77FF", location: "Toyota Loca..." },
+      { partNo: "100219-51", desc: "Box walls inlay ca...", category: "Hardware", type: "Parts", typeBg: "#DBEAFE", typeColor: "#0A77FF", location: "Toyota Tech..." },
+      { partNo: "100219-51-01", desc: "Box walls inlay ca...", category: "Cabinet", type: "Equipment • Capital", typeBg: "#DBEAFE", typeColor: "#0A77FF", location: "Roseville To..." },
+      { partNo: "100219-51-01RC", desc: "Box walls inlay ca...", category: "Electronics", type: "Equipment • Non-Capital", typeBg: "#FEF3C7", typeColor: "#D97706", location: "Right Toyota..." },
+      { partNo: "100219-51-02", desc: "Box walls inlay ca...", category: "Hardware", type: "Parts", typeBg: "#DBEAFE", typeColor: "#0A77FF", location: "Maplewood..." },
+      { partNo: "100219-52", desc: "Box closeout top...", category: "Electronics", type: "Equipment • Non-Capital", typeBg: "#FEF3C7", typeColor: "#D97706", location: "Peterson To..." },
+      { partNo: "100219-52-02", desc: "Box closeout top...", category: "Cabinet", type: "Parts", typeBg: "#DBEAFE", typeColor: "#0A77FF", location: "Toyota of N..." },
+      { partNo: "02901201000", desc: "Foam padding RF1...", category: "Hardware", type: "Parts", typeBg: "#DBEAFE", typeColor: "#0A77FF", location: "Toyota of C..." },
+      { partNo: "100120-79", desc: "Toyota long cut, b...", category: "Electronics", type: "Equipment • Non-Capital", typeBg: "#FEF3C7", typeColor: "#D97706", location: "Toyota 101 (...)" },
+    ];
+
+    return (
+      <div className="space-y-3">
+        {/* Section header */}
+        <div className="mb-1">
+          <h4 className="text-sm text-[#0F172A]" style={{ fontWeight: 700 }}>Vendor Pricing Rules</h4>
+          <p className="text-xs text-[#64748B] mt-0.5 leading-relaxed">
+            Set a pricing rule to this partner to automatically apply tier-based discounts and pricing in purchase and sales orders.{" "}
+            <span className="text-[#0A77FF] inline-flex items-center gap-0.5 cursor-pointer hover:underline" style={{ fontWeight: 500 }}>
+              Learn More <ExternalLink className="w-3 h-3" />
+            </span>
+          </p>
+        </div>
+
+        {/* Selected pricing rules */}
+        {selectedPricingRules.length > 0 && (
+          <div className="space-y-3">
+            {selectedPricingRules.map((rule) => (
+              <div key={rule.id} className="relative rounded-lg border border-[#E8ECF1] bg-white p-3 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-start gap-2.5">
+                    <div className={`px-2 py-0.5 rounded text-[11px] text-white shrink-0 mt-0.5`} style={{ fontWeight: 700, backgroundColor: rule.category === "discount" ? "#16A34A" : "#0A77FF" }}>
+                      {rule.category === "discount" ? "Discount" : "Premium"}
+                    </div>
+                    <div className="px-2 py-0.5 rounded border border-[#E2E8F0] text-[11px] text-[#64748B] shrink-0 mt-0.5" style={{ fontWeight: 500 }}>
+                      {rule.basis === "value" ? "Value-Based" : "Volume-Based"}
+                    </div>
+                    <div className="px-2 py-0.5 rounded bg-[#F1F5F9] text-[11px] text-[#64748B] shrink-0 mt-0.5" style={{ fontWeight: 500 }}>
+                      {rule.id.startsWith("pr-custom-") ? "Custom" : "Preset"}
+                    </div>
+                  </div>
+                  <button onClick={() => removePricingRule(rule.id)} className="w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center shadow-sm hover:bg-red-600 transition-colors">
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+                <h5 onClick={() => handleOpenRuleDetails(rule)} className="text-sm text-[#0F172A] mt-2 cursor-pointer hover:text-[#0A77FF] transition-colors" style={{ fontWeight: 600 }}>{rule.name}</h5>
+                <p className="text-xs text-[#64748B] mt-1 leading-relaxed">{rule.description}</p>
+                {/* Tier info */}
+                <div className="mt-2 rounded-lg border border-[#E8ECF1] p-3 bg-[#F8FAFC]">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>
+                      {rule.tierType === "single" ? "Single tier" : "Multiple tier"} · 1 out of {rule.totalTiers}
+                    </span>
+                  </div>
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-[#64748B]">{rule.basis === "value" ? "Min Order Value" : "Min Order Quantity"}</span>
+                      <span className="text-[#0F172A]" style={{ fontWeight: 500 }}>{rule.tiers[0]?.minValue || "-"}</span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-[#64748B]">{rule.basis === "value" ? "Max Order Value" : "Max Order Quantity"}</span>
+                      <span className="text-[#0F172A]" style={{ fontWeight: 500 }}>{rule.tiers[0]?.maxValue || "-"}</span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-[#64748B]">Discount</span>
+                      <span className="text-[#0F172A]" style={{ fontWeight: 500 }}>{rule.tiers[0]?.discount || "-"}</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-3 flex items-center gap-2">
+                  <button
+                    onClick={() => handleOpenRuleDetails(rule)}
+                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-[#DBEAFE] bg-[#EFF6FF] text-xs text-[#0A77FF] hover:bg-[#DBEAFE] transition-colors cursor-pointer"
+                    style={{ fontWeight: 500 }}
+                  >
+                    <Eye className="w-3 h-3" /> View Details
+                  </button>
+                  <button
+                    onClick={() => handleDuplicatePricingRule(rule)}
+                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-[#E2E8F0] text-xs text-[#0F172A] hover:bg-[#F8FAFC] transition-colors cursor-pointer"
+                    style={{ fontWeight: 500 }}
+                  >
+                    <Copy className="w-3 h-3" /> Duplicate
+                  </button>
+                </div>
+                {/* Vendors Applied footer */}
+                <div className="mt-2 pt-2 border-t border-[#F1F5F9] flex items-center gap-2">
+                  <span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Vendors Applied</span>
+                  <div className="flex items-center -space-x-1.5">
+                    {Array.from({ length: Math.min(rule.vendorsApplied, 3) }).map((_, i) => (
+                      <div key={i} className="w-5 h-5 rounded-full border-2 border-white bg-[#94A3B8]" />
+                    ))}
+                    {rule.vendorsApplied > 3 && (
+                      <div className="w-5 h-5 rounded-full border-2 border-white bg-[#F1F5F9] flex items-center justify-center">
+                        <span className="text-[8px] text-[#64748B]" style={{ fontWeight: 600 }}>+{rule.vendorsApplied - 3}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Empty state / Add more */}
+        <div className={`rounded-lg border-2 border-dashed border-[#E2E8F0] bg-white ${selectedPricingRules.length > 0 ? "py-4" : "py-6"} flex flex-col items-center justify-center gap-3`}>
+          {selectedPricingRules.length === 0 && (
+            <div className="w-10 h-10 rounded-lg bg-[#F8FAFC] border border-[#E8ECF1] flex items-center justify-center">
+              <FileText className="w-5 h-5 text-[#94A3B8]" />
+            </div>
+          )}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => { resetCreatePrForm(); setCreatePrModalOpen(true); }}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#0F172A] hover:bg-[#F8FAFC] transition-colors"
+              style={{ fontWeight: 500 }}
+            >
+              <Plus className="w-3.5 h-3.5" /> Create rule
+            </button>
+            <button
+              onClick={() => { setPrSidebarFilter("all"); setPrSearch(""); setPreviewPricingRuleId(null); setPrPreviewTab("preview"); setPricingRulesModalOpen(true); }}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-[#DBEAFE] bg-[#EFF6FF] text-xs text-[#0A77FF] hover:bg-[#DBEAFE] transition-colors"
+              style={{ fontWeight: 500 }}
+            >
+              <FileText className="w-3.5 h-3.5" /> Explore presets
+            </button>
+          </div>
+        </div>
+
+        {/* ── Explore Pricing Rules Presets Modal ── */}
+        <Dialog open={pricingRulesModalOpen} onOpenChange={(v) => { setPricingRulesModalOpen(v); if (!v) { setPreviewPricingRuleId(null); setPrPreviewTab("preview"); setPrFullscreen(false); } }}>
+          <DialogContent
+            className="p-0 gap-0 overflow-hidden z-[210] border-0 shadow-[0_24px_80px_-12px_rgba(0,0,0,0.18)] transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] flex flex-col"
+            style={prFullscreen
+              ? { maxWidth: "calc(100% - 1rem)", width: "calc(100% - 1rem)", height: "calc(100dvh - 1rem)", maxHeight: "calc(100dvh - 1rem)", borderRadius: 16 }
+              : { maxWidth: 980, width: "95vw", height: "85vh", maxHeight: "85vh", borderRadius: 16 }
+            }
+            hideCloseButton
+          >
+            <DialogTitle className="sr-only">Pricing rule presets library</DialogTitle>
+            <DialogDescription className="sr-only">Browse and select pricing rule presets to apply to this vendor.</DialogDescription>
+
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 h-12 border-b border-[#EEF2F6] bg-card shrink-0">
+              <div className="flex items-center gap-3">
+                <div>
+                  <h3 className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Pricing Rule Presets</h3>
+                  <p className="text-[11px] text-muted-foreground" style={{ fontWeight: 400 }}>Browse and apply pricing rules to this vendor</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setPrFullscreen(!prFullscreen)}
+                  className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#475569] hover:bg-[#F8FAFC] hover:border-[#CBD5E1] transition-all"
+                  style={{ fontWeight: 500 }}
+                >
+                  {prFullscreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
+                  {prFullscreen ? "Exit full" : "Full view"}
+                </button>
+                <button onClick={() => setPricingRulesModalOpen(false)} className="w-8 h-8 rounded-lg flex items-center justify-center text-[#94A3B8] hover:text-[#0F172A] hover:bg-[#F1F5F9] transition-all">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* Body */}
+            {previewPricingRuleId ? (() => {
+              const rule = allPricingRulePresets.find((r) => r.id === previewPricingRuleId);
+              if (!rule) return null;
+
+              return (
+                <div className="flex flex-col flex-1 min-h-0">
+                  <div className="flex flex-1 min-h-0 overflow-hidden">
+                    {/* Left detail panel */}
+                    <div className="w-[340px] shrink-0 border-r border-[#EEF2F6] overflow-y-auto flex flex-col bg-card">
+                      <div className="p-5 flex-1">
+                        <button
+                          onClick={() => { setPreviewPricingRuleId(null); setPrPreviewTab("preview"); }}
+                          className="inline-flex items-center gap-1.5 text-[13px] text-muted-foreground hover:text-[#0A77FF] transition-colors mb-4 group"
+                          style={{ fontWeight: 500 }}
+                        >
+                          <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
+                          All Pricing Rules
+                        </button>
+
+                        {/* Rule hero */}
+                        <div className="flex items-start gap-3 mb-4">
+                          <div
+                            className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
+                            style={{ backgroundColor: rule.category === "discount" ? "#F0FDF4" : "#F5F3FF" }}
+                          >
+                            {rule.category === "discount"
+                              ? <Tag className="w-5 h-5 text-[#16A34A]" />
+                              : <Sparkles className="w-5 h-5 text-[#7C3AED]" />
+                            }
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-2 mb-0.5">
+                              <span className="px-1.5 py-[1px] rounded-md text-[10px] shrink-0" style={{ fontWeight: 700, backgroundColor: rule.category === "discount" ? "#F0FDF4" : "#F5F3FF", color: rule.category === "discount" ? "#16A34A" : "#7C3AED", border: `1px solid ${rule.category === "discount" ? "#BBF7D0" : "#DDD6FE"}` }}>
+                                {rule.category === "discount" ? "Discount" : "Premium"}
+                              </span>
+                              <span className="px-1.5 py-[1px] rounded-md text-[10px] shrink-0" style={{ fontWeight: 600, backgroundColor: rule.basis === "value" ? "#EFF6FF" : "#FFFBEB", color: rule.basis === "value" ? "#0A77FF" : "#D97706", border: `1px solid ${rule.basis === "value" ? "#DBEAFE" : "#FEF3C7"}` }}>
+                                {rule.basis === "value" ? "Value" : "Volume"}
+                              </span>
+                            </div>
+                            <h4 className="text-[15px] text-[#0F172A] leading-snug" style={{ fontWeight: 600 }}>{rule.name}</h4>
+                          </div>
+                        </div>
+
+                        <p className="text-[12px] text-[#64748B] leading-relaxed mb-4">{rule.aboutText || rule.description}</p>
+
+                        {/* Quick stats */}
+                        <div className="flex items-center gap-2 mb-5">
+                          <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-[#F8FAFC] border border-[#F1F5F9] text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>
+                            {rule.tierType === "single" ? "1 tier" : `${rule.totalTiers} tiers`}
+                          </span>
+                          <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-[#EFF6FF] border border-[#DBEAFE] text-[11px] text-[#0A77FF] tabular-nums" style={{ fontWeight: 600 }}>
+                            {rule.tiers[0]?.discount || "-"}
+                          </span>
+                          <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-[#F0FDF4] border border-[#BBF7D0] text-[11px] text-[#15803D]" style={{ fontWeight: 600 }}>
+                            <Building2 className="w-3 h-3" />
+                            {rule.vendorsApplied} vendors
+                          </span>
+                        </div>
+
+                        {/* Tier details */}
+                        <div className="mb-5">
+                          <h5 className="text-[11px] text-muted-foreground uppercase tracking-[0.08em] mb-2.5" style={{ fontWeight: 700 }}>Tier Details</h5>
+                          <div className="rounded-lg border border-[#E8ECF1] bg-white divide-y divide-[#F5F7FA] overflow-hidden">
+                            {[
+                              { label: rule.basis === "value" ? "Min Order Value" : "Min Order Qty", value: rule.tiers[0]?.minValue || "-" },
+                              { label: rule.basis === "value" ? "Max Order Value" : "Max Order Qty", value: rule.tiers[0]?.maxValue || "-" },
+                              { label: "Discount / Surcharge", value: rule.tiers[0]?.discount || "-" },
+                            ].map((row) => (
+                              <div key={row.label} className="flex items-center justify-between px-3.5 py-2.5">
+                                <span className="text-[12px] text-muted-foreground" style={{ fontWeight: 500 }}>{row.label}</span>
+                                <span className="text-[12px] text-[#0F172A] tabular-nums" style={{ fontWeight: 600 }}>{row.value}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Author */}
+                        <div className="mb-5">
+                          <h5 className="text-[11px] text-muted-foreground uppercase tracking-[0.08em] mb-2.5" style={{ fontWeight: 700 }}>Created By</h5>
+                          <div className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg border border-[#E8ECF1] bg-white">
+                            {(() => { const at = getAvatarTint("Areeb Tanvir"); return (
+                              <div className="w-8 h-8 rounded-md flex items-center justify-center text-[10px]" style={{ fontWeight: 700, backgroundColor: at.bg, color: at.fg }}>AT</div>
+                            ); })()}
+                            <div>
+                              <p className="text-[12px] text-[#0F172A]" style={{ fontWeight: 600 }}>Areeb Tanvir</p>
+                              <p className="text-[11px] text-muted-foreground">Supply chain manager</p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Other templates */}
+                        <div>
+                          <h5 className="text-[11px] text-muted-foreground uppercase tracking-[0.08em] mb-2.5" style={{ fontWeight: 700 }}>Other Templates</h5>
+                          <div className="space-y-1.5">
+                            {allPricingRulePresets.filter((r) => r.id !== rule.id).slice(0, 3).map((other) => {
+                              const oCatColor = other.category === "discount" ? "#16A34A" : "#7C3AED";
+                              const oCatBg = other.category === "discount" ? "#F0FDF4" : "#F5F3FF";
+                              return (
+                                <button
+                                  key={other.id}
+                                  onClick={() => { setPreviewPricingRuleId(other.id); setPrPreviewTab("preview"); }}
+                                  className="w-full text-left rounded-lg border border-[#E8ECF1] p-3 hover:border-[#CBD5E1] hover:shadow-[0_1px_3px_rgba(0,0,0,0.04)] transition-all"
+                                >
+                                  <div className="flex items-center gap-1.5 mb-1.5">
+                                    <span className="px-1.5 py-[1px] rounded-md text-[9px]" style={{ fontWeight: 700, backgroundColor: oCatBg, color: oCatColor }}>
+                                      {other.category === "discount" ? "Discount" : "Premium"}
+                                    </span>
+                                    <span className="px-1.5 py-[1px] rounded-md text-[9px] bg-[#F8FAFC] text-[#64748B] border border-[#F1F5F9]" style={{ fontWeight: 500 }}>
+                                      {other.basis === "value" ? "Value" : "Volume"}
+                                    </span>
+                                  </div>
+                                  <p className="text-[12px] text-[#0F172A]" style={{ fontWeight: 600 }}>{other.name}</p>
+                                  <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-1">{other.description}</p>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Right panel – Preview */}
+                    <div className="flex-1 min-w-0 overflow-y-auto border-l border-[#EEF2F6] bg-white">
+                      <div className="px-6 py-5">
+                        <span className="text-[11px] text-[#94A3B8] uppercase tracking-wider mb-5 block" style={{ fontWeight: 600 }}>Preview & Configure</span>
+
+                        {/* ── Pricing rule type ── */}
+                        <div className="mb-6">
+                          <div className="flex items-center gap-1.5 mb-3">
+                            <span className="text-sm text-[#0F172A]" style={{ fontWeight: 600 }}>Pricing rule type</span>
+                            <Info className="w-3.5 h-3.5 text-[#CBD5E1]" />
+                          </div>
+
+                          {/* Discount option */}
+                          <button type="button" onClick={() => setPrvCategory("discount")} className={`w-full text-left rounded-xl border-2 p-4 mb-3 transition-all ${prvCategory === "discount" ? "border-[#0A77FF] bg-[#FAFBFF] shadow-[0_0_0_1px_rgba(10,119,255,0.1)]" : "border-[#E2E8F0] hover:border-[#CBD5E1] hover:shadow-[0_1px_4px_rgba(0,0,0,0.04)]"}`}>
+                            <div className="flex items-start justify-between">
+                              <div className="flex items-center gap-2">
+                                <Tag className="w-4 h-4 text-[#0A77FF]" />
+                                <span className="text-sm text-[#0F172A]" style={{ fontWeight: 600 }}>Discount</span>
+                              </div>
+                              <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${prvCategory === "discount" ? "border-[#0A77FF] bg-[#0A77FF] scale-110" : "border-[#CBD5E1]"}`}>
+                                {prvCategory === "discount" && <Check className="w-3 h-3 text-white" />}
+                              </div>
+                            </div>
+                            <p className={`text-xs mt-1.5 leading-relaxed ${prvCategory === "discount" ? "text-[#0A77FF]" : "text-[#64748B]"}`}>A decrease in price adjustment to offer discounts for loyal customers and products. Automate pricing changes to lower costs and encourage repeat purchases.</p>
+                          </button>
+                          {prvCategory === "discount" && (
+                            <div className="flex items-center gap-3 mb-3 -mt-1 px-1">
+                              <button type="button" onClick={() => setPrvBasis("volume")} className={`flex items-center gap-2 flex-1 px-3 py-2.5 rounded-lg border-2 transition-all ${prvBasis === "volume" ? "border-[#0A77FF] bg-[#EFF6FF]" : "border-[#E2E8F0] hover:border-[#CBD5E1] hover:bg-[#F8FAFC]"}`}>
+                                <ChartColumn className={`w-4 h-4 ${prvBasis === "volume" ? "text-[#0A77FF]" : "text-[#64748B]"}`} />
+                                <span className={`text-xs ${prvBasis === "volume" ? "text-[#0A77FF]" : "text-[#0F172A]"}`} style={{ fontWeight: 500 }}>Volume-based</span>
+                                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ml-auto transition-all ${prvBasis === "volume" ? "border-[#0A77FF]" : "border-[#CBD5E1]"}`}>
+                                  {prvBasis === "volume" && <div className="w-2.5 h-2.5 rounded-full bg-[#0A77FF]" />}
+                                </div>
+                              </button>
+                              <button type="button" onClick={() => setPrvBasis("value")} className={`flex items-center gap-2 flex-1 px-3 py-2.5 rounded-lg border-2 transition-all ${prvBasis === "value" ? "border-[#0A77FF] bg-[#EFF6FF]" : "border-[#E2E8F0] hover:border-[#CBD5E1] hover:bg-[#F8FAFC]"}`}>
+                                <DollarSign className={`w-4 h-4 ${prvBasis === "value" ? "text-[#0A77FF]" : "text-[#64748B]"}`} />
+                                <span className={`text-xs ${prvBasis === "value" ? "text-[#0A77FF]" : "text-[#0F172A]"}`} style={{ fontWeight: 500 }}>Value-based</span>
+                                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ml-auto transition-all ${prvBasis === "value" ? "border-[#0A77FF]" : "border-[#CBD5E1]"}`}>
+                                  {prvBasis === "value" && <div className="w-2.5 h-2.5 rounded-full bg-[#0A77FF]" />}
+                                </div>
+                              </button>
+                            </div>
+                          )}
+
+                          {/* Premium option */}
+                          <button type="button" onClick={() => setPrvCategory("premium")} className={`w-full text-left rounded-xl border-2 p-4 transition-all ${prvCategory === "premium" ? "border-[#0A77FF] bg-[#FAFBFF] shadow-[0_0_0_1px_rgba(10,119,255,0.1)]" : "border-[#E2E8F0] hover:border-[#CBD5E1] hover:shadow-[0_1px_4px_rgba(0,0,0,0.04)]"}`}>
+                            <div className="flex items-start justify-between">
+                              <div className="flex items-center gap-2">
+                                <Sparkles className={`w-4 h-4 ${prvCategory === "premium" ? "text-[#0A77FF]" : "text-[#64748B]"}`} />
+                                <span className="text-sm text-[#0F172A]" style={{ fontWeight: 600 }}>Premium</span>
+                              </div>
+                              <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${prvCategory === "premium" ? "border-[#0A77FF] bg-[#0A77FF] scale-110" : "border-[#CBD5E1]"}`}>
+                                {prvCategory === "premium" && <Check className="w-3 h-3 text-white" />}
+                              </div>
+                            </div>
+                            <p className={`text-xs mt-1.5 leading-relaxed ${prvCategory === "premium" ? "text-[#0A77FF]" : "text-[#64748B]"}`}>An increase in price adjustment for VIP clients and premium products. Automate pricing increases to enhance exclusivity and maximize profitability.</p>
+                          </button>
+                          {prvCategory === "premium" && (
+                            <div className="flex items-center gap-3 mt-3 px-1">
+                              <button type="button" onClick={() => setPrvBasis("volume")} className={`flex items-center gap-2 flex-1 px-3 py-2.5 rounded-lg border-2 transition-all ${prvBasis === "volume" ? "border-[#0A77FF] bg-[#EFF6FF]" : "border-[#E2E8F0] hover:border-[#CBD5E1] hover:bg-[#F8FAFC]"}`}>
+                                <ChartColumn className={`w-4 h-4 ${prvBasis === "volume" ? "text-[#0A77FF]" : "text-[#64748B]"}`} />
+                                <span className={`text-xs ${prvBasis === "volume" ? "text-[#0A77FF]" : "text-[#0F172A]"}`} style={{ fontWeight: 500 }}>Volume-based</span>
+                                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ml-auto transition-all ${prvBasis === "volume" ? "border-[#0A77FF]" : "border-[#CBD5E1]"}`}>
+                                  {prvBasis === "volume" && <div className="w-2.5 h-2.5 rounded-full bg-[#0A77FF]" />}
+                                </div>
+                              </button>
+                              <button type="button" onClick={() => setPrvBasis("value")} className={`flex items-center gap-2 flex-1 px-3 py-2.5 rounded-lg border-2 transition-all ${prvBasis === "value" ? "border-[#0A77FF] bg-[#EFF6FF]" : "border-[#E2E8F0] hover:border-[#CBD5E1] hover:bg-[#F8FAFC]"}`}>
+                                <DollarSign className={`w-4 h-4 ${prvBasis === "value" ? "text-[#0A77FF]" : "text-[#64748B]"}`} />
+                                <span className={`text-xs ${prvBasis === "value" ? "text-[#0A77FF]" : "text-[#0F172A]"}`} style={{ fontWeight: 500 }}>Value-based</span>
+                                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ml-auto transition-all ${prvBasis === "value" ? "border-[#0A77FF]" : "border-[#CBD5E1]"}`}>
+                                  {prvBasis === "value" && <div className="w-2.5 h-2.5 rounded-full bg-[#0A77FF]" />}
+                                </div>
+                              </button>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* ── Pricing rule Details ── */}
+                        <div className="mb-6">
+                          <div className="flex items-center gap-1.5 mb-3">
+                            <span className="text-sm text-[#0F172A]" style={{ fontWeight: 600 }}>Pricing rule Details</span>
+                            <Info className="w-3.5 h-3.5 text-[#CBD5E1]" />
+                          </div>
+                          <div className="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                              <label className="text-xs text-[#64748B] mb-1.5 block" style={{ fontWeight: 500 }}>{prvCategory === "discount" ? "Discount" : "Premium"} Name</label>
+                              <input type="text" value={prvName} onChange={(e) => setPrvName(e.target.value)} className="w-full px-3 py-2.5 rounded-lg border border-[#E2E8F0] bg-white text-sm text-[#0F172A] focus:outline-none focus:border-[#0A77FF] focus:ring-2 focus:ring-[#0A77FF]/10 transition-all placeholder:text-[#94A3B8]" placeholder="Enter rule name" />
+                            </div>
+                            <div>
+                              <label className="text-xs text-[#64748B] mb-1.5 block" style={{ fontWeight: 500 }}>Description</label>
+                              <textarea value={prvDesc} onChange={(e) => setPrvDesc(e.target.value)} rows={1} className="w-full px-3 py-2.5 rounded-lg border border-[#E2E8F0] bg-white text-sm text-[#0F172A] focus:outline-none focus:border-[#0A77FF] focus:ring-2 focus:ring-[#0A77FF]/10 transition-all placeholder:text-[#94A3B8] resize-none min-h-[40px]" placeholder="Enter description" />
+                            </div>
+                          </div>
+
+                          {/* Limit Rule to Date Range toggle */}
+                          <div className="flex items-center gap-2.5 mb-4">
+                            <button type="button" onClick={() => setPrvLimitDate(!prvLimitDate)} className={`w-10 h-[22px] rounded-full relative transition-colors ${prvLimitDate ? "bg-[#0A77FF]" : "bg-[#E2E8F0]"}`}>
+                              <div className={`w-[18px] h-[18px] rounded-full bg-white absolute top-0.5 shadow-sm transition-all ${prvLimitDate ? "right-0.5" : "left-0.5"}`} />
+                            </button>
+                            <span className="text-sm text-[#0F172A]" style={{ fontWeight: 500 }}>Limit Rule to Date Range</span>
+                          </div>
+
+                          {/* Date range fields */}
+                          {prvLimitDate && (
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <div className="flex items-center gap-1 mb-1.5">
+                                  <label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Valid From</label>
+                                  <Info className="w-3 h-3 text-[#CBD5E1]" />
+                                </div>
+                                <div className="relative">
+                                  <input type="date" value={prvValidFrom} onChange={(e) => setPrvValidFrom(e.target.value)} className="w-full px-3 py-2.5 rounded-lg border border-[#E2E8F0] bg-white text-sm text-[#0F172A] focus:outline-none focus:border-[#0A77FF] focus:ring-2 focus:ring-[#0A77FF]/10 transition-all" />
+                                </div>
+                              </div>
+                              <div>
+                                <div className="flex items-center gap-1 mb-1.5">
+                                  <label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Valid To</label>
+                                  <Info className="w-3 h-3 text-[#CBD5E1]" />
+                                </div>
+                                <div className="relative">
+                                  <input type="date" value={prvValidTo} onChange={(e) => setPrvValidTo(e.target.value)} className="w-full px-3 py-2.5 rounded-lg border border-[#E2E8F0] bg-white text-sm text-[#0F172A] focus:outline-none focus:border-[#0A77FF] focus:ring-2 focus:ring-[#0A77FF]/10 transition-all" />
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* ── Discount Tier ���─ */}
+                        <div className="mb-6">
+                          <div className="border-t border-[#E2E8F0] pt-5">
+                            <p className="text-xs text-[#94A3B8] mb-2" style={{ fontWeight: 600 }}>#1 {prvCategory === "discount" ? "Discount" : "Premium"} Tier</p>
+                            <div className="mb-4">
+                              <div className="flex items-center gap-1.5 mb-1.5">
+                                <span className="text-xs text-[#0F172A]" style={{ fontWeight: 500 }}>{prvCategory === "discount" ? "Discount" : "Premium"} Percentage (%)</span>
+                                <Info className="w-3 h-3 text-[#CBD5E1]" />
+                              </div>
+                              <div className="flex items-center gap-4">
+                                <div className="flex items-center gap-0 flex-1">
+                                  <input type="number" value={prvDiscountPct} onChange={(e) => setPrvDiscountPct(e.target.value)} className="w-full px-3 py-2.5 rounded-lg border border-[#E2E8F0] bg-white text-sm text-[#0F172A] tabular-nums focus:outline-none focus:border-[#0A77FF] focus:ring-2 focus:ring-[#0A77FF]/10 transition-all placeholder:text-[#94A3B8]" placeholder="10" min={0} max={100} />
+                                  <span className="ml-2 text-sm text-[#64748B] shrink-0">%</span>
+                                </div>
+                                <div className="flex items-center gap-2 shrink-0">
+                                  <button type="button" onClick={() => setPrvFixRate(!prvFixRate)} className={`w-10 h-[22px] rounded-full relative transition-colors ${prvFixRate ? "bg-[#0A77FF]" : "bg-[#E2E8F0]"}`}>
+                                    <div className={`w-[18px] h-[18px] rounded-full bg-white absolute top-0.5 shadow-sm transition-all ${prvFixRate ? "right-0.5" : "left-0.5"}`} />
+                                  </button>
+                                  <span className="text-xs text-[#0F172A]" style={{ fontWeight: 500 }}>Fix Rate ($)</span>
+                                  <Info className="w-3 h-3 text-[#CBD5E1]" />
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Enable order quantity limits toggle */}
+                            <div className="flex items-center gap-2.5 mb-4">
+                              <button type="button" onClick={() => setPrvQtyLimits(!prvQtyLimits)} className={`w-10 h-[22px] rounded-full relative transition-colors ${prvQtyLimits ? "bg-[#0A77FF]" : "bg-[#E2E8F0]"}`}>
+                                <div className={`w-[18px] h-[18px] rounded-full bg-white absolute top-0.5 shadow-sm transition-all ${prvQtyLimits ? "right-0.5" : "left-0.5"}`} />
+                              </button>
+                              <span className="text-sm text-[#0F172A]" style={{ fontWeight: 500 }}>Enable order quantity limits</span>
+                            </div>
+
+                            {/* Quantity fields */}
+                            {prvQtyLimits && (
+                              <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                  <div className="flex items-center gap-1 mb-1.5">
+                                    <label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Minimum Order Quantity</label>
+                                    <Info className="w-3 h-3 text-[#CBD5E1]" />
+                                  </div>
+                                  <input type="number" value={prvMinQty} onChange={(e) => setPrvMinQty(e.target.value)} className="w-full px-3 py-2.5 rounded-lg border border-[#E2E8F0] bg-white text-sm text-[#0F172A] focus:outline-none focus:border-[#0A77FF] focus:ring-2 focus:ring-[#0A77FF]/10 transition-all placeholder:text-[#94A3B8] tabular-nums" placeholder="Enter minimum units" min={0} />
+                                </div>
+                                <div>
+                                  <div className="flex items-center gap-1 mb-1.5">
+                                    <label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Maximum Order Quantity</label>
+                                    <Info className="w-3 h-3 text-[#CBD5E1]" />
+                                  </div>
+                                  <input type="number" value={prvMaxQty} onChange={(e) => setPrvMaxQty(e.target.value)} className="w-full px-3 py-2.5 rounded-lg border border-[#E2E8F0] bg-white text-sm text-[#0F172A] focus:outline-none focus:border-[#0A77FF] focus:ring-2 focus:ring-[#0A77FF]/10 transition-all placeholder:text-[#94A3B8] tabular-nums" placeholder="Enter maximum units" min={0} />
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* + Discount Tier button */}
+                        <button type="button" onClick={() => toast.info("Multi-tier support coming soon")} className="inline-flex items-center gap-1.5 mb-6 text-sm text-[#0A77FF] hover:text-[#0862D0] transition-colors group" style={{ fontWeight: 600 }}>
+                          <div className="w-5 h-5 rounded-md bg-[#EFF6FF] flex items-center justify-center group-hover:bg-[#DBEAFE] transition-colors">
+                            <Plus className="w-3 h-3" />
+                          </div>
+                          {prvCategory === "discount" ? "Discount" : "Premium"} Tier
+                        </button>
+
+                        {/* ── Items & Categories ── */}
+                        <div className="border-t border-[#E2E8F0] pt-5 mb-6">
+                          <div className="flex items-center justify-between mb-4">
+                            <h5 className="text-sm text-[#0F172A]" style={{ fontWeight: 600 }}>Items and Categories Assigned to Pricing Rule for Qualification</h5>
+                            <button type="button" onClick={() => setPrvItemsCollapsed(!prvItemsCollapsed)} className="text-xs text-[#0A77FF] hover:text-[#0862D0] transition-colors flex items-center gap-1" style={{ fontWeight: 500 }}>
+                              {prvItemsCollapsed ? "Expand" : "Collapse"} {prvItemsCollapsed ? <ChevronDown className="w-3 h-3" /> : <ChevronUp className="w-3 h-3" />}
+                            </button>
+                          </div>
+
+                          {!prvItemsCollapsed && (
+                            <>
+                              {/* Tabs */}
+                              <div className="flex items-center gap-0 border-b border-[#E2E8F0] mb-4">
+                                <button type="button" onClick={() => setPrvItemsTab("items")} className={`px-3 py-2 text-xs flex items-center gap-1.5 transition-colors ${prvItemsTab === "items" ? "text-[#0A77FF] border-b-2 border-[#0A77FF]" : "text-[#64748B] hover:text-[#0F172A]"}`} style={{ fontWeight: prvItemsTab === "items" ? 600 : 500 }}>
+                                  Items
+                                  <span className={`px-1.5 py-0.5 rounded text-[10px] ${prvItemsTab === "items" ? "bg-[#DBEAFE] text-[#0A77FF]" : "bg-[#F1F5F9] text-[#64748B]"}`} style={{ fontWeight: 700 }}>24</span>
+                                </button>
+                                <button type="button" onClick={() => setPrvItemsTab("categories")} className={`px-3 py-2 text-xs transition-colors ${prvItemsTab === "categories" ? "text-[#0A77FF] border-b-2 border-[#0A77FF]" : "text-[#64748B] hover:text-[#0F172A]"}`} style={{ fontWeight: prvItemsTab === "categories" ? 600 : 500 }}>
+                                  Categories
+                                </button>
+                              </div>
+
+                              {prvItemsTab === "items" && (
+                                <>
+                                  {/* Items header */}
+                                  <div className="flex items-center justify-between mb-3">
+                                    <div className="flex items-center gap-2.5">
+                                      <div className="w-8 h-8 rounded-lg bg-[#EFF6FF] flex items-center justify-center">
+                                        <ChartColumn className="w-4 h-4 text-[#0A77FF]" />
+                                      </div>
+                                      <div>
+                                        <p className="text-xs text-[#0F172A]" style={{ fontWeight: 600 }}>Items</p>
+                                        <p className="text-[11px] text-[#64748B]">Associate items with this pricing rule</p>
+                                      </div>
+                                    </div>
+                                    <button type="button" onClick={() => toast.info("Assign items dialog coming soon")} className="px-3 py-1.5 rounded-lg bg-[#0A77FF] text-white text-xs hover:bg-[#0862D0] transition-colors shrink-0" style={{ fontWeight: 600 }}>
+                                      Assign items
+                                    </button>
+                                  </div>
+
+                                  {/* Search & Filters */}
+                                  <div className="flex items-center gap-3 mb-3">
+                                    <div className="relative flex-1 max-w-[220px]">
+                                      <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8]" />
+                                      <input type="text" value={prvItemsSearch} onChange={(e) => setPrvItemsSearch(e.target.value)} placeholder="Search items..." className="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border border-[#E2E8F0] bg-white focus:outline-none focus:border-[#0A77FF] focus:ring-2 focus:ring-[#0A77FF]/10 placeholder:text-[#94A3B8] transition-all" />
+                                      {prvItemsSearch && (
+                                        <button type="button" onClick={() => setPrvItemsSearch("")} className="absolute right-2 top-1/2 -translate-y-1/2 text-[#94A3B8] hover:text-[#64748B]">
+                                          <X className="w-3 h-3" />
+                                        </button>
+                                      )}
+                                    </div>
+                                  </div>
+                                  <div className="flex items-center gap-1.5 mb-3">
+                                    {["All", "Parts", "Equipment", "Miscellaneous"].map((cat) => (
+                                      <button key={cat} type="button" onClick={() => setPrvItemsFilter(cat)} className={`px-2.5 py-1 rounded-md text-[11px] transition-all ${prvItemsFilter === cat ? "bg-[#0A77FF] text-white shadow-sm" : "text-[#64748B] hover:bg-[#F1F5F9] hover:text-[#0F172A]"}`} style={{ fontWeight: prvItemsFilter === cat ? 600 : 400 }}>
+                                        {cat}
+                                      </button>
+                                    ))}
+                                  </div>
+
+                                  {/* Table */}
+                                  <div className="rounded-lg border border-[#E2E8F0] overflow-hidden">
+                                    <table className="w-full text-xs">
+                                      <thead>
+                                        <tr className="bg-[#F8FAFC] border-b border-[#E2E8F0]">
+                                          <th className="text-left px-3 py-2 text-[#64748B]" style={{ fontWeight: 600 }}>Part No. ↓</th>
+                                          <th className="text-left px-3 py-2 text-[#64748B]" style={{ fontWeight: 600 }}>Item Description</th>
+                                          <th className="text-left px-3 py-2 text-[#64748B]" style={{ fontWeight: 600 }}>Category ↓</th>
+                                          <th className="text-left px-3 py-2 text-[#64748B]" style={{ fontWeight: 600 }}>Item Type</th>
+                                          <th className="text-left px-3 py-2 text-[#64748B]" style={{ fontWeight: 600 }}>Location</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        {PR_MOCK_ITEMS.filter((item) => {
+                                          const matchSearch = !prvItemsSearch || item.partNo.toLowerCase().includes(prvItemsSearch.toLowerCase()) || item.desc.toLowerCase().includes(prvItemsSearch.toLowerCase());
+                                          const matchFilter = prvItemsFilter === "All" || item.type.toLowerCase().includes(prvItemsFilter.toLowerCase());
+                                          return matchSearch && matchFilter;
+                                        }).map((item) => (
+                                          <tr key={item.partNo} className="border-b border-[#F1F5F9] last:border-b-0 hover:bg-[#F8FAFC] transition-colors">
+                                            <td className="px-3 py-2.5 text-[#0F172A]" style={{ fontWeight: 500 }}>{highlightMatch(item.partNo, prvItemsSearch)}</td>
+                                            <td className="px-3 py-2.5">
+                                              <div className="flex items-center gap-2">
+                                                <div className="w-7 h-7 rounded bg-[#F1F5F9] border border-[#E8ECF1] flex items-center justify-center shrink-0">
+                                                  <Package className="w-3 h-3 text-[#94A3B8]" />
+                                                </div>
+                                                <span className="text-[#64748B]">{highlightMatch(item.desc, prvItemsSearch)}</span>
+                                              </div>
+                                            </td>
+                                            <td className="px-3 py-2.5 text-[#64748B]">{item.category}</td>
+                                            <td className="px-3 py-2.5">
+                                              <span className="px-1.5 py-0.5 rounded text-[10px]" style={{ backgroundColor: item.typeBg, color: item.typeColor, fontWeight: 500 }}>{item.type}</span>
+                                            </td>
+                                            <td className="px-3 py-2.5 text-[#64748B]">{item.location}</td>
+                                          </tr>
+                                        ))}
+                                      </tbody>
+                                    </table>
+                                  </div>
+                                  <div className="flex items-center justify-center gap-3 mt-3 text-xs text-[#64748B]">
+                                    <span>Records per page</span>
+                                    <span className="px-1.5 py-0.5 rounded border border-[#E2E8F0] text-[#0F172A]" style={{ fontWeight: 500 }}>20 ↓</span>
+                                    <span className="text-[#94A3B8]">«</span>
+                                    <span className="text-[#94A3B8]">← Prev</span>
+                                    <span className="w-6 h-6 rounded bg-[#0A77FF] text-white flex items-center justify-center text-xs" style={{ fontWeight: 600 }}>1</span>
+                                    <span className="cursor-pointer hover:text-[#0F172A]">Next →</span>
+                                    <span className="cursor-pointer hover:text-[#0F172A]">»</span>
+                                  </div>
+                                </>
+                              )}
+
+                              {prvItemsTab === "categories" && (
+                                <div className="rounded-lg border-2 border-dashed border-[#E2E8F0] py-10 flex flex-col items-center gap-2">
+                                  <Tag className="w-6 h-6 text-[#94A3B8]" />
+                                  <p className="text-xs text-[#94A3B8]" style={{ fontWeight: 500 }}>No categories assigned yet</p>
+                                  <button type="button" onClick={() => toast.info("Assign categories dialog coming soon")} className="mt-1 px-3 py-1.5 rounded-lg bg-[#EFF6FF] text-[#0A77FF] text-xs hover:bg-[#DBEAFE] transition-colors" style={{ fontWeight: 600 }}>
+                                    Assign categories
+                                  </button>
+                                </div>
+                              )}
+                            </>
+                          )}
+                        </div>
+
+                        {/* ── Attachments ── */}
+                        <div className="border-t border-[#E2E8F0] pt-5">
+                          <div className="flex items-center justify-between mb-4">
+                            <h5 className="text-sm text-[#0F172A]" style={{ fontWeight: 600 }}>Attachments</h5>
+                            <button type="button" onClick={() => toast.info("File upload dialog coming soon")} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0A77FF] text-white text-xs hover:bg-[#0862D0] transition-colors" style={{ fontWeight: 600 }}>
+                              <Upload className="w-3.5 h-3.5" /> Upload files
+                            </button>
+                          </div>
+                          <div className="grid grid-cols-3 gap-3">
+                            {[
+                              { ext: "PNG", name: "Generic Cotton Salad", bg: "#F8FAFC", color: "#0A77FF", badgeBg: "#DBEAFE" },
+                              { ext: "PDF", name: "Tasty Frozen Computer", bg: "#FEF2F2", color: "#EF4444", badgeBg: "#FEE2E2" },
+                              { ext: "ZIP", name: "Awesome Cotton Mouse", bg: "#F0FDF4", color: "#22C55E", badgeBg: "#DCFCE7" },
+                            ].map((file) => (
+                              <div key={file.ext} className="rounded-lg border border-[#E2E8F0] overflow-hidden bg-white group relative hover:shadow-[0_2px_8px_rgba(0,0,0,0.06)] transition-all">
+                                <div className="absolute top-2 left-2 z-10">
+                                  <div className="w-5 h-5 rounded bg-[#0A77FF] flex items-center justify-center">
+                                    <Check className="w-3 h-3 text-white" />
+                                  </div>
+                                </div>
+                                <div className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+                                  <button type="button" onClick={() => toast.info(`Preview ${file.name}`)} className="w-6 h-6 rounded-md bg-white/90 border border-[#E2E8F0] flex items-center justify-center cursor-pointer hover:bg-white">
+                                    <Eye className="w-3 h-3 text-[#64748B]" />
+                                  </button>
+                                  <button type="button" onClick={() => toast.error(`Removed ${file.name}`)} className="w-6 h-6 rounded-md bg-white/90 border border-[#E2E8F0] flex items-center justify-center cursor-pointer hover:bg-[#FEF2F2]">
+                                    <Trash className="w-3 h-3 text-[#EF4444]" />
+                                  </button>
+                                </div>
+                                <div className="h-28 border-b border-[#E2E8F0] flex items-center justify-center" style={{ backgroundColor: file.bg }}>
+                                  {file.ext === "PNG" ? (
+                                    <FileText className="w-8 h-8 text-[#94A3B8]" />
+                                  ) : (
+                                    <div className="px-2.5 py-1.5 rounded-lg text-white text-sm" style={{ fontWeight: 700, backgroundColor: file.color }}>{file.ext}</div>
+                                  )}
+                                </div>
+                                <div className="p-2.5 flex items-center gap-2">
+                                  <span className="px-1.5 py-0.5 rounded text-[9px]" style={{ fontWeight: 700, backgroundColor: file.badgeBg, color: file.color }}>{file.ext}</span>
+                                  <span className="text-xs text-[#0F172A] truncate" style={{ fontWeight: 500 }}>{file.name}</span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                          {/* Drop zone */}
+                          <div className="mt-3 rounded-lg border-2 border-dashed border-[#E2E8F0] hover:border-[#0A77FF] py-6 flex flex-col items-center gap-1.5 transition-colors cursor-pointer group" onClick={() => toast.info("File upload dialog coming soon")}>
+                            <Upload className="w-5 h-5 text-[#94A3B8] group-hover:text-[#0A77FF] transition-colors" />
+                            <p className="text-xs text-[#94A3B8] group-hover:text-[#64748B] transition-colors" style={{ fontWeight: 500 }}>Drop files here or <span className="text-[#0A77FF]">browse</span></p>
+                            <p className="text-[10px] text-[#CBD5E1]">PNG, PDF, ZIP up to 25MB</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })() : (
+            <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
+              {/* ── Main content (no sidebar) ── */}
+              <div className="flex-1 min-w-0 flex flex-col overflow-hidden bg-white">
+                {/* Sticky toolbar */}
+                <div className="shrink-0 bg-white border-b border-[#EEF2F6] px-5 pt-4 pb-3 space-y-3">
+                  {/* Search + sort row */}
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
+                      <Input
+                        value={prSearch}
+                        onChange={(e) => setPrSearch(e.target.value)}
+                        placeholder="Search pricing rules..."
+                        className="pl-9 pr-8 rounded-lg border-[#D0D7E1] h-9 bg-white text-[13px] w-[280px] placeholder:text-[#94A3B8] shadow-[0_1px_2px_rgba(0,0,0,0.05)] focus:border-[#0A77FF] focus:shadow-[0_0_0_3px_rgba(10,119,255,0.08)]"
+                      />
+                      {prSearch && (
+                        <button onClick={() => setPrSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#94A3B8] hover:text-[#0F172A] transition-colors">
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="inline-flex items-center justify-center min-w-[22px] h-[20px] px-1.5 rounded-md bg-primary/[0.04] text-[11px] text-[#64748B]" style={{ fontWeight: 600 }}>
+                        {filteredPricingRulePresets.length}
+                      </span>
+                    <Popover open={prSortOpen} onOpenChange={setPrSortOpen}>
+                      <PopoverTrigger asChild>
+                        <button className={`inline-flex items-center gap-1 text-[12px] transition-colors px-2 py-1 rounded-md border ${prSortOpen ? "text-[#0A77FF] bg-[#EFF6FF] border-[#DBEAFE]" : "text-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC] border-transparent hover:border-[#E2E8F0]"}`} style={{ fontWeight: 500 }}>
+                          <ArrowUpDown className="w-3 h-3" />
+                          {prSortBy === "name" ? "Name" : prSortBy === "vendorsApplied" ? "Vendors" : prSortBy === "category" ? "Type" : "Basis"}
+                          {prSortDir === "asc" ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />}
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent align="end" className="w-[200px] p-1.5 rounded-lg z-[250]" sideOffset={6}>
+                        <div className="space-y-0.5">
+                          {([
+                            { key: "name", label: "Name", icon: <ArrowUpDown className="w-3.5 h-3.5" /> },
+                            { key: "vendorsApplied", label: "Vendors Applied", icon: <Building2 className="w-3.5 h-3.5" /> },
+                            { key: "category", label: "Type", icon: <Tag className="w-3.5 h-3.5" /> },
+                            { key: "basis", label: "Basis", icon: <ChartColumn className="w-3.5 h-3.5" /> },
+                          ] as const).map((opt) => {
+                            const isActive = prSortBy === opt.key;
+                            return (
+                              <button
+                                key={opt.key}
+                                onClick={() => {
+                                  if (isActive) {
+                                    setPrSortDir((d) => d === "asc" ? "desc" : "asc");
+                                  } else {
+                                    setPrSortBy(opt.key);
+                                    setPrSortDir("asc");
+                                  }
+                                  setPrSortOpen(false);
+                                }}
+                                className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[12px] transition-all ${
+                                  isActive
+                                    ? "bg-[#EFF6FF] text-[#0A77FF]"
+                                    : "text-[#475569] hover:bg-[#F8FAFC] hover:text-[#0F172A]"
+                                }`}
+                                style={{ fontWeight: isActive ? 600 : 500 }}
+                              >
+                                <span className={isActive ? "text-[#0A77FF]" : "text-[#94A3B8]"}>{opt.icon}</span>
+                                <span className="flex-1 text-left">{opt.label}</span>
+                                {isActive && (
+                                  prSortDir === "asc"
+                                    ? <ArrowUp className="w-3 h-3 text-[#0A77FF]" />
+                                    : <ArrowDown className="w-3 h-3 text-[#0A77FF]" />
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                    <Button
+                      onClick={() => { setPricingRulesModalOpen(false); resetCreatePrForm(); setCreatePrModalOpen(true); }}
+                      className="bg-primary text-primary-foreground shrink-0 h-8 px-3 text-[12px]"
+                    >
+                      <Plus className="w-3.5 h-3.5 mr-1" /> Create New
+                    </Button>
+                    </div>
+                  </div>
+
+                  {/* ── Filter tabs ── */}
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    {([
+                      { id: "all", label: "All Rules" },
+                      { id: "discount", label: "Discounts" },
+                      { id: "premium", label: "Premium" },
+                    ] as const).map((tab) => {
+                      const isActive = prSidebarFilter === tab.id;
+                      return (
+                        <button
+                          key={tab.id}
+                          onClick={() => setPrSidebarFilter(tab.id)}
+                          className={`px-3 py-1.5 rounded-md text-[12px] transition-all border ${
+                            isActive
+                              ? "bg-[#EFF6FF] text-[#0A77FF] border-[#DBEAFE]"
+                              : "bg-white text-[#475569] border-[#E8ECF1] hover:bg-[#F8FAFC] hover:text-[#0F172A] hover:border-[#CBD5E1]"
+                          }`}
+                          style={{ fontWeight: isActive ? 600 : 500 }}
+                        >
+                          {tab.label}
+                        </button>
+                      );
+                    })}
+                    <div className="w-px h-4 bg-[#E2E8F0] mx-0.5" />
+                    {([
+                      { id: "recent", label: "Recently Used" },
+                      { id: "vendors_applied", label: "Vendors Applied" },
+                      { id: "created_by_me", label: "Created by Me" },
+                      { id: "created_by_others", label: "Created by Others" },
+                    ] as const).map((tab) => {
+                      const isActive = prSidebarFilter === tab.id;
+                      return (
+                        <button
+                          key={tab.id}
+                          onClick={() => setPrSidebarFilter(tab.id)}
+                          className={`px-3 py-1.5 rounded-md text-[12px] transition-all border ${
+                            isActive
+                              ? "bg-[#EFF6FF] text-[#0A77FF] border-[#DBEAFE]"
+                              : "bg-white text-[#475569] border-[#E8ECF1] hover:bg-[#F8FAFC] hover:text-[#0F172A] hover:border-[#CBD5E1]"
+                          }`}
+                          style={{ fontWeight: isActive ? 600 : 500 }}
+                        >
+                          {tab.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Cards area */}
+                <div className="flex-1 min-h-0 overflow-y-auto p-5">
+                  {filteredPricingRulePresets.length === 0 ? (
+                    <div className="py-20 text-center">
+                      <div className="w-12 h-12 rounded-lg bg-[#F1F5F9] border border-[#E8ECF1] flex items-center justify-center mx-auto mb-3">
+                        <Search className="w-5 h-5 text-[#94A3B8]" />
+                      </div>
+                      <p className="text-[13px] text-[#475569]" style={{ fontWeight: 600 }}>No pricing rules found</p>
+                      <p className="text-[12px] text-[#94A3B8] mt-1">Try adjusting your search or filter</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-1.5">
+                      {filteredPricingRulePresets.map((rule, ruleIdx) => {
+                        const isApplied = selectedPricingRuleIds.includes(rule.id);
+                        const PR_VENDOR_NAMES = ["Acme Industrial", "Global Fasteners", "Berlin Technik", "Tokyo Materials", "Pacific Trading", "Nordic Supply", "Atlas Mfg"];
+                        return (
+                          <div
+                            key={rule.id}
+                            tabIndex={0}
+                            onClick={() => setPreviewPricingRuleId(rule.id)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setPreviewPricingRuleId(rule.id); }
+                              if (e.key === "ArrowDown") { e.preventDefault(); const next = e.currentTarget.nextElementSibling as HTMLElement; next?.focus(); }
+                              if (e.key === "ArrowUp") { e.preventDefault(); const prev = e.currentTarget.previousElementSibling as HTMLElement; prev?.focus(); }
+                            }}
+                            className={`group relative flex items-center gap-3.5 rounded-xl border transition-all duration-200 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-[#0A77FF]/30 px-4 py-3.5 ${
+                              isApplied
+                                ? "border-[#0A77FF]/25 bg-[#F7FAFF] shadow-[0_2px_12px_rgba(10,119,255,0.10)]"
+                                : "border-[#E8ECF1] bg-white shadow-[0_1px_3px_rgba(0,0,0,0.03)] hover:border-[#0A77FF]/20 hover:shadow-[0_4px_16px_rgba(10,119,255,0.08)]"
+                            }`}
+                          >
+                              {/* Icon — circle with abbreviation */}
+                              <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-colors ${
+                                isApplied
+                                  ? "bg-[#0A77FF]/10"
+                                  : "bg-[#F1F5F9] group-hover:bg-[#0A77FF]/8"
+                              }`}>
+                                <span className={`text-[11px] tracking-wide transition-colors ${
+                                  isApplied
+                                    ? "text-[#0A77FF]"
+                                    : "text-[#64748B] group-hover:text-[#0A77FF]"
+                                }`} style={{ fontWeight: 700 }}>{rule.category === "discount" ? "DIS" : "PRE"}</span>
+                              </div>
+
+                              {/* Main info */}
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 mb-0.5">
+                                  <h5 className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{highlightMatch(rule.name, prSearch)}</h5>
+                                </div>
+                                <p className="text-[11px] text-[#94A3B8] truncate leading-relaxed">{highlightMatch(rule.description, prSearch)}</p>
+                              </div>
+
+                              {/* Meta badges */}
+                              <div className="shrink-0 flex items-center gap-2">
+                                <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10px] bg-[#EFF6FF] border border-[#0A77FF]/12 text-[#0A77FF]" style={{ fontWeight: 600 }}>
+                                  {rule.tierType === "single" ? "1 tier" : `${rule.totalTiers} tiers`}
+                                </span>
+                                <span className="inline-flex items-center gap-1 px-1.5 py-1 rounded-md bg-[#F8FAFC] border border-[#E8ECF1] text-[10px] text-[#64748B] tabular-nums" style={{ fontWeight: 500 }}>
+                                  {rule.tiers[0]?.discount || "-"}
+                                </span>
+                              </div>
+
+                              {/* Actions — always visible */}
+                              <div className="shrink-0 flex items-center gap-1.5">
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    toast.success("Pricing rule duplicated.");
+                                  }}
+                                  className="p-1.5 rounded-md border border-[#E8ECF1] bg-white text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#334155] transition-colors"
+                                  title="Duplicate"
+                                >
+                                  <Copy className="w-3 h-3" />
+                                </button>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedPricingRuleIds((prev) => prev.includes(rule.id) ? prev : [...prev, rule.id]);
+                                    setPricingRulesModalOpen(false);
+                                    toast.success("Pricing rule applied.");
+                                  }}
+                                  className="px-3 py-1 rounded-md bg-[#0A77FF] text-white text-[11px] hover:bg-[#0862D0] transition-colors"
+                                  style={{ fontWeight: 600 }}
+                                >
+                                  Apply
+                                </button>
+                              </div>
+
+                              {isApplied && (
+                                <div className="w-5 h-5 rounded-full bg-[#0A77FF] flex items-center justify-center shrink-0">
+                                  <Check className="w-3 h-3 text-white" />
+                                </div>
+                              )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+            )}
+          </DialogContent>
+        </Dialog>
+
+        {/* ── Create New Pricing Rule Modal (multi-step) ── */}
+        <Dialog open={createPrModalOpen} onOpenChange={(v) => { setCreatePrModalOpen(v); if (!v) { resetCreatePrForm(); setCreatePrFullscreen(false); } }}>
+          <DialogContent
+            className="p-0 gap-0 overflow-hidden z-[210] flex flex-col border-0 sm:border sm:!rounded-2xl transition-[max-width,max-height,border-radius] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
+            style={createPrFullscreen
+              ? { position: "fixed" as const, inset: 0, maxWidth: "100%", width: "100%", height: "100dvh", maxHeight: "100dvh", borderRadius: 0 }
+              : { maxWidth: 960, width: "95vw", height: "85vh", maxHeight: "85vh" }
+            }
+            hideCloseButton
+          >
+            <DialogTitle className="sr-only">{createPrMode === "view" ? "Pricing Rule Details" : "Create New Pricing Rule"}</DialogTitle>
+            <DialogDescription className="sr-only">{createPrMode === "view" ? "View and edit pricing rule details." : "Create a new pricing rule for this vendor."}</DialogDescription>
+
+            {/* Header — matching PricingRulesTab pattern */}
+            <div className="px-3 sm:px-4 lg:px-5 pt-3 sm:pt-4 pb-0 shrink-0 bg-white rounded-t-none sm:rounded-t-2xl border-b border-[#EEF2F6]">
+              {/* Title row */}
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2.5">
+                    <h2 className="text-[15px] sm:text-[17px] text-[#0F172A]" style={{ fontWeight: 700 }}>
+                      {createPrMode === "view" ? (createPrName || "Pricing Rule Details") : "Create New Pricing Rule"}
+                    </h2>
+                    {createPrMode === "view" ? (
+                      <>
+                        <span className={`hidden sm:inline-flex items-center px-2 py-0.5 rounded-md text-[10px] uppercase tracking-wide ${
+                          createPrCategory === "discount" ? "bg-[#F0FDF4] text-[#16A34A]" : "bg-[#F5F3FF] text-[#7C3AED]"
+                        }`} style={{ fontWeight: 600 }}>
+                          {createPrCategory === "discount" ? "Discount" : "Premium"}
+                        </span>
+                        <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-md bg-[#F1F5F9] text-[10px] text-[#64748B]" style={{ fontWeight: 500 }}>
+                          {createPrBasis === "volume" ? "Volume" : "Value"}
+                        </span>
+                        {editingPrRuleId && !editingPrRuleId.startsWith("pr-custom-") && (
+                          <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#FEF3C7] text-[10px] text-[#D97706]" style={{ fontWeight: 600 }}>
+                            <Lock className="w-2.5 h-2.5" /> Preset
+                          </span>
+                        )}
+                      </>
+                    ) : (
+                      <span className="hidden sm:inline-flex items-center px-2.5 py-1 rounded-lg bg-[#F1F5F9] text-[10px] text-[#64748B] uppercase tracking-wide" style={{ fontWeight: 600 }}>Custom</span>
+                    )}
+                  </div>
+                  <p className="text-[11px] sm:text-xs text-[#64748B] mt-0.5" style={{ fontWeight: 400 }}>
+                    {createPrMode === "view"
+                      ? (createPrDescription || "View and manage this pricing rule's configuration.")
+                      : "Configure the type, tiers, and assign items for the new rule."
+                    }
+                  </p>
+                </div>
+                <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
+                  <button
+                    onClick={() => setCreatePrFullscreen(!createPrFullscreen)}
+                    className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#475569] hover:bg-[#F8FAFC] hover:border-[#CBD5E1] transition-all cursor-pointer"
+                    style={{ fontWeight: 500 }}
+                  >
+                    {createPrFullscreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
+                    {createPrFullscreen ? "Exit full" : "Full view"}
+                  </button>
+                  <button
+                    onClick={() => { setCreatePrModalOpen(false); resetCreatePrForm(); }}
+                    className="w-8 h-8 rounded-lg flex items-center justify-center text-[#94A3B8] hover:text-[#64748B] hover:bg-[#F1F5F9] transition-all cursor-pointer"
+                  >
+                    <X className="w-4.5 h-4.5" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Step tabs */}
+              <div className="flex items-center gap-4 sm:gap-6 mt-3 sm:mt-3.5 overflow-x-auto -mb-px">
+                {[
+                  { num: 1 as const, label: "Rule Setup", shortLabel: "Setup", active: createPrStep === 1, completed: createPrStep === 2 },
+                  { num: 2 as const, label: "Items & Attachments", shortLabel: "Items", active: createPrStep === 2, completed: false },
+                ].map((tab) => (
+                  <div
+                    key={tab.num}
+                    onClick={() => {
+                      if (tab.num === 1 && createPrStep === 2) setCreatePrStep(1);
+                      if (tab.num === 2 && createPrStep === 1 && (createPrMode === "view" || createPrName.trim())) setCreatePrStep(2);
+                    }}
+                    className={`relative flex items-center gap-2 pb-2.5 sm:pb-3 ${
+                      (tab.num === 1 && createPrStep === 2) || (tab.num === 2 && createPrStep === 1 && (createPrMode === "view" || createPrName.trim()))
+                        ? "cursor-pointer" : "cursor-default"
+                    }`}
+                  >
+                    <div
+                      className={`w-[22px] h-[22px] sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-[11px] sm:text-[12px] shrink-0 transition-all duration-200 ${
+                        tab.completed
+                          ? "bg-[#10B981] text-white"
+                          : tab.active
+                          ? "bg-[#0A77FF] text-white"
+                          : "border-[1.5px] border-[#CBD5E1] text-[#64748B] bg-white"
+                      }`}
+                      style={{ fontWeight: 600 }}
+                    >
+                      {tab.completed ? <Check className="w-3 h-3" /> : tab.num}
+                    </div>
+                    <span
+                      className={`text-[12px] sm:text-[13px] whitespace-nowrap transition-colors ${
+                        tab.active
+                          ? "text-[#0A77FF]"
+                          : tab.completed
+                          ? "text-[#10B981]"
+                          : "text-[#334155]"
+                      }`}
+                      style={{ fontWeight: tab.active || tab.completed ? 600 : 500 }}
+                    >
+                      <span className="hidden sm:inline">{tab.label}</span>
+                      <span className="sm:hidden">{tab.shortLabel}</span>
+                    </span>
+                    {(tab.active || tab.completed) && (
+                      <div className={`absolute bottom-0 left-0 right-0 h-[2px] rounded-t-full ${tab.completed ? "bg-[#10B981]" : "bg-[#0A77FF]"}`} />
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Body */}
+            <div className="flex-1 overflow-y-auto p-6 min-h-0">
+              {/* ─── Step 1: Rule Setup ─── */}
+              {createPrStep === 1 && (() => {
+                const isPresetReadOnly = createPrMode === "view" && editingPrRuleId != null && !editingPrRuleId.startsWith("pr-custom-");
+                return (
+                <div className="space-y-5">
+                  {/* Preset read-only banner */}
+                  {isPresetReadOnly && (
+                    <div className="rounded-xl border border-[#FEF3C7] bg-[#FFFBEB] p-3 flex items-start gap-2.5">
+                      <Lock className="w-4 h-4 text-[#D97706] shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-[12px] text-[#92400E]" style={{ fontWeight: 600 }}>Preset Rule — Configuration Locked</p>
+                        <p className="text-[11px] text-[#B45309] mt-0.5">This is a tenant-provided preset rule. You can view its configuration and add items, categories, and attachments, but you cannot modify the rule type, tiers, or names.</p>
+                      </div>
+                    </div>
+                  )}
+                  {/* Pricing Rule Type — gradient cards */}
+                  <div className={isPresetReadOnly ? "opacity-60 pointer-events-none" : ""}>
+                    <div className="flex items-center gap-1.5 mb-3">
+                      <span className="text-sm text-[#0F172A]" style={{ fontWeight: 600 }}>Pricing Rule Type</span>
+                      <Tooltip><TooltipTrigger asChild><span><Info className="w-3.5 h-3.5 text-[#CBD5E1]" /></span></TooltipTrigger><TooltipContent className="z-[300]"><p className="text-xs">Choose whether this rule decreases or increases prices.</p></TooltipContent></Tooltip>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      {/* Discount card — green */}
+                      <div
+                        onClick={() => setCreatePrCategory("discount")}
+                        className={`group relative rounded-xl overflow-hidden border transition-all duration-200 cursor-pointer ${
+                          createPrCategory === "discount"
+                            ? "border-[#86EFAC]/70 bg-white shadow-[0_1px_4px_rgba(4,120,87,0.06)]"
+                            : "border-[#E2E8F0] bg-white hover:border-[#BBF7D0] hover:shadow-[0_4px_16px_-4px_rgba(4,120,87,0.10)]"
+                        }`}
+                      >
+                        <div className={`absolute inset-0 transition-all duration-300 pointer-events-none ${
+                          createPrCategory === "discount" ? "bg-gradient-to-br from-[#F0FDF4]/50 to-transparent" : "bg-gradient-to-br from-[#F0FDF4]/0 to-[#F0FDF4]/0 group-hover:from-[#F0FDF4]/60 group-hover:to-transparent"
+                        }`} />
+                        <div className="relative flex items-center gap-3 pl-3.5 pr-3 py-3">
+                          <div className={`w-9 h-9 rounded-[10px] flex items-center justify-center shrink-0 transition-all duration-200 ${
+                            createPrCategory === "discount" ? "bg-gradient-to-br from-[#DCFCE7] to-[#BBF7D0] text-[#15803D]" : "bg-gradient-to-br from-[#F0FDF4] to-[#DCFCE7] text-[#16A34A] group-hover:scale-105"
+                          }`}>
+                            <TrendingDown className="w-[18px] h-[18px]" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className={`text-[13px] transition-colors duration-150 ${createPrCategory === "discount" ? "text-[#166534]" : "text-[#0F172A] group-hover:text-[#1E293B]"}`} style={{ fontWeight: 600 }}>Discount</p>
+                            <p className={`text-[11px] mt-0.5 truncate transition-colors duration-150 ${createPrCategory === "discount" ? "text-[#22C55E]" : "text-[#94A3B8]"}`}>Lower price adjustment</p>
+                          </div>
+                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-200 shrink-0 ${createPrCategory === "discount" ? "border-[#16A34A] bg-[#16A34A]" : "border-[#CBD5E1] group-hover:border-[#86EFAC]"}`}>
+                            {createPrCategory === "discount" && <Check className="w-3 h-3 text-white" />}
+                          </div>
+                        </div>
+                      </div>
+                      {/* Premium card — purple */}
+                      <div
+                        onClick={() => setCreatePrCategory("premium")}
+                        className={`group relative rounded-xl overflow-hidden border transition-all duration-200 cursor-pointer ${
+                          createPrCategory === "premium"
+                            ? "border-[#C4B5FD]/70 bg-white shadow-[0_1px_4px_rgba(124,58,237,0.06)]"
+                            : "border-[#E2E8F0] bg-white hover:border-[#DDD6FE] hover:shadow-[0_4px_16px_-4px_rgba(124,58,237,0.10)]"
+                        }`}
+                      >
+                        <div className={`absolute inset-0 transition-all duration-300 pointer-events-none ${
+                          createPrCategory === "premium" ? "bg-gradient-to-br from-[#F5F3FF]/50 to-transparent" : "bg-gradient-to-br from-[#F5F3FF]/0 to-[#F5F3FF]/0 group-hover:from-[#F5F3FF]/60 group-hover:to-transparent"
+                        }`} />
+                        <div className="relative flex items-center gap-3 pl-3.5 pr-3 py-3">
+                          <div className={`w-9 h-9 rounded-[10px] flex items-center justify-center shrink-0 transition-all duration-200 ${
+                            createPrCategory === "premium" ? "bg-gradient-to-br from-[#EDE9FE] to-[#DDD6FE] text-[#7C3AED]" : "bg-gradient-to-br from-[#F5F3FF] to-[#EDE9FE] text-[#8B5CF6] group-hover:scale-105"
+                          }`}>
+                            <TrendingUp className="w-[18px] h-[18px]" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className={`text-[13px] transition-colors duration-150 ${createPrCategory === "premium" ? "text-[#5B21B6]" : "text-[#0F172A] group-hover:text-[#1E293B]"}`} style={{ fontWeight: 600 }}>Premium</p>
+                            <p className={`text-[11px] mt-0.5 truncate transition-colors duration-150 ${createPrCategory === "premium" ? "text-[#8B5CF6]" : "text-[#94A3B8]"}`}>Higher price adjustment</p>
+                          </div>
+                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-200 shrink-0 ${createPrCategory === "premium" ? "border-[#7C3AED] bg-[#7C3AED]" : "border-[#CBD5E1] group-hover:border-[#C4B5FD]"}`}>
+                            {createPrCategory === "premium" && <Check className="w-3 h-3 text-white" />}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    {/* Basis selector pills */}
+                    <div className="flex items-center gap-2 mt-3">
+                      <span className="text-[12px] text-[#64748B] mr-1" style={{ fontWeight: 500 }}>Basis:</span>
+                      {(["volume", "value"] as const).map((b) => (
+                        <button
+                          key={b}
+                          onClick={() => setCreatePrBasis(b)}
+                          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[12px] transition-all cursor-pointer ${
+                            createPrBasis === b
+                              ? createPrCategory === "discount" ? "border-[#16A34A]/30 bg-[#F0FDF4] text-[#15803D]" : "border-[#7C3AED]/30 bg-[#F5F3FF] text-[#6D28D9]"
+                              : "border-[#E2E8F0] bg-white text-[#64748B] hover:border-[#CBD5E1] hover:bg-[#F8FAFC]"
+                          }`}
+                          style={{ fontWeight: createPrBasis === b ? 600 : 500 }}
+                        >
+                          {b === "volume" ? <ChartColumn className="w-3.5 h-3.5" /> : <DollarSign className="w-3.5 h-3.5" />}
+                          {b === "volume" ? "Volume-Based" : "Value-Based"}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Pricing Rule Details */}
+                  <div className={isPresetReadOnly ? "opacity-60 pointer-events-none" : ""}>
+                    <div className="flex items-center gap-1.5 mb-3">
+                      <span className="text-sm text-[#0F172A]" style={{ fontWeight: 600 }}>Pricing Rule Details</span>
+                      <Tooltip><TooltipTrigger asChild><span><Info className="w-3.5 h-3.5 text-[#CBD5E1]" /></span></TooltipTrigger><TooltipContent className="z-[300]"><p className="text-xs">Name and describe this pricing rule.</p></TooltipContent></Tooltip>
+                    </div>
+                    <div className="rounded-xl border border-[#E2E8F0] bg-white p-4 space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-[12px] text-[#0F172A] mb-1.5 block" style={{ fontWeight: 600 }}>{createPrCategory === "discount" ? "Discount" : "Premium"} Name</label>
+                          <Input value={createPrName} onChange={(e) => setCreatePrName(e.target.value)} placeholder={`e.g. ${createPrCategory === "discount" ? "Volume Discount for Q4" : "Premium Markup for VIP"}`} className="rounded-lg border-[#E2E8F0] bg-white text-[13px] text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+                        </div>
+                        <div>
+                          <label className="text-[12px] text-[#0F172A] mb-1.5 block" style={{ fontWeight: 600 }}>Description</label>
+                          <Textarea value={createPrDescription} onChange={(e) => setCreatePrDescription(e.target.value.slice(0, 150))} placeholder="Type here..." className="rounded-lg border-[#E2E8F0] bg-white min-h-[38px] resize-none text-[13px] text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" rows={2} />
+                          <p className="text-right text-[10px] text-[#94A3B8] mt-0.5">{createPrDescription.length}/150</p>
+                        </div>
+                      </div>
+                      {/* Date range toggle + fields */}
+                      <div>
+                        <div className="flex items-center gap-2.5">
+                          <Switch checked={createPrLimitDateRange} onCheckedChange={setCreatePrLimitDateRange} />
+                          <span className="text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>Limit Rule to Date Range</span>
+                        </div>
+                        {createPrLimitDateRange && (
+                          <div className="grid grid-cols-2 gap-4 mt-3 pt-3 border-t border-[#F1F5F9]">
+                            <div>
+                              <div className="flex items-center gap-1 mb-1.5">
+                                <label className="text-[12px] text-[#0F172A]" style={{ fontWeight: 600 }}>Valid From</label>
+                                <Tooltip><TooltipTrigger asChild><span><Info className="w-3 h-3 text-[#CBD5E1]" /></span></TooltipTrigger><TooltipContent className="z-[300]"><p className="text-xs">Start date for this rule.</p></TooltipContent></Tooltip>
+                              </div>
+                              <Input type="date" value={createPrValidFrom} onChange={(e) => setCreatePrValidFrom(e.target.value)} className="rounded-lg border-[#E2E8F0] bg-white text-[13px] text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-1 mb-1.5">
+                                <label className="text-[12px] text-[#0F172A]" style={{ fontWeight: 600 }}>Valid To</label>
+                                <Tooltip><TooltipTrigger asChild><span><Info className="w-3 h-3 text-[#CBD5E1]" /></span></TooltipTrigger><TooltipContent className="z-[300]"><p className="text-xs">End date for this rule.</p></TooltipContent></Tooltip>
+                              </div>
+                              <Input type="date" value={createPrValidTo} onChange={(e) => setCreatePrValidTo(e.target.value)} className="rounded-lg border-[#E2E8F0] bg-white text-[13px] text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Tiers — multi-tier with add/remove */}
+                  <div className={isPresetReadOnly ? "opacity-60 pointer-events-none" : ""}>
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-sm text-[#0F172A]" style={{ fontWeight: 600 }}>{createPrCategory === "discount" ? "Discount" : "Premium"} Tiers</span>
+                        <span className="text-[11px] text-[#94A3B8] bg-[#F1F5F9] px-1.5 py-0.5 rounded" style={{ fontWeight: 600 }}>{createPrTiers.length}</span>
+                      </div>
+                    </div>
+                    <div className="space-y-3">
+                      {createPrTiers.map((tier, idx) => (
+                        <div key={idx} className="rounded-xl border border-[#E2E8F0] bg-white p-4 relative">
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-2">
+                              <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 600 }}>#{idx + 1}</span>
+                              <span className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>{createPrCategory === "discount" ? "Discount" : "Premium"} Tier</span>
+                            </div>
+                            {idx > 0 && (
+                              <button onClick={() => removeCpmTier(idx)} className="w-7 h-7 rounded-full border border-[#FEE2E2] bg-[#FEF2F2] flex items-center justify-center text-[#EF4444] hover:bg-[#FEE2E2] hover:border-[#FECACA] transition-all cursor-pointer">
+                                <X className="w-3.5 h-3.5" />
+                              </button>
+                            )}
+                          </div>
+                          <div className="flex items-start gap-4 mb-3">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-1 mb-1.5">
+                                <label className="text-[12px] text-[#0F172A]" style={{ fontWeight: 500 }}>
+                                  {tier.fixRate ? `${createPrCategory === "discount" ? "Discount" : "Premium"} Price ($)` : `${createPrCategory === "discount" ? "Discount" : "Premium"} Percentage (%)`}
+                                </label>
+                                <Tooltip><TooltipTrigger asChild><span><Info className="w-3 h-3 text-[#CBD5E1]" /></span></TooltipTrigger><TooltipContent className="z-[300]"><p className="text-xs">{tier.fixRate ? "Fixed dollar amount adjustment." : "Percentage-based adjustment."}</p></TooltipContent></Tooltip>
+                              </div>
+                              <div className="relative">
+                                <Input value={tier.discount} onChange={(e) => updateCpmTier(idx, { discount: e.target.value })} placeholder={tier.fixRate ? "Enter price (e.g., 5$)" : "Enter percentage (e.g., 50%)"} className="rounded-lg border-[#E2E8F0] bg-white text-[13px] pr-8 text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+                                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[13px] text-[#94A3B8]">{tier.fixRate ? "$" : "%"}</span>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2 pt-7">
+                              <Switch checked={tier.fixRate} onCheckedChange={(v) => updateCpmTier(idx, { fixRate: v })} />
+                              <div className="flex items-center gap-1">
+                                <span className="text-[12px] text-[#0F172A] whitespace-nowrap" style={{ fontWeight: 500 }}>Fix {createPrCategory === "discount" ? "Discount" : "Premium"} Rate ($)</span>
+                                <Tooltip><TooltipTrigger asChild><span><Info className="w-3 h-3 text-[#CBD5E1]" /></span></TooltipTrigger><TooltipContent className="z-[300]"><p className="text-xs">Toggle between percentage and fixed dollar amount.</p></TooltipContent></Tooltip>
+                              </div>
+                            </div>
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2.5">
+                              <Switch checked={tier.qtyLimits} onCheckedChange={(v) => updateCpmTier(idx, { qtyLimits: v })} />
+                              <span className="text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>Enable order quantity limits</span>
+                            </div>
+                            {tier.qtyLimits && (
+                              <div className="grid grid-cols-2 gap-4 mt-3 pt-3 border-t border-[#F1F5F9]">
+                                <div>
+                                  <div className="flex items-center gap-1 mb-1.5">
+                                    <label className="text-[12px] text-[#0F172A]" style={{ fontWeight: 500 }}>Minimum Order Quantity</label>
+                                    <Tooltip><TooltipTrigger asChild><span><Info className="w-3 h-3 text-[#CBD5E1]" /></span></TooltipTrigger><TooltipContent className="z-[300]"><p className="text-xs">Minimum units for this tier to apply.</p></TooltipContent></Tooltip>
+                                  </div>
+                                  <Input value={tier.minQty} onChange={(e) => updateCpmTier(idx, { minQty: e.target.value })} placeholder="Enter minimum units" className="rounded-lg border-[#E2E8F0] bg-white text-[13px] text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+                                </div>
+                                <div>
+                                  <div className="flex items-center gap-1 mb-1.5">
+                                    <label className="text-[12px] text-[#0F172A]" style={{ fontWeight: 500 }}>Maximum Order Quantity</label>
+                                    <Tooltip><TooltipTrigger asChild><span><Info className="w-3 h-3 text-[#CBD5E1]" /></span></TooltipTrigger><TooltipContent className="z-[300]"><p className="text-xs">Maximum units for this tier to apply.</p></TooltipContent></Tooltip>
+                                  </div>
+                                  <Input value={tier.maxQty} onChange={(e) => updateCpmTier(idx, { maxQty: e.target.value })} placeholder="Enter maximum units" className="rounded-lg border-[#E2E8F0] bg-white text-[13px] text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <button onClick={addCpmTier} className={`inline-flex items-center gap-1.5 mt-3 text-[12px] transition-colors cursor-pointer ${createPrCategory === "discount" ? "text-[#16A34A] hover:text-[#15803D]" : "text-[#7C3AED] hover:text-[#6D28D9]"}`} style={{ fontWeight: 600 }}>
+                      <Plus className="w-3.5 h-3.5" /> Add {createPrCategory === "discount" ? "Discount" : "Premium"} Tier
+                    </button>
+                  </div>
+                </div>
+                );
+              })()}
+
+              {/* ─── Step 2: Items, Categories & Attachments ─── */}
+              {createPrStep === 2 && (
+                <div className="space-y-5">
+                  {/* Summary banner */}
+                  <div className="rounded-xl border border-[#E2E8F0] bg-white p-3.5 flex items-center gap-3">
+                    <div className={`w-9 h-9 rounded-[10px] flex items-center justify-center shrink-0 ${createPrCategory === "discount" ? "bg-gradient-to-br from-[#DCFCE7] to-[#BBF7D0]" : "bg-gradient-to-br from-[#EDE9FE] to-[#DDD6FE]"}`}>
+                      {createPrCategory === "discount" ? <TrendingDown className="w-4.5 h-4.5 text-[#15803D]" /> : <TrendingUp className="w-4.5 h-4.5 text-[#7C3AED]" />}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{createPrName || "Untitled Rule"}</p>
+                      <p className="text-[11px] text-[#64748B] truncate">
+                        {createPrCategory === "discount" ? "Discount" : "Premium"} · {createPrBasis === "volume" ? "Volume-Based" : "Value-Based"} · {createPrTiers.length} tier{createPrTiers.length !== 1 ? "s" : ""}
+                        {createPrTiers[0]?.discount ? ` · ${createPrTiers[0].discount}${createPrTiers[0].fixRate ? "$" : "%"}` : ""}
+                      </p>
+                    </div>
+                    <button onClick={() => setCreatePrStep(1)} className="text-[11px] text-[#0A77FF] hover:text-[#0862D0] transition-colors cursor-pointer shrink-0" style={{ fontWeight: 600 }}>{createPrMode === "view" ? "View Setup" : "Edit Setup"}</button>
+                  </div>
+
+                  {/* Items & Categories card */}
+                  <div className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden">
+                    <div className="flex items-center gap-0 border-b border-[#E2E8F0] px-4">
+                      {([
+                        { key: "items" as const, label: "Items", icon: Package, count: cpmSelectedItems.length },
+                        { key: "categories" as const, label: "Categories", icon: FolderOpen, count: cpmSelectedCats.length },
+                        { key: "attachments" as const, label: "Attachments", icon: Paperclip, count: cpmAttachments.length },
+                      ]).map((t) => (
+                        <button
+                          key={t.key}
+                          onClick={() => setCreatePrItemsTab(t.key)}
+                          className={`relative px-3 py-2.5 text-[12px] flex items-center gap-1.5 transition-colors cursor-pointer ${createPrItemsTab === t.key ? "text-[#0A77FF]" : "text-[#64748B] hover:text-[#334155]"}`}
+                          style={{ fontWeight: createPrItemsTab === t.key ? 600 : 500 }}
+                        >
+                          <t.icon className="w-3.5 h-3.5" />
+                          {t.label}
+                          <span className={`px-1.5 py-0.5 rounded text-[10px] ${createPrItemsTab === t.key ? "bg-[#DBEAFE] text-[#0A77FF]" : "bg-[#F1F5F9] text-[#94A3B8]"}`} style={{ fontWeight: 700 }}>{t.count}</span>
+                          {createPrItemsTab === t.key && (
+                            <div className="absolute bottom-0 left-0 right-0 h-[2px] rounded-t-full bg-[#0A77FF]" />
+                          )}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Tab content — Items */}
+                    {createPrItemsTab === "items" && (
+                      <div className="p-4">
+                        <div className="flex items-center gap-2 mb-4">
+                          <div className="relative flex-1">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8]" />
+                            <Input
+                              value={cpmItemSearch}
+                              onChange={(e) => setCpmItemSearch(e.target.value)}
+                              placeholder="Search assigned items..."
+                              className="pl-9 rounded-lg border-[#E2E8F0] bg-[#F8FAFC] text-[13px] h-9"
+                            />
+                          </div>
+                          <button
+                            onClick={() => { setCpmShowItemPicker(!cpmShowItemPicker); setCpmItemPickerSearch(""); }}
+                            className="inline-flex items-center gap-1.5 h-9 px-3 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-[12px] shadow-sm transition-colors cursor-pointer"
+                            style={{ fontWeight: 600 }}
+                          >
+                            <Plus className="w-3.5 h-3.5" /> Add Items
+                          </button>
+                        </div>
+
+                        {/* Item picker dropdown */}
+                        {cpmShowItemPicker && (
+                          <div className="mb-4 rounded-xl border border-[#DBEAFE] bg-[#F8FBFF] p-3">
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-[12px] text-[#0F172A]" style={{ fontWeight: 600 }}>Select items to add</span>
+                              <button onClick={() => setCpmShowItemPicker(false)} className="w-6 h-6 rounded-md flex items-center justify-center text-[#94A3B8] hover:text-[#64748B] hover:bg-white transition-colors cursor-pointer">
+                                <X className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                            <div className="relative mb-2">
+                              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8]" />
+                              <Input
+                                value={cpmItemPickerSearch}
+                                onChange={(e) => setCpmItemPickerSearch(e.target.value)}
+                                placeholder="Search by part number, description..."
+                                className="pl-8 rounded-lg border-[#E2E8F0] bg-white text-[12px] h-8"
+                              />
+                            </div>
+                            <div className="max-h-[200px] overflow-y-auto space-y-1">
+                              {cpmAvailableItemsFiltered.length === 0 ? (
+                                <p className="text-[11px] text-[#94A3B8] text-center py-4">No items available</p>
+                              ) : (
+                                cpmAvailableItemsFiltered.map((item) => (
+                                  <div
+                                    key={item.id}
+                                    onClick={() => { cpmAddItem(item); toast.success(`Added ${item.partNo}`); }}
+                                    className="flex items-center gap-3 px-2.5 py-2 rounded-lg hover:bg-white hover:shadow-[0_1px_2px_rgba(0,0,0,0.04)] cursor-pointer transition-all group"
+                                  >
+                                    <div className="w-7 h-7 rounded-md bg-[#F1F5F9] flex items-center justify-center shrink-0">
+                                      <Package className="w-3.5 h-3.5 text-[#94A3B8]" />
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-[12px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{item.partNo}</p>
+                                      <p className="text-[10px] text-[#64748B] truncate">{item.description}</p>
+                                    </div>
+                                    <span className="text-[10px] text-[#94A3B8] px-1.5 py-0.5 rounded bg-[#F1F5F9]">{item.category}</span>
+                                    <Plus className="w-3.5 h-3.5 text-[#0A77FF] opacity-0 group-hover:opacity-100 transition-opacity" />
+                                  </div>
+                                ))
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Selected items list */}
+                        {cpmSelectedItems.length > 0 ? (
+                          <div className="space-y-1.5">
+                            {cpmFilteredSelectedItems.map((item) => (
+                              <div key={item.id} className="flex items-center gap-3 px-3 py-2.5 rounded-lg border border-[#E8ECF1] bg-white hover:border-[#CBD5E1] transition-all group">
+                                <div className={`w-7 h-7 rounded-md flex items-center justify-center shrink-0 ${item.status === "Active" ? "bg-[#F0FDF4]" : "bg-[#FEF2F2]"}`}>
+                                  <Package className={`w-3.5 h-3.5 ${item.status === "Active" ? "text-[#16A34A]" : "text-[#EF4444]"}`} />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-[12px] text-[#0F172A]" style={{ fontWeight: 600 }}>{item.partNo}</span>
+                                    <span className={`px-1.5 py-0.5 rounded text-[9px] ${item.status === "Active" ? "bg-[#F0FDF4] text-[#16A34A]" : "bg-[#FEF2F2] text-[#EF4444]"}`} style={{ fontWeight: 600 }}>{item.status}</span>
+                                  </div>
+                                  <p className="text-[10px] text-[#64748B] truncate">{item.description}</p>
+                                </div>
+                                <span className="text-[10px] text-[#94A3B8] px-1.5 py-0.5 rounded bg-[#F1F5F9] hidden sm:inline">{item.category}</span>
+                                <span className="text-[10px] text-[#64748B] px-1.5 py-0.5 rounded border border-[#E2E8F0] hidden sm:inline">{item.itemType}</span>
+                                <button
+                                  onClick={() => { cpmRemoveItem(item.id); toast("Item removed"); }}
+                                  className="w-6 h-6 rounded-md flex items-center justify-center text-[#94A3B8] hover:text-[#EF4444] hover:bg-[#FEF2F2] opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
+                                >
+                                  <X className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="py-8 text-center">
+                            <div className="w-12 h-12 rounded-xl bg-[#F8FAFC] border border-[#E8ECF1] flex items-center justify-center mx-auto mb-3">
+                              <Package className="w-5 h-5 text-[#94A3B8]" />
+                            </div>
+                            <p className="text-[13px] text-[#334155] mb-1" style={{ fontWeight: 600 }}>No items assigned yet</p>
+                            <p className="text-[11px] text-[#94A3B8] max-w-[260px] mx-auto">Search and add items that should be affected by this pricing rule.</p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Tab content — Categories */}
+                    {createPrItemsTab === "categories" && (
+                      <div className="p-4">
+                        <div className="flex items-center gap-2 mb-4">
+                          <div className="relative flex-1">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8]" />
+                            <Input
+                              value={cpmCatSearch}
+                              onChange={(e) => setCpmCatSearch(e.target.value)}
+                              placeholder="Search assigned categories..."
+                              className="pl-9 rounded-lg border-[#E2E8F0] bg-[#F8FAFC] text-[13px] h-9"
+                            />
+                          </div>
+                          <button
+                            onClick={() => { setCpmShowCatPicker(!cpmShowCatPicker); setCpmCatPickerSearch(""); }}
+                            className="inline-flex items-center gap-1.5 h-9 px-3 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-[12px] shadow-sm transition-colors cursor-pointer"
+                            style={{ fontWeight: 600 }}
+                          >
+                            <Plus className="w-3.5 h-3.5" /> Add Categories
+                          </button>
+                        </div>
+
+                        {/* Category picker dropdown */}
+                        {cpmShowCatPicker && (
+                          <div className="mb-4 rounded-xl border border-[#DBEAFE] bg-[#F8FBFF] p-3">
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-[12px] text-[#0F172A]" style={{ fontWeight: 600 }}>Select categories to add</span>
+                              <button onClick={() => setCpmShowCatPicker(false)} className="w-6 h-6 rounded-md flex items-center justify-center text-[#94A3B8] hover:text-[#64748B] hover:bg-white transition-colors cursor-pointer">
+                                <X className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                            <div className="relative mb-2">
+                              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8]" />
+                              <Input
+                                value={cpmCatPickerSearch}
+                                onChange={(e) => setCpmCatPickerSearch(e.target.value)}
+                                placeholder="Search by name, code..."
+                                className="pl-8 rounded-lg border-[#E2E8F0] bg-white text-[12px] h-8"
+                              />
+                            </div>
+                            <div className="max-h-[200px] overflow-y-auto space-y-1">
+                              {cpmAvailableCatsFiltered.length === 0 ? (
+                                <p className="text-[11px] text-[#94A3B8] text-center py-4">No categories available</p>
+                              ) : (
+                                cpmAvailableCatsFiltered.map((cat) => (
+                                  <div
+                                    key={cat.id}
+                                    onClick={() => { cpmAddCat(cat); toast.success(`Added ${cat.name}`); }}
+                                    className="flex items-center gap-3 px-2.5 py-2 rounded-lg hover:bg-white hover:shadow-[0_1px_2px_rgba(0,0,0,0.04)] cursor-pointer transition-all group"
+                                  >
+                                    <div className="w-7 h-7 rounded-md bg-[#F5F3FF] flex items-center justify-center shrink-0">
+                                      <FolderOpen className="w-3.5 h-3.5 text-[#8B5CF6]" />
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-[12px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{cat.name}</p>
+                                      <p className="text-[10px] text-[#64748B] truncate">{cat.code} · {cat.description}</p>
+                                    </div>
+                                    <span className="text-[10px] text-[#64748B]">{cat.linkedItems} items</span>
+                                    <Plus className="w-3.5 h-3.5 text-[#0A77FF] opacity-0 group-hover:opacity-100 transition-opacity" />
+                                  </div>
+                                ))
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Selected categories list */}
+                        {cpmSelectedCats.length > 0 ? (
+                          <div className="space-y-1.5">
+                            {cpmFilteredSelectedCats.map((cat) => (
+                              <div key={cat.id} className="flex items-center gap-3 px-3 py-2.5 rounded-lg border border-[#E8ECF1] bg-white hover:border-[#CBD5E1] transition-all group">
+                                <div className="w-7 h-7 rounded-md bg-[#F5F3FF] flex items-center justify-center shrink-0">
+                                  <FolderOpen className="w-3.5 h-3.5 text-[#8B5CF6]" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-[12px] text-[#0F172A]" style={{ fontWeight: 600 }}>{cat.name}</span>
+                                    <span className="text-[10px] text-[#94A3B8] px-1.5 py-0.5 rounded bg-[#F1F5F9]">{cat.code}</span>
+                                  </div>
+                                  <p className="text-[10px] text-[#64748B] truncate">{cat.description} · {cat.linkedItems} linked items</p>
+                                </div>
+                                <span className={`px-1.5 py-0.5 rounded text-[9px] ${cat.status === "Active" ? "bg-[#F0FDF4] text-[#16A34A]" : "bg-[#FEF2F2] text-[#EF4444]"}`} style={{ fontWeight: 600 }}>{cat.status}</span>
+                                <button
+                                  onClick={() => { cpmRemoveCat(cat.id); toast("Category removed"); }}
+                                  className="w-6 h-6 rounded-md flex items-center justify-center text-[#94A3B8] hover:text-[#EF4444] hover:bg-[#FEF2F2] opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
+                                >
+                                  <X className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="py-8 text-center">
+                            <div className="w-12 h-12 rounded-xl bg-[#F8FAFC] border border-[#E8ECF1] flex items-center justify-center mx-auto mb-3">
+                              <FolderOpen className="w-5 h-5 text-[#94A3B8]" />
+                            </div>
+                            <p className="text-[13px] text-[#334155] mb-1" style={{ fontWeight: 600 }}>No categories assigned yet</p>
+                            <p className="text-[11px] text-[#94A3B8] max-w-[260px] mx-auto">Assign categories to apply this pricing rule to all items within them.</p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Tab content — Attachments */}
+                    {createPrItemsTab === "attachments" && (
+                      <div className="p-4">
+                        {cpmAttachments.length > 0 ? (
+                          <div className="space-y-2 mb-4">
+                            {cpmAttachments.map((att) => (
+                              <div key={att.id} className="flex items-center gap-3 px-3 py-2.5 rounded-lg border border-[#E8ECF1] bg-white hover:border-[#CBD5E1] transition-all group">
+                                <div className="w-8 h-8 rounded-lg bg-[#EFF6FF] flex items-center justify-center shrink-0">
+                                  <FileText className="w-4 h-4 text-[#0A77FF]" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-[12px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{att.name}</p>
+                                  <p className="text-[10px] text-[#94A3B8]">{att.size} · {att.type} · {att.uploadedAt}</p>
+                                </div>
+                                <button
+                                  onClick={() => cpmRemoveAttachment(att.id)}
+                                  className="w-6 h-6 rounded-md flex items-center justify-center text-[#94A3B8] hover:text-[#EF4444] hover:bg-[#FEF2F2] opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        ) : null}
+                        <div className="py-6 text-center border-2 border-dashed border-[#E2E8F0] rounded-xl bg-[#FAFBFC]">
+                          <div className="w-12 h-12 rounded-xl bg-[#F8FAFC] border border-[#E8ECF1] border-dashed flex items-center justify-center mx-auto mb-3">
+                            <Upload className="w-5 h-5 text-[#94A3B8]" />
+                          </div>
+                          <p className="text-[13px] text-[#334155] mb-1" style={{ fontWeight: 600 }}>
+                            {cpmAttachments.length > 0 ? "Upload more files" : "No attachments yet"}
+                          </p>
+                          <p className="text-[11px] text-[#94A3B8] max-w-[280px] mx-auto mb-3">Upload supporting documents, contracts, or approval files for this pricing rule.</p>
+                          <button
+                            onClick={cpmAddAttachment}
+                            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg border border-[#E2E8F0] bg-white text-[12px] text-[#334155] hover:bg-[#F8FAFC] hover:border-[#CBD5E1] transition-colors cursor-pointer"
+                            style={{ fontWeight: 600 }}
+                          >
+                            <Upload className="w-3.5 h-3.5" /> Upload Files
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Footer — step-aware + mode-aware */}
+            <div className="flex items-center justify-between px-5 py-4 border-t border-[#E2E8F0] bg-white shrink-0">
+              <div>
+                {createPrStep === 2 && (
+                  <button onClick={() => setCreatePrStep(1)} className="px-4 py-2 rounded-lg border border-[#E2E8F0] text-[13px] text-[#475569] hover:bg-[#F8FAFC] transition-colors cursor-pointer" style={{ fontWeight: 600 }}>
+                    <ArrowLeft className="w-3.5 h-3.5 inline mr-1.5" />Back
+                  </button>
+                )}
+              </div>
+              <div className="flex items-center gap-3">
+                {createPrMode === "view" ? (
+                  createPrStep === 1 ? (
+                    <>
+                      <button onClick={() => { setCreatePrModalOpen(false); resetCreatePrForm(); }} className="px-4 py-2 rounded-lg border border-[#E2E8F0] text-[13px] text-[#475569] hover:bg-[#F8FAFC] transition-colors cursor-pointer" style={{ fontWeight: 600 }}>Close</button>
+                      {editingPrRuleId?.startsWith("pr-custom-") && (
+                        <button onClick={() => { setCreatePrMode("create"); }} className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg border border-[#DBEAFE] bg-[#EFF6FF] text-[13px] text-[#0A77FF] hover:bg-[#DBEAFE] transition-colors cursor-pointer" style={{ fontWeight: 600 }}>
+                          <Pencil className="w-3.5 h-3.5" /> Edit Rule
+                        </button>
+                      )}
+                      <button onClick={() => setCreatePrStep(2)} className="px-4 py-2 rounded-lg bg-[#0A77FF] text-white text-[13px] hover:bg-[#0862D0] transition-colors cursor-pointer" style={{ fontWeight: 600 }}>
+                        View Items & Categories
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button onClick={() => { setCreatePrModalOpen(false); resetCreatePrForm(); }} className="px-4 py-2 rounded-lg border border-[#E2E8F0] text-[13px] text-[#475569] hover:bg-[#F8FAFC] transition-colors cursor-pointer" style={{ fontWeight: 600 }}>Close</button>
+                      <button
+                        onClick={() => {
+                          toast.success(`Saved changes — ${cpmSelectedItems.length} items, ${cpmSelectedCats.length} categories, ${cpmAttachments.length} attachments`);
+                          setCreatePrModalOpen(false);
+                          resetCreatePrForm();
+                        }}
+                        className="px-4 py-2 rounded-lg bg-[#0A77FF] text-white text-[13px] hover:bg-[#0862D0] transition-colors cursor-pointer"
+                        style={{ fontWeight: 600 }}
+                      >
+                        Save Changes
+                      </button>
+                    </>
+                  )
+                ) : (
+                  createPrStep === 1 ? (
+                    <>
+                      <button onClick={() => { setCreatePrModalOpen(false); resetCreatePrForm(); }} className="px-4 py-2 rounded-lg border border-[#E2E8F0] text-[13px] text-[#475569] hover:bg-[#F8FAFC] transition-colors cursor-pointer" style={{ fontWeight: 600 }}>Cancel</button>
+                      <button onClick={() => setCreatePrStep(2)} disabled={!createPrName.trim()} className="px-4 py-2 rounded-lg bg-[#0A77FF] text-white text-[13px] hover:bg-[#0862D0] transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer" style={{ fontWeight: 600 }}>Continue</button>
+                    </>
+                  ) : (
+                    <>
+                      <button onClick={() => { setCreatePrModalOpen(false); resetCreatePrForm(); }} className="px-4 py-2 rounded-lg border border-[#E2E8F0] text-[13px] text-[#475569] hover:bg-[#F8FAFC] transition-colors cursor-pointer" style={{ fontWeight: 600 }}>Discard</button>
+                      <button onClick={handleSaveNewPricingRule} disabled={!createPrName.trim()} className="px-4 py-2 rounded-lg bg-[#0A77FF] text-white text-[13px] hover:bg-[#0862D0] transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer" style={{ fontWeight: 600 }}>
+                        {editingPrRuleId ? "Save Changes" : "Save & Apply"}
+                      </button>
+                    </>
+                  )
+                )}
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+    );
+  }
+
+  if (sectionId === "shipping_methods") {
+    function addCarrierService() {
+      csCounter.current += 1;
+      setCarrierServices((prev) => [
+        ...prev,
+        { id: `cs-${Date.now()}`, name: "", description: "", minDuration: 1, maxDuration: 30, isDefault: false },
+      ]);
+    }
+    function removeCarrierService(id: string) {
+      setCarrierServices((prev) => {
+        const next = prev.filter((s) => s.id !== id);
+        if (next.length > 0 && !next.some((s) => s.isDefault)) {
+          next[0].isDefault = true;
+        }
+        return next;
+      });
+    }
+    function toggleCarrierDefault(id: string) {
+      setCarrierServices((prev) => prev.map((s) => ({ ...s, isDefault: s.id === id })));
+    }
+    function updateCarrierService(id: string, updates: Partial<typeof carrierServices[0]>) {
+      setCarrierServices((prev) => prev.map((s) => (s.id === id ? { ...s, ...updates } : s)));
+    }
+    function addVendorShippingPref() {
+      vspCounter.current += 1;
+      setVendorShippingPrefs((prev) => [
+        ...prev,
+        { id: `vsp-${Date.now()}`, carrier: "", methods: "", isDefault: false },
+      ]);
+    }
+    function removeVendorShippingPref(id: string) {
+      setVendorShippingPrefs((prev) => {
+        const next = prev.filter((s) => s.id !== id);
+        if (next.length > 0 && !next.some((s) => s.isDefault)) {
+          next[0].isDefault = true;
+        }
+        return next;
+      });
+    }
+    function toggleVendorDefault(id: string) {
+      setVendorShippingPrefs((prev) => prev.map((s) => ({ ...s, isDefault: s.id === id })));
+    }
+    function updateVendorShippingPref(id: string, updates: Partial<typeof vendorShippingPrefs[0]>) {
+      setVendorShippingPrefs((prev) => prev.map((s) => (s.id === id ? { ...s, ...updates } : s)));
+    }
+
+    const SHIPPING_TAB_CARDS: { id: "carrier" | "vendor"; label: string; description: string; icon: typeof Truck }[] = [
+      { id: "carrier", label: "Carrier Services", description: "Define shipping services with delivery durations and defaults.", icon: Truck },
+      { id: "vendor", label: "Vendor Shipping Preferences", description: "Map vendor-specific carrier and method preferences.", icon: Ship },
+    ];
+
+    /* Render the right-column content for the active tab */
+    const renderRightColumn = () => {
+      if (shippingTab === "carrier") {
+        if (carrierServices.length === 0) {
+          return (
+            <div className="py-6 flex flex-col items-center justify-center text-center">
+              <div className="w-10 h-10 rounded-lg bg-[#F8FAFC] border border-[#E8ECF1] flex items-center justify-center mb-2.5">
+                <Truck className="w-5 h-5 text-[#94A3B8]" />
+              </div>
+              <p className="text-sm text-[#64748B]" style={{ fontWeight: 600 }}>No carrier service added yet</p>
+              <p className="text-xs text-[#94A3B8] mt-1 max-w-[240px]">Select a shipping type on the left, then click below to add details.</p>
+              <button
+                onClick={addCarrierService}
+                className="mt-3 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#0A77FF] text-white text-xs transition-colors hover:bg-[#0862D0]"
+                style={{ fontWeight: 600 }}
+              >
+                <Plus className="w-3.5 h-3.5" /> Add Carrier Service
+              </button>
+            </div>
+          );
+        }
+        return (
+          <div className="space-y-4">
+            {carrierServices.map((entry, idx) => (
+              <div key={entry.id} className="rounded-lg border border-[#E8ECF1] bg-white p-3 space-y-3 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+                {/* Entry header */}
+                <div className="flex items-center justify-between">
+                  <h5 className="text-sm text-[#0F172A]" style={{ fontWeight: 600 }}>
+                    <span className="text-[#94A3B8]">#{idx + 1}</span>{" "}Shipping Method
+                  </h5>
+                  <div className="flex items-center gap-3">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <Switch
+                        checked={entry.isDefault}
+                        onCheckedChange={() => toggleCarrierDefault(entry.id)}
+                        className="data-[state=checked]:bg-[#0A77FF] h-5 w-9"
+                      />
+                      <span className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Mark as Default</span>
+                    </label>
+                    {carrierServices.length > 1 && (
+                      <button
+                        onClick={() => removeCarrierService(entry.id)}
+                        className="w-7 h-7 rounded-full border border-[#E2E8F0] flex items-center justify-center hover:bg-[#FEF2F2] hover:border-[#FECACA] transition-colors"
+                      >
+                        <X className="w-3.5 h-3.5 text-[#94A3B8]" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Form fields - single column stacked */}
+                <div className="space-y-3">
+                  <div>
+                    <Label className="text-xs text-[#0F172A]" style={{ fontWeight: 600 }}>Shipping method name<span className="text-red-500">*</span></Label>
+                    <Input
+                      value={entry.name}
+                      onChange={(e) => updateCarrierService(entry.id, { name: e.target.value })}
+                      placeholder="Economical Shipping"
+                      className="mt-1 rounded-lg border-[#E2E8F0] h-9 bg-white"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs text-[#0F172A]" style={{ fontWeight: 600 }}>Description</Label>
+                    <Input
+                      value={entry.description}
+                      onChange={(e) => updateCarrierService(entry.id, { description: e.target.value })}
+                      placeholder="UPS Worldwide Economy® is our most econo..."
+                      className="mt-1 rounded-lg border-[#E2E8F0] h-9 bg-white"
+                    />
+                  </div>
+
+                  {/* Duration */}
+                  <div>
+                    <Label className="text-xs text-[#0F172A]" style={{ fontWeight: 600 }}>Duration (calendar days)</Label>
+                  <div className="mt-1 bg-[#F8FAFC] rounded-lg p-2.5 space-y-2.5">
+                    <div>
+                      <span className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Minimum</span>
+                      <Input
+                        type="number"
+                        value={entry.minDuration}
+                        onChange={(e) => updateCarrierService(entry.id, { minDuration: Math.max(1, parseInt(e.target.value) || 1) })}
+                        className="mt-1.5 h-9 rounded-lg border-[#E2E8F0] bg-white text-sm"
+                      />
+                    </div>
+                    <div className="relative h-2">
+                      <div className="absolute inset-0 bg-[#E2E8F0] rounded-full" />
+                      <div
+                        className="absolute top-0 h-full bg-[#0A77FF] rounded-full"
+                        style={{
+                          left: `${((entry.minDuration - 1) / 29) * 100}%`,
+                          right: `${100 - ((entry.maxDuration - 1) / 29) * 100}%`,
+                        }}
+                      />
+                      <div
+                        className="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-white border-2 border-[#0A77FF] rounded-full shadow-sm"
+                        style={{ left: `calc(${((entry.minDuration - 1) / 29) * 100}% - 8px)` }}
+                      />
+                      <div
+                        className="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-white border-2 border-[#0A77FF] rounded-full shadow-sm"
+                        style={{ left: `calc(${((entry.maxDuration - 1) / 29) * 100}% - 8px)` }}
+                      />
+                    </div>
+                    <div>
+                      <span className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Maximum</span>
+                      <Input
+                        type="number"
+                        value={entry.maxDuration}
+                        onChange={(e) => updateCarrierService(entry.id, { maxDuration: Math.min(30, parseInt(e.target.value) || 30) })}
+                        className="mt-1.5 h-9 rounded-lg border-[#E2E8F0] bg-white text-sm"
+                      />
+                    </div>
+                  </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+
+            {/* + Add */}
+            <button
+              onClick={addCarrierService}
+              className="inline-flex items-center gap-1.5 text-sm text-[#0A77FF] hover:underline"
+              style={{ fontWeight: 600 }}
+            >
+              <Plus className="w-4 h-4" /> Add
+            </button>
+          </div>
+        );
+      }
+
+      /* Vendor Shipping Preferences */
+      if (vendorShippingPrefs.length === 0) {
+        return (
+          <div className="py-6 flex flex-col items-center justify-center text-center">
+            <div className="w-10 h-10 rounded-lg bg-[#F8FAFC] border border-[#E8ECF1] flex items-center justify-center mb-2.5">
+              <Ship className="w-5 h-5 text-[#94A3B8]" />
+            </div>
+            <p className="text-sm text-[#64748B]" style={{ fontWeight: 600 }}>No vendor shipping preference added yet</p>
+            <p className="text-xs text-[#94A3B8] mt-1 max-w-[240px]">Select a shipping type on the left, then click below to add details.</p>
+            <button
+              onClick={addVendorShippingPref}
+              className="mt-3 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#0A77FF] text-white text-xs transition-colors hover:bg-[#0862D0]"
+              style={{ fontWeight: 600 }}
+            >
+              <Plus className="w-3.5 h-3.5" /> Add Vendor Preference
+            </button>
+          </div>
+        );
+      }
+
+      return (
+        <div className="space-y-4">
+          {vendorShippingPrefs.map((entry, idx) => (
+            <div key={entry.id} className="rounded-lg border border-[#E8ECF1] bg-white p-3 space-y-3 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+              {/* Entry header */}
+              <div className="flex items-center justify-between">
+                <h5 className="text-sm text-[#0F172A]" style={{ fontWeight: 600 }}>
+                  <span className="text-[#94A3B8]">#{idx + 1}</span>{" "}Vendor Shipping Methods
+                </h5>
+                <div className="flex items-center gap-3">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <Switch
+                      checked={entry.isDefault}
+                      onCheckedChange={() => toggleVendorDefault(entry.id)}
+                      className="data-[state=checked]:bg-[#0A77FF] h-5 w-9"
+                    />
+                    <span className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Mark as Default</span>
+                  </label>
+                  {vendorShippingPrefs.length > 1 && (
+                    <button
+                      onClick={() => removeVendorShippingPref(entry.id)}
+                      className="w-7 h-7 rounded-full border border-[#E2E8F0] flex items-center justify-center hover:bg-[#FEF2F2] hover:border-[#FECACA] transition-colors"
+                    >
+                      <X className="w-3.5 h-3.5 text-[#94A3B8]" />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Form fields - single column stacked */}
+              <div className="space-y-3">
+                <div>
+                  <Label className="text-xs text-[#0F172A]" style={{ fontWeight: 600 }}>Carrier</Label>
+                  <Select value={entry.carrier} onValueChange={(v) => updateVendorShippingPref(entry.id, { carrier: v })}>
+                    <SelectTrigger className="mt-1 rounded-lg border-[#E2E8F0] h-9 bg-white">
+                      <SelectValue placeholder="Select carrier" />
+                    </SelectTrigger>
+                    <SelectContent className="z-[250]">
+                      <SelectItem value="ups">UPS</SelectItem>
+                      <SelectItem value="fedex">FedEx</SelectItem>
+                      <SelectItem value="dhl">DHL</SelectItem>
+                      <SelectItem value="usps">USPS</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-[11px] text-[#94A3B8] mt-1">Choose the vendor's preferred carrier.</p>
+                </div>
+                <div>
+                  <Label className="text-xs text-[#0F172A]" style={{ fontWeight: 600 }}>Shipping methods</Label>
+                  <Select value={entry.methods} onValueChange={(v) => updateVendorShippingPref(entry.id, { methods: v })}>
+                    <SelectTrigger className="mt-1 rounded-lg border-[#E2E8F0] h-9 bg-white">
+                      <SelectValue placeholder="Select methods" />
+                    </SelectTrigger>
+                    <SelectContent className="z-[250]">
+                      <SelectItem value="ground">Ground</SelectItem>
+                      <SelectItem value="express">Express</SelectItem>
+                      <SelectItem value="overnight">Overnight</SelectItem>
+                      <SelectItem value="freight">Freight</SelectItem>
+                      <SelectItem value="economy">Economy</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-[11px] text-[#94A3B8] mt-1">Choose the vendor's preferred delivery methods.</p>
+                </div>
+              </div>
+            </div>
+          ))}
+
+          {/* + Add */}
+          <button
+            onClick={addVendorShippingPref}
+            className="inline-flex items-center gap-1.5 text-sm text-[#0A77FF] hover:underline"
+            style={{ fontWeight: 600 }}
+          >
+            <Plus className="w-4 h-4" /> Add
+          </button>
+        </div>
+      );
+    };
+
+    return (
+      <div className="space-y-3">
+        {/* ── Heading + Helper Copy ── */}
+        <div className="mb-1">
+          <h4 className="text-sm text-[#0F172A]" style={{ fontWeight: 700 }}>Shipping Methods</h4>
+          <p className="text-xs text-[#64748B] mt-0.5 leading-relaxed">
+            Set up carrier-grade shipping services and vendor-specific delivery methods to ensure accurate lead times and tracking for all shipments involving this partner.{" "}
+            <span className="text-[#0A77FF] inline-flex items-center gap-0.5 cursor-pointer hover:underline" style={{ fontWeight: 500 }}>
+              Learn More <ExternalLink className="w-3 h-3" />
+            </span>
+          </p>
+        </div>
+
+        {/* ── Two Column Layout ── */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {/* ── Left Column: Tab Selector Cards ── */}
+          <div className="rounded-lg border border-[#E8ECF1] bg-white p-3 space-y-3 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+            <h5 className="text-xs text-[#64748B]" style={{ fontWeight: 600 }}>Select shipping type</h5>
+
+            <div className="space-y-2">
+              {SHIPPING_TAB_CARDS.map((tab) => {
+                const Icon = tab.icon;
+                const isSelected = shippingTab === tab.id;
+                const count = tab.id === "carrier" ? carrierServices.length : vendorShippingPrefs.length;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setShippingTab(tab.id)}
+                    className={`w-full flex items-start gap-2.5 p-2.5 rounded-lg border transition-all text-left ${
+                      isSelected
+                        ? "border-[1.5px] border-[#0A77FF] bg-white shadow-[0_1px_4px_rgba(10,119,255,0.1)]"
+                        : "border-[#E8ECF1] bg-white hover:border-[#CBD5E1]"
+                    }`}
+                  >
+                    <div className={`w-8 h-8 rounded-md flex items-center justify-center shrink-0 ${
+                      isSelected ? "bg-[#EFF6FF]" : "bg-[#F8FAFC]"
+                    }`}>
+                      <Icon className={`w-5 h-5 ${isSelected ? "text-[#0A77FF]" : "text-[#94A3B8]"}`} />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className={`text-sm truncate ${isSelected ? "text-[#0A77FF]" : "text-[#0F172A]"}`} style={{ fontWeight: 600 }}>
+                          {tab.label}
+                        </span>
+                        {count > 0 && (
+                          <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
+                            isSelected ? "bg-[#0A77FF] text-white" : "bg-[#E2E8F0] text-[#64748B]"
+                          }`} style={{ fontWeight: 600 }}>
+                            {count}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs text-[#94A3B8] mt-0.5 line-clamp-2">{tab.description}</p>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* ── Right Column: Details ── */}
+          <div className="rounded-lg border border-[#E8ECF1] bg-white p-3 space-y-3 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+            <h5 className="text-xs text-[#64748B]" style={{ fontWeight: 600 }}>
+              {shippingTab === "carrier" ? "Carrier service details" : "Vendor preference details"}
+            </h5>
+            {renderRightColumn()}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (sectionId === "global_contact") {
+    return (
+      <div className="space-y-3">
+        {/* Section header */}
+        <div className="mb-1">
+          <h4 className="text-sm text-[#0F172A]" style={{ fontWeight: 700 }}>Point of Contact</h4>
+          <p className="text-xs text-[#64748B] mt-0.5 leading-relaxed">
+            Select contacts or create new ones for order communication.
+          </p>
+        </div>
+
+        {/* CTA buttons */}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleOpenSelectPoc}
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#EDF4FF] text-[#0A77FF] text-xs hover:bg-[#DBEAFE] transition-colors border border-[#DBEAFE]"
+            style={{ fontWeight: 600 }}
+          >
+            <Users className="w-3.5 h-3.5" />
+            Select from Contact Directory
+          </button>
+          <button
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white text-[#334155] text-xs hover:bg-[#F8FAFC] transition-colors border border-[#E2E8F0]"
+            style={{ fontWeight: 600 }}
+            onClick={handleOpenCreatePoc}
+          >
+            <Plus className="w-3.5 h-3.5" />
+            Create new contact
+          </button>
+        </div>
+
+        {/* Selected contacts display */}
+        {selectedPocContacts.length > 0 ? (
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-[#0F172A]" style={{ fontWeight: 600 }}>
+                {selectedPocContacts.length} contact{selectedPocContacts.length !== 1 ? "s" : ""} selected
+              </span>
+              <span className="text-[10px] text-[#64748B] bg-[#F1F5F9] px-1.5 py-0.5 rounded-full" style={{ fontWeight: 500 }}>{selectedPocContacts.length}</span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {selectedPocContacts.map((contact) => (
+                <div key={contact.id} className="rounded-lg border border-[#E8ECF1] bg-white p-3 relative group hover:border-[#BFDBFE] transition-all shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+                  <button
+                    onClick={() => handleRemovePoc(contact.id)}
+                    className="absolute top-3 right-3 w-6 h-6 rounded-full bg-[#FEF2F2] text-[#EF4444] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-[#FEE2E2]"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                  <div className="flex items-start gap-3">
+                    <div
+                      className="w-9 h-9 rounded-full flex items-center justify-center text-white text-xs shrink-0"
+                      style={{ backgroundColor: contact.avatarColor, fontWeight: 700 }}
+                    >
+                      {getInitials(contact.name)}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{contact.name}</p>
+                      <p className="text-[11px] text-[#94A3B8] truncate">{contact.company}</p>
+                      <div className="mt-2.5 space-y-1.5">
+                        <div className="flex items-center gap-2 text-[11px] text-[#64748B]">
+                          <Phone className="w-3 h-3 text-[#94A3B8] shrink-0" />
+                          <span className="truncate">{contact.phone}</span>
+                          <span className="ml-auto inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-[#F1F5F9] text-[10px] text-[#64748B] shrink-0" style={{ fontWeight: 500 }}>
+                            <Users className="w-2.5 h-2.5" /> {contact.department}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2 text-[11px] text-[#64748B]">
+                          <PhoneCall className="w-3 h-3 text-[#94A3B8] shrink-0" />
+                          <span className="truncate">{contact.secondaryPhone}</span>
+                          {contact.secondaryPhoneExt && <span className="text-[#94A3B8]">Ext. {contact.secondaryPhoneExt}</span>}
+                        </div>
+                        <div className="flex items-center gap-2 text-[11px] text-[#64748B]">
+                          <Mail className="w-3 h-3 text-[#94A3B8] shrink-0" />
+                          <span className="truncate">{contact.email}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="py-6 rounded-lg border-2 border-dashed border-[#E2E8F0] bg-white flex flex-col items-center justify-center text-center">
+            <div className="w-10 h-10 rounded-lg bg-[#F8FAFC] border border-[#E8ECF1] flex items-center justify-center mb-2.5">
+              <UserPlus className="w-5 h-5 text-[#94A3B8]" />
+            </div>
+            <p className="text-sm text-[#94A3B8]" style={{ fontWeight: 500 }}>No contacts selected</p>
+            <p className="text-xs text-[#CBD5E1] mt-1.5 max-w-[280px]">
+              Select contacts from your Contact Directory or create a new one to get started.
+            </p>
+          </div>
+        )}
+
+        {/* ── Select Point of Contact Modal ── */}
+        <Dialog open={showSelectPocModal} onOpenChange={setShowSelectPocModal}>
+          <DialogContent
+            className="w-full max-w-none rounded-none sm:rounded-2xl sm:max-w-[960px] max-h-[100dvh] h-[100dvh] sm:h-[85vh] flex flex-col p-0 gap-0 sm:max-h-[92vh]"
+            style={{ zIndex: 210 }}
+            hideCloseButton
+          >
+            <DialogTitle className="sr-only">Select point of contact</DialogTitle>
+            <DialogDescription className="sr-only">Choose contacts from the Contact Directory to associate with this partner.</DialogDescription>
+
+            {/* Modal Header */}
+            <div className="px-5 sm:px-6 pt-5 pb-4 shrink-0 border-b border-[#E2E8F0] bg-[#F8FAFC] rounded-t-none sm:rounded-t-2xl">
+              <div className="flex items-center justify-between mb-1">
+                <h3 className="text-base sm:text-[17px] text-[#0F172A]" style={{ fontWeight: 700 }}>Select point of contact</h3>
+                <button
+                  onClick={() => setShowSelectPocModal(false)}
+                  className="w-8 h-8 rounded-lg hover:bg-[#E2E8F0] flex items-center justify-center transition-colors"
+                >
+                  <X className="w-4 h-4 text-[#64748B]" />
+                </button>
+              </div>
+              <p className="text-xs text-[#64748B] mb-4" style={{ fontWeight: 400 }}>
+                Choose from your saved contacts or create a new one to assign to this partner.
+              </p>
+
+              {/* Search + Create CTA */}
+              <div className="flex items-center justify-between gap-3 mb-4">
+                <div className="relative w-[220px]">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
+                  <Input
+                    value={pocSearch}
+                    onChange={(e) => { setPocSearch(e.target.value); setPocPage(1); }}
+                    placeholder="Search point of contact"
+                    className="pl-9 h-9 rounded-lg border-[#E2E8F0] bg-white text-sm"
+                  />
+                </div>
+                <button
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#EDF4FF] text-[#0A77FF] text-[13px] hover:bg-[#DBEAFE] transition-colors border border-[#DBEAFE] shrink-0"
+                  style={{ fontWeight: 600 }}
+                  onClick={handleOpenCreatePoc}
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  Create New Point of Contact
+                </button>
+              </div>
+
+              {/* Category filter tabs */}
+              <div className="flex items-center gap-2 flex-wrap">
+                {([
+                  { key: "all" as const, label: `All (${contactDictionary.length})` },
+                  { key: "Sales" as const, label: `Sales (${pocDepartmentCounts["Sales"]})` },
+                  { key: "Supply Chain Management" as const, label: `Supply Chain Management (${pocDepartmentCounts["Supply Chain Management"]})` },
+                  { key: "Finance" as const, label: `Finance (${pocDepartmentCounts["Finance"]})` },
+                ]).map((tab) => {
+                  const isActive = pocCategoryFilter === tab.key;
+                  return (
+                    <button
+                      key={tab.key}
+                      onClick={() => { setPocCategoryFilter(tab.key); setPocPage(1); }}
+                      className={`px-3 py-1.5 rounded-full text-xs transition-colors border ${
+                        isActive
+                          ? "bg-white border-[#E2E8F0] text-[#0F172A] shadow-sm"
+                          : "bg-transparent border-transparent text-[#64748B] hover:bg-white/60"
+                      }`}
+                      style={{ fontWeight: isActive ? 600 : 500 }}
+                    >
+                      {tab.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Card Grid */}
+            <div className="flex-1 overflow-y-auto px-5 sm:px-6 py-4">
+              {pocPagedContacts.length === 0 ? (
+                <div className="py-16 flex flex-col items-center justify-center text-center">
+                  <div className="w-12 h-12 rounded-full bg-[#F1F5F9] flex items-center justify-center mb-3">
+                    <Search className="w-6 h-6 text-[#94A3B8]" />
+                  </div>
+                  <p className="text-sm text-[#94A3B8]" style={{ fontWeight: 500 }}>No contacts found</p>
+                  <p className="text-xs text-[#CBD5E1] mt-1">Try adjusting your search or filter.</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {pocPagedContacts.map((contact) => {
+                    const isSelected = pocTempSelected.has(contact.id);
+                    return (
+                      <button
+                        key={contact.id}
+                        onClick={() => handleTogglePocTemp(contact.id)}
+                        className={`relative text-left rounded-xl border p-3.5 transition-all ${
+                          isSelected
+                            ? "border-[#0A77FF] bg-[#FAFCFF] shadow-[0_0_0_1px_#0A77FF]"
+                            : "border-[#E2E8F0] bg-white hover:border-[#BFDBFE]"
+                        }`}
+                      >
+                        {/* Checkbox */}
+                        <div className={`absolute top-3 right-3 w-5 h-5 rounded border flex items-center justify-center transition-colors ${
+                          isSelected ? "bg-[#0A77FF] border-[#0A77FF]" : "border-[#D1D5DB] bg-white"
+                        }`}>
+                          {isSelected && <Check className="w-3 h-3 text-white" />}
+                        </div>
+
+                        {/* Avatar + Name */}
+                        <div className="flex items-center gap-2.5 mb-3">
+                          <div
+                            className="w-8 h-8 rounded-full flex items-center justify-center text-white text-[11px] shrink-0"
+                            style={{ backgroundColor: contact.avatarColor, fontWeight: 700 }}
+                          >
+                            {getInitials(contact.name)}
+                          </div>
+                          <div className="min-w-0 pr-5">
+                            <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{highlightMatch(contact.name, pocSearch)}</p>
+                            <p className="text-[11px] text-[#94A3B8] truncate">{highlightMatch(contact.company, pocSearch)}</p>
+                          </div>
+                        </div>
+
+                        {/* Contact details */}
+                        <div className="space-y-1.5">
+                          <div className="flex items-center gap-1.5 text-[11px] text-[#64748B]">
+                            <Phone className="w-3 h-3 text-[#94A3B8] shrink-0" />
+                            <span className="truncate">{contact.phone}</span>
+                            <span className="ml-auto inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-[#F1F5F9] text-[10px] text-[#64748B] shrink-0" style={{ fontWeight: 500 }}>
+                              <Users className="w-2.5 h-2.5" />
+                              {contact.department.length > 15 ? contact.department.slice(0, 15) + "..." : contact.department}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1.5 text-[11px] text-[#64748B]">
+                            <PhoneCall className="w-3 h-3 text-[#94A3B8] shrink-0" />
+                            <span className="truncate">{contact.secondaryPhone}</span>
+                            {contact.secondaryPhoneExt && <span className="text-[#94A3B8]">Ext. {contact.secondaryPhoneExt}</span>}
+                          </div>
+                          <div className="flex items-center gap-1.5 text-[11px] text-[#64748B]">
+                            <Mail className="w-3 h-3 text-[#94A3B8] shrink-0" />
+                            <span className="truncate">{contact.email}</span>
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Pagination */}
+            <div className="px-5 sm:px-6 py-3 border-t border-[#F1F5F9] flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-2 text-xs text-[#64748B]">
+                <span>Records per page</span>
+                <span className="px-2 py-1 rounded border border-[#E2E8F0] text-xs text-[#0F172A]" style={{ fontWeight: 500 }}>{POC_PER_PAGE}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <button onClick={() => setPocPage(1)} disabled={pocPage === 1} className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-[#F1F5F9] disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+                  <ChevronsLeft className="w-4 h-4 text-[#64748B]" />
+                </button>
+                <button onClick={() => setPocPage(Math.max(1, pocPage - 1))} disabled={pocPage === 1} className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-[#F1F5F9] disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-xs text-[#64748B]">
+                  <ChevronLeft className="w-4 h-4" />
+                  <span className="ml-0.5">Prev</span>
+                </button>
+                {Array.from({ length: Math.min(pocTotalPages, 5) }, (_, i) => {
+                  let pageNum: number;
+                  if (pocTotalPages <= 5) {
+                    pageNum = i + 1;
+                  } else if (pocPage <= 3) {
+                    pageNum = i + 1;
+                  } else if (pocPage >= pocTotalPages - 2) {
+                    pageNum = pocTotalPages - 4 + i;
+                  } else {
+                    pageNum = pocPage - 2 + i;
+                  }
+                  return (
+                    <button
+                      key={pageNum}
+                      onClick={() => setPocPage(pageNum)}
+                      className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs transition-colors ${
+                        pocPage === pageNum
+                          ? "bg-[#0A77FF] text-white"
+                          : "text-[#64748B] hover:bg-[#F1F5F9]"
+                      }`}
+                      style={{ fontWeight: pocPage === pageNum ? 600 : 400 }}
+                    >
+                      {pageNum}
+                    </button>
+                  );
+                })}
+                <button onClick={() => setPocPage(Math.min(pocTotalPages, pocPage + 1))} disabled={pocPage === pocTotalPages} className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-[#F1F5F9] disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-xs text-[#64748B]">
+                  <span className="mr-0.5">Next</span>
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+                <button onClick={() => setPocPage(pocTotalPages)} disabled={pocPage === pocTotalPages} className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-[#F1F5F9] disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+                  <ChevronsRight className="w-4 h-4 text-[#64748B]" />
+                </button>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="px-5 sm:px-6 py-3.5 border-t border-[#E2E8F0] bg-[#FAFBFC] rounded-b-none sm:rounded-b-2xl flex items-center justify-between shrink-0">
+              <p className="text-sm text-[#0F172A]">
+                <span style={{ fontWeight: 700 }}>{pocTempSelected.size}</span>{" "}
+                <span className="text-[#64748B]">point of contact{pocTempSelected.size !== 1 ? "s" : ""} selected</span>
+              </p>
+              <div className="flex items-center gap-2.5">
+                <button
+                  onClick={() => setShowSelectPocModal(false)}
+                  className="px-5 py-2.5 rounded-lg border border-[#E2E8F0] bg-white text-sm text-[#334155] hover:bg-[#F8FAFC] transition-colors"
+                  style={{ fontWeight: 500 }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleConfirmPocSelection}
+                  className="px-5 py-2.5 rounded-lg bg-[#0A77FF] text-sm text-white hover:bg-[#0960D9] transition-colors"
+                  style={{ fontWeight: 600 }}
+                >
+                  Confirm
+                </button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* ── Create New Point of Contact Modal ── */}
+        <Dialog open={showCreatePocModal} onOpenChange={setShowCreatePocModal}>
+          <DialogContent
+            className="w-full max-w-none rounded-none sm:rounded-2xl sm:max-w-[640px] max-h-[100dvh] h-auto flex flex-col p-0 gap-0 sm:max-h-[92vh]"
+            style={{ zIndex: 210 }}
+            hideCloseButton
+          >
+            <DialogTitle className="sr-only">Create New Point of Contact</DialogTitle>
+            <DialogDescription className="sr-only">Create a new contact for this partner</DialogDescription>
+
+            {/* Header */}
+            <div className="px-6 pt-6 pb-5 shrink-0 border-b border-[#E2E8F0] bg-[#F8FAFC] rounded-t-none sm:rounded-t-2xl">
+              <div className="flex items-start justify-between">
+                <div className="min-w-0 pr-4">
+                  <h3 className="text-base sm:text-[17px] text-[#0F172A]" style={{ fontWeight: 700 }}>
+                    Create New Point of Contact {partnerName ? <span className="text-[#64748B]">"{partnerName}"</span> : ""}
+                  </h3>
+                  <p className="text-xs text-[#64748B] mt-1" style={{ fontWeight: 400 }}>
+                    Create a new contact for this partner to assist with your Purchase Orders/Sales Orders and inquiries on locations.
+                  </p>
+                </div>
+                <button
+                  onClick={() => setShowCreatePocModal(false)}
+                  className="w-8 h-8 rounded-lg hover:bg-[#E2E8F0] flex items-center justify-center transition-colors shrink-0 mt-0.5"
+                >
+                  <X className="w-4 h-4 text-[#64748B]" />
+                </button>
+              </div>
+            </div>
+
+            {/* Form body */}
+            <div className="flex-1 overflow-y-auto px-6 py-5 space-y-6">
+              {/* Personnel info */}
+              <div>
+                <h4 className="text-[13px] text-[#0F172A] mb-3" style={{ fontWeight: 600 }}>Personnel info</h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[13px] text-[#0F172A] mb-1.5" style={{ fontWeight: 600 }}>Name</label>
+                    <Input
+                      value={newPocName}
+                      onChange={(e) => setNewPocName(e.target.value)}
+                      placeholder="Full name"
+                      className="h-10 rounded-lg border-[#E2E8F0] bg-white text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[13px] text-[#0F172A] mb-1.5" style={{ fontWeight: 600 }}>Department</label>
+                    <Select value={newPocDepartment} onValueChange={(v) => setNewPocDepartment(v as "Sales" | "Supply Chain Management" | "Finance")}>
+                      <SelectTrigger className="h-10 rounded-lg border-[#E2E8F0] bg-white text-sm">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent style={{ zIndex: 250 }}>
+                        <SelectItem value="Sales">Sales</SelectItem>
+                        <SelectItem value="Supply Chain Management">Supply Chain Management</SelectItem>
+                        <SelectItem value="Finance">Finance</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <label className="block text-[13px] text-[#0F172A] mb-1.5" style={{ fontWeight: 600 }}>Role</label>
+                    <Input
+                      value={newPocRole}
+                      onChange={(e) => setNewPocRole(e.target.value)}
+                      placeholder="e.g. Sales Manager"
+                      className="h-10 rounded-lg border-[#E2E8F0] bg-white text-sm"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Contact details */}
+              <div>
+                <h4 className="text-[13px] text-[#0F172A] mb-3" style={{ fontWeight: 600 }}>Contact details</h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[13px] text-[#0F172A] mb-1.5" style={{ fontWeight: 600 }}>Landline phone number</label>
+                    <div className="flex items-center gap-0 rounded-lg border border-[#E2E8F0] bg-white overflow-hidden h-10">
+                      <Select value={newPocLandlineCode} onValueChange={setNewPocLandlineCode}>
+                        <SelectTrigger className="h-full border-0 border-r border-[#E2E8F0] rounded-none bg-[#FAFBFC] px-2.5 text-xs w-[80px] shrink-0 shadow-none focus:ring-0">
+                          <span className="flex items-center gap-1.5">
+                            <span className="text-[13px]">🇺🇸</span>
+                            <SelectValue />
+                          </span>
+                        </SelectTrigger>
+                        <SelectContent style={{ zIndex: 250 }}>
+                          <SelectItem value="+1">+1</SelectItem>
+                          <SelectItem value="+44">+44</SelectItem>
+                          <SelectItem value="+91">+91</SelectItem>
+                          <SelectItem value="+49">+49</SelectItem>
+                          <SelectItem value="+33">+33</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <input
+                        value={newPocLandline}
+                        onChange={(e) => setNewPocLandline(e.target.value)}
+                        placeholder="678 627 2788"
+                        className="flex-1 h-full px-3 text-sm text-[#0F172A] outline-none bg-transparent placeholder:text-[#94A3B8]"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-[13px] text-[#0F172A] mb-1.5" style={{ fontWeight: 600 }}>Ext</label>
+                    <Input
+                      value={newPocExt}
+                      onChange={(e) => setNewPocExt(e.target.value)}
+                      placeholder="8979"
+                      className="h-10 rounded-lg border-[#E2E8F0] bg-white text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[13px] text-[#0F172A] mb-1.5" style={{ fontWeight: 600 }}>Mobile number</label>
+                    <div className="flex items-center gap-0 rounded-lg border border-[#E2E8F0] bg-white overflow-hidden h-10">
+                      <Select value={newPocMobileCode} onValueChange={setNewPocMobileCode}>
+                        <SelectTrigger className="h-full border-0 border-r border-[#E2E8F0] rounded-none bg-[#FAFBFC] px-2.5 text-xs w-[80px] shrink-0 shadow-none focus:ring-0">
+                          <span className="flex items-center gap-1.5">
+                            <span className="text-[13px]">🇺🇸</span>
+                            <SelectValue />
+                          </span>
+                        </SelectTrigger>
+                        <SelectContent style={{ zIndex: 250 }}>
+                          <SelectItem value="+1">+1</SelectItem>
+                          <SelectItem value="+44">+44</SelectItem>
+                          <SelectItem value="+91">+91</SelectItem>
+                          <SelectItem value="+49">+49</SelectItem>
+                          <SelectItem value="+33">+33</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <input
+                        value={newPocMobile}
+                        onChange={(e) => setNewPocMobile(e.target.value)}
+                        placeholder="678 627 2788"
+                        className="flex-1 h-full px-3 text-sm text-[#0F172A] outline-none bg-transparent placeholder:text-[#94A3B8]"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-[13px] text-[#0F172A] mb-1.5" style={{ fontWeight: 600 }}>Email</label>
+                    <Input
+                      value={newPocEmail}
+                      onChange={(e) => setNewPocEmail(e.target.value)}
+                      placeholder="alec@company.com"
+                      className="h-10 rounded-lg border-[#E2E8F0] bg-white text-sm"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="px-6 py-4 border-t border-[#E2E8F0] bg-[#FAFBFC] rounded-b-none sm:rounded-b-2xl flex items-center justify-between shrink-0">
+              <label className="flex items-center gap-2 cursor-pointer select-none">
+                <div
+                  onClick={() => setSaveAndCreateAnother(!saveAndCreateAnother)}
+                  className={`w-[18px] h-[18px] rounded border flex items-center justify-center transition-colors cursor-pointer ${
+                    saveAndCreateAnother ? "bg-[#0A77FF] border-[#0A77FF]" : "border-[#D1D5DB] bg-white"
+                  }`}
+                >
+                  {saveAndCreateAnother && <Check className="w-3 h-3 text-white" />}
+                </div>
+                <span className="text-[13px] text-[#334155]" style={{ fontWeight: 500 }}>Save and create another</span>
+              </label>
+              <div className="flex items-center gap-2.5">
+                <button
+                  onClick={() => setShowCreatePocModal(false)}
+                  className="px-5 py-2.5 rounded-lg border border-[#E2E8F0] bg-white text-sm text-[#334155] hover:bg-[#F8FAFC] transition-colors"
+                  style={{ fontWeight: 500 }}
+                >
+                  Discard
+                </button>
+                <button
+                  onClick={handleSaveNewPoc}
+                  disabled={!newPocName.trim()}
+                  className={`px-5 py-2.5 rounded-lg text-sm text-white transition-colors ${
+                    newPocName.trim()
+                      ? "bg-[#0A77FF] hover:bg-[#0960D9]"
+                      : "bg-[#0A77FF]/50 cursor-not-allowed"
+                  }`}
+                  style={{ fontWeight: 600 }}
+                >
+                  Save
+                </button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+    );
+  }
+
+  // Default fallback
+  return (
+    <div className="p-6 rounded-lg border-2 border-dashed border-[#E2E8F0] bg-white flex flex-col items-center justify-center text-center">
+      <div className="w-10 h-10 rounded-lg bg-[#F8FAFC] border border-[#E8ECF1] flex items-center justify-center mb-2.5">
+        <Settings2 className="w-5 h-5 text-[#94A3B8]" />
+      </div>
+      <p className="text-sm text-[#64748B]" style={{ fontWeight: 600 }}>No configuration set</p>
+      <p className="text-xs text-[#94A3B8] mt-1.5 max-w-[300px]">
+        Configure {currentSection.title.toLowerCase()} settings for this {configType}. These will be applied as defaults for all associated orders.
+      </p>
+      <button className="inline-flex items-center gap-1.5 mt-4 px-4 py-2 rounded-lg border border-[#E2E8F0] bg-white text-sm text-[#334155] hover:bg-[#F8FAFC] transition-colors" style={{ fontWeight: 500 }}>
+        <Plus className="w-3.5 h-3.5" />
+        Add Configuration
+      </button>
+    </div>
+  );
+}
