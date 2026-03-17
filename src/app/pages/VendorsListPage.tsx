@@ -107,6 +107,7 @@ import {
 import { CreatePartnerModal } from "../components/vendors/CreatePartnerModal";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
+import type { PartnerType } from "../data/vendors";
 
 const DND_LIST_KPI = "LIST_KPI_CARD";
 
@@ -687,7 +688,7 @@ export function VendorsListPage() {
       const f = advFilters;
 
       // Partner Type (multiselect)
-      if (f.partnerTypes.length > 0 && !f.partnerTypes.some((t) => (v.partnerTypes || []).includes(t))) return false;
+      if (f.partnerTypes.length > 0 && !f.partnerTypes.some((t) => (v.partnerTypes || []).includes(t as PartnerType))) return false;
 
       // Vendor Type (multiselect)
       if (f.vendorTypes.length > 0 && !f.vendorTypes.includes(v.vendorType)) return false;
@@ -1727,8 +1728,8 @@ export function VendorsListPage() {
                                           </div>); })()}
                                           <div className="min-w-0">
                                             <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate block max-w-[90px]`}>{highlightText(globalPointOfContacts[0]?.name)}</span>
-                                            {isRelaxed && globalPointOfContacts[0]?.role && (
-                                              <span className="text-xs text-muted-foreground/60 truncate block max-w-[90px]">{globalPointOfContacts[0]?.role}</span>
+                                            {isRelaxed && (globalPointOfContacts[0] as any)?.role && (
+                                              <span className="text-xs text-muted-foreground/60 truncate block max-w-[90px]">{(globalPointOfContacts[0] as any)?.role}</span>
                                             )}
                                           </div>
                                           {extraContacts > 0 && (

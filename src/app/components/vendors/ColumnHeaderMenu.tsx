@@ -1,7 +1,7 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import type { ReactNode } from "react";
 import React from "react";
-import type { Vendor } from "../../data/vendors";
+import type { Vendor, PartnerType } from "../../data/vendors";
 import {
   Popover,
   PopoverContent,
@@ -1127,7 +1127,7 @@ export function applyColumnFilters(
           break;
         }
         case "partner_type": {
-          if (filter.values.length > 0 && !filter.values.some((t) => (v.partnerTypes || []).includes(t))) return false;
+          if (filter.values.length > 0 && !filter.values.some((t) => (v.partnerTypes || []).includes(t as PartnerType))) return false;
           break;
         }
         case "vendor_type": {

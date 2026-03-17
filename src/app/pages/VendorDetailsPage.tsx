@@ -3671,7 +3671,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                                 >
                                   {/* Top: Avatar + Name */}
                                   <div className="flex items-start gap-3 mb-3.5">
-                                    <div className="w-10 h-10 rounded-full flex items-center justify-center text-[12px] shrink-0" style={{ fontWeight: 600, backgroundColor: tint.bg, color: tint.fg }}>
+                                    <div className="w-10 h-10 rounded-full flex items-center justify-center text-[12px] shrink-0" style={{ fontWeight: 600, backgroundColor: tint.bg, color: tint.text }}>
                                       {initials}
                                     </div>
                                     <div className="flex-1 min-w-0">
@@ -3729,7 +3729,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                                   <tr key={poc.id} className="hover:bg-[#F8FBFF] transition-colors">
                                     <td className={`px-4 ${locPocDensity === "condensed" ? "py-1.5" : "py-2.5"}`}>
                                       <div className="flex items-center gap-2.5">
-                                        <div className={`${locPocDensity === "condensed" ? "w-6 h-6 text-[9px]" : "w-7 h-7 text-[10px]"} rounded-full flex items-center justify-center shrink-0`} style={{ fontWeight: 600, backgroundColor: tint.bg, color: tint.fg }}>
+                                        <div className={`${locPocDensity === "condensed" ? "w-6 h-6 text-[9px]" : "w-7 h-7 text-[10px]"} rounded-full flex items-center justify-center shrink-0`} style={{ fontWeight: 600, backgroundColor: tint.bg, color: tint.text }}>
                                           {initials}
                                         </div>
                                         <span className="text-[12px] text-[#0F172A]" style={{ fontWeight: 500 }}>{poc.name}</span>
@@ -4571,7 +4571,7 @@ function ContactsTab({ vendor, cfg }: { vendor: Vendor; cfg?: VendorConfigData }
     const newContact: PartnerContact = {
       id: `C-NEW-${Date.now()}`,
       name: newPocName.trim(),
-      company: vendor.displayName || vendor.name,
+      company: vendor.displayName || vendor.companyName,
       department: newPocDepartment,
       phone: newPocLandline ? `${newPocLandlineCode} ${newPocLandline}` : "",
       phoneExt: newPocExt,
@@ -5005,7 +5005,7 @@ function ContactsTab({ vendor, cfg }: { vendor: Vendor; cfg?: VendorConfigData }
       <CreatePocModal
         open={showCreateModal}
         onOpenChange={setShowCreateModal}
-        contextName={vendor.displayName || vendor.name}
+        contextName={vendor.displayName || vendor.companyName}
         newPocName={newPocName}
         onNewPocNameChange={setNewPocName}
         newPocDepartment={newPocDepartment}
