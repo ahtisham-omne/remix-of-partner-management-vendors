@@ -107,6 +107,7 @@ import {
 import { CreatePartnerModal } from "../components/vendors/CreatePartnerModal";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
+import type { PartnerType } from "../data/vendors";
 
 const DND_LIST_KPI = "LIST_KPI_CARD";
 
