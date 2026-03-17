@@ -4571,7 +4571,7 @@ function ContactsTab({ vendor, cfg }: { vendor: Vendor; cfg?: VendorConfigData }
     const newContact: PartnerContact = {
       id: `C-NEW-${Date.now()}`,
       name: newPocName.trim(),
-      company: vendor.displayName || vendor.name,
+      company: vendor.displayName || vendor.companyName,
       department: newPocDepartment,
       phone: newPocLandline ? `${newPocLandlineCode} ${newPocLandline}` : "",
       phoneExt: newPocExt,
