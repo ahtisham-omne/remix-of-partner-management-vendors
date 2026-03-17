@@ -48,7 +48,7 @@ function AlertDialogContent({
   className,
   onInteractOutside,
   ...props
-}: React.ComponentProps<typeof AlertDialogPrimitive.Content>) {
+}: React.ComponentProps<typeof AlertDialogPrimitive.Content> & { onInteractOutside?: (e: any) => void }) {
   return (
     <AlertDialogPortal>
       <AlertDialogPrimitive.Overlay
