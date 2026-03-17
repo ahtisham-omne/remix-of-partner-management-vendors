@@ -254,7 +254,7 @@ function ChartTooltipContent({
 
 function ChartLegend({
   ...props
-}: React.ComponentProps<typeof RechartsPrimitive.Legend>) {
+}: any) {
   return <RechartsPrimitive.Legend {...props} />;
 }
 
