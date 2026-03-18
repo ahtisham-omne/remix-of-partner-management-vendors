@@ -580,7 +580,7 @@ export function PaymentMethodsSection({
                     <button
                       onClick={() => setPmModalTypeFilter("All")}
                       className={`px-2.5 py-1 rounded-full text-[11px] border transition-all cursor-pointer ${
-                        pmModalTypeFilter === "All" ? "bg-[#0F172A] text-white border-[#0F172A]" : "bg-white text-[#64748B] border-[#E2E8F0] hover:border-[#CBD5E1]"
+                        pmModalTypeFilter === "All" ? "bg-[#0A77FF] text-white border-[#0A77FF]" : "bg-white text-[#64748B] border-[#E2E8F0] hover:border-[#CBD5E1]"
                       }`}
                       style={{ fontWeight: 600 }}
                     >
