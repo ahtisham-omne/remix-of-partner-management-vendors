@@ -542,12 +542,30 @@ export function PaymentMethodsSection({
                     <ChevronLeft className="w-4 h-4 text-[#64748B]" />
                   </button>
                 )}
-                <div>
-                  <h3 className="text-sm text-[#0F172A]" style={{ fontWeight: 700 }}>
-                    {pmModalStep === "select" ? "Add Payment Method" : modalEntry?.isSaved ? `Edit ${typeLabel(modalEntry.type)}` : `New ${modalEntry ? typeLabel(modalEntry.type) : "Payment Method"}`}
-                  </h3>
-                  {pmModalStep === "select" && <p className="text-[11px] text-[#94A3B8] mt-0.5">Choose a payment method type to get started</p>}
-                </div>
+                {pmModalStep === "form" && modalEntry ? (() => {
+                  const Icon = typeIcon(modalEntry.type);
+                  const cat = typeCategory(modalEntry.type);
+                  return (
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: catBg[cat] || "#F1F5F9" }}>
+                        <Icon className="w-4 h-4" style={{ color: catColor[cat] || "#64748B" }} />
+                      </div>
+                      <div>
+                        <h3 className="text-sm text-[#0F172A]" style={{ fontWeight: 700 }}>
+                          {modalEntry.isSaved ? `Edit ${typeLabel(modalEntry.type)}` : `New ${typeLabel(modalEntry.type)}`}
+                        </h3>
+                        <span className="text-[10px] px-1.5 py-0.5 rounded-full" style={{ fontWeight: 600, color: catColor[cat] || "#64748B", backgroundColor: catBg[cat] || "#F1F5F9" }}>
+                          {typeCategory(modalEntry.type)}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })() : (
+                  <div>
+                    <h3 className="text-sm text-[#0F172A]" style={{ fontWeight: 700 }}>Add Payment Method</h3>
+                    {pmModalStep === "select" && <p className="text-[11px] text-[#94A3B8] mt-0.5">Choose a payment method type to get started</p>}
+                  </div>
+                )}
               </div>
               <button onClick={handleModalCancel} className="p-1.5 rounded-md hover:bg-[#F1F5F9] transition-colors cursor-pointer">
                 <X className="w-4 h-4 text-[#64748B]" />
