@@ -582,25 +582,18 @@ export const CURRENCY_OPTIONS = [
 ];
 
 // ── Payment Method Types ──
-export type PaymentMethodType = "ach" | "check" | "wire" | "card" | "digital_wallet" | "cash" | "letter_of_credit" | "money_order" | "purchase_card" | "virtual_card" | "sepa" | "crypto" | "direct_debit" | "escrow";
+export type PaymentMethodType = "ach" | "wire" | "card" | "digital_wallet" | "check" | "cash" | "other";
 
-export type PaymentTypeCategory = "Bank" | "Traditional" | "Card" | "Digital" | "Trade Finance";
+export type PaymentTypeCategory = "Bank" | "Card" | "Digital" | "Traditional" | "Other";
 
 export const PAYMENT_TYPE_CARDS: { id: PaymentMethodType; label: string; description: string; icon: React.ElementType; category: PaymentTypeCategory }[] = [
   { id: "ach", label: "ACH / Direct Deposit", description: "Electronic bank transfer via ACH network", icon: CircleDollarSign, category: "Bank" },
-  { id: "wire", label: "Wire Transfer", description: "Expedited domestic or international bank transfer", icon: Landmark, category: "Bank" },
-  { id: "sepa", label: "SEPA Transfer", description: "Single Euro Payments Area bank transfer (EU)", icon: ArrowLeftRight, category: "Bank" },
-  { id: "direct_debit", label: "Direct Debit / Standing Order", description: "Recurring automatic bank withdrawals", icon: BadgeDollarSign, category: "Bank" },
-  { id: "check", label: "Check / Cheque", description: "Physical paper check payment via mail", icon: Receipt, category: "Traditional" },
-  { id: "money_order", label: "Money Order", description: "Prepaid payment instrument via postal/bank", icon: Mail, category: "Traditional" },
-  { id: "cash", label: "Cash", description: "Physical cash payment at collection point", icon: Banknote, category: "Traditional" },
+  { id: "wire", label: "Wire Transfer", description: "Domestic or international bank wire transfer", icon: Landmark, category: "Bank" },
   { id: "card", label: "Credit / Debit Card", description: "Visa, Mastercard, Amex and other card networks", icon: CreditCard, category: "Card" },
-  { id: "purchase_card", label: "Purchase Card (P-Card)", description: "Corporate procurement card for business purchases", icon: ShieldCheck, category: "Card" },
-  { id: "virtual_card", label: "Virtual Card", description: "Single-use or limited-use virtual card number", icon: Smartphone, category: "Card" },
   { id: "digital_wallet", label: "Digital Wallet", description: "PayPal, Venmo, Stripe, Apple Pay, Google Pay", icon: Wallet, category: "Digital" },
-  { id: "crypto", label: "Cryptocurrency", description: "Bitcoin, Ethereum, USDC and other digital currencies", icon: Bitcoin, category: "Digital" },
-  { id: "letter_of_credit", label: "Letter of Credit (L/C)", description: "Bank-guaranteed payment for international trade", icon: FileText, category: "Trade Finance" },
-  { id: "escrow", label: "Escrow", description: "Third-party held funds released on conditions", icon: Lock, category: "Trade Finance" },
+  { id: "check", label: "Cheque (Paper)", description: "Physical paper cheque payment via mail", icon: Receipt, category: "Traditional" },
+  { id: "cash", label: "Cash", description: "Physical cash payment at collection point", icon: Banknote, category: "Traditional" },
+  { id: "other", label: "Other (Record Only)", description: "Custom payment method for record-keeping", icon: FileText, category: "Other" },
 ];
 
 // ── Payment Terms Presets ──
