@@ -793,6 +793,7 @@ export interface PaymentMethodEntry {
   bankName: string;
   accountTitle: string;
   accountNumber: string;
+  accountHolderName: string;
   phone: string;
   countryCode: string;
   swiftCode: string;
@@ -813,7 +814,7 @@ export interface PaymentMethodEntry {
   applyDiscount: boolean;
   discountPercent: string;
   additionalCharges: string;
-  // New type fields
+  // Legacy fields kept for backward compat
   ibanNumber: string;
   bicCode: string;
   sepaMandate: string;
@@ -836,6 +837,15 @@ export interface PaymentMethodEntry {
   escrowProvider: string;
   escrowAccountId: string;
   releaseConditions: string;
+  // New fields for redesigned payment methods
+  beneficiaryName: string;
+  beneficiaryAddress: string;
+  instantPayBrand: string;
+  instantPayHandle: string;
+  instantPayAccountName: string;
+  methodDescription: string;
+  contactPersonName: string;
+  contactNotes: string;
 }
 
 // ── Contact Dictionary (Point of Contact) ──
