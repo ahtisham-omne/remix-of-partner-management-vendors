@@ -848,3 +848,36 @@ export const CONTACT_DICTIONARY: ContactPerson[] = [
   { id: "C-023", name: "Tyler Brooks", company: "Construction Materials", department: "Sales", phone: "(602) 444-7788", phoneExt: "", secondaryPhone: "(602) 444-7789", secondaryPhoneExt: "500", email: "tbrooks@constmat.com", avatarColor: "#059669" },
   { id: "C-024", name: "Sofia Martinez", company: "Electronics Distribution", department: "Supply Chain Management", phone: "(713) 999-2211", phoneExt: "", secondaryPhone: "(713) 999-2212", secondaryPhoneExt: "3515", email: "smartinez@elecdist.com", avatarColor: "#0A77FF" },
 ];
+
+// ── System Users (all users in the system for notifications/alerts) ──
+export interface SystemUser {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  department: string;
+  avatarColor: string;
+}
+
+export const SYSTEM_USERS: SystemUser[] = [
+  { id: "U-001", name: "Sarah Johnson", email: "sjohnson@company.com", role: "Procurement Manager", department: "Procurement", avatarColor: "#0A77FF" },
+  { id: "U-002", name: "Michael Torres", email: "mtorres@company.com", role: "Finance Director", department: "Finance", avatarColor: "#7C3AED" },
+  { id: "U-003", name: "Emily Chen", email: "echen@company.com", role: "Supply Chain Lead", department: "Supply Chain", avatarColor: "#059669" },
+  { id: "U-004", name: "David Kim", email: "dkim@company.com", role: "Account Manager", department: "Sales", avatarColor: "#D97706" },
+  { id: "U-005", name: "Rachel Adams", email: "radams@company.com", role: "CFO", department: "Finance", avatarColor: "#DC2626" },
+  { id: "U-006", name: "James Wilson", email: "jwilson@company.com", role: "Buyer", department: "Procurement", avatarColor: "#0A77FF" },
+  { id: "U-007", name: "Lisa Park", email: "lpark@company.com", role: "Operations Manager", department: "Operations", avatarColor: "#7C3AED" },
+  { id: "U-008", name: "Robert Garcia", email: "rgarcia@company.com", role: "Warehouse Lead", department: "Logistics", avatarColor: "#059669" },
+  { id: "U-009", name: "Amanda Foster", email: "afoster@company.com", role: "Compliance Officer", department: "Legal", avatarColor: "#D97706" },
+  { id: "U-010", name: "Kevin Wright", email: "kwright@company.com", role: "AP Specialist", department: "Finance", avatarColor: "#0A77FF" },
+  { id: "U-011", name: "Maria Rodriguez", email: "mrodriguez@company.com", role: "Category Manager", department: "Procurement", avatarColor: "#7C3AED" },
+  { id: "U-012", name: "Chris Taylor", email: "ctaylor@company.com", role: "IT Admin", department: "IT", avatarColor: "#059669" },
+  { id: "U-013", name: "Jessica Lee", email: "jlee@company.com", role: "VP Procurement", department: "Procurement", avatarColor: "#DC2626" },
+  { id: "U-014", name: "Andrew Scott", email: "ascott@company.com", role: "Inventory Analyst", department: "Supply Chain", avatarColor: "#D97706" },
+  { id: "U-015", name: "Nicole Brown", email: "nbrown@company.com", role: "Controller", department: "Finance", avatarColor: "#0A77FF" },
+  { id: "U-016", name: "Thomas Miller", email: "tmiller@company.com", role: "Sourcing Specialist", department: "Procurement", avatarColor: "#7C3AED" },
+  { id: "U-017", name: "Stephanie White", email: "swhite@company.com", role: "Risk Analyst", department: "Finance", avatarColor: "#059669" },
+  { id: "U-018", name: "Daniel Harris", email: "dharris@company.com", role: "Logistics Coordinator", department: "Logistics", avatarColor: "#D97706" },
+  { id: "U-019", name: "Karen Martinez", email: "kmartinez@company.com", role: "Quality Manager", department: "Operations", avatarColor: "#0A77FF" },
+  { id: "U-020", name: "Brian Clark", email: "bclark@company.com", role: "Accounts Payable Manager", department: "Finance", avatarColor: "#DC2626" },
+];
