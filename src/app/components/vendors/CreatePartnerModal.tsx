@@ -3202,7 +3202,7 @@ function ConfigPageContent({
   const [thresholdAlertRecipients, setThresholdAlertRecipients] = useState<Set<string>>(new Set());
   const [softWarningRecipients, setSoftWarningRecipients] = useState<Set<string>>(new Set());
   const [hardBlockRecipients, setHardBlockRecipients] = useState<Set<string>>(new Set());
-  const allAvailableContacts = [...CONTACT_DICTIONARY];
+  
   const [paymentTerm, setPaymentTerm] = useState("net_30");
   const [pricingTier, setPricingTier] = useState("standard");
   const [shippingMethod, setShippingMethod] = useState("ground");
