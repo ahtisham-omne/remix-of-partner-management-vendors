@@ -3671,7 +3671,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                                 >
                                   {/* Top: Avatar + Name */}
                                   <div className="flex items-start gap-3 mb-3.5">
-                                    <div className="w-10 h-10 rounded-full flex items-center justify-center text-[12px] shrink-0" style={{ fontWeight: 600, backgroundColor: tint.bg, color: tint.text }}>
+                                    <div className="w-10 h-10 rounded-full flex items-center justify-center text-[12px] shrink-0" style={{ fontWeight: 600, backgroundColor: tint.bg, color: tint.fg }}>
                                       {initials}
                                     </div>
                                     <div className="flex-1 min-w-0">
