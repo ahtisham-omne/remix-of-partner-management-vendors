@@ -780,52 +780,39 @@ export interface PaymentMethodEntry {
   isSaved: boolean;
   isPrimary: boolean;
   nickname: string;
+  // Bank fields (ACH / Wire)
   bankName: string;
   accountTitle: string;
   accountNumber: string;
-  phone: string;
-  countryCode: string;
-  swiftCode: string;
   routingNumber: string;
-  specialInstructions: string;
-  payeeName: string;
-  mailingAddress: string;
-  accountType: string;
+  swiftCode: string;
+  accountType: string; // "checking" | "saving"
+  // Card fields
   cardholderName: string;
   cardNumber: string;
   expiryDate: string;
   cvv: string;
   billingAddress: string;
+  // Digital wallet
   walletProvider: string;
   walletId: string;
+  // Cheque
+  payeeName: string;
+  mailingAddress: string;
+  // Cash
   recipientName: string;
   collectionPoint: string;
+  // Other (record only)
+  methodName: string;
+  description: string;
+  documentLink: string;
+  // Common
+  phone: string;
+  countryCode: string;
+  specialInstructions: string;
   applyDiscount: boolean;
   discountPercent: string;
   additionalCharges: string;
-  // New type fields
-  ibanNumber: string;
-  bicCode: string;
-  sepaMandate: string;
-  frequency: string;
-  issuerName: string;
-  moneyOrderNumber: string;
-  purchaseCardNumber: string;
-  spendingLimit: string;
-  approvalWorkflow: string;
-  virtualCardProvider: string;
-  virtualCardLimit: string;
-  cryptoCurrency: string;
-  cryptoWalletAddress: string;
-  cryptoNetwork: string;
-  lcNumber: string;
-  issuingBank: string;
-  beneficiaryBank: string;
-  lcAmount: string;
-  lcExpiryDate: string;
-  escrowProvider: string;
-  escrowAccountId: string;
-  releaseConditions: string;
 }
 
 // ── Contact Dictionary (Point of Contact) ──
