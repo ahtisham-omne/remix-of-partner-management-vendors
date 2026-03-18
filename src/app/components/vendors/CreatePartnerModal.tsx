@@ -88,6 +88,7 @@ import {
   CalendarDays,
   Trash,
   Lock,
+  ShieldAlert,
   TrendingDown,
   TrendingUp,
   Archive,
