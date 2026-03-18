@@ -5,6 +5,7 @@ import {
 } from "lucide-react";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
+import { Textarea } from "../ui/textarea";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../ui/select";
 import { Tooltip, TooltipTrigger, TooltipContent } from "../ui/tooltip";
 import {
@@ -22,17 +23,17 @@ const catColor: Record<string, string> = {
   Traditional: "#7C3AED",
   Card: "#D97706",
   Digital: "#059669",
-  "Trade Finance": "#DC2626",
+  Other: "#64748B",
 };
 const catBg: Record<string, string> = {
   Bank: "#EDF4FF",
   Traditional: "#F0EBFF",
   Card: "#FEF3C7",
   Digital: "#ECFDF5",
-  "Trade Finance": "#FEF2F2",
+  Other: "#F1F5F9",
 };
 
-const categories: PaymentTypeCategory[] = ["Bank", "Traditional", "Card", "Digital", "Trade Finance"];
+const categories: PaymentTypeCategory[] = ["Bank", "Card", "Digital", "Traditional", "Other"];
 
 function typeLabel(type: PaymentMethodType) {
   return PAYMENT_TYPE_CARDS.find((t) => t.id === type)?.label || type;
@@ -51,10 +52,7 @@ function getEntrySummary(e: PaymentMethodEntry): string {
   if (e.walletProvider) return e.walletProvider;
   if (e.payeeName) return e.payeeName;
   if (e.recipientName) return e.recipientName;
-  if (e.issuerName) return e.issuerName;
-  if (e.escrowProvider) return e.escrowProvider;
-  if (e.virtualCardProvider) return e.virtualCardProvider;
-  if (e.issuingBank) return e.issuingBank;
+  if (e.methodName) return e.methodName;
   return typeLabel(e.type);
 }
 
@@ -64,11 +62,7 @@ function getEntrySubtext(e: PaymentMethodEntry): string {
   if (e.walletId) return e.walletId;
   if (e.mailingAddress) return e.mailingAddress;
   if (e.collectionPoint) return e.collectionPoint;
-  if (e.cryptoWalletAddress) return `${e.cryptoWalletAddress.slice(0, 8)}...`;
-  if (e.ibanNumber) return `••••${e.ibanNumber.slice(-4)}`;
-  if (e.lcNumber) return e.lcNumber;
-  if (e.escrowAccountId) return e.escrowAccountId;
-  if (e.purchaseCardNumber) return `••••${e.purchaseCardNumber.slice(-4)}`;
+  if (e.description) return e.description;
   return typeCategory(e.type);
 }
 
@@ -88,138 +82,62 @@ function PaymentFormFields({
         <Input value={e.nickname} onChange={(ev) => updateEntry(e.id, { nickname: ev.target.value })} placeholder="e.g. Primary ACH, Backup Wire" className={inputCls} />
       </div>
 
-      {/* ACH / Wire */}
-      {(e.type === "wire" || e.type === "ach") && (
+      {/* ACH / Direct Deposit */}
+      {e.type === "ach" && (
         <>
           <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Bank Name *</Label>
+            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Bank Name <span className="text-[#EF4444]">*</span></Label>
             <Input value={e.bankName} onChange={(ev) => updateEntry(e.id, { bankName: ev.target.value })} placeholder="e.g. Chase Bank" className={inputCls} />
           </div>
           <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Account Title *</Label>
+            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Account Title <span className="text-[#EF4444]">*</span></Label>
             <Input value={e.accountTitle} onChange={(ev) => updateEntry(e.id, { accountTitle: ev.target.value })} placeholder="Enter account holder name" className={inputCls} />
           </div>
           <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>{e.type === "wire" ? "Account Number/IBAN *" : "Account Number *"}</Label>
-            <Input value={e.accountNumber} onChange={(ev) => updateEntry(e.id, { accountNumber: ev.target.value })} placeholder={e.type === "wire" ? "Enter account number/IBAN" : "Enter account number"} className={inputCls} />
-          </div>
-          {e.type === "ach" && (
-            <div>
-              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Routing Number *</Label>
-              <Input value={e.routingNumber} onChange={(ev) => updateEntry(e.id, { routingNumber: ev.target.value })} placeholder="e.g. 021000021" className={inputCls} />
-            </div>
-          )}
-          {e.type === "wire" && (
-            <div>
-              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Swift Code *</Label>
-              <Input value={e.swiftCode} onChange={(ev) => updateEntry(e.id, { swiftCode: ev.target.value })} placeholder="Enter swift code" className={inputCls} />
-            </div>
-          )}
-        </>
-      )}
-
-      {/* SEPA */}
-      {e.type === "sepa" && (
-        <>
-          <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Bank Name *</Label>
-            <Input value={e.bankName} onChange={(ev) => updateEntry(e.id, { bankName: ev.target.value })} placeholder="e.g. Deutsche Bank" className={inputCls} />
-          </div>
-          <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Account Holder *</Label>
-            <Input value={e.accountTitle} onChange={(ev) => updateEntry(e.id, { accountTitle: ev.target.value })} placeholder="Enter account holder name" className={inputCls} />
-          </div>
-          <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>IBAN *</Label>
-            <Input value={e.ibanNumber} onChange={(ev) => updateEntry(e.id, { ibanNumber: ev.target.value })} placeholder="e.g. DE89370400440532013000" className={inputCls} />
-          </div>
-          <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>BIC/SWIFT Code *</Label>
-            <Input value={e.bicCode} onChange={(ev) => updateEntry(e.id, { bicCode: ev.target.value })} placeholder="e.g. DEUTDEDBFRA" className={inputCls} />
-          </div>
-          <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>SEPA Mandate Reference</Label>
-            <Input value={e.sepaMandate} onChange={(ev) => updateEntry(e.id, { sepaMandate: ev.target.value })} placeholder="Enter mandate reference" className={inputCls} />
-          </div>
-        </>
-      )}
-
-      {/* Direct Debit */}
-      {e.type === "direct_debit" && (
-        <>
-          <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Bank Name *</Label>
-            <Input value={e.bankName} onChange={(ev) => updateEntry(e.id, { bankName: ev.target.value })} placeholder="e.g. HSBC" className={inputCls} />
-          </div>
-          <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Account Holder *</Label>
-            <Input value={e.accountTitle} onChange={(ev) => updateEntry(e.id, { accountTitle: ev.target.value })} placeholder="Enter account holder name" className={inputCls} />
-          </div>
-          <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Account Number / IBAN *</Label>
-            <Input value={e.accountNumber} onChange={(ev) => updateEntry(e.id, { accountNumber: ev.target.value })} placeholder="Enter account number or IBAN" className={inputCls} />
-          </div>
-          <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Frequency</Label>
-            <Input value={e.frequency} onChange={(ev) => updateEntry(e.id, { frequency: ev.target.value })} placeholder="e.g. Monthly, Weekly, Bi-weekly" className={inputCls} />
-          </div>
-        </>
-      )}
-
-      {/* Check */}
-      {e.type === "check" && (
-        <>
-          <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Payee Name *</Label>
-            <Input value={e.payeeName} onChange={(ev) => updateEntry(e.id, { payeeName: ev.target.value })} placeholder="Enter payee name" className={inputCls} />
-          </div>
-          <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Mailing Address *</Label>
-            <Input value={e.mailingAddress} onChange={(ev) => updateEntry(e.id, { mailingAddress: ev.target.value })} placeholder="Enter mailing address" className={inputCls} />
-          </div>
-          <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Bank Name</Label>
-            <Input value={e.bankName} onChange={(ev) => updateEntry(e.id, { bankName: ev.target.value })} placeholder="e.g. Chase Bank" className={inputCls} />
-          </div>
-          <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Account Number</Label>
+            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Account Number <span className="text-[#EF4444]">*</span></Label>
             <Input value={e.accountNumber} onChange={(ev) => updateEntry(e.id, { accountNumber: ev.target.value })} placeholder="Enter account number" className={inputCls} />
           </div>
-        </>
-      )}
-
-      {/* Money Order */}
-      {e.type === "money_order" && (
-        <>
           <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Issuer Name *</Label>
-            <Input value={e.issuerName} onChange={(ev) => updateEntry(e.id, { issuerName: ev.target.value })} placeholder="e.g. USPS, Western Union" className={inputCls} />
+            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Routing Number <span className="text-[#EF4444]">*</span></Label>
+            <Input value={e.routingNumber} onChange={(ev) => updateEntry(e.id, { routingNumber: ev.target.value })} placeholder="e.g. 021000021" className={inputCls} />
           </div>
           <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Payee Name *</Label>
-            <Input value={e.payeeName} onChange={(ev) => updateEntry(e.id, { payeeName: ev.target.value })} placeholder="Enter payee name" className={inputCls} />
-          </div>
-          <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Money Order Number</Label>
-            <Input value={e.moneyOrderNumber} onChange={(ev) => updateEntry(e.id, { moneyOrderNumber: ev.target.value })} placeholder="Enter serial/tracking number" className={inputCls} />
-          </div>
-          <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Mailing Address</Label>
-            <Input value={e.mailingAddress} onChange={(ev) => updateEntry(e.id, { mailingAddress: ev.target.value })} placeholder="Enter mailing address" className={inputCls} />
+            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Account Type</Label>
+            <Select value={e.accountType} onValueChange={(v) => updateEntry(e.id, { accountType: v })}>
+              <SelectTrigger className={`${inputCls} mt-1.5`}>
+                <SelectValue placeholder="Select account type" />
+              </SelectTrigger>
+              <SelectContent className="z-[250] rounded-lg">
+                <SelectItem value="checking">Checking</SelectItem>
+                <SelectItem value="saving">Saving</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </>
       )}
 
-      {/* Cash */}
-      {e.type === "cash" && (
+      {/* Wire Transfer */}
+      {e.type === "wire" && (
         <>
           <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Recipient Name *</Label>
-            <Input value={e.recipientName} onChange={(ev) => updateEntry(e.id, { recipientName: ev.target.value })} placeholder="Enter recipient name" className={inputCls} />
+            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Bank Name <span className="text-[#EF4444]">*</span></Label>
+            <Input value={e.bankName} onChange={(ev) => updateEntry(e.id, { bankName: ev.target.value })} placeholder="e.g. Chase Bank" className={inputCls} />
           </div>
           <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Collection Point *</Label>
-            <Input value={e.collectionPoint} onChange={(ev) => updateEntry(e.id, { collectionPoint: ev.target.value })} placeholder="Enter collection point or location" className={inputCls} />
+            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Account Title <span className="text-[#EF4444]">*</span></Label>
+            <Input value={e.accountTitle} onChange={(ev) => updateEntry(e.id, { accountTitle: ev.target.value })} placeholder="Enter account holder name" className={inputCls} />
+          </div>
+          <div>
+            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Account Number <span className="text-[#EF4444]">*</span></Label>
+            <Input value={e.accountNumber} onChange={(ev) => updateEntry(e.id, { accountNumber: ev.target.value })} placeholder="Enter account number" className={inputCls} />
+          </div>
+          <div>
+            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Routing Number <span className="text-[#EF4444]">*</span></Label>
+            <Input value={e.routingNumber} onChange={(ev) => updateEntry(e.id, { routingNumber: ev.target.value })} placeholder="e.g. 021000021" className={inputCls} />
+          </div>
+          <div>
+            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>SWIFT Code <span className="text-[10px] text-[#94A3B8] font-normal">(optional — international wire only)</span></Label>
+            <Input value={e.swiftCode} onChange={(ev) => updateEntry(e.id, { swiftCode: ev.target.value })} placeholder="Enter SWIFT code for international transfers" className={inputCls} />
           </div>
         </>
       )}
@@ -228,20 +146,20 @@ function PaymentFormFields({
       {e.type === "card" && (
         <>
           <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Cardholder Name *</Label>
+            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Cardholder Name <span className="text-[#EF4444]">*</span></Label>
             <Input value={e.cardholderName} onChange={(ev) => updateEntry(e.id, { cardholderName: ev.target.value })} placeholder="Enter cardholder name" className={inputCls} />
           </div>
           <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Card Number *</Label>
+            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Card Number <span className="text-[#EF4444]">*</span></Label>
             <Input value={e.cardNumber} onChange={(ev) => updateEntry(e.id, { cardNumber: ev.target.value })} placeholder="Enter card number" className={inputCls} />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Expiry Date *</Label>
+              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Expiry Date <span className="text-[#EF4444]">*</span></Label>
               <Input value={e.expiryDate} onChange={(ev) => updateEntry(e.id, { expiryDate: ev.target.value })} placeholder="MM/YY" className={inputCls} />
             </div>
             <div>
-              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>CVV *</Label>
+              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>CVV <span className="text-[#EF4444]">*</span></Label>
               <Input value={e.cvv} onChange={(ev) => updateEntry(e.id, { cvv: ev.target.value })} placeholder="Enter CVV" className={inputCls} />
             </div>
           </div>
@@ -252,131 +170,72 @@ function PaymentFormFields({
         </>
       )}
 
-      {/* Purchase Card */}
-      {e.type === "purchase_card" && (
-        <>
-          <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Cardholder Name *</Label>
-            <Input value={e.cardholderName} onChange={(ev) => updateEntry(e.id, { cardholderName: ev.target.value })} placeholder="Enter cardholder name" className={inputCls} />
-          </div>
-          <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>P-Card Number *</Label>
-            <Input value={e.purchaseCardNumber} onChange={(ev) => updateEntry(e.id, { purchaseCardNumber: ev.target.value })} placeholder="Enter purchase card number" className={inputCls} />
-          </div>
-          <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Spending Limit</Label>
-            <Input value={e.spendingLimit} onChange={(ev) => updateEntry(e.id, { spendingLimit: ev.target.value })} placeholder="e.g. $10,000" className={inputCls} />
-          </div>
-          <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Approval Workflow</Label>
-            <Input value={e.approvalWorkflow} onChange={(ev) => updateEntry(e.id, { approvalWorkflow: ev.target.value })} placeholder="e.g. Manager approval required" className={inputCls} />
-          </div>
-        </>
-      )}
-
-      {/* Virtual Card */}
-      {e.type === "virtual_card" && (
-        <>
-          <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Provider *</Label>
-            <Input value={e.virtualCardProvider} onChange={(ev) => updateEntry(e.id, { virtualCardProvider: ev.target.value })} placeholder="e.g. Divvy, Ramp, Brex" className={inputCls} />
-          </div>
-          <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Card Number *</Label>
-            <Input value={e.cardNumber} onChange={(ev) => updateEntry(e.id, { cardNumber: ev.target.value })} placeholder="Enter virtual card number" className={inputCls} />
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Expiry Date *</Label>
-              <Input value={e.expiryDate} onChange={(ev) => updateEntry(e.id, { expiryDate: ev.target.value })} placeholder="MM/YY" className={inputCls} />
-            </div>
-            <div>
-              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Spending Limit</Label>
-              <Input value={e.virtualCardLimit} onChange={(ev) => updateEntry(e.id, { virtualCardLimit: ev.target.value })} placeholder="e.g. $5,000" className={inputCls} />
-            </div>
-          </div>
-        </>
-      )}
-
       {/* Digital Wallet */}
       {e.type === "digital_wallet" && (
         <>
           <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Wallet Provider *</Label>
+            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Wallet Provider <span className="text-[#EF4444]">*</span></Label>
             <Input value={e.walletProvider} onChange={(ev) => updateEntry(e.id, { walletProvider: ev.target.value })} placeholder="e.g. PayPal, Venmo, Stripe" className={inputCls} />
           </div>
           <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Wallet ID/Email *</Label>
+            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Wallet ID / Email <span className="text-[#EF4444]">*</span></Label>
             <Input value={e.walletId} onChange={(ev) => updateEntry(e.id, { walletId: ev.target.value })} placeholder="Enter wallet ID or email" className={inputCls} />
           </div>
         </>
       )}
 
-      {/* Cryptocurrency */}
-      {e.type === "crypto" && (
+      {/* Cheque (Paper) */}
+      {e.type === "check" && (
         <>
           <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Currency *</Label>
-            <Input value={e.cryptoCurrency} onChange={(ev) => updateEntry(e.id, { cryptoCurrency: ev.target.value })} placeholder="e.g. Bitcoin, Ethereum, USDC" className={inputCls} />
+            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Payee Name <span className="text-[#EF4444]">*</span></Label>
+            <Input value={e.payeeName} onChange={(ev) => updateEntry(e.id, { payeeName: ev.target.value })} placeholder="Enter payee name" className={inputCls} />
           </div>
           <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Wallet Address *</Label>
-            <Input value={e.cryptoWalletAddress} onChange={(ev) => updateEntry(e.id, { cryptoWalletAddress: ev.target.value })} placeholder="Enter wallet address" className={inputCls} />
-          </div>
-          <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Network</Label>
-            <Input value={e.cryptoNetwork} onChange={(ev) => updateEntry(e.id, { cryptoNetwork: ev.target.value })} placeholder="e.g. Ethereum Mainnet, Bitcoin" className={inputCls} />
+            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Mailing Address <span className="text-[#EF4444]">*</span></Label>
+            <Input value={e.mailingAddress} onChange={(ev) => updateEntry(e.id, { mailingAddress: ev.target.value })} placeholder="Enter mailing address" className={inputCls} />
           </div>
         </>
       )}
 
-      {/* Letter of Credit */}
-      {e.type === "letter_of_credit" && (
+      {/* Cash */}
+      {e.type === "cash" && (
         <>
           <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>L/C Number *</Label>
-            <Input value={e.lcNumber} onChange={(ev) => updateEntry(e.id, { lcNumber: ev.target.value })} placeholder="Enter L/C reference number" className={inputCls} />
+            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Recipient Name</Label>
+            <Input value={e.recipientName} onChange={(ev) => updateEntry(e.id, { recipientName: ev.target.value })} placeholder="Enter recipient name" className={inputCls} />
           </div>
           <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Issuing Bank *</Label>
-            <Input value={e.issuingBank} onChange={(ev) => updateEntry(e.id, { issuingBank: ev.target.value })} placeholder="e.g. Citibank, HSBC" className={inputCls} />
-          </div>
-          <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Beneficiary Bank</Label>
-            <Input value={e.beneficiaryBank} onChange={(ev) => updateEntry(e.id, { beneficiaryBank: ev.target.value })} placeholder="Enter beneficiary bank" className={inputCls} />
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>L/C Amount</Label>
-              <Input value={e.lcAmount} onChange={(ev) => updateEntry(e.id, { lcAmount: ev.target.value })} placeholder="e.g. $100,000" className={inputCls} />
-            </div>
-            <div>
-              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Expiry Date</Label>
-              <Input type="date" value={e.lcExpiryDate} onChange={(ev) => updateEntry(e.id, { lcExpiryDate: ev.target.value })} className={`${inputCls} text-[#0F172A]`} />
-            </div>
+            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Collection Point</Label>
+            <Input value={e.collectionPoint} onChange={(ev) => updateEntry(e.id, { collectionPoint: ev.target.value })} placeholder="Enter collection point or location" className={inputCls} />
           </div>
         </>
       )}
 
-      {/* Escrow */}
-      {e.type === "escrow" && (
+      {/* Other (Record Only) */}
+      {e.type === "other" && (
         <>
           <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Escrow Provider *</Label>
-            <Input value={e.escrowProvider} onChange={(ev) => updateEntry(e.id, { escrowProvider: ev.target.value })} placeholder="e.g. Escrow.com, PayPal Escrow" className={inputCls} />
+            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Method Name</Label>
+            <Input value={e.methodName} onChange={(ev) => updateEntry(e.id, { methodName: ev.target.value })} placeholder="e.g. Barter, Trade Credit" className={inputCls} />
           </div>
           <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Escrow Account ID</Label>
-            <Input value={e.escrowAccountId} onChange={(ev) => updateEntry(e.id, { escrowAccountId: ev.target.value })} placeholder="Enter escrow account ID" className={inputCls} />
+            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Description</Label>
+            <Textarea
+              value={e.description}
+              onChange={(ev) => updateEntry(e.id, { description: ev.target.value })}
+              placeholder="Describe this payment arrangement..."
+              className="mt-1.5 rounded-lg border-[#E2E8F0] bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 min-h-[80px]"
+            />
           </div>
           <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Release Conditions</Label>
-            <Input value={e.releaseConditions} onChange={(ev) => updateEntry(e.id, { releaseConditions: ev.target.value })} placeholder="e.g. Delivery confirmed, Inspection passed" className={inputCls} />
+            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Document Attachment Link</Label>
+            <Input value={e.documentLink} onChange={(ev) => updateEntry(e.id, { documentLink: ev.target.value })} placeholder="Paste link to supporting document" className={inputCls} />
           </div>
         </>
       )}
 
-      {/* Phone */}
+      {/* Phone — for ACH, Wire, Digital Wallet, Cash */}
       {(e.type === "ach" || e.type === "wire" || e.type === "digital_wallet" || e.type === "cash") && (
         <div>
           <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Phone Number</Label>
@@ -391,11 +250,13 @@ function PaymentFormFields({
         </div>
       )}
 
-      {/* Special Instructions */}
-      <div>
-        <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Special Instructions</Label>
-        <Input value={e.specialInstructions} onChange={(ev) => updateEntry(e.id, { specialInstructions: ev.target.value })} placeholder="Enter any special instructions or notes..." className={inputCls} />
-      </div>
+      {/* Special Instructions — skip for "other" since it has description */}
+      {e.type !== "other" && (
+        <div>
+          <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Special Instructions</Label>
+          <Input value={e.specialInstructions} onChange={(ev) => updateEntry(e.id, { specialInstructions: ev.target.value })} placeholder="Enter any special instructions or notes..." className={inputCls} />
+        </div>
+      )}
 
       {/* Discount */}
       <div className="pt-1 border-t border-[#E2E8F0]">
@@ -518,7 +379,7 @@ export function PaymentMethodsSection({
       <div>
         <h4 className="text-sm text-[#0F172A]" style={{ fontWeight: 700 }}>Payment Methods</h4>
         <p className="text-xs text-[#64748B] mt-0.5 leading-relaxed">
-          Configure payment methods for this {configType}. Add multiple methods across bank transfers, cards, digital wallets, trade finance and more.{" "}
+          Configure payment methods for this {configType}. Add multiple methods across bank transfers, cards, digital wallets and more.{" "}
           <span className="text-[#0A77FF] inline-flex items-center gap-0.5 cursor-pointer hover:underline" style={{ fontWeight: 500 }}>
             Learn More <ExternalLink className="w-3 h-3" />
           </span>
