@@ -624,18 +624,6 @@ export function PaymentMethodsSection({
                 </div>
               ) : modalEntry ? (
                 <div className="space-y-3">
-                  <div className="flex items-center gap-2 pb-3 border-b border-[#F1F5F9]">
-                    {(() => {
-                      const Icon = typeIcon(modalEntry.type);
-                      const cat = typeCategory(modalEntry.type);
-                      return (
-                        <div className="w-7 h-7 rounded-md flex items-center justify-center" style={{ backgroundColor: catBg[cat] || "#F1F5F9" }}>
-                          <Icon className="w-3.5 h-3.5" style={{ color: catColor[cat] || "#64748B" }} />
-                        </div>
-                      );
-                    })()}
-                    <span className="text-xs text-[#64748B]" style={{ fontWeight: 600 }}>{typeLabel(modalEntry.type)}</span>
-                  </div>
                   <PaymentFormFields e={modalEntry} updateEntry={updatePaymentEntry} />
                 </div>
               ) : null}
