@@ -480,6 +480,7 @@ export function createEmptyPaymentEntry(type: PaymentMethodType): PaymentMethodE
     bankName: "",
     accountTitle: "",
     accountNumber: "",
+    accountHolderName: "",
     phone: "",
     countryCode: "+1",
     swiftCode: "",
@@ -522,5 +523,13 @@ export function createEmptyPaymentEntry(type: PaymentMethodType): PaymentMethodE
     escrowProvider: "",
     escrowAccountId: "",
     releaseConditions: "",
+    beneficiaryName: "",
+    beneficiaryAddress: "",
+    instantPayBrand: "",
+    instantPayHandle: "",
+    instantPayAccountName: "",
+    methodDescription: "",
+    contactPersonName: "",
+    contactNotes: "",
   };
 }
