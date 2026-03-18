@@ -3183,12 +3183,14 @@ function ConfigPageContent({
   configType,
   selectedGroup,
   partnerName,
+  partnerAddress,
   configDataRef,
 }: {
   sectionId: string;
   configType: "vendor" | "customer";
   selectedGroup: PartnerGroup | null;
   partnerName: string;
+  partnerAddress: string;
   configDataRef: React.MutableRefObject<Record<string, unknown>>;
 }) {
   const sections = configType === "vendor" ? VENDOR_CONFIG_SECTIONS : CUSTOMER_CONFIG_SECTIONS;
