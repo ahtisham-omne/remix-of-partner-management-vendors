@@ -4718,204 +4718,145 @@ function ConfigPageContent({
       <div className="space-y-3">
         {/* Section header */}
         <div className="mb-1">
-          <h4 className="text-sm text-[#0F172A]" style={{ fontWeight: 700 }}>Manage Credit Limit</h4>
-          <p className="text-xs text-[#64748B] mt-0.5 leading-relaxed">
-            Optionally define a credit limit for this {configType}. If set, it will guide purchase orders and notify relevant stakeholders when limits are approached or exceeded.{" "}
-            <span className="text-[#0A77FF] inline-flex items-center gap-0.5 cursor-pointer hover:underline" style={{ fontWeight: 500 }}>
-              Learn More <ExternalLink className="w-3 h-3" />
-            </span>
+          <h4 className="text-sm text-[#0F172A]" style={{ fontWeight: 700 }}>Credit Limit</h4>
+          <p className="text-xs text-[#64748B] mt-0.5">
+            Optionally set a credit limit and enforcement behaviour for this {configType}.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {/* Left card – Credit Limit */}
-          <div className="rounded-lg border border-[#E8ECF1] bg-white p-3 space-y-3 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
-            <h5 className="text-xs text-[#64748B]" style={{ fontWeight: 600 }}>Credit limit</h5>
-
+        {/* Credit limit fields */}
+        <div className="rounded-lg border border-[#E8ECF1] bg-white p-3 space-y-3 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+          <div className="grid grid-cols-3 gap-3">
             {/* Currency */}
-            <CurrencyDropdown selectedId={currency} onSelect={setCurrency} />
-
+            <div>
+              <Label className="text-xs text-[#0F172A]" style={{ fontWeight: 600 }}>Currency</Label>
+              <div className="mt-1">
+                <CurrencyDropdown selectedId={currency} onSelect={setCurrency} />
+              </div>
+            </div>
             {/* Maximum Credit Limit */}
             <div>
               <Label className="text-xs text-[#0F172A]" style={{ fontWeight: 600 }}>Maximum credit limit</Label>
               <div className="relative mt-1">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#64748B]">$</span>
-                <Input placeholder="50,000.00" className="pl-7 rounded-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+                <Input placeholder="50,000.00" className="pl-7 rounded-lg border-[#E2E8F0] h-9 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
               </div>
-              <p className="text-[11px] text-[#94A3B8] mt-1">Leave empty if credit is not tracked for this {configType}.</p>
             </div>
-
             {/* Warning Threshold */}
             <div>
               <Label className="text-xs text-[#0F172A]" style={{ fontWeight: 600 }}>Warning threshold (%)</Label>
               <div className="relative mt-1">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#64748B]">%</span>
-                <Input placeholder="80" className="pl-7 rounded-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
-              </div>
-              <p className="text-[11px] text-[#94A3B8] mt-1">When utilization reaches this %, alerts are triggered.</p>
-            </div>
-
-            {/* Threshold alert recipients */}
-            <div className="rounded-lg bg-[#FFFBEB] border border-[#FDE68A] p-2.5 space-y-2">
-              <div className="flex items-start gap-2">
-                <AlertTriangle className="w-3.5 h-3.5 text-[#D97706] mt-0.5 shrink-0" />
-                <div>
-                  <p className="text-[11px] text-[#92400E]" style={{ fontWeight: 600 }}>Who gets alerted?</p>
-                  <p className="text-[10px] text-[#B45309] mt-0.5 leading-relaxed">
-                    Select users who will receive alerts when the threshold is reached.
-                  </p>
-                </div>
-              </div>
-              <div className="border-t border-[#FDE68A] pt-2 space-y-1.5">
-                <div className="flex items-start gap-2">
-                  <div className="w-1 h-1 rounded-full bg-[#D97706] mt-1.5 shrink-0" />
-                  <p className="text-[10px] text-[#92400E] leading-relaxed"><span style={{ fontWeight: 600 }}>PO Flow:</span> Warning banner when creating a PO that would exceed threshold</p>
-                </div>
-                <div className="flex items-start gap-2">
-                  <div className="w-1 h-1 rounded-full bg-[#D97706] mt-1.5 shrink-0" />
-                  <p className="text-[10px] text-[#92400E] leading-relaxed"><span style={{ fontWeight: 600 }}>Vendor Module:</span> Status badge updates to "Near Limit"</p>
-                </div>
-                <div className="flex items-start gap-2">
-                  <div className="w-1 h-1 rounded-full bg-[#D97706] mt-1.5 shrink-0" />
-                  <p className="text-[10px] text-[#92400E] leading-relaxed"><span style={{ fontWeight: 600 }}>Notifications:</span> In-app ping + email digest to selected recipients</p>
-                </div>
-              </div>
-              {/* User selection for threshold alerts */}
-              <div className="border-t border-[#FDE68A] pt-2">
-                <SearchableUserPicker
-                  selectedIds={thresholdAlertRecipients}
-                  onSelectionChange={setThresholdAlertRecipients}
-                  accentColor="#D97706"
-                  accentBg="#FFFBEB"
-                  accentBorder="#FDE68A"
-                  accentText="#92400E"
-                  label="Select alert recipients"
-                  placeholder="Search users by name, role, or department…"
-                />
+                <Input placeholder="80" className="pl-7 rounded-lg border-[#E2E8F0] h-9 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
               </div>
             </div>
           </div>
+          <p className="text-[10px] text-[#94A3B8]">All fields are optional. Leave empty if credit is not tracked.</p>
 
-          {/* Right card – Enforcement */}
-          <div className="rounded-lg border border-[#E8ECF1] bg-white p-3 space-y-3 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
-            <h5 className="text-xs text-[#64748B]" style={{ fontWeight: 600 }}>Enforcement</h5>
-            <p className="text-xs text-[#94A3B8]">Define how the system responds when the credit limit is exceeded.</p>
-            <div className="space-y-2">
-              {/* Hard Block */}
-              <button
-                onClick={() => setEnforcement("hard_block")}
-                className={`w-full text-left px-3 py-2.5 rounded-lg border transition-all ${
-                  enforcement === "hard_block"
-                    ? "border-[#0A77FF] bg-[#EDF4FF]/30"
-                    : "border-[#E2E8F0] hover:border-[#CBD5E1]"
-                }`}
-              >
-                <div className="flex items-start gap-2.5">
-                  <div className={`mt-0.5 w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                    enforcement === "hard_block" ? "border-[#0A77FF]" : "border-[#CBD5E1]"
-                  }`}>
-                    {enforcement === "hard_block" && <div className="w-2 h-2 rounded-full bg-[#0A77FF]" />}
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-xs text-[#0F172A]" style={{ fontWeight: 600 }}>Hard Block</p>
-                    <p className="text-[10px] text-[#94A3B8] mt-0.5 leading-relaxed">Prevents purchase orders from being placed if the credit limit is exceeded. Users cannot proceed until the limit is increased or balance is cleared.</p>
-                  </div>
-                </div>
-                {enforcement === "hard_block" && (
-                  <div className="mt-2 ml-6.5 flex items-start gap-1.5 rounded-md bg-[#FEF2F2] border border-[#FECACA] px-2 py-1.5">
-                    <ShieldAlert className="w-3 h-3 text-[#DC2626] mt-0.5 shrink-0" />
-                    <p className="text-[10px] text-[#991B1B] leading-relaxed">Orders will be blocked at checkout with a "Credit limit exceeded" error.</p>
-                  </div>
-                )}
-              </button>
-              {/* Hard block recipient selection */}
-              {enforcement === "hard_block" && (
-                <div className="ml-6.5 rounded-lg bg-[#FEF2F2]/50 border border-[#FECACA]/60 p-2.5">
-                  <SearchableUserPicker
-                    selectedIds={hardBlockRecipients}
-                    onSelectionChange={setHardBlockRecipients}
-                    accentColor="#DC2626"
-                    accentBg="#FEF2F2"
-                    accentBorder="#FECACA"
-                    accentText="#991B1B"
-                    label="Notify when orders are blocked"
-                    placeholder="Search users by name, role, or department…"
-                  />
-                </div>
-              )}
+          {/* Threshold alert recipients */}
+          <SearchableUserPicker
+            selectedIds={thresholdAlertRecipients}
+            onSelectionChange={setThresholdAlertRecipients}
+            accentColor="#D97706"
+            accentBg="#FFFBEB"
+            accentBorder="#FDE68A"
+            accentText="#92400E"
+            label="Notify when threshold is reached"
+            placeholder="Search users…"
+          />
+        </div>
 
-              {/* Soft Warning */}
-              <button
-                onClick={() => setEnforcement("soft_warning")}
-                className={`w-full text-left px-3 py-2.5 rounded-lg border transition-all ${
-                  enforcement === "soft_warning"
-                    ? "border-[#0A77FF] bg-[#EDF4FF]/30"
-                    : "border-[#E2E8F0] hover:border-[#CBD5E1]"
-                }`}
-              >
-                <div className="flex items-start gap-2.5">
-                  <div className={`mt-0.5 w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                    enforcement === "soft_warning" ? "border-[#0A77FF]" : "border-[#CBD5E1]"
-                  }`}>
-                    {enforcement === "soft_warning" && <div className="w-2 h-2 rounded-full bg-[#0A77FF]" />}
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-xs text-[#0F172A]" style={{ fontWeight: 600 }}>Soft Warning</p>
-                    <p className="text-[10px] text-[#94A3B8] mt-0.5 leading-relaxed">Allows the order to proceed but triggers a confirmation modal warning the user that the credit limit will be exceeded. Requires explicit acknowledgement to continue.</p>
-                  </div>
-                </div>
-                {enforcement === "soft_warning" && (
-                  <div className="mt-2 ml-6.5 flex items-start gap-1.5 rounded-md bg-[#FFFBEB] border border-[#FDE68A] px-2 py-1.5">
-                    <AlertTriangle className="w-3 h-3 text-[#D97706] mt-0.5 shrink-0" />
-                    <p className="text-[10px] text-[#92400E] leading-relaxed">A pop-up modal will ask for confirmation before placing the order.</p>
-                  </div>
-                )}
-              </button>
-              {/* Soft warning recipient selection */}
-              {enforcement === "soft_warning" && (
-                <div className="ml-6.5 rounded-lg bg-[#FFFBEB]/50 border border-[#FDE68A]/60 p-2.5">
-                  <SearchableUserPicker
-                    selectedIds={softWarningRecipients}
-                    onSelectionChange={setSoftWarningRecipients}
-                    accentColor="#D97706"
-                    accentBg="#FFFBEB"
-                    accentBorder="#FDE68A"
-                    accentText="#92400E"
-                    label="Notify when warnings are triggered"
-                    placeholder="Search users by name, role, or department…"
-                  />
-                </div>
-              )}
+        {/* Enforcement */}
+        <div className="rounded-lg border border-[#E8ECF1] bg-white p-3 space-y-2.5 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+          <h5 className="text-xs text-[#64748B]" style={{ fontWeight: 600 }}>Enforcement</h5>
 
-              {/* No Enforcement */}
-              <button
-                onClick={() => setEnforcement("none")}
-                className={`w-full text-left px-3 py-2.5 rounded-lg border transition-all ${
-                  enforcement === "none"
-                    ? "border-[#0A77FF] bg-[#EDF4FF]/30"
-                    : "border-[#E2E8F0] hover:border-[#CBD5E1]"
-                }`}
-              >
-                <div className="flex items-start gap-2.5">
-                  <div className={`mt-0.5 w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                    enforcement === "none" ? "border-[#0A77FF]" : "border-[#CBD5E1]"
-                  }`}>
-                    {enforcement === "none" && <div className="w-2 h-2 rounded-full bg-[#0A77FF]" />}
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-xs text-[#0F172A]" style={{ fontWeight: 600 }}>No Enforcement</p>
-                    <p className="text-[10px] text-[#94A3B8] mt-0.5 leading-relaxed">No restrictions on order placement. A passive "Over Limit" label will appear on the vendor profile and PO screens, but users can continue without interruption.</p>
-                  </div>
-                </div>
-                {enforcement === "none" && (
-                  <div className="mt-2 ml-6.5 flex items-start gap-1.5 rounded-md bg-[#F1F5F9] border border-[#E2E8F0] px-2 py-1.5">
-                    <Info className="w-3 h-3 text-[#64748B] mt-0.5 shrink-0" />
-                    <p className="text-[10px] text-[#64748B] leading-relaxed">A passive label is shown but has no impact on the user flow. No notifications are sent.</p>
-                  </div>
-                )}
-              </button>
+          {/* Hard Block */}
+          <button
+            onClick={() => setEnforcement("hard_block")}
+            className={`w-full text-left px-3 py-2 rounded-lg border transition-all ${
+              enforcement === "hard_block"
+                ? "border-[#0A77FF] bg-[#EDF4FF]/30"
+                : "border-[#E2E8F0] hover:border-[#CBD5E1]"
+            }`}
+          >
+            <div className="flex items-center gap-2.5">
+              <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                enforcement === "hard_block" ? "border-[#0A77FF]" : "border-[#CBD5E1]"
+              }`}>
+                {enforcement === "hard_block" && <div className="w-2 h-2 rounded-full bg-[#0A77FF]" />}
+              </div>
+              <p className="text-xs text-[#0F172A] flex-1" style={{ fontWeight: 600 }}>Hard Block</p>
+              <span className="text-[10px] text-[#94A3B8]">Prevents orders when limit exceeded</span>
             </div>
-          </div>
+          </button>
+          {enforcement === "hard_block" && (
+            <div className="ml-6.5 mt-1">
+              <SearchableUserPicker
+                selectedIds={hardBlockRecipients}
+                onSelectionChange={setHardBlockRecipients}
+                accentColor="#DC2626"
+                accentBg="#FEF2F2"
+                accentBorder="#FECACA"
+                accentText="#991B1B"
+                label="Notify when orders are blocked"
+                placeholder="Search users…"
+              />
+            </div>
+          )}
+
+          {/* Soft Warning */}
+          <button
+            onClick={() => setEnforcement("soft_warning")}
+            className={`w-full text-left px-3 py-2 rounded-lg border transition-all ${
+              enforcement === "soft_warning"
+                ? "border-[#0A77FF] bg-[#EDF4FF]/30"
+                : "border-[#E2E8F0] hover:border-[#CBD5E1]"
+            }`}
+          >
+            <div className="flex items-center gap-2.5">
+              <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                enforcement === "soft_warning" ? "border-[#0A77FF]" : "border-[#CBD5E1]"
+              }`}>
+                {enforcement === "soft_warning" && <div className="w-2 h-2 rounded-full bg-[#0A77FF]" />}
+              </div>
+              <p className="text-xs text-[#0F172A] flex-1" style={{ fontWeight: 600 }}>Soft Warning</p>
+              <span className="text-[10px] text-[#94A3B8]">Shows confirmation modal before proceeding</span>
+            </div>
+          </button>
+          {enforcement === "soft_warning" && (
+            <div className="ml-6.5 mt-1">
+              <SearchableUserPicker
+                selectedIds={softWarningRecipients}
+                onSelectionChange={setSoftWarningRecipients}
+                accentColor="#D97706"
+                accentBg="#FFFBEB"
+                accentBorder="#FDE68A"
+                accentText="#92400E"
+                label="Notify when warnings are triggered"
+                placeholder="Search users…"
+              />
+            </div>
+          )}
+
+          {/* No Enforcement */}
+          <button
+            onClick={() => setEnforcement("none")}
+            className={`w-full text-left px-3 py-2 rounded-lg border transition-all ${
+              enforcement === "none"
+                ? "border-[#0A77FF] bg-[#EDF4FF]/30"
+                : "border-[#E2E8F0] hover:border-[#CBD5E1]"
+            }`}
+          >
+            <div className="flex items-center gap-2.5">
+              <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                enforcement === "none" ? "border-[#0A77FF]" : "border-[#CBD5E1]"
+              }`}>
+                {enforcement === "none" && <div className="w-2 h-2 rounded-full bg-[#0A77FF]" />}
+              </div>
+              <p className="text-xs text-[#0F172A] flex-1" style={{ fontWeight: 600 }}>No Enforcement</p>
+              <span className="text-[10px] text-[#94A3B8]">Passive "Over Limit" label only</span>
+            </div>
+          </button>
         </div>
       </div>
     );
