@@ -159,6 +159,7 @@ import {
 } from "./partnerConstants";
 import { SelectPocDictionaryModal, CreatePocModal } from "./PocModals";
 import { PocPillsRow } from "./PocPillComponents";
+import { SearchableUserPicker } from "./SearchableUserPicker";
 
 /** Props for multi-step partner creation modal */
 interface CreatePartnerModalProps {
@@ -3201,7 +3202,7 @@ function ConfigPageContent({
   const [thresholdAlertRecipients, setThresholdAlertRecipients] = useState<Set<string>>(new Set());
   const [softWarningRecipients, setSoftWarningRecipients] = useState<Set<string>>(new Set());
   const [hardBlockRecipients, setHardBlockRecipients] = useState<Set<string>>(new Set());
-  const allAvailableContacts = [...CONTACT_DICTIONARY];
+  
   const [paymentTerm, setPaymentTerm] = useState("net_30");
   const [pricingTier, setPricingTier] = useState("standard");
   const [shippingMethod, setShippingMethod] = useState("ground");
@@ -4781,32 +4782,16 @@ function ConfigPageContent({
               </div>
               {/* User selection for threshold alerts */}
               <div className="border-t border-[#FDE68A] pt-2">
-                <p className="text-[10px] text-[#92400E] mb-1.5" style={{ fontWeight: 600 }}>Select alert recipients</p>
-                <div className="space-y-1 max-h-[120px] overflow-y-auto">
-                  {allAvailableContacts.map((contact) => (
-                    <label key={contact.id} className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-[#FEF3C7]/60 cursor-pointer transition-colors">
-                      <Checkbox
-                        checked={thresholdAlertRecipients.has(contact.id)}
-                        onCheckedChange={(checked) => {
-                          const next = new Set(thresholdAlertRecipients);
-                          checked ? next.add(contact.id) : next.delete(contact.id);
-                          setThresholdAlertRecipients(next);
-                        }}
-                        className="h-3.5 w-3.5 rounded border-[#D97706] data-[state=checked]:bg-[#D97706] data-[state=checked]:border-[#D97706]"
-                      />
-                      <div className="flex items-center gap-1.5 min-w-0">
-                        <div className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] text-white shrink-0" style={{ fontWeight: 600, backgroundColor: contact.avatarColor || '#64748B' }}>
-                          {contact.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                        </div>
-                        <span className="text-[10px] text-[#92400E] truncate" style={{ fontWeight: 500 }}>{contact.name}</span>
-                        <span className="text-[9px] text-[#B45309] truncate hidden sm:inline">· {contact.department}</span>
-                      </div>
-                    </label>
-                  ))}
-                </div>
-                {thresholdAlertRecipients.size > 0 && (
-                  <p className="text-[9px] text-[#D97706] mt-1" style={{ fontWeight: 500 }}>{thresholdAlertRecipients.size} recipient{thresholdAlertRecipients.size !== 1 ? 's' : ''} selected</p>
-                )}
+                <SearchableUserPicker
+                  selectedIds={thresholdAlertRecipients}
+                  onSelectionChange={setThresholdAlertRecipients}
+                  accentColor="#D97706"
+                  accentBg="#FFFBEB"
+                  accentBorder="#FDE68A"
+                  accentText="#92400E"
+                  label="Select alert recipients"
+                  placeholder="Search users by name, role, or department…"
+                />
               </div>
             </div>
           </div>
@@ -4845,32 +4830,17 @@ function ConfigPageContent({
               </button>
               {/* Hard block recipient selection */}
               {enforcement === "hard_block" && (
-                <div className="ml-6.5 rounded-lg bg-[#FEF2F2]/50 border border-[#FECACA]/60 p-2.5 space-y-1.5">
-                  <p className="text-[10px] text-[#991B1B]" style={{ fontWeight: 600 }}>Notify when orders are blocked</p>
-                  <div className="space-y-1 max-h-[100px] overflow-y-auto">
-                    {allAvailableContacts.map((contact) => (
-                      <label key={contact.id} className="flex items-center gap-2 px-2 py-1 rounded-md hover:bg-[#FEE2E2]/60 cursor-pointer transition-colors">
-                        <Checkbox
-                          checked={hardBlockRecipients.has(contact.id)}
-                          onCheckedChange={(checked) => {
-                            const next = new Set(hardBlockRecipients);
-                            checked ? next.add(contact.id) : next.delete(contact.id);
-                            setHardBlockRecipients(next);
-                          }}
-                          className="h-3.5 w-3.5 rounded border-[#DC2626] data-[state=checked]:bg-[#DC2626] data-[state=checked]:border-[#DC2626]"
-                        />
-                        <div className="flex items-center gap-1.5 min-w-0">
-                          <div className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] text-white shrink-0" style={{ fontWeight: 600, backgroundColor: contact.avatarColor || '#64748B' }}>
-                            {contact.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                          </div>
-                          <span className="text-[10px] text-[#991B1B] truncate" style={{ fontWeight: 500 }}>{contact.name}</span>
-                        </div>
-                      </label>
-                    ))}
-                  </div>
-                  {hardBlockRecipients.size > 0 && (
-                    <p className="text-[9px] text-[#DC2626] mt-0.5" style={{ fontWeight: 500 }}>{hardBlockRecipients.size} recipient{hardBlockRecipients.size !== 1 ? 's' : ''} selected</p>
-                  )}
+                <div className="ml-6.5 rounded-lg bg-[#FEF2F2]/50 border border-[#FECACA]/60 p-2.5">
+                  <SearchableUserPicker
+                    selectedIds={hardBlockRecipients}
+                    onSelectionChange={setHardBlockRecipients}
+                    accentColor="#DC2626"
+                    accentBg="#FEF2F2"
+                    accentBorder="#FECACA"
+                    accentText="#991B1B"
+                    label="Notify when orders are blocked"
+                    placeholder="Search users by name, role, or department…"
+                  />
                 </div>
               )}
 
@@ -4903,32 +4873,17 @@ function ConfigPageContent({
               </button>
               {/* Soft warning recipient selection */}
               {enforcement === "soft_warning" && (
-                <div className="ml-6.5 rounded-lg bg-[#FFFBEB]/50 border border-[#FDE68A]/60 p-2.5 space-y-1.5">
-                  <p className="text-[10px] text-[#92400E]" style={{ fontWeight: 600 }}>Notify when warnings are triggered</p>
-                  <div className="space-y-1 max-h-[100px] overflow-y-auto">
-                    {allAvailableContacts.map((contact) => (
-                      <label key={contact.id} className="flex items-center gap-2 px-2 py-1 rounded-md hover:bg-[#FEF3C7]/60 cursor-pointer transition-colors">
-                        <Checkbox
-                          checked={softWarningRecipients.has(contact.id)}
-                          onCheckedChange={(checked) => {
-                            const next = new Set(softWarningRecipients);
-                            checked ? next.add(contact.id) : next.delete(contact.id);
-                            setSoftWarningRecipients(next);
-                          }}
-                          className="h-3.5 w-3.5 rounded border-[#D97706] data-[state=checked]:bg-[#D97706] data-[state=checked]:border-[#D97706]"
-                        />
-                        <div className="flex items-center gap-1.5 min-w-0">
-                          <div className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] text-white shrink-0" style={{ fontWeight: 600, backgroundColor: contact.avatarColor || '#64748B' }}>
-                            {contact.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
-                          </div>
-                          <span className="text-[10px] text-[#92400E] truncate" style={{ fontWeight: 500 }}>{contact.name}</span>
-                        </div>
-                      </label>
-                    ))}
-                  </div>
-                  {softWarningRecipients.size > 0 && (
-                    <p className="text-[9px] text-[#D97706] mt-0.5" style={{ fontWeight: 500 }}>{softWarningRecipients.size} recipient{softWarningRecipients.size !== 1 ? 's' : ''} selected</p>
-                  )}
+                <div className="ml-6.5 rounded-lg bg-[#FFFBEB]/50 border border-[#FDE68A]/60 p-2.5">
+                  <SearchableUserPicker
+                    selectedIds={softWarningRecipients}
+                    onSelectionChange={setSoftWarningRecipients}
+                    accentColor="#D97706"
+                    accentBg="#FFFBEB"
+                    accentBorder="#FDE68A"
+                    accentText="#92400E"
+                    label="Notify when warnings are triggered"
+                    placeholder="Search users by name, role, or department…"
+                  />
                 </div>
               )}
 
