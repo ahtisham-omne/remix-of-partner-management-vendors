@@ -159,6 +159,7 @@ import {
 } from "./partnerConstants";
 import { SelectPocDictionaryModal, CreatePocModal } from "./PocModals";
 import { PocPillsRow } from "./PocPillComponents";
+import { SearchableUserPicker } from "./SearchableUserPicker";
 
 /** Props for multi-step partner creation modal */
 interface CreatePartnerModalProps {
