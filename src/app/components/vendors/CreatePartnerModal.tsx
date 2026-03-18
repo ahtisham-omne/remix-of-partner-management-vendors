@@ -589,6 +589,7 @@ export function CreatePartnerModal({ open, onOpenChange, onPartnerCreated }: Cre
                         configType={configType}
                         selectedGroup={primaryGroup}
                         partnerName={partnerName}
+                        partnerAddress={address}
                         configDataRef={configDataRef}
                       />
                     </div>
@@ -3182,12 +3183,14 @@ function ConfigPageContent({
   configType,
   selectedGroup,
   partnerName,
+  partnerAddress,
   configDataRef,
 }: {
   sectionId: string;
   configType: "vendor" | "customer";
   selectedGroup: PartnerGroup | null;
   partnerName: string;
+  partnerAddress: string;
   configDataRef: React.MutableRefObject<Record<string, unknown>>;
 }) {
   const sections = configType === "vendor" ? VENDOR_CONFIG_SECTIONS : CUSTOMER_CONFIG_SECTIONS;
@@ -4262,6 +4265,8 @@ function ConfigPageContent({
         updatePaymentEntry={updatePaymentEntry}
         savePaymentEntry={savePaymentEntry}
         removePaymentEntry={removePaymentEntry}
+        payToEntityName={partnerName}
+        payToEntityAddress={partnerAddress}
       />
     );
   }
