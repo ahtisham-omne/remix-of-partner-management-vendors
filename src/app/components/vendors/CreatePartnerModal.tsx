@@ -3198,6 +3198,10 @@ function ConfigPageContent({
   const [billingType, setBillingType] = useState("domestic");
   const [shippingPref, setShippingPref] = useState("same_as_billing");
   const [enforcement, setEnforcement] = useState("hard_block");
+  const [thresholdAlertRecipients, setThresholdAlertRecipients] = useState<Set<string>>(new Set());
+  const [softWarningRecipients, setSoftWarningRecipients] = useState<Set<string>>(new Set());
+  const [hardBlockRecipients, setHardBlockRecipients] = useState<Set<string>>(new Set());
+  const allAvailableContacts = [...CONTACT_DICTIONARY];
   const [paymentTerm, setPaymentTerm] = useState("net_30");
   const [pricingTier, setPricingTier] = useState("standard");
   const [shippingMethod, setShippingMethod] = useState("ground");
