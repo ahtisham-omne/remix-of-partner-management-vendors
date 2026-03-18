@@ -22,13 +22,6 @@ import {
   Wallet,
   Banknote,
   FileText,
-  Mail,
-  ShieldCheck,
-  Bitcoin,
-  ArrowLeftRight,
-  Lock,
-  Smartphone,
-  BadgeDollarSign,
 } from "lucide-react";
 
 // ── Partner Group Data ──
