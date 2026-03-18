@@ -111,7 +111,7 @@ import type { PartnerType } from "../data/vendors";
 
 const DND_LIST_KPI = "LIST_KPI_CARD";
 
-// Module refresh v6
+// Module refresh v7
 type QuickFilter = "all" | "customers" | "vendors" | "active" | "inactive" | "archived";
 type DensityOption = "condensed" | "comfort" | "card";
 
