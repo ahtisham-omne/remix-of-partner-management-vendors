@@ -4262,6 +4262,8 @@ function ConfigPageContent({
         updatePaymentEntry={updatePaymentEntry}
         savePaymentEntry={savePaymentEntry}
         removePaymentEntry={removePaymentEntry}
+        payToEntityName={partnerName}
+        payToEntityAddress={address}
       />
     );
   }
