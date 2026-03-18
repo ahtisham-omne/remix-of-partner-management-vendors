@@ -589,6 +589,7 @@ export function CreatePartnerModal({ open, onOpenChange, onPartnerCreated }: Cre
                         configType={configType}
                         selectedGroup={primaryGroup}
                         partnerName={partnerName}
+                        partnerAddress={address}
                         configDataRef={configDataRef}
                       />
                     </div>
