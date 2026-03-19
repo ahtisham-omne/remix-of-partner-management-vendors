@@ -4004,144 +4004,265 @@ function ConfigPageContent({
     const payToObj = PARTNER_LOCATION_ITEMS.find((i) => i.id === payTo);
     const fundedByObj = FUNDED_BY_ITEMS.find((i) => i.id === fundedBy);
 
+    // Visual flow nodes
+    const flowNodes = [
+      {
+        icon: <DollarSign className="w-5 h-5" />,
+        label: "Currency",
+        sublabel: currencyObj ? currencyObj.id.toUpperCase() : null,
+        active: !!currencyObj,
+        color: "#0A77FF",
+        bgActive: "#EFF6FF",
+        dataKey: "currency" as const,
+      },
+      {
+        icon: <Truck className="w-5 h-5" />,
+        label: "Ship To",
+        sublabel: shipToObj ? shipToObj.name.split(",")[0] : null,
+        active: !!shipToObj,
+        color: "#22C55E",
+        bgActive: "#ECFDF5",
+        dataKey: "shipTo" as const,
+      },
+      {
+        icon: <Receipt className="w-5 h-5" />,
+        label: "Pay To",
+        sublabel: payToObj ? payToObj.name.split(",")[0] : null,
+        active: !!payToObj,
+        color: "#8B5CF6",
+        bgActive: "#F5F3FF",
+        dataKey: "payTo" as const,
+      },
+      {
+        icon: <Landmark className="w-5 h-5" />,
+        label: "Funded By",
+        sublabel: fundedByObj ? fundedByObj.name.split(",")[0] : null,
+        active: !!fundedByObj,
+        color: "#F59E0B",
+        bgActive: "#FFFBEB",
+        dataKey: "fundedBy" as const,
+      },
+    ];
+
     return (
       <div className="space-y-5">
-        {/* ── Header ── */}
+        {/* ── Heading ── */}
         <div>
-          <h4 className="text-[14px] text-[#0F172A]" style={{ fontWeight: 700 }}>Billing & Shipping</h4>
-          <p className="text-[12px] text-[#64748B] mt-0.5 leading-relaxed max-w-md">
-            Configure default transaction settings for this partner.
+          <h4 className="text-sm text-[#0F172A]" style={{ fontWeight: 700 }}>Billing & Shipping</h4>
+          <p className="text-xs text-[#64748B] mt-0.5 leading-relaxed">
+            Configure default transaction currency, delivery destination, payment recipient, and funding source for this partner.
           </p>
         </div>
 
-        {/* ── Two-column card layout ── */}
-        <div className="grid grid-cols-2 gap-4">
+        {/* ── Visual Flow Header ── */}
+        <div className="flex items-center justify-center py-5 px-2 relative" style={{ overflow: "visible" }}>
+          {flowNodes.map((node, i) => {
+            const partnerObj = node.dataKey === "shipTo" ? shipToObj : node.dataKey === "payTo" ? payToObj : node.dataKey === "fundedBy" ? fundedByObj : null;
+            const isCurrency = node.dataKey === "currency";
+            const hasData = isCurrency ? !!currencyObj : !!partnerObj;
 
-          {/* LEFT: Transaction Defaults */}
-          <div className="rounded-xl border border-[#E8ECF1] bg-white overflow-hidden">
-            <div className="px-4 py-3 border-b border-[#F1F5F9]">
-              <p className="text-[10px] text-[#64748B] uppercase tracking-wider" style={{ fontWeight: 600 }}>Transaction Defaults</p>
+            const renderFlowIcon = () => {
+              if (isCurrency && currencyObj) {
+                return <span className="text-[18px]" style={{ fontWeight: 700 }}>{currencyObj.symbol}</span>;
+              }
+              if (!isCurrency && partnerObj) {
+                return (
+                  <div
+                    className="w-full h-full rounded-xl flex items-center justify-center text-white text-[12px]"
+                    style={{ fontWeight: 700, backgroundColor: partnerObj.logoColor }}
+                  >
+                    {partnerObj.logoText}
+                  </div>
+                );
+              }
+              return node.icon;
+            };
+
+            const renderFlowHoverCard = () => {
+              if (isCurrency && currencyObj) {
+                const code = currencyObj.id.toUpperCase();
+                const name = currencyObj.label.split(" — ")[1] || currencyObj.label;
+                return (
+                  <div className="w-[200px] bg-white rounded-xl border border-[#E8ECF1] shadow-lg p-3">
+                    <div className="flex items-center gap-2.5 mb-2">
+                      <div className="w-9 h-9 rounded-lg bg-[#EFF6FF] flex items-center justify-center text-[#0A77FF] text-[18px]" style={{ fontWeight: 700 }}>
+                        {currencyObj.symbol}
+                      </div>
+                      <div>
+                        <p className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>{code}</p>
+                        <p className="text-[11px] text-[#64748B]">{name}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1.5 px-2 py-1 bg-[#EFF6FF] rounded-md">
+                      <div className="w-1.5 h-1.5 rounded-full bg-[#0A77FF]" />
+                      <span className="text-[10px] text-[#0A77FF]" style={{ fontWeight: 500 }}>Active transaction currency</span>
+                    </div>
+                  </div>
+                );
+              }
+              if (!isCurrency && partnerObj) {
+                const typeLabel = partnerObj.type === "location" ? "Location" : "Partner";
+                const roleLabel = node.dataKey === "shipTo" ? "Delivery Address" : node.dataKey === "payTo" ? "Payment Recipient" : "Funding Source";
+                return (
+                  <div className="w-[220px] bg-white rounded-xl border border-[#E8ECF1] shadow-lg p-3">
+                    <div className="flex items-center gap-2.5 mb-2.5">
+                      <div
+                        className="w-9 h-9 rounded-lg flex items-center justify-center text-white text-[13px] shrink-0"
+                        style={{ fontWeight: 700, backgroundColor: partnerObj.logoColor }}
+                      >
+                        {partnerObj.logoText}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{partnerObj.name}</p>
+                        <div className="flex items-center gap-1 mt-0.5">
+                          <MapPin className="w-3 h-3 text-[#94A3B8] shrink-0" />
+                          <span className="text-[11px] text-[#64748B] truncate">{partnerObj.location || typeLabel}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1.5 px-2 py-1 rounded-md" style={{ backgroundColor: node.bgActive }}>
+                      <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: node.color }} />
+                      <span className="text-[10px]" style={{ fontWeight: 500, color: node.color }}>{roleLabel}</span>
+                    </div>
+                    {partnerObj.isDefault && (
+                      <div className="flex items-center gap-1 mt-2 pt-2 border-t border-[#F1F5F9]">
+                        <Star className="w-3 h-3 text-[#F59E0B]" />
+                        <span className="text-[10px] text-[#64748B]" style={{ fontWeight: 500 }}>Default selection</span>
+                      </div>
+                    )}
+                  </div>
+                );
+              }
+              return null;
+            };
+
+            return (
+              <div key={node.label} className="flex items-center">
+                {hasData ? (
+                  <HoverCard openDelay={200} closeDelay={100}>
+                    <HoverCardTrigger asChild>
+                      <div className="relative flex flex-col items-center gap-1.5 cursor-pointer">
+                        <div
+                          className="w-[46px] h-[46px] rounded-xl flex items-center justify-center transition-all duration-200 overflow-hidden"
+                          style={{
+                            backgroundColor: node.active ? (isCurrency || !partnerObj ? node.bgActive : "transparent") : "#F8FAFC",
+                            border: `1.5px solid ${node.active ? node.color + "30" : "#E8ECF1"}`,
+                            color: node.active ? node.color : "#B0B8C4",
+                          }}
+                        >
+                          {renderFlowIcon()}
+                        </div>
+                        {node.sublabel ? (
+                          <span className="text-[10px] text-[#0F172A] max-w-[80px] truncate text-center" style={{ fontWeight: 600 }}>
+                            {node.sublabel}
+                          </span>
+                        ) : (
+                          <span className="text-[10px] text-[#94A3B8] max-w-[80px] truncate text-center" style={{ fontWeight: 500 }}>
+                            {node.label}
+                          </span>
+                        )}
+                      </div>
+                    </HoverCardTrigger>
+                    <HoverCardContent
+                      side="bottom"
+                      sideOffset={8}
+                      align="center"
+                      className="w-auto p-0 border-none bg-transparent shadow-none z-[300]"
+                    >
+                      {renderFlowHoverCard()}
+                    </HoverCardContent>
+                  </HoverCard>
+                ) : (
+                  <div className="relative flex flex-col items-center gap-1.5">
+                    <div
+                      className="w-[46px] h-[46px] rounded-xl flex items-center justify-center transition-all duration-200 overflow-hidden"
+                      style={{
+                        backgroundColor: "#F8FAFC",
+                        border: `1.5px solid #E8ECF1`,
+                        color: "#B0B8C4",
+                      }}
+                    >
+                      {renderFlowIcon()}
+                    </div>
+                    <span className="text-[10px] text-[#94A3B8] max-w-[80px] truncate text-center" style={{ fontWeight: 500 }}>
+                      {node.label}
+                    </span>
+                  </div>
+                )}
+                {i < flowNodes.length - 1 && (
+                  <ChevronRight className="w-4 h-4 text-[#CBD5E1] mx-3 sm:mx-5 shrink-0 -mt-4" />
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="border-t border-[#F1F5F9]" />
+
+        {/* ── Form Content: Two-column card layout ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+
+          {/* Left Column: Transaction Details */}
+          <div className="rounded-xl border border-[#E8ECF1] bg-white">
+            <div className="px-4 py-3 border-b border-[#F1F5F9] rounded-t-xl">
+              <span className="text-[12px] text-[#334155] tracking-wide" style={{ fontWeight: 700 }}>Transaction Details</span>
             </div>
             <div className="p-4 space-y-4">
-              {/* Currency */}
-              <div>
-                <div className="flex items-center gap-1.5 mb-1.5">
-                  <span className="text-[12px] text-[#334155]" style={{ fontWeight: 600 }}>Currency</span>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button type="button" className="inline-flex" tabIndex={-1}>
-                        <Info className="w-3 h-3 text-[#CBD5E1] hover:text-[#94A3B8] transition-colors" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent side="top" sideOffset={6} className="bg-[#1E293B] text-white text-[11px] leading-[1.5] rounded-lg max-w-[220px] px-3 py-2 shadow-xl border border-[#334155] z-[300]">
-                      <p style={{ fontWeight: 500 }}>All POs, invoices, and payments will default to this currency.</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </div>
-                <CurrencyDropdown selectedId={currency} onSelect={setCurrency} />
-                {currencyObj && (
-                  <p className="text-[11px] text-[#94A3B8] mt-1.5" style={{ fontWeight: 400 }}>
-                    Symbol: <span className="text-[#334155]" style={{ fontWeight: 600 }}>{currencyObj.symbol}</span>
-                  </p>
-                )}
-              </div>
-
-              {/* Pay To */}
-              <div>
-                <div className="flex items-center gap-1.5 mb-1.5">
-                  <span className="text-[12px] text-[#334155]" style={{ fontWeight: 600 }}>Pay To</span>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button type="button" className="inline-flex" tabIndex={-1}>
-                        <Info className="w-3 h-3 text-[#CBD5E1] hover:text-[#94A3B8] transition-colors" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent side="top" sideOffset={6} className="bg-[#1E293B] text-white text-[11px] leading-[1.5] rounded-lg max-w-[220px] px-3 py-2 shadow-xl border border-[#334155] z-[300]">
-                      <p style={{ fontWeight: 500 }}>The entity or location that receives payment.</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </div>
-                <SearchablePartnerDropdown
-                  label=""
-                  tooltip=""
-                  placeholder="Select payment recipient"
-                  items={PARTNER_LOCATION_ITEMS}
-                  selectedId={payTo}
-                  onSelect={setPayTo}
-                />
-                {payToObj && (
-                  <p className="text-[11px] text-[#94A3B8] mt-1.5 truncate" style={{ fontWeight: 400 }}>
-                    {payToObj.location || "—"}
-                  </p>
-                )}
-              </div>
+              <CurrencyDropdown selectedId={currency} onSelect={setCurrency} />
+              <SearchablePartnerDropdown
+                label="Pay To"
+                tooltip="The party receiving payment for this transaction. Ensure this matches the supplier or recipient's account details."
+                placeholder="Select payment recipient"
+                items={PARTNER_LOCATION_ITEMS}
+                selectedId={payTo}
+                onSelect={setPayTo}
+              />
             </div>
           </div>
 
-          {/* RIGHT: Shipping & Funding */}
-          <div className="rounded-xl border border-[#E8ECF1] bg-white overflow-hidden">
-            <div className="px-4 py-3 border-b border-[#F1F5F9]">
-              <p className="text-[10px] text-[#64748B] uppercase tracking-wider" style={{ fontWeight: 600 }}>Shipping & Funding</p>
+          {/* Right Column: Delivery & Funding */}
+          <div className="rounded-xl border border-[#E8ECF1] bg-white">
+            <div className="px-4 py-3 border-b border-[#F1F5F9] rounded-t-xl">
+              <span className="text-[12px] text-[#334155] tracking-wide" style={{ fontWeight: 700 }}>Delivery & Funding</span>
             </div>
             <div className="p-4 space-y-4">
-              {/* Ship To */}
-              <div>
-                <div className="flex items-center gap-1.5 mb-1.5">
-                  <span className="text-[12px] text-[#334155]" style={{ fontWeight: 600 }}>Ship To</span>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button type="button" className="inline-flex" tabIndex={-1}>
-                        <Info className="w-3 h-3 text-[#CBD5E1] hover:text-[#94A3B8] transition-colors" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent side="top" sideOffset={6} className="bg-[#1E293B] text-white text-[11px] leading-[1.5] rounded-lg max-w-[220px] px-3 py-2 shadow-xl border border-[#334155] z-[300]">
-                      <p style={{ fontWeight: 500 }}>Default delivery address for goods from this vendor. Can be overridden per order.</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </div>
-                <SearchablePartnerDropdown
-                  label=""
-                  tooltip=""
-                  placeholder="Select delivery destination"
-                  items={PARTNER_LOCATION_ITEMS}
-                  selectedId={shipTo}
-                  onSelect={setShipTo}
-                />
-                {shipToObj && (
-                  <div className="flex items-center gap-1.5 mt-1.5">
-                    <MapPin className="w-3 h-3 text-[#94A3B8] shrink-0" />
-                    <p className="text-[11px] text-[#94A3B8] truncate" style={{ fontWeight: 400 }}>{shipToObj.location || "—"}</p>
-                  </div>
-                )}
-              </div>
+              <SearchablePartnerDropdown
+                label="Ship To"
+                tooltip="The destination where goods or services will be delivered. This may differ from the billing address."
+                placeholder="Select delivery destination"
+                items={PARTNER_LOCATION_ITEMS}
+                selectedId={shipTo}
+                onSelect={setShipTo}
+              />
 
-              {/* Funded By */}
+              {/* Funded By — stacked layout with toggle below */}
               <div>
                 <div className="flex items-center gap-1.5 mb-1.5">
-                  <span className="text-[12px] text-[#334155]" style={{ fontWeight: 600 }}>Funded By</span>
+                  <span className="text-xs text-[#0F172A]" style={{ fontWeight: 600 }}>Funded By</span>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <button type="button" className="inline-flex" tabIndex={-1}>
-                        <Info className="w-3 h-3 text-[#CBD5E1] hover:text-[#94A3B8] transition-colors" />
+                        <Info className="w-3.5 h-3.5 text-[#94A3B8] cursor-help" />
                       </button>
                     </TooltipTrigger>
-                    <TooltipContent side="top" sideOffset={6} className="bg-[#1E293B] text-white text-[11px] leading-[1.5] rounded-lg max-w-[220px] px-3 py-2 shadow-xl border border-[#334155] z-[300]">
-                      <p style={{ fontWeight: 500 }}>The internal entity or budget that covers costs for this partner.</p>
+                    <TooltipContent side="bottom" sideOffset={6} className="bg-[#1E293B] text-white text-[12px] leading-[1.5] rounded-lg max-w-[260px] px-3 py-2.5 shadow-lg z-[300]">
+                      The entity covering costs for this transaction. Enable the toggle to select a different funding source.
                     </TooltipContent>
                   </Tooltip>
                 </div>
+
                 {!allowAltFunding ? (
                   <div className="space-y-2.5">
-                    <div className="h-9 px-3 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] flex items-center gap-2 text-[13px]">
+                    <div className="h-10 px-3 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] flex items-center gap-2.5 text-sm">
                       {fundedByObj && (
                         <>
                           <div
-                            className="w-5 h-5 rounded flex items-center justify-center text-white text-[8px] shrink-0"
+                            className="w-6 h-6 rounded-md flex items-center justify-center text-white text-[9px] shrink-0"
                             style={{ backgroundColor: fundedByObj.logoColor, fontWeight: 700 }}
                           >
                             {fundedByObj.logoText}
                           </div>
-                          <span className="text-[#334155] truncate text-[12px]" style={{ fontWeight: 500 }}>{fundedByObj.name}</span>
+                          <span className="text-[#334155] truncate" style={{ fontWeight: 500 }}>{fundedByObj.name}</span>
                           <span className="text-[9px] text-[#0A77FF] bg-[#EDF4FF] border border-[#0A77FF]/20 px-1.5 py-0.5 rounded shrink-0 ml-auto" style={{ fontWeight: 600 }}>Default</span>
                         </>
                       )}
@@ -4151,12 +4272,21 @@ function ConfigPageContent({
                       tabIndex={0}
                       onClick={() => setAllowAltFunding(true)}
                       onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setAllowAltFunding(true); }}}
-                      className="flex items-center gap-2 cursor-pointer select-none group"
+                      className="flex items-center gap-2 cursor-pointer select-none"
                     >
-                      <div className="relative w-7 h-[16px] rounded-full bg-[#CBD5E1] group-hover:bg-[#94A3B8] transition-colors cursor-pointer">
-                        <div className="absolute top-[2px] left-[2px] w-[12px] h-[12px] rounded-full bg-white shadow-sm transition-transform" />
-                      </div>
-                      <span className="text-[11px] text-[#64748B] group-hover:text-[#475569] transition-colors" style={{ fontWeight: 500 }}>Use alternative funding source</span>
+                      <Switch
+                        checked={false}
+                        onCheckedChange={() => setAllowAltFunding(true)}
+                        className="data-[state=checked]:bg-[#0A77FF] h-[18px] w-[32px] pointer-events-none"
+                      />
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span className="text-[11px] text-[#64748B] cursor-help" style={{ fontWeight: 500 }}>Use alternative funding source</span>
+                        </TooltipTrigger>
+                        <TooltipContent side="right" sideOffset={8} className="bg-[#1E293B] text-white text-[11px] leading-[1.5] rounded-lg max-w-[200px] px-3 py-2 shadow-lg z-[300]">
+                          Enable to select a different funding source instead of the default partner.
+                        </TooltipContent>
+                      </Tooltip>
                     </div>
                   </div>
                 ) : (
@@ -4173,24 +4303,18 @@ function ConfigPageContent({
                       onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setAllowAltFunding(false); setFundedBy("pl-7"); }}}
                       className="flex items-center gap-2 cursor-pointer select-none"
                     >
-                      <div className="relative w-7 h-[16px] rounded-full bg-[#0A77FF] cursor-pointer">
-                        <div className="absolute top-[2px] left-[13px] w-[12px] h-[12px] rounded-full bg-white shadow-sm transition-transform" />
-                      </div>
-                      <span className="text-[11px] text-[#0A77FF]" style={{ fontWeight: 500 }}>Override active</span>
+                      <Switch
+                        checked={true}
+                        onCheckedChange={(checked) => { setAllowAltFunding(checked); if (!checked) setFundedBy("pl-7"); }}
+                        className="data-[state=checked]:bg-[#0A77FF] h-[18px] w-[32px] pointer-events-none"
+                      />
+                      <span className="text-[11px] text-[#0A77FF]" style={{ fontWeight: 500 }}>Override active — using alternative source</span>
                     </div>
                   </div>
                 )}
               </div>
             </div>
           </div>
-        </div>
-
-        {/* ── Help hint ── */}
-        <div className="flex items-start gap-2 px-3 py-2.5 rounded-lg bg-[#F8FAFC] border border-[#F1F5F9]">
-          <Info className="w-3.5 h-3.5 text-[#94A3B8] shrink-0 mt-0.5" />
-          <p className="text-[11px] text-[#94A3B8] leading-relaxed" style={{ fontWeight: 400 }}>
-            These defaults apply to all new transactions. Individual orders can override as needed.
-          </p>
         </div>
       </div>
     );
