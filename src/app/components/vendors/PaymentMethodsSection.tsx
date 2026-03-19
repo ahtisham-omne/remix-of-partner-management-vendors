@@ -362,8 +362,8 @@ function getEntryDataRows(e: PaymentMethodEntry): { icon: React.ElementType; lab
   return rows;
 }
 
-// ── Payment Method Card ──
-function PaymentMethodCard({
+// ── Payment Method Card (exported for reuse in details page) ──
+export function PaymentMethodCard({
   entry: pe,
   onEdit,
   onDelete,

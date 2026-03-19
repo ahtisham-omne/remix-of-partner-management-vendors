@@ -716,6 +716,14 @@ const _manualVendors: Vendor[] = [
     notes: "Primary express shipping carrier. Priority delivery services.",
     createdAt: "2024-08-18T09:00:00Z",
     updatedAt: "2025-09-15T08:00:00Z",
+    configData: {
+      paymentMethods: [
+        { id: "pm-fed1", type: "ach", typeLabel: "ACH / Direct Deposit", bankName: "US Bank", accountNumber: "7283019465", routingNumber: "091000019", isSaved: true, discountPercent: 1 },
+        { id: "pm-fed2", type: "digital_wallet", typeLabel: "Digital Wallet", walletProvider: "Stripe", walletId: "acct_fedex_corp", isSaved: true },
+        { id: "pm-fed3", type: "wire", typeLabel: "Wire Transfer", bankName: "Deutsche Bank", accountNumber: "4829103765", routingNumber: "021000089", wireRoutingNumber: "DEUTDEFF", isSaved: true },
+        { id: "pm-fed4", type: "check", typeLabel: "Check / Paper", checkPayableTo: "FedEx Corporation", isSaved: true },
+      ],
+    },
   },
   {
     id: "v-009",
