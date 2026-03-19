@@ -2630,32 +2630,20 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
             </div>
 
             {/* Filter pills */}
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-3">
-              {([
-                { key: "all", label: "All Rules" },
-                { key: "discount", label: "Discounts" },
-                { key: "premium", label: "Premium" },
-                { key: "recent", label: "Recently Used" },
-                { key: "vendors_applied", label: "Vendors Applied" },
-                { key: "created_by_me", label: "Created by Me" },
-                { key: "created_by_others", label: "Created by Others" },
-              ] as const).map((f) => {
-                const active = explorePresetsSidebar === f.key;
-                return (
-                  <button
-                    key={f.key}
-                    onClick={() => setExplorePresetsSidebar(f.key)}
-                    className={`inline-flex items-center px-3 py-1.5 rounded-full border text-[12px] transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                      active
-                        ? "border-[#BFDBFE] bg-[#EFF6FF] text-[#0A77FF]"
-                        : "border-[#E2E8F0] bg-white text-[#64748B] hover:bg-[#F8FAFC] hover:border-[#CBD5E1] hover:text-[#334155]"
-                    }`}
-                    style={{ fontWeight: active ? 600 : 500 }}
-                  >
-                    {f.label}
-                  </button>
-                );
-              })}
+            <div className="pb-3">
+              <FilterPills
+                options={[
+                  { key: "all", label: "All Rules" },
+                  { key: "discount", label: "Discounts" },
+                  { key: "premium", label: "Premium" },
+                  { key: "recent", label: "Recently Used" },
+                  { key: "vendors_applied", label: "Vendors Applied" },
+                  { key: "created_by_me", label: "Created by Me" },
+                  { key: "created_by_others", label: "Created by Others" },
+                ]}
+                activeKey={explorePresetsSidebar}
+                onSelect={(k) => setExplorePresetsSidebar(k)}
+              />
             </div>
           </div>
 
