@@ -5915,7 +5915,7 @@ function ConfigPageContent({
                       <p className="text-[12px] text-[#94A3B8] mt-1">Try adjusting your search or filter</p>
                     </div>
                   ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-3">
                       {filteredPaymentTermPresets.map((term) => {
                         const isSelected = selectedPaymentTermId === term.id;
                         const ptDays = term.duration || (term.name.match(/\d+/) ? term.name.match(/\d+/)![0] : "30");

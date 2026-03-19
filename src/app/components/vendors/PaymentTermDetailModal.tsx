@@ -24,7 +24,6 @@ import {
   FileText,
   Paperclip,
   Clock,
-  ChartColumn,
   Zap,
   Search,
   Plus,
@@ -41,12 +40,10 @@ import {
 import { FilterPills, type FilterPillOption } from "./FilterPills";
 
 const PT_DETAIL_TABS = [
-  { id: "items", label: "Items", icon: Package },
-  { id: "vendors_applied", label: "Vendors Applied", icon: Building2 },
-  { id: "notes", label: "Notes", icon: FileText },
-  { id: "attachments", label: "Attachments", icon: Paperclip },
-  { id: "audit_log", label: "Audit log", icon: Clock },
-  { id: "recent_activity", label: "Recent Activity", icon: ChartColumn },
+  { id: "items", label: "Applicable Items", icon: Package },
+  { id: "vendors_applied", label: "Partners Using", icon: Building2 },
+  { id: "notes", label: "Notes & Attachments", icon: FileText },
+  { id: "audit_log", label: "Activity Log", icon: Clock },
 ];
 
 // Richer items data matching the reference screenshot
@@ -119,7 +116,7 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
   const modalBaseClass = "!fixed !inset-0 !translate-x-0 !translate-y-0 !m-auto !w-full !h-full transition-[max-width,max-height,border-radius] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]";
   const modalSizeClass = isFullscreen
     ? `${modalBaseClass} !max-w-[calc(100%-1rem)] sm:!max-w-[calc(100%-1.5rem)] lg:!max-w-[calc(100%-2rem)] !max-h-[calc(100%-1rem)] sm:!max-h-[calc(100%-1.5rem)] lg:!max-h-[calc(100%-2rem)] !rounded-2xl`
-    : `${modalBaseClass} !max-w-[100%] sm:!max-w-[1200px] !max-h-[100dvh] sm:!max-h-[88vh] rounded-none sm:!rounded-2xl`;
+    : `${modalBaseClass} !max-w-[100%] sm:!max-w-[1400px] !max-h-[100dvh] sm:!max-h-[92vh] rounded-none sm:!rounded-2xl`;
 
   return (
     <Dialog open={open} onOpenChange={(v) => { if (!v) { onClose(); setIsFullscreen(false); setTab("items"); setAboutOpen(true); } }}>
@@ -176,7 +173,7 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
         {/* ─── Body: Split Layout ─── */}
         <div className="flex flex-1 overflow-hidden min-h-0">
           {/* ─── LEFT PANEL ─── */}
-          <div className="w-[340px] border-r border-[#E8ECF1] flex flex-col bg-white shrink-0 overflow-y-auto">
+          <div className="w-[380px] border-r border-[#E8ECF1] flex flex-col bg-white shrink-0 overflow-y-auto">
             {/* Hero: Badge + Name + Description + Trigger pill */}
             <div className="px-5 pt-5 pb-4">
               <div className="flex items-start gap-3">
@@ -207,145 +204,56 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
             <div className="border-t border-[#E8ECF1]">
               <button onClick={() => setAboutOpen(!aboutOpen)} className="w-full flex items-center gap-1.5 px-5 py-3 text-[12px] text-[#0F172A] cursor-pointer hover:bg-[#F8FAFC] transition-colors" style={{ fontWeight: 600 }}>
                 <ChevronDown className={`w-3.5 h-3.5 text-[#0A77FF] transition-transform duration-200 ${aboutOpen ? "" : "-rotate-90"}`} />
-                About this pricing rule
+                About this payment term
               </button>
               <div className={`overflow-hidden transition-all duration-200 ${aboutOpen ? "max-h-[800px] opacity-100" : "max-h-0 opacity-0"}`}>
-                <div className="px-5 pb-4 space-y-3.5">
-                  {/* 2-col grid of details */}
-                  <div className="grid grid-cols-2 gap-x-6 gap-y-3">
-                    <div>
-                      <div className="flex items-center gap-1">
-                        <p className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Payment Term Name</p>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Info className="w-3 h-3 text-[#CBD5E1] cursor-help" />
-                          </TooltipTrigger>
-                          <TooltipContent className="z-[300]"><p className="text-xs">The name of this payment term</p></TooltipContent>
-                        </Tooltip>
-                      </div>
-                      <p className="text-[12px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>{term.name}</p>
+                <div className="px-5 pb-4 space-y-2.5">
+                  {/* Compact key-value rows */}
+                  {[
+                    { label: "Term Type", value: ptTypeLabel },
+                    { label: "NET Duration", value: `${ptDuration} days` },
+                    { label: "Trigger Event", value: term.trigger, isBadge: true },
+                    { label: "Description", value: term.description || "-" },
+                  ].map((row) => (
+                    <div key={row.label} className="flex items-start justify-between gap-3 py-1.5 border-b border-[#F1F5F9] last:border-0">
+                      <span className="text-[11px] text-[#64748B] shrink-0" style={{ fontWeight: 500 }}>{row.label}</span>
+                      {row.isBadge ? (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-md border border-[#E2E8F0] bg-[#F8FAFC] text-[11px] text-[#334155]" style={{ fontWeight: 500 }}>
+                          {row.value}
+                        </span>
+                      ) : (
+                        <span className="text-[12px] text-[#0F172A] text-right" style={{ fontWeight: 500 }}>{row.value}</span>
+                      )}
                     </div>
-                    <div>
-                      <div className="flex items-center gap-1">
-                        <p className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Payment Term Type</p>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Info className="w-3 h-3 text-[#CBD5E1] cursor-help" />
-                          </TooltipTrigger>
-                          <TooltipContent className="z-[300]"><p className="text-xs">The type of payment term</p></TooltipContent>
-                        </Tooltip>
-                      </div>
-                      <p className="text-[12px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>{ptTypeLabel}</p>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-x-6 gap-y-3">
-                    <div>
-                      <div className="flex items-center gap-1">
-                        <p className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>NET Duration (Days)</p>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Info className="w-3 h-3 text-[#CBD5E1] cursor-help" />
-                          </TooltipTrigger>
-                          <TooltipContent className="z-[300]"><p className="text-xs">Number of days until payment is due</p></TooltipContent>
-                        </Tooltip>
-                      </div>
-                      <p className="text-[12px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>{ptDuration} days</p>
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-1">
-                        <p className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Description</p>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Info className="w-3 h-3 text-[#CBD5E1] cursor-help" />
-                          </TooltipTrigger>
-                          <TooltipContent className="z-[300]"><p className="text-xs">Description of payment term</p></TooltipContent>
-                        </Tooltip>
-                      </div>
-                      <p className="text-[12px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>-</p>
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="flex items-center gap-1">
-                      <p className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Trigger Event</p>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Info className="w-3 h-3 text-[#CBD5E1] cursor-help" />
-                        </TooltipTrigger>
-                        <TooltipContent className="z-[300]"><p className="text-xs">The event that triggers payment</p></TooltipContent>
-                      </Tooltip>
-                    </div>
-                    <div className="mt-1">
-                      <span className="inline-flex items-center px-2.5 py-1 rounded-md border border-[#E2E8F0] bg-[#F8FAFC] text-[11px] text-[#334155]" style={{ fontWeight: 500 }}>
-                        {term.trigger}
-                      </span>
-                    </div>
-                  </div>
+                  ))}
 
                   {/* Discount section */}
-                  <div className="border-t border-[#E8ECF1] pt-3.5">
-                    <h4 className="text-[12px] text-[#0F172A] mb-3" style={{ fontWeight: 600 }}>Apply Discount Terms</h4>
-                    <div className="grid grid-cols-2 gap-x-6 gap-y-3">
-                      <div>
-                        <div className="flex items-center gap-1">
-                          <p className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Discount Percentage (%)</p>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Info className="w-3 h-3 text-[#CBD5E1] cursor-help" />
-                            </TooltipTrigger>
-                            <TooltipContent className="z-[300]"><p className="text-xs">Early payment discount percentage</p></TooltipContent>
-                          </Tooltip>
-                        </div>
-                        <p className="text-[12px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>{term.discountPercent || "-"}</p>
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-1">
-                          <p className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Eligible Payment Period (Days)</p>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Info className="w-3 h-3 text-[#CBD5E1] cursor-help" />
-                            </TooltipTrigger>
-                            <TooltipContent className="z-[300]"><p className="text-xs">Days within which discount applies</p></TooltipContent>
-                          </Tooltip>
-                        </div>
-                        <p className="text-[12px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>{term.discountPeriod || "-"}</p>
-                      </div>
+                  <div className="border-t border-[#E8ECF1] pt-2.5 mt-1">
+                    <h4 className="text-[11px] text-[#0F172A] mb-2" style={{ fontWeight: 600 }}>Early Payment Discount</h4>
+                    <div className="flex items-start justify-between gap-3 py-1.5 border-b border-[#F1F5F9]">
+                      <span className="text-[11px] text-[#64748B] shrink-0" style={{ fontWeight: 500 }}>Discount %</span>
+                      <span className="text-[12px] text-[#0F172A]" style={{ fontWeight: 500 }}>{term.discountPercent || "-"}</span>
+                    </div>
+                    <div className="flex items-start justify-between gap-3 py-1.5">
+                      <span className="text-[11px] text-[#64748B] shrink-0" style={{ fontWeight: 500 }}>Eligible Period</span>
+                      <span className="text-[12px] text-[#0F172A]" style={{ fontWeight: 500 }}>{term.discountPeriod ? `${term.discountPeriod} days` : "-"}</span>
                     </div>
                   </div>
 
                   {/* Created by / Created at */}
-                  <div className="border-t border-[#E8ECF1] pt-3.5">
-                    <div className="grid grid-cols-2 gap-x-6">
-                      <div>
-                        <div className="flex items-center gap-1">
-                          <p className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Created By</p>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Info className="w-3 h-3 text-[#CBD5E1] cursor-help" />
-                            </TooltipTrigger>
-                            <TooltipContent className="z-[300]"><p className="text-xs">User who created this term</p></TooltipContent>
-                          </Tooltip>
-                        </div>
-                        <div className="flex items-center gap-1.5 mt-1">
-                          {(() => { const cTint = getAvatarTint("Ahtisham Ahmad"); return (
-                            <div className="w-5 h-5 rounded-full flex items-center justify-center text-[8px] shrink-0" style={{ backgroundColor: cTint.bg, color: cTint.fg, fontWeight: 700 }}>AA</div>
-                          ); })()}
-                          <span className="text-[12px] text-[#0F172A]" style={{ fontWeight: 500 }}>Ahtisham Ahmad</span>
-                        </div>
+                  <div className="border-t border-[#E8ECF1] pt-2.5 mt-1">
+                    <div className="flex items-start justify-between gap-3 py-1.5 border-b border-[#F1F5F9]">
+                      <span className="text-[11px] text-[#64748B] shrink-0" style={{ fontWeight: 500 }}>Created By</span>
+                      <div className="flex items-center gap-1.5">
+                        {(() => { const cTint = getAvatarTint("Ahtisham Ahmad"); return (
+                          <div className="w-4 h-4 rounded-full flex items-center justify-center text-[7px] shrink-0" style={{ backgroundColor: cTint.bg, color: cTint.fg, fontWeight: 700 }}>AA</div>
+                        ); })()}
+                        <span className="text-[12px] text-[#0F172A]" style={{ fontWeight: 500 }}>Ahtisham Ahmad</span>
                       </div>
-                      <div>
-                        <div className="flex items-center gap-1">
-                          <p className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Created at</p>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Info className="w-3 h-3 text-[#CBD5E1] cursor-help" />
-                            </TooltipTrigger>
-                            <TooltipContent className="z-[300]"><p className="text-xs">Date this term was created</p></TooltipContent>
-                          </Tooltip>
-                        </div>
-                        <p className="text-[12px] text-[#0F172A] mt-1" style={{ fontWeight: 500 }}>Jan 16, 2025</p>
-                      </div>
+                    </div>
+                    <div className="flex items-start justify-between gap-3 py-1.5">
+                      <span className="text-[11px] text-[#64748B] shrink-0" style={{ fontWeight: 500 }}>Created at</span>
+                      <span className="text-[12px] text-[#0F172A]" style={{ fontWeight: 500 }}>Jan 16, 2025</span>
                     </div>
                   </div>
                 </div>
