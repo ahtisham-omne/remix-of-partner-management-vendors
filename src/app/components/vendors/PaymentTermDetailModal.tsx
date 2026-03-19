@@ -174,7 +174,7 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
         {/* ─── Body: Split Layout ─── */}
         <div className="flex flex-1 overflow-hidden min-h-0">
           {/* ─── LEFT PANEL ─── */}
-          <div className="w-[340px] border-r border-[#E8ECF1] flex flex-col bg-white shrink-0 overflow-y-auto">
+          <div className="w-[380px] border-r border-[#E8ECF1] flex flex-col bg-white shrink-0 overflow-y-auto">
             {/* Hero: Badge + Name + Description + Trigger pill */}
             <div className="px-5 pt-5 pb-4">
               <div className="flex items-start gap-3">
