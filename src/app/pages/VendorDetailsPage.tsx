@@ -18,6 +18,7 @@ import type { ContactPerson as PartnerContact } from "../components/vendors/part
 import { CreatePartnerLocationModal } from "../components/vendors/CreatePartnerLocationModal";
 import { PartnerItemsTab } from "../components/vendors/PartnerItemsTab";
 import { PricingRulesTabNew } from "../components/vendors/PricingRulesTab";
+import { PaymentMethodCard as PaymentMethodCardBase } from "../components/vendors/PaymentMethodsSection";
 import { PaymentTermDetailModal } from "../components/vendors/PaymentTermDetailModal";
 import { PAYMENT_TERM_PRESETS, type PaymentTermPreset } from "../components/vendors/partnerConstants";
 import { PocSectionContent, SelectPocDictionaryModal, CreatePocModal } from "../components/vendors/PocModals";
