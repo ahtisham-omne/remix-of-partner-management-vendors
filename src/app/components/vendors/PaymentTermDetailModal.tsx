@@ -41,12 +41,10 @@ import {
 import { FilterPills, type FilterPillOption } from "./FilterPills";
 
 const PT_DETAIL_TABS = [
-  { id: "items", label: "Items", icon: Package },
-  { id: "vendors_applied", label: "Vendors Applied", icon: Building2 },
-  { id: "notes", label: "Notes", icon: FileText },
-  { id: "attachments", label: "Attachments", icon: Paperclip },
-  { id: "audit_log", label: "Audit log", icon: Clock },
-  { id: "recent_activity", label: "Recent Activity", icon: ChartColumn },
+  { id: "items", label: "Applicable Items", icon: Package },
+  { id: "vendors_applied", label: "Partners Using", icon: Building2 },
+  { id: "notes", label: "Notes & Attachments", icon: FileText },
+  { id: "audit_log", label: "Activity Log", icon: Clock },
 ];
 
 // Richer items data matching the reference screenshot
