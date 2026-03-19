@@ -5011,111 +5011,14 @@ function ConfigPageContent({
             </div>
           </div>
         ) : (
-          /* ── Selected Payment Term Card — PricingRuleCard-style ── */
-          <div
-            className="bg-white border border-[#E2E8F0] rounded-xl cursor-pointer group transition-all duration-200 flex flex-col relative"
+          /* ── Selected Payment Term Card — reusable component ── */
+          <PaymentTermCard
+            term={selectedPaymentTermPreset}
             onClick={() => { setStandalonePtDetailTerm(selectedPaymentTermPreset); setStandalonePtDetailOpen(true); }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = "#BFDBFE";
-              e.currentTarget.style.boxShadow = "0 4px 16px -4px rgba(10,119,255,0.10), 0 0 0 1px #BFDBFE";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = "#E2E8F0";
-              e.currentTarget.style.boxShadow = "none";
-            }}
-          >
-            {/* Remove button */}
-            <button
-              onClick={(e) => { e.stopPropagation(); setSelectedPaymentTermId(null); customPaymentTermRef.current = null; }}
-              className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center shadow-sm hover:bg-red-600 transition-colors z-10"
-            >
-              <X className="w-3.5 h-3.5" />
-            </button>
-
-            <div className="p-3.5 flex-1 flex flex-col min-h-0 overflow-hidden">
-              {/* Row 1: Type pill + actions */}
-              <div className="flex items-center justify-between gap-2 mb-2 shrink-0">
-                <span className="inline-flex items-stretch rounded-full overflow-hidden border shrink-0" style={{ borderColor: selectedPaymentTermPreset.badgeColor + "40" }}>
-                  <span
-                    className="inline-flex items-center gap-1 px-2 py-[2px] text-[10px]"
-                    style={{ fontWeight: 600, color: selectedPaymentTermPreset.badgeColor, backgroundColor: selectedPaymentTermPreset.badgeColor + "15" }}
-                  >
-                    <Receipt className="w-3 h-3" />
-                    {selectedPaymentTermPreset.typeBadge}
-                  </span>
-                  <span className="inline-flex items-center px-2 py-[2px] text-[10px] bg-white text-[#64748B] border-l" style={{ fontWeight: 500, borderColor: selectedPaymentTermPreset.badgeColor + "40" }}>
-                    {selectedPaymentTermPreset.trigger}
-                  </span>
-                </span>
-                <div className="flex items-center gap-0.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button onClick={() => toast.info("Duplicate flow coming soon.")} className="p-1.5 rounded-md hover:bg-[#F1F5F9] transition-colors cursor-pointer">
-                        <Copy className="w-3.5 h-3.5 text-[#94A3B8] hover:text-[#475569]" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent className="z-[300]"><p className="text-xs">Duplicate</p></TooltipContent>
-                  </Tooltip>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button onClick={() => toast.info("Edit flow coming soon.")} className="p-1.5 rounded-md hover:bg-[#F1F5F9] transition-colors cursor-pointer">
-                        <Pencil className="w-3.5 h-3.5 text-[#94A3B8] hover:text-[#475569]" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent className="z-[300]"><p className="text-xs">Edit</p></TooltipContent>
-                  </Tooltip>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button onClick={() => { setStandalonePtDetailTerm(selectedPaymentTermPreset); setStandalonePtDetailOpen(true); }} className="p-1.5 rounded-md hover:bg-[#F1F5F9] transition-colors cursor-pointer">
-                        <Eye className="w-3.5 h-3.5 text-[#94A3B8] hover:text-[#475569]" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent className="z-[300]"><p className="text-xs">View Details</p></TooltipContent>
-                  </Tooltip>
-                </div>
-              </div>
-
-              {/* Row 2: Name */}
-              <div className="shrink-0 mb-1">
-                <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{selectedPaymentTermPreset.name}</p>
-              </div>
-
-              {/* Row 3: Description */}
-              <div className="h-[32px] shrink-0 mb-2">
-                <p className="text-[11px] text-[#64748B] line-clamp-2 leading-relaxed" style={{ fontWeight: 400 }}>{selectedPaymentTermPreset.description}</p>
-              </div>
-
-              {/* Row 4: Hero value */}
-              <div className="flex items-baseline gap-2 shrink-0">
-                <span className="text-[22px] text-[#0F172A] tabular-nums leading-none tracking-tight" style={{ fontWeight: 600 }}>
-                  {selectedPaymentTermPreset.duration || (selectedPaymentTermPreset.name.match(/\d+/) ? selectedPaymentTermPreset.name.match(/\d+/)![0] : "30")}
-                </span>
-                <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>days</span>
-              </div>
-
-              {/* Row 5: Discount info if applicable */}
-              {(selectedPaymentTermPreset.applyDiscount || selectedPaymentTermPreset.discountPercent) && (
-                <div className="mt-auto pt-2 shrink-0">
-                  <div className="flex items-center justify-between px-3 py-[6px] rounded-lg border border-[#E8ECF1] bg-[#FAFBFC] text-[11px] tabular-nums min-w-0">
-                    <span className="text-[#64748B]" style={{ fontWeight: 400 }}>Early pay {selectedPaymentTermPreset.discountPercent || "2"}% within {selectedPaymentTermPreset.discountPeriod || "10"} days</span>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Footer */}
-            <div className="flex items-center gap-2 px-3.5 py-2.5 border-t border-[#F1F5F9] shrink-0">
-              <span className="inline-flex items-center gap-1 text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>
-                <Building2 className="w-3 h-3" /> {selectedPaymentTermPreset.vendorsApplied}
-              </span>
-              <span
-                className="ml-auto px-2 py-[2px] rounded-full text-[10px] border"
-                style={{ fontWeight: 500, color: "#059669", backgroundColor: "#F0FDF4", borderColor: "#BBF7D0" }}
-              >
-                Active
-              </span>
-            </div>
-          </div>
+            onRemove={() => { setSelectedPaymentTermId(null); customPaymentTermRef.current = null; }}
+            onDuplicate={() => toast.info("Duplicate flow coming soon.")}
+            onView={(t) => { setStandalonePtDetailTerm(t); setStandalonePtDetailOpen(true); }}
+          />
         )}
 
         {/* ── Create New Payment Terms Modal ── */}
