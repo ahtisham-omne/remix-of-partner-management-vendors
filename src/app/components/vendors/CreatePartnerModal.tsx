@@ -4952,7 +4952,7 @@ function ConfigPageContent({
           )}
 
           {enforcement === "none" && (
-            <div className="mt-3 rounded-xl border-2 border-primary/30 bg-card shadow-sm p-3.5">
+            <div className="mt-3 rounded-xl border border-primary/15 bg-card shadow-sm p-3.5">
               <div className="flex items-center gap-2.5">
                 <Info className="w-3.5 h-3.5 text-primary" />
                 <p className="text-xs text-muted-foreground">No enforcement applied. A passive "Over Limit" label will appear on orders exceeding the credit limit.</p>
