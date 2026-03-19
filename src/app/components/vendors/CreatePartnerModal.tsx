@@ -4791,7 +4791,7 @@ function ConfigPageContent({
 
         {/* ── Currency & Limit Row ── */}
         <div className="rounded-xl border border-border bg-card shadow-sm p-4">
-          <div className="grid grid-cols-[180px_1fr] gap-3">
+          <div className="grid grid-cols-[140px_1fr] gap-3">
             {/* Currency — reuse same dropdown as billing/shipping */}
             <div>
               <CurrencyDropdown selectedId={currency} onSelect={setCurrency} />
