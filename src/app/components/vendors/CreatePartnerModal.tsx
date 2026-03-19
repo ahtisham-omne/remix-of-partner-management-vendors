@@ -4934,7 +4934,7 @@ function ConfigPageContent({
                   <div className="absolute left-0 top-0 bottom-0 w-10 rounded-l-lg bg-muted/60 border-r border-border flex items-center justify-center">
                     <span className="text-xs text-muted-foreground font-medium">%</span>
                   </div>
-                  <Input placeholder="80" className="pl-12 rounded-lg border-border h-9 bg-card text-sm placeholder:text-muted-foreground" />
+                  <Input placeholder="80" className="pl-12 rounded-lg border-border h-9 bg-card text-sm placeholder:text-muted-foreground/50" />
                 </div>
                 <p className="text-[10px] text-muted-foreground mt-1">Alert triggers at this % of credit limit</p>
               </div>
