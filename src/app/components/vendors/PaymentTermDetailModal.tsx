@@ -114,37 +114,37 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
         <DialogDescription className="sr-only">Detailed view of payment term {term.name}</DialogDescription>
 
         {/* ─── Header ─── */}
-        <div className="shrink-0 bg-background rounded-t-none sm:rounded-t-2xl border-b border-border">
+        <div className="shrink-0 bg-card rounded-t-none sm:rounded-t-2xl border-b border-border">
           <div className="px-4 sm:px-5 py-3 flex items-center justify-between gap-3">
             <div className="flex items-center gap-3 min-w-0">
-              <button onClick={onClose} className="w-9 h-9 rounded-full border border-border bg-background flex items-center justify-center hover:bg-muted transition-colors cursor-pointer shrink-0">
-                <ArrowLeft className="w-4 h-4 text-muted-foreground" />
+              <button onClick={onClose} className="w-9 h-9 rounded-full border border-border bg-card flex items-center justify-center hover:bg-accent transition-colors cursor-pointer shrink-0">
+                <ArrowLeft className="w-4 h-4 text-foreground" />
               </button>
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
                   <h2 className="text-[15px] font-semibold text-foreground truncate">{term.name}</h2>
-                  <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold text-white shrink-0" style={{ backgroundColor: badgeColor }}>
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-[10px] font-bold text-primary-foreground shrink-0" style={{ backgroundColor: badgeColor }}>
                     {term.typeBadge}
                   </span>
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-md border border-border bg-muted text-[11px] font-medium text-muted-foreground shrink-0">
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-md border border-border bg-secondary text-[11px] font-medium text-secondary-foreground shrink-0">
                     {term.trigger}
                   </span>
                 </div>
-                <p className="text-[12px] text-muted-foreground mt-0.5 truncate">{term.description}</p>
+                <p className="text-[12px] text-muted-foreground mt-0.5 truncate max-w-[480px]">{term.description}</p>
               </div>
             </div>
             <div className="flex items-center gap-1.5 shrink-0">
-              <button onClick={() => toast.info("Edit coming soon")} className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-background text-xs font-medium text-foreground hover:bg-muted transition-colors cursor-pointer">
+              <button onClick={() => toast.info("Edit coming soon")} className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-card text-xs font-medium text-foreground hover:bg-accent transition-colors cursor-pointer">
                 <Pencil className="w-3.5 h-3.5" /> Edit
               </button>
-              <button onClick={() => toast.info("Archive coming soon")} className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-background text-xs font-medium text-foreground hover:bg-muted transition-colors cursor-pointer">
+              <button onClick={() => toast.info("Archive coming soon")} className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-card text-xs font-medium text-foreground hover:bg-accent transition-colors cursor-pointer">
                 <Archive className="w-3.5 h-3.5" /> Archive
               </button>
-              <button onClick={() => setIsFullscreen(!isFullscreen)} className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-background text-xs font-medium text-foreground hover:bg-muted transition-colors cursor-pointer">
+              <button onClick={() => setIsFullscreen(!isFullscreen)} className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-card text-xs font-medium text-foreground hover:bg-accent transition-colors cursor-pointer">
                 {isFullscreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
                 {isFullscreen ? "Exit full" : "Full view"}
               </button>
-              <button onClick={onClose} className="w-8 h-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-all cursor-pointer">
+              <button onClick={onClose} className="w-8 h-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent transition-all cursor-pointer">
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -154,92 +154,90 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
         {/* ─── Body ─── */}
         <div className="flex flex-1 overflow-hidden min-h-0">
           {/* ─── LEFT SIDEBAR ─── */}
-          <div className="w-[340px] border-r border-border flex flex-col bg-background shrink-0 overflow-y-auto">
+          <div className="w-[340px] border-r border-border flex flex-col bg-secondary/50 shrink-0 overflow-y-auto">
             {/* Hero metric */}
             <div className="px-5 pt-5 pb-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-baseline gap-2">
-                  <span className="text-[36px] font-bold text-foreground leading-none tabular-nums">{ptDuration}</span>
+                  <span className="text-[36px] font-extrabold text-foreground leading-none tabular-nums">{ptDuration}</span>
                   <span className="text-[14px] text-muted-foreground font-medium">days</span>
                 </div>
-                <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-600 border border-emerald-200">
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-semibold bg-chart-2/15 text-chart-2 border border-chart-2/25">
                   Active
                 </span>
               </div>
               <div className="flex items-center gap-4 mt-3 text-[13px]">
-                <span className="font-semibold text-foreground">{itemCount} <span className="font-normal text-muted-foreground">Items</span></span>
-                <span className="font-semibold text-foreground">{vendorCount} <span className="font-normal text-muted-foreground">Vendors</span></span>
+                <span className="font-bold text-foreground">{itemCount} <span className="font-normal text-muted-foreground">Items</span></span>
+                <span className="font-bold text-foreground">{vendorCount} <span className="font-normal text-muted-foreground">Vendors</span></span>
               </div>
-              {/* Action icons */}
-              <div className="flex items-center gap-1.5 mt-3">
-                <button className="w-8 h-8 rounded-lg border border-border bg-background flex items-center justify-center hover:bg-muted transition-colors cursor-pointer">
-                  <Receipt className="w-3.5 h-3.5 text-muted-foreground" />
+              <div className="flex items-center gap-1.5 mt-4">
+                <button className="w-9 h-9 rounded-lg border border-border bg-card flex items-center justify-center hover:bg-accent transition-colors cursor-pointer shadow-sm">
+                  <Receipt className="w-4 h-4 text-foreground" />
                 </button>
-                <button className="w-8 h-8 rounded-lg border border-border bg-background flex items-center justify-center hover:bg-muted transition-colors cursor-pointer">
-                  <Copy className="w-3.5 h-3.5 text-muted-foreground" />
+                <button className="w-9 h-9 rounded-lg border border-border bg-card flex items-center justify-center hover:bg-accent transition-colors cursor-pointer shadow-sm">
+                  <Copy className="w-4 h-4 text-foreground" />
                 </button>
-                <button className="w-8 h-8 rounded-lg border border-border bg-background flex items-center justify-center hover:bg-muted transition-colors cursor-pointer">
-                  <MoreHorizontal className="w-3.5 h-3.5 text-muted-foreground" />
+                <button className="w-9 h-9 rounded-lg border border-border bg-card flex items-center justify-center hover:bg-accent transition-colors cursor-pointer shadow-sm">
+                  <MoreHorizontal className="w-4 h-4 text-foreground" />
                 </button>
               </div>
             </div>
 
             {/* About section */}
             <div className="border-t border-border">
-              <button onClick={() => setAboutOpen(!aboutOpen)} className="w-full flex items-center justify-between px-5 py-3 text-[13px] font-semibold text-foreground cursor-pointer hover:bg-muted/50 transition-colors">
+              <button onClick={() => setAboutOpen(!aboutOpen)} className="w-full flex items-center justify-between px-5 py-3 text-[13px] font-semibold text-foreground cursor-pointer hover:bg-accent/50 transition-colors">
                 About
-                {aboutOpen ? <ChevronUp className="w-3.5 h-3.5 text-muted-foreground" /> : <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />}
+                {aboutOpen ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
               </button>
               {aboutOpen && (
                 <div className="px-5 pb-4 space-y-3">
                   <p className="text-[12px] text-muted-foreground leading-relaxed">{term.description}</p>
                   
-                  {/* Trigger event row */}
-                  <div className="flex items-center justify-between py-2.5 px-3 rounded-lg border border-border bg-muted/30">
-                    <div className="flex items-center gap-2 text-[12px] text-muted-foreground">
-                      <Zap className="w-3.5 h-3.5 text-amber-500" />
+                  <div className="flex items-center justify-between py-3 px-3.5 rounded-lg border border-border bg-card shadow-sm">
+                    <div className="flex items-center gap-2.5 text-[12px] text-foreground">
+                      <div className="w-7 h-7 rounded-md bg-chart-3/15 flex items-center justify-center">
+                        <Zap className="w-3.5 h-3.5 text-chart-3" />
+                      </div>
                       <span className="font-medium">Trigger Event</span>
                     </div>
-                    <span className="text-[12px] font-semibold text-foreground">{term.trigger}</span>
+                    <span className="text-[12px] font-bold text-foreground">{term.trigger}</span>
                   </div>
 
-                  {/* Type / Duration 2-col cards */}
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="rounded-lg border border-border bg-muted/20 p-3">
-                      <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Type</span>
-                      <p className="text-[12px] font-medium text-foreground mt-1 leading-snug">{ptTypeLabel}</p>
+                  <div className="grid grid-cols-2 gap-2.5">
+                    <div className="rounded-lg border border-border bg-card p-3.5 shadow-sm">
+                      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Type</span>
+                      <p className="text-[12px] font-semibold text-foreground mt-1.5 leading-snug">{ptTypeLabel}</p>
                     </div>
-                    <div className="rounded-lg border border-border bg-muted/20 p-3">
-                      <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Duration</span>
-                      <p className="text-[12px] font-medium text-foreground mt-1">{ptDuration} days</p>
+                    <div className="rounded-lg border border-border bg-card p-3.5 shadow-sm">
+                      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Duration</span>
+                      <p className="text-[12px] font-semibold text-foreground mt-1.5">{ptDuration} days</p>
                     </div>
                   </div>
 
-                  {/* Created by / Created at 2-col cards */}
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="rounded-lg border border-border bg-muted/20 p-3">
-                      <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Created by</span>
-                      <div className="flex items-center gap-1.5 mt-1.5">
+                  <div className="grid grid-cols-2 gap-2.5">
+                    <div className="rounded-lg border border-border bg-card p-3.5 shadow-sm">
+                      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Created by</span>
+                      <div className="flex items-center gap-2 mt-2">
                         {(() => { const t = getAvatarTint("John Doe"); return (
-                          <div className="w-5 h-5 rounded-full flex items-center justify-center text-[8px] font-bold shrink-0" style={{ backgroundColor: t.bg, color: t.fg }}>JD</div>
+                          <div className="w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-bold shrink-0" style={{ backgroundColor: t.bg, color: t.fg }}>JD</div>
                         ); })()}
-                        <span className="text-[12px] font-medium text-foreground">John Doe</span>
+                        <span className="text-[12px] font-semibold text-foreground">John Doe</span>
                       </div>
                     </div>
-                    <div className="rounded-lg border border-border bg-muted/20 p-3">
-                      <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Created at</span>
-                      <p className="text-[12px] font-medium text-foreground mt-1.5">Dec 15, 2025</p>
+                    <div className="rounded-lg border border-border bg-card p-3.5 shadow-sm">
+                      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Created at</span>
+                      <p className="text-[12px] font-semibold text-foreground mt-2">Dec 15, 2025</p>
                     </div>
                   </div>
                 </div>
               )}
             </div>
 
-            {/* Vendors list in sidebar */}
+            {/* Vendors list */}
             <div className="border-t border-border">
-              <button onClick={() => setVendorsOpen(!vendorsOpen)} className="w-full flex items-center justify-between px-5 py-3 text-[13px] font-semibold text-foreground cursor-pointer hover:bg-muted/50 transition-colors">
+              <button onClick={() => setVendorsOpen(!vendorsOpen)} className="w-full flex items-center justify-between px-5 py-3 text-[13px] font-semibold text-foreground cursor-pointer hover:bg-accent/50 transition-colors">
                 Vendors ({vendorCount})
-                {vendorsOpen ? <ChevronUp className="w-3.5 h-3.5 text-muted-foreground" /> : <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />}
+                {vendorsOpen ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
               </button>
               {vendorsOpen && (
                 <div className="px-5 pb-4 space-y-2">
@@ -247,18 +245,18 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
                     const t = getAvatarTint(v.name);
                     const initials = v.name.split(" ").map(w => w[0]).slice(0, 2).join("");
                     return (
-                      <div key={v.id} className="flex items-center gap-3 p-2.5 rounded-lg border border-border bg-background hover:bg-muted/30 transition-colors cursor-pointer">
-                        <div className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0" style={{ backgroundColor: t.bg, color: t.fg }}>
+                      <div key={v.id} className="flex items-center gap-3 p-3 rounded-lg border border-border bg-card hover:bg-accent/40 transition-colors cursor-pointer shadow-sm">
+                        <div className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 shadow-sm" style={{ backgroundColor: t.bg, color: t.fg }}>
                           {initials}
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between gap-2">
-                            <span className="text-[12px] font-medium text-foreground truncate">{v.name}</span>
-                            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold shrink-0 ${v.status === "Active" ? "bg-emerald-50 text-emerald-600 border border-emerald-200" : "bg-muted text-muted-foreground border border-border"}`}>
+                            <span className="text-[12px] font-semibold text-foreground truncate">{v.name}</span>
+                            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold shrink-0 ${v.status === "Active" ? "bg-chart-2/15 text-chart-2 border border-chart-2/25" : "bg-secondary text-muted-foreground border border-border"}`}>
                               {v.status}
                             </span>
                           </div>
-                          <span className="text-[11px] text-muted-foreground">{v.id}</span>
+                          <span className="text-[11px] text-muted-foreground font-medium">{v.id}</span>
                         </div>
                       </div>
                     );
@@ -269,9 +267,9 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
           </div>
 
           {/* ─── RIGHT PANEL ─── */}
-          <div className="flex-1 flex flex-col overflow-hidden bg-background">
+          <div className="flex-1 flex flex-col overflow-hidden bg-card">
             {/* Tabs */}
-            <div className="flex items-center border-b border-border shrink-0 px-1">
+            <div className="flex items-center border-b border-border shrink-0 px-2 bg-card">
               {PT_DETAIL_TABS.map((t) => {
                 const active = tab === t.id;
                 const count = t.id === "items" ? itemCount : t.id === "vendors" ? vendorCount : 0;
@@ -279,15 +277,14 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
                   <button
                     key={t.id}
                     onClick={() => setTab(t.id)}
-                    className={`inline-flex items-center gap-1.5 px-3.5 py-2.5 text-[12px] border-b-2 transition-all cursor-pointer whitespace-nowrap ${
-                      active ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
+                    className={`inline-flex items-center gap-1.5 px-3.5 py-3 text-[12px] border-b-2 transition-all cursor-pointer whitespace-nowrap ${
+                      active ? "border-primary text-primary font-semibold" : "border-transparent text-muted-foreground hover:text-foreground font-medium"
                     }`}
-                    style={{ fontWeight: active ? 600 : 500 }}
                   >
                     <t.icon className="w-3.5 h-3.5" />
                     {t.label}
                     {count > 0 && (
-                      <span className={`text-[9px] rounded-full px-1.5 py-px min-w-[16px] text-center font-bold ${active ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>
+                      <span className={`text-[9px] rounded-full px-1.5 py-0.5 min-w-[18px] text-center font-bold ${active ? "bg-primary/15 text-primary" : "bg-secondary text-muted-foreground"}`}>
                         {count}
                       </span>
                     )}
@@ -296,58 +293,54 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
               })}
             </div>
 
-            {/* ── Items Tab ── */}
+            {/* Items Tab */}
             {tab === "items" && (
               <div className="flex-1 flex flex-col overflow-hidden">
-                {/* Search bar */}
-                <div className="flex items-center justify-between gap-3 px-4 py-3 shrink-0">
+                <div className="flex items-center justify-between gap-3 px-4 py-3 shrink-0 bg-card border-b border-border">
                   <div className="flex items-center gap-2 flex-1 min-w-0">
                     <div className="relative flex-1 max-w-[260px]">
                       <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
-                      <input type="text" placeholder="Search items..." className="w-full pl-9 pr-3 h-9 text-[12px] bg-background border border-border rounded-lg focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-colors" />
+                      <input type="text" placeholder="Search items..." className="w-full pl-9 pr-3 h-9 text-[12px] bg-card border border-border rounded-lg shadow-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-ring transition-colors" />
                     </div>
-                    <button className="h-9 px-3 rounded-lg border border-border bg-background text-[12px] font-medium text-foreground hover:bg-muted cursor-pointer transition-colors inline-flex items-center gap-1.5">
+                    <button className="h-9 px-3 rounded-lg border border-border bg-card text-[12px] font-medium text-foreground hover:bg-accent cursor-pointer transition-colors inline-flex items-center gap-1.5 shadow-sm">
                       <SlidersHorizontal className="w-3.5 h-3.5" /> Filters
                     </button>
                   </div>
-                  <button className="h-9 px-3 rounded-lg bg-primary text-primary-foreground text-[12px] font-medium hover:bg-primary/90 cursor-pointer transition-colors inline-flex items-center gap-1.5">
+                  <button className="h-9 px-3 rounded-lg bg-primary text-primary-foreground text-[12px] font-medium hover:bg-primary/90 cursor-pointer transition-colors inline-flex items-center gap-1.5 shadow-sm">
                     + Add Item
                   </button>
                 </div>
 
-                {/* Table */}
-                <div className="flex-1 overflow-auto">
+                <div className="flex-1 overflow-auto bg-card">
                   <table className="w-full text-[12px]">
-                    <thead className="sticky top-0 bg-muted/50 z-10">
+                    <thead className="sticky top-0 bg-secondary z-10">
                       <tr>
-                        <th className="text-left px-4 py-2.5 text-muted-foreground text-[11px] font-semibold border-b border-border">Item</th>
-                        <th className="text-left px-4 py-2.5 text-muted-foreground text-[11px] font-semibold border-b border-border">Part No.</th>
-                        <th className="text-left px-4 py-2.5 text-muted-foreground text-[11px] font-semibold border-b border-border">Category</th>
-                        <th className="text-right px-4 py-2.5 text-muted-foreground text-[11px] font-semibold border-b border-border">Price</th>
-                        <th className="text-left px-4 py-2.5 text-muted-foreground text-[11px] font-semibold border-b border-border">Status</th>
+                        <th className="text-left px-4 py-3 text-foreground text-[11px] font-bold border-b border-border tracking-wide">Item</th>
+                        <th className="text-left px-4 py-3 text-foreground text-[11px] font-bold border-b border-border tracking-wide">Part No.</th>
+                        <th className="text-left px-4 py-3 text-foreground text-[11px] font-bold border-b border-border tracking-wide">Category</th>
+                        <th className="text-right px-4 py-3 text-foreground text-[11px] font-bold border-b border-border tracking-wide">Price</th>
+                        <th className="text-left px-4 py-3 text-foreground text-[11px] font-bold border-b border-border tracking-wide">Status</th>
                       </tr>
                     </thead>
                     <tbody>
                       {PT_MOCK_ITEMS.map((item) => (
-                        <tr key={item.id} className="hover:bg-muted/30 transition-colors border-b border-border/50">
+                        <tr key={item.id} className="hover:bg-accent/40 transition-colors border-b border-border">
                           <td className="px-4 py-3">
                             <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-lg bg-muted border border-border flex items-center justify-center shrink-0">
+                              <div className="w-8 h-8 rounded-lg bg-secondary border border-border flex items-center justify-center shrink-0">
                                 <Package className="w-3.5 h-3.5 text-muted-foreground" />
                               </div>
                               <span className="text-[13px] font-medium text-foreground">{item.name}</span>
                             </div>
                           </td>
                           <td className="px-4 py-3">
-                            <span className="inline-flex px-2 py-0.5 rounded border border-border bg-muted/50 text-[11px] font-mono text-muted-foreground">{item.partNo}</span>
+                            <span className="inline-flex px-2.5 py-1 rounded-md border border-border bg-secondary text-[11px] font-mono text-foreground">{item.partNo}</span>
                           </td>
-                          <td className="px-4 py-3 text-[12px] text-muted-foreground">{item.category}</td>
-                          <td className="px-4 py-3 text-right text-[13px] font-medium text-foreground tabular-nums">{item.price}</td>
+                          <td className="px-4 py-3 text-[12px] text-muted-foreground font-medium">{item.category}</td>
+                          <td className="px-4 py-3 text-right text-[13px] font-semibold text-foreground tabular-nums">{item.price}</td>
                           <td className="px-4 py-3">
-                            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold ${
-                              item.status === "Active"
-                                ? "bg-emerald-50 text-emerald-600 border border-emerald-200"
-                                : "bg-orange-50 text-orange-600 border border-orange-200"
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                              item.status === "Active" ? "bg-chart-2/15 text-chart-2 border border-chart-2/25" : "bg-chart-5/10 text-chart-5 border border-chart-5/20"
                             }`}>
                               {item.status}
                             </span>
@@ -358,12 +351,11 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
                   </table>
                 </div>
 
-                {/* Pagination footer */}
-                <div className="flex items-center justify-between px-4 py-2.5 border-t border-border shrink-0 bg-muted/30">
-                  <span className="text-[11px] text-muted-foreground">Showing {itemCount} of {itemCount} items</span>
-                  <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                <div className="flex items-center justify-between px-4 py-2.5 border-t border-border shrink-0 bg-secondary">
+                  <span className="text-[11px] text-muted-foreground font-medium">Showing {itemCount} of {itemCount} items</span>
+                  <div className="flex items-center gap-2 text-[11px] text-muted-foreground font-medium">
                     <span>Records per page</span>
-                    <select className="h-6 px-1.5 rounded border border-border bg-background text-[11px] cursor-pointer outline-none">
+                    <select className="h-7 px-2 rounded-md border border-border bg-card text-[11px] text-foreground cursor-pointer outline-none shadow-sm">
                       <option>20</option><option>50</option>
                     </select>
                   </div>
@@ -371,27 +363,27 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
               </div>
             )}
 
-            {/* ── Vendors Tab ── */}
+            {/* Vendors Tab */}
             {tab === "vendors" && (
               <div className="flex-1 flex flex-col overflow-hidden">
-                <div className="flex items-center justify-between gap-3 px-4 py-3 shrink-0">
+                <div className="flex items-center justify-between gap-3 px-4 py-3 shrink-0 bg-card border-b border-border">
                   <div className="flex items-center gap-2 flex-1 min-w-0">
                     <div className="relative flex-1 max-w-[260px]">
                       <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
-                      <input type="text" placeholder="Search vendors..." className="w-full pl-9 pr-3 h-9 text-[12px] bg-background border border-border rounded-lg focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-colors" />
+                      <input type="text" placeholder="Search vendors..." className="w-full pl-9 pr-3 h-9 text-[12px] bg-card border border-border rounded-lg shadow-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-ring transition-colors" />
                     </div>
-                    <button className="h-9 px-3 rounded-lg border border-border bg-background text-[12px] font-medium text-foreground hover:bg-muted cursor-pointer transition-colors inline-flex items-center gap-1.5">
+                    <button className="h-9 px-3 rounded-lg border border-border bg-card text-[12px] font-medium text-foreground hover:bg-accent cursor-pointer transition-colors inline-flex items-center gap-1.5 shadow-sm">
                       <SlidersHorizontal className="w-3.5 h-3.5" /> Filters
                     </button>
                   </div>
                 </div>
-                <div className="flex-1 overflow-auto">
+                <div className="flex-1 overflow-auto bg-card">
                   <table className="w-full text-[12px]">
-                    <thead className="sticky top-0 bg-muted/50 z-10">
+                    <thead className="sticky top-0 bg-secondary z-10">
                       <tr>
-                        <th className="text-left px-4 py-2.5 text-muted-foreground text-[11px] font-semibold border-b border-border">Partner Name</th>
-                        <th className="text-left px-4 py-2.5 text-muted-foreground text-[11px] font-semibold border-b border-border">Partner Type</th>
-                        <th className="text-left px-4 py-2.5 text-muted-foreground text-[11px] font-semibold border-b border-border">No. of Items</th>
+                        <th className="text-left px-4 py-3 text-foreground text-[11px] font-bold border-b border-border tracking-wide">Partner Name</th>
+                        <th className="text-left px-4 py-3 text-foreground text-[11px] font-bold border-b border-border tracking-wide">Partner Type</th>
+                        <th className="text-left px-4 py-3 text-foreground text-[11px] font-bold border-b border-border tracking-wide">No. of Items</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -399,20 +391,20 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
                         const vTint = getAvatarTint(v.name);
                         const vInit = v.name.split(" ").map(w => w[0]).slice(0, 2).join("");
                         return (
-                          <tr key={v.id} className="hover:bg-muted/30 transition-colors border-b border-border/50">
+                          <tr key={v.id} className="hover:bg-accent/40 transition-colors border-b border-border">
                             <td className="px-4 py-3">
                               <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0" style={{ backgroundColor: vTint.bg, color: vTint.fg }}>
+                                <div className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 shadow-sm" style={{ backgroundColor: vTint.bg, color: vTint.fg }}>
                                   {vInit}
                                 </div>
-                                <span className="text-[12px] font-medium text-foreground">{v.name}</span>
+                                <span className="text-[12px] font-semibold text-foreground">{v.name}</span>
                               </div>
                             </td>
                             <td className="px-4 py-3">
-                              <div className="flex items-center gap-1 flex-wrap">
+                              <div className="flex items-center gap-1.5 flex-wrap">
                                 {v.types.map((type, i) => (
-                                  <span key={i} className={`inline-flex px-2 py-0.5 rounded-md border text-[10px] font-medium ${
-                                    type.includes("Customer") ? "border-primary/25 bg-primary/5 text-primary" : "border-border bg-muted text-muted-foreground"
+                                  <span key={i} className={`inline-flex px-2.5 py-0.5 rounded-md border text-[10px] font-semibold ${
+                                    type.includes("Customer") ? "border-primary/30 bg-primary/10 text-primary" : "border-border bg-secondary text-foreground"
                                   }`}>
                                     {type}
                                   </span>
@@ -421,8 +413,8 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
                             </td>
                             <td className="px-4 py-3">
                               <div className="flex items-center gap-1.5">
-                                <span className="text-[12px] font-medium text-foreground tabular-nums">{v.partNo}</span>
-                                <span className="text-[11px] text-primary cursor-pointer hover:underline font-medium">+{v.moreItems} more</span>
+                                <span className="text-[12px] font-semibold text-foreground tabular-nums">{v.partNo}</span>
+                                <span className="text-[11px] text-primary cursor-pointer hover:underline font-semibold">+{v.moreItems} more</span>
                               </div>
                             </td>
                           </tr>
@@ -431,11 +423,11 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
                     </tbody>
                   </table>
                 </div>
-                <div className="flex items-center justify-between px-4 py-2.5 border-t border-border shrink-0 bg-muted/30">
-                  <span className="text-[11px] text-muted-foreground">Showing {vendorCount} of {vendorCount} vendors</span>
-                  <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                <div className="flex items-center justify-between px-4 py-2.5 border-t border-border shrink-0 bg-secondary">
+                  <span className="text-[11px] text-muted-foreground font-medium">Showing {PT_MOCK_VENDORS_TABLE.length} of {vendorCount} vendors</span>
+                  <div className="flex items-center gap-2 text-[11px] text-muted-foreground font-medium">
                     <span>Records per page</span>
-                    <select className="h-6 px-1.5 rounded border border-border bg-background text-[11px] cursor-pointer outline-none">
+                    <select className="h-7 px-2 rounded-md border border-border bg-card text-[11px] text-foreground cursor-pointer outline-none shadow-sm">
                       <option>20</option><option>50</option>
                     </select>
                   </div>
@@ -445,13 +437,13 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
 
             {/* Placeholder tabs */}
             {tab !== "items" && tab !== "vendors" && (
-              <div className="flex-1 flex items-center justify-center">
+              <div className="flex-1 flex items-center justify-center bg-card">
                 <div className="text-center">
-                  <div className="w-12 h-12 rounded-xl bg-muted border border-border flex items-center justify-center mx-auto mb-3">
+                  <div className="w-14 h-14 rounded-xl bg-secondary border border-border flex items-center justify-center mx-auto mb-3 shadow-sm">
                     {(() => { const T = PT_DETAIL_TABS.find((x) => x.id === tab); return T ? <T.icon className="w-5 h-5 text-muted-foreground" /> : null; })()}
                   </div>
-                  <p className="text-[13px] font-medium text-foreground">{PT_DETAIL_TABS.find((x) => x.id === tab)?.label || tab}</p>
-                  <p className="text-[11px] text-muted-foreground mt-1">Coming soon</p>
+                  <p className="text-[14px] font-semibold text-foreground">{PT_DETAIL_TABS.find((x) => x.id === tab)?.label || tab}</p>
+                  <p className="text-[12px] text-muted-foreground mt-1">Coming soon</p>
                 </div>
               </div>
             )}
@@ -459,14 +451,14 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
         </div>
 
         {/* ─── Footer ─── */}
-        <div className="shrink-0 border-t border-border bg-muted/30 rounded-b-none sm:rounded-b-2xl">
+        <div className="shrink-0 border-t border-border bg-secondary rounded-b-none sm:rounded-b-2xl">
           <div className="px-5 py-3 flex items-center justify-between">
-            <span className="text-[12px] text-muted-foreground font-medium">Reviewing: {term.name}</span>
+            <span className="text-[12px] text-muted-foreground font-medium">Reviewing: <span className="text-foreground font-semibold">{term.name}</span></span>
             <div className="flex items-center gap-2">
-              <button className="h-9 px-4 rounded-lg border border-border bg-background text-[12px] font-medium text-foreground hover:bg-muted transition-colors cursor-pointer inline-flex items-center gap-1.5">
+              <button className="h-9 px-4 rounded-lg border border-border bg-card text-[12px] font-medium text-foreground hover:bg-accent transition-colors cursor-pointer inline-flex items-center gap-1.5 shadow-sm">
                 <Copy className="w-3.5 h-3.5" /> Duplicate
               </button>
-              <button className="h-9 px-4 rounded-lg bg-primary text-primary-foreground text-[12px] font-medium hover:bg-primary/90 transition-colors cursor-pointer inline-flex items-center gap-1.5">
+              <button className="h-9 px-4 rounded-lg bg-primary text-primary-foreground text-[12px] font-medium hover:bg-primary/90 transition-colors cursor-pointer inline-flex items-center gap-1.5 shadow-sm">
                 <Check className="w-3.5 h-3.5" /> Use Template
               </button>
             </div>
