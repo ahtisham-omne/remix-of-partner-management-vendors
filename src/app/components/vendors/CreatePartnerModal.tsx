@@ -4903,7 +4903,7 @@ function ConfigPageContent({
 
           {/* ── Contextual settings for selected enforcement ── */}
           {enforcement === "hard_block" && (
-            <div className="mt-3 rounded-xl border-2 border-destructive/30 bg-card shadow-sm p-4 space-y-3">
+            <div className="mt-3 rounded-xl border border-destructive/20 bg-card shadow-sm p-4 space-y-3">
               <div className="flex items-center gap-2">
                 <Lock className="w-3.5 h-3.5 text-destructive" />
                 <span className="text-xs text-foreground" style={{ fontWeight: 600 }}>Hard Block Settings</span>
