@@ -102,9 +102,7 @@ ${colorConfig
   );
 }
 
-function ChartTooltip({
-  ...props
-}: React.ComponentProps<typeof RechartsPrimitive.Tooltip>) {
+function ChartTooltip(props: any) {
   return <RechartsPrimitive.Tooltip {...props} />;
 }
 
@@ -122,8 +120,7 @@ function ChartTooltipContent({
   color,
   nameKey,
   labelKey,
-}: React.ComponentProps<typeof RechartsPrimitive.Tooltip> &
-  React.ComponentProps<"div"> & {
+}: any & {
     hideLabel?: boolean;
     hideIndicator?: boolean;
     indicator?: "line" | "dot" | "dashed";
