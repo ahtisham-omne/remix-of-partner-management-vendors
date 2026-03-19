@@ -5130,155 +5130,225 @@ function ConfigPageContent({
             <DialogTitle className="sr-only">Create New Payment Terms</DialogTitle>
             <DialogDescription className="sr-only">Fill in the form to create a new payment term.</DialogDescription>
 
-            {/* Header */}
+            {/* Header — matches pricing rule creation style */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-[#E2E8F0] shrink-0">
-              <h3 className="text-[15px] text-[#0F172A]" style={{ fontWeight: 600 }}>Create New Payment Terms</h3>
+              <div className="flex items-center gap-3">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-[15px] text-[#0F172A]" style={{ fontWeight: 600 }}>Create New Payment Term</h3>
+                    <span className="inline-flex items-center gap-1 px-2 py-[2px] rounded-md text-[10px] border border-[#DBEAFE] bg-[#EFF6FF] text-[#0A77FF]" style={{ fontWeight: 600 }}>
+                      <Receipt className="w-3 h-3" /> Payment Term
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">Configure the type, trigger, and duration for the new term.</p>
+                </div>
+              </div>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setCreatePtFullscreen(!createPtFullscreen)}
-                  className="w-8 h-8 rounded-lg flex items-center justify-center text-[#94A3B8] hover:text-[#0F172A] hover:bg-[#F1F5F9] transition-all"
-                  title={createPtFullscreen ? "Exit full" : "Full view"}
+                  className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#475569] hover:bg-[#F8FAFC] hover:border-[#CBD5E1] transition-all"
+                  style={{ fontWeight: 500 }}
                 >
-                  {createPtFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+                  {createPtFullscreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
+                  {createPtFullscreen ? "Exit full" : "Full view"}
                 </button>
-                <button onClick={() => setCreatePtModalOpen(false)} className="text-[#94A3B8] hover:text-[#0F172A] transition-colors">
-                  <X className="w-5 h-5" />
+                <button onClick={() => setCreatePtModalOpen(false)} className="w-8 h-8 rounded-lg flex items-center justify-center text-[#94A3B8] hover:text-[#0F172A] hover:bg-[#F1F5F9] transition-all cursor-pointer">
+                  <X className="w-4 h-4" />
                 </button>
               </div>
             </div>
 
             {/* Form body */}
             <div className="px-6 py-5 space-y-5 overflow-y-auto flex-1 min-h-0">
-              {/* Row 1: Payment Term Name + Payment Term Type */}
+              {/* Payment Term Type — card selector like Pricing Rule Type */}
+              <div>
+                <Label className="text-[13px] text-[#0F172A] mb-2.5 flex items-center gap-1.5" style={{ fontWeight: 600 }}>
+                  Payment Term Type <Info className="w-3.5 h-3.5 text-[#94A3B8]" />
+                </Label>
+                <div className="grid grid-cols-3 gap-3">
+                  {CREATE_PT_TYPES.map((t) => {
+                    const isActive = createPtType === t.id;
+                    const icon = t.id === "net" ? <Clock className="w-5 h-5" /> : t.id === "prepayment" ? <Banknote className="w-5 h-5" /> : <ArrowUpDown className="w-5 h-5" />;
+                    const shortLabel = t.id === "net" ? "NET Terms" : t.id === "prepayment" ? "Prepayment" : "Split Payment";
+                    const shortDesc = t.id === "net" ? "Pay after X days" : t.id === "prepayment" ? "Pay before delivery" : "Multiple installments";
+                    return (
+                      <button
+                        key={t.id}
+                        onClick={() => setCreatePtType(t.id as "net" | "prepayment" | "split")}
+                        className={`relative flex items-start gap-3 p-4 rounded-xl border-2 text-left transition-all cursor-pointer ${
+                          isActive
+                            ? "border-primary bg-[#F8FBFF] shadow-[0_0_0_1px_hsl(var(--primary)/0.15)]"
+                            : "border-[#E8ECF1] bg-white hover:border-[#CBD5E1] hover:shadow-[0_1px_4px_rgba(0,0,0,0.04)]"
+                        }`}
+                      >
+                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${isActive ? "bg-[#EFF6FF] text-primary" : "bg-[#F8FAFC] text-[#94A3B8]"}`}>
+                          {icon}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>{shortLabel}</p>
+                          <p className="text-[11px] text-[#64748B] mt-0.5">{shortDesc}</p>
+                        </div>
+                        {isActive && (
+                          <div className="absolute top-3 right-3 w-5 h-5 rounded-full bg-primary flex items-center justify-center">
+                            <Check className="w-3 h-3 text-white" />
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Trigger pills — like Basis in pricing rules */}
+              <div>
+                <Label className="text-[13px] text-[#0F172A] mb-2 block" style={{ fontWeight: 600 }}>Trigger:</Label>
+                <div className="flex items-center gap-2 flex-wrap">
+                  {CREATE_PT_TRIGGERS.map((t) => {
+                    const isActive = createPtTrigger === t.id;
+                    return (
+                      <button
+                        key={t.id}
+                        onClick={() => setCreatePtTrigger(t.id)}
+                        className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full border text-xs transition-all cursor-pointer ${
+                          isActive
+                            ? "border-primary bg-[#EDF4FF] text-primary"
+                            : "border-[#E2E8F0] text-[#64748B] hover:border-[#CBD5E1] hover:bg-[#F8FAFC]"
+                        }`}
+                        style={{ fontWeight: isActive ? 600 : 400 }}
+                      >
+                        {t.id === "order_confirmation" && <ShoppingCart className="w-3.5 h-3.5" />}
+                        {t.id === "production_start" && <Cog className="w-3.5 h-3.5" />}
+                        {t.id === "shipment_date" && <Ship className="w-3.5 h-3.5" />}
+                        {t.id === "invoice_date" && <Receipt className="w-3.5 h-3.5" />}
+                        {t.id === "delivery_date" && <Truck className="w-3.5 h-3.5" />}
+                        {t.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Divider */}
+              <div className="border-t border-[#E8ECF1]" />
+
+              {/* Payment Term Details */}
+              <div>
+                <Label className="text-[13px] text-[#0F172A] mb-1 flex items-center gap-1.5" style={{ fontWeight: 600 }}>
+                  Payment Term Details <Info className="w-3.5 h-3.5 text-[#94A3B8]" />
+                </Label>
+              </div>
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-[13px] text-[#0F172A] mb-1.5 block" style={{ fontWeight: 600 }}>Payment term name</Label>
+                  <Label className="text-[12px] text-[#475569] mb-1.5 block" style={{ fontWeight: 500 }}>
+                    {createPtType === "net" ? "NET Term" : createPtType === "prepayment" ? "Prepayment Term" : "Split Term"} Name
+                  </Label>
                   <Input
                     value={createPtName}
                     onChange={(e) => setCreatePtName(e.target.value)}
-                    placeholder="Enter payment terms name"
-                    className="h-11 rounded-lg border-[#E2E8F0] bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
+                    placeholder={`e.g. ${createPtType === "net" ? "Net 30 Standard" : createPtType === "prepayment" ? "50% Upfront" : "3-Part Split"}`}
+                    className="h-10 rounded-lg border-[#E2E8F0] bg-white text-sm text-[#0F172A] placeholder:text-muted-foreground/50 focus:border-primary focus:ring-1 focus:ring-primary/20"
                   />
                 </div>
                 <div>
-                  <Label className="text-[13px] text-[#0F172A] mb-1.5 block" style={{ fontWeight: 600 }}>Payment Term Type</Label>
-                  <Select value={createPtType} onValueChange={(v: "net" | "prepayment" | "split") => setCreatePtType(v)}>
-                    <SelectTrigger className="h-11 rounded-lg border-[#E2E8F0] bg-white">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="z-[250] rounded-lg">
-                      {CREATE_PT_TYPES.map((t) => (
-                        <SelectItem key={t.id} value={t.id} className="py-3 px-3">
-                          <span className="text-sm">{t.label}</span>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <p className="text-xs text-[#64748B] mt-1.5" style={{ fontWeight: 500 }}>Set the name for custom payment term.</p>
-                </div>
-              </div>
-
-              {/* Row 2: Trigger Event + NET Duration (visible for NET type) */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <Label className="text-[13px] text-[#0F172A] mb-1.5 block" style={{ fontWeight: 600 }}>Trigger Event</Label>
-                  <Select value={createPtTrigger} onValueChange={setCreatePtTrigger}>
-                    <SelectTrigger className="h-11 rounded-lg border-[#E2E8F0] bg-white">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="z-[250] rounded-lg">
-                      {CREATE_PT_TRIGGERS.map((t) => (
-                        <SelectItem key={t.id} value={t.id} className="py-3 px-3">
-                          <span className="text-sm">{t.label}</span>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <p className="text-xs text-[#64748B] mt-1.5" style={{ fontWeight: 500 }}>Select the event that triggers the {createPtType === "net" ? "NET" : createPtType === "prepayment" ? "prepayment" : "split"} term.</p>
-                </div>
-                {createPtType === "net" && (
-                  <div>
-                    <Label className="text-[13px] text-[#0F172A] mb-1.5 block" style={{ fontWeight: 600 }}>NET Duration (Days)</Label>
-                    <Select value={createPtDuration} onValueChange={setCreatePtDuration}>
-                      <SelectTrigger className="h-11 rounded-lg border-[#E2E8F0] bg-white">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="z-[250] rounded-lg">
-                        {CREATE_PT_DURATIONS.map((d) => (
-                          <SelectItem key={d.id} value={d.id} className="py-3 px-3">
-                            <span className="text-sm">{d.label}</span>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <p className="text-xs text-[#64748B] mt-1.5" style={{ fontWeight: 500 }}>Enter days after the event for payment.</p>
+                  <Label className="text-[12px] text-[#475569] mb-1.5 block" style={{ fontWeight: 500 }}>Description</Label>
+                  <div className="relative">
+                    <Input
+                      value={createPtDescription}
+                      onChange={(e) => { if (e.target.value.length <= 150) setCreatePtDescription(e.target.value); }}
+                      placeholder="Type here..."
+                      className="h-10 rounded-lg border-[#E2E8F0] bg-white text-sm text-[#0F172A] placeholder:text-muted-foreground/50 focus:border-primary focus:ring-1 focus:ring-primary/20 pr-14"
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-[#94A3B8]">{createPtDescription.length}/150</span>
                   </div>
-                )}
-              </div>
-
-              {/* Description */}
-              <div>
-                <Label className="text-[13px] text-[#0F172A] mb-1.5 block" style={{ fontWeight: 600 }}>Description</Label>
-                <div className="relative">
-                  <Textarea
-                    value={createPtDescription}
-                    onChange={(e) => {
-                      if (e.target.value.length <= 150) setCreatePtDescription(e.target.value);
-                    }}
-                    placeholder="type here..."
-                    className="rounded-lg border-[#E2E8F0] bg-white min-h-[100px] text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
-                  />
-                  <span className="absolute bottom-2.5 right-3 text-xs text-[#94A3B8]">{createPtDescription.length}/150</span>
                 </div>
               </div>
 
-              {/* Apply Discount Terms */}
-              <div className={`rounded-xl border p-4 transition-colors ${createPtApplyDiscount ? "border-[#0A77FF] bg-[#F8FAFC]" : "border-[#E2E8F0] bg-[#F8FAFC]"}`}>
-                <div className="flex items-start gap-3">
-                  <Checkbox
+              {createPtType === "net" && (
+                <div className="flex items-center gap-3">
+                  <Switch
+                    checked={createPtDuration !== "30"}
+                    onCheckedChange={() => {}}
+                    className="data-[state=checked]:bg-primary"
+                    style={{ width: 18, height: 8 }}
+                  />
+                  <span className="text-[12px] text-[#475569]" style={{ fontWeight: 500 }}>Custom Duration</span>
+                </div>
+              )}
+
+              {createPtType === "net" && (
+                <div>
+                  <Label className="text-[12px] text-[#475569] mb-1.5 block" style={{ fontWeight: 500 }}>NET Duration (Days)</Label>
+                  <Select value={createPtDuration} onValueChange={setCreatePtDuration}>
+                    <SelectTrigger className="h-10 rounded-lg border-[#E2E8F0] bg-white max-w-[200px]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="z-[250] rounded-lg">
+                      {CREATE_PT_DURATIONS.map((d) => (
+                        <SelectItem key={d.id} value={d.id} className="py-2.5 px-3">
+                          <span className="text-sm">{d.label}</span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
+              {/* Divider */}
+              <div className="border-t border-[#E8ECF1]" />
+
+              {/* Discount Terms — collapsible like "Discount Tiers" in pricing rule */}
+              <div className={`rounded-xl border p-4 transition-colors ${createPtApplyDiscount ? "border-primary/30 bg-[#FAFCFF]" : "border-[#E8ECF1] bg-[#FAFBFC]"}`}>
+                <div className="flex items-center gap-3">
+                  <Switch
                     checked={createPtApplyDiscount}
                     onCheckedChange={(v) => setCreatePtApplyDiscount(v === true)}
-                    className="mt-0.5"
+                    className="data-[state=checked]:bg-primary"
+                    style={{ width: 18, height: 8 }}
                   />
                   <div className="flex-1 min-w-0">
-                    <h5 className="text-sm text-[#0F172A]" style={{ fontWeight: 600 }}>Apply Discount Terms</h5>
-                    <p className="text-xs text-[#64748B] mt-0.5 leading-relaxed">
-                      Enable early payment discounts based on the selected NET terms. The discount will apply if payment is completed within the specified period.
-                    </p>
+                    <h5 className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Apply Early Payment Discount</h5>
+                    <p className="text-[11px] text-[#64748B] mt-0.5">Enable early payment discounts based on the selected terms.</p>
                   </div>
                 </div>
 
-                {/* Discount fields (shown when checked) */}
                 {createPtApplyDiscount && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 pt-4 border-t border-[#E2E8F0]">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 pt-4 border-t border-[#E8ECF1]">
                     <div>
-                      <Label className="text-[13px] text-[#0F172A] mb-1.5 block" style={{ fontWeight: 600 }}>Discount Percentage (%)</Label>
+                      <Label className="text-[12px] text-[#475569] mb-1.5 flex items-center gap-1" style={{ fontWeight: 500 }}>
+                        Discount Percentage (%) <Info className="w-3 h-3 text-[#CBD5E1]" />
+                      </Label>
                       <div className="relative">
                         <Input
                           value={createPtDiscountPercent}
                           onChange={(e) => setCreatePtDiscountPercent(e.target.value)}
-                          placeholder="Enter discount percentage (e.g., 5%)"
-                          className="h-11 rounded-lg border-[#E2E8F0] bg-white pr-8 text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
+                          placeholder="Enter percentage (e.g., 50%)"
+                          className="h-10 rounded-lg border-[#E2E8F0] bg-white pr-8 text-sm text-[#0F172A] placeholder:text-muted-foreground/50 focus:border-primary focus:ring-1 focus:ring-primary/20"
                         />
                         <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-[#94A3B8]">%</span>
                       </div>
-                      <p className="text-xs text-[#64748B] mt-1.5" style={{ fontWeight: 500 }}>Specify the percentage discount applied for early payment.</p>
                     </div>
-                    <div>
-                      <Label className="text-[13px] text-[#0F172A] mb-1.5 block" style={{ fontWeight: 600 }}>Eligible Payment Period (Days)</Label>
-                      <Select value={createPtDiscountPeriod} onValueChange={setCreatePtDiscountPeriod}>
-                        <SelectTrigger className="h-11 rounded-lg border-[#E2E8F0] bg-white">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent className="z-[250] rounded-lg">
-                          {CREATE_PT_DISCOUNT_PERIODS.map((d) => (
-                            <SelectItem key={d.id} value={d.id} className="py-3 px-3">
-                              <span className="text-sm">{d.label}</span>
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <p className="text-xs text-[#64748B] mt-1.5" style={{ fontWeight: 500 }}>Set the payment deadline to apply the discount.</p>
+                    <div className="flex items-end gap-3">
+                      <div className="flex-1">
+                        <Label className="text-[12px] text-[#475569] mb-1.5 block" style={{ fontWeight: 500 }}>Eligible Payment Period</Label>
+                        <Select value={createPtDiscountPeriod} onValueChange={setCreatePtDiscountPeriod}>
+                          <SelectTrigger className="h-10 rounded-lg border-[#E2E8F0] bg-white">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent className="z-[250] rounded-lg">
+                            {CREATE_PT_DISCOUNT_PERIODS.map((d) => (
+                              <SelectItem key={d.id} value={d.id} className="py-2.5 px-3">
+                                <span className="text-sm">{d.label}</span>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="flex items-center gap-2 pb-1">
+                        <Switch checked={false} onCheckedChange={() => {}} className="data-[state=checked]:bg-primary" style={{ width: 18, height: 8 }} />
+                        <span className="text-[11px] text-[#64748B] whitespace-nowrap" style={{ fontWeight: 500 }}>Fix Discount Rate ($)</span>
+                        <Info className="w-3 h-3 text-[#CBD5E1]" />
+                      </div>
                     </div>
                   </div>
                 )}
@@ -5292,15 +5362,15 @@ function ConfigPageContent({
                 className="px-5 py-2.5 rounded-lg border border-[#E2E8F0] bg-white text-sm text-[#0F172A] hover:bg-[#F8FAFC] transition-colors"
                 style={{ fontWeight: 600 }}
               >
-                Discard
+                Cancel
               </button>
               <button
                 onClick={handleSaveNewPaymentTerm}
                 disabled={!createPtName.trim()}
-                className="px-5 py-2.5 rounded-lg bg-[#0A77FF] text-white text-sm hover:bg-[#0862D0] transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#0A77FF]"
+                className="px-5 py-2.5 rounded-lg bg-primary text-white text-sm hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5"
                 style={{ fontWeight: 600 }}
               >
-                Save & Apply
+                Save & Apply <ChevronRight className="w-4 h-4" />
               </button>
             </div>
           </DialogContent>
