@@ -5943,100 +5943,112 @@ function ConfigPageContent({
                       <p className="text-[12px] text-[#94A3B8] mt-1">Try adjusting your search or filter</p>
                     </div>
                   ) : (
-                    <div className="space-y-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
                       {filteredPaymentTermPresets.map((term) => {
                         const isSelected = selectedPaymentTermId === term.id;
                         const ptDays = term.duration || (term.name.match(/\d+/) ? term.name.match(/\d+/)![0] : "30");
+                        const badgeColor = term.badgeColor;
+                        const isCustom = term.id.startsWith("pt-custom-");
+
                         return (
                           <div
                             key={term.id}
-                            tabIndex={0}
                             onClick={() => setPreviewPaymentTermId(term.id)}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setPreviewPaymentTermId(term.id); }
-                              if (e.key === "ArrowDown") { e.preventDefault(); const next = e.currentTarget.nextElementSibling as HTMLElement; next?.focus(); }
-                              if (e.key === "ArrowUp") { e.preventDefault(); const prev = e.currentTarget.previousElementSibling as HTMLElement; prev?.focus(); }
-                            }}
-                            className={`group relative flex items-center gap-3.5 rounded-xl border transition-all duration-200 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-[#0A77FF]/30 px-4 py-3.5 ${
+                            className={`bg-white border rounded-xl cursor-pointer group transition-all duration-200 flex flex-col relative ${
                               isSelected
-                                ? "border-[#0A77FF]/25 bg-[#F7FAFF] shadow-[0_2px_12px_rgba(10,119,255,0.10)]"
-                                : "border-[#E8ECF1] bg-white shadow-[0_1px_3px_rgba(0,0,0,0.03)] hover:border-[#0A77FF]/20 hover:shadow-[0_4px_16px_rgba(10,119,255,0.08)]"
+                                ? "border-[#0A77FF]/25 shadow-[0_2px_12px_rgba(10,119,255,0.10)]"
+                                : "border-[#E8ECF1] shadow-[0_1px_3px_rgba(0,0,0,0.03)] hover:border-[#BFDBFE] hover:shadow-[0_4px_16px_-4px_rgba(10,119,255,0.10)]"
                             }`}
                           >
-                              {/* Icon — neutral gray, blue when selected */}
-                              <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-colors ${
-                                isSelected
-                                  ? "bg-[#0A77FF]/10"
-                                  : "bg-[#F1F5F9] group-hover:bg-[#0A77FF]/8"
-                              }`}>
-                                <span className={`text-[11px] tracking-wide transition-colors ${
-                                  isSelected
-                                    ? "text-[#0A77FF]"
-                                    : "text-[#64748B] group-hover:text-[#0A77FF]"
-                                }`} style={{ fontWeight: 700 }}>{term.typeBadge}</span>
+                            {/* Selected checkmark */}
+                            {isSelected && (
+                              <div className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-[#0A77FF] flex items-center justify-center z-10 shadow-sm">
+                                <Check className="w-3 h-3 text-white" />
+                              </div>
+                            )}
+
+                            <div className="p-3.5 flex-1 flex flex-col min-h-0 overflow-hidden">
+                              {/* Row 1: Type pill + preset/custom badge */}
+                              <div className="flex items-center justify-between gap-2 mb-2 shrink-0">
+                                <span className="inline-flex items-stretch rounded-full overflow-hidden border shrink-0" style={{ borderColor: badgeColor + "40" }}>
+                                  <span
+                                    className="inline-flex items-center gap-1 px-2 py-[2px] text-[10px]"
+                                    style={{ fontWeight: 600, color: badgeColor, backgroundColor: badgeColor + "15" }}
+                                  >
+                                    <Receipt className="w-3 h-3" />
+                                    {term.typeBadge}
+                                  </span>
+                                  <span className="inline-flex items-center px-2 py-[2px] text-[10px] bg-white text-[#64748B] border-l" style={{ fontWeight: 500, borderColor: badgeColor + "40" }}>
+                                    {term.trigger}
+                                  </span>
+                                </span>
+                                <span className={`inline-flex items-center gap-1 px-1.5 py-[3px] rounded-md border text-[9px] shrink-0 ${
+                                  isCustom
+                                    ? "border-[#E2E8F0] bg-white text-[#64748B]"
+                                    : "bg-[#F1F5F9] border-[#E2E8F0] text-[#94A3B8]"
+                                }`} style={{ fontWeight: 600 }}>
+                                  {isCustom ? "Custom" : <><Lock className="w-2.5 h-2.5" /> PRESET</>}
+                                </span>
                               </div>
 
-                              {/* Main info */}
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2 mb-0.5">
-                                  <h5 className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{highlightMatch(term.name, ptSearch)}</h5>
+                              {/* Row 2: Name */}
+                              <div className="shrink-0 mb-1">
+                                <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{highlightMatch(term.name, ptSearch)}</p>
+                              </div>
+
+                              {/* Row 3: Description */}
+                              <div className="h-[32px] shrink-0 mb-2">
+                                <p className="text-[11px] text-[#64748B] line-clamp-2 leading-relaxed" style={{ fontWeight: 400 }}>{highlightMatch(term.description, ptSearch)}</p>
+                              </div>
+
+                              {/* Row 4: Hero value */}
+                              <div className="flex items-baseline gap-2 shrink-0">
+                                <span className="text-[22px] text-[#0F172A] tabular-nums leading-none tracking-tight" style={{ fontWeight: 600 }}>
+                                  {ptDays}
+                                </span>
+                                <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>days</span>
+                              </div>
+
+                              {/* Row 5: Discount info strip */}
+                              {(term.applyDiscount || term.discountPercent) && (
+                                <div className="mt-auto pt-2 shrink-0">
+                                  <div className="flex items-center justify-between px-3 py-[6px] rounded-lg border border-[#E8ECF1] bg-[#FAFBFC] text-[11px] tabular-nums min-w-0">
+                                    <span className="text-[#64748B]" style={{ fontWeight: 400 }}>
+                                      Early pay {term.discountPercent || "2"}% within {term.discountPeriod || "10"} days
+                                    </span>
+                                  </div>
                                 </div>
-                                <p className="text-[11px] text-[#94A3B8] truncate leading-relaxed">{highlightMatch(term.description, ptSearch)}</p>
-                              </div>
-
-                              {/* Meta badges — trigger in primary tint, duration neutral */}
-                              <div className="shrink-0 flex items-center gap-2">
-                                <span
-                                  className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10px] bg-[#EFF6FF] border border-[#0A77FF]/12 text-[#0A77FF]"
-                                  style={{ fontWeight: 600 }}
-                                >
-                                  <Zap className="w-2.5 h-2.5" />
-                                  {term.trigger}
-                                </span>
-                                <span className="inline-flex items-center gap-1 px-1.5 py-1 rounded-md bg-[#F8FAFC] border border-[#E8ECF1] text-[10px] text-[#64748B] tabular-nums" style={{ fontWeight: 500 }}>
-                                  <Clock className="w-2.5 h-2.5 text-[#94A3B8]" />
-                                  {ptDays}d
-                                </span>
-                              </div>
-
-                              {/* Vendor count — simple text */}
-                              {term.vendorsApplied > 0 && (
-                                <span className="shrink-0 text-[11px] text-[#94A3B8] hidden lg:block" style={{ fontWeight: 500 }}>
-                                  {term.vendorsApplied} vendor{term.vendorsApplied !== 1 ? "s" : ""}
-                                </span>
                               )}
+                            </div>
 
-                              {/* Actions — always visible */}
-                              <div className="shrink-0 flex items-center gap-1.5">
+                            {/* Footer */}
+                            <div className="flex items-center gap-2 px-3.5 py-2.5 border-t border-[#F1F5F9] shrink-0">
+                              <span className="inline-flex items-center gap-1 text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>
+                                <Building2 className="w-3 h-3" /> {term.vendorsApplied}
+                              </span>
+                              <div className="ml-auto flex items-center gap-1.5">
                                 <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleDuplicatePaymentTerm(term);
-                                  }}
-                                  className="p-1.5 rounded-md border border-[#E8ECF1] bg-white text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#334155] transition-colors"
+                                  onClick={(e) => { e.stopPropagation(); handleDuplicatePaymentTerm(term); }}
+                                  className="p-1 rounded-md border border-[#E8ECF1] bg-white text-[#94A3B8] hover:text-[#475569] hover:bg-[#F8FAFC] transition-colors opacity-0 group-hover:opacity-100"
                                   title="Duplicate"
                                 >
                                   <Copy className="w-3 h-3" />
                                 </button>
                                 <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setSelectedPaymentTermId(term.id);
-                                    setPaymentTermsModalOpen(false);
-                                  }}
-                                  className="px-3 py-1 rounded-md bg-[#0A77FF] text-white text-[11px] hover:bg-[#0862D0] transition-colors"
+                                  onClick={(e) => { e.stopPropagation(); setSelectedPaymentTermId(term.id); setPaymentTermsModalOpen(false); }}
+                                  className="px-2.5 py-[3px] rounded-md bg-[#0A77FF] text-white text-[10px] hover:bg-[#0862D0] transition-colors"
                                   style={{ fontWeight: 600 }}
                                 >
                                   Apply
                                 </button>
+                                <span
+                                  className="px-2 py-[2px] rounded-full text-[10px] border"
+                                  style={{ fontWeight: 500, color: "#059669", backgroundColor: "#F0FDF4", borderColor: "#BBF7D0" }}
+                                >
+                                  Active
+                                </span>
                               </div>
-
-                              {/* Selected checkmark */}
-                              {isSelected && (
-                                <div className="w-5 h-5 rounded-full bg-[#0A77FF] flex items-center justify-center shrink-0">
-                                  <Check className="w-3 h-3 text-white" />
-                                </div>
-                              )}
+                            </div>
                           </div>
                         );
                       })}
