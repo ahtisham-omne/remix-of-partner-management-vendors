@@ -6079,7 +6079,7 @@ function ConfigPageContent({
 
                               {/* Row 5: Discount info strip */}
                               {(term.applyDiscount || term.discountPercent) && (
-                                <div className="mt-auto pt-2 shrink-0">
+                                <div className="pt-2 shrink-0">
                                   <div className="flex items-center justify-between px-3 py-[6px] rounded-lg border border-[#E8ECF1] bg-[#FAFBFC] text-[11px] tabular-nums min-w-0">
                                     <span className="text-[#64748B]" style={{ fontWeight: 400 }}>
                                       Early pay {term.discountPercent || "2"}% within {term.discountPeriod || "10"} days
@@ -6087,29 +6087,32 @@ function ConfigPageContent({
                                   </div>
                                 </div>
                               )}
+
+                              {/* Row 6: Vendor usage count */}
+                              <div className="flex items-center gap-3 mt-auto pt-2 shrink-0">
+                                <span className="inline-flex items-center gap-1 text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>
+                                  <Building2 className="w-3 h-3" /> {term.vendorsApplied} vendors
+                                </span>
+                              </div>
                             </div>
 
                             {/* Footer */}
-                            <div className="flex items-center gap-2 px-3.5 py-2.5 border-t border-[#F1F5F9] shrink-0">
-                              <span className="inline-flex items-center gap-1 text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>
-                                <Building2 className="w-3 h-3" /> {term.vendorsApplied}
-                              </span>
-                              <div className="ml-auto flex items-center gap-0">
-                                <button
-                                  onClick={(e) => { e.stopPropagation(); setSelectedPaymentTermId(term.id); setPaymentTermsModalOpen(false); }}
-                                  className="inline-flex items-center gap-1 px-2.5 py-[5px] text-[11px] text-[#64748B] hover:text-[#0A77FF] hover:bg-[#F8FAFC] rounded-md transition-colors border-r border-[#F1F5F9]"
-                                  style={{ fontWeight: 500 }}
-                                >
-                                  <Check className="w-3 h-3" /> Apply
-                                </button>
-                                <button
-                                  onClick={(e) => { e.stopPropagation(); handleDuplicatePaymentTerm(term); }}
-                                  className="inline-flex items-center gap-1 px-2.5 py-[5px] text-[11px] text-[#64748B] hover:text-[#0A77FF] hover:bg-[#F8FAFC] rounded-md transition-colors opacity-0 group-hover:opacity-100"
-                                  style={{ fontWeight: 500 }}
-                                >
-                                  <Copy className="w-3 h-3" /> Duplicate
-                                </button>
-                              </div>
+                            <div className="flex items-center justify-center gap-0 px-3.5 py-2 border-t border-[#F1F5F9] shrink-0">
+                              <button
+                                onClick={(e) => { e.stopPropagation(); setSelectedPaymentTermId(term.id); setPaymentTermsModalOpen(false); }}
+                                className="inline-flex items-center gap-1 px-3 py-[5px] text-[11px] text-[#64748B] hover:text-[#0A77FF] hover:bg-[#F8FAFC] rounded-md transition-colors"
+                                style={{ fontWeight: 500 }}
+                              >
+                                <Check className="w-3 h-3" /> Apply
+                              </button>
+                              <div className="w-px h-4 bg-[#F1F5F9]" />
+                              <button
+                                onClick={(e) => { e.stopPropagation(); handleDuplicatePaymentTerm(term); }}
+                                className="inline-flex items-center gap-1 px-3 py-[5px] text-[11px] text-[#64748B] hover:text-[#0A77FF] hover:bg-[#F8FAFC] rounded-md transition-colors"
+                                style={{ fontWeight: 500 }}
+                              >
+                                <Copy className="w-3 h-3" /> Duplicate
+                              </button>
                             </div>
                           </div>
                         );
