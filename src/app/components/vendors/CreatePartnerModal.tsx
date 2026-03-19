@@ -257,6 +257,11 @@ export function CreatePartnerModal({ open, onOpenChange, onPartnerCreated }: Cre
     setSelectedVendorSubTypes((prev) => {
       const next = new Set(prev);
       if (next.has(id)) {
+        // Seller can only be disabled if at least one other profile remains enabled
+        if (id === "seller_items") {
+          const othersEnabled = Array.from(next).filter(x => x !== "seller_items");
+          if (othersEnabled.length === 0) return prev; // can't disable seller if it's the only one
+        }
         next.delete(id);
       } else {
         next.add(id);
@@ -522,30 +527,55 @@ export function CreatePartnerModal({ open, onOpenChange, onPartnerCreated }: Cre
                   const profileDesc = subTypeInfo[activeSubTypeTab] || `Configure the ${subTypeLabel} profile settings.`;
 
                   if (!isSubTypeEnabled) {
-                    // State 1: Not enabled — show enable CTA with educational copy
+                    // State 1: Not enabled — rich empty state explaining the profile
+                    const configCount = (configType === "vendor" ? VENDOR_CONFIG_SECTIONS : CUSTOMER_CONFIG_SECTIONS).length;
                     return (
                       <div className="absolute inset-0 z-10 flex items-center justify-center bg-[#FAFBFC]">
-                        <div className="flex flex-col items-center gap-4 text-center px-8 max-w-md animate-coming-soon-in">
-                          <div className="w-14 h-14 rounded-2xl bg-[#EDF4FF] border border-[#DBEAFE] flex items-center justify-center shadow-sm">
-                            {subTypeIcon ? React.cloneElement(subTypeIcon as React.ReactElement, { className: "w-6 h-6 text-[#0A77FF]" }) : <Settings2 className="w-6 h-6 text-[#0A77FF]" />}
+                        <div className="flex flex-col items-center gap-5 text-center px-8 max-w-lg animate-coming-soon-in">
+                          {/* Profile icon with lock indicator */}
+                          <div className="relative">
+                            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#F1F5F9] to-[#E2E8F0] border border-[#E2E8F0] flex items-center justify-center shadow-sm">
+                              {subTypeIcon ? React.cloneElement(subTypeIcon as React.ReactElement, { className: "w-7 h-7 text-[#94A3B8]" }) : <Settings2 className="w-7 h-7 text-[#94A3B8]" />}
+                            </div>
+                            <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-white border-2 border-[#E2E8F0] flex items-center justify-center">
+                              <Lock className="w-3 h-3 text-[#CBD5E1]" />
+                            </div>
                           </div>
-                          <div>
-                            <p className="text-sm text-[#0F172A]" style={{ fontWeight: 600 }}>Enable {subTypeLabel}</p>
-                            <p className="text-[13px] text-[#64748B] mt-1.5 leading-relaxed max-w-sm">
+
+                          {/* Title + description */}
+                          <div className="space-y-2">
+                            <p className="text-[15px] text-[#0F172A]" style={{ fontWeight: 600 }}>{subTypeLabel} Profile</p>
+                            <p className="text-[13px] text-[#64748B] leading-relaxed max-w-sm">
                               {profileDesc}
                             </p>
                           </div>
+
+                          {/* What enabling unlocks */}
+                          <div className="flex items-center gap-4 text-[11px] text-[#94A3B8]">
+                            <span className="flex items-center gap-1">
+                              <Settings2 className="w-3 h-3" />
+                              {configCount} configuration sections
+                            </span>
+                            <span className="w-1 h-1 rounded-full bg-[#CBD5E1]" />
+                            <span className="flex items-center gap-1">
+                              <Zap className="w-3 h-3" />
+                              Auto-inherits group defaults
+                            </span>
+                          </div>
+
+                          {/* Enable CTA */}
                           <button
                             onClick={() => {
                               const toggleFn = configType === "vendor" ? handleToggleVendorSubType : handleToggleCustomerSubType;
                               toggleFn(activeSubTypeTab);
                             }}
-                            className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-lg bg-[#0A77FF] text-white text-[13px] shadow-md hover:bg-[#0862D0] hover:shadow-lg transition-all"
+                            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#0A77FF] text-white text-[13px] shadow-md hover:bg-[#0862D0] hover:shadow-lg transition-all"
                             style={{ fontWeight: 600 }}
                           >
-                            <Check className="w-3.5 h-3.5" />
-                            Enable {subTypeLabel}
+                            <Zap className="w-3.5 h-3.5" />
+                            Enable {subTypeLabel} Profile
                           </button>
+                          <p className="text-[11px] text-[#CBD5E1]">You can disable this profile anytime</p>
                         </div>
                       </div>
                     );
@@ -2988,39 +3018,51 @@ function ConfigUnifiedNav({
   onSetActiveSubType: (id: string) => void;
   onActiveSectionChange: (id: string) => void;
 }) {
+  const enabledCount = subTypes.filter(s => selectedSubTypes.has(s.id)).length;
+
+  // Check if seller can be disabled (only if another profile is enabled)
+  const canDisableSeller = (id: string) => {
+    if (id !== "seller_items") return true;
+    return enabledCount > 1;
+  };
+
   return (
     <>
       {/* Mobile: horizontal scrollable nav */}
       <div className="sm:hidden shrink-0 border-b border-[#EEF2F6] bg-white overflow-x-auto scrollbar-hide">
         <nav className="flex flex-col">
-          <div className="flex px-3 py-2 gap-1.5 min-w-max">
+          <div className="px-3 pt-2 pb-1">
+            <p className="text-[10px] text-[#94A3B8] uppercase tracking-wider" style={{ fontWeight: 600 }}>
+              Profiles · {enabledCount} active
+            </p>
+          </div>
+          <div className="flex px-3 py-1.5 gap-1.5 min-w-max">
             {subTypes.map((subType) => {
               const isEnabled = selectedSubTypes.has(subType.id);
               const isActive = activeSubTypeTab === subType.id;
               return (
                 <button
                   key={subType.id}
-                  onClick={() => {
-                    if (!isEnabled) onToggleSubType(subType.id);
-                    onSetActiveSubType(subType.id);
-                  }}
+                  onClick={() => onSetActiveSubType(subType.id)}
                   className={`flex items-center gap-2 px-3 py-2 rounded-lg text-left transition-all whitespace-nowrap shrink-0 ${
                     isActive && isEnabled
-                      ? "bg-[#EDF4FF] text-[#0A77FF]"
-                      : isActive
-                      ? "bg-[#F8FAFC] text-[#475569]"
+                      ? "bg-[#EDF4FF] text-[#0A77FF] ring-1 ring-[#0A77FF]/20"
+                      : isActive && !isEnabled
+                      ? "bg-[#F8FAFC] text-[#475569] ring-1 ring-[#E2E8F0]"
                       : isEnabled
                       ? "text-[#475569] hover:bg-[#F8FAFC]"
                       : "text-[#94A3B8] hover:bg-[#F8FAFC]"
                   }`}
                 >
                   <div className={`w-6 h-6 rounded-md flex items-center justify-center shrink-0 ${
-                    isActive && isEnabled ? "bg-white text-[#0A77FF] shadow-sm" : isEnabled ? "bg-[#F1F5F9] text-[#64748B]" : "bg-[#F1F5F9] text-[#CBD5E1]"
+                    isActive && isEnabled ? "bg-[#0A77FF] text-white" : isEnabled ? "bg-[#DBEAFE] text-[#0A77FF]" : "bg-[#F1F5F9] text-[#CBD5E1]"
                   }`}>
                     {React.cloneElement(subType.icon as React.ReactElement, { className: "w-3.5 h-3.5" })}
                   </div>
                   <span className="text-xs" style={{ fontWeight: isActive ? 600 : 500 }}>{subType.label}</span>
-                  {isEnabled && !isActive && <span className="w-1.5 h-1.5 rounded-full bg-[#0A77FF] shrink-0" />}
+                  {isEnabled && (
+                    <span className={`text-[9px] px-1.5 py-0.5 rounded-full ${isActive ? "bg-[#0A77FF]/10 text-[#0A77FF]" : "bg-[#DCFCE7] text-[#16A34A]"}`} style={{ fontWeight: 600 }}>ON</span>
+                  )}
                 </button>
               );
             })}
@@ -3048,108 +3090,122 @@ function ConfigUnifiedNav({
         </nav>
       </div>
 
-      {/* Desktop: unified vertical accordion sidebar */}
-      <div className="hidden sm:flex sm:flex-col w-[252px] lg:w-[268px] shrink-0 border-r border-[#EEF2F6] bg-white overflow-y-auto">
-        <div className="px-3.5 pt-3.5 pb-1.5">
-          <p className="text-[10px] text-[#94A3B8] uppercase tracking-wider" style={{ fontWeight: 600 }}>Sub-types</p>
+      {/* Desktop: redesigned profile sidebar */}
+      <div className="hidden sm:flex sm:flex-col w-[252px] lg:w-[272px] shrink-0 border-r border-[#EEF2F6] bg-white overflow-y-auto">
+        {/* Header */}
+        <div className="px-3.5 pt-3.5 pb-2 border-b border-[#F1F5F9]">
+          <div className="flex items-center justify-between">
+            <p className="text-[11px] text-[#64748B] uppercase tracking-wider" style={{ fontWeight: 600 }}>Profiles</p>
+            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#EDF4FF] text-[#0A77FF]" style={{ fontWeight: 600 }}>
+              {enabledCount} of {subTypes.length} active
+            </span>
+          </div>
+          <p className="text-[10px] text-[#94A3B8] mt-0.5">Enable profiles to configure vendor capabilities</p>
         </div>
-        <nav className="flex flex-col px-1.5 pb-3 flex-1">
-          {subTypes.map((subType, index) => {
+
+        <nav className="flex flex-col px-1.5 py-2 flex-1 gap-0.5">
+          {subTypes.map((subType) => {
             const isEnabled = selectedSubTypes.has(subType.id);
-            const isExpanded = activeSubTypeTab === subType.id;
+            const isActive = activeSubTypeTab === subType.id;
             const isSeller = subType.id === "seller_items";
+            const canToggle = !isSeller || canDisableSeller(subType.id);
 
             return (
               <div key={subType.id}>
-                {/* Sub-type header row */}
+                {/* Profile card row */}
                 <div
-                  className={`group flex items-center gap-2 px-2 py-[7px] rounded-md cursor-pointer transition-colors duration-150 ${
-                    isExpanded ? "bg-transparent" : "hover:bg-[#F1F5F9]/60"
+                  className={`group flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer transition-all duration-150 ${
+                    isActive
+                      ? isEnabled
+                        ? "bg-[#EDF4FF] ring-1 ring-[#0A77FF]/15"
+                        : "bg-[#F8FAFC] ring-1 ring-[#E2E8F0]"
+                      : "hover:bg-[#F8FAFC]"
                   }`}
                   onClick={() => {
                     onSetActiveSubType(subType.id);
-                    if (!isExpanded && isEnabled && isSeller) {
+                    if (isEnabled) {
                       onActiveSectionChange(sections[0]?.id || activeSection);
                     }
                   }}
                 >
-                  {/* Expand/collapse chevron */}
-                  <ChevronRight className={`w-3 h-3 shrink-0 transition-transform duration-150 ${
-                    isExpanded ? "rotate-90 text-[#64748B]" : "text-[#CBD5E1] group-hover:text-[#94A3B8]"
-                  }`} />
-
-                  {/* Icon */}
-                  <div className={`w-6 h-6 rounded-md flex items-center justify-center shrink-0 transition-colors duration-150 ${
-                    isExpanded
-                      ? "bg-[#0A77FF] text-white"
+                  {/* Profile icon */}
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-all duration-150 ${
+                    isActive && isEnabled
+                      ? "bg-[#0A77FF] text-white shadow-sm"
                       : isEnabled
                       ? "bg-[#DBEAFE] text-[#0A77FF]"
                       : "bg-[#F1F5F9] text-[#94A3B8]"
                   }`}>
-                    {React.cloneElement(subType.icon as React.ReactElement, { className: "w-3.5 h-3.5" })}
+                    {React.cloneElement(subType.icon as React.ReactElement, { className: "w-4 h-4" })}
                   </div>
 
-                  {/* Label */}
-                  <span className={`flex-1 min-w-0 text-[13px] truncate transition-colors duration-150 ${
-                    isExpanded
-                      ? "text-[#0F172A]"
-                      : isEnabled
-                      ? "text-[#1E293B]"
-                      : "text-[#64748B] group-hover:text-[#334155]"
-                  }`} style={{ fontWeight: isExpanded ? 600 : isEnabled ? 500 : 400 }}>
-                    {subType.label}
-                  </span>
+                  {/* Label + status */}
+                  <div className="flex-1 min-w-0">
+                    <span className={`block text-[13px] truncate transition-colors duration-150 ${
+                      isActive
+                        ? "text-[#0F172A]"
+                        : isEnabled
+                        ? "text-[#1E293B]"
+                        : "text-[#64748B] group-hover:text-[#334155]"
+                    }`} style={{ fontWeight: isActive ? 600 : isEnabled ? 500 : 400 }}>
+                      {subType.label}
+                    </span>
+                    <span className={`text-[10px] ${
+                      isEnabled ? "text-[#16A34A]" : "text-[#94A3B8]"
+                    }`} style={{ fontWeight: 500 }}>
+                      {isEnabled ? "Active" : "Inactive"}
+                      {isSeller && isEnabled && enabledCount === 1 && (
+                        <span className="text-[#CBD5E1] ml-1">· Default</span>
+                      )}
+                    </span>
+                  </div>
 
-                  {/* Toggle checkbox */}
-                  <span
-                    role="checkbox"
-                    aria-checked={isEnabled}
+                  {/* Toggle switch */}
+                  <div
                     onClick={(e) => {
                       e.stopPropagation();
+                      if (!canToggle && isEnabled) return; // Can't disable seller when it's the only one
                       onToggleSubType(subType.id);
                     }}
-                    className={`relative w-4 h-4 rounded border-[1.5px] flex items-center justify-center shrink-0 transition-colors duration-150 cursor-pointer ${
-                      isEnabled
-                        ? "bg-[#0A77FF] border-[#0A77FF]"
-                        : "border-[#CBD5E1] bg-white hover:border-[#94A3B8]"
-                    }`}
+                    className="shrink-0"
+                    title={!canToggle && isEnabled ? "Enable another profile before disabling Seller" : undefined}
                   >
-                    {isEnabled && <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />}
-                  </span>
+                    <div className={`relative w-8 h-[18px] rounded-full transition-colors duration-200 cursor-pointer ${
+                      isEnabled
+                        ? "bg-[#0A77FF]"
+                        : "bg-[#CBD5E1] hover:bg-[#94A3B8]"
+                    } ${!canToggle && isEnabled ? "opacity-50 cursor-not-allowed" : ""}`}>
+                      <div className={`absolute top-[2px] w-[14px] h-[14px] rounded-full bg-white shadow-sm transition-transform duration-200 ${
+                        isEnabled ? "left-[16px]" : "left-[2px]"
+                      }`} />
+                    </div>
+                  </div>
                 </div>
 
-                {/* Nested config sections — only for seller type */}
+                {/* Nested config sections — shown for any enabled+active profile */}
                 <div
                   className="overflow-hidden transition-all duration-200 ease-out"
                   style={{
-                    maxHeight: isExpanded && isSeller ? `${sections.length * 34 + 8}px` : "0px",
-                    opacity: isExpanded && isSeller ? 1 : 0,
+                    maxHeight: isActive && isEnabled ? `${sections.length * 36 + 12}px` : "0px",
+                    opacity: isActive && isEnabled ? 1 : 0,
                   }}
                 >
-                  <div className="ml-[18px] pl-[14px] border-l-[1.5px] border-[#E2E8F0] py-0.5">
+                  <div className="ml-[20px] pl-[12px] border-l-[1.5px] border-[#E2E8F0] py-1 mt-0.5">
                     {sections.map((section) => {
-                      const isSectionActive = isExpanded && isEnabled && section.id === activeSection;
-                      const isDisabledSection = !isEnabled;
+                      const isSectionActive = isActive && isEnabled && section.id === activeSection;
                       return (
                         <button
                           key={section.id}
-                          onClick={() => {
-                            if (isDisabledSection) return;
-                            onActiveSectionChange(section.id);
-                          }}
-                          className={`group/item w-full flex items-center gap-2 px-2 py-[6px] rounded-md text-left transition-colors duration-150 ${
+                          onClick={() => onActiveSectionChange(section.id)}
+                          className={`group/item w-full flex items-center gap-2 px-2.5 py-[7px] rounded-md text-left transition-colors duration-150 ${
                             isSectionActive
                               ? "bg-[#EDF4FF]"
-                              : isDisabledSection
-                              ? "opacity-30 cursor-not-allowed"
                               : "hover:bg-[#F1F5F9]/60"
                           }`}
                         >
                           <span className={`transition-colors duration-150 ${
                             isSectionActive
                               ? "text-[#0A77FF]"
-                              : isDisabledSection
-                              ? "text-[#CBD5E1]"
                               : "text-[#94A3B8] group-hover/item:text-[#64748B]"
                           }`}>
                             {React.cloneElement(section.icon as React.ReactElement, { className: "w-3.5 h-3.5" })}
@@ -3157,8 +3213,6 @@ function ConfigUnifiedNav({
                           <span className={`text-[12.5px] truncate transition-colors duration-150 ${
                             isSectionActive
                               ? "text-[#0A77FF]"
-                              : isDisabledSection
-                              ? "text-[#94A3B8]"
                               : "text-[#475569] group-hover/item:text-[#1E293B]"
                           }`} style={{ fontWeight: isSectionActive ? 600 : 400 }}>
                             {section.title}
@@ -3172,6 +3226,14 @@ function ConfigUnifiedNav({
             );
           })}
         </nav>
+
+        {/* Sidebar footer hint */}
+        <div className="px-3.5 py-2.5 border-t border-[#F1F5F9]">
+          <p className="text-[10px] text-[#94A3B8] leading-relaxed">
+            <Info className="w-3 h-3 inline mr-1 -mt-0.5" />
+            Seller profile is always required. Enable additional profiles to expand capabilities.
+          </p>
+        </div>
       </div>
     </>
   );
