@@ -3527,7 +3527,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                                   key={pt.id}
                                   term={pt}
                                   readOnly
-                                  onClick={() => { setPtDetailTerm(pt); setPtDetailOpen(true); }}
+                                  onClick={() => { setLocPtDetailTerm(pt); setLocPtDetailOpen(true); }}
                                 />
                               ))}
                             </div>
