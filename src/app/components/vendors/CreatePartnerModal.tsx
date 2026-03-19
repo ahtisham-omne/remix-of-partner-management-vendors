@@ -5294,285 +5294,272 @@ function ConfigPageContent({
 
               const ptDuration = previewTerm.duration || (previewTerm.name.match(/\d+/) ? previewTerm.name.match(/\d+/)![0] : "30");
               const ptTypeLabel = CREATE_PT_TYPES.find((t) => t.id === previewTerm.category)?.label || previewTerm.typeBadge;
-              const PT_DETAIL_TABS = [
-                { id: "items", label: "Applicable Items", icon: Package },
-                { id: "vendors_applied", label: "Partners Using", icon: Building2 },
-                { id: "notes_files", label: "Notes & Files", icon: Paperclip },
-                { id: "activity", label: "Activity", icon: Clock },
+              const PREVIEW_TABS = [
+                { id: "items", label: "Items", icon: Package },
+                { id: "vendors", label: "Vendors", icon: Building2 },
+                { id: "notes", label: "Notes", icon: FileText },
+                { id: "files", label: "Files", icon: Paperclip },
+                { id: "audit", label: "Audit", icon: Clock },
+                { id: "activity", label: "Activity", icon: BarChart3 },
               ] as const;
-              const PT_MOCK_ITEMS = [
-                { id: "100219-42", partNo: "100219-42", name: "Front bulkhead cabinet lower cover", category: "Ram Pro Master 2500", itemType: "Parts" },
-                { id: "100219-51", partNo: "100219-51", name: "Box walls inlay cabinet", category: "Hardware", itemType: "Parts" },
-                { id: "100219-51-01", partNo: "100219-51-01", name: "Box walls inlay cabinet with defibrillator storage", category: "Cabinet", itemType: "Equipment • Capital" },
-                { id: "100219-51-01RC", partNo: "100219-51-01RC", name: "Box walls inlay cabinet with refrigeration cutout", category: "Electronics", itemType: "Equipment • Non-Capital" },
-                { id: "100219-52", partNo: "100219-52", name: "Box closeout top cap inlay cabinet", category: "Electronics", itemType: "Equipment • Non-Capital" },
-                { id: "100120-70", partNo: "100120-70", name: "Toyota long cut emergency brake panel", category: "Hardware", itemType: "Miscellaneous" },
+              const PREVIEW_ITEMS = [
+                { id: "1", name: "Steel Bolts M10×40", partNo: "SB-M10-40", category: "Fasteners", price: "$12.50", status: "Active" },
+                { id: "2", name: "Hex Nuts M10", partNo: "HN-M10", category: "Fasteners", price: "$4.20", status: "Active" },
+                { id: "3", name: "Flat Washers M10", partNo: "FW-M10", category: "Fasteners", price: "$2.80", status: "Active" },
+                { id: "4", name: "Spring Lock Washers M10", partNo: "SLW-M10", category: "Fasteners", price: "$3.40", status: "Inactive" },
+                { id: "5", name: "Threaded Rods M12×1m", partNo: "TR-M12-1M", category: "Rods", price: "$18.90", status: "Active" },
+                { id: "6", name: "Carriage Bolts 3/8×3", partNo: "CB-38-3", category: "Fasteners", price: "$8.60", status: "Active" },
               ];
-              const PT_MOCK_VENDORS = [
-                { id: "V-1", name: "Toyota International", types: ["Vendor • Sub-Contractor", "Customer"], moreTypes: 2, primaryItem: "100219-42", moreItems: 12 },
-                { id: "V-2", name: "Ford Motor Company", types: ["Vendor • Service Provider"], moreTypes: 1, primaryItem: "100219-51", moreItems: 34 },
-                { id: "V-3", name: "General Motors (GM)", types: ["Vendor • Seller", "Customer"], moreTypes: 3, primaryItem: "100219-51-01", moreItems: 15 },
-                { id: "V-4", name: "Tesla, Inc.", types: ["Vendor • Sub-Contractor"], moreTypes: 1, primaryItem: "100219-51-01RC", moreItems: 23 },
-                { id: "V-5", name: "Rivian Automotive", types: ["Vendor • Seller", "Customer"], moreTypes: 2, primaryItem: "100219-52", moreItems: 9 },
+              const PREVIEW_VENDORS_SIDEBAR = [
+                { id: "V-1", name: "Acme Industrial Supply Co.", status: "Active" },
+                { id: "V-2", name: "Global Fasteners Inc.", status: "Active" },
+                { id: "V-3", name: "Berlin Technik GmbH", status: "Active" },
+                { id: "V-4", name: "Pacific Hardware Ltd.", status: "Active" },
+                { id: "V-5", name: "Midwest Bolt & Nut Co.", status: "Active" },
+                { id: "V-6", name: "Atlas Steel Products", status: "Inactive" },
+                { id: "V-7", name: "Nordic Fastening Systems", status: "Active" },
+              ];
+              const PREVIEW_VENDORS_TABLE = [
+                { id: "V-1", name: "Acme Industrial Supply Co.", types: ["Vendor • Sub-Contractor", "Customer"], partNo: "SB-M10-40", moreItems: 12 },
+                { id: "V-2", name: "Global Fasteners Inc.", types: ["Vendor • Service Provider"], partNo: "HN-M10", moreItems: 34 },
+                { id: "V-3", name: "Berlin Technik GmbH", types: ["Vendor • Seller"], partNo: "FW-M10", moreItems: 15 },
+                { id: "V-4", name: "Pacific Hardware Ltd.", types: ["Vendor • Sub-Contractor"], partNo: "SLW-M10", moreItems: 23 },
+                { id: "V-5", name: "Midwest Bolt & Nut Co.", types: ["Vendor • Service Provider", "Customer"], partNo: "TR-M12-1M", moreItems: 8 },
               ];
               const badgeColor = previewTerm.badgeColor;
-              const activePreviewTab = PT_DETAIL_TABS.find((tab) => tab.id === previewTab);
+              const itemCount = PREVIEW_ITEMS.length;
+              const vendorCount = PREVIEW_VENDORS_SIDEBAR.length;
 
               return (
                 <>
+                  {/* Header */}
                   <div className="shrink-0 border-b border-border bg-background">
-                    <div className="flex items-center justify-between gap-3 px-4 py-3 sm:px-5 sm:py-4">
-                      <div className="flex min-w-0 items-start gap-3">
+                    <div className="flex items-center justify-between gap-3 px-4 py-3 sm:px-5">
+                      <div className="flex min-w-0 items-center gap-3">
                         <button
                           onClick={() => { setPreviewPaymentTermId(null); setPreviewTab("items"); }}
-                          className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                          className="w-9 h-9 rounded-full border border-border bg-background flex items-center justify-center hover:bg-muted transition-colors cursor-pointer shrink-0"
                         >
-                          <ArrowLeft className="h-4 w-4" />
+                          <ArrowLeft className="w-4 h-4 text-muted-foreground" />
                         </button>
                         <div className="min-w-0">
-                          <div className="flex flex-wrap items-center gap-2">
-                            <h3 className="truncate text-sm text-foreground sm:text-base" style={{ fontWeight: 600 }}>{previewTerm.name}</h3>
-                            <span
-                              className="inline-flex items-center gap-1 rounded-full border px-2 py-1 text-[10px]"
-                              style={{ fontWeight: 600, color: badgeColor, backgroundColor: `${badgeColor}12`, borderColor: `${badgeColor}2f` }}
-                            >
-                              <Receipt className="h-3 w-3" />
+                          <div className="flex items-center gap-2">
+                            <h3 className="text-[15px] font-semibold text-foreground truncate">{previewTerm.name}</h3>
+                            <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold text-white shrink-0" style={{ backgroundColor: badgeColor }}>
                               {previewTerm.typeBadge}
                             </span>
-                            <span className="inline-flex items-center rounded-full border border-border bg-muted px-2 py-1 text-[10px] text-muted-foreground" style={{ fontWeight: 600 }}>
-                              {ptTypeLabel}
-                            </span>
-                            <span className="inline-flex items-center rounded-full border border-border bg-background px-2 py-1 text-[10px] text-muted-foreground" style={{ fontWeight: 600 }}>
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-md border border-border bg-muted text-[11px] font-medium text-muted-foreground shrink-0">
                               {previewTerm.trigger}
                             </span>
                           </div>
-                          <p className="mt-1 max-w-[54rem] text-xs leading-relaxed text-muted-foreground">{previewTerm.description}</p>
+                          <p className="text-[12px] text-muted-foreground mt-0.5 truncate">{previewTerm.description}</p>
                         </div>
                       </div>
-
-                      <div className="flex shrink-0 items-center gap-2">
-                        <button
-                          onClick={() => setPtFullscreen(!ptFullscreen)}
-                          className="hidden sm:inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-2.5 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                          style={{ fontWeight: 500 }}
-                        >
-                          {ptFullscreen ? <Minimize2 className="h-3.5 w-3.5" /> : <Maximize2 className="h-3.5 w-3.5" />}
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        <button onClick={() => toast.info("Edit coming soon")} className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-background text-xs font-medium text-foreground hover:bg-muted transition-colors cursor-pointer">
+                          <Pencil className="w-3.5 h-3.5" /> Edit
+                        </button>
+                        <button onClick={() => toast.info("Archive coming soon")} className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-background text-xs font-medium text-foreground hover:bg-muted transition-colors cursor-pointer">
+                          <Archive className="w-3.5 h-3.5" /> Archive
+                        </button>
+                        <button onClick={() => setPtFullscreen(!ptFullscreen)} className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-background text-xs font-medium text-foreground hover:bg-muted transition-colors cursor-pointer">
+                          {ptFullscreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
                           {ptFullscreen ? "Exit full" : "Full view"}
                         </button>
-                        <button
-                          onClick={() => setPaymentTermsModalOpen(false)}
-                          className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                        >
-                          <X className="h-4 w-4" />
+                        <button onClick={() => setPaymentTermsModalOpen(false)} className="w-8 h-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-all cursor-pointer">
+                          <X className="w-4 h-4" />
                         </button>
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex min-h-0 flex-1 flex-col overflow-hidden xl:flex-row">
-                    <div className="shrink-0 border-b border-border bg-muted/20 xl:w-[360px] xl:border-b-0 xl:border-r">
-                      <div className="space-y-4 overflow-y-auto p-4 sm:p-5">
-                        <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
-                          <div className="flex items-start justify-between gap-3">
-                            <div>
-                              <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground" style={{ fontWeight: 600 }}>Net Duration</p>
-                              <div className="mt-2 flex items-end gap-2">
-                                <span className="text-3xl leading-none tracking-tight" style={{ fontWeight: 700, color: badgeColor }}>
-                                  {ptDuration}
-                                </span>
-                                <span className="pb-1 text-xs text-muted-foreground" style={{ fontWeight: 600 }}>days</span>
+                  {/* Body: Split Layout */}
+                  <div className="flex flex-1 overflow-hidden min-h-0">
+                    {/* LEFT SIDEBAR */}
+                    <div className="w-[340px] border-r border-border flex flex-col bg-background shrink-0 overflow-y-auto">
+                      {/* Hero metric */}
+                      <div className="px-5 pt-5 pb-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-baseline gap-2">
+                            <span className="text-[36px] font-bold text-foreground leading-none tabular-nums">{ptDuration}</span>
+                            <span className="text-[14px] text-muted-foreground font-medium">days</span>
+                          </div>
+                          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-600 border border-emerald-200">
+                            Active
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-4 mt-3 text-[13px]">
+                          <span className="font-semibold text-foreground">{itemCount} <span className="font-normal text-muted-foreground">Items</span></span>
+                          <span className="font-semibold text-foreground">{vendorCount} <span className="font-normal text-muted-foreground">Vendors</span></span>
+                        </div>
+                        <div className="flex items-center gap-1.5 mt-3">
+                          <button className="w-8 h-8 rounded-lg border border-border bg-background flex items-center justify-center hover:bg-muted transition-colors cursor-pointer">
+                            <Receipt className="w-3.5 h-3.5 text-muted-foreground" />
+                          </button>
+                          <button className="w-8 h-8 rounded-lg border border-border bg-background flex items-center justify-center hover:bg-muted transition-colors cursor-pointer">
+                            <Copy className="w-3.5 h-3.5 text-muted-foreground" />
+                          </button>
+                          <button className="w-8 h-8 rounded-lg border border-border bg-background flex items-center justify-center hover:bg-muted transition-colors cursor-pointer">
+                            <MoreHorizontal className="w-3.5 h-3.5 text-muted-foreground" />
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* About section */}
+                      <div className="border-t border-border">
+                        <button onClick={() => setAboutPtOpen(!aboutPtOpen)} className="w-full flex items-center justify-between px-5 py-3 text-[13px] font-semibold text-foreground cursor-pointer hover:bg-muted/50 transition-colors">
+                          About
+                          <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform ${aboutPtOpen ? "rotate-180" : ""}`} />
+                        </button>
+                        {aboutPtOpen && (
+                          <div className="px-5 pb-4 space-y-3">
+                            <p className="text-[12px] text-muted-foreground leading-relaxed">{previewTerm.description}</p>
+                            <div className="flex items-center justify-between py-2.5 px-3 rounded-lg border border-border bg-muted/30">
+                              <div className="flex items-center gap-2 text-[12px] text-muted-foreground">
+                                <Zap className="w-3.5 h-3.5 text-amber-500" />
+                                <span className="font-medium">Trigger Event</span>
+                              </div>
+                              <span className="text-[12px] font-semibold text-foreground">{previewTerm.trigger}</span>
+                            </div>
+                            <div className="grid grid-cols-2 gap-2">
+                              <div className="rounded-lg border border-border bg-muted/20 p-3">
+                                <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Type</span>
+                                <p className="text-[12px] font-medium text-foreground mt-1 leading-snug">{ptTypeLabel}</p>
+                              </div>
+                              <div className="rounded-lg border border-border bg-muted/20 p-3">
+                                <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Duration</span>
+                                <p className="text-[12px] font-medium text-foreground mt-1">{ptDuration} days</p>
                               </div>
                             </div>
-                            <span className="inline-flex items-center rounded-full border border-primary/20 bg-primary/10 px-2 py-1 text-[10px] text-primary" style={{ fontWeight: 600 }}>
-                              Template
-                            </span>
-                          </div>
-
-                          <div className="mt-4 grid grid-cols-2 gap-2">
-                            <div className="rounded-xl border border-border bg-background px-3 py-2.5">
-                              <p className="text-[10px] uppercase tracking-[0.16em] text-muted-foreground" style={{ fontWeight: 600 }}>Partners Using</p>
-                              <p className="mt-1 text-lg text-foreground" style={{ fontWeight: 700 }}>{previewTerm.vendorsApplied}</p>
-                            </div>
-                            <div className="rounded-xl border border-border bg-background px-3 py-2.5">
-                              <p className="text-[10px] uppercase tracking-[0.16em] text-muted-foreground" style={{ fontWeight: 600 }}>Applicable Items</p>
-                              <p className="mt-1 text-lg text-foreground" style={{ fontWeight: 700 }}>{PT_MOCK_ITEMS.length}</p>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="rounded-2xl border border-border bg-background shadow-sm">
-                          <button
-                            onClick={() => setAboutPtOpen(!aboutPtOpen)}
-                            className="flex w-full items-center justify-between px-4 py-3 text-left"
-                          >
-                            <div>
-                              <p className="text-sm text-foreground" style={{ fontWeight: 600 }}>Configuration details</p>
-                              <p className="mt-0.5 text-xs text-muted-foreground">Core settings that define how the term behaves.</p>
-                            </div>
-                            <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${aboutPtOpen ? "rotate-180" : ""}`} />
-                          </button>
-
-                          <div className={`overflow-hidden transition-all duration-200 ${aboutPtOpen ? "max-h-[480px] opacity-100" : "max-h-0 opacity-0"}`}>
-                            <div className="space-y-3 px-4 pb-4">
-                              <div className="rounded-xl border border-border bg-muted/30 px-3 py-3">
-                                <div className="mb-3 flex items-center gap-2 text-xs text-foreground" style={{ fontWeight: 600 }}>
-                                  <Info className="h-3.5 w-3.5 text-primary" />
-                                  Payment term overview
-                                </div>
-                                {[
-                                  { label: "Type", value: ptTypeLabel },
-                                  { label: "Trigger", value: previewTerm.trigger },
-                                  { label: "Duration", value: `${ptDuration} days` },
-                                  { label: "Description", value: previewTerm.description || "-" },
-                                ].map((row) => (
-                                  <div key={row.label} className="flex items-start justify-between gap-3 border-t border-border/70 py-2 first:border-t-0 first:pt-0 last:pb-0">
-                                    <span className="text-xs text-muted-foreground" style={{ fontWeight: 500 }}>{row.label}</span>
-                                    <span className="max-w-[60%] text-right text-xs text-foreground" style={{ fontWeight: 600 }}>{row.value}</span>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="rounded-2xl border border-border bg-background shadow-sm">
-                          <button
-                            onClick={() => setVendorsPtOpen(!vendorsPtOpen)}
-                            className="flex w-full items-center justify-between px-4 py-3 text-left"
-                          >
-                            <div>
-                              <p className="text-sm text-foreground" style={{ fontWeight: 600 }}>Ownership & controls</p>
-                              <p className="mt-0.5 text-xs text-muted-foreground">Review discount logic and who created this template.</p>
-                            </div>
-                            <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${vendorsPtOpen ? "rotate-180" : ""}`} />
-                          </button>
-
-                          <div className={`overflow-hidden transition-all duration-200 ${vendorsPtOpen ? "max-h-[420px] opacity-100" : "max-h-0 opacity-0"}`}>
-                            <div className="space-y-3 px-4 pb-4">
-                              <div className="rounded-xl border border-border bg-background px-3 py-3">
-                                <p className="text-[10px] uppercase tracking-[0.16em] text-muted-foreground" style={{ fontWeight: 600 }}>Early payment discount</p>
-                                <div className="mt-3 grid grid-cols-2 gap-2">
-                                  <div className="rounded-lg border border-border bg-muted/30 px-3 py-2.5">
-                                    <p className="text-[10px] text-muted-foreground" style={{ fontWeight: 600 }}>Discount %</p>
-                                    <p className="mt-1 text-sm text-foreground" style={{ fontWeight: 700 }}>{previewTerm.discountPercent || "-"}</p>
-                                  </div>
-                                  <div className="rounded-lg border border-border bg-muted/30 px-3 py-2.5">
-                                    <p className="text-[10px] text-muted-foreground" style={{ fontWeight: 600 }}>Eligible Period</p>
-                                    <p className="mt-1 text-sm text-foreground" style={{ fontWeight: 700 }}>{previewTerm.discountPeriod ? `${previewTerm.discountPeriod} days` : "-"}</p>
-                                  </div>
+                            <div className="grid grid-cols-2 gap-2">
+                              <div className="rounded-lg border border-border bg-muted/20 p-3">
+                                <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Created by</span>
+                                <div className="flex items-center gap-1.5 mt-1.5">
+                                  {(() => { const cTint = getAvatarTint("John Doe"); return (
+                                    <div className="w-5 h-5 rounded-full flex items-center justify-center text-[8px] font-bold shrink-0" style={{ backgroundColor: cTint.bg, color: cTint.fg }}>JD</div>
+                                  ); })()}
+                                  <span className="text-[12px] font-medium text-foreground">John Doe</span>
                                 </div>
                               </div>
+                              <div className="rounded-lg border border-border bg-muted/20 p-3">
+                                <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Created at</span>
+                                <p className="text-[12px] font-medium text-foreground mt-1.5">Dec 15, 2025</p>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
 
-                              <div className="rounded-xl border border-border bg-muted/30 px-3 py-3">
-                                <p className="text-[10px] uppercase tracking-[0.16em] text-muted-foreground" style={{ fontWeight: 600 }}>Ownership</p>
-                                <div className="mt-3 space-y-2">
-                                  <div className="flex items-center justify-between gap-3">
-                                    <span className="text-xs text-muted-foreground" style={{ fontWeight: 500 }}>Created by</span>
-                                    <div className="flex items-center gap-2">
-                                      {(() => {
-                                        const cTint = getAvatarTint("John Doe");
-                                        return (
-                                          <div className="flex h-6 w-6 items-center justify-center rounded-full text-[9px]" style={{ backgroundColor: cTint.bg, color: cTint.fg, fontWeight: 700 }}>
-                                            JD
-                                          </div>
-                                        );
-                                      })()}
-                                      <span className="text-xs text-foreground" style={{ fontWeight: 600 }}>John Doe</span>
+                      {/* Vendors list */}
+                      <div className="border-t border-border">
+                        <button onClick={() => setVendorsPtOpen(!vendorsPtOpen)} className="w-full flex items-center justify-between px-5 py-3 text-[13px] font-semibold text-foreground cursor-pointer hover:bg-muted/50 transition-colors">
+                          Vendors ({vendorCount})
+                          <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform ${vendorsPtOpen ? "rotate-180" : ""}`} />
+                        </button>
+                        {vendorsPtOpen && (
+                          <div className="px-5 pb-4 space-y-2">
+                            {PREVIEW_VENDORS_SIDEBAR.map((v) => {
+                              const vTint = getAvatarTint(v.name);
+                              const initials = v.name.split(" ").map(w => w[0]).slice(0, 2).join("");
+                              return (
+                                <div key={v.id} className="flex items-center gap-3 p-2.5 rounded-lg border border-border bg-background hover:bg-muted/30 transition-colors cursor-pointer">
+                                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0" style={{ backgroundColor: vTint.bg, color: vTint.fg }}>
+                                    {initials}
+                                  </div>
+                                  <div className="min-w-0 flex-1">
+                                    <div className="flex items-center justify-between gap-2">
+                                      <span className="text-[12px] font-medium text-foreground truncate">{v.name}</span>
+                                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold shrink-0 ${v.status === "Active" ? "bg-emerald-50 text-emerald-600 border border-emerald-200" : "bg-muted text-muted-foreground border border-border"}`}>
+                                        {v.status}
+                                      </span>
                                     </div>
-                                  </div>
-                                  <div className="flex items-center justify-between gap-3 border-t border-border/70 pt-2">
-                                    <span className="text-xs text-muted-foreground" style={{ fontWeight: 500 }}>Created on</span>
-                                    <span className="text-xs text-foreground" style={{ fontWeight: 600 }}>Dec 15, 2025</span>
+                                    <span className="text-[11px] text-muted-foreground">{v.id}</span>
                                   </div>
                                 </div>
-                              </div>
-                            </div>
+                              );
+                            })}
                           </div>
-                        </div>
+                        )}
                       </div>
                     </div>
 
-                    <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-background">
-                      <div className="border-b border-border px-2 sm:px-3">
-                        <div className="flex items-center gap-1 overflow-x-auto py-2">
-                          {PT_DETAIL_TABS.map((tab) => {
-                            const active = previewTab === tab.id;
-                            const count = tab.id === "items" ? PT_MOCK_ITEMS.length : tab.id === "vendors_applied" ? previewTerm.vendorsApplied : 0;
-
-                            return (
-                              <button
-                                key={tab.id}
-                                onClick={() => setPreviewTab(tab.id)}
-                                className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border px-3 py-2 text-xs transition-colors ${
-                                  active
-                                    ? "border-primary/20 bg-primary/10 text-primary"
-                                    : "border-transparent text-muted-foreground hover:border-border hover:bg-muted hover:text-foreground"
-                                }`}
-                                style={{ fontWeight: active ? 600 : 500 }}
-                              >
-                                <tab.icon className="h-3.5 w-3.5" />
-                                {tab.label}
-                                {count > 0 && (
-                                  <span className={`inline-flex min-w-[18px] items-center justify-center rounded-full px-1.5 py-0.5 text-[10px] ${
-                                    active ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
-                                  }`} style={{ fontWeight: 700 }}>
-                                    {count}
-                                  </span>
-                                )}
-                              </button>
-                            );
-                          })}
-                        </div>
+                    {/* RIGHT PANEL */}
+                    <div className="flex-1 flex flex-col overflow-hidden bg-background">
+                      {/* Tabs */}
+                      <div className="flex items-center border-b border-border shrink-0 px-1">
+                        {PREVIEW_TABS.map((t) => {
+                          const active = previewTab === t.id;
+                          const count = t.id === "items" ? itemCount : t.id === "vendors" ? vendorCount : 0;
+                          return (
+                            <button
+                              key={t.id}
+                              onClick={() => setPreviewTab(t.id)}
+                              className={`inline-flex items-center gap-1.5 px-3.5 py-2.5 text-[12px] border-b-2 transition-all cursor-pointer whitespace-nowrap ${
+                                active ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
+                              }`}
+                              style={{ fontWeight: active ? 600 : 500 }}
+                            >
+                              <t.icon className="w-3.5 h-3.5" />
+                              {t.label}
+                              {count > 0 && (
+                                <span className={`text-[9px] rounded-full px-1.5 py-px min-w-[16px] text-center font-bold ${active ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>
+                                  {count}
+                                </span>
+                              )}
+                            </button>
+                          );
+                        })}
                       </div>
 
+                      {/* Items tab */}
                       {previewTab === "items" && (
-                        <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-                          <div className="flex flex-col gap-3 border-b border-border px-4 py-3 lg:flex-row lg:items-center lg:justify-between">
-                            <div className="flex min-w-0 flex-1 items-center gap-2">
-                              <div className="relative w-full max-w-sm">
-                                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                                <Input placeholder="Search applicable items..." className="h-9 rounded-lg border-border bg-background pl-9 text-sm" />
+                        <div className="flex-1 flex flex-col overflow-hidden">
+                          <div className="flex items-center justify-between gap-3 px-4 py-3 shrink-0">
+                            <div className="flex items-center gap-2 flex-1 min-w-0">
+                              <div className="relative flex-1 max-w-[260px]">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
+                                <Input placeholder="Search items..." className="pl-9 pr-3 h-9 text-[12px] bg-background border-border rounded-lg" />
                               </div>
-                              <Button variant="outline" size="sm" className="h-9 shrink-0 gap-1.5 rounded-lg">
-                                <SlidersHorizontal className="h-3.5 w-3.5" /> Filters
+                              <Button variant="outline" size="sm" className="h-9 gap-1.5 rounded-lg">
+                                <SlidersHorizontal className="w-3.5 h-3.5" /> Filters
                               </Button>
                             </div>
-                            <div className="inline-flex items-center gap-2 text-xs text-muted-foreground" style={{ fontWeight: 600 }}>
-                              <span className="inline-flex h-7 min-w-[28px] items-center justify-center rounded-md bg-primary/10 px-2 text-primary">{PT_MOCK_ITEMS.length}</span>
-                              items matched to this template
-                            </div>
+                            <Button size="sm" className="h-9 bg-primary text-primary-foreground">
+                              + Add Item
+                            </Button>
                           </div>
-
-                          <div className="min-h-0 flex-1 overflow-auto">
-                            <table className="w-full min-w-[820px] text-sm">
-                              <thead className="sticky top-0 z-10 bg-muted/40">
+                          <div className="flex-1 overflow-auto">
+                            <table className="w-full text-[12px]">
+                              <thead className="sticky top-0 bg-muted/50 z-10">
                                 <tr>
-                                  <th className="border-b border-border px-4 py-3 text-left text-[11px] uppercase tracking-[0.14em] text-muted-foreground" style={{ fontWeight: 600 }}>Part No.</th>
-                                  <th className="border-b border-border px-4 py-3 text-left text-[11px] uppercase tracking-[0.14em] text-muted-foreground" style={{ fontWeight: 600 }}>Item Description</th>
-                                  <th className="border-b border-border px-4 py-3 text-left text-[11px] uppercase tracking-[0.14em] text-muted-foreground" style={{ fontWeight: 600 }}>Category</th>
-                                  <th className="border-b border-border px-4 py-3 text-left text-[11px] uppercase tracking-[0.14em] text-muted-foreground" style={{ fontWeight: 600 }}>Item Type</th>
+                                  <th className="text-left px-4 py-2.5 text-muted-foreground text-[11px] font-semibold border-b border-border">Item</th>
+                                  <th className="text-left px-4 py-2.5 text-muted-foreground text-[11px] font-semibold border-b border-border">Part No.</th>
+                                  <th className="text-left px-4 py-2.5 text-muted-foreground text-[11px] font-semibold border-b border-border">Category</th>
+                                  <th className="text-right px-4 py-2.5 text-muted-foreground text-[11px] font-semibold border-b border-border">Price</th>
+                                  <th className="text-left px-4 py-2.5 text-muted-foreground text-[11px] font-semibold border-b border-border">Status</th>
                                 </tr>
                               </thead>
                               <tbody>
-                                {PT_MOCK_ITEMS.map((item) => (
-                                  <tr key={item.id} className="border-b border-border/70 transition-colors hover:bg-muted/30">
-                                    <td className="px-4 py-3 text-xs text-foreground" style={{ fontWeight: 600 }}>{item.partNo}</td>
+                                {PREVIEW_ITEMS.map((item) => (
+                                  <tr key={item.id} className="hover:bg-muted/30 transition-colors border-b border-border/50">
                                     <td className="px-4 py-3">
                                       <div className="flex items-center gap-3">
-                                        <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-muted/50 text-muted-foreground">
-                                          <Package className="h-4 w-4" />
+                                        <div className="w-8 h-8 rounded-lg bg-muted border border-border flex items-center justify-center shrink-0">
+                                          <Package className="w-3.5 h-3.5 text-muted-foreground" />
                                         </div>
-                                        <span className="text-sm text-foreground" style={{ fontWeight: 500 }}>{item.name}</span>
+                                        <span className="text-[13px] font-medium text-foreground">{item.name}</span>
                                       </div>
                                     </td>
-                                    <td className="px-4 py-3 text-sm text-muted-foreground">{item.category}</td>
                                     <td className="px-4 py-3">
-                                      <span className={`inline-flex items-center rounded-md border px-2 py-1 text-[11px] ${
-                                        item.itemType === "Parts"
-                                          ? "border-primary/20 bg-primary/10 text-primary"
-                                          : "border-border bg-muted text-muted-foreground"
-                                      }`} style={{ fontWeight: 600 }}>
-                                        {item.itemType}
+                                      <span className="inline-flex px-2 py-0.5 rounded border border-border bg-muted/50 text-[11px] font-mono text-muted-foreground">{item.partNo}</span>
+                                    </td>
+                                    <td className="px-4 py-3 text-[12px] text-muted-foreground">{item.category}</td>
+                                    <td className="px-4 py-3 text-right text-[13px] font-medium text-foreground tabular-nums">{item.price}</td>
+                                    <td className="px-4 py-3">
+                                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+                                        item.status === "Active" ? "bg-emerald-50 text-emerald-600 border border-emerald-200" : "bg-orange-50 text-orange-600 border border-orange-200"
+                                      }`}>
+                                        {item.status}
                                       </span>
                                     </td>
                                   </tr>
@@ -5580,78 +5567,70 @@ function ConfigPageContent({
                               </tbody>
                             </table>
                           </div>
+                          <div className="flex items-center justify-between px-4 py-2.5 border-t border-border shrink-0 bg-muted/30">
+                            <span className="text-[11px] text-muted-foreground">Showing {itemCount} of {itemCount} items</span>
+                            <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                              <span>Records per page</span>
+                              <select className="h-6 px-1.5 rounded border border-border bg-background text-[11px] cursor-pointer outline-none">
+                                <option>20</option><option>50</option>
+                              </select>
+                            </div>
+                          </div>
                         </div>
                       )}
 
-                      {previewTab === "vendors_applied" && (
-                        <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-                          <div className="flex flex-col gap-3 border-b border-border px-4 py-3 lg:flex-row lg:items-center lg:justify-between">
-                            <div className="flex min-w-0 flex-1 items-center gap-2">
-                              <div className="relative w-full max-w-sm">
-                                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                                <Input placeholder="Search partners using this term..." className="h-9 rounded-lg border-border bg-background pl-9 text-sm" />
+                      {/* Vendors tab */}
+                      {previewTab === "vendors" && (
+                        <div className="flex-1 flex flex-col overflow-hidden">
+                          <div className="flex items-center justify-between gap-3 px-4 py-3 shrink-0">
+                            <div className="flex items-center gap-2 flex-1 min-w-0">
+                              <div className="relative flex-1 max-w-[260px]">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
+                                <Input placeholder="Search vendors..." className="pl-9 pr-3 h-9 text-[12px] bg-background border-border rounded-lg" />
                               </div>
-                              <Button variant="outline" size="sm" className="h-9 shrink-0 gap-1.5 rounded-lg">
-                                <SlidersHorizontal className="h-3.5 w-3.5" /> Filters
+                              <Button variant="outline" size="sm" className="h-9 gap-1.5 rounded-lg">
+                                <SlidersHorizontal className="w-3.5 h-3.5" /> Filters
                               </Button>
                             </div>
-                            <div className="inline-flex items-center gap-2 text-xs text-muted-foreground" style={{ fontWeight: 600 }}>
-                              <span className="inline-flex h-7 min-w-[28px] items-center justify-center rounded-md bg-primary/10 px-2 text-primary">{previewTerm.vendorsApplied}</span>
-                              partners currently using this template
-                            </div>
                           </div>
-
-                          <div className="min-h-0 flex-1 overflow-auto">
-                            <table className="w-full min-w-[860px] text-sm">
-                              <thead className="sticky top-0 z-10 bg-muted/40">
+                          <div className="flex-1 overflow-auto">
+                            <table className="w-full text-[12px]">
+                              <thead className="sticky top-0 bg-muted/50 z-10">
                                 <tr>
-                                  <th className="border-b border-border px-4 py-3 text-left text-[11px] uppercase tracking-[0.14em] text-muted-foreground" style={{ fontWeight: 600 }}>Partner Name</th>
-                                  <th className="border-b border-border px-4 py-3 text-left text-[11px] uppercase tracking-[0.14em] text-muted-foreground" style={{ fontWeight: 600 }}>Partner Type</th>
-                                  <th className="border-b border-border px-4 py-3 text-left text-[11px] uppercase tracking-[0.14em] text-muted-foreground" style={{ fontWeight: 600 }}>Applied Items</th>
+                                  <th className="text-left px-4 py-2.5 text-muted-foreground text-[11px] font-semibold border-b border-border">Partner Name</th>
+                                  <th className="text-left px-4 py-2.5 text-muted-foreground text-[11px] font-semibold border-b border-border">Partner Type</th>
+                                  <th className="text-left px-4 py-2.5 text-muted-foreground text-[11px] font-semibold border-b border-border">No. of Items</th>
                                 </tr>
                               </thead>
                               <tbody>
-                                {PT_MOCK_VENDORS.map((vendor) => {
-                                  const vendorTint = getAvatarTint(vendor.name);
-                                  const vendorInitials = vendor.name.split(" ").map((word) => word[0]).slice(0, 2).join("");
-
+                                {PREVIEW_VENDORS_TABLE.map((v) => {
+                                  const vTint = getAvatarTint(v.name);
+                                  const vInit = v.name.split(" ").map(w => w[0]).slice(0, 2).join("");
                                   return (
-                                    <tr key={vendor.id} className="border-b border-border/70 transition-colors hover:bg-muted/30">
+                                    <tr key={v.id} className="hover:bg-muted/30 transition-colors border-b border-border/50">
                                       <td className="px-4 py-3">
                                         <div className="flex items-center gap-3">
-                                          <div className="flex h-9 w-9 items-center justify-center rounded-full text-[11px]" style={{ backgroundColor: vendorTint.bg, color: vendorTint.fg, fontWeight: 700 }}>
-                                            {vendorInitials}
+                                          <div className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0" style={{ backgroundColor: vTint.bg, color: vTint.fg }}>
+                                            {vInit}
                                           </div>
-                                          <div>
-                                            <p className="text-sm text-foreground" style={{ fontWeight: 600 }}>{vendor.name}</p>
-                                            <p className="text-xs text-muted-foreground">{vendor.id}</p>
-                                          </div>
+                                          <span className="text-[12px] font-medium text-foreground">{v.name}</span>
                                         </div>
                                       </td>
                                       <td className="px-4 py-3">
-                                        <div className="flex flex-wrap items-center gap-1.5">
-                                          {vendor.types.map((type, index) => (
-                                            <span
-                                              key={`${vendor.id}-${index}`}
-                                              className={`inline-flex items-center rounded-md border px-2 py-1 text-[11px] ${
-                                                type.includes("Customer")
-                                                  ? "border-primary/20 bg-primary/10 text-primary"
-                                                  : "border-border bg-muted text-muted-foreground"
-                                              }`}
-                                              style={{ fontWeight: 600 }}
-                                            >
+                                        <div className="flex items-center gap-1 flex-wrap">
+                                          {v.types.map((type, i) => (
+                                            <span key={i} className={`inline-flex px-2 py-0.5 rounded-md border text-[10px] font-medium ${
+                                              type.includes("Customer") ? "border-primary/25 bg-primary/5 text-primary" : "border-border bg-muted text-muted-foreground"
+                                            }`}>
                                               {type}
                                             </span>
                                           ))}
-                                          {vendor.moreTypes > 0 && (
-                                            <span className="text-xs text-muted-foreground" style={{ fontWeight: 600 }}>+{vendor.moreTypes} more</span>
-                                          )}
                                         </div>
                                       </td>
                                       <td className="px-4 py-3">
-                                        <div className="flex items-center gap-2 text-sm">
-                                          <span className="text-foreground" style={{ fontWeight: 600 }}>{vendor.primaryItem}</span>
-                                          <span className="text-primary" style={{ fontWeight: 600 }}>+{vendor.moreItems} more</span>
+                                        <div className="flex items-center gap-1.5">
+                                          <span className="text-[12px] font-medium text-foreground tabular-nums">{v.partNo}</span>
+                                          <span className="text-[11px] text-primary cursor-pointer hover:underline font-medium">+{v.moreItems} more</span>
                                         </div>
                                       </td>
                                     </tr>
@@ -5660,51 +5639,45 @@ function ConfigPageContent({
                               </tbody>
                             </table>
                           </div>
+                          <div className="flex items-center justify-between px-4 py-2.5 border-t border-border shrink-0 bg-muted/30">
+                            <span className="text-[11px] text-muted-foreground">Showing {PREVIEW_VENDORS_TABLE.length} of {vendorCount} vendors</span>
+                            <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                              <span>Records per page</span>
+                              <select className="h-6 px-1.5 rounded border border-border bg-background text-[11px] cursor-pointer outline-none">
+                                <option>20</option><option>50</option>
+                              </select>
+                            </div>
+                          </div>
                         </div>
                       )}
 
-                      {previewTab !== "items" && previewTab !== "vendors_applied" && (
-                        <div className="flex flex-1 items-center justify-center p-8">
-                          <div className="max-w-sm text-center">
-                            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-border bg-muted/40 text-primary">
-                              {activePreviewTab ? <activePreviewTab.icon className="h-5 w-5" /> : null}
+                      {/* Placeholder tabs */}
+                      {previewTab !== "items" && previewTab !== "vendors" && (
+                        <div className="flex-1 flex items-center justify-center">
+                          <div className="text-center">
+                            <div className="w-12 h-12 rounded-xl bg-muted border border-border flex items-center justify-center mx-auto mb-3">
+                              {(() => { const T = PREVIEW_TABS.find((x) => x.id === previewTab); return T ? <T.icon className="w-5 h-5 text-muted-foreground" /> : null; })()}
                             </div>
-                            <p className="text-sm text-foreground" style={{ fontWeight: 600 }}>{activePreviewTab?.label}</p>
-                            <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                              {previewTab === "notes_files"
-                                ? "Use this section for internal notes, supporting documents, and attachments tied to this payment-term template."
-                                : "Use this section to review changes, edits, and recent activity related to this payment-term template."}
-                            </p>
+                            <p className="text-[13px] font-medium text-foreground">{PREVIEW_TABS.find((x) => x.id === previewTab)?.label || previewTab}</p>
+                            <p className="text-[11px] text-muted-foreground mt-1">Coming soon</p>
                           </div>
                         </div>
                       )}
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between border-t border-border bg-card px-4 py-3">
-                    <div className="text-xs text-muted-foreground" style={{ fontWeight: 500 }}>
-                      Reviewing template: <span className="text-foreground" style={{ fontWeight: 600 }}>{previewTerm.name}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleDuplicatePaymentTerm(previewTerm)}
-                      >
-                        <Copy className="mr-1.5 h-3.5 w-3.5" /> Duplicate
-                      </Button>
-                      <Button
-                        size="sm"
-                        onClick={() => {
-                          setSelectedPaymentTermId(previewTerm.id);
-                          setPaymentTermsModalOpen(false);
-                          setPreviewPaymentTermId(null);
-                          setPreviewTab("items");
-                        }}
-                        className="bg-primary text-primary-foreground"
-                      >
-                        <Check className="mr-1.5 h-3.5 w-3.5" /> Use Template
-                      </Button>
+                  {/* Footer */}
+                  <div className="shrink-0 border-t border-border bg-muted/30">
+                    <div className="px-5 py-3 flex items-center justify-between">
+                      <span className="text-[12px] text-muted-foreground font-medium">Reviewing: {previewTerm.name}</span>
+                      <div className="flex items-center gap-2">
+                        <Button variant="outline" size="sm" onClick={() => handleDuplicatePaymentTerm(previewTerm)}>
+                          <Copy className="mr-1.5 h-3.5 w-3.5" /> Duplicate
+                        </Button>
+                        <Button size="sm" onClick={() => { setSelectedPaymentTermId(previewTerm.id); setPaymentTermsModalOpen(false); setPreviewPaymentTermId(null); setPreviewTab("items"); }} className="bg-primary text-primary-foreground">
+                          <Check className="mr-1.5 h-3.5 w-3.5" /> Use Template
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </>
