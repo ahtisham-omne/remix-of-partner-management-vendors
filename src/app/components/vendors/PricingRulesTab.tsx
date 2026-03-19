@@ -1823,7 +1823,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
 
           <button type="button" onClick={() => { setExplorePresetsOpen(true); setExplorePresetsSidebar("all"); setExplorePresetsSearch(""); }} className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg border border-[#E2E8F0] bg-white text-[#334155] hover:bg-[#F8FAFC] text-sm transition-colors cursor-pointer" style={{ fontWeight: 600 }}>
             <BookOpen className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Explore presets</span>
+            <span className="hidden sm:inline">Templates</span>
           </button>
           <button type="button" onClick={() => { resetCreateForm(); setCreateModalOpen(true); }} className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-sm shadow-sm transition-colors cursor-pointer" style={{ fontWeight: 600 }}>
             <Plus className="w-3.5 h-3.5" />
