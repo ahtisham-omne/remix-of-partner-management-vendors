@@ -20,6 +20,7 @@ import { PartnerItemsTab } from "../components/vendors/PartnerItemsTab";
 import { PricingRulesTabNew } from "../components/vendors/PricingRulesTab";
 import { PaymentMethodCard as PaymentMethodCardBase } from "../components/vendors/PaymentMethodsSection";
 import { PaymentTermDetailModal } from "../components/vendors/PaymentTermDetailModal";
+import { PaymentTermCard } from "../components/vendors/PaymentTermCard";
 import { PAYMENT_TERM_PRESETS, type PaymentTermPreset } from "../components/vendors/partnerConstants";
 import { PocSectionContent, SelectPocDictionaryModal, CreatePocModal } from "../components/vendors/PocModals";
 import {
