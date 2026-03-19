@@ -4263,49 +4263,26 @@ function PaymentTermsTab({ vendor, cfg }: { vendor: Vendor; cfg?: VendorConfigDa
       </ContentCard>
 
       {/* Applied Payment Term from Step 3 config */}
-      {hasPaymentTerm && (
+      {hasPaymentTerm ? (
         <ContentCard title="Applied Payment Term" icon={Receipt}>
-          <div className="rounded-md border border-[#E2E8F0] p-3 space-y-2 bg-[#FAFBFC]">
-            <div className="flex items-center gap-2">
-              <span
-                className="inline-flex items-center px-2 py-0.5 rounded text-[10px] text-white"
-                style={{
-                  fontWeight: 700,
-                  backgroundColor: cfg!.paymentTermConfig!.type === "NET" ? "#0A77FF" : cfg!.paymentTermConfig!.type === "Pre" ? "#7C3AED" : "#D97706",
-                }}
-              >
-                {cfg!.paymentTermConfig!.type}
-              </span>
-              <span className="text-[13px] text-[#0F172A]" style={{ fontWeight: 700 }}>{cfg!.paymentTermConfig!.name}</span>
-            </div>
-            <p className="text-[12px] text-[#64748B] leading-relaxed">{cfg!.paymentTermConfig!.description}</p>
-            <div className="flex gap-4 text-[11px]">
-              {cfg!.paymentTermConfig!.trigger && (
-                <div>
-                  <span className="text-[#94A3B8]">Trigger: </span>
-                  <span className="text-[#334155]" style={{ fontWeight: 500 }}>{cfg!.paymentTermConfig!.trigger}</span>
-                </div>
-              )}
-              {cfg!.paymentTermConfig!.duration && (
-                <div>
-                  <span className="text-[#94A3B8]">Duration: </span>
-                  <span className="text-[#334155]" style={{ fontWeight: 500 }}>{cfg!.paymentTermConfig!.duration} days</span>
-                </div>
-              )}
-            </div>
-            {cfg!.paymentTermConfig!.discountPercent && (
-              <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-[#F0FDF4] border border-[#DCFCE7]">
-                <CheckCircle2 className="w-3 h-3 text-[#059669]" />
-                <span className="text-[11px] text-[#059669]" style={{ fontWeight: 600 }}>
-                  {cfg!.paymentTermConfig!.discountPercent}% discount if paid within {cfg!.paymentTermConfig!.discountPeriod || "—"} days
-                </span>
-              </div>
-            )}
-          </div>
+          <PaymentTermCard
+            term={{
+              id: "pt-applied",
+              name: cfg!.paymentTermConfig!.name,
+              category: (cfg!.paymentTermConfig!.type === "Pre" ? "prepayment" : cfg!.paymentTermConfig!.type === "Split" ? "split" : "net") as "net" | "prepayment" | "split",
+              typeBadge: cfg!.paymentTermConfig!.type,
+              badgeColor: cfg!.paymentTermConfig!.type === "Pre" ? "#7C3AED" : cfg!.paymentTermConfig!.type === "Split" ? "#D97706" : "#0A77FF",
+              trigger: cfg!.paymentTermConfig!.trigger,
+              description: cfg!.paymentTermConfig!.description,
+              vendorsApplied: 4,
+              duration: cfg!.paymentTermConfig!.duration,
+              discountPercent: cfg!.paymentTermConfig!.discountPercent,
+              discountPeriod: cfg!.paymentTermConfig!.discountPeriod,
+            }}
+            readOnly
+          />
         </ContentCard>
-      )}
-
-      {!hasPaymentTerm && (
+      ) : (
         <ContentCard title="Applied Payment Term" icon={Receipt}>
           <EmptyState icon={Receipt} title="No custom payment term" description="A custom payment term can be configured during partner creation." />
         </ContentCard>
