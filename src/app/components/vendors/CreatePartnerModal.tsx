@@ -5281,281 +5281,241 @@ function ConfigPageContent({
         {/* ── Explore Presets Modal ── */}
         <Dialog open={paymentTermsModalOpen} onOpenChange={(v) => { setPaymentTermsModalOpen(v); if (!v) { setPreviewPaymentTermId(null); setPreviewTab("items"); setPtFullscreen(false); setAboutPtOpen(true); setVendorsPtOpen(true); } }}>
           <DialogContent
-            className="p-0 gap-0 overflow-hidden z-[210] border-0 shadow-[0_24px_80px_-12px_rgba(0,0,0,0.18)] transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] flex flex-col"
+            className="z-[210] flex flex-col gap-0 overflow-hidden border-0 p-0 shadow-[0_24px_80px_-12px_rgba(0,0,0,0.18)] transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
             style={ptFullscreen
               ? { maxWidth: "calc(100% - 1rem)", width: "calc(100% - 1rem)", height: "calc(100dvh - 1rem)", maxHeight: "calc(100dvh - 1rem)", borderRadius: 16 }
-              : { maxWidth: 980, width: "95vw", height: "85vh", maxHeight: "85vh", borderRadius: 16 }
+              : { maxWidth: 1480, width: "96vw", height: "88dvh", maxHeight: 920, borderRadius: 16 }
             }
             hideCloseButton
           >
-            <DialogTitle className="sr-only">Select payment terms</DialogTitle>
-            <DialogDescription className="sr-only">Browse and select a payment term preset to apply to this vendor.</DialogDescription>
-
-            {/* ── Header (changes based on preview vs list mode) ── */}
             {previewPaymentTermId ? (() => {
               const previewTerm = PAYMENT_TERM_PRESETS.find((t) => t.id === previewPaymentTermId) || (customPaymentTermRef.current?.id === previewPaymentTermId ? customPaymentTermRef.current : null);
               if (!previewTerm) return null;
+
               const ptDuration = previewTerm.duration || (previewTerm.name.match(/\d+/) ? previewTerm.name.match(/\d+/)![0] : "30");
               const ptTypeLabel = CREATE_PT_TYPES.find((t) => t.id === previewTerm.category)?.label || previewTerm.typeBadge;
               const PT_DETAIL_TABS = [
-                { id: "items", label: "Items", icon: Package },
-                { id: "vendors_applied", label: "Vendors", icon: Building2 },
-                { id: "notes", label: "Notes", icon: FileText },
-                { id: "attachments", label: "Files", icon: Paperclip },
-                { id: "audit_log", label: "Audit", icon: Clock },
-                { id: "recent_activity", label: "Activity", icon: ChartColumn },
-              ];
+                { id: "items", label: "Applicable Items", icon: Package },
+                { id: "vendors_applied", label: "Partners Using", icon: Building2 },
+                { id: "notes_files", label: "Notes & Files", icon: Paperclip },
+                { id: "activity", label: "Activity", icon: Clock },
+              ] as const;
               const PT_MOCK_ITEMS = [
-                { id: "ITM-001", name: "Steel Bolts M10x40", partNo: "SB-M10-40", category: "Fasteners", price: "$12.50", status: "Active" as const },
-                { id: "ITM-002", name: "Hex Nuts M10", partNo: "HN-M10", category: "Fasteners", price: "$4.20", status: "Active" as const },
-                { id: "ITM-003", name: "Flat Washers M10", partNo: "FW-M10", category: "Fasteners", price: "$2.80", status: "Active" as const },
-                { id: "ITM-004", name: "Spring Lock Washers M10", partNo: "SLW-M10", category: "Fasteners", price: "$3.40", status: "Inactive" as const },
-                { id: "ITM-005", name: "Threaded Rods M12x1m", partNo: "TR-M12-1M", category: "Rods", price: "$18.90", status: "Active" as const },
-                { id: "ITM-006", name: "Carriage Bolts 3/8x3", partNo: "CB-38-3", category: "Fasteners", price: "$8.60", status: "Active" as const },
+                { id: "100219-42", partNo: "100219-42", name: "Front bulkhead cabinet lower cover", category: "Ram Pro Master 2500", itemType: "Parts" },
+                { id: "100219-51", partNo: "100219-51", name: "Box walls inlay cabinet", category: "Hardware", itemType: "Parts" },
+                { id: "100219-51-01", partNo: "100219-51-01", name: "Box walls inlay cabinet with defibrillator storage", category: "Cabinet", itemType: "Equipment • Capital" },
+                { id: "100219-51-01RC", partNo: "100219-51-01RC", name: "Box walls inlay cabinet with refrigeration cutout", category: "Electronics", itemType: "Equipment • Non-Capital" },
+                { id: "100219-52", partNo: "100219-52", name: "Box closeout top cap inlay cabinet", category: "Electronics", itemType: "Equipment • Non-Capital" },
+                { id: "100120-70", partNo: "100120-70", name: "Toyota long cut emergency brake panel", category: "Hardware", itemType: "Miscellaneous" },
               ];
               const PT_MOCK_VENDORS = [
-                { id: "V-1", name: "Acme Industrial Supply Co.", avatar: "AI", status: "Active" as const, itemCount: 12 },
-                { id: "V-2", name: "Global Fasteners Inc.", avatar: "GF", status: "Active" as const, itemCount: 8 },
-                { id: "V-3", name: "Berlin Technik GmbH", avatar: "BT", status: "Active" as const, itemCount: 15 },
-                { id: "V-4", name: "Tokyo Materials Corp.", avatar: "TM", status: "Inactive" as const, itemCount: 3 },
+                { id: "V-1", name: "Toyota International", types: ["Vendor • Sub-Contractor", "Customer"], moreTypes: 2, primaryItem: "100219-42", moreItems: 12 },
+                { id: "V-2", name: "Ford Motor Company", types: ["Vendor • Service Provider"], moreTypes: 1, primaryItem: "100219-51", moreItems: 34 },
+                { id: "V-3", name: "General Motors (GM)", types: ["Vendor • Seller", "Customer"], moreTypes: 3, primaryItem: "100219-51-01", moreItems: 15 },
+                { id: "V-4", name: "Tesla, Inc.", types: ["Vendor • Sub-Contractor"], moreTypes: 1, primaryItem: "100219-51-01RC", moreItems: 23 },
+                { id: "V-5", name: "Rivian Automotive", types: ["Vendor • Seller", "Customer"], moreTypes: 2, primaryItem: "100219-52", moreItems: 9 },
               ];
               const badgeColor = previewTerm.badgeColor;
+              const activePreviewTab = PT_DETAIL_TABS.find((tab) => tab.id === previewTab);
 
               return (
                 <>
-                  {/* ─── Header Bar (pricing rules style) ─── */}
-                  <div className="shrink-0 bg-white rounded-t-none sm:rounded-t-2xl border-b border-[#EEF2F6]">
-                    <div className="px-3 sm:px-5 py-3 sm:py-3.5 flex items-center justify-between gap-3">
-                      <div className="flex items-center gap-3 min-w-0">
-                        <button onClick={() => { setPreviewPaymentTermId(null); setPreviewTab("items"); }} className="w-8 h-8 rounded-lg border border-[#E2E8F0] flex items-center justify-center hover:bg-[#F8FAFC] hover:border-[#CBD5E1] transition-all shrink-0 cursor-pointer">
-                          <ArrowLeft className="w-4 h-4 text-[#64748B]" />
+                  <div className="shrink-0 border-b border-border bg-background">
+                    <div className="flex items-center justify-between gap-3 px-4 py-3 sm:px-5 sm:py-4">
+                      <div className="flex min-w-0 items-start gap-3">
+                        <button
+                          onClick={() => { setPreviewPaymentTermId(null); setPreviewTab("items"); }}
+                          className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                        >
+                          <ArrowLeft className="h-4 w-4" />
                         </button>
                         <div className="min-w-0">
-                          <div className="flex items-center gap-2.5">
-                            <h3 className="text-[15px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{previewTerm.name}</h3>
-                            <span className="hidden sm:inline-flex items-stretch rounded-full overflow-hidden border shrink-0" style={{ borderColor: badgeColor + "40" }}>
-                              <span className="inline-flex items-center gap-1 px-2 py-[2px] text-[10px]" style={{ fontWeight: 600, color: badgeColor, backgroundColor: badgeColor + "15" }}>
-                                <Receipt className="w-3 h-3" />
-                                {previewTerm.typeBadge}
-                              </span>
-                              <span className="inline-flex items-center px-2 py-[2px] text-[10px] bg-white text-[#64748B] border-l" style={{ fontWeight: 500, borderColor: badgeColor + "40" }}>
-                                {previewTerm.trigger}
-                              </span>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <h3 className="truncate text-sm text-foreground sm:text-base" style={{ fontWeight: 600 }}>{previewTerm.name}</h3>
+                            <span
+                              className="inline-flex items-center gap-1 rounded-full border px-2 py-1 text-[10px]"
+                              style={{ fontWeight: 600, color: badgeColor, backgroundColor: `${badgeColor}12`, borderColor: `${badgeColor}2f` }}
+                            >
+                              <Receipt className="h-3 w-3" />
+                              {previewTerm.typeBadge}
+                            </span>
+                            <span className="inline-flex items-center rounded-full border border-border bg-muted px-2 py-1 text-[10px] text-muted-foreground" style={{ fontWeight: 600 }}>
+                              {ptTypeLabel}
+                            </span>
+                            <span className="inline-flex items-center rounded-full border border-border bg-background px-2 py-1 text-[10px] text-muted-foreground" style={{ fontWeight: 600 }}>
+                              {previewTerm.trigger}
                             </span>
                           </div>
-                          <div className="flex items-center gap-2 mt-0.5">
-                            <span className="text-[11px] text-[#64748B] truncate max-w-[340px]" style={{ fontWeight: 400 }}>{previewTerm.description}</span>
-                          </div>
+                          <p className="mt-1 max-w-[54rem] text-xs leading-relaxed text-muted-foreground">{previewTerm.description}</p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-1.5 shrink-0">
-                        <button
-                          onClick={() => toast.info("Edit coming soon")}
-                          className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#475569] hover:bg-[#F8FAFC] hover:border-[#CBD5E1] transition-all cursor-pointer"
-                          style={{ fontWeight: 500 }}
-                        >
-                          <Pencil className="w-3.5 h-3.5" />
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => toast.info("Archive coming soon")}
-                          className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#475569] hover:bg-[#F8FAFC] hover:border-[#CBD5E1] transition-all cursor-pointer"
-                          style={{ fontWeight: 500 }}
-                        >
-                          <Archive className="w-3.5 h-3.5" />
-                          Archive
-                        </button>
-                        <div className="w-px h-5 bg-[#E2E8F0] mx-0.5 hidden sm:block" />
+
+                      <div className="flex shrink-0 items-center gap-2">
                         <button
                           onClick={() => setPtFullscreen(!ptFullscreen)}
-                          className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#475569] hover:bg-[#F8FAFC] hover:border-[#CBD5E1] transition-all cursor-pointer"
+                          className="hidden sm:inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-2.5 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                           style={{ fontWeight: 500 }}
                         >
-                          {ptFullscreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
+                          {ptFullscreen ? <Minimize2 className="h-3.5 w-3.5" /> : <Maximize2 className="h-3.5 w-3.5" />}
                           {ptFullscreen ? "Exit full" : "Full view"}
                         </button>
-                        <button onClick={() => setPaymentTermsModalOpen(false)} className="w-8 h-8 rounded-lg flex items-center justify-center text-[#94A3B8] hover:text-[#64748B] hover:bg-[#F1F5F9] transition-all cursor-pointer">
-                          <X className="w-4 h-4" />
+                        <button
+                          onClick={() => setPaymentTermsModalOpen(false)}
+                          className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                        >
+                          <X className="h-4 w-4" />
                         </button>
                       </div>
                     </div>
                   </div>
 
-                  {/* ─── Body: Split Layout ─── */}
-                  <div className="flex flex-1 overflow-hidden min-h-0">
-                    {/* ─── LEFT PANEL ─── */}
-                    <div className="w-[300px] border-r border-[#E8ECF1] flex flex-col bg-[#FAFBFC] shrink-0 overflow-y-auto">
-                      {/* Hero value + status */}
-                      <div className="px-4 pt-4 pb-3 border-b border-[#E8ECF1]">
-                        <div className="flex items-baseline justify-between gap-3">
-                          <div className="flex items-baseline gap-2">
-                            <span className="text-[28px] tabular-nums leading-none tracking-tight" style={{ fontWeight: 600, color: badgeColor }}>
-                              {ptDuration}
-                            </span>
-                            <span className="text-[12px] text-[#94A3B8]" style={{ fontWeight: 500 }}>
-                              days
+                  <div className="flex min-h-0 flex-1 flex-col overflow-hidden xl:flex-row">
+                    <div className="shrink-0 border-b border-border bg-muted/20 xl:w-[360px] xl:border-b-0 xl:border-r">
+                      <div className="space-y-4 overflow-y-auto p-4 sm:p-5">
+                        <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
+                          <div className="flex items-start justify-between gap-3">
+                            <div>
+                              <p className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground" style={{ fontWeight: 600 }}>Net Duration</p>
+                              <div className="mt-2 flex items-end gap-2">
+                                <span className="text-3xl leading-none tracking-tight" style={{ fontWeight: 700, color: badgeColor }}>
+                                  {ptDuration}
+                                </span>
+                                <span className="pb-1 text-xs text-muted-foreground" style={{ fontWeight: 600 }}>days</span>
+                              </div>
+                            </div>
+                            <span className="inline-flex items-center rounded-full border border-primary/20 bg-primary/10 px-2 py-1 text-[10px] text-primary" style={{ fontWeight: 600 }}>
+                              Template
                             </span>
                           </div>
-                          <span className="px-2 py-[3px] rounded-full text-[10px] border shrink-0" style={{ fontWeight: 500, color: "#059669", backgroundColor: "#ECFDF5", borderColor: "#A7F3D0" }}>
-                            Active
-                          </span>
+
+                          <div className="mt-4 grid grid-cols-2 gap-2">
+                            <div className="rounded-xl border border-border bg-background px-3 py-2.5">
+                              <p className="text-[10px] uppercase tracking-[0.16em] text-muted-foreground" style={{ fontWeight: 600 }}>Partners Using</p>
+                              <p className="mt-1 text-lg text-foreground" style={{ fontWeight: 700 }}>{previewTerm.vendorsApplied}</p>
+                            </div>
+                            <div className="rounded-xl border border-border bg-background px-3 py-2.5">
+                              <p className="text-[10px] uppercase tracking-[0.16em] text-muted-foreground" style={{ fontWeight: 600 }}>Applicable Items</p>
+                              <p className="mt-1 text-lg text-foreground" style={{ fontWeight: 700 }}>{PT_MOCK_ITEMS.length}</p>
+                            </div>
+                          </div>
                         </div>
-                        <div className="flex items-center gap-3 mt-3">
-                          {[
-                            { label: "Items", value: String(PT_MOCK_ITEMS.length) },
-                            { label: "Vendors", value: String(previewTerm.vendorsApplied) },
-                          ].map((s, i) => (
-                            <div key={s.label} className="flex items-center gap-3">
-                              {i > 0 && <div className="w-px h-4 bg-[#E8ECF1]" />}
-                              <div className="flex items-center gap-1.5">
-                                <span className="text-[14px] text-[#0F172A] tabular-nums" style={{ fontWeight: 600 }}>{s.value}</span>
-                                <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>{s.label}</span>
-                              </div>
+
+                        <div className="rounded-2xl border border-border bg-background shadow-sm">
+                          <button
+                            onClick={() => setAboutPtOpen(!aboutPtOpen)}
+                            className="flex w-full items-center justify-between px-4 py-3 text-left"
+                          >
+                            <div>
+                              <p className="text-sm text-foreground" style={{ fontWeight: 600 }}>Configuration details</p>
+                              <p className="mt-0.5 text-xs text-muted-foreground">Core settings that define how the term behaves.</p>
                             </div>
-                          ))}
-                        </div>
-                      </div>
+                            <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${aboutPtOpen ? "rotate-180" : ""}`} />
+                          </button>
 
-                      {/* Quick actions */}
-                      <div className="flex items-center gap-1.5 px-4 py-2.5 border-b border-[#E8ECF1]">
-                        {[
-                          { icon: Package, label: "Add item" },
-                          { icon: Building2, label: "Add vendor" },
-                          { icon: MoreHorizontal, label: "More actions" },
-                        ].map((a) => (
-                          <Tooltip key={a.label}>
-                            <TooltipTrigger asChild>
-                              <button
-                                onClick={() => toast.info(`${a.label} coming soon`)}
-                                className="w-8 h-8 rounded-lg border border-[#E2E8F0] bg-white flex items-center justify-center cursor-pointer transition-all duration-150 hover:bg-[#F8FAFC] hover:border-[#CBD5E1] active:scale-[0.97]"
-                              >
-                                <a.icon className="w-3.5 h-3.5 text-[#64748B]" />
-                              </button>
-                            </TooltipTrigger>
-                            <TooltipContent side="bottom" sideOffset={6} className="z-[300] !bg-white !text-[#334155] !border !border-[#E2E8F0] !shadow-sm rounded-lg text-[11px] px-2.5 py-1.5" style={{ fontWeight: 500 }}>
-                              {a.label}
-                            </TooltipContent>
-                          </Tooltip>
-                        ))}
-                      </div>
-
-                      {/* About section (collapsible) */}
-                      <div className="border-b border-[#E8ECF1]">
-                        <button onClick={() => setAboutPtOpen(!aboutPtOpen)} className="w-full flex items-center justify-between px-4 py-2.5 text-[12px] text-[#0F172A] cursor-pointer hover:bg-white/60 transition-colors" style={{ fontWeight: 600 }}>
-                          About
-                          <ChevronDown className={`w-3.5 h-3.5 text-[#94A3B8] transition-transform duration-200 ${aboutPtOpen ? "rotate-180" : ""}`} />
-                        </button>
-                        <div className={`overflow-hidden transition-all duration-200 ${aboutPtOpen ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0"}`}>
-                          <div className="px-4 pb-3 space-y-3">
-                            <p className="text-[11px] text-[#475569] leading-relaxed" style={{ fontWeight: 400 }}>{previewTerm.description}</p>
-
-                            <div className="flex items-center justify-between rounded-lg border px-3 py-2 bg-white border-[#E8ECF1]">
-                              <div className="flex items-center gap-2">
-                                <Zap className="w-3.5 h-3.5 text-[#F59E0B]" />
-                                <span className="text-[11px] text-[#334155]" style={{ fontWeight: 500 }}>Trigger Event</span>
-                              </div>
-                              <span className="text-[11px] text-[#0F172A]" style={{ fontWeight: 600 }}>{previewTerm.trigger}</span>
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-2">
-                              <div className="rounded-lg border border-[#E8ECF1] bg-white px-3 py-2">
-                                <p className="text-[9px] text-[#94A3B8] uppercase tracking-wide" style={{ fontWeight: 500 }}>Type</p>
-                                <p className="text-[12px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>{ptTypeLabel}</p>
-                              </div>
-                              <div className="rounded-lg border border-[#E8ECF1] bg-white px-3 py-2">
-                                <p className="text-[9px] text-[#94A3B8] uppercase tracking-wide" style={{ fontWeight: 500 }}>Duration</p>
-                                <p className="text-[12px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>{ptDuration} days</p>
-                              </div>
-                            </div>
-
-                            {(previewTerm.applyDiscount || previewTerm.discountPercent) && (
-                              <div className="grid grid-cols-2 gap-2">
-                                <div className="rounded-lg border border-[#E8ECF1] bg-white px-3 py-2">
-                                  <p className="text-[9px] text-[#94A3B8] uppercase tracking-wide" style={{ fontWeight: 500 }}>Discount %</p>
-                                  <p className="text-[12px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>{previewTerm.discountPercent || "2"}%</p>
+                          <div className={`overflow-hidden transition-all duration-200 ${aboutPtOpen ? "max-h-[480px] opacity-100" : "max-h-0 opacity-0"}`}>
+                            <div className="space-y-3 px-4 pb-4">
+                              <div className="rounded-xl border border-border bg-muted/30 px-3 py-3">
+                                <div className="mb-3 flex items-center gap-2 text-xs text-foreground" style={{ fontWeight: 600 }}>
+                                  <Info className="h-3.5 w-3.5 text-primary" />
+                                  Payment term overview
                                 </div>
-                                <div className="rounded-lg border border-[#E8ECF1] bg-white px-3 py-2">
-                                  <p className="text-[9px] text-[#94A3B8] uppercase tracking-wide" style={{ fontWeight: 500 }}>Discount Period</p>
-                                  <p className="text-[12px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>{previewTerm.discountPeriod || "10"} days</p>
-                                </div>
-                              </div>
-                            )}
-
-                            <div className="grid grid-cols-2 gap-2">
-                              <div className="rounded-lg border border-[#E8ECF1] bg-white px-3 py-2">
-                                <p className="text-[9px] text-[#94A3B8] uppercase tracking-wide" style={{ fontWeight: 500 }}>Created by</p>
-                                <div className="flex items-center gap-1.5 mt-1">
-                                  {(() => { const cTint = getAvatarTint("John Doe"); return (
-                                    <div className="w-5 h-5 rounded-full flex items-center justify-center text-[8px] shrink-0" style={{ backgroundColor: cTint.bg, color: cTint.fg, fontWeight: 700 }}>JD</div>
-                                  ); })()}
-                                  <span className="text-[11px] text-[#0F172A] truncate" style={{ fontWeight: 500 }}>John Doe</span>
-                                </div>
-                              </div>
-                              <div className="rounded-lg border border-[#E8ECF1] bg-white px-3 py-2">
-                                <p className="text-[9px] text-[#94A3B8] uppercase tracking-wide" style={{ fontWeight: 500 }}>Created at</p>
-                                <p className="text-[11px] text-[#0F172A] mt-1" style={{ fontWeight: 500 }}>Dec 15, 2025</p>
+                                {[
+                                  { label: "Type", value: ptTypeLabel },
+                                  { label: "Trigger", value: previewTerm.trigger },
+                                  { label: "Duration", value: `${ptDuration} days` },
+                                  { label: "Description", value: previewTerm.description || "-" },
+                                ].map((row) => (
+                                  <div key={row.label} className="flex items-start justify-between gap-3 border-t border-border/70 py-2 first:border-t-0 first:pt-0 last:pb-0">
+                                    <span className="text-xs text-muted-foreground" style={{ fontWeight: 500 }}>{row.label}</span>
+                                    <span className="max-w-[60%] text-right text-xs text-foreground" style={{ fontWeight: 600 }}>{row.value}</span>
+                                  </div>
+                                ))}
                               </div>
                             </div>
                           </div>
                         </div>
-                      </div>
 
-                      {/* Vendors section (collapsible) */}
-                      <div className="flex-1">
-                        <button onClick={() => setVendorsPtOpen(!vendorsPtOpen)} className="w-full flex items-center justify-between px-4 py-2.5 text-[12px] text-[#0F172A] cursor-pointer hover:bg-white/60 transition-colors" style={{ fontWeight: 600 }}>
-                          <span>Vendors ({previewTerm.vendorsApplied})</span>
-                          <ChevronDown className={`w-3.5 h-3.5 text-[#94A3B8] transition-transform duration-200 ${vendorsPtOpen ? "rotate-180" : ""}`} />
-                        </button>
-                        <div className={`overflow-hidden transition-all duration-200 ${vendorsPtOpen ? "max-h-[2000px] opacity-100" : "max-h-0 opacity-0"}`}>
-                          <div className="px-4 pb-4 space-y-2">
-                            {PT_MOCK_VENDORS.map((v) => {
-                              const vTint = getAvatarTint(v.name);
-                              const vInitials = v.name.split(" ").map(w => w[0]).slice(0, 2).join("");
-                              return (
-                                <div key={v.id} className="rounded-xl border p-3 transition-all bg-white border-[#E8ECF1] hover:border-[#CBD5E1] hover:shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-                                  <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-2.5">
-                                      <div className="w-7 h-7 rounded-md flex items-center justify-center text-[10px]" style={{ fontWeight: 700, backgroundColor: vTint.bg, color: vTint.fg }}>
-                                        {vInitials}
-                                      </div>
-                                      <div>
-                                        <span className="text-[12px] text-[#0F172A] block" style={{ fontWeight: 500 }}>{v.name}</span>
-                                        <span className="text-[10px] text-[#94A3B8]">{v.id}</span>
-                                      </div>
-                                    </div>
-                                    <span className={`px-2 py-0.5 rounded-full text-[10px] border ${
-                                      v.status === "Active" ? "bg-[#ECFDF5] text-[#059669] border-[#A7F3D0]" : "bg-[#F8FAFC] text-[#94A3B8] border-[#E2E8F0]"
-                                    }`} style={{ fontWeight: 500 }}>{v.status}</span>
+                        <div className="rounded-2xl border border-border bg-background shadow-sm">
+                          <button
+                            onClick={() => setVendorsPtOpen(!vendorsPtOpen)}
+                            className="flex w-full items-center justify-between px-4 py-3 text-left"
+                          >
+                            <div>
+                              <p className="text-sm text-foreground" style={{ fontWeight: 600 }}>Ownership & controls</p>
+                              <p className="mt-0.5 text-xs text-muted-foreground">Review discount logic and who created this template.</p>
+                            </div>
+                            <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${vendorsPtOpen ? "rotate-180" : ""}`} />
+                          </button>
+
+                          <div className={`overflow-hidden transition-all duration-200 ${vendorsPtOpen ? "max-h-[420px] opacity-100" : "max-h-0 opacity-0"}`}>
+                            <div className="space-y-3 px-4 pb-4">
+                              <div className="rounded-xl border border-border bg-background px-3 py-3">
+                                <p className="text-[10px] uppercase tracking-[0.16em] text-muted-foreground" style={{ fontWeight: 600 }}>Early payment discount</p>
+                                <div className="mt-3 grid grid-cols-2 gap-2">
+                                  <div className="rounded-lg border border-border bg-muted/30 px-3 py-2.5">
+                                    <p className="text-[10px] text-muted-foreground" style={{ fontWeight: 600 }}>Discount %</p>
+                                    <p className="mt-1 text-sm text-foreground" style={{ fontWeight: 700 }}>{previewTerm.discountPercent || "-"}</p>
+                                  </div>
+                                  <div className="rounded-lg border border-border bg-muted/30 px-3 py-2.5">
+                                    <p className="text-[10px] text-muted-foreground" style={{ fontWeight: 600 }}>Eligible Period</p>
+                                    <p className="mt-1 text-sm text-foreground" style={{ fontWeight: 700 }}>{previewTerm.discountPeriod ? `${previewTerm.discountPeriod} days` : "-"}</p>
                                   </div>
                                 </div>
-                              );
-                            })}
+                              </div>
+
+                              <div className="rounded-xl border border-border bg-muted/30 px-3 py-3">
+                                <p className="text-[10px] uppercase tracking-[0.16em] text-muted-foreground" style={{ fontWeight: 600 }}>Ownership</p>
+                                <div className="mt-3 space-y-2">
+                                  <div className="flex items-center justify-between gap-3">
+                                    <span className="text-xs text-muted-foreground" style={{ fontWeight: 500 }}>Created by</span>
+                                    <div className="flex items-center gap-2">
+                                      {(() => {
+                                        const cTint = getAvatarTint("John Doe");
+                                        return (
+                                          <div className="flex h-6 w-6 items-center justify-center rounded-full text-[9px]" style={{ backgroundColor: cTint.bg, color: cTint.fg, fontWeight: 700 }}>
+                                            JD
+                                          </div>
+                                        );
+                                      })()}
+                                      <span className="text-xs text-foreground" style={{ fontWeight: 600 }}>John Doe</span>
+                                    </div>
+                                  </div>
+                                  <div className="flex items-center justify-between gap-3 border-t border-border/70 pt-2">
+                                    <span className="text-xs text-muted-foreground" style={{ fontWeight: 500 }}>Created on</span>
+                                    <span className="text-xs text-foreground" style={{ fontWeight: 600 }}>Dec 15, 2025</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
 
-                    {/* ─── RIGHT PANEL ─── */}
-                    <div className="flex-1 flex flex-col overflow-hidden bg-white">
-                      {/* Tabs row */}
-                      <div className="flex items-center border-b border-[#E8ECF1] shrink-0">
-                        <div className="flex items-center flex-1 overflow-x-auto px-2">
-                          {PT_DETAIL_TABS.map((t) => {
-                            const active = previewTab === t.id;
-                            const count = t.id === "items" ? PT_MOCK_ITEMS.length : t.id === "vendors_applied" ? previewTerm.vendorsApplied : 0;
+                    <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-background">
+                      <div className="border-b border-border px-2 sm:px-3">
+                        <div className="flex items-center gap-1 overflow-x-auto py-2">
+                          {PT_DETAIL_TABS.map((tab) => {
+                            const active = previewTab === tab.id;
+                            const count = tab.id === "items" ? PT_MOCK_ITEMS.length : tab.id === "vendors_applied" ? previewTerm.vendorsApplied : 0;
+
                             return (
                               <button
-                                key={t.id}
-                                onClick={() => setPreviewTab(t.id)}
-                                className={`inline-flex items-center gap-1.5 px-3 py-2.5 text-[12px] border-b-2 transition-all cursor-pointer whitespace-nowrap ${
-                                  active ? "border-[#0A77FF] text-[#0A77FF] bg-white" : "border-transparent text-[#94A3B8] hover:text-[#64748B]"
+                                key={tab.id}
+                                onClick={() => setPreviewTab(tab.id)}
+                                className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border px-3 py-2 text-xs transition-colors ${
+                                  active
+                                    ? "border-primary/20 bg-primary/10 text-primary"
+                                    : "border-transparent text-muted-foreground hover:border-border hover:bg-muted hover:text-foreground"
                                 }`}
                                 style={{ fontWeight: active ? 600 : 500 }}
                               >
-                                <t.icon className="w-3.5 h-3.5" />
-                                {t.label}
+                                <tab.icon className="h-3.5 w-3.5" />
+                                {tab.label}
                                 {count > 0 && (
-                                  <span className={`text-[9px] rounded-full px-1.5 py-px min-w-[16px] text-center ${active ? "bg-[#0A77FF]/10 text-[#0A77FF]" : "bg-[#F1F5F9] text-[#94A3B8]"}`} style={{ fontWeight: 700 }}>
+                                  <span className={`inline-flex min-w-[18px] items-center justify-center rounded-full px-1.5 py-0.5 text-[10px] ${
+                                    active ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                                  }`} style={{ fontWeight: 700 }}>
                                     {count}
                                   </span>
                                 )}
@@ -5565,58 +5525,54 @@ function ConfigPageContent({
                         </div>
                       </div>
 
-                      {/* Items tab */}
                       {previewTab === "items" && (
-                        <div className="flex-1 flex flex-col overflow-hidden">
-                          <div className="flex items-center justify-between gap-3 px-4 pt-3 pb-2 shrink-0">
-                            <div className="flex items-center gap-2 flex-1 min-w-0">
-                              <div className="relative flex-1 max-w-[220px]">
-                                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8] pointer-events-none" />
-                                <input type="text" placeholder="Search items..." className="w-full pl-8 h-8 text-[12px] bg-white border border-[#E2E8F0] rounded-lg px-3 py-1.5 focus:outline-none focus:border-[#0A77FF] transition-colors placeholder:text-[#94A3B8]" />
+                        <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+                          <div className="flex flex-col gap-3 border-b border-border px-4 py-3 lg:flex-row lg:items-center lg:justify-between">
+                            <div className="flex min-w-0 flex-1 items-center gap-2">
+                              <div className="relative w-full max-w-sm">
+                                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                                <Input placeholder="Search applicable items..." className="h-9 rounded-lg border-border bg-background pl-9 text-sm" />
                               </div>
-                              <button className="h-8 px-2.5 rounded-lg border border-[#E2E8F0] bg-white text-[12px] text-[#475569] hover:bg-[#F8FAFC] cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 500 }}>
-                                <SlidersHorizontal className="w-3.5 h-3.5" /> Filters
-                              </button>
+                              <Button variant="outline" size="sm" className="h-9 shrink-0 gap-1.5 rounded-lg">
+                                <SlidersHorizontal className="h-3.5 w-3.5" /> Filters
+                              </Button>
                             </div>
-                            <button onClick={() => toast.info("Add item coming soon")} className="h-8 px-3 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-[12px] shadow-sm cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 600 }}>
-                              <Plus className="w-3.5 h-3.5" /> Add item
-                            </button>
+                            <div className="inline-flex items-center gap-2 text-xs text-muted-foreground" style={{ fontWeight: 600 }}>
+                              <span className="inline-flex h-7 min-w-[28px] items-center justify-center rounded-md bg-primary/10 px-2 text-primary">{PT_MOCK_ITEMS.length}</span>
+                              items matched to this template
+                            </div>
                           </div>
 
-                          <div className="h-px bg-[#E8ECF1] mx-4 shrink-0" />
-
-                          <div className="flex-1 overflow-auto">
-                            <table className="w-full text-[12px]">
-                              <thead className="sticky top-0 bg-[#F8FAFC] z-10">
+                          <div className="min-h-0 flex-1 overflow-auto">
+                            <table className="w-full min-w-[820px] text-sm">
+                              <thead className="sticky top-0 z-10 bg-muted/40">
                                 <tr>
-                                  <th className="text-left px-4 py-2.5 text-[#94A3B8] text-[11px] border-b border-[#E8ECF1]" style={{ fontWeight: 600 }}>Item</th>
-                                  <th className="text-left px-4 py-2.5 text-[#94A3B8] text-[11px] border-b border-[#E8ECF1]" style={{ fontWeight: 600 }}>Part No.</th>
-                                  <th className="text-left px-4 py-2.5 text-[#94A3B8] text-[11px] border-b border-[#E8ECF1]" style={{ fontWeight: 600 }}>Category</th>
-                                  <th className="text-right px-4 py-2.5 text-[#94A3B8] text-[11px] border-b border-[#E8ECF1]" style={{ fontWeight: 600 }}>Price</th>
-                                  <th className="text-left px-4 py-2.5 text-[#94A3B8] text-[11px] border-b border-[#E8ECF1]" style={{ fontWeight: 600 }}>Status</th>
+                                  <th className="border-b border-border px-4 py-3 text-left text-[11px] uppercase tracking-[0.14em] text-muted-foreground" style={{ fontWeight: 600 }}>Part No.</th>
+                                  <th className="border-b border-border px-4 py-3 text-left text-[11px] uppercase tracking-[0.14em] text-muted-foreground" style={{ fontWeight: 600 }}>Item Description</th>
+                                  <th className="border-b border-border px-4 py-3 text-left text-[11px] uppercase tracking-[0.14em] text-muted-foreground" style={{ fontWeight: 600 }}>Category</th>
+                                  <th className="border-b border-border px-4 py-3 text-left text-[11px] uppercase tracking-[0.14em] text-muted-foreground" style={{ fontWeight: 600 }}>Item Type</th>
                                 </tr>
                               </thead>
                               <tbody>
                                 {PT_MOCK_ITEMS.map((item) => (
-                                  <tr key={item.id} className="hover:bg-[#F8FBFF] transition-colors">
-                                    <td className="px-4 py-2.5">
-                                      <div className="flex items-center gap-2.5">
-                                        <div className="w-8 h-8 rounded-lg bg-[#F1F5F9] border border-[#E2E8F0] flex items-center justify-center shrink-0">
-                                          <Package className="w-3.5 h-3.5 text-[#94A3B8]" />
+                                  <tr key={item.id} className="border-b border-border/70 transition-colors hover:bg-muted/30">
+                                    <td className="px-4 py-3 text-xs text-foreground" style={{ fontWeight: 600 }}>{item.partNo}</td>
+                                    <td className="px-4 py-3">
+                                      <div className="flex items-center gap-3">
+                                        <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-muted/50 text-muted-foreground">
+                                          <Package className="h-4 w-4" />
                                         </div>
-                                        <span className="text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>{item.name}</span>
+                                        <span className="text-sm text-foreground" style={{ fontWeight: 500 }}>{item.name}</span>
                                       </div>
                                     </td>
-                                    <td className="px-4 py-2.5">
-                                      <code className="text-[11px] text-[#64748B] bg-[#F1F5F9] px-1.5 py-0.5 rounded">{item.partNo}</code>
-                                    </td>
-                                    <td className="px-4 py-2.5">
-                                      <span className="px-2 py-0.5 rounded-md bg-[#F1F5F9] text-[#64748B] text-[11px]" style={{ fontWeight: 500 }}>{item.category}</span>
-                                    </td>
-                                    <td className="px-4 py-2.5 text-right text-[#0F172A] tabular-nums" style={{ fontWeight: 500 }}>{item.price}</td>
-                                    <td className="px-4 py-2.5">
-                                      <span className="inline-flex px-2 py-0.5 rounded-full text-[10px] border" style={{ fontWeight: 500, color: item.status === "Active" ? "#059669" : "#DC2626", backgroundColor: item.status === "Active" ? "#ECFDF5" : "#FEF2F2", borderColor: item.status === "Active" ? "#A7F3D0" : "#FECACA" }}>
-                                        {item.status}
+                                    <td className="px-4 py-3 text-sm text-muted-foreground">{item.category}</td>
+                                    <td className="px-4 py-3">
+                                      <span className={`inline-flex items-center rounded-md border px-2 py-1 text-[11px] ${
+                                        item.itemType === "Parts"
+                                          ? "border-primary/20 bg-primary/10 text-primary"
+                                          : "border-border bg-muted text-muted-foreground"
+                                      }`} style={{ fontWeight: 600 }}>
+                                        {item.itemType}
                                       </span>
                                     </td>
                                   </tr>
@@ -5624,72 +5580,79 @@ function ConfigPageContent({
                               </tbody>
                             </table>
                           </div>
-
-                          <div className="flex items-center justify-between px-4 py-2 border-t border-[#E8ECF1] shrink-0 bg-[#FAFBFC]">
-                            <span className="text-[11px] text-[#94A3B8]">Showing {PT_MOCK_ITEMS.length} of {PT_MOCK_ITEMS.length} items</span>
-                            <div className="flex items-center gap-2 text-[11px] text-[#94A3B8]">
-                              <span>Records per page</span>
-                              <select className="h-6 px-1.5 rounded border border-[#E2E8F0] text-[11px] cursor-pointer outline-none">
-                                <option>20</option><option>50</option>
-                              </select>
-                            </div>
-                          </div>
                         </div>
                       )}
 
-                      {/* Vendors tab */}
                       {previewTab === "vendors_applied" && (
-                        <div className="flex-1 flex flex-col overflow-hidden">
-                          <div className="flex items-center justify-between gap-3 px-4 pt-3 pb-2 shrink-0">
-                            <div className="flex items-center gap-2 flex-1 min-w-0">
-                              <div className="relative flex-1 max-w-[220px]">
-                                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8] pointer-events-none" />
-                                <input type="text" placeholder="Search vendors..." className="w-full pl-8 h-8 text-[12px] bg-white border border-[#E2E8F0] rounded-lg px-3 py-1.5 focus:outline-none focus:border-[#0A77FF] transition-colors placeholder:text-[#94A3B8]" />
+                        <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+                          <div className="flex flex-col gap-3 border-b border-border px-4 py-3 lg:flex-row lg:items-center lg:justify-between">
+                            <div className="flex min-w-0 flex-1 items-center gap-2">
+                              <div className="relative w-full max-w-sm">
+                                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                                <Input placeholder="Search partners using this term..." className="h-9 rounded-lg border-border bg-background pl-9 text-sm" />
                               </div>
+                              <Button variant="outline" size="sm" className="h-9 shrink-0 gap-1.5 rounded-lg">
+                                <SlidersHorizontal className="h-3.5 w-3.5" /> Filters
+                              </Button>
                             </div>
-                            <button onClick={() => toast.info("Add vendor coming soon")} className="h-8 px-3 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-[12px] shadow-sm cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 600 }}>
-                              <Plus className="w-3.5 h-3.5" /> Add vendor
-                            </button>
+                            <div className="inline-flex items-center gap-2 text-xs text-muted-foreground" style={{ fontWeight: 600 }}>
+                              <span className="inline-flex h-7 min-w-[28px] items-center justify-center rounded-md bg-primary/10 px-2 text-primary">{previewTerm.vendorsApplied}</span>
+                              partners currently using this template
+                            </div>
                           </div>
 
-                          <div className="h-px bg-[#E8ECF1] mx-4 shrink-0" />
-
-                          <div className="flex-1 overflow-auto">
-                            <table className="w-full text-[12px]">
-                              <thead className="sticky top-0 bg-[#F8FAFC] z-10">
+                          <div className="min-h-0 flex-1 overflow-auto">
+                            <table className="w-full min-w-[860px] text-sm">
+                              <thead className="sticky top-0 z-10 bg-muted/40">
                                 <tr>
-                                  <th className="text-left px-4 py-2.5 text-[#94A3B8] text-[11px] border-b border-[#E8ECF1]" style={{ fontWeight: 600 }}>Vendor Name</th>
-                                  <th className="text-left px-4 py-2.5 text-[#94A3B8] text-[11px] border-b border-[#E8ECF1]" style={{ fontWeight: 600 }}>Status</th>
-                                  <th className="text-right px-4 py-2.5 text-[#94A3B8] text-[11px] border-b border-[#E8ECF1]" style={{ fontWeight: 600 }}>No. of Items</th>
-                                  <th className="text-right px-4 py-2.5 text-[#94A3B8] text-[11px] border-b border-[#E8ECF1]" style={{ fontWeight: 600 }}>Actions</th>
+                                  <th className="border-b border-border px-4 py-3 text-left text-[11px] uppercase tracking-[0.14em] text-muted-foreground" style={{ fontWeight: 600 }}>Partner Name</th>
+                                  <th className="border-b border-border px-4 py-3 text-left text-[11px] uppercase tracking-[0.14em] text-muted-foreground" style={{ fontWeight: 600 }}>Partner Type</th>
+                                  <th className="border-b border-border px-4 py-3 text-left text-[11px] uppercase tracking-[0.14em] text-muted-foreground" style={{ fontWeight: 600 }}>Applied Items</th>
                                 </tr>
                               </thead>
                               <tbody>
-                                {PT_MOCK_VENDORS.map((v) => {
-                                  const vTint = getAvatarTint(v.name);
-                                  const vInit = v.name.split(" ").map(w => w[0]).slice(0, 2).join("");
+                                {PT_MOCK_VENDORS.map((vendor) => {
+                                  const vendorTint = getAvatarTint(vendor.name);
+                                  const vendorInitials = vendor.name.split(" ").map((word) => word[0]).slice(0, 2).join("");
+
                                   return (
-                                    <tr key={v.id} className="hover:bg-[#F8FBFF] transition-colors">
-                                      <td className="px-4 py-2.5">
-                                        <div className="flex items-center gap-2.5">
-                                          <div className="w-8 h-8 rounded-full flex items-center justify-center text-[11px] shrink-0" style={{ fontWeight: 600, backgroundColor: vTint.bg, color: vTint.fg }}>
-                                            {vInit}
+                                    <tr key={vendor.id} className="border-b border-border/70 transition-colors hover:bg-muted/30">
+                                      <td className="px-4 py-3">
+                                        <div className="flex items-center gap-3">
+                                          <div className="flex h-9 w-9 items-center justify-center rounded-full text-[11px]" style={{ backgroundColor: vendorTint.bg, color: vendorTint.fg, fontWeight: 700 }}>
+                                            {vendorInitials}
                                           </div>
-                                          <span className="text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>{v.name}</span>
+                                          <div>
+                                            <p className="text-sm text-foreground" style={{ fontWeight: 600 }}>{vendor.name}</p>
+                                            <p className="text-xs text-muted-foreground">{vendor.id}</p>
+                                          </div>
                                         </div>
                                       </td>
-                                      <td className="px-4 py-2.5">
-                                        <span className="inline-flex px-2 py-0.5 rounded-full text-[10px] border" style={{ fontWeight: 500, color: v.status === "Active" ? "#059669" : "#DC2626", backgroundColor: v.status === "Active" ? "#ECFDF5" : "#FEF2F2", borderColor: v.status === "Active" ? "#A7F3D0" : "#FECACA" }}>
-                                          {v.status}
-                                        </span>
+                                      <td className="px-4 py-3">
+                                        <div className="flex flex-wrap items-center gap-1.5">
+                                          {vendor.types.map((type, index) => (
+                                            <span
+                                              key={`${vendor.id}-${index}`}
+                                              className={`inline-flex items-center rounded-md border px-2 py-1 text-[11px] ${
+                                                type.includes("Customer")
+                                                  ? "border-primary/20 bg-primary/10 text-primary"
+                                                  : "border-border bg-muted text-muted-foreground"
+                                              }`}
+                                              style={{ fontWeight: 600 }}
+                                            >
+                                              {type}
+                                            </span>
+                                          ))}
+                                          {vendor.moreTypes > 0 && (
+                                            <span className="text-xs text-muted-foreground" style={{ fontWeight: 600 }}>+{vendor.moreTypes} more</span>
+                                          )}
+                                        </div>
                                       </td>
-                                      <td className="px-4 py-2.5 text-right">
-                                        <span className="text-[14px] text-[#0F172A] tabular-nums" style={{ fontWeight: 600 }}>{v.itemCount}</span>
-                                      </td>
-                                      <td className="px-4 py-2.5 text-right">
-                                        <button className="w-6 h-6 rounded flex items-center justify-center text-[#94A3B8] hover:text-[#475569] hover:bg-[#F1F5F9] cursor-pointer transition-colors">
-                                          <MoreHorizontal className="w-3.5 h-3.5" />
-                                        </button>
+                                      <td className="px-4 py-3">
+                                        <div className="flex items-center gap-2 text-sm">
+                                          <span className="text-foreground" style={{ fontWeight: 600 }}>{vendor.primaryItem}</span>
+                                          <span className="text-primary" style={{ fontWeight: 600 }}>+{vendor.moreItems} more</span>
+                                        </div>
                                       </td>
                                     </tr>
                                   );
@@ -5700,25 +5663,27 @@ function ConfigPageContent({
                         </div>
                       )}
 
-                      {/* Placeholder tabs */}
                       {previewTab !== "items" && previewTab !== "vendors_applied" && (
-                        <div className="flex-1 flex items-center justify-center">
-                          <div className="text-center">
-                            <div className="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3" style={{ backgroundColor: badgeColor + "12", border: `1px solid ${badgeColor}30` }}>
-                              {(() => { const T = PT_DETAIL_TABS.find((x) => x.id === previewTab); return T ? <T.icon className="w-5 h-5" style={{ color: badgeColor }} /> : null; })()}
+                        <div className="flex flex-1 items-center justify-center p-8">
+                          <div className="max-w-sm text-center">
+                            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-border bg-muted/40 text-primary">
+                              {activePreviewTab ? <activePreviewTab.icon className="h-5 w-5" /> : null}
                             </div>
-                            <p className="text-[13px] text-[#334155]" style={{ fontWeight: 500 }}>{PT_DETAIL_TABS.find((x) => x.id === previewTab)?.label || previewTab}</p>
-                            <p className="text-[11px] text-[#CBD5E1] mt-1" style={{ fontWeight: 400 }}>Coming soon</p>
+                            <p className="text-sm text-foreground" style={{ fontWeight: 600 }}>{activePreviewTab?.label}</p>
+                            <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                              {previewTab === "notes_files"
+                                ? "Use this section for internal notes, supporting documents, and attachments tied to this payment-term template."
+                                : "Use this section to review changes, edits, and recent activity related to this payment-term template."}
+                            </p>
                           </div>
                         </div>
                       )}
                     </div>
                   </div>
 
-                  {/* ── Detail footer ── */}
-                  <div className="flex items-center justify-between px-6 h-12 border-t border-[#EEF2F6] bg-card shrink-0">
-                    <div className="text-[11px] text-muted-foreground" style={{ fontWeight: 500 }}>
-                      Reviewing: <span className="text-[#475569]" style={{ fontWeight: 600 }}>{previewTerm.name}</span>
+                  <div className="flex items-center justify-between border-t border-border bg-card px-4 py-3">
+                    <div className="text-xs text-muted-foreground" style={{ fontWeight: 500 }}>
+                      Reviewing template: <span className="text-foreground" style={{ fontWeight: 600 }}>{previewTerm.name}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Button
@@ -5726,7 +5691,7 @@ function ConfigPageContent({
                         size="sm"
                         onClick={() => handleDuplicatePaymentTerm(previewTerm)}
                       >
-                        <Copy className="w-3.5 h-3.5 mr-1.5" /> Duplicate
+                        <Copy className="mr-1.5 h-3.5 w-3.5" /> Duplicate
                       </Button>
                       <Button
                         size="sm"
@@ -5738,7 +5703,7 @@ function ConfigPageContent({
                         }}
                         className="bg-primary text-primary-foreground"
                       >
-                        <Check className="w-3.5 h-3.5 mr-1.5" /> Use Template
+                        <Check className="mr-1.5 h-3.5 w-3.5" /> Use Template
                       </Button>
                     </div>
                   </div>
@@ -5746,8 +5711,7 @@ function ConfigPageContent({
               );
             })() : (
             <>
-            {/* ── Header (list mode) ── */}
-            <div className="flex items-center justify-between px-6 h-12 border-b border-[#EEF2F6] bg-card shrink-0">
+            <div className="flex items-center justify-between border-b border-[#EEF2F6] bg-card px-6 h-12 shrink-0">
               <div className="flex items-center gap-3">
                 <div>
                   <h3 className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Payment Terms</h3>
@@ -5772,11 +5736,8 @@ function ConfigPageContent({
               </div>
             </div>
             <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
-              {/* ── Main content (no sidebar) ── */}
               <div className="flex-1 min-w-0 flex flex-col overflow-hidden bg-white">
-                {/* Sticky toolbar */}
                 <div className="shrink-0 bg-white border-b border-[#EEF2F6] px-5 pt-4 pb-3 space-y-3">
-                  {/* Search + sort row */}
                   <div className="flex items-center justify-between gap-3">
                     <div className="relative">
                       <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
@@ -5854,7 +5815,6 @@ function ConfigPageContent({
                     </div>
                   </div>
 
-                  {/* ── Filter tabs ── */}
                   <div className="flex items-center gap-1.5 flex-wrap">
                     {([
                       { id: "all", label: "All Terms" },
@@ -5904,7 +5864,6 @@ function ConfigPageContent({
                   </div>
                 </div>
 
-                {/* Cards area */}
                 <div className="flex-1 min-h-0 overflow-y-auto p-5">
                   {filteredPaymentTermPresets.length === 0 ? (
                     <div className="py-20 text-center">
@@ -5915,12 +5874,9 @@ function ConfigPageContent({
                       <p className="text-[12px] text-[#94A3B8] mt-1">Try adjusting your search or filter</p>
                     </div>
                   ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 3xl:grid-cols-4 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 3xl:grid-cols-4 auto-rows-fr gap-4">
                       {filteredPaymentTermPresets.map((term) => {
                         const isSelected = selectedPaymentTermId === term.id;
-                        const ptDays = term.duration || (term.name.match(/\d+/) ? term.name.match(/\d+/)![0] : "30");
-                        const badgeColor = term.badgeColor;
-                        const isCustom = term.id.startsWith("pt-custom-");
 
                         return (
                           <PaymentTermCard
@@ -5936,6 +5892,8 @@ function ConfigPageContent({
                         );
                       })}
                     </div>
+                  )}
+                </div>
                   )}
                 </div>
               </div>
