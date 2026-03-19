@@ -2417,6 +2417,8 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
   const [currentPage, setCurrentPage] = useState(1);
   const [recordsPerPage, setRecordsPerPage] = useState(20);
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
+  const [locPtDetailOpen, setLocPtDetailOpen] = useState(false);
+  const [locPtDetailTerm, setLocPtDetailTerm] = useState<PaymentTermPreset | null>(null);
 
   const filtered = useMemo(() => {
     let list = locations;
