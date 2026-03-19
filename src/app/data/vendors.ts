@@ -320,6 +320,12 @@ const _manualVendors: Vendor[] = [
     notes: "Primary logistics and shipping partner.",
     createdAt: "2024-11-25T08:00:00Z",
     updatedAt: "2025-11-22T09:15:00Z",
+    configData: {
+      paymentMethods: [
+        { id: "pm-u1", type: "ach", typeLabel: "ACH / Direct Deposit", bankName: "Wells Fargo", accountNumber: "5038291640", routingNumber: "121000248", isSaved: true },
+        { id: "pm-u2", type: "digital_wallet", typeLabel: "Digital Wallet", walletProvider: "PayPal", walletId: "payments@ups.com", isSaved: true, discountPercent: 1.5 },
+      ],
+    },
   },
   {
     id: "v-003",
