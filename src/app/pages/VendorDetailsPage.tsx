@@ -4011,6 +4011,11 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
           })()}
         </DialogContent>
       </Dialog>
+      <PaymentTermDetailModal
+        term={locPtDetailTerm}
+        open={locPtDetailOpen}
+        onClose={() => { setLocPtDetailOpen(false); setLocPtDetailTerm(null); }}
+      />
     </>
   );
 }
