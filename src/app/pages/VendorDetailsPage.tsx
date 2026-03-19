@@ -4179,6 +4179,11 @@ function BillingShippingTab({ vendor, cfg }: { vendor: Vendor; cfg?: VendorConfi
   );
 }
 
+// Read-only wrapper for PaymentMethodCard on details page
+function PaymentMethodCardView({ entry }: { entry: import("../components/vendors/partnerConstants").PaymentMethodEntry }) {
+  return <PaymentMethodCardBase entry={entry} onEdit={() => {}} onDelete={() => {}} onSetPrimary={() => {}} />;
+}
+
 // ----- PAYMENT METHODS TAB -----
 function PaymentMethodsTab({ cfg, PAYMENT_TYPE_ICONS }: { cfg?: VendorConfigData; PAYMENT_TYPE_ICONS: Record<string, React.ElementType> }) {
   const hasPaymentMethods = cfg?.paymentMethods && cfg.paymentMethods.length > 0;
