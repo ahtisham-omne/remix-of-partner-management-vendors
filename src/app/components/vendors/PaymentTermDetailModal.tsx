@@ -261,7 +261,6 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
               </div>
             </div>
           </div>
-          </div>
 
           {/* ─── RIGHT PANEL ─── */}
           <div className="flex-1 flex flex-col overflow-hidden bg-white">
