@@ -6035,7 +6035,7 @@ function ConfigPageContent({
                               </div>
                             )}
 
-                            <div className="p-3.5 flex-1 flex flex-col min-h-0 overflow-hidden">
+                            <div className="p-3 flex-1 flex flex-col min-h-0 overflow-hidden">
                               {/* Row 1: Type pill + preset/custom badge */}
                               <div className="flex items-center justify-between gap-2 mb-2 shrink-0">
                                 <span className="inline-flex items-stretch rounded-full overflow-hidden border shrink-0" style={{ borderColor: badgeColor + "40" }}>
@@ -6069,46 +6069,43 @@ function ConfigPageContent({
                                 <p className="text-[11px] text-[#64748B] line-clamp-2 leading-relaxed" style={{ fontWeight: 400 }}>{highlightMatch(term.description, ptSearch)}</p>
                               </div>
 
-                              {/* Row 4: Hero value */}
-                              <div className="flex items-baseline gap-2 shrink-0">
-                                <span className="text-[22px] text-[#0F172A] tabular-nums leading-none tracking-tight" style={{ fontWeight: 600 }}>
-                                  {ptDays}
+                              {/* Row 4: Hero value + vendor count inline */}
+                              <div className="flex items-baseline justify-between shrink-0">
+                                <div className="flex items-baseline gap-2">
+                                  <span className="text-[22px] text-[#0F172A] tabular-nums leading-none tracking-tight" style={{ fontWeight: 600 }}>
+                                    {ptDays}
+                                  </span>
+                                  <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>days</span>
+                                </div>
+                                <span className="inline-flex items-center gap-1 text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>
+                                  <Building2 className="w-3 h-3" /> {term.vendorsApplied}
                                 </span>
-                                <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>days</span>
                               </div>
 
                               {/* Row 5: Discount info strip */}
                               {(term.applyDiscount || term.discountPercent) && (
-                                <div className="pt-2 shrink-0">
-                                  <div className="flex items-center justify-between px-3 py-[6px] rounded-lg border border-[#E8ECF1] bg-[#FAFBFC] text-[11px] tabular-nums min-w-0">
+                                <div className="pt-1.5 shrink-0">
+                                  <div className="flex items-center px-2.5 py-[5px] rounded-lg border border-[#E8ECF1] bg-[#FAFBFC] text-[11px] tabular-nums">
                                     <span className="text-[#64748B]" style={{ fontWeight: 400 }}>
                                       Early pay {term.discountPercent || "2"}% within {term.discountPeriod || "10"} days
                                     </span>
                                   </div>
                                 </div>
                               )}
-
-                              {/* Row 6: Vendor usage count */}
-                              <div className="flex items-center gap-3 mt-auto pt-2 shrink-0">
-                                <span className="inline-flex items-center gap-1 text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>
-                                  <Building2 className="w-3 h-3" /> {term.vendorsApplied} vendors
-                                </span>
-                              </div>
                             </div>
 
-                            {/* Footer */}
-                            <div className="flex items-center justify-center gap-0 px-3.5 py-2 border-t border-[#F1F5F9] shrink-0">
+                            {/* Footer — full-width 2-col CTAs */}
+                            <div className="grid grid-cols-2 border-t border-[#F1F5F9] shrink-0">
                               <button
                                 onClick={(e) => { e.stopPropagation(); setSelectedPaymentTermId(term.id); setPaymentTermsModalOpen(false); }}
-                                className="inline-flex items-center gap-1 px-3 py-[5px] text-[11px] text-[#64748B] hover:text-[#0A77FF] hover:bg-[#F8FAFC] rounded-md transition-colors"
+                                className="inline-flex items-center justify-center gap-1 py-2 text-[11px] text-[#64748B] hover:text-[#0A77FF] hover:bg-[#F8FAFC] transition-colors border-r border-[#F1F5F9]"
                                 style={{ fontWeight: 500 }}
                               >
                                 <Check className="w-3 h-3" /> Apply
                               </button>
-                              <div className="w-px h-4 bg-[#F1F5F9]" />
                               <button
                                 onClick={(e) => { e.stopPropagation(); handleDuplicatePaymentTerm(term); }}
-                                className="inline-flex items-center gap-1 px-3 py-[5px] text-[11px] text-[#64748B] hover:text-[#0A77FF] hover:bg-[#F8FAFC] rounded-md transition-colors"
+                                className="inline-flex items-center justify-center gap-1 py-2 text-[11px] text-[#64748B] hover:text-[#0A77FF] hover:bg-[#F8FAFC] transition-colors"
                                 style={{ fontWeight: 500 }}
                               >
                                 <Copy className="w-3 h-3" /> Duplicate
