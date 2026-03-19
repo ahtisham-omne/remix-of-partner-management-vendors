@@ -6026,27 +6026,21 @@ function ConfigPageContent({
                               <span className="inline-flex items-center gap-1 text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>
                                 <Building2 className="w-3 h-3" /> {term.vendorsApplied}
                               </span>
-                              <div className="ml-auto flex items-center gap-1.5">
-                                <button
-                                  onClick={(e) => { e.stopPropagation(); handleDuplicatePaymentTerm(term); }}
-                                  className="p-1 rounded-md border border-[#E8ECF1] bg-white text-[#94A3B8] hover:text-[#475569] hover:bg-[#F8FAFC] transition-colors opacity-0 group-hover:opacity-100"
-                                  title="Duplicate"
-                                >
-                                  <Copy className="w-3 h-3" />
-                                </button>
+                              <div className="ml-auto flex items-center gap-0">
                                 <button
                                   onClick={(e) => { e.stopPropagation(); setSelectedPaymentTermId(term.id); setPaymentTermsModalOpen(false); }}
-                                  className="px-2.5 py-[3px] rounded-md bg-[#0A77FF] text-white text-[10px] hover:bg-[#0862D0] transition-colors"
-                                  style={{ fontWeight: 600 }}
+                                  className="inline-flex items-center gap-1 px-2.5 py-[5px] text-[11px] text-[#64748B] hover:text-[#0A77FF] hover:bg-[#F8FAFC] rounded-md transition-colors border-r border-[#F1F5F9]"
+                                  style={{ fontWeight: 500 }}
                                 >
-                                  Apply
+                                  <Check className="w-3 h-3" /> Apply
                                 </button>
-                                <span
-                                  className="px-2 py-[2px] rounded-full text-[10px] border"
-                                  style={{ fontWeight: 500, color: "#059669", backgroundColor: "#F0FDF4", borderColor: "#BBF7D0" }}
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); handleDuplicatePaymentTerm(term); }}
+                                  className="inline-flex items-center gap-1 px-2.5 py-[5px] text-[11px] text-[#64748B] hover:text-[#0A77FF] hover:bg-[#F8FAFC] rounded-md transition-colors opacity-0 group-hover:opacity-100"
+                                  style={{ fontWeight: 500 }}
                                 >
-                                  Active
-                                </span>
+                                  <Copy className="w-3 h-3" /> Duplicate
+                                </button>
                               </div>
                             </div>
                           </div>
