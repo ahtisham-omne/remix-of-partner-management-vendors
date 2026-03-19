@@ -383,6 +383,13 @@ const _manualVendors: Vendor[] = [
     notes: "Major automotive customer. Large volume orders.",
     createdAt: "2024-10-29T12:00:00Z",
     updatedAt: "2026-01-15T16:00:00Z",
+    configData: {
+      paymentMethods: [
+        { id: "pm-f1", type: "wire", typeLabel: "Wire Transfer", bankName: "Citibank", accountNumber: "8192736450", routingNumber: "021000089", wireRoutingNumber: "CITIUS33", isSaved: true },
+        { id: "pm-f2", type: "check", typeLabel: "Check / Paper", checkPayableTo: "Ford Motor Company", isSaved: true },
+        { id: "pm-f3", type: "ach", typeLabel: "ACH / Direct Deposit", bankName: "JPMorgan Chase", accountNumber: "3829104756", routingNumber: "021000021", isSaved: true, additionalChargesPercent: 0.5 },
+      ],
+    },
   },
   {
     id: "v-004",
