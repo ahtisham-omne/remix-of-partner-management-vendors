@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import {
   Plus, X, CreditCard, ChevronLeft, Check, Pencil, Trash2, Star,
-  ArrowUpDown, ExternalLink, ChevronDown, MoreHorizontal,
+  ArrowUpDown, ExternalLink, ChevronDown, MoreHorizontal, Eye, EyeOff,
+  Building2, Hash, Phone, MapPin, FileText, Percent, AlertCircle, Wallet, User,
 } from "lucide-react";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
