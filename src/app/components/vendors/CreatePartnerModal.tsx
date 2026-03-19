@@ -5285,7 +5285,7 @@ function ConfigPageContent({
             className="z-[210] flex flex-col gap-0 overflow-hidden border-0 p-0 shadow-[0_24px_80px_-12px_rgba(0,0,0,0.18)] transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
             style={ptFullscreen
               ? { maxWidth: "calc(100% - 1rem)", width: "calc(100% - 1rem)", height: "calc(100dvh - 1rem)", maxHeight: "calc(100dvh - 1rem)", borderRadius: 16 }
-              : { maxWidth: 1480, width: "96vw", height: "88dvh", maxHeight: 920, borderRadius: 16 }
+              : { maxWidth: 980, width: "95vw", height: "85vh", maxHeight: "85vh", borderRadius: 16 }
             }
             hideCloseButton
           >
