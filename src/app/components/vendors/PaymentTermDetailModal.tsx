@@ -24,9 +24,9 @@ import {
   SlidersHorizontal,
   MoreHorizontal,
   Copy,
-  Receipt,
-  Zap,
   Check,
+  CalendarDays,
+  Lock,
 } from "lucide-react";
 import { toast } from "sonner";
 import { getAvatarTint } from "../../utils/avatarTints";
@@ -35,17 +35,15 @@ import {
   CREATE_PT_TYPES,
 } from "./partnerConstants";
 
-/* ─── Tab config matching the screenshot ─── */
+/* ─── Tab config ─── */
 const PT_DETAIL_TABS = [
-  { id: "items", label: "Items", icon: Package },
-  { id: "vendors", label: "Vendors", icon: Building2 },
-  { id: "notes", label: "Notes", icon: FileText },
-  { id: "files", label: "Files", icon: Paperclip },
-  { id: "audit", label: "Audit", icon: Clock },
-  { id: "activity", label: "Activity", icon: BarChart3 },
+  { id: "items", label: "Applicable Items", icon: Package },
+  { id: "vendors", label: "Partners Using", icon: Building2 },
+  { id: "notes", label: "Notes & Attachments", icon: FileText },
+  { id: "activity", label: "Activity Log", icon: Clock },
 ];
 
-/* ─── Mock items matching the screenshot ─── */
+/* ─── Mock items ─── */
 const PT_MOCK_ITEMS = [
   { id: "1", name: "Steel Bolts M10×40", partNo: "SB-M10-40", category: "Fasteners", price: "$12.50", status: "Active" },
   { id: "2", name: "Hex Nuts M10", partNo: "HN-M10", category: "Fasteners", price: "$4.20", status: "Active" },
@@ -53,17 +51,6 @@ const PT_MOCK_ITEMS = [
   { id: "4", name: "Spring Lock Washers M10", partNo: "SLW-M10", category: "Fasteners", price: "$3.40", status: "Inactive" },
   { id: "5", name: "Threaded Rods M12×1m", partNo: "TR-M12-1M", category: "Rods", price: "$18.90", status: "Active" },
   { id: "6", name: "Carriage Bolts 3/8×3", partNo: "CB-38-3", category: "Fasteners", price: "$8.60", status: "Active" },
-];
-
-/* ─── Mock vendors for sidebar ─── */
-const PT_MOCK_VENDORS_SIDEBAR = [
-  { id: "V-1", name: "Acme Industrial Supply Co.", status: "Active" },
-  { id: "V-2", name: "Global Fasteners Inc.", status: "Active" },
-  { id: "V-3", name: "Berlin Technik GmbH", status: "Active" },
-  { id: "V-4", name: "Pacific Hardware Ltd.", status: "Active" },
-  { id: "V-5", name: "Midwest Bolt & Nut Co.", status: "Active" },
-  { id: "V-6", name: "Atlas Steel Products", status: "Inactive" },
-  { id: "V-7", name: "Nordic Fastening Systems", status: "Active" },
 ];
 
 /* ─── Mock vendors for tab table ─── */
@@ -87,7 +74,6 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
   const [tab, setTab] = useState("items");
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(true);
-  const [vendorsOpen, setVendorsOpen] = useState(true);
 
   if (!term) return null;
 
@@ -101,7 +87,9 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
     : `${modalBaseClass} !max-w-[100%] sm:!max-w-[1400px] !max-h-[100dvh] sm:!max-h-[92vh] rounded-none sm:!rounded-2xl`;
 
   const itemCount = PT_MOCK_ITEMS.length;
-  const vendorCount = PT_MOCK_VENDORS_SIDEBAR.length;
+  const vendorCount = PT_MOCK_VENDORS_TABLE.length;
+
+  const creatorTint = getAvatarTint("John Doe");
 
   return (
     <Dialog open={open} onOpenChange={(v) => { if (!v) { onClose(); setIsFullscreen(false); setTab("items"); } }}>
@@ -117,21 +105,10 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
         <div className="shrink-0 bg-card rounded-t-none sm:rounded-t-2xl border-b border-border">
           <div className="px-4 sm:px-5 py-3 flex items-center justify-between gap-3">
             <div className="flex items-center gap-3 min-w-0">
-              <button onClick={onClose} className="w-9 h-9 rounded-full border border-border bg-card flex items-center justify-center hover:bg-accent transition-colors cursor-pointer shrink-0">
-                <ArrowLeft className="w-4 h-4 text-foreground" />
+              <button onClick={onClose} className="w-8 h-8 rounded-lg border border-border bg-card flex items-center justify-center hover:bg-accent transition-colors cursor-pointer shrink-0">
+                <ArrowLeft className="w-3.5 h-3.5 text-foreground" />
               </button>
-              <div className="min-w-0">
-                <div className="flex items-center gap-2">
-                  <h2 className="text-[15px] font-semibold text-foreground truncate">{term.name}</h2>
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-[10px] font-bold text-primary-foreground shrink-0" style={{ backgroundColor: badgeColor }}>
-                    {term.typeBadge}
-                  </span>
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-md border border-border bg-secondary text-[11px] font-medium text-secondary-foreground shrink-0">
-                    {term.trigger}
-                  </span>
-                </div>
-                <p className="text-[12px] text-muted-foreground mt-0.5 truncate max-w-[480px]">{term.description}</p>
-              </div>
+              <span className="text-[14px] font-semibold text-foreground truncate">Payment Term Details</span>
             </div>
             <div className="flex items-center gap-1.5 shrink-0">
               <button onClick={() => toast.info("Edit coming soon")} className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-card text-xs font-medium text-foreground hover:bg-accent transition-colors cursor-pointer">
@@ -142,7 +119,9 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
               </button>
               <button onClick={() => setIsFullscreen(!isFullscreen)} className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-card text-xs font-medium text-foreground hover:bg-accent transition-colors cursor-pointer">
                 {isFullscreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
-                {isFullscreen ? "Exit full" : "Full view"}
+              </button>
+              <button onClick={() => toast.info("More options")} className="hidden sm:inline-flex items-center gap-1.5 px-2 py-1.5 rounded-lg border border-border bg-card text-xs font-medium text-foreground hover:bg-accent transition-colors cursor-pointer">
+                <MoreHorizontal className="w-3.5 h-3.5" />
               </button>
               <button onClick={onClose} className="w-8 h-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent transition-all cursor-pointer">
                 <X className="w-4 h-4" />
@@ -154,122 +133,102 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
         {/* ─── Body ─── */}
         <div className="flex flex-1 overflow-hidden min-h-0">
           {/* ─── LEFT SIDEBAR ─── */}
-          <div className="w-[340px] border-r border-border flex flex-col bg-secondary/50 shrink-0 overflow-y-auto">
-            {/* Hero metric */}
-            <div className="px-5 pt-5 pb-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-[36px] font-extrabold text-foreground leading-none tabular-nums">{ptDuration}</span>
-                  <span className="text-[14px] text-muted-foreground font-medium">days</span>
+          <div className="w-[380px] border-r border-border flex flex-col shrink-0 overflow-y-auto bg-card">
+            {/* Card-style summary — mirrors the payment term card design */}
+            <div className="p-5">
+              <div className="rounded-xl border border-border bg-card p-5" style={{ boxShadow: "0 1px 3px 0 rgba(0,0,0,0.04)" }}>
+                {/* Pills row — same as card */}
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold border"
+                      style={{ backgroundColor: `${badgeColor}12`, color: badgeColor, borderColor: `${badgeColor}30` }}
+                    >
+                      <Package className="w-3 h-3" />
+                      {term.typeBadge}
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium border border-border bg-secondary/60 text-secondary-foreground">
+                      <CalendarDays className="w-3 h-3" />
+                      {term.trigger}
+                    </span>
+                  </div>
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[10px] font-semibold border border-border bg-secondary/60 text-muted-foreground uppercase tracking-wide">
+                    <Lock className="w-3 h-3" />
+                    Preset
+                  </span>
                 </div>
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-semibold bg-chart-2/15 text-chart-2 border border-chart-2/25">
-                  Active
-                </span>
-              </div>
-              <div className="flex items-center gap-4 mt-3 text-[13px]">
-                <span className="font-bold text-foreground">{itemCount} <span className="font-normal text-muted-foreground">Items</span></span>
-                <span className="font-bold text-foreground">{vendorCount} <span className="font-normal text-muted-foreground">Vendors</span></span>
-              </div>
-              <div className="flex items-center gap-1.5 mt-4">
-                <button className="w-9 h-9 rounded-lg border border-border bg-card flex items-center justify-center hover:bg-accent transition-colors cursor-pointer shadow-sm">
-                  <Receipt className="w-4 h-4 text-foreground" />
-                </button>
-                <button className="w-9 h-9 rounded-lg border border-border bg-card flex items-center justify-center hover:bg-accent transition-colors cursor-pointer shadow-sm">
-                  <Copy className="w-4 h-4 text-foreground" />
-                </button>
-                <button className="w-9 h-9 rounded-lg border border-border bg-card flex items-center justify-center hover:bg-accent transition-colors cursor-pointer shadow-sm">
-                  <MoreHorizontal className="w-4 h-4 text-foreground" />
-                </button>
+
+                {/* Title & description */}
+                <h3 className="text-[16px] font-bold text-foreground leading-snug">{term.name}</h3>
+                <p className="text-[12px] text-muted-foreground mt-1 leading-relaxed">{term.description}</p>
+
+                {/* Hero metric row */}
+                <div className="flex items-end justify-between mt-5 pt-4 border-t border-border">
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-[32px] font-extrabold text-foreground leading-none tabular-nums">{ptDuration}</span>
+                    <span className="text-[13px] text-muted-foreground font-medium">days</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-[12px] text-muted-foreground">
+                    <Building2 className="w-3.5 h-3.5" />
+                    <span className="font-semibold text-foreground">{vendorCount}</span> vendors using
+                  </div>
+                </div>
               </div>
             </div>
 
             {/* About section */}
             <div className="border-t border-border">
-              <button onClick={() => setAboutOpen(!aboutOpen)} className="w-full flex items-center justify-between px-5 py-3 text-[13px] font-semibold text-foreground cursor-pointer hover:bg-accent/50 transition-colors">
-                About
-                {aboutOpen ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
+              <button onClick={() => setAboutOpen(!aboutOpen)} className="w-full flex items-center justify-between px-5 py-3 text-[12px] font-semibold text-foreground cursor-pointer hover:bg-accent/50 transition-colors uppercase tracking-wider">
+                Details
+                {aboutOpen ? <ChevronUp className="w-3.5 h-3.5 text-muted-foreground" /> : <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />}
               </button>
               {aboutOpen && (
-                <div className="px-5 pb-4 space-y-3">
-                  <p className="text-[12px] text-muted-foreground leading-relaxed">{term.description}</p>
-                  
-                  <div className="flex items-center justify-between py-3 px-3.5 rounded-lg border border-border bg-card shadow-sm">
-                    <div className="flex items-center gap-2.5 text-[12px] text-foreground">
-                      <div className="w-7 h-7 rounded-md bg-chart-3/15 flex items-center justify-center">
-                        <Zap className="w-3.5 h-3.5 text-chart-3" />
+                <div className="px-5 pb-5">
+                  <div className="space-y-0 rounded-lg border border-border overflow-hidden">
+                    {/* Row items */}
+                    {[
+                      { label: "Type", value: ptTypeLabel },
+                      { label: "Duration", value: `${ptDuration} days` },
+                      { label: "Trigger", value: term.trigger },
+                      { label: "Discount", value: term.description?.includes("discount") ? "2% / 10 days" : "None" },
+                      { label: "Status", value: "Active", isStatus: true },
+                    ].map((row, i) => (
+                      <div key={row.label} className={`flex items-center justify-between px-4 py-3 ${i > 0 ? "border-t border-border" : ""} bg-card`}>
+                        <span className="text-[11px] text-muted-foreground font-medium">{row.label}</span>
+                        {row.isStatus ? (
+                          <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-chart-2">
+                            <span className="w-1.5 h-1.5 rounded-full bg-chart-2" />
+                            {row.value}
+                          </span>
+                        ) : (
+                          <span className="text-[12px] font-semibold text-foreground">{row.value}</span>
+                        )}
                       </div>
-                      <span className="font-medium">Trigger Event</span>
-                    </div>
-                    <span className="text-[12px] font-bold text-foreground">{term.trigger}</span>
+                    ))}
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2.5">
-                    <div className="rounded-lg border border-border bg-card p-3.5 shadow-sm">
-                      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Type</span>
-                      <p className="text-[12px] font-semibold text-foreground mt-1.5 leading-snug">{ptTypeLabel}</p>
+                  {/* Created by — clean inline row */}
+                  <div className="mt-4 flex items-center gap-3 px-4 py-3 rounded-lg border border-border bg-card">
+                    <div
+                      className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0"
+                      style={{ backgroundColor: creatorTint.bg, color: creatorTint.fg }}
+                    >
+                      JD
                     </div>
-                    <div className="rounded-lg border border-border bg-card p-3.5 shadow-sm">
-                      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Duration</span>
-                      <p className="text-[12px] font-semibold text-foreground mt-1.5">{ptDuration} days</p>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-2.5">
-                    <div className="rounded-lg border border-border bg-card p-3.5 shadow-sm">
-                      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Created by</span>
-                      <div className="flex items-center gap-2 mt-2">
-                        {(() => { const t = getAvatarTint("John Doe"); return (
-                          <div className="w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-bold shrink-0" style={{ backgroundColor: t.bg, color: t.fg }}>JD</div>
-                        ); })()}
-                        <span className="text-[12px] font-semibold text-foreground">John Doe</span>
-                      </div>
-                    </div>
-                    <div className="rounded-lg border border-border bg-card p-3.5 shadow-sm">
-                      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Created at</span>
-                      <p className="text-[12px] font-semibold text-foreground mt-2">Dec 15, 2025</p>
+                    <div className="min-w-0 flex-1">
+                      <span className="text-[12px] font-semibold text-foreground">John Doe</span>
+                      <p className="text-[10px] text-muted-foreground">Created Dec 15, 2025</p>
                     </div>
                   </div>
-                </div>
-              )}
-            </div>
-
-            {/* Vendors list */}
-            <div className="border-t border-border">
-              <button onClick={() => setVendorsOpen(!vendorsOpen)} className="w-full flex items-center justify-between px-5 py-3 text-[13px] font-semibold text-foreground cursor-pointer hover:bg-accent/50 transition-colors">
-                Vendors ({vendorCount})
-                {vendorsOpen ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
-              </button>
-              {vendorsOpen && (
-                <div className="px-5 pb-4 space-y-2">
-                  {PT_MOCK_VENDORS_SIDEBAR.map((v) => {
-                    const t = getAvatarTint(v.name);
-                    const initials = v.name.split(" ").map(w => w[0]).slice(0, 2).join("");
-                    return (
-                      <div key={v.id} className="flex items-center gap-3 p-3 rounded-lg border border-border bg-card hover:bg-accent/40 transition-colors cursor-pointer shadow-sm">
-                        <div className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 shadow-sm" style={{ backgroundColor: t.bg, color: t.fg }}>
-                          {initials}
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center justify-between gap-2">
-                            <span className="text-[12px] font-semibold text-foreground truncate">{v.name}</span>
-                            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold shrink-0 ${v.status === "Active" ? "bg-chart-2/15 text-chart-2 border border-chart-2/25" : "bg-secondary text-muted-foreground border border-border"}`}>
-                              {v.status}
-                            </span>
-                          </div>
-                          <span className="text-[11px] text-muted-foreground font-medium">{v.id}</span>
-                        </div>
-                      </div>
-                    );
-                  })}
                 </div>
               )}
             </div>
           </div>
 
           {/* ─── RIGHT PANEL ─── */}
-          <div className="flex-1 flex flex-col overflow-hidden bg-card">
+          <div className="flex-1 flex flex-col overflow-hidden bg-secondary/30">
             {/* Tabs */}
-            <div className="flex items-center border-b border-border shrink-0 px-2 bg-card">
+            <div className="flex items-center border-b border-border shrink-0 px-1 bg-card">
               {PT_DETAIL_TABS.map((t) => {
                 const active = tab === t.id;
                 const count = t.id === "items" ? itemCount : t.id === "vendors" ? vendorCount : 0;
@@ -277,7 +236,7 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
                   <button
                     key={t.id}
                     onClick={() => setTab(t.id)}
-                    className={`inline-flex items-center gap-1.5 px-3.5 py-3 text-[12px] border-b-2 transition-all cursor-pointer whitespace-nowrap ${
+                    className={`inline-flex items-center gap-1.5 px-4 py-3 text-[12px] border-b-2 transition-all cursor-pointer whitespace-nowrap ${
                       active ? "border-primary text-primary font-semibold" : "border-transparent text-muted-foreground hover:text-foreground font-medium"
                     }`}
                   >
@@ -300,48 +259,49 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
                   <div className="flex items-center gap-2 flex-1 min-w-0">
                     <div className="relative flex-1 max-w-[260px]">
                       <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
-                      <input type="text" placeholder="Search items..." className="w-full pl-9 pr-3 h-9 text-[12px] bg-card border border-border rounded-lg shadow-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-ring transition-colors" />
+                      <input type="text" placeholder="Search items..." className="w-full pl-9 pr-3 h-8 text-[12px] bg-secondary/50 border border-border rounded-lg focus:outline-none focus:border-primary focus:ring-1 focus:ring-ring transition-colors placeholder:text-muted-foreground/60" />
                     </div>
-                    <button className="h-9 px-3 rounded-lg border border-border bg-card text-[12px] font-medium text-foreground hover:bg-accent cursor-pointer transition-colors inline-flex items-center gap-1.5 shadow-sm">
+                    <button className="h-8 px-3 rounded-lg border border-border bg-card text-[12px] font-medium text-foreground hover:bg-accent cursor-pointer transition-colors inline-flex items-center gap-1.5">
                       <SlidersHorizontal className="w-3.5 h-3.5" /> Filters
                     </button>
                   </div>
-                  <button className="h-9 px-3 rounded-lg bg-primary text-primary-foreground text-[12px] font-medium hover:bg-primary/90 cursor-pointer transition-colors inline-flex items-center gap-1.5 shadow-sm">
+                  <button className="h-8 px-3 rounded-lg bg-primary text-primary-foreground text-[12px] font-medium hover:bg-primary/90 cursor-pointer transition-colors inline-flex items-center gap-1.5">
                     + Add Item
                   </button>
                 </div>
 
-                <div className="flex-1 overflow-auto bg-card">
+                <div className="flex-1 overflow-auto">
                   <table className="w-full text-[12px]">
-                    <thead className="sticky top-0 bg-secondary z-10">
-                      <tr>
-                        <th className="text-left px-4 py-3 text-foreground text-[11px] font-bold border-b border-border tracking-wide">Item</th>
-                        <th className="text-left px-4 py-3 text-foreground text-[11px] font-bold border-b border-border tracking-wide">Part No.</th>
-                        <th className="text-left px-4 py-3 text-foreground text-[11px] font-bold border-b border-border tracking-wide">Category</th>
-                        <th className="text-right px-4 py-3 text-foreground text-[11px] font-bold border-b border-border tracking-wide">Price</th>
-                        <th className="text-left px-4 py-3 text-foreground text-[11px] font-bold border-b border-border tracking-wide">Status</th>
+                    <thead className="sticky top-0 z-10">
+                      <tr className="bg-secondary/70">
+                        <th className="text-left px-4 py-2.5 text-muted-foreground text-[10px] font-semibold border-b border-border uppercase tracking-wider">Item</th>
+                        <th className="text-left px-4 py-2.5 text-muted-foreground text-[10px] font-semibold border-b border-border uppercase tracking-wider">Part No.</th>
+                        <th className="text-left px-4 py-2.5 text-muted-foreground text-[10px] font-semibold border-b border-border uppercase tracking-wider">Category</th>
+                        <th className="text-right px-4 py-2.5 text-muted-foreground text-[10px] font-semibold border-b border-border uppercase tracking-wider">Price</th>
+                        <th className="text-left px-4 py-2.5 text-muted-foreground text-[10px] font-semibold border-b border-border uppercase tracking-wider">Status</th>
                       </tr>
                     </thead>
                     <tbody>
                       {PT_MOCK_ITEMS.map((item) => (
-                        <tr key={item.id} className="hover:bg-accent/40 transition-colors border-b border-border">
-                          <td className="px-4 py-3">
-                            <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-lg bg-secondary border border-border flex items-center justify-center shrink-0">
-                                <Package className="w-3.5 h-3.5 text-muted-foreground" />
+                        <tr key={item.id} className="hover:bg-accent/30 transition-colors border-b border-border bg-card">
+                          <td className="px-4 py-2.5">
+                            <div className="flex items-center gap-2.5">
+                              <div className="w-7 h-7 rounded-md bg-secondary border border-border flex items-center justify-center shrink-0">
+                                <Package className="w-3 h-3 text-muted-foreground" />
                               </div>
-                              <span className="text-[13px] font-medium text-foreground">{item.name}</span>
+                              <span className="text-[12px] font-medium text-foreground">{item.name}</span>
                             </div>
                           </td>
-                          <td className="px-4 py-3">
-                            <span className="inline-flex px-2.5 py-1 rounded-md border border-border bg-secondary text-[11px] font-mono text-foreground">{item.partNo}</span>
+                          <td className="px-4 py-2.5">
+                            <span className="inline-flex px-2 py-0.5 rounded-md bg-secondary/80 text-[11px] font-mono text-muted-foreground">{item.partNo}</span>
                           </td>
-                          <td className="px-4 py-3 text-[12px] text-muted-foreground font-medium">{item.category}</td>
-                          <td className="px-4 py-3 text-right text-[13px] font-semibold text-foreground tabular-nums">{item.price}</td>
-                          <td className="px-4 py-3">
-                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
-                              item.status === "Active" ? "bg-chart-2/15 text-chart-2 border border-chart-2/25" : "bg-chart-5/10 text-chart-5 border border-chart-5/20"
+                          <td className="px-4 py-2.5 text-[12px] text-muted-foreground">{item.category}</td>
+                          <td className="px-4 py-2.5 text-right text-[12px] font-semibold text-foreground tabular-nums">{item.price}</td>
+                          <td className="px-4 py-2.5">
+                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+                              item.status === "Active" ? "bg-chart-2/10 text-chart-2" : "bg-chart-5/10 text-chart-5"
                             }`}>
+                              <span className={`w-1.5 h-1.5 rounded-full ${item.status === "Active" ? "bg-chart-2" : "bg-chart-5"}`} />
                               {item.status}
                             </span>
                           </td>
@@ -351,11 +311,11 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
                   </table>
                 </div>
 
-                <div className="flex items-center justify-between px-4 py-2.5 border-t border-border shrink-0 bg-secondary">
-                  <span className="text-[11px] text-muted-foreground font-medium">Showing {itemCount} of {itemCount} items</span>
-                  <div className="flex items-center gap-2 text-[11px] text-muted-foreground font-medium">
-                    <span>Records per page</span>
-                    <select className="h-7 px-2 rounded-md border border-border bg-card text-[11px] text-foreground cursor-pointer outline-none shadow-sm">
+                <div className="flex items-center justify-between px-4 py-2 border-t border-border shrink-0 bg-card">
+                  <span className="text-[11px] text-muted-foreground">Showing {itemCount} of {itemCount} items</span>
+                  <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                    <span>Per page</span>
+                    <select className="h-6 px-1.5 rounded border border-border bg-card text-[11px] text-foreground cursor-pointer outline-none">
                       <option>20</option><option>50</option>
                     </select>
                   </div>
@@ -370,20 +330,20 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
                   <div className="flex items-center gap-2 flex-1 min-w-0">
                     <div className="relative flex-1 max-w-[260px]">
                       <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
-                      <input type="text" placeholder="Search vendors..." className="w-full pl-9 pr-3 h-9 text-[12px] bg-card border border-border rounded-lg shadow-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-ring transition-colors" />
+                      <input type="text" placeholder="Search partners..." className="w-full pl-9 pr-3 h-8 text-[12px] bg-secondary/50 border border-border rounded-lg focus:outline-none focus:border-primary focus:ring-1 focus:ring-ring transition-colors placeholder:text-muted-foreground/60" />
                     </div>
-                    <button className="h-9 px-3 rounded-lg border border-border bg-card text-[12px] font-medium text-foreground hover:bg-accent cursor-pointer transition-colors inline-flex items-center gap-1.5 shadow-sm">
+                    <button className="h-8 px-3 rounded-lg border border-border bg-card text-[12px] font-medium text-foreground hover:bg-accent cursor-pointer transition-colors inline-flex items-center gap-1.5">
                       <SlidersHorizontal className="w-3.5 h-3.5" /> Filters
                     </button>
                   </div>
                 </div>
-                <div className="flex-1 overflow-auto bg-card">
+                <div className="flex-1 overflow-auto">
                   <table className="w-full text-[12px]">
-                    <thead className="sticky top-0 bg-secondary z-10">
-                      <tr>
-                        <th className="text-left px-4 py-3 text-foreground text-[11px] font-bold border-b border-border tracking-wide">Partner Name</th>
-                        <th className="text-left px-4 py-3 text-foreground text-[11px] font-bold border-b border-border tracking-wide">Partner Type</th>
-                        <th className="text-left px-4 py-3 text-foreground text-[11px] font-bold border-b border-border tracking-wide">No. of Items</th>
+                    <thead className="sticky top-0 z-10">
+                      <tr className="bg-secondary/70">
+                        <th className="text-left px-4 py-2.5 text-muted-foreground text-[10px] font-semibold border-b border-border uppercase tracking-wider">Partner</th>
+                        <th className="text-left px-4 py-2.5 text-muted-foreground text-[10px] font-semibold border-b border-border uppercase tracking-wider">Type</th>
+                        <th className="text-left px-4 py-2.5 text-muted-foreground text-[10px] font-semibold border-b border-border uppercase tracking-wider">Items</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -391,30 +351,30 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
                         const vTint = getAvatarTint(v.name);
                         const vInit = v.name.split(" ").map(w => w[0]).slice(0, 2).join("");
                         return (
-                          <tr key={v.id} className="hover:bg-accent/40 transition-colors border-b border-border">
-                            <td className="px-4 py-3">
-                              <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 shadow-sm" style={{ backgroundColor: vTint.bg, color: vTint.fg }}>
+                          <tr key={v.id} className="hover:bg-accent/30 transition-colors border-b border-border bg-card">
+                            <td className="px-4 py-2.5">
+                              <div className="flex items-center gap-2.5">
+                                <div className="w-7 h-7 rounded-full flex items-center justify-center text-[9px] font-bold shrink-0" style={{ backgroundColor: vTint.bg, color: vTint.fg }}>
                                   {vInit}
                                 </div>
-                                <span className="text-[12px] font-semibold text-foreground">{v.name}</span>
+                                <span className="text-[12px] font-medium text-foreground">{v.name}</span>
                               </div>
                             </td>
-                            <td className="px-4 py-3">
-                              <div className="flex items-center gap-1.5 flex-wrap">
+                            <td className="px-4 py-2.5">
+                              <div className="flex items-center gap-1 flex-wrap">
                                 {v.types.map((type, i) => (
-                                  <span key={i} className={`inline-flex px-2.5 py-0.5 rounded-md border text-[10px] font-semibold ${
-                                    type.includes("Customer") ? "border-primary/30 bg-primary/10 text-primary" : "border-border bg-secondary text-foreground"
+                                  <span key={i} className={`inline-flex px-2 py-0.5 rounded-md text-[10px] font-medium ${
+                                    type.includes("Customer") ? "bg-primary/10 text-primary" : "bg-secondary text-muted-foreground"
                                   }`}>
                                     {type}
                                   </span>
                                 ))}
                               </div>
                             </td>
-                            <td className="px-4 py-3">
+                            <td className="px-4 py-2.5">
                               <div className="flex items-center gap-1.5">
-                                <span className="text-[12px] font-semibold text-foreground tabular-nums">{v.partNo}</span>
-                                <span className="text-[11px] text-primary cursor-pointer hover:underline font-semibold">+{v.moreItems} more</span>
+                                <span className="text-[11px] font-mono text-muted-foreground">{v.partNo}</span>
+                                <span className="text-[11px] text-primary cursor-pointer hover:underline font-medium">+{v.moreItems}</span>
                               </div>
                             </td>
                           </tr>
@@ -423,11 +383,11 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
                     </tbody>
                   </table>
                 </div>
-                <div className="flex items-center justify-between px-4 py-2.5 border-t border-border shrink-0 bg-secondary">
-                  <span className="text-[11px] text-muted-foreground font-medium">Showing {PT_MOCK_VENDORS_TABLE.length} of {vendorCount} vendors</span>
-                  <div className="flex items-center gap-2 text-[11px] text-muted-foreground font-medium">
-                    <span>Records per page</span>
-                    <select className="h-7 px-2 rounded-md border border-border bg-card text-[11px] text-foreground cursor-pointer outline-none shadow-sm">
+                <div className="flex items-center justify-between px-4 py-2 border-t border-border shrink-0 bg-card">
+                  <span className="text-[11px] text-muted-foreground">Showing {PT_MOCK_VENDORS_TABLE.length} of {vendorCount} partners</span>
+                  <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                    <span>Per page</span>
+                    <select className="h-6 px-1.5 rounded border border-border bg-card text-[11px] text-foreground cursor-pointer outline-none">
                       <option>20</option><option>50</option>
                     </select>
                   </div>
@@ -439,11 +399,11 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
             {tab !== "items" && tab !== "vendors" && (
               <div className="flex-1 flex items-center justify-center bg-card">
                 <div className="text-center">
-                  <div className="w-14 h-14 rounded-xl bg-secondary border border-border flex items-center justify-center mx-auto mb-3 shadow-sm">
+                  <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center mx-auto mb-3">
                     {(() => { const T = PT_DETAIL_TABS.find((x) => x.id === tab); return T ? <T.icon className="w-5 h-5 text-muted-foreground" /> : null; })()}
                   </div>
-                  <p className="text-[14px] font-semibold text-foreground">{PT_DETAIL_TABS.find((x) => x.id === tab)?.label || tab}</p>
-                  <p className="text-[12px] text-muted-foreground mt-1">Coming soon</p>
+                  <p className="text-[13px] font-semibold text-foreground">{PT_DETAIL_TABS.find((x) => x.id === tab)?.label || tab}</p>
+                  <p className="text-[11px] text-muted-foreground mt-1">Coming soon</p>
                 </div>
               </div>
             )}
@@ -451,14 +411,14 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
         </div>
 
         {/* ─── Footer ─── */}
-        <div className="shrink-0 border-t border-border bg-secondary rounded-b-none sm:rounded-b-2xl">
-          <div className="px-5 py-3 flex items-center justify-between">
-            <span className="text-[12px] text-muted-foreground font-medium">Reviewing: <span className="text-foreground font-semibold">{term.name}</span></span>
+        <div className="shrink-0 border-t border-border bg-card rounded-b-none sm:rounded-b-2xl">
+          <div className="px-5 py-2.5 flex items-center justify-between">
+            <span className="text-[11px] text-muted-foreground">Reviewing: <span className="text-foreground font-semibold">{term.name}</span></span>
             <div className="flex items-center gap-2">
-              <button className="h-9 px-4 rounded-lg border border-border bg-card text-[12px] font-medium text-foreground hover:bg-accent transition-colors cursor-pointer inline-flex items-center gap-1.5 shadow-sm">
+              <button className="h-8 px-3.5 rounded-lg border border-border bg-card text-[12px] font-medium text-foreground hover:bg-accent transition-colors cursor-pointer inline-flex items-center gap-1.5">
                 <Copy className="w-3.5 h-3.5" /> Duplicate
               </button>
-              <button className="h-9 px-4 rounded-lg bg-primary text-primary-foreground text-[12px] font-medium hover:bg-primary/90 transition-colors cursor-pointer inline-flex items-center gap-1.5 shadow-sm">
+              <button className="h-8 px-3.5 rounded-lg bg-primary text-primary-foreground text-[12px] font-medium hover:bg-primary/90 transition-colors cursor-pointer inline-flex items-center gap-1.5">
                 <Check className="w-3.5 h-3.5" /> Use Template
               </button>
             </div>
