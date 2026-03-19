@@ -1900,7 +1900,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
             <div className="text-center">
               <p className="text-sm text-[#334155]" style={{ fontWeight: 600 }}>No {categoryView} rules found</p>
               <p className="text-[13px] text-[#94A3B8] mt-1" style={{ fontWeight: 400 }}>
-                {searchQuery ? "Try a different search term" : `Create a new ${categoryView} rule or explore presets to get started.`}
+                {searchQuery ? "Try a different search term" : `Create a new ${categoryView} rule or browse templates to get started.`}
               </p>
             </div>
             {searchQuery && (

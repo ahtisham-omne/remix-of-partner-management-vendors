@@ -3934,8 +3934,8 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                           <button onClick={() => toast.info("Add pricing rule coming soon")} className="h-8 px-3 rounded-lg border border-[#DC2626] bg-white text-[#DC2626] text-[12px] cursor-pointer transition-colors inline-flex items-center gap-1.5 hover:bg-[#FEF2F2]" style={{ fontWeight: 600 }}>
                             <Plus className="w-3.5 h-3.5" /> Add New Pricing Rule
                           </button>
-                          <button onClick={() => toast.info("Explore presets coming soon")} className="h-8 px-3 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-[12px] shadow-sm cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 600 }}>
-                            <Sparkles className="w-3.5 h-3.5" /> Explore presets
+                          <button onClick={() => toast.info("Templates coming soon")} className="h-8 px-3 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-[12px] shadow-sm cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 600 }}>
+                            <Sparkles className="w-3.5 h-3.5" /> Templates
                           </button>
                         </div>
                       </div>
