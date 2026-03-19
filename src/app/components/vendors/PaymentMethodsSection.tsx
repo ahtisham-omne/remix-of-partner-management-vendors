@@ -296,7 +296,191 @@ function PaymentFormFields({
   );
 }
 
-// ── Main Exported Component ──
+// ── Inline Data Row ──
+function DataRow({ icon: Icon, label, value, sensitive = false }: { icon: React.ElementType; label: string; value?: string; sensitive?: boolean }) {
+  const [revealed, setRevealed] = useState(false);
+  if (!value) return null;
+  const masked = sensitive && !revealed ? value.replace(/.(?=.{4})/g, "•") : value;
+  return (
+    <div className="flex items-center gap-2 min-w-0">
+      <Icon className="w-3 h-3 text-muted-foreground shrink-0" />
+      <span className="text-[10px] text-muted-foreground shrink-0" style={{ fontWeight: 500 }}>{label}</span>
+      <span className="text-[10px] text-foreground truncate flex-1 text-right tabular-nums" style={{ fontWeight: 500, letterSpacing: sensitive ? "0.5px" : undefined }}>{masked}</span>
+      {sensitive && (
+        <button
+          onClick={(ev) => { ev.stopPropagation(); setRevealed(!revealed); }}
+          className="p-0.5 rounded hover:bg-accent transition-colors cursor-pointer shrink-0"
+          title={revealed ? "Hide" : "Reveal"}
+        >
+          {revealed ? <EyeOff className="w-2.5 h-2.5 text-muted-foreground" /> : <Eye className="w-2.5 h-2.5 text-muted-foreground" />}
+        </button>
+      )}
+    </div>
+  );
+}
+
+// ── Get all displayable fields for an entry ──
+function getEntryDataRows(e: PaymentMethodEntry): { icon: React.ElementType; label: string; value?: string; sensitive?: boolean }[] {
+  const rows: { icon: React.ElementType; label: string; value?: string; sensitive?: boolean }[] = [];
+  
+  // Common: nickname shown as title, so skip
+  if (e.type === "ach" || e.type === "wire") {
+    rows.push({ icon: Building2, label: "Bank", value: e.bankName });
+    rows.push({ icon: User, label: "Account", value: e.accountTitle });
+    rows.push({ icon: Hash, label: "Acct #", value: e.accountNumber, sensitive: true });
+    rows.push({ icon: Hash, label: "Routing", value: e.routingNumber, sensitive: true });
+    if (e.type === "ach" && e.accountType) rows.push({ icon: FileText, label: "Type", value: e.accountType === "checking" ? "Checking" : "Saving" });
+    if (e.type === "wire" && e.swiftCode) rows.push({ icon: Hash, label: "SWIFT", value: e.swiftCode, sensitive: true });
+  }
+  if (e.type === "card") {
+    rows.push({ icon: User, label: "Holder", value: e.cardholderName });
+    rows.push({ icon: CreditCard, label: "Card #", value: e.cardNumber, sensitive: true });
+    rows.push({ icon: FileText, label: "Expiry", value: e.expiryDate });
+    rows.push({ icon: Hash, label: "CVV", value: e.cvv, sensitive: true });
+    if (e.billingAddress) rows.push({ icon: MapPin, label: "Billing", value: e.billingAddress });
+  }
+  if (e.type === "digital_wallet") {
+    rows.push({ icon: Wallet, label: "Provider", value: e.walletProvider });
+    rows.push({ icon: Hash, label: "Wallet ID", value: e.walletId, sensitive: true });
+  }
+  if (e.type === "check") {
+    rows.push({ icon: User, label: "Payee", value: e.payeeName });
+    rows.push({ icon: MapPin, label: "Address", value: e.mailingAddress });
+  }
+  if (e.type === "cash") {
+    rows.push({ icon: User, label: "Recipient", value: e.recipientName });
+    rows.push({ icon: MapPin, label: "Location", value: e.collectionPoint });
+  }
+  if (e.type === "other") {
+    rows.push({ icon: FileText, label: "Method", value: e.methodName });
+    if (e.description) rows.push({ icon: FileText, label: "Desc", value: e.description });
+  }
+  // Common fields
+  if (e.phone) rows.push({ icon: Phone, label: "Phone", value: `${e.countryCode} ${e.phone}` });
+  if (e.specialInstructions) rows.push({ icon: AlertCircle, label: "Notes", value: e.specialInstructions });
+  
+  return rows;
+}
+
+// ── Payment Method Card ──
+function PaymentMethodCard({
+  entry: pe,
+  onEdit,
+  onDelete,
+  onSetPrimary,
+}: {
+  entry: PaymentMethodEntry;
+  onEdit: () => void;
+  onDelete: () => void;
+  onSetPrimary: () => void;
+}) {
+  const PeIcon = typeIcon(pe.type);
+  const cat = typeCategory(pe.type);
+  const color = catColor[cat] || "#64748B";
+  const bg = catBg[cat] || "#F1F5F9";
+  const dataRows = getEntryDataRows(pe);
+
+  return (
+    <div
+      className="bg-card border border-border rounded-xl group transition-all duration-200 flex flex-col relative hover:border-primary/30 hover:shadow-[0_4px_16px_-4px_rgba(10,119,255,0.10)]"
+    >
+      {/* Color accent bar */}
+      <div className="h-[3px] rounded-t-xl" style={{ background: `linear-gradient(90deg, ${color}, ${color}80)` }} />
+
+      <div className="p-3 flex-1 flex flex-col gap-2">
+        {/* Header: icon + name + actions */}
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0 flex-1">
+            <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" style={{ backgroundColor: bg }}>
+              <PeIcon className="w-3.5 h-3.5" style={{ color }} />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs text-foreground truncate leading-tight" style={{ fontWeight: 600 }}>{getEntrySummary(pe)}</p>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <span className="text-[9px] px-1.5 py-[1px] rounded-full" style={{ fontWeight: 600, color, backgroundColor: bg }}>
+                  {typeLabel(pe.type)}
+                </span>
+                {pe.isPrimary && (
+                  <span className="text-[8px] px-1 py-[1px] rounded bg-primary/10 text-primary border border-primary/15" style={{ fontWeight: 700 }}>
+                    PRIMARY
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-0 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
+            {!pe.isPrimary && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button onClick={onSetPrimary} className="p-1 rounded-md hover:bg-accent transition-colors cursor-pointer">
+                    <Star className="w-3 h-3 text-muted-foreground hover:text-primary" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent className="z-[300]"><p className="text-xs">Set as primary</p></TooltipContent>
+              </Tooltip>
+            )}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button onClick={onEdit} className="p-1 rounded-md hover:bg-accent transition-colors cursor-pointer">
+                  <Pencil className="w-3 h-3 text-muted-foreground hover:text-primary" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent className="z-[300]"><p className="text-xs">Edit</p></TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button onClick={onDelete} className="p-1 rounded-md hover:bg-destructive/5 transition-colors cursor-pointer">
+                  <Trash2 className="w-3 h-3 text-muted-foreground hover:text-destructive" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent className="z-[300]"><p className="text-xs">Delete</p></TooltipContent>
+            </Tooltip>
+          </div>
+        </div>
+
+        {/* Data rows */}
+        {dataRows.length > 0 && (
+          <div className="flex flex-col gap-[5px] py-1.5 px-2 rounded-lg bg-muted/40 border border-border/50">
+            {dataRows.map((row, i) => (
+              <DataRow key={i} icon={row.icon} label={row.label} value={row.value} sensitive={row.sensitive} />
+            ))}
+          </div>
+        )}
+
+        {/* Discount/charges strip */}
+        {pe.applyDiscount && (
+          <div className="flex items-center justify-between px-2 py-1 rounded-md bg-accent/50 border border-border/50">
+            <div className="flex items-center gap-1">
+              <Percent className="w-2.5 h-2.5 text-primary" />
+              <span className="text-[10px] text-muted-foreground" style={{ fontWeight: 500 }}>Discount</span>
+            </div>
+            <span className="text-[10px] text-foreground tabular-nums" style={{ fontWeight: 600 }}>{pe.discountPercent || "0"}%</span>
+            {pe.additionalCharges && (
+              <>
+                <span className="text-[10px] text-muted-foreground mx-1">|</span>
+                <span className="text-[10px] text-muted-foreground" style={{ fontWeight: 500 }}>Charges</span>
+                <span className="text-[10px] text-foreground tabular-nums ml-1" style={{ fontWeight: 600 }}>{pe.additionalCharges}%</span>
+              </>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Footer */}
+      <div className="flex items-center justify-between px-3 py-1.5 border-t border-border/50 bg-muted/20 rounded-b-xl">
+        <span className="text-[9px] text-muted-foreground" style={{ fontWeight: 500 }}>{typeCategory(pe.type)}</span>
+        <span
+          className="px-1.5 py-[1px] rounded-full text-[9px] border"
+          style={{ fontWeight: 500, color: "#059669", backgroundColor: "#F0FDF4", borderColor: "#BBF7D0" }}
+        >
+          Active
+        </span>
+      </div>
+    </div>
+  );
+}
+
+
 export function PaymentMethodsSection({
   configType,
   paymentEntries,
