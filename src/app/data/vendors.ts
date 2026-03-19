@@ -454,6 +454,12 @@ const _manualVendors: Vendor[] = [
     notes: "EV technology partner. Battery and powertrain components.",
     createdAt: "2024-12-23T09:30:00Z",
     updatedAt: "2025-06-30T11:00:00Z",
+    configData: {
+      paymentMethods: [
+        { id: "pm-byd1", type: "wire", typeLabel: "Wire Transfer", bankName: "HSBC", accountNumber: "6174920385", routingNumber: "022000020", wireRoutingNumber: "HSBCHKHH", isSaved: true },
+        { id: "pm-byd2", type: "digital_wallet", typeLabel: "Digital Wallet", walletProvider: "Alipay", walletId: "byd-treasury@byd.com", isSaved: true },
+      ],
+    },
   },
   {
     id: "v-005",
