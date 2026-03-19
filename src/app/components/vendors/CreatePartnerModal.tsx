@@ -4791,21 +4791,10 @@ function ConfigPageContent({
 
         {/* ── Currency & Limit Row ── */}
         <div className="rounded-xl border border-border bg-card shadow-sm p-4">
-          <div className="grid grid-cols-[140px_1fr] gap-3">
-            {/* Currency */}
+          <div className="grid grid-cols-[180px_1fr] gap-3">
+            {/* Currency — reuse same dropdown as billing/shipping */}
             <div>
-              <Label className="text-xs text-foreground" style={{ fontWeight: 600 }}>Currency</Label>
-              <Select value={currency} onValueChange={(v: any) => setCurrency(v)}>
-                <SelectTrigger className="mt-1.5 h-9 rounded-lg text-sm">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="usd">🇺🇸 USD</SelectItem>
-                  <SelectItem value="eur">🇪🇺 EUR</SelectItem>
-                  <SelectItem value="gbp">🇬🇧 GBP</SelectItem>
-                  <SelectItem value="jpy">🇯🇵 JPY</SelectItem>
-                </SelectContent>
-              </Select>
+              <CurrencyDropdown selectedId={currency} onSelect={setCurrency} />
               <p className="text-[10px] text-muted-foreground mt-1">Synced from billing</p>
             </div>
             {/* Maximum Credit Limit */}
@@ -4815,7 +4804,7 @@ function ConfigPageContent({
                 <div className="absolute left-0 top-0 bottom-0 w-10 rounded-l-lg bg-muted/60 border-r border-border flex items-center justify-center">
                   <span className="text-xs text-muted-foreground font-medium">{currencySymbol}</span>
                 </div>
-                <Input placeholder="50,000.00" className="pl-12 rounded-lg border-border h-9 bg-card text-sm placeholder:text-muted-foreground" />
+                <Input placeholder="50,000.00" className="pl-12 rounded-lg border-border h-9 bg-card text-sm placeholder:text-muted-foreground/50" />
               </div>
               <p className="text-[10px] text-muted-foreground mt-1">Leave empty for unlimited credit</p>
             </div>
