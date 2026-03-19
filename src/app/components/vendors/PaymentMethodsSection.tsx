@@ -16,17 +16,6 @@ import {
   PAYMENT_TYPE_CARDS,
 } from "./partnerConstants";
 import { createEmptyPaymentEntry } from "./config-helpers";
-import { Label } from "../ui/label";
-import { Textarea } from "../ui/textarea";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../ui/select";
-import { Tooltip, TooltipTrigger, TooltipContent } from "../ui/tooltip";
-import {
-  type PaymentMethodType,
-  type PaymentTypeCategory,
-  type PaymentMethodEntry,
-  PAYMENT_TYPE_CARDS,
-} from "./partnerConstants";
-import { createEmptyPaymentEntry } from "./config-helpers";
 
 const inputCls = "mt-1.5 rounded-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20";
 
