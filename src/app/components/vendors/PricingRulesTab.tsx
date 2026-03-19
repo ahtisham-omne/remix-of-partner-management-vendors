@@ -1875,32 +1875,16 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
         <div className="w-px h-5 bg-[#E2E8F0] shrink-0" />
 
         {/* Quick Sort/Filter Pills */}
-        {QUICK_FILTER_DEFS.map((f) => {
-          const active = quickFilter === f.key;
-          const count = filterCounts[f.key];
-          return (
-            <button
-              key={f.key}
-              onClick={() => { setQuickFilter(f.key); setCurrentPage(1); }}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                active
-                  ? "border-[#0A77FF] bg-[#EDF4FF] text-[#0A77FF]"
-                  : "border-border text-muted-foreground hover:bg-muted/60 hover:text-foreground hover:border-muted-foreground/30 active:bg-muted"
-              }`}
-              style={{ fontWeight: active ? 600 : 400 }}
-            >
-              {f.label}
-              {f.showCount && (
-                <span
-                  className={`text-[10px] rounded-full px-1.5 py-px min-w-[18px] text-center ${active ? "bg-[#0A77FF]/10" : "bg-muted"}`}
-                  style={{ fontWeight: 600, color: active ? "#0A77FF" : "#475569" }}
-                >
-                  {count}
-                </span>
-              )}
-            </button>
-          );
-        })}
+        <FilterPills
+          options={QUICK_FILTER_DEFS.map((f) => ({
+            key: f.key,
+            label: f.label,
+            count: filterCounts[f.key],
+            showCount: f.showCount,
+          }))}
+          activeKey={quickFilter}
+          onSelect={(k) => { setQuickFilter(k as QuickFilter); setCurrentPage(1); }}
+        />
       </div>
 
       {/* Divider */}
