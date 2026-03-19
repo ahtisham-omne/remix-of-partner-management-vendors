@@ -4833,11 +4833,12 @@ function ConfigPageContent({
             {/* ── Hard Block Card ── */}
             <button
               onClick={() => setEnforcement("hard_block")}
-              className={`text-left rounded-xl border transition-all flex flex-col overflow-hidden ${
+              className={`text-left rounded-xl border-2 transition-all flex flex-col overflow-hidden bg-card ${
                 enforcement === "hard_block"
-                  ? "border-primary ring-1 ring-primary/20 shadow-sm"
-                  : "border-border hover:border-muted-foreground/30"
+                  ? "border-destructive ring-1 ring-destructive/20 shadow-md shadow-destructive/10"
+                  : "border-transparent shadow-sm hover:shadow-md hover:border-destructive/30"
               }`}
+              style={{ boxShadow: enforcement !== "hard_block" ? "0 1px 3px 0 hsl(var(--border))" : undefined }}
             >
               <div className="p-3.5 flex-1">
                 <div className="flex items-center justify-between mb-2">
@@ -4847,9 +4848,9 @@ function ConfigPageContent({
                     <Lock className={`w-4 h-4 ${enforcement === "hard_block" ? "text-destructive" : "text-muted-foreground"}`} />
                   </div>
                   <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                    enforcement === "hard_block" ? "border-primary" : "border-muted-foreground/40"
+                    enforcement === "hard_block" ? "border-destructive" : "border-muted-foreground/40"
                   }`}>
-                    {enforcement === "hard_block" && <div className="w-2 h-2 rounded-full bg-primary" />}
+                    {enforcement === "hard_block" && <div className="w-2 h-2 rounded-full bg-destructive" />}
                   </div>
                 </div>
                 <p className="text-xs text-foreground" style={{ fontWeight: 600 }}>Hard Block</p>
@@ -4860,23 +4861,24 @@ function ConfigPageContent({
             {/* ── Soft Warning Card ── */}
             <button
               onClick={() => setEnforcement("soft_warning")}
-              className={`text-left rounded-xl border transition-all flex flex-col overflow-hidden ${
+              className={`text-left rounded-xl border-2 transition-all flex flex-col overflow-hidden bg-card ${
                 enforcement === "soft_warning"
-                  ? "border-primary ring-1 ring-primary/20 shadow-sm"
-                  : "border-border hover:border-muted-foreground/30"
+                  ? "border-yellow-500 ring-1 ring-yellow-500/20 shadow-md shadow-yellow-500/10"
+                  : "border-transparent shadow-sm hover:shadow-md hover:border-yellow-500/30"
               }`}
+              style={{ boxShadow: enforcement !== "soft_warning" ? "0 1px 3px 0 hsl(var(--border))" : undefined }}
             >
               <div className="p-3.5 flex-1">
                 <div className="flex items-center justify-between mb-2">
                   <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                    enforcement === "soft_warning" ? "bg-accent" : "bg-muted/60"
+                    enforcement === "soft_warning" ? "bg-yellow-50" : "bg-muted/60"
                   }`}>
-                    <AlertTriangle className={`w-4 h-4 ${enforcement === "soft_warning" ? "text-primary" : "text-muted-foreground"}`} />
+                    <AlertTriangle className={`w-4 h-4 ${enforcement === "soft_warning" ? "text-yellow-600" : "text-muted-foreground"}`} />
                   </div>
                   <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                    enforcement === "soft_warning" ? "border-primary" : "border-muted-foreground/40"
+                    enforcement === "soft_warning" ? "border-yellow-500" : "border-muted-foreground/40"
                   }`}>
-                    {enforcement === "soft_warning" && <div className="w-2 h-2 rounded-full bg-primary" />}
+                    {enforcement === "soft_warning" && <div className="w-2 h-2 rounded-full bg-yellow-500" />}
                   </div>
                 </div>
                 <p className="text-xs text-foreground" style={{ fontWeight: 600 }}>Soft Warning</p>
@@ -4887,11 +4889,12 @@ function ConfigPageContent({
             {/* ── No Enforcement Card ── */}
             <button
               onClick={() => setEnforcement("none")}
-              className={`text-left rounded-xl border transition-all flex flex-col overflow-hidden ${
+              className={`text-left rounded-xl border-2 transition-all flex flex-col overflow-hidden bg-card ${
                 enforcement === "none"
-                  ? "border-primary ring-1 ring-primary/20 shadow-sm"
-                  : "border-border hover:border-muted-foreground/30"
+                  ? "border-primary ring-1 ring-primary/20 shadow-md shadow-primary/10"
+                  : "border-transparent shadow-sm hover:shadow-md hover:border-primary/30"
               }`}
+              style={{ boxShadow: enforcement !== "none" ? "0 1px 3px 0 hsl(var(--border))" : undefined }}
             >
               <div className="p-3.5 flex-1">
                 <div className="flex items-center justify-between mb-2">
