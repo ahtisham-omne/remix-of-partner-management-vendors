@@ -390,37 +390,24 @@ export function PaymentMethodsSection({
       {/* Toolbar */}
       {savedPaymentEntries.length > 0 && (
         <div className="flex flex-wrap items-center gap-2">
-          <div className="flex items-center gap-1 flex-1 flex-wrap">
-            <button
-              onClick={() => setPmListFilter("all")}
-              className={`px-2.5 py-1 rounded-full text-[11px] transition-all border cursor-pointer ${
-                pmListFilter === "all" ? "bg-[#0A77FF] text-white border-[#0A77FF]" : "bg-white text-[#64748B] border-[#E2E8F0] hover:border-[#CBD5E1]"
-              }`}
-              style={{ fontWeight: 600 }}
-            >
-              All ({savedPaymentEntries.length})
-            </button>
-            {savedTypes.map((st) => {
-              const count = savedPaymentEntries.filter((e) => e.type === st).length;
-              const cat = typeCategory(st);
-              const isActive = pmListFilter === st;
-              return (
-                <button
-                  key={st}
-                  onClick={() => setPmListFilter(st)}
-                  className={`px-2.5 py-1 rounded-full text-[11px] transition-all border cursor-pointer ${
-                    isActive ? "text-white border-transparent" : "bg-white text-[#64748B] border-[#E2E8F0] hover:border-[#CBD5E1]"
-                  }`}
-                  style={{ fontWeight: 600, ...(isActive ? { backgroundColor: catColor[cat] || "#64748B" } : {}) }}
-                >
-                  {typeLabel(st)} ({count})
-                </button>
-              );
-            })}
+          <div className="flex-1">
+            <FilterPills
+              options={[
+                { key: "all", label: "All", count: savedPaymentEntries.length, showCount: true },
+                ...savedTypes.map((st) => ({
+                  key: st,
+                  label: typeLabel(st),
+                  count: savedPaymentEntries.filter((e) => e.type === st).length,
+                  showCount: true,
+                })),
+              ]}
+              activeKey={pmListFilter}
+              onSelect={(k) => setPmListFilter(k as PaymentMethodType | "all")}
+            />
           </div>
           <Select value={pmListSort} onValueChange={(v: "newest" | "oldest" | "type" | "name") => setPmListSort(v)}>
-            <SelectTrigger className="h-7 w-auto min-w-[100px] text-[11px] rounded-lg border-[#E2E8F0] bg-white px-2 gap-1 [&>svg]:w-3 [&>svg]:h-3">
-              <ArrowUpDown className="w-3 h-3 text-[#94A3B8] shrink-0" />
+            <SelectTrigger className="h-7 w-auto min-w-[100px] text-[11px] rounded-lg border-border bg-background px-2 gap-1 [&>svg]:w-3 [&>svg]:h-3">
+              <ArrowUpDown className="w-3 h-3 text-muted-foreground shrink-0" />
               <SelectValue />
             </SelectTrigger>
             <SelectContent className="z-[250] rounded-lg text-[11px]">
@@ -432,7 +419,7 @@ export function PaymentMethodsSection({
           </Select>
           <button
             onClick={openAddModal}
-            className="h-7 px-2.5 rounded-lg bg-[#0A77FF] text-white text-[11px] hover:bg-[#0862D0] transition-colors inline-flex items-center gap-1 cursor-pointer"
+            className="h-7 px-2.5 rounded-lg bg-primary text-primary-foreground text-[11px] hover:bg-primary/90 transition-colors inline-flex items-center gap-1 cursor-pointer"
             style={{ fontWeight: 600 }}
           >
             <Plus className="w-3 h-3" /> Add Method
@@ -440,61 +427,74 @@ export function PaymentMethodsSection({
         </div>
       )}
 
-      {/* Saved List */}
+      {/* Saved Grid */}
       {savedPaymentEntries.length > 0 ? (
-        <div className="space-y-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
           {filteredSaved.map((pe) => {
             const PeIcon = typeIcon(pe.type);
             const cat = typeCategory(pe.type);
             return (
               <div
                 key={pe.id}
-                className="group flex items-center gap-3 px-3.5 py-3 rounded-xl border border-[#E8ECF1] bg-white hover:border-[#BFDBFE] hover:shadow-[0_2px_8px_-2px_rgba(10,119,255,0.08)] transition-all"
+                className="group relative rounded-xl border border-border bg-card hover:border-primary/25 hover:shadow-[0_2px_8px_-2px_rgba(10,119,255,0.08)] transition-all overflow-hidden"
               >
-                <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style={{ backgroundColor: catBg[cat] || "#F1F5F9" }}>
-                  <PeIcon className="w-4 h-4" style={{ color: catColor[cat] || "#64748B" }} />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{getEntrySummary(pe)}</span>
-                    {pe.isPrimary && (
-                      <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#EDF4FF] text-[#0A77FF] border border-[#0A77FF]/15 shrink-0" style={{ fontWeight: 700 }}>PRIMARY</span>
-                    )}
+                {/* Category color stripe */}
+                <div className="h-[3px] w-full" style={{ backgroundColor: catColor[cat] || "#64748B" }} />
+                <div className="px-3.5 pt-3 pb-3">
+                  {/* Top row: icon + type badge + actions */}
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ backgroundColor: catBg[cat] || "#F1F5F9" }}>
+                        <PeIcon className="w-4 h-4" style={{ color: catColor[cat] || "#64748B" }} />
+                      </div>
+                      <div className="min-w-0">
+                        <span className="text-[13px] text-foreground block truncate" style={{ fontWeight: 600 }}>{getEntrySummary(pe)}</span>
+                        <span className="text-[11px] text-muted-foreground truncate block">{getEntrySubtext(pe)}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-0.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                      {!pe.isPrimary && (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <button onClick={() => handleSetPrimary(pe.id)} className="p-1.5 rounded-md hover:bg-primary/5 transition-colors cursor-pointer">
+                              <Star className="w-3.5 h-3.5 text-muted-foreground hover:text-primary" />
+                            </button>
+                          </TooltipTrigger>
+                          <TooltipContent className="z-[300]"><p className="text-xs">Set as primary</p></TooltipContent>
+                        </Tooltip>
+                      )}
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button onClick={() => openEditModal(pe.id)} className="p-1.5 rounded-md hover:bg-primary/5 transition-colors cursor-pointer">
+                            <Pencil className="w-3.5 h-3.5 text-muted-foreground hover:text-primary" />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent className="z-[300]"><p className="text-xs">Edit</p></TooltipContent>
+                      </Tooltip>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button onClick={() => removePaymentEntry(pe.id)} className="p-1.5 rounded-md hover:bg-destructive/5 transition-colors cursor-pointer">
+                            <Trash2 className="w-3.5 h-3.5 text-muted-foreground hover:text-destructive" />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent className="z-[300]"><p className="text-xs">Delete</p></TooltipContent>
+                      </Tooltip>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2 mt-0.5">
+                  {/* Bottom row: badges */}
+                  <div className="flex items-center gap-1.5 mt-2.5 pt-2.5 border-t border-border/50">
                     <span className="text-[10px] px-1.5 py-0.5 rounded-full shrink-0" style={{ fontWeight: 600, color: catColor[cat] || "#64748B", backgroundColor: catBg[cat] || "#F1F5F9" }}>
                       {typeLabel(pe.type)}
                     </span>
-                    <span className="text-[11px] text-[#94A3B8] truncate">{getEntrySubtext(pe)}</span>
+                    <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground shrink-0" style={{ fontWeight: 500 }}>
+                      {typeCategory(pe.type)}
+                    </span>
+                    {pe.isPrimary && (
+                      <span className="ml-auto text-[9px] px-1.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/15 shrink-0" style={{ fontWeight: 700 }}>
+                        PRIMARY
+                      </span>
+                    )}
                   </div>
-                </div>
-                <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                  {!pe.isPrimary && (
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <button onClick={() => handleSetPrimary(pe.id)} className="p-1.5 rounded-md hover:bg-[#EDF4FF] transition-colors cursor-pointer">
-                          <Star className="w-3.5 h-3.5 text-[#94A3B8] hover:text-[#0A77FF]" />
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent className="z-[300]"><p className="text-xs">Set as primary</p></TooltipContent>
-                    </Tooltip>
-                  )}
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button onClick={() => openEditModal(pe.id)} className="p-1.5 rounded-md hover:bg-[#EDF4FF] transition-colors cursor-pointer">
-                        <Pencil className="w-3.5 h-3.5 text-[#94A3B8] hover:text-[#0A77FF]" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent className="z-[300]"><p className="text-xs">Edit</p></TooltipContent>
-                  </Tooltip>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button onClick={() => removePaymentEntry(pe.id)} className="p-1.5 rounded-md hover:bg-[#FEF2F2] transition-colors cursor-pointer">
-                        <Trash2 className="w-3.5 h-3.5 text-[#94A3B8] hover:text-[#EF4444]" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent className="z-[300]"><p className="text-xs">Delete</p></TooltipContent>
-                  </Tooltip>
                 </div>
               </div>
             );
