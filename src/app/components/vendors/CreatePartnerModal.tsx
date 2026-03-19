@@ -6019,99 +6019,16 @@ function ConfigPageContent({
                         const isCustom = term.id.startsWith("pt-custom-");
 
                         return (
-                          <div
+                          <PaymentTermCard
                             key={term.id}
+                            term={term}
+                            isSelected={isSelected}
                             onClick={() => setPreviewPaymentTermId(term.id)}
-                            className={`bg-white border rounded-xl cursor-pointer group transition-all duration-200 flex flex-col relative ${
-                              isSelected
-                                ? "border-[#0A77FF]/25 shadow-[0_2px_12px_rgba(10,119,255,0.10)]"
-                                : "border-[#E8ECF1] shadow-[0_1px_3px_rgba(0,0,0,0.03)] hover:border-[#BFDBFE] hover:shadow-[0_4px_16px_-4px_rgba(10,119,255,0.10)]"
-                            }`}
-                          >
-                            {/* Selected checkmark */}
-                            {isSelected && (
-                              <div className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-[#0A77FF] flex items-center justify-center z-10 shadow-sm">
-                                <Check className="w-3 h-3 text-white" />
-                              </div>
-                            )}
-
-                            <div className="p-3 flex-1 flex flex-col min-h-0 overflow-hidden">
-                              {/* Row 1: Type pill + preset/custom badge */}
-                              <div className="flex items-center justify-between gap-2 mb-2 shrink-0">
-                                <span className="inline-flex items-stretch rounded-full overflow-hidden border shrink-0" style={{ borderColor: badgeColor + "40" }}>
-                                  <span
-                                    className="inline-flex items-center gap-1 px-2 py-[2px] text-[10px]"
-                                    style={{ fontWeight: 600, color: badgeColor, backgroundColor: badgeColor + "15" }}
-                                  >
-                                    <Receipt className="w-3 h-3" />
-                                    {term.typeBadge}
-                                  </span>
-                                  <span className="inline-flex items-center px-2 py-[2px] text-[10px] bg-white text-[#64748B] border-l" style={{ fontWeight: 500, borderColor: badgeColor + "40" }}>
-                                    {term.trigger}
-                                  </span>
-                                </span>
-                                <span className={`inline-flex items-center gap-1 px-1.5 py-[3px] rounded-md border text-[9px] shrink-0 ${
-                                  isCustom
-                                    ? "border-[#E2E8F0] bg-white text-[#64748B]"
-                                    : "bg-[#F1F5F9] border-[#E2E8F0] text-[#94A3B8]"
-                                }`} style={{ fontWeight: 600 }}>
-                                  {isCustom ? "Custom" : <><Lock className="w-2.5 h-2.5" /> PRESET</>}
-                                </span>
-                              </div>
-
-                              {/* Row 2: Name */}
-                              <div className="shrink-0 mb-1">
-                                <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{highlightMatch(term.name, ptSearch)}</p>
-                              </div>
-
-                              {/* Row 3: Description */}
-                              <div className="h-[32px] shrink-0 mb-2">
-                                <p className="text-[11px] text-[#64748B] line-clamp-2 leading-relaxed" style={{ fontWeight: 400 }}>{highlightMatch(term.description, ptSearch)}</p>
-                              </div>
-
-                              {/* Row 4: Hero value + vendor count inline */}
-                              <div className="flex items-baseline justify-between shrink-0">
-                                <div className="flex items-baseline gap-2">
-                                  <span className="text-[22px] text-[#0F172A] tabular-nums leading-none tracking-tight" style={{ fontWeight: 600 }}>
-                                    {ptDays}
-                                  </span>
-                                  <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>days</span>
-                                </div>
-                                <span className="inline-flex items-center gap-1 text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>
-                                  <Building2 className="w-3 h-3" /> {term.vendorsApplied}
-                                </span>
-                              </div>
-
-                              {/* Row 5: Discount info strip */}
-                              {(term.applyDiscount || term.discountPercent) && (
-                                <div className="pt-1.5 shrink-0">
-                                  <div className="flex items-center px-2.5 py-[5px] rounded-lg border border-[#E8ECF1] bg-[#FAFBFC] text-[11px] tabular-nums">
-                                    <span className="text-[#64748B]" style={{ fontWeight: 400 }}>
-                                      Early pay {term.discountPercent || "2"}% within {term.discountPeriod || "10"} days
-                                    </span>
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-
-                            {/* Footer — full-width 2-col CTAs */}
-                            <div className="grid grid-cols-2 border-t border-[#F1F5F9] shrink-0">
-                              <button
-                                onClick={(e) => { e.stopPropagation(); setSelectedPaymentTermId(term.id); setPaymentTermsModalOpen(false); }}
-                                className="inline-flex items-center justify-center gap-1 py-2 text-[11px] text-[#64748B] hover:text-[#0A77FF] hover:bg-[#F8FAFC] transition-colors border-r border-[#F1F5F9]"
-                                style={{ fontWeight: 500 }}
-                              >
-                                <Check className="w-3 h-3" /> Apply
-                              </button>
-                              <button
-                                onClick={(e) => { e.stopPropagation(); handleDuplicatePaymentTerm(term); }}
-                                className="inline-flex items-center justify-center gap-1 py-2 text-[11px] text-[#64748B] hover:text-[#0A77FF] hover:bg-[#F8FAFC] transition-colors"
-                                style={{ fontWeight: 500 }}
-                              >
-                                <Copy className="w-3 h-3" /> Duplicate
-                              </button>
-                            </div>
-                          </div>
+                            onApply={(t) => { setSelectedPaymentTermId(t.id); setPaymentTermsModalOpen(false); }}
+                            onDuplicate={(t) => handleDuplicatePaymentTerm(t)}
+                            searchText={ptSearch}
+                            showPresetBadge
+                          />
                         );
                       })}
                     </div>
