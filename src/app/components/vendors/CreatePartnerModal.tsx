@@ -5160,10 +5160,10 @@ function ConfigPageContent({
 
             {/* Form body */}
             <div className="px-6 py-5 space-y-5 overflow-y-auto flex-1 min-h-0">
-              {/* Payment Term Type — card selector like Pricing Rule Type */}
+              {/* Payment Term Type — card selector */}
               <div>
-                <Label className="text-[13px] text-[#0F172A] mb-2.5 flex items-center gap-1.5" style={{ fontWeight: 600 }}>
-                  Payment Term Type <Info className="w-3.5 h-3.5 text-[#94A3B8]" />
+                <Label className="text-[13px] text-foreground mb-2.5 flex items-center gap-1.5" style={{ fontWeight: 600 }}>
+                  Payment Term Type <Info className="w-3.5 h-3.5 text-muted-foreground" />
                 </Label>
                 <div className="grid grid-cols-3 gap-3">
                   {CREATE_PT_TYPES.map((t) => {
@@ -5175,18 +5175,18 @@ function ConfigPageContent({
                       <button
                         key={t.id}
                         onClick={() => setCreatePtType(t.id as "net" | "prepayment" | "split")}
-                        className={`relative flex items-start gap-3 p-4 rounded-xl border-2 text-left transition-all cursor-pointer ${
+                        className={`relative flex items-start gap-3 p-4 rounded-xl border text-left transition-all cursor-pointer ${
                           isActive
-                            ? "border-primary bg-[#F8FBFF] shadow-[0_0_0_1px_hsl(var(--primary)/0.15)]"
-                            : "border-[#E8ECF1] bg-white hover:border-[#CBD5E1] hover:shadow-[0_1px_4px_rgba(0,0,0,0.04)]"
+                            ? "border-primary bg-white shadow-[0_0_0_1px_hsl(var(--primary)/0.2),0_2px_8px_-2px_hsl(var(--primary)/0.1)]"
+                            : "border-border bg-white hover:border-primary/30 hover:shadow-sm"
                         }`}
                       >
-                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${isActive ? "bg-[#EFF6FF] text-primary" : "bg-[#F8FAFC] text-[#94A3B8]"}`}>
+                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${isActive ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>
                           {icon}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>{shortLabel}</p>
-                          <p className="text-[11px] text-[#64748B] mt-0.5">{shortDesc}</p>
+                          <p className="text-[13px] text-foreground" style={{ fontWeight: 600 }}>{shortLabel}</p>
+                          <p className="text-[11px] text-muted-foreground mt-0.5">{shortDesc}</p>
                         </div>
                         {isActive && (
                           <div className="absolute top-3 right-3 w-5 h-5 rounded-full bg-primary flex items-center justify-center">
@@ -5199,9 +5199,9 @@ function ConfigPageContent({
                 </div>
               </div>
 
-              {/* Trigger pills — like Basis in pricing rules */}
+              {/* Trigger pills */}
               <div>
-                <Label className="text-[13px] text-[#0F172A] mb-2 block" style={{ fontWeight: 600 }}>Trigger:</Label>
+                <Label className="text-[13px] text-foreground mb-2 block" style={{ fontWeight: 600 }}>Trigger:</Label>
                 <div className="flex items-center gap-2 flex-wrap">
                   {CREATE_PT_TRIGGERS.map((t) => {
                     const isActive = createPtTrigger === t.id;
@@ -5211,10 +5211,10 @@ function ConfigPageContent({
                         onClick={() => setCreatePtTrigger(t.id)}
                         className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full border text-xs transition-all cursor-pointer ${
                           isActive
-                            ? "border-primary bg-[#EDF4FF] text-primary"
-                            : "border-[#E2E8F0] text-[#64748B] hover:border-[#CBD5E1] hover:bg-[#F8FAFC]"
+                            ? "border-primary bg-primary/10 text-primary shadow-sm"
+                            : "border-border bg-white text-foreground hover:border-primary/30 hover:bg-muted/50"
                         }`}
-                        style={{ fontWeight: isActive ? 600 : 400 }}
+                        style={{ fontWeight: isActive ? 600 : 500 }}
                       >
                         {t.id === "order_confirmation" && <ShoppingCart className="w-3.5 h-3.5" />}
                         {t.id === "production_start" && <Cog className="w-3.5 h-3.5" />}
@@ -5229,37 +5229,37 @@ function ConfigPageContent({
               </div>
 
               {/* Divider */}
-              <div className="border-t border-[#E8ECF1]" />
+              <div className="border-t border-border" />
 
               {/* Payment Term Details */}
               <div>
-                <Label className="text-[13px] text-[#0F172A] mb-1 flex items-center gap-1.5" style={{ fontWeight: 600 }}>
-                  Payment Term Details <Info className="w-3.5 h-3.5 text-[#94A3B8]" />
+                <Label className="text-[13px] text-foreground mb-1 flex items-center gap-1.5" style={{ fontWeight: 600 }}>
+                  Payment Term Details <Info className="w-3.5 h-3.5 text-muted-foreground" />
                 </Label>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-[12px] text-[#475569] mb-1.5 block" style={{ fontWeight: 500 }}>
+                  <Label className="text-[12px] text-muted-foreground mb-1.5 block" style={{ fontWeight: 500 }}>
                     {createPtType === "net" ? "NET Term" : createPtType === "prepayment" ? "Prepayment Term" : "Split Term"} Name
                   </Label>
                   <Input
                     value={createPtName}
                     onChange={(e) => setCreatePtName(e.target.value)}
                     placeholder={`e.g. ${createPtType === "net" ? "Net 30 Standard" : createPtType === "prepayment" ? "50% Upfront" : "3-Part Split"}`}
-                    className="h-10 rounded-lg border-[#E2E8F0] bg-white text-sm text-[#0F172A] placeholder:text-muted-foreground/50 focus:border-primary focus:ring-1 focus:ring-primary/20"
+                    className="h-10 rounded-lg border-border bg-white text-sm text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:ring-1 focus:ring-primary/20"
                   />
                 </div>
                 <div>
-                  <Label className="text-[12px] text-[#475569] mb-1.5 block" style={{ fontWeight: 500 }}>Description</Label>
+                  <Label className="text-[12px] text-muted-foreground mb-1.5 block" style={{ fontWeight: 500 }}>Description</Label>
                   <div className="relative">
                     <Input
                       value={createPtDescription}
                       onChange={(e) => { if (e.target.value.length <= 150) setCreatePtDescription(e.target.value); }}
                       placeholder="Type here..."
-                      className="h-10 rounded-lg border-[#E2E8F0] bg-white text-sm text-[#0F172A] placeholder:text-muted-foreground/50 focus:border-primary focus:ring-1 focus:ring-primary/20 pr-14"
+                      className="h-10 rounded-lg border-border bg-white text-sm text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:ring-1 focus:ring-primary/20 pr-14"
                     />
-                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-[#94A3B8]">{createPtDescription.length}/150</span>
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground">{createPtDescription.length}/150</span>
                   </div>
                 </div>
               </div>
@@ -5270,17 +5270,16 @@ function ConfigPageContent({
                     checked={createPtDuration !== "30"}
                     onCheckedChange={() => {}}
                     className="data-[state=checked]:bg-primary"
-                    style={{ width: 18, height: 8 }}
                   />
-                  <span className="text-[12px] text-[#475569]" style={{ fontWeight: 500 }}>Custom Duration</span>
+                  <span className="text-[12px] text-foreground" style={{ fontWeight: 500 }}>Custom Duration</span>
                 </div>
               )}
 
               {createPtType === "net" && (
                 <div>
-                  <Label className="text-[12px] text-[#475569] mb-1.5 block" style={{ fontWeight: 500 }}>NET Duration (Days)</Label>
+                  <Label className="text-[12px] text-muted-foreground mb-1.5 block" style={{ fontWeight: 500 }}>NET Duration (Days)</Label>
                   <Select value={createPtDuration} onValueChange={setCreatePtDuration}>
-                    <SelectTrigger className="h-10 rounded-lg border-[#E2E8F0] bg-white max-w-[200px]">
+                    <SelectTrigger className="h-10 rounded-lg border-border bg-white max-w-[200px]">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="z-[250] rounded-lg">
@@ -5295,44 +5294,43 @@ function ConfigPageContent({
               )}
 
               {/* Divider */}
-              <div className="border-t border-[#E8ECF1]" />
+              <div className="border-t border-border" />
 
-              {/* Discount Terms — collapsible like "Discount Tiers" in pricing rule */}
-              <div className={`rounded-xl border p-4 transition-colors ${createPtApplyDiscount ? "border-primary/30 bg-[#FAFCFF]" : "border-[#E8ECF1] bg-[#FAFBFC]"}`}>
+              {/* Discount Terms — collapsible */}
+              <div className={`rounded-xl border p-4 transition-all ${createPtApplyDiscount ? "border-primary/25 bg-white shadow-sm" : "border-border bg-white"}`}>
                 <div className="flex items-center gap-3">
                   <Switch
                     checked={createPtApplyDiscount}
                     onCheckedChange={(v) => setCreatePtApplyDiscount(v === true)}
                     className="data-[state=checked]:bg-primary"
-                    style={{ width: 18, height: 8 }}
                   />
                   <div className="flex-1 min-w-0">
-                    <h5 className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Apply Early Payment Discount</h5>
-                    <p className="text-[11px] text-[#64748B] mt-0.5">Enable early payment discounts based on the selected terms.</p>
+                    <h5 className="text-[13px] text-foreground" style={{ fontWeight: 600 }}>Apply Early Payment Discount</h5>
+                    <p className="text-[11px] text-muted-foreground mt-0.5">Enable early payment discounts based on the selected terms.</p>
                   </div>
                 </div>
 
                 {createPtApplyDiscount && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 pt-4 border-t border-[#E8ECF1]">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 pt-4 border-t border-border">
                     <div>
-                      <Label className="text-[12px] text-[#475569] mb-1.5 flex items-center gap-1" style={{ fontWeight: 500 }}>
-                        Discount Percentage (%) <Info className="w-3 h-3 text-[#CBD5E1]" />
+                      <Label className="text-[12px] text-muted-foreground mb-1.5 flex items-center gap-1" style={{ fontWeight: 500 }}>
+                        Discount Percentage (%) <Info className="w-3 h-3 text-muted-foreground/60" />
                       </Label>
                       <div className="relative">
                         <Input
                           value={createPtDiscountPercent}
                           onChange={(e) => setCreatePtDiscountPercent(e.target.value)}
                           placeholder="Enter percentage (e.g., 50%)"
-                          className="h-10 rounded-lg border-[#E2E8F0] bg-white pr-8 text-sm text-[#0F172A] placeholder:text-muted-foreground/50 focus:border-primary focus:ring-1 focus:ring-primary/20"
+                          className="h-10 rounded-lg border-border bg-white pr-8 text-sm text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:ring-1 focus:ring-primary/20"
                         />
-                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-[#94A3B8]">%</span>
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">%</span>
                       </div>
                     </div>
                     <div className="flex items-end gap-3">
                       <div className="flex-1">
-                        <Label className="text-[12px] text-[#475569] mb-1.5 block" style={{ fontWeight: 500 }}>Eligible Payment Period</Label>
+                        <Label className="text-[12px] text-muted-foreground mb-1.5 block" style={{ fontWeight: 500 }}>Eligible Payment Period</Label>
                         <Select value={createPtDiscountPeriod} onValueChange={setCreatePtDiscountPeriod}>
-                          <SelectTrigger className="h-10 rounded-lg border-[#E2E8F0] bg-white">
+                          <SelectTrigger className="h-10 rounded-lg border-border bg-white">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent className="z-[250] rounded-lg">
@@ -5345,9 +5343,9 @@ function ConfigPageContent({
                         </Select>
                       </div>
                       <div className="flex items-center gap-2 pb-1">
-                        <Switch checked={false} onCheckedChange={() => {}} className="data-[state=checked]:bg-primary" style={{ width: 18, height: 8 }} />
-                        <span className="text-[11px] text-[#64748B] whitespace-nowrap" style={{ fontWeight: 500 }}>Fix Discount Rate ($)</span>
-                        <Info className="w-3 h-3 text-[#CBD5E1]" />
+                        <Switch checked={false} onCheckedChange={() => {}} className="data-[state=checked]:bg-primary" />
+                        <span className="text-[11px] text-foreground whitespace-nowrap" style={{ fontWeight: 500 }}>Fix Discount Rate ($)</span>
+                        <Info className="w-3 h-3 text-muted-foreground/60" />
                       </div>
                     </div>
                   </div>
