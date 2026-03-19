@@ -257,6 +257,11 @@ export function CreatePartnerModal({ open, onOpenChange, onPartnerCreated }: Cre
     setSelectedVendorSubTypes((prev) => {
       const next = new Set(prev);
       if (next.has(id)) {
+        // Seller can only be disabled if at least one other profile remains enabled
+        if (id === "seller_items") {
+          const othersEnabled = Array.from(next).filter(x => x !== "seller_items");
+          if (othersEnabled.length === 0) return prev; // can't disable seller if it's the only one
+        }
         next.delete(id);
       } else {
         next.add(id);
