@@ -4182,6 +4182,45 @@ function BillingShippingTab({ vendor, cfg }: { vendor: Vendor; cfg?: VendorConfi
 function PaymentMethodsTab({ cfg, PAYMENT_TYPE_ICONS }: { cfg?: VendorConfigData; PAYMENT_TYPE_ICONS: Record<string, React.ElementType> }) {
   const hasPaymentMethods = cfg?.paymentMethods && cfg.paymentMethods.length > 0;
 
+  // Convert SavedPaymentMethod → PaymentMethodEntry shape for the shared card
+  const asEntries = React.useMemo(() => {
+    if (!hasPaymentMethods) return [];
+    return cfg!.paymentMethods!.map((pm): import("../components/vendors/partnerConstants").PaymentMethodEntry => ({
+      id: pm.id,
+      type: pm.type as import("../components/vendors/partnerConstants").PaymentMethodType,
+      expanded: false,
+      isSaved: pm.isSaved,
+      isPrimary: false,
+      nickname: pm.typeLabel,
+      bankName: pm.bankName || "",
+      accountTitle: "",
+      accountNumber: pm.accountNumber || "",
+      routingNumber: pm.routingNumber || "",
+      swiftCode: pm.wireRoutingNumber || "",
+      accountType: "checking",
+      cardholderName: "",
+      cardNumber: pm.cardNumber || "",
+      expiryDate: pm.expiryDate || "",
+      cvv: "",
+      billingAddress: "",
+      walletProvider: pm.walletProvider || "",
+      walletId: pm.walletId || "",
+      payeeName: pm.checkPayableTo || "",
+      mailingAddress: "",
+      recipientName: "",
+      collectionPoint: "",
+      methodName: "",
+      description: "",
+      documentLink: "",
+      phone: "",
+      countryCode: "+1",
+      specialInstructions: "",
+      applyDiscount: (pm.discountPercent != null && pm.discountPercent > 0) || (pm.additionalChargesPercent != null && pm.additionalChargesPercent > 0),
+      discountPercent: pm.discountPercent != null ? String(pm.discountPercent) : "",
+      additionalCharges: pm.additionalChargesPercent != null ? String(pm.additionalChargesPercent) : "",
+    }));
+  }, [cfg, hasPaymentMethods]);
+
   return (
     <div className="space-y-4">
       <ContentCard
@@ -4190,49 +4229,13 @@ function PaymentMethodsTab({ cfg, PAYMENT_TYPE_ICONS }: { cfg?: VendorConfigData
         count={hasPaymentMethods ? cfg!.paymentMethods!.length : undefined}
       >
         {hasPaymentMethods ? (
-          <div className="space-y-2">
-            {cfg!.paymentMethods!.map((pm) => {
-              const Icon = PAYMENT_TYPE_ICONS[pm.type] || DollarSign;
-              return (
-                <div key={pm.id} className="rounded-md border border-[#E2E8F0] p-3 flex items-start gap-3 hover:border-[#CBD5E1] transition-colors">
-                  <div className="w-8 h-8 rounded-md flex items-center justify-center shrink-0 bg-[#EDF4FF]">
-                    <Icon className="w-4 h-4 text-[#0A77FF]" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2 mb-0.5">
-                      <p className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>{pm.typeLabel}</p>
-                      {pm.isSaved && (
-                        <CheckCircle2 className="w-3.5 h-3.5 text-[#059669]" />
-                      )}
-                    </div>
-                    <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[12px] text-[#64748B] mt-1.5">
-                      {pm.bankName && <DetailRow label="Bank" value={pm.bankName} />}
-                      {pm.accountNumber && <DetailRow label="Account" value={`****${pm.accountNumber.slice(-4)}`} />}
-                      {pm.routingNumber && <DetailRow label="Routing" value={`****${pm.routingNumber.slice(-4)}`} />}
-                      {pm.cardNumber && <DetailRow label="Card" value={`****${pm.cardNumber.slice(-4)}`} />}
-                      {pm.expiryDate && <DetailRow label="Expiry" value={pm.expiryDate} />}
-                      {pm.walletProvider && <DetailRow label="Provider" value={pm.walletProvider} />}
-                      {pm.wireRoutingNumber && <DetailRow label="Wire Routing" value={`****${pm.wireRoutingNumber.slice(-4)}`} />}
-                      {pm.checkPayableTo && <DetailRow label="Payable To" value={pm.checkPayableTo} />}
-                    </div>
-                    {((pm.discountPercent != null && pm.discountPercent > 0) || (pm.additionalChargesPercent != null && pm.additionalChargesPercent > 0)) && (
-                      <div className="flex items-center gap-3 mt-2.5">
-                        {pm.discountPercent != null && pm.discountPercent > 0 && (
-                          <span className="text-[11px] text-[#059669] px-2 py-0.5 rounded-md bg-[#F0FDF4] border border-[#DCFCE7]" style={{ fontWeight: 600 }}>
-                            {pm.discountPercent}% discount
-                          </span>
-                        )}
-                        {pm.additionalChargesPercent != null && pm.additionalChargesPercent > 0 && (
-                          <span className="text-[11px] text-[#D97706] px-2 py-0.5 rounded-md bg-[#FFFBEB] border border-[#FDE68A]" style={{ fontWeight: 600 }}>
-                            {pm.additionalChargesPercent}% surcharge
-                          </span>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+            {asEntries.map((entry) => (
+              <PaymentMethodCardView
+                key={entry.id}
+                entry={entry}
+              />
+            ))}
           </div>
         ) : (
           <EmptyState icon={CreditCard} title="No payment methods configured" description="Payment methods will appear here once added during partner creation or editing." />
