@@ -1,9 +1,21 @@
 import React, { useState } from "react";
 import {
   Plus, X, CreditCard, ChevronLeft, Check, Pencil, Trash2, Star,
-  ArrowUpDown, ExternalLink, ChevronDown,
+  ArrowUpDown, ExternalLink, ChevronDown, MoreHorizontal,
 } from "lucide-react";
 import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import { Textarea } from "../ui/textarea";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../ui/select";
+import { Tooltip, TooltipTrigger, TooltipContent } from "../ui/tooltip";
+import { FilterPills, type FilterPillOption } from "./FilterPills";
+import {
+  type PaymentMethodType,
+  type PaymentTypeCategory,
+  type PaymentMethodEntry,
+  PAYMENT_TYPE_CARDS,
+} from "./partnerConstants";
+import { createEmptyPaymentEntry } from "./config-helpers";
 import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../ui/select";
