@@ -572,6 +572,12 @@ const _manualVendors: Vendor[] = [
     notes: "EV manufacturer customer. Growing partnership.",
     createdAt: "2024-10-29T10:00:00Z",
     updatedAt: "2026-02-10T10:00:00Z",
+    configData: {
+      paymentMethods: [
+        { id: "pm-riv1", type: "ach", typeLabel: "ACH / Direct Deposit", bankName: "Silicon Valley Bank", accountNumber: "2048571936", routingNumber: "121140399", isSaved: true },
+        { id: "pm-riv2", type: "card", typeLabel: "Credit / Debit Card", cardNumber: "5500000000007890", expiryDate: "11/28", isSaved: true, discountPercent: 3 },
+      ],
+    },
   },
   {
     id: "v-007",
