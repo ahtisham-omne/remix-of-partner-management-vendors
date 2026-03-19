@@ -4776,149 +4776,176 @@ function ConfigPageContent({
   }
 
   if (sectionId === "credit_limit" || sectionId === "customer_credit") {
+    const currencySymbol = currency === "eur" ? "€" : currency === "gbp" ? "£" : currency === "jpy" ? "¥" : "$";
+    const currencyLabel = currency === "eur" ? "EUR" : currency === "gbp" ? "GBP" : currency === "jpy" ? "JPY" : "USD";
+
     return (
       <div className="space-y-3">
         {/* Section header */}
         <div className="mb-1">
-          <h4 className="text-sm text-[#0F172A]" style={{ fontWeight: 700 }}>Credit Limit</h4>
-          <p className="text-xs text-[#64748B] mt-0.5">
+          <h4 className="text-sm text-foreground" style={{ fontWeight: 700 }}>Credit Limit</h4>
+          <p className="text-xs text-muted-foreground mt-0.5">
             Optionally set a credit limit and enforcement behaviour for this {configType}.
           </p>
         </div>
 
-        {/* Credit limit fields */}
-        <div className="rounded-lg border border-[#E8ECF1] bg-white p-3 space-y-3 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
-          <div className="grid grid-cols-3 gap-3">
-            {/* Currency */}
-            <div>
-              <Label className="text-xs text-[#0F172A]" style={{ fontWeight: 600 }}>Currency</Label>
-              <div className="mt-1">
-                <CurrencyDropdown selectedId={currency} onSelect={setCurrency} />
+        {/* Unified credit config card */}
+        <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
+
+          {/* ── Limit & Threshold row ── */}
+          <div className="p-4 space-y-3">
+            <div className="grid grid-cols-2 gap-3">
+              {/* Maximum Credit Limit */}
+              <div>
+                <Label className="text-xs text-foreground" style={{ fontWeight: 600 }}>Maximum credit limit</Label>
+                <div className="relative mt-1.5">
+                  <div className="absolute left-0 top-0 bottom-0 w-10 rounded-l-lg bg-muted/60 border-r border-border flex items-center justify-center">
+                    <span className="text-xs text-muted-foreground font-medium">{currencySymbol}</span>
+                  </div>
+                  <Input placeholder="50,000.00" className="pl-12 rounded-lg border-border h-9 bg-card text-sm placeholder:text-muted-foreground" />
+                </div>
+                <p className="text-[10px] text-muted-foreground mt-1">
+                  Currency synced from billing: <span className="font-semibold text-foreground">{currencyLabel}</span>
+                </p>
+              </div>
+              {/* Warning Threshold */}
+              <div>
+                <Label className="text-xs text-foreground" style={{ fontWeight: 600 }}>Warning threshold</Label>
+                <div className="relative mt-1.5">
+                  <div className="absolute left-0 top-0 bottom-0 w-10 rounded-l-lg bg-muted/60 border-r border-border flex items-center justify-center">
+                    <span className="text-xs text-muted-foreground font-medium">%</span>
+                  </div>
+                  <Input placeholder="80" className="pl-12 rounded-lg border-border h-9 bg-card text-sm placeholder:text-muted-foreground" />
+                </div>
+                <p className="text-[10px] text-muted-foreground mt-1">Alert triggers at this % of limit</p>
               </div>
             </div>
-            {/* Maximum Credit Limit */}
-            <div>
-              <Label className="text-xs text-[#0F172A]" style={{ fontWeight: 600 }}>Maximum credit limit</Label>
-              <div className="relative mt-1">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#64748B]">$</span>
-                <Input placeholder="50,000.00" className="pl-7 rounded-lg border-[#E2E8F0] h-9 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
-              </div>
-            </div>
-            {/* Warning Threshold */}
-            <div>
-              <Label className="text-xs text-[#0F172A]" style={{ fontWeight: 600 }}>Warning threshold (%)</Label>
-              <div className="relative mt-1">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#64748B]">%</span>
-                <Input placeholder="80" className="pl-7 rounded-lg border-[#E2E8F0] h-9 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
-              </div>
-            </div>
+
+            {/* Threshold alert recipients */}
+            <SearchableUserPicker
+              selectedIds={thresholdAlertRecipients}
+              onSelectionChange={setThresholdAlertRecipients}
+              accentColor="#D97706"
+              accentBg="#FFFBEB"
+              accentBorder="#FDE68A"
+              accentText="#92400E"
+              label="Notify when threshold is reached"
+              placeholder="Search users…"
+            />
           </div>
-          <p className="text-[10px] text-[#94A3B8]">All fields are optional. Leave empty if credit is not tracked.</p>
 
-          {/* Threshold alert recipients */}
-          <SearchableUserPicker
-            selectedIds={thresholdAlertRecipients}
-            onSelectionChange={setThresholdAlertRecipients}
-            accentColor="#D97706"
-            accentBg="#FFFBEB"
-            accentBorder="#FDE68A"
-            accentText="#92400E"
-            label="Notify when threshold is reached"
-            placeholder="Search users…"
-          />
-        </div>
+          {/* ── Divider ── */}
+          <div className="border-t border-border" />
 
-        {/* Enforcement */}
-        <div className="rounded-lg border border-[#E8ECF1] bg-white p-3 space-y-2.5 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
-          <h5 className="text-xs text-[#64748B]" style={{ fontWeight: 600 }}>Enforcement</h5>
+          {/* ── Enforcement section ── */}
+          <div className="p-4 space-y-2.5">
+            <div className="flex items-center gap-2 mb-1">
+              <ShieldAlert className="w-3.5 h-3.5 text-muted-foreground" />
+              <span className="text-xs text-muted-foreground" style={{ fontWeight: 600 }}>Enforcement Policy</span>
+            </div>
 
-          {/* Hard Block */}
-          <button
-            onClick={() => setEnforcement("hard_block")}
-            className={`w-full text-left px-3 py-2 rounded-lg border transition-all ${
-              enforcement === "hard_block"
-                ? "border-[#0A77FF] bg-[#EDF4FF]/30"
-                : "border-[#E2E8F0] hover:border-[#CBD5E1]"
-            }`}
-          >
-            <div className="flex items-center gap-2.5">
-              <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                enforcement === "hard_block" ? "border-[#0A77FF]" : "border-[#CBD5E1]"
-              }`}>
-                {enforcement === "hard_block" && <div className="w-2 h-2 rounded-full bg-[#0A77FF]" />}
+            {/* Hard Block */}
+            <button
+              onClick={() => setEnforcement("hard_block")}
+              className={`w-full text-left px-3 py-2.5 rounded-lg border transition-all ${
+                enforcement === "hard_block"
+                  ? "border-primary bg-primary/5 ring-1 ring-primary/20"
+                  : "border-border hover:border-muted-foreground/30"
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                  enforcement === "hard_block" ? "border-primary" : "border-muted-foreground/40"
+                }`}>
+                  {enforcement === "hard_block" && <div className="w-2 h-2 rounded-full bg-primary" />}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs text-foreground" style={{ fontWeight: 600 }}>Hard Block</p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">Prevents order placement when credit limit is exceeded</p>
+                </div>
+                <Lock className="w-3.5 h-3.5 text-destructive/60 shrink-0" />
               </div>
-              <p className="text-xs text-[#0F172A] flex-1" style={{ fontWeight: 600 }}>Hard Block</p>
-              <span className="text-[10px] text-[#94A3B8]">Prevents orders when limit exceeded</span>
-            </div>
-          </button>
-          {enforcement === "hard_block" && (
-            <div className="ml-6.5 mt-1">
-              <SearchableUserPicker
-                selectedIds={hardBlockRecipients}
-                onSelectionChange={setHardBlockRecipients}
-                accentColor="#DC2626"
-                accentBg="#FEF2F2"
-                accentBorder="#FECACA"
-                accentText="#991B1B"
-                label="Notify when orders are blocked"
-                placeholder="Search users…"
-              />
-            </div>
-          )}
-
-          {/* Soft Warning */}
-          <button
-            onClick={() => setEnforcement("soft_warning")}
-            className={`w-full text-left px-3 py-2 rounded-lg border transition-all ${
-              enforcement === "soft_warning"
-                ? "border-[#0A77FF] bg-[#EDF4FF]/30"
-                : "border-[#E2E8F0] hover:border-[#CBD5E1]"
-            }`}
-          >
-            <div className="flex items-center gap-2.5">
-              <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                enforcement === "soft_warning" ? "border-[#0A77FF]" : "border-[#CBD5E1]"
-              }`}>
-                {enforcement === "soft_warning" && <div className="w-2 h-2 rounded-full bg-[#0A77FF]" />}
+            </button>
+            {enforcement === "hard_block" && (
+              <div className="ml-6 mt-1">
+                <SearchableUserPicker
+                  selectedIds={hardBlockRecipients}
+                  onSelectionChange={setHardBlockRecipients}
+                  accentColor="#DC2626"
+                  accentBg="#FEF2F2"
+                  accentBorder="#FECACA"
+                  accentText="#991B1B"
+                  label="Notify when orders are blocked"
+                  placeholder="Search users…"
+                />
               </div>
-              <p className="text-xs text-[#0F172A] flex-1" style={{ fontWeight: 600 }}>Soft Warning</p>
-              <span className="text-[10px] text-[#94A3B8]">Shows confirmation modal before proceeding</span>
-            </div>
-          </button>
-          {enforcement === "soft_warning" && (
-            <div className="ml-6.5 mt-1">
-              <SearchableUserPicker
-                selectedIds={softWarningRecipients}
-                onSelectionChange={setSoftWarningRecipients}
-                accentColor="#D97706"
-                accentBg="#FFFBEB"
-                accentBorder="#FDE68A"
-                accentText="#92400E"
-                label="Notify when warnings are triggered"
-                placeholder="Search users…"
-              />
-            </div>
-          )}
+            )}
 
-          {/* No Enforcement */}
-          <button
-            onClick={() => setEnforcement("none")}
-            className={`w-full text-left px-3 py-2 rounded-lg border transition-all ${
-              enforcement === "none"
-                ? "border-[#0A77FF] bg-[#EDF4FF]/30"
-                : "border-[#E2E8F0] hover:border-[#CBD5E1]"
-            }`}
-          >
-            <div className="flex items-center gap-2.5">
-              <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                enforcement === "none" ? "border-[#0A77FF]" : "border-[#CBD5E1]"
-              }`}>
-                {enforcement === "none" && <div className="w-2 h-2 rounded-full bg-[#0A77FF]" />}
+            {/* Soft Warning */}
+            <button
+              onClick={() => setEnforcement("soft_warning")}
+              className={`w-full text-left px-3 py-2.5 rounded-lg border transition-all ${
+                enforcement === "soft_warning"
+                  ? "border-primary bg-primary/5 ring-1 ring-primary/20"
+                  : "border-border hover:border-muted-foreground/30"
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                  enforcement === "soft_warning" ? "border-primary" : "border-muted-foreground/40"
+                }`}>
+                  {enforcement === "soft_warning" && <div className="w-2 h-2 rounded-full bg-primary" />}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs text-foreground" style={{ fontWeight: 600 }}>Soft Warning</p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">Shows confirmation modal before proceeding with the order</p>
+                </div>
+                <AlertTriangle className="w-3.5 h-3.5 text-[#D97706]/60 shrink-0" />
               </div>
-              <p className="text-xs text-[#0F172A] flex-1" style={{ fontWeight: 600 }}>No Enforcement</p>
-              <span className="text-[10px] text-[#94A3B8]">Passive "Over Limit" label only</span>
-            </div>
-          </button>
+            </button>
+            {enforcement === "soft_warning" && (
+              <div className="ml-6 mt-1">
+                <SearchableUserPicker
+                  selectedIds={softWarningRecipients}
+                  onSelectionChange={setSoftWarningRecipients}
+                  accentColor="#D97706"
+                  accentBg="#FFFBEB"
+                  accentBorder="#FDE68A"
+                  accentText="#92400E"
+                  label="Notify when warnings are triggered"
+                  placeholder="Search users…"
+                />
+              </div>
+            )}
+
+            {/* No Enforcement */}
+            <button
+              onClick={() => setEnforcement("none")}
+              className={`w-full text-left px-3 py-2.5 rounded-lg border transition-all ${
+                enforcement === "none"
+                  ? "border-primary bg-primary/5 ring-1 ring-primary/20"
+                  : "border-border hover:border-muted-foreground/30"
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                  enforcement === "none" ? "border-primary" : "border-muted-foreground/40"
+                }`}>
+                  {enforcement === "none" && <div className="w-2 h-2 rounded-full bg-primary" />}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs text-foreground" style={{ fontWeight: 600 }}>No Enforcement</p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">Passive "Over Limit" label only — no blocking</p>
+                </div>
+                <Info className="w-3.5 h-3.5 text-muted-foreground/40 shrink-0" />
+              </div>
+            </button>
+          </div>
+
+          {/* ── Footer hint ── */}
+          <div className="px-4 py-2.5 bg-muted/30 border-t border-border">
+            <p className="text-[10px] text-muted-foreground">All fields are optional. Leave empty if credit is not tracked for this {configType}.</p>
+          </div>
         </div>
       </div>
     );
