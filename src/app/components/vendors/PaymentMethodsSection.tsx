@@ -384,9 +384,6 @@ function PaymentMethodCard({
     <div
       className="bg-card border border-border rounded-xl group transition-all duration-200 flex flex-col relative hover:border-primary/30 hover:shadow-[0_4px_16px_-4px_rgba(10,119,255,0.10)]"
     >
-      {/* Color accent bar */}
-      <div className="h-[3px] rounded-t-xl" style={{ background: `linear-gradient(90deg, ${color}, ${color}80)` }} />
-
       <div className="p-3 flex-1 flex flex-col gap-2">
         {/* Header: icon + name + actions */}
         <div className="flex items-start justify-between gap-2">
