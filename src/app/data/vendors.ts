@@ -260,6 +260,13 @@ const _manualVendors: Vendor[] = [
     notes: "Major automotive partner. Preferred vendor for vehicle parts and equipment.",
     createdAt: "2024-12-23T10:00:00Z",
     updatedAt: "2025-12-10T14:30:00Z",
+    configData: {
+      paymentMethods: [
+        { id: "pm-t1", type: "ach", typeLabel: "ACH / Direct Deposit", bankName: "Chase Bank", accountNumber: "9283746501", routingNumber: "021000021", isSaved: true, discountPercent: 2 },
+        { id: "pm-t2", type: "wire", typeLabel: "Wire Transfer", bankName: "Bank of America", accountNumber: "7461829305", routingNumber: "026009593", wireRoutingNumber: "BOFAUS3N", isSaved: true },
+        { id: "pm-t3", type: "card", typeLabel: "Credit / Debit Card", cardNumber: "4111111111113456", expiryDate: "09/27", isSaved: true },
+      ],
+    },
   },
   {
     id: "v-002",
@@ -313,6 +320,12 @@ const _manualVendors: Vendor[] = [
     notes: "Primary logistics and shipping partner.",
     createdAt: "2024-11-25T08:00:00Z",
     updatedAt: "2025-11-22T09:15:00Z",
+    configData: {
+      paymentMethods: [
+        { id: "pm-u1", type: "ach", typeLabel: "ACH / Direct Deposit", bankName: "Wells Fargo", accountNumber: "5038291640", routingNumber: "121000248", isSaved: true },
+        { id: "pm-u2", type: "digital_wallet", typeLabel: "Digital Wallet", walletProvider: "PayPal", walletId: "payments@ups.com", isSaved: true, discountPercent: 1.5 },
+      ],
+    },
   },
   {
     id: "v-003",
@@ -370,6 +383,13 @@ const _manualVendors: Vendor[] = [
     notes: "Major automotive customer. Large volume orders.",
     createdAt: "2024-10-29T12:00:00Z",
     updatedAt: "2026-01-15T16:00:00Z",
+    configData: {
+      paymentMethods: [
+        { id: "pm-f1", type: "wire", typeLabel: "Wire Transfer", bankName: "Citibank", accountNumber: "8192736450", routingNumber: "021000089", wireRoutingNumber: "CITIUS33", isSaved: true },
+        { id: "pm-f2", type: "check", typeLabel: "Check / Paper", checkPayableTo: "Ford Motor Company", isSaved: true },
+        { id: "pm-f3", type: "ach", typeLabel: "ACH / Direct Deposit", bankName: "JPMorgan Chase", accountNumber: "3829104756", routingNumber: "021000021", isSaved: true, additionalChargesPercent: 0.5 },
+      ],
+    },
   },
   {
     id: "v-004",
@@ -434,6 +454,12 @@ const _manualVendors: Vendor[] = [
     notes: "EV technology partner. Battery and powertrain components.",
     createdAt: "2024-12-23T09:30:00Z",
     updatedAt: "2025-06-30T11:00:00Z",
+    configData: {
+      paymentMethods: [
+        { id: "pm-byd1", type: "wire", typeLabel: "Wire Transfer", bankName: "HSBC", accountNumber: "6174920385", routingNumber: "022000020", wireRoutingNumber: "HSBCHKHH", isSaved: true },
+        { id: "pm-byd2", type: "digital_wallet", typeLabel: "Digital Wallet", walletProvider: "Alipay", walletId: "byd-treasury@byd.com", isSaved: true },
+      ],
+    },
   },
   {
     id: "v-005",
@@ -546,6 +572,12 @@ const _manualVendors: Vendor[] = [
     notes: "EV manufacturer customer. Growing partnership.",
     createdAt: "2024-10-29T10:00:00Z",
     updatedAt: "2026-02-10T10:00:00Z",
+    configData: {
+      paymentMethods: [
+        { id: "pm-riv1", type: "ach", typeLabel: "ACH / Direct Deposit", bankName: "Silicon Valley Bank", accountNumber: "2048571936", routingNumber: "121140399", isSaved: true },
+        { id: "pm-riv2", type: "card", typeLabel: "Credit / Debit Card", cardNumber: "5500000000007890", expiryDate: "11/28", isSaved: true, discountPercent: 3 },
+      ],
+    },
   },
   {
     id: "v-007",
@@ -606,6 +638,11 @@ const _manualVendors: Vendor[] = [
     notes: "Luxury EV partner. Premium vehicle components supplier.",
     createdAt: "2024-09-15T08:30:00Z",
     updatedAt: "2026-01-20T10:15:00Z",
+    configData: {
+      paymentMethods: [
+        { id: "pm-luc1", type: "wire", typeLabel: "Wire Transfer", bankName: "Goldman Sachs", accountNumber: "9150384726", routingNumber: "021000089", wireRoutingNumber: "GOLDUS33", isSaved: true },
+      ],
+    },
   },
   {
     id: "v-008",
@@ -679,6 +716,14 @@ const _manualVendors: Vendor[] = [
     notes: "Primary express shipping carrier. Priority delivery services.",
     createdAt: "2024-08-18T09:00:00Z",
     updatedAt: "2025-09-15T08:00:00Z",
+    configData: {
+      paymentMethods: [
+        { id: "pm-fed1", type: "ach", typeLabel: "ACH / Direct Deposit", bankName: "US Bank", accountNumber: "7283019465", routingNumber: "091000019", isSaved: true, discountPercent: 1 },
+        { id: "pm-fed2", type: "digital_wallet", typeLabel: "Digital Wallet", walletProvider: "Stripe", walletId: "acct_fedex_corp", isSaved: true },
+        { id: "pm-fed3", type: "wire", typeLabel: "Wire Transfer", bankName: "Deutsche Bank", accountNumber: "4829103765", routingNumber: "021000089", wireRoutingNumber: "DEUTDEFF", isSaved: true },
+        { id: "pm-fed4", type: "check", typeLabel: "Check / Paper", checkPayableTo: "FedEx Corporation", isSaved: true },
+      ],
+    },
   },
   {
     id: "v-009",
