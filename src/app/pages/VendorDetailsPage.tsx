@@ -3934,8 +3934,8 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                           <button onClick={() => toast.info("Add pricing rule coming soon")} className="h-8 px-3 rounded-lg border border-[#DC2626] bg-white text-[#DC2626] text-[12px] cursor-pointer transition-colors inline-flex items-center gap-1.5 hover:bg-[#FEF2F2]" style={{ fontWeight: 600 }}>
                             <Plus className="w-3.5 h-3.5" /> Add New Pricing Rule
                           </button>
-                          <button onClick={() => toast.info("Explore presets coming soon")} className="h-8 px-3 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-[12px] shadow-sm cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 600 }}>
-                            <Sparkles className="w-3.5 h-3.5" /> Explore presets
+                          <button onClick={() => toast.info("Templates coming soon")} className="h-8 px-3 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-[12px] shadow-sm cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 600 }}>
+                            <Sparkles className="w-3.5 h-3.5" /> Templates
                           </button>
                         </div>
                       </div>
@@ -3956,24 +3956,71 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                       <div className="flex-1 overflow-auto p-4">
                         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3">
                           {LOC_PRICING_DATA.map((rule) => (
-                            <div key={rule.id} className="rounded-xl border border-[#E2E8F0] bg-white p-4 hover:border-[#CBD5E1] hover:shadow-[0_2px_8px_rgba(0,0,0,0.06)] transition-all">
-                              <p className="text-[12px] text-[#0F172A] mb-0.5" style={{ fontWeight: 600 }}>{rule.name}</p>
-                              <p className="text-[10px] text-[#94A3B8] mb-3">{rule.desc}</p>
-                              <div className="flex items-center gap-1.5 mb-3">
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] bg-[#DC2626] text-white" style={{ fontWeight: 600 }}>
-                                  <Tag className="w-2.5 h-2.5" /> Discount {rule.discount} off
-                                </span>
-                                <span className="text-[10px] px-2 py-0.5 rounded-full border border-[#E2E8F0] bg-white text-[#475569]" style={{ fontWeight: 500 }}>Expire In ({rule.expiry})</span>
+                            <div
+                              key={rule.id}
+                              onClick={() => toast.info("View details coming soon")}
+                              className="bg-white border border-[#E2E8F0] rounded-xl cursor-pointer group transition-all duration-200 flex flex-col relative"
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.borderColor = "#BFDBFE";
+                                e.currentTarget.style.boxShadow = "0 4px 16px -4px rgba(10,119,255,0.10), 0 0 0 1px #BFDBFE";
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.borderColor = "#E2E8F0";
+                                e.currentTarget.style.boxShadow = "none";
+                              }}
+                            >
+                              <div className="p-3.5 flex-1 flex flex-col min-h-0 overflow-hidden">
+                                {/* Row 1: Type pill */}
+                                <div className="flex items-center justify-between gap-2 mb-2 shrink-0">
+                                  <span className="inline-flex items-stretch rounded-full overflow-hidden border border-[#D1FAE5] shrink-0">
+                                    <span className="inline-flex items-center gap-1 px-2 py-[2px] text-[10px] text-[#047857] bg-[#ECFDF5]" style={{ fontWeight: 600 }}>
+                                      <Tag className="w-3 h-3" /> Discount
+                                    </span>
+                                    <span className="inline-flex items-center px-2 py-[2px] text-[10px] bg-white text-[#64748B] border-l border-[#D1FAE5]" style={{ fontWeight: 500 }}>
+                                      Value
+                                    </span>
+                                  </span>
+                                  <span className="px-1.5 py-[2px] rounded-md text-[10px] border border-[#E2E8F0] bg-white text-[#64748B]" style={{ fontWeight: 500 }}>Custom</span>
+                                </div>
+
+                                {/* Row 2: Name */}
+                                <p className="text-[13px] text-[#0F172A] truncate shrink-0 mb-1" style={{ fontWeight: 600 }}>{rule.name}</p>
+
+                                {/* Row 3: Description */}
+                                <div className="h-[32px] shrink-0 mb-2">
+                                  <p className="text-[11px] text-[#64748B] line-clamp-2 leading-relaxed" style={{ fontWeight: 400 }}>{rule.desc}</p>
+                                </div>
+
+                                {/* Row 4: Hero value */}
+                                <div className="flex items-baseline gap-2 shrink-0">
+                                  <span className="text-[22px] text-[#0F172A] tabular-nums leading-none tracking-tight" style={{ fontWeight: 600 }}>
+                                    {rule.discount}
+                                  </span>
+                                  <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>off</span>
+                                </div>
+
+                                {/* Row 5: Range detail */}
+                                <div className="mt-auto pt-2 shrink-0">
+                                  <div className="flex items-center justify-between px-3 py-[6px] rounded-lg border border-[#E8ECF1] bg-[#FAFBFC] text-[11px] tabular-nums min-w-0">
+                                    <div className="flex items-center gap-1.5 text-[#64748B] min-w-0">
+                                      <span style={{ fontWeight: 400 }}>{rule.minQty}</span>
+                                      <span className="text-[#CBD5E1]">–</span>
+                                      <span style={{ fontWeight: 400 }}>{rule.maxQty}</span>
+                                    </div>
+                                    <span className="shrink-0 ml-2 text-[#0F172A]" style={{ fontWeight: 600 }}>{rule.discount}</span>
+                                  </div>
+                                </div>
                               </div>
-                              <div className="space-y-1.5 text-[11px]">
-                                <div className="flex items-center justify-between">
-                                  <span className="text-[#94A3B8]">Minimum Order Quantity</span>
-                                  <span className="text-[#0F172A]" style={{ fontWeight: 600 }}>{rule.minQty}</span>
-                                </div>
-                                <div className="flex items-center justify-between">
-                                  <span className="text-[#94A3B8]">Maximum Order Quantity</span>
-                                  <span className="text-[#0F172A]" style={{ fontWeight: 600 }}>{rule.maxQty}</span>
-                                </div>
+
+                              {/* Footer */}
+                              <div className="flex items-center gap-2 px-3.5 py-2.5 border-t border-[#F1F5F9] shrink-0">
+                                <span className="text-[10px] px-2 py-0.5 rounded-full border border-[#E2E8F0] bg-white text-[#475569]" style={{ fontWeight: 500 }}>Expire In ({rule.expiry})</span>
+                                <span
+                                  className="ml-auto px-2 py-[2px] rounded-full text-[10px] border"
+                                  style={{ fontWeight: 500, color: "#059669", backgroundColor: "#F0FDF4", borderColor: "#BBF7D0" }}
+                                >
+                                  Active
+                                </span>
                               </div>
                             </div>
                           ))}

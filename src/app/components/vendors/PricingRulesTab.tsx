@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useCallback } from "react";
+import { FilterPills } from "./FilterPills";
 import { Input } from "../ui/input";
 import {
   DropdownMenu,
@@ -1823,7 +1824,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
 
           <button type="button" onClick={() => { setExplorePresetsOpen(true); setExplorePresetsSidebar("all"); setExplorePresetsSearch(""); }} className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg border border-[#E2E8F0] bg-white text-[#334155] hover:bg-[#F8FAFC] text-sm transition-colors cursor-pointer" style={{ fontWeight: 600 }}>
             <BookOpen className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Explore presets</span>
+            <span className="hidden sm:inline">Templates</span>
           </button>
           <button type="button" onClick={() => { resetCreateForm(); setCreateModalOpen(true); }} className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-sm shadow-sm transition-colors cursor-pointer" style={{ fontWeight: 600 }}>
             <Plus className="w-3.5 h-3.5" />
@@ -1875,32 +1876,16 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
         <div className="w-px h-5 bg-[#E2E8F0] shrink-0" />
 
         {/* Quick Sort/Filter Pills */}
-        {QUICK_FILTER_DEFS.map((f) => {
-          const active = quickFilter === f.key;
-          const count = filterCounts[f.key];
-          return (
-            <button
-              key={f.key}
-              onClick={() => { setQuickFilter(f.key); setCurrentPage(1); }}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                active
-                  ? "border-[#0A77FF] bg-[#EDF4FF] text-[#0A77FF]"
-                  : "border-border text-muted-foreground hover:bg-muted/60 hover:text-foreground hover:border-muted-foreground/30 active:bg-muted"
-              }`}
-              style={{ fontWeight: active ? 600 : 400 }}
-            >
-              {f.label}
-              {f.showCount && (
-                <span
-                  className={`text-[10px] rounded-full px-1.5 py-px min-w-[18px] text-center ${active ? "bg-[#0A77FF]/10" : "bg-muted"}`}
-                  style={{ fontWeight: 600, color: active ? "#0A77FF" : "#475569" }}
-                >
-                  {count}
-                </span>
-              )}
-            </button>
-          );
-        })}
+        <FilterPills
+          options={QUICK_FILTER_DEFS.map((f) => ({
+            key: f.key,
+            label: f.label,
+            count: filterCounts[f.key],
+            showCount: f.showCount,
+          }))}
+          activeKey={quickFilter}
+          onSelect={(k) => { setQuickFilter(k as QuickFilter); setCurrentPage(1); }}
+        />
       </div>
 
       {/* Divider */}
@@ -1916,7 +1901,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
             <div className="text-center">
               <p className="text-sm text-[#334155]" style={{ fontWeight: 600 }}>No {categoryView} rules found</p>
               <p className="text-[13px] text-[#94A3B8] mt-1" style={{ fontWeight: 400 }}>
-                {searchQuery ? "Try a different search term" : `Create a new ${categoryView} rule or explore presets to get started.`}
+                {searchQuery ? "Try a different search term" : `Create a new ${categoryView} rule or browse templates to get started.`}
               </p>
             </div>
             {searchQuery && (
@@ -2645,32 +2630,20 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
             </div>
 
             {/* Filter pills */}
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-3">
-              {([
-                { key: "all", label: "All Rules" },
-                { key: "discount", label: "Discounts" },
-                { key: "premium", label: "Premium" },
-                { key: "recent", label: "Recently Used" },
-                { key: "vendors_applied", label: "Vendors Applied" },
-                { key: "created_by_me", label: "Created by Me" },
-                { key: "created_by_others", label: "Created by Others" },
-              ] as const).map((f) => {
-                const active = explorePresetsSidebar === f.key;
-                return (
-                  <button
-                    key={f.key}
-                    onClick={() => setExplorePresetsSidebar(f.key)}
-                    className={`inline-flex items-center px-3 py-1.5 rounded-full border text-[12px] transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                      active
-                        ? "border-[#BFDBFE] bg-[#EFF6FF] text-[#0A77FF]"
-                        : "border-[#E2E8F0] bg-white text-[#64748B] hover:bg-[#F8FAFC] hover:border-[#CBD5E1] hover:text-[#334155]"
-                    }`}
-                    style={{ fontWeight: active ? 600 : 500 }}
-                  >
-                    {f.label}
-                  </button>
-                );
-              })}
+            <div className="pb-3">
+              <FilterPills
+                options={[
+                  { key: "all", label: "All Rules" },
+                  { key: "discount", label: "Discounts" },
+                  { key: "premium", label: "Premium" },
+                  { key: "recent", label: "Recently Used" },
+                  { key: "vendors_applied", label: "Vendors Applied" },
+                  { key: "created_by_me", label: "Created by Me" },
+                  { key: "created_by_others", label: "Created by Others" },
+                ]}
+                activeKey={explorePresetsSidebar}
+                onSelect={(k) => setExplorePresetsSidebar(k)}
+              />
             </div>
           </div>
 
