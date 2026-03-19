@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useCallback } from "react";
+import { FilterPills } from "./FilterPills";
 import { Input } from "../ui/input";
 import {
   DropdownMenu,

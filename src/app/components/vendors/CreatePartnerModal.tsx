@@ -6111,7 +6111,7 @@ function ConfigPageContent({
               className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-[#DBEAFE] bg-[#EFF6FF] text-xs text-[#0A77FF] hover:bg-[#DBEAFE] transition-colors"
               style={{ fontWeight: 500 }}
             >
-              <FileText className="w-3.5 h-3.5" /> Explore presets
+              <FileText className="w-3.5 h-3.5" /> Templates
             </button>
           </div>
         </div>
