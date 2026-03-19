@@ -3517,25 +3517,16 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                           </div>
                           <div className="p-4">
                             <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
-                              {[
-                                { type: "Vendor", icon: "NET", iconBg: "linear-gradient(135deg, #EBF3FF 0%, #DBEAFE 100%)", iconColor: "#0A77FF", name: "Net 60 Post Production End", trigger: "Production End", desc: "Payment is due 60 days after production is completed." },
-                                { type: "Customer", icon: "Pre", iconBg: "linear-gradient(135deg, #F0EBFF 0%, #E9DFFF 100%)", iconColor: "#7C3AED", name: "Full Advance Payment: Product...", trigger: "Production Start", desc: "A (X)% prepayment is required when production ends..." },
-                              ].map((pt) => (
-                                <div key={pt.type} className="rounded-xl border border-[#F1F5F9] bg-[#FAFBFC] overflow-hidden transition-all duration-200 hover:bg-white hover:border-[#BFDBFE] hover:shadow-[0_4px_12px_-4px_rgba(10,119,255,0.08)] group/pterm cursor-pointer">
-                                  <div className="px-3.5 py-2 border-b border-[#F1F5F9] bg-white/50">
-                                    <span className="text-[10px] text-[#64748B] uppercase tracking-wider" style={{ fontWeight: 600 }}>{pt.type}</span>
-                                  </div>
-                                  <div className="p-3.5 flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-xl flex items-center justify-center text-[11px] shrink-0 transition-transform duration-200 group-hover/pterm:scale-105" style={{ background: pt.iconBg, color: pt.iconColor, fontWeight: 800 }}>{pt.icon}</div>
-                                    <div className="min-w-0 flex-1">
-                                      <div className="flex items-center gap-1.5">
-                                        <p className="text-[12px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{pt.name}</p>
-                                        <span className="text-[9px] px-1.5 py-0.5 rounded-full border border-[#E2E8F0] bg-[#F8FAFC] text-[#64748B] shrink-0" style={{ fontWeight: 500 }}>{pt.trigger}</span>
-                                      </div>
-                                      <p className="text-[11px] text-[#94A3B8] mt-0.5 truncate">{pt.desc}</p>
-                                    </div>
-                                  </div>
-                                </div>
+                              {([
+                                PAYMENT_TERM_PRESETS.find(p => p.name === "Net 60 Post Production End") || PAYMENT_TERM_PRESETS[5],
+                                PAYMENT_TERM_PRESETS.find(p => p.category === "prepayment") || PAYMENT_TERM_PRESETS[7],
+                              ] as PaymentTermPreset[]).map((pt) => (
+                                <PaymentTermCard
+                                  key={pt.id}
+                                  term={pt}
+                                  readOnly
+                                  onClick={() => { setPtDetailTerm(pt); setPtDetailOpen(true); }}
+                                />
                               ))}
                             </div>
                           </div>
