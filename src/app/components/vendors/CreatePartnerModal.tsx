@@ -4791,21 +4791,10 @@ function ConfigPageContent({
 
         {/* ── Currency & Limit Row ── */}
         <div className="rounded-xl border border-border bg-card shadow-sm p-4">
-          <div className="grid grid-cols-[140px_1fr] gap-3">
-            {/* Currency */}
+          <div className="grid grid-cols-[180px_1fr] gap-3">
+            {/* Currency — reuse same dropdown as billing/shipping */}
             <div>
-              <Label className="text-xs text-foreground" style={{ fontWeight: 600 }}>Currency</Label>
-              <Select value={currency} onValueChange={(v: any) => setCurrency(v)}>
-                <SelectTrigger className="mt-1.5 h-9 rounded-lg text-sm">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="usd">🇺🇸 USD</SelectItem>
-                  <SelectItem value="eur">🇪🇺 EUR</SelectItem>
-                  <SelectItem value="gbp">🇬🇧 GBP</SelectItem>
-                  <SelectItem value="jpy">🇯🇵 JPY</SelectItem>
-                </SelectContent>
-              </Select>
+              <CurrencyDropdown selectedId={currency} onSelect={setCurrency} />
               <p className="text-[10px] text-muted-foreground mt-1">Synced from billing</p>
             </div>
             {/* Maximum Credit Limit */}
@@ -4815,7 +4804,7 @@ function ConfigPageContent({
                 <div className="absolute left-0 top-0 bottom-0 w-10 rounded-l-lg bg-muted/60 border-r border-border flex items-center justify-center">
                   <span className="text-xs text-muted-foreground font-medium">{currencySymbol}</span>
                 </div>
-                <Input placeholder="50,000.00" className="pl-12 rounded-lg border-border h-9 bg-card text-sm placeholder:text-muted-foreground" />
+                <Input placeholder="50,000.00" className="pl-12 rounded-lg border-border h-9 bg-card text-sm placeholder:text-muted-foreground/50" />
               </div>
               <p className="text-[10px] text-muted-foreground mt-1">Leave empty for unlimited credit</p>
             </div>
@@ -4833,12 +4822,11 @@ function ConfigPageContent({
             {/* ── Hard Block Card ── */}
             <button
               onClick={() => setEnforcement("hard_block")}
-              className={`text-left rounded-xl border-2 transition-all flex flex-col overflow-hidden bg-card ${
+              className={`text-left rounded-xl border transition-all flex flex-col overflow-hidden bg-card ${
                 enforcement === "hard_block"
-                  ? "border-destructive ring-1 ring-destructive/20 shadow-md shadow-destructive/10"
-                  : "border-transparent shadow-sm hover:shadow-md hover:border-destructive/30"
+                  ? "border-destructive/40 shadow-sm"
+                  : "border-border hover:border-destructive/25 shadow-sm hover:shadow-md"
               }`}
-              style={{ boxShadow: enforcement !== "hard_block" ? "0 1px 3px 0 hsl(var(--border))" : undefined }}
             >
               <div className="p-3.5 flex-1">
                 <div className="flex items-center justify-between mb-2">
@@ -4848,7 +4836,7 @@ function ConfigPageContent({
                     <Lock className={`w-4 h-4 ${enforcement === "hard_block" ? "text-destructive" : "text-muted-foreground"}`} />
                   </div>
                   <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                    enforcement === "hard_block" ? "border-destructive" : "border-muted-foreground/40"
+                    enforcement === "hard_block" ? "border-destructive/60" : "border-muted-foreground/40"
                   }`}>
                     {enforcement === "hard_block" && <div className="w-2 h-2 rounded-full bg-destructive" />}
                   </div>
@@ -4861,12 +4849,11 @@ function ConfigPageContent({
             {/* ── Soft Warning Card ── */}
             <button
               onClick={() => setEnforcement("soft_warning")}
-              className={`text-left rounded-xl border-2 transition-all flex flex-col overflow-hidden bg-card ${
+              className={`text-left rounded-xl border transition-all flex flex-col overflow-hidden bg-card ${
                 enforcement === "soft_warning"
-                  ? "border-yellow-500 ring-1 ring-yellow-500/20 shadow-md shadow-yellow-500/10"
-                  : "border-transparent shadow-sm hover:shadow-md hover:border-yellow-500/30"
+                  ? "border-yellow-400/50 shadow-sm"
+                  : "border-border hover:border-yellow-400/30 shadow-sm hover:shadow-md"
               }`}
-              style={{ boxShadow: enforcement !== "soft_warning" ? "0 1px 3px 0 hsl(var(--border))" : undefined }}
             >
               <div className="p-3.5 flex-1">
                 <div className="flex items-center justify-between mb-2">
@@ -4876,9 +4863,9 @@ function ConfigPageContent({
                     <AlertTriangle className={`w-4 h-4 ${enforcement === "soft_warning" ? "text-yellow-600" : "text-muted-foreground"}`} />
                   </div>
                   <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                    enforcement === "soft_warning" ? "border-yellow-500" : "border-muted-foreground/40"
+                    enforcement === "soft_warning" ? "border-yellow-400/60" : "border-muted-foreground/40"
                   }`}>
-                    {enforcement === "soft_warning" && <div className="w-2 h-2 rounded-full bg-yellow-500" />}
+                    {enforcement === "soft_warning" && <div className="w-2 h-2 rounded-full bg-yellow-400" />}
                   </div>
                 </div>
                 <p className="text-xs text-foreground" style={{ fontWeight: 600 }}>Soft Warning</p>
@@ -4889,12 +4876,11 @@ function ConfigPageContent({
             {/* ── No Enforcement Card ── */}
             <button
               onClick={() => setEnforcement("none")}
-              className={`text-left rounded-xl border-2 transition-all flex flex-col overflow-hidden bg-card ${
+              className={`text-left rounded-xl border transition-all flex flex-col overflow-hidden bg-card ${
                 enforcement === "none"
-                  ? "border-primary ring-1 ring-primary/20 shadow-md shadow-primary/10"
-                  : "border-transparent shadow-sm hover:shadow-md hover:border-primary/30"
+                  ? "border-primary/30 shadow-sm"
+                  : "border-border hover:border-primary/20 shadow-sm hover:shadow-md"
               }`}
-              style={{ boxShadow: enforcement !== "none" ? "0 1px 3px 0 hsl(var(--border))" : undefined }}
             >
               <div className="p-3.5 flex-1">
                 <div className="flex items-center justify-between mb-2">
@@ -4904,7 +4890,7 @@ function ConfigPageContent({
                     <Info className={`w-4 h-4 ${enforcement === "none" ? "text-primary" : "text-muted-foreground"}`} />
                   </div>
                   <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                    enforcement === "none" ? "border-primary" : "border-muted-foreground/40"
+                    enforcement === "none" ? "border-primary/60" : "border-muted-foreground/40"
                   }`}>
                     {enforcement === "none" && <div className="w-2 h-2 rounded-full bg-primary" />}
                   </div>
@@ -4917,7 +4903,7 @@ function ConfigPageContent({
 
           {/* ── Contextual settings for selected enforcement ── */}
           {enforcement === "hard_block" && (
-            <div className="mt-3 rounded-xl border-2 border-destructive/30 bg-card shadow-sm p-4 space-y-3">
+            <div className="mt-3 rounded-xl border border-destructive/20 bg-card shadow-sm p-4 space-y-3">
               <div className="flex items-center gap-2">
                 <Lock className="w-3.5 h-3.5 text-destructive" />
                 <span className="text-xs text-foreground" style={{ fontWeight: 600 }}>Hard Block Settings</span>
@@ -4936,7 +4922,7 @@ function ConfigPageContent({
           )}
 
           {enforcement === "soft_warning" && (
-            <div className="mt-3 rounded-xl border-2 border-yellow-500/30 bg-card shadow-sm p-4 space-y-3">
+            <div className="mt-3 rounded-xl border border-yellow-400/20 bg-card shadow-sm p-4 space-y-3">
               <div className="flex items-center gap-2">
                 <AlertTriangle className="w-3.5 h-3.5 text-yellow-600" />
                 <span className="text-xs text-foreground" style={{ fontWeight: 600 }}>Soft Warning Settings</span>
@@ -4966,7 +4952,7 @@ function ConfigPageContent({
           )}
 
           {enforcement === "none" && (
-            <div className="mt-3 rounded-xl border-2 border-primary/30 bg-card shadow-sm p-3.5">
+            <div className="mt-3 rounded-xl border border-primary/15 bg-card shadow-sm p-3.5">
               <div className="flex items-center gap-2.5">
                 <Info className="w-3.5 h-3.5 text-primary" />
                 <p className="text-xs text-muted-foreground">No enforcement applied. A passive "Over Limit" label will appear on orders exceeding the credit limit.</p>
