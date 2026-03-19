@@ -260,6 +260,13 @@ const _manualVendors: Vendor[] = [
     notes: "Major automotive partner. Preferred vendor for vehicle parts and equipment.",
     createdAt: "2024-12-23T10:00:00Z",
     updatedAt: "2025-12-10T14:30:00Z",
+    configData: {
+      paymentMethods: [
+        { id: "pm-t1", type: "ach", typeLabel: "ACH / Direct Deposit", bankName: "Chase Bank", accountNumber: "9283746501", routingNumber: "021000021", isSaved: true, discountPercent: 2 },
+        { id: "pm-t2", type: "wire", typeLabel: "Wire Transfer", bankName: "Bank of America", accountNumber: "7461829305", routingNumber: "026009593", wireRoutingNumber: "BOFAUS3N", isSaved: true },
+        { id: "pm-t3", type: "card", typeLabel: "Credit / Debit Card", cardNumber: "4111111111113456", expiryDate: "09/27", isSaved: true },
+      ],
+    },
   },
   {
     id: "v-002",
