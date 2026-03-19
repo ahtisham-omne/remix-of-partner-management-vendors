@@ -577,29 +577,14 @@ export function PaymentMethodsSection({
             <div className="flex-1 overflow-y-auto px-5 py-4">
               {pmModalStep === "select" ? (
                 <div className="space-y-4">
-                  <div className="flex flex-wrap gap-1.5">
-                    <button
-                      onClick={() => setPmModalTypeFilter("All")}
-                      className={`px-2.5 py-1 rounded-full text-[11px] border transition-all cursor-pointer ${
-                        pmModalTypeFilter === "All" ? "bg-[#0A77FF] text-white border-[#0A77FF]" : "bg-white text-[#64748B] border-[#E2E8F0] hover:border-[#CBD5E1]"
-                      }`}
-                      style={{ fontWeight: 600 }}
-                    >
-                      All Types
-                    </button>
-                    {categories.map((cat) => (
-                      <button
-                        key={cat}
-                        onClick={() => setPmModalTypeFilter(cat)}
-                        className={`px-2.5 py-1 rounded-full text-[11px] border transition-all cursor-pointer ${
-                          pmModalTypeFilter === cat ? "text-white border-transparent" : "bg-white text-[#64748B] border-[#E2E8F0] hover:border-[#CBD5E1]"
-                        }`}
-                        style={{ fontWeight: 600, ...(pmModalTypeFilter === cat ? { backgroundColor: catColor[cat] || "#64748B" } : {}) }}
-                      >
-                        {cat}
-                      </button>
-                    ))}
-                  </div>
+                  <FilterPills
+                    options={[
+                      { key: "All", label: "All Types" },
+                      ...categories.map((cat) => ({ key: cat, label: cat })),
+                    ]}
+                    activeKey={pmModalTypeFilter}
+                    onSelect={(k) => setPmModalTypeFilter(k as PaymentTypeCategory | "All")}
+                  />
                   <div className="grid grid-cols-2 gap-2">
                     {filteredTypeCards.map((t) => {
                       const Icon = t.icon;
