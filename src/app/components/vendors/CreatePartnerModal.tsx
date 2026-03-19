@@ -4917,7 +4917,7 @@ function ConfigPageContent({
 
           {/* ── Contextual settings for selected enforcement ── */}
           {enforcement === "hard_block" && (
-            <div className="mt-3 rounded-xl border border-border bg-card shadow-sm p-4 space-y-3">
+            <div className="mt-3 rounded-xl border-2 border-destructive/30 bg-card shadow-sm p-4 space-y-3">
               <div className="flex items-center gap-2">
                 <Lock className="w-3.5 h-3.5 text-destructive" />
                 <span className="text-xs text-foreground" style={{ fontWeight: 600 }}>Hard Block Settings</span>
@@ -4936,9 +4936,9 @@ function ConfigPageContent({
           )}
 
           {enforcement === "soft_warning" && (
-            <div className="mt-3 rounded-xl border border-border bg-card shadow-sm p-4 space-y-3">
+            <div className="mt-3 rounded-xl border-2 border-yellow-500/30 bg-card shadow-sm p-4 space-y-3">
               <div className="flex items-center gap-2">
-                <AlertTriangle className="w-3.5 h-3.5 text-primary" />
+                <AlertTriangle className="w-3.5 h-3.5 text-yellow-600" />
                 <span className="text-xs text-foreground" style={{ fontWeight: 600 }}>Soft Warning Settings</span>
               </div>
               {/* Warning Threshold */}
@@ -4955,10 +4955,10 @@ function ConfigPageContent({
               <SearchableUserPicker
                 selectedIds={softWarningRecipients}
                 onSelectionChange={setSoftWarningRecipients}
-                accentColor="hsl(var(--primary))"
-                accentBg="hsl(var(--primary) / 0.05)"
-                accentBorder="hsl(var(--primary) / 0.2)"
-                accentText="hsl(var(--primary))"
+                accentColor="hsl(45 100% 40%)"
+                accentBg="hsl(45 100% 50% / 0.05)"
+                accentBorder="hsl(45 100% 50% / 0.2)"
+                accentText="hsl(45 100% 35%)"
                 label="Notify when warning threshold is reached"
                 placeholder="Search users…"
               />
@@ -4966,9 +4966,9 @@ function ConfigPageContent({
           )}
 
           {enforcement === "none" && (
-            <div className="mt-3 rounded-xl border border-border bg-card shadow-sm p-3.5">
+            <div className="mt-3 rounded-xl border-2 border-primary/30 bg-card shadow-sm p-3.5">
               <div className="flex items-center gap-2.5">
-                <Info className="w-3.5 h-3.5 text-muted-foreground" />
+                <Info className="w-3.5 h-3.5 text-primary" />
                 <p className="text-xs text-muted-foreground">No enforcement applied. A passive "Over Limit" label will appear on orders exceeding the credit limit.</p>
               </div>
             </div>
