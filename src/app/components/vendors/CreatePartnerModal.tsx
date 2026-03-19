@@ -95,7 +95,6 @@ import {
   SlidersHorizontal,
   MoreHorizontal,
   BarChart3,
-  Receipt,
 } from "lucide-react";
 import {
   AlertDialog,
