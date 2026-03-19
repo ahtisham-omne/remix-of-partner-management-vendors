@@ -638,6 +638,11 @@ const _manualVendors: Vendor[] = [
     notes: "Luxury EV partner. Premium vehicle components supplier.",
     createdAt: "2024-09-15T08:30:00Z",
     updatedAt: "2026-01-20T10:15:00Z",
+    configData: {
+      paymentMethods: [
+        { id: "pm-luc1", type: "wire", typeLabel: "Wire Transfer", bankName: "Goldman Sachs", accountNumber: "9150384726", routingNumber: "021000089", wireRoutingNumber: "GOLDUS33", isSaved: true },
+      ],
+    },
   },
   {
     id: "v-008",
