@@ -4922,7 +4922,7 @@ function ConfigPageContent({
           )}
 
           {enforcement === "soft_warning" && (
-            <div className="mt-3 rounded-xl border-2 border-yellow-500/30 bg-card shadow-sm p-4 space-y-3">
+            <div className="mt-3 rounded-xl border border-yellow-400/20 bg-card shadow-sm p-4 space-y-3">
               <div className="flex items-center gap-2">
                 <AlertTriangle className="w-3.5 h-3.5 text-yellow-600" />
                 <span className="text-xs text-foreground" style={{ fontWeight: 600 }}>Soft Warning Settings</span>
