@@ -4967,77 +4967,109 @@ function ConfigPageContent({
             </div>
           </div>
         ) : (
-          /* ── Selected Payment Term Card ── */
-          <div className="rounded-lg border border-[#0A77FF] bg-white p-3 relative shadow-[0_1px_4px_rgba(10,119,255,0.08)]">
+          /* ── Selected Payment Term Card — PricingRuleCard-style ── */
+          <div
+            className="bg-white border border-[#E2E8F0] rounded-xl cursor-pointer group transition-all duration-200 flex flex-col relative"
+            onClick={() => { setStandalonePtDetailTerm(selectedPaymentTermPreset); setStandalonePtDetailOpen(true); }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = "#BFDBFE";
+              e.currentTarget.style.boxShadow = "0 4px 16px -4px rgba(10,119,255,0.10), 0 0 0 1px #BFDBFE";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = "#E2E8F0";
+              e.currentTarget.style.boxShadow = "none";
+            }}
+          >
             {/* Remove button */}
             <button
-              onClick={() => { setSelectedPaymentTermId(null); customPaymentTermRef.current = null; }}
-              className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center shadow-sm hover:bg-red-600 transition-colors"
+              onClick={(e) => { e.stopPropagation(); setSelectedPaymentTermId(null); customPaymentTermRef.current = null; }}
+              className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-red-500 text-white flex items-center justify-center shadow-sm hover:bg-red-600 transition-colors z-10"
             >
               <X className="w-3.5 h-3.5" />
             </button>
 
-            <div className="flex items-start gap-3">
-              {/* Type badge */}
-              <div
-                className="px-2 py-1 rounded text-xs text-white shrink-0 mt-0.5"
-                style={{ fontWeight: 700, backgroundColor: selectedPaymentTermPreset.badgeColor }}
+            <div className="p-3.5 flex-1 flex flex-col min-h-0 overflow-hidden">
+              {/* Row 1: Type pill + actions */}
+              <div className="flex items-center justify-between gap-2 mb-2 shrink-0">
+                <span className="inline-flex items-stretch rounded-full overflow-hidden border shrink-0" style={{ borderColor: selectedPaymentTermPreset.badgeColor + "40" }}>
+                  <span
+                    className="inline-flex items-center gap-1 px-2 py-[2px] text-[10px]"
+                    style={{ fontWeight: 600, color: selectedPaymentTermPreset.badgeColor, backgroundColor: selectedPaymentTermPreset.badgeColor + "15" }}
+                  >
+                    <Receipt className="w-3 h-3" />
+                    {selectedPaymentTermPreset.typeBadge}
+                  </span>
+                  <span className="inline-flex items-center px-2 py-[2px] text-[10px] bg-white text-[#64748B] border-l" style={{ fontWeight: 500, borderColor: selectedPaymentTermPreset.badgeColor + "40" }}>
+                    {selectedPaymentTermPreset.trigger}
+                  </span>
+                </span>
+                <div className="flex items-center gap-0.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button onClick={() => toast.info("Duplicate flow coming soon.")} className="p-1.5 rounded-md hover:bg-[#F1F5F9] transition-colors cursor-pointer">
+                        <Copy className="w-3.5 h-3.5 text-[#94A3B8] hover:text-[#475569]" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent className="z-[300]"><p className="text-xs">Duplicate</p></TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button onClick={() => toast.info("Edit flow coming soon.")} className="p-1.5 rounded-md hover:bg-[#F1F5F9] transition-colors cursor-pointer">
+                        <Pencil className="w-3.5 h-3.5 text-[#94A3B8] hover:text-[#475569]" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent className="z-[300]"><p className="text-xs">Edit</p></TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button onClick={() => { setStandalonePtDetailTerm(selectedPaymentTermPreset); setStandalonePtDetailOpen(true); }} className="p-1.5 rounded-md hover:bg-[#F1F5F9] transition-colors cursor-pointer">
+                        <Eye className="w-3.5 h-3.5 text-[#94A3B8] hover:text-[#475569]" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent className="z-[300]"><p className="text-xs">View Details</p></TooltipContent>
+                  </Tooltip>
+                </div>
+              </div>
+
+              {/* Row 2: Name */}
+              <div className="shrink-0 mb-1">
+                <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{selectedPaymentTermPreset.name}</p>
+              </div>
+
+              {/* Row 3: Description */}
+              <div className="h-[32px] shrink-0 mb-2">
+                <p className="text-[11px] text-[#64748B] line-clamp-2 leading-relaxed" style={{ fontWeight: 400 }}>{selectedPaymentTermPreset.description}</p>
+              </div>
+
+              {/* Row 4: Hero value */}
+              <div className="flex items-baseline gap-2 shrink-0">
+                <span className="text-[22px] text-[#0F172A] tabular-nums leading-none tracking-tight" style={{ fontWeight: 600 }}>
+                  {selectedPaymentTermPreset.duration || (selectedPaymentTermPreset.name.match(/\d+/) ? selectedPaymentTermPreset.name.match(/\d+/)![0] : "30")}
+                </span>
+                <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>days</span>
+              </div>
+
+              {/* Row 5: Discount info if applicable */}
+              {(selectedPaymentTermPreset.applyDiscount || selectedPaymentTermPreset.discountPercent) && (
+                <div className="mt-auto pt-2 shrink-0">
+                  <div className="flex items-center justify-between px-3 py-[6px] rounded-lg border border-[#E8ECF1] bg-[#FAFBFC] text-[11px] tabular-nums min-w-0">
+                    <span className="text-[#64748B]" style={{ fontWeight: 400 }}>Early pay {selectedPaymentTermPreset.discountPercent || "2"}% within {selectedPaymentTermPreset.discountPeriod || "10"} days</span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="flex items-center gap-2 px-3.5 py-2.5 border-t border-[#F1F5F9] shrink-0">
+              <span className="inline-flex items-center gap-1 text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>
+                <Building2 className="w-3 h-3" /> {selectedPaymentTermPreset.vendorsApplied}
+              </span>
+              <span
+                className="ml-auto px-2 py-[2px] rounded-full text-[10px] border"
+                style={{ fontWeight: 500, color: "#059669", backgroundColor: "#F0FDF4", borderColor: "#BBF7D0" }}
               >
-                {selectedPaymentTermPreset.typeBadge}
-              </div>
-
-              <div className="flex-1 min-w-0">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <h5 className="text-sm text-[#0F172A]" style={{ fontWeight: 600 }}>{selectedPaymentTermPreset.name}</h5>
-                    <span className="inline-block mt-1 px-2 py-0.5 rounded bg-[#F1F5F9] text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>
-                      {selectedPaymentTermPreset.trigger}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <button
-                      onClick={() => toast.info("Duplicate flow coming soon.")}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#0F172A] hover:bg-[#F8FAFC] transition-colors"
-                      style={{ fontWeight: 500 }}
-                    >
-                      <Copy className="w-3.5 h-3.5" /> Duplicate
-                    </button>
-                    <button
-                      onClick={() => toast.info("Edit flow coming soon.")}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#0F172A] hover:bg-[#F8FAFC] transition-colors"
-                      style={{ fontWeight: 500 }}
-                    >
-                      <Pencil className="w-3.5 h-3.5" /> Edit
-                    </button>
-                    <button
-                      onClick={() => { setStandalonePtDetailTerm(selectedPaymentTermPreset); setStandalonePtDetailOpen(true); }}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#0F172A] hover:bg-[#F8FAFC] transition-colors"
-                      style={{ fontWeight: 500 }}
-                    >
-                      <Eye className="w-3.5 h-3.5" /> View
-                    </button>
-                  </div>
-                </div>
-                <p className="text-xs text-[#64748B] mt-1 leading-relaxed">{selectedPaymentTermPreset.description}</p>
-
-                {/* Vendors Applied footer */}
-                <div className="mt-2 pt-2 border-t border-[#F1F5F9] flex items-center justify-between">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Vendors Applied</span>
-                    <Info className="w-3 h-3 text-[#94A3B8]" />
-                  </div>
-                  <div className="flex items-center -space-x-1.5">
-                    {Array.from({ length: Math.min(selectedPaymentTermPreset.vendorsApplied, 3) }).map((_, i) => (
-                      <div key={i} className="w-6 h-6 rounded-full border-2 border-white bg-[#94A3B8]" />
-                    ))}
-                    {selectedPaymentTermPreset.vendorsApplied > 3 && (
-                      <div className="w-6 h-6 rounded-full border-2 border-white bg-[#F1F5F9] flex items-center justify-center">
-                        <span className="text-[9px] text-[#64748B]" style={{ fontWeight: 600 }}>+{selectedPaymentTermPreset.vendorsApplied - 3}</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
+                Active
+              </span>
             </div>
           </div>
         )}

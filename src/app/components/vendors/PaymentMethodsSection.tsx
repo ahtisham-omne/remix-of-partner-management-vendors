@@ -429,30 +429,40 @@ export function PaymentMethodsSection({
 
       {/* Saved Grid */}
       {savedPaymentEntries.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3">
           {filteredSaved.map((pe) => {
             const PeIcon = typeIcon(pe.type);
             const cat = typeCategory(pe.type);
             return (
               <div
                 key={pe.id}
-                className="group relative rounded-xl border border-border bg-card hover:border-primary/25 hover:shadow-[0_2px_8px_-2px_rgba(10,119,255,0.08)] transition-all overflow-hidden"
+                onClick={() => openEditModal(pe.id)}
+                className="bg-white border border-[#E2E8F0] rounded-xl cursor-pointer group transition-all duration-200 flex flex-col relative"
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = "#BFDBFE";
+                  e.currentTarget.style.boxShadow = "0 4px 16px -4px rgba(10,119,255,0.10), 0 0 0 1px #BFDBFE";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = "#E2E8F0";
+                  e.currentTarget.style.boxShadow = "none";
+                }}
               >
-                {/* Category color stripe */}
-                <div className="h-[3px] w-full" style={{ backgroundColor: catColor[cat] || "#64748B" }} />
-                <div className="px-3.5 pt-3 pb-3">
-                  {/* Top row: icon + type badge + actions */}
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ backgroundColor: catBg[cat] || "#F1F5F9" }}>
-                        <PeIcon className="w-4 h-4" style={{ color: catColor[cat] || "#64748B" }} />
-                      </div>
-                      <div className="min-w-0">
-                        <span className="text-[13px] text-foreground block truncate" style={{ fontWeight: 600 }}>{getEntrySummary(pe)}</span>
-                        <span className="text-[11px] text-muted-foreground truncate block">{getEntrySubtext(pe)}</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-0.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="p-3.5 flex-1 flex flex-col min-h-0 overflow-hidden">
+                  {/* Row 1: Type pill + actions */}
+                  <div className="flex items-center justify-between gap-2 mb-2 shrink-0">
+                    <span className="inline-flex items-stretch rounded-full overflow-hidden border shrink-0" style={{ borderColor: (catColor[cat] || "#64748B") + "40" }}>
+                      <span
+                        className="inline-flex items-center gap-1 px-2 py-[2px] text-[10px]"
+                        style={{ fontWeight: 600, color: catColor[cat] || "#64748B", backgroundColor: catBg[cat] || "#F1F5F9" }}
+                      >
+                        <PeIcon className="w-3 h-3" />
+                        {typeLabel(pe.type)}
+                      </span>
+                      <span className="inline-flex items-center px-2 py-[2px] text-[10px] bg-white text-[#64748B] border-l" style={{ fontWeight: 500, borderColor: (catColor[cat] || "#64748B") + "40" }}>
+                        {typeCategory(pe.type)}
+                      </span>
+                    </span>
+                    <div className="flex items-center gap-0.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
                       {!pe.isPrimary && (
                         <Tooltip>
                           <TooltipTrigger asChild>
@@ -481,20 +491,52 @@ export function PaymentMethodsSection({
                       </Tooltip>
                     </div>
                   </div>
-                  {/* Bottom row: badges */}
-                  <div className="flex items-center gap-1.5 mt-2.5 pt-2.5 border-t border-border/50">
-                    <span className="text-[10px] px-1.5 py-0.5 rounded-full shrink-0" style={{ fontWeight: 600, color: catColor[cat] || "#64748B", backgroundColor: catBg[cat] || "#F1F5F9" }}>
-                      {typeLabel(pe.type)}
-                    </span>
-                    <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground shrink-0" style={{ fontWeight: 500 }}>
-                      {typeCategory(pe.type)}
-                    </span>
-                    {pe.isPrimary && (
-                      <span className="ml-auto text-[9px] px-1.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/15 shrink-0" style={{ fontWeight: 700 }}>
-                        PRIMARY
-                      </span>
-                    )}
+
+                  {/* Row 2: Name */}
+                  <div className="shrink-0 mb-1">
+                    <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{getEntrySummary(pe)}</p>
                   </div>
+
+                  {/* Row 3: Subtext */}
+                  <div className="h-[32px] shrink-0 mb-2">
+                    <p className="text-[11px] text-[#64748B] line-clamp-2 leading-relaxed" style={{ fontWeight: 400 }}>{getEntrySubtext(pe)}</p>
+                  </div>
+
+                  {/* Row 4: Special instructions or discount info */}
+                  {(pe.specialInstructions || pe.applyDiscount) && (
+                    <div className="mt-auto pt-2 shrink-0">
+                      <div className="flex items-center justify-between px-3 py-[6px] rounded-lg border border-[#E8ECF1] bg-[#FAFBFC] text-[11px] tabular-nums min-w-0">
+                        {pe.applyDiscount ? (
+                          <>
+                            <span className="text-[#64748B]" style={{ fontWeight: 400 }}>Discount</span>
+                            <span className="text-[#0F172A]" style={{ fontWeight: 600 }}>{pe.discountPercent || "—"}%</span>
+                          </>
+                        ) : pe.specialInstructions ? (
+                          <span className="text-[#64748B] truncate" style={{ fontWeight: 400 }}>{pe.specialInstructions}</span>
+                        ) : null}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Footer */}
+                <div className="flex items-center gap-2 px-3.5 py-2.5 border-t border-[#F1F5F9] shrink-0">
+                  {pe.isPrimary && (
+                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/15 shrink-0" style={{ fontWeight: 700 }}>
+                      PRIMARY
+                    </span>
+                  )}
+                  <span
+                    className="ml-auto px-2 py-[2px] rounded-full text-[10px] border"
+                    style={{
+                      fontWeight: 500,
+                      color: "#059669",
+                      backgroundColor: "#F0FDF4",
+                      borderColor: "#BBF7D0",
+                    }}
+                  >
+                    Active
+                  </span>
                 </div>
               </div>
             );
