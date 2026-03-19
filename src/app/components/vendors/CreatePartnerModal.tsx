@@ -4004,250 +4004,183 @@ function ConfigPageContent({
     const payToObj = PARTNER_LOCATION_ITEMS.find((i) => i.id === payTo);
     const fundedByObj = FUNDED_BY_ITEMS.find((i) => i.id === fundedBy);
 
-    // Completion status
-    const completedFields = [currencyObj, shipToObj, payToObj, fundedByObj].filter(Boolean).length;
-    const totalFields = 4;
-
-    // Summary items for visual overview
-    const summaryItems = [
-      { label: "Currency", value: currencyObj ? currencyObj.id.toUpperCase() : "Not set", icon: <DollarSign className="w-3.5 h-3.5" />, color: "#0A77FF", bgColor: "#EFF6FF", set: !!currencyObj },
-      { label: "Ship To", value: shipToObj ? shipToObj.name.split(",")[0] : "Not set", icon: <Truck className="w-3.5 h-3.5" />, color: "#22C55E", bgColor: "#ECFDF5", set: !!shipToObj },
-      { label: "Pay To", value: payToObj ? payToObj.name.split(",")[0] : "Not set", icon: <Receipt className="w-3.5 h-3.5" />, color: "#8B5CF6", bgColor: "#F5F3FF", set: !!payToObj },
-      { label: "Funded By", value: fundedByObj ? fundedByObj.name.split(",")[0] : "Not set", icon: <Landmark className="w-3.5 h-3.5" />, color: "#F59E0B", bgColor: "#FFFBEB", set: !!fundedByObj },
-    ];
-
     return (
       <div className="space-y-5">
-        {/* ── Header with completion indicator ── */}
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h4 className="text-[14px] text-[#0F172A]" style={{ fontWeight: 700 }}>Billing & Shipping</h4>
-            <p className="text-[12px] text-[#64748B] mt-0.5 leading-relaxed max-w-md">
-              Set default currency, delivery destination, payment recipient, and funding source for all transactions with this partner.
-            </p>
-          </div>
-          <div className="flex items-center gap-2 shrink-0">
-            <div className="flex items-center gap-1">
-              {[...Array(totalFields)].map((_, i) => (
-                <div key={i} className={`w-1.5 h-1.5 rounded-full transition-colors ${i < completedFields ? "bg-[#22C55E]" : "bg-[#E2E8F0]"}`} />
-              ))}
-            </div>
-            <span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>{completedFields}/{totalFields}</span>
-          </div>
+        {/* ── Header ── */}
+        <div>
+          <h4 className="text-[14px] text-[#0F172A]" style={{ fontWeight: 700 }}>Billing & Shipping</h4>
+          <p className="text-[12px] text-[#64748B] mt-0.5 leading-relaxed max-w-md">
+            Configure default transaction settings for this partner.
+          </p>
         </div>
 
-        {/* ── Quick Overview Strip ── */}
-        <div className="grid grid-cols-4 gap-2">
-          {summaryItems.map((item) => (
-            <div
-              key={item.label}
-              className={`group relative rounded-lg border px-3 py-2.5 transition-all duration-150 ${
-                item.set
-                  ? "border-[#E8ECF1] bg-white hover:border-[#CBD5E1] hover:shadow-sm"
-                  : "border-dashed border-[#E2E8F0] bg-[#FAFBFC]"
-              }`}
-            >
-              <div className="flex items-center gap-2 mb-1.5">
-                <div
-                  className="w-6 h-6 rounded-md flex items-center justify-center shrink-0"
-                  style={{ backgroundColor: item.set ? item.bgColor : "#F1F5F9", color: item.set ? item.color : "#94A3B8" }}
-                >
-                  {item.icon}
-                </div>
-                <span className="text-[10px] text-[#94A3B8] uppercase tracking-wide" style={{ fontWeight: 600 }}>{item.label}</span>
-              </div>
-              <p className={`text-[12px] truncate ${item.set ? "text-[#0F172A]" : "text-[#CBD5E1]"}`} style={{ fontWeight: item.set ? 600 : 400 }}>
-                {item.value}
-              </p>
-              {item.set && (
-                <div className="absolute top-2 right-2">
-                  <div className="w-1.5 h-1.5 rounded-full bg-[#22C55E]" />
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
+        {/* ── Two-column card layout ── */}
+        <div className="grid grid-cols-2 gap-4">
 
-        {/* ── Form Content: 2x2 compact card grid ── */}
-        <div className="grid grid-cols-2 gap-3">
-
-          {/* Card 1: Currency */}
+          {/* LEFT: Transaction Defaults */}
           <div className="rounded-xl border border-[#E8ECF1] bg-white overflow-hidden">
-            <div className="px-3.5 py-2.5 border-b border-[#F1F5F9] flex items-center gap-2">
-              <div className="w-5 h-5 rounded flex items-center justify-center bg-[#EFF6FF] text-[#0A77FF]">
-                <DollarSign className="w-3 h-3" />
-              </div>
-              <span className="text-[11px] text-[#334155]" style={{ fontWeight: 700 }}>Transaction Currency</span>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button type="button" className="ml-auto inline-flex" tabIndex={-1}>
-                    <Info className="w-3 h-3 text-[#CBD5E1] hover:text-[#94A3B8] transition-colors" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent side="top" sideOffset={6} className="bg-[#1E293B] text-white text-[11px] leading-[1.5] rounded-lg max-w-[220px] px-3 py-2 shadow-xl border border-[#334155] z-[300]">
-                  <p style={{ fontWeight: 500 }}>All purchase orders, invoices, and payments with this partner will default to this currency.</p>
-                </TooltipContent>
-              </Tooltip>
+            <div className="px-4 py-3 border-b border-[#F1F5F9]">
+              <p className="text-[10px] text-[#64748B] uppercase tracking-wider" style={{ fontWeight: 600 }}>Transaction Defaults</p>
             </div>
-            <div className="p-3.5">
-              <CurrencyDropdown selectedId={currency} onSelect={setCurrency} />
-              {currencyObj && (
-                <div className="flex items-center gap-1.5 mt-2.5 px-2 py-1.5 bg-[#F8FAFC] rounded-md">
-                  <span className="text-[15px]" style={{ fontWeight: 700 }}>{currencyObj.symbol}</span>
-                  <span className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>{currencyObj.label.split(" — ")[1] || currencyObj.label}</span>
+            <div className="p-4 space-y-4">
+              {/* Currency */}
+              <div>
+                <div className="flex items-center gap-1.5 mb-1.5">
+                  <span className="text-[12px] text-[#334155]" style={{ fontWeight: 600 }}>Currency</span>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button type="button" className="inline-flex" tabIndex={-1}>
+                        <Info className="w-3 h-3 text-[#CBD5E1] hover:text-[#94A3B8] transition-colors" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="top" sideOffset={6} className="bg-[#1E293B] text-white text-[11px] leading-[1.5] rounded-lg max-w-[220px] px-3 py-2 shadow-xl border border-[#334155] z-[300]">
+                      <p style={{ fontWeight: 500 }}>All POs, invoices, and payments will default to this currency.</p>
+                    </TooltipContent>
+                  </Tooltip>
                 </div>
-              )}
+                <CurrencyDropdown selectedId={currency} onSelect={setCurrency} />
+                {currencyObj && (
+                  <p className="text-[11px] text-[#94A3B8] mt-1.5" style={{ fontWeight: 400 }}>
+                    Symbol: <span className="text-[#334155]" style={{ fontWeight: 600 }}>{currencyObj.symbol}</span>
+                  </p>
+                )}
+              </div>
+
+              {/* Pay To */}
+              <div>
+                <div className="flex items-center gap-1.5 mb-1.5">
+                  <span className="text-[12px] text-[#334155]" style={{ fontWeight: 600 }}>Pay To</span>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button type="button" className="inline-flex" tabIndex={-1}>
+                        <Info className="w-3 h-3 text-[#CBD5E1] hover:text-[#94A3B8] transition-colors" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="top" sideOffset={6} className="bg-[#1E293B] text-white text-[11px] leading-[1.5] rounded-lg max-w-[220px] px-3 py-2 shadow-xl border border-[#334155] z-[300]">
+                      <p style={{ fontWeight: 500 }}>The entity or location that receives payment.</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+                <SearchablePartnerDropdown
+                  label=""
+                  tooltip=""
+                  placeholder="Select payment recipient"
+                  items={PARTNER_LOCATION_ITEMS}
+                  selectedId={payTo}
+                  onSelect={setPayTo}
+                />
+                {payToObj && (
+                  <p className="text-[11px] text-[#94A3B8] mt-1.5 truncate" style={{ fontWeight: 400 }}>
+                    {payToObj.location || "—"}
+                  </p>
+                )}
+              </div>
             </div>
           </div>
 
-          {/* Card 2: Pay To */}
+          {/* RIGHT: Shipping & Funding */}
           <div className="rounded-xl border border-[#E8ECF1] bg-white overflow-hidden">
-            <div className="px-3.5 py-2.5 border-b border-[#F1F5F9] flex items-center gap-2">
-              <div className="w-5 h-5 rounded flex items-center justify-center bg-[#F5F3FF] text-[#8B5CF6]">
-                <Receipt className="w-3 h-3" />
-              </div>
-              <span className="text-[11px] text-[#334155]" style={{ fontWeight: 700 }}>Payment Recipient</span>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button type="button" className="ml-auto inline-flex" tabIndex={-1}>
-                    <Info className="w-3 h-3 text-[#CBD5E1] hover:text-[#94A3B8] transition-colors" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent side="top" sideOffset={6} className="bg-[#1E293B] text-white text-[11px] leading-[1.5] rounded-lg max-w-[220px] px-3 py-2 shadow-xl border border-[#334155] z-[300]">
-                  <p style={{ fontWeight: 500 }}>The entity or location that receives payment. Ensure bank details match this recipient.</p>
-                </TooltipContent>
-              </Tooltip>
+            <div className="px-4 py-3 border-b border-[#F1F5F9]">
+              <p className="text-[10px] text-[#64748B] uppercase tracking-wider" style={{ fontWeight: 600 }}>Shipping & Funding</p>
             </div>
-            <div className="p-3.5">
-              <SearchablePartnerDropdown
-                label=""
-                tooltip=""
-                placeholder="Select payment recipient"
-                items={PARTNER_LOCATION_ITEMS}
-                selectedId={payTo}
-                onSelect={setPayTo}
-              />
-              {payToObj && (
-                <div className="flex items-center gap-2 mt-2.5 px-2 py-1.5 bg-[#F8FAFC] rounded-md">
-                  <div className="w-5 h-5 rounded flex items-center justify-center text-white text-[8px] shrink-0" style={{ backgroundColor: payToObj.logoColor, fontWeight: 700 }}>
-                    {payToObj.logoText}
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-[11px] text-[#64748B] truncate" style={{ fontWeight: 500 }}>{payToObj.location || "—"}</p>
-                  </div>
+            <div className="p-4 space-y-4">
+              {/* Ship To */}
+              <div>
+                <div className="flex items-center gap-1.5 mb-1.5">
+                  <span className="text-[12px] text-[#334155]" style={{ fontWeight: 600 }}>Ship To</span>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button type="button" className="inline-flex" tabIndex={-1}>
+                        <Info className="w-3 h-3 text-[#CBD5E1] hover:text-[#94A3B8] transition-colors" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="top" sideOffset={6} className="bg-[#1E293B] text-white text-[11px] leading-[1.5] rounded-lg max-w-[220px] px-3 py-2 shadow-xl border border-[#334155] z-[300]">
+                      <p style={{ fontWeight: 500 }}>Default delivery address for goods from this vendor. Can be overridden per order.</p>
+                    </TooltipContent>
+                  </Tooltip>
                 </div>
-              )}
-            </div>
-          </div>
-
-          {/* Card 3: Ship To */}
-          <div className="rounded-xl border border-[#E8ECF1] bg-white overflow-hidden">
-            <div className="px-3.5 py-2.5 border-b border-[#F1F5F9] flex items-center gap-2">
-              <div className="w-5 h-5 rounded flex items-center justify-center bg-[#ECFDF5] text-[#22C55E]">
-                <Truck className="w-3 h-3" />
-              </div>
-              <span className="text-[11px] text-[#334155]" style={{ fontWeight: 700 }}>Delivery Destination</span>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button type="button" className="ml-auto inline-flex" tabIndex={-1}>
-                    <Info className="w-3 h-3 text-[#CBD5E1] hover:text-[#94A3B8] transition-colors" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent side="top" sideOffset={6} className="bg-[#1E293B] text-white text-[11px] leading-[1.5] rounded-lg max-w-[220px] px-3 py-2 shadow-xl border border-[#334155] z-[300]">
-                  <p style={{ fontWeight: 500 }}>Default address where goods from this vendor will be delivered. Can be overridden per order.</p>
-                </TooltipContent>
-              </Tooltip>
-            </div>
-            <div className="p-3.5">
-              <SearchablePartnerDropdown
-                label=""
-                tooltip=""
-                placeholder="Select delivery destination"
-                items={PARTNER_LOCATION_ITEMS}
-                selectedId={shipTo}
-                onSelect={setShipTo}
-              />
-              {shipToObj && (
-                <div className="flex items-center gap-2 mt-2.5 px-2 py-1.5 bg-[#F8FAFC] rounded-md">
-                  <MapPin className="w-3 h-3 text-[#94A3B8] shrink-0" />
-                  <p className="text-[11px] text-[#64748B] truncate" style={{ fontWeight: 500 }}>{shipToObj.location || "—"}</p>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Card 4: Funded By */}
-          <div className="rounded-xl border border-[#E8ECF1] bg-white overflow-hidden">
-            <div className="px-3.5 py-2.5 border-b border-[#F1F5F9] flex items-center gap-2">
-              <div className="w-5 h-5 rounded flex items-center justify-center bg-[#FFFBEB] text-[#F59E0B]">
-                <Landmark className="w-3 h-3" />
-              </div>
-              <span className="text-[11px] text-[#334155]" style={{ fontWeight: 700 }}>Funding Source</span>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button type="button" className="ml-auto inline-flex" tabIndex={-1}>
-                    <Info className="w-3 h-3 text-[#CBD5E1] hover:text-[#94A3B8] transition-colors" />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent side="top" sideOffset={6} className="bg-[#1E293B] text-white text-[11px] leading-[1.5] rounded-lg max-w-[220px] px-3 py-2 shadow-xl border border-[#334155] z-[300]">
-                  <p style={{ fontWeight: 500 }}>The internal entity or budget that covers costs. Toggle the switch to override the default source.</p>
-                </TooltipContent>
-              </Tooltip>
-            </div>
-            <div className="p-3.5">
-              {!allowAltFunding ? (
-                <div className="space-y-3">
-                  {/* Default funding display */}
-                  <div className="h-9 px-3 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] flex items-center gap-2 text-[13px]">
-                    {fundedByObj && (
-                      <>
-                        <div
-                          className="w-5 h-5 rounded flex items-center justify-center text-white text-[8px] shrink-0"
-                          style={{ backgroundColor: fundedByObj.logoColor, fontWeight: 700 }}
-                        >
-                          {fundedByObj.logoText}
-                        </div>
-                        <span className="text-[#334155] truncate text-[12px]" style={{ fontWeight: 500 }}>{fundedByObj.name}</span>
-                        <span className="text-[9px] text-[#0A77FF] bg-[#EDF4FF] border border-[#0A77FF]/20 px-1.5 py-0.5 rounded shrink-0 ml-auto" style={{ fontWeight: 600 }}>Default</span>
-                      </>
-                    )}
+                <SearchablePartnerDropdown
+                  label=""
+                  tooltip=""
+                  placeholder="Select delivery destination"
+                  items={PARTNER_LOCATION_ITEMS}
+                  selectedId={shipTo}
+                  onSelect={setShipTo}
+                />
+                {shipToObj && (
+                  <div className="flex items-center gap-1.5 mt-1.5">
+                    <MapPin className="w-3 h-3 text-[#94A3B8] shrink-0" />
+                    <p className="text-[11px] text-[#94A3B8] truncate" style={{ fontWeight: 400 }}>{shipToObj.location || "—"}</p>
                   </div>
-                  {/* Override toggle */}
-                  <div
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => setAllowAltFunding(true)}
-                    onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setAllowAltFunding(true); }}}
-                    className="flex items-center gap-2 cursor-pointer select-none group"
-                  >
-                    <div className="relative w-7 h-[16px] rounded-full bg-[#CBD5E1] group-hover:bg-[#94A3B8] transition-colors cursor-pointer">
-                      <div className="absolute top-[2px] left-[2px] w-[12px] h-[12px] rounded-full bg-white shadow-sm transition-transform" />
+                )}
+              </div>
+
+              {/* Funded By */}
+              <div>
+                <div className="flex items-center gap-1.5 mb-1.5">
+                  <span className="text-[12px] text-[#334155]" style={{ fontWeight: 600 }}>Funded By</span>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button type="button" className="inline-flex" tabIndex={-1}>
+                        <Info className="w-3 h-3 text-[#CBD5E1] hover:text-[#94A3B8] transition-colors" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="top" sideOffset={6} className="bg-[#1E293B] text-white text-[11px] leading-[1.5] rounded-lg max-w-[220px] px-3 py-2 shadow-xl border border-[#334155] z-[300]">
+                      <p style={{ fontWeight: 500 }}>The internal entity or budget that covers costs for this partner.</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+                {!allowAltFunding ? (
+                  <div className="space-y-2.5">
+                    <div className="h-9 px-3 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] flex items-center gap-2 text-[13px]">
+                      {fundedByObj && (
+                        <>
+                          <div
+                            className="w-5 h-5 rounded flex items-center justify-center text-white text-[8px] shrink-0"
+                            style={{ backgroundColor: fundedByObj.logoColor, fontWeight: 700 }}
+                          >
+                            {fundedByObj.logoText}
+                          </div>
+                          <span className="text-[#334155] truncate text-[12px]" style={{ fontWeight: 500 }}>{fundedByObj.name}</span>
+                          <span className="text-[9px] text-[#0A77FF] bg-[#EDF4FF] border border-[#0A77FF]/20 px-1.5 py-0.5 rounded shrink-0 ml-auto" style={{ fontWeight: 600 }}>Default</span>
+                        </>
+                      )}
                     </div>
-                    <span className="text-[11px] text-[#64748B] group-hover:text-[#475569] transition-colors" style={{ fontWeight: 500 }}>Use alternative funding source</span>
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  <FundedByDropdown
-                    selectedId={fundedBy}
-                    onSelect={setFundedBy}
-                    hideLabel
-                  />
-                  {/* Active override toggle */}
-                  <div
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => { setAllowAltFunding(false); setFundedBy("pl-7"); }}
-                    onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setAllowAltFunding(false); setFundedBy("pl-7"); }}}
-                    className="flex items-center gap-2 cursor-pointer select-none"
-                  >
-                    <div className="relative w-7 h-[16px] rounded-full bg-[#0A77FF] cursor-pointer">
-                      <div className="absolute top-[2px] left-[13px] w-[12px] h-[12px] rounded-full bg-white shadow-sm transition-transform" />
+                    <div
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => setAllowAltFunding(true)}
+                      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setAllowAltFunding(true); }}}
+                      className="flex items-center gap-2 cursor-pointer select-none group"
+                    >
+                      <div className="relative w-7 h-[16px] rounded-full bg-[#CBD5E1] group-hover:bg-[#94A3B8] transition-colors cursor-pointer">
+                        <div className="absolute top-[2px] left-[2px] w-[12px] h-[12px] rounded-full bg-white shadow-sm transition-transform" />
+                      </div>
+                      <span className="text-[11px] text-[#64748B] group-hover:text-[#475569] transition-colors" style={{ fontWeight: 500 }}>Use alternative funding source</span>
                     </div>
-                    <span className="text-[11px] text-[#0A77FF]" style={{ fontWeight: 500 }}>Override active — using alternative source</span>
                   </div>
-                </div>
-              )}
+                ) : (
+                  <div className="space-y-2.5">
+                    <FundedByDropdown
+                      selectedId={fundedBy}
+                      onSelect={setFundedBy}
+                      hideLabel
+                    />
+                    <div
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => { setAllowAltFunding(false); setFundedBy("pl-7"); }}
+                      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setAllowAltFunding(false); setFundedBy("pl-7"); }}}
+                      className="flex items-center gap-2 cursor-pointer select-none"
+                    >
+                      <div className="relative w-7 h-[16px] rounded-full bg-[#0A77FF] cursor-pointer">
+                        <div className="absolute top-[2px] left-[13px] w-[12px] h-[12px] rounded-full bg-white shadow-sm transition-transform" />
+                      </div>
+                      <span className="text-[11px] text-[#0A77FF]" style={{ fontWeight: 500 }}>Override active</span>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -4256,7 +4189,7 @@ function ConfigPageContent({
         <div className="flex items-start gap-2 px-3 py-2.5 rounded-lg bg-[#F8FAFC] border border-[#F1F5F9]">
           <Info className="w-3.5 h-3.5 text-[#94A3B8] shrink-0 mt-0.5" />
           <p className="text-[11px] text-[#94A3B8] leading-relaxed" style={{ fontWeight: 400 }}>
-            These defaults apply to all new transactions. Individual purchase orders can override delivery and payment details as needed.
+            These defaults apply to all new transactions. Individual orders can override as needed.
           </p>
         </div>
       </div>
