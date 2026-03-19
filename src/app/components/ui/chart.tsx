@@ -102,9 +102,7 @@ ${colorConfig
   );
 }
 
-function ChartTooltip({
-  ...props
-}: React.ComponentProps<typeof RechartsPrimitive.Tooltip>) {
+function ChartTooltip(props: any) {
   return <RechartsPrimitive.Tooltip {...props} />;
 }
 
