@@ -20,6 +20,7 @@ import { PartnerItemsTab } from "../components/vendors/PartnerItemsTab";
 import { PricingRulesTabNew } from "../components/vendors/PricingRulesTab";
 import { PaymentMethodCard as PaymentMethodCardBase } from "../components/vendors/PaymentMethodsSection";
 import { PaymentTermDetailModal } from "../components/vendors/PaymentTermDetailModal";
+import { PaymentTermCard } from "../components/vendors/PaymentTermCard";
 import { PAYMENT_TERM_PRESETS, type PaymentTermPreset } from "../components/vendors/partnerConstants";
 import { PocSectionContent, SelectPocDictionaryModal, CreatePocModal } from "../components/vendors/PocModals";
 import {
@@ -1962,77 +1963,39 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate }: {
 
         {/* Payment Terms */}
         <DashInfoCard title="Payment Terms" icon={Receipt}>
-          {paymentTermCfg ? (
-            <div className="rounded-lg border border-[#E2E8F0] p-3">
-              <div className="flex items-start gap-2.5">
-                <span className="text-[10px] px-2 py-1 rounded-md bg-[#EDF4FF] text-[#0A77FF] shrink-0 uppercase" style={{ fontWeight: 700 }}>
-                  {paymentTermCfg.type === "prepayment" ? "Pre" : "NET"}
-                </span>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <p className="text-[12px] text-[#0F172A]" style={{ fontWeight: 600 }}>{paymentTermCfg.name}</p>
-                    <span className="text-[10px] px-1.5 py-0.5 rounded border border-[#E2E8F0] bg-[#F8FAFC] text-[#64748B]" style={{ fontWeight: 500 }}>
-                      {paymentTermCfg.trigger.replace(/_/g, " ")}
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-[#64748B] mt-0.5 leading-relaxed">{paymentTermCfg.description}</p>
-                </div>
-              </div>
-              <button
-                onClick={() => {
-                  const matchedPreset = PAYMENT_TERM_PRESETS.find((p) => p.name === paymentTermCfg.name) || {
-                    id: "pt-cfg",
-                    name: paymentTermCfg.name,
-                    category: (paymentTermCfg.type === "prepayment" ? "prepayment" : "net") as "net" | "prepayment" | "split",
-                    typeBadge: paymentTermCfg.type === "prepayment" ? "Pre" : "NET",
-                    badgeColor: paymentTermCfg.type === "prepayment" ? "#7C3AED" : "#0A77FF",
-                    trigger: paymentTermCfg.trigger.replace(/_/g, " "),
-                    description: paymentTermCfg.description,
-                    vendorsApplied: 4,
-                  };
-                  setPtDetailTerm(matchedPreset);
-                  setPtDetailOpen(true);
-                }}
-                className="mt-2.5 w-full inline-flex items-center justify-center gap-1.5 h-7 rounded-md border border-[#E2E8F0] bg-white text-[11px] text-[#475569] hover:bg-[#F8FAFC] hover:border-[#CBD5E1] transition-all cursor-pointer"
-                style={{ fontWeight: 500 }}
-              >
-                <Eye className="w-3 h-3" />
-                View details
-              </button>
-            </div>
-          ) : (
-            <div className="rounded-lg border border-[#E2E8F0] p-3">
-              <div className="flex items-start gap-2.5">
-                <span className="text-[10px] px-2 py-1 rounded-md bg-[#EDF4FF] text-[#0A77FF] shrink-0 uppercase" style={{ fontWeight: 700 }}>NET</span>
-                <div className="min-w-0">
-                  <p className="text-[12px] text-[#0F172A]" style={{ fontWeight: 600 }}>{PAYMENT_TERMS_LABELS[vendor.paymentTerms]}</p>
-                  <p className="text-[11px] text-[#64748B] mt-0.5">Standard payment terms for this partner.</p>
-                </div>
-              </div>
-              <button
-                onClick={() => {
-                  const termLabel = PAYMENT_TERMS_LABELS[vendor.paymentTerms];
-                  const matchedPreset = PAYMENT_TERM_PRESETS.find((p) => p.name === termLabel) || {
-                    id: "pt-default",
-                    name: termLabel,
-                    category: "net" as const,
-                    typeBadge: "NET",
-                    badgeColor: "#0A77FF",
-                    trigger: "Invoice Date",
-                    description: "Standard payment terms for this partner.",
-                    vendorsApplied: 3,
-                  };
-                  setPtDetailTerm(matchedPreset);
-                  setPtDetailOpen(true);
-                }}
-                className="mt-2.5 w-full inline-flex items-center justify-center gap-1.5 h-7 rounded-md border border-[#E2E8F0] bg-white text-[11px] text-[#475569] hover:bg-[#F8FAFC] hover:border-[#CBD5E1] transition-all cursor-pointer"
-                style={{ fontWeight: 500 }}
-              >
-                <Eye className="w-3 h-3" />
-                View details
-              </button>
-            </div>
-          )}
+          {(() => {
+            const termPreset: PaymentTermPreset = paymentTermCfg
+              ? (PAYMENT_TERM_PRESETS.find((p) => p.name === paymentTermCfg.name) || {
+                  id: "pt-cfg",
+                  name: paymentTermCfg.name,
+                  category: (paymentTermCfg.type === "prepayment" ? "prepayment" : "net") as "net" | "prepayment" | "split",
+                  typeBadge: paymentTermCfg.type === "prepayment" ? "Pre" : "NET",
+                  badgeColor: paymentTermCfg.type === "prepayment" ? "#7C3AED" : "#0A77FF",
+                  trigger: paymentTermCfg.trigger.replace(/_/g, " "),
+                  description: paymentTermCfg.description,
+                  vendorsApplied: 4,
+                  duration: paymentTermCfg.duration,
+                  discountPercent: paymentTermCfg.discountPercent,
+                  discountPeriod: paymentTermCfg.discountPeriod,
+                })
+              : (PAYMENT_TERM_PRESETS.find((p) => p.name === PAYMENT_TERMS_LABELS[vendor.paymentTerms]) || {
+                  id: "pt-default",
+                  name: PAYMENT_TERMS_LABELS[vendor.paymentTerms],
+                  category: "net" as const,
+                  typeBadge: "NET",
+                  badgeColor: "#0A77FF",
+                  trigger: "Invoice Date",
+                  description: "Standard payment terms for this partner.",
+                  vendorsApplied: 3,
+                });
+            return (
+              <PaymentTermCard
+                term={termPreset}
+                readOnly
+                onClick={() => { setPtDetailTerm(termPreset); setPtDetailOpen(true); }}
+              />
+            );
+          })()}
         </DashInfoCard>
 
         {/* Carrier & Shipping */}
@@ -2454,6 +2417,8 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
   const [currentPage, setCurrentPage] = useState(1);
   const [recordsPerPage, setRecordsPerPage] = useState(20);
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
+  const [locPtDetailOpen, setLocPtDetailOpen] = useState(false);
+  const [locPtDetailTerm, setLocPtDetailTerm] = useState<PaymentTermPreset | null>(null);
 
   const filtered = useMemo(() => {
     let list = locations;
@@ -3554,25 +3519,16 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                           </div>
                           <div className="p-4">
                             <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
-                              {[
-                                { type: "Vendor", icon: "NET", iconBg: "linear-gradient(135deg, #EBF3FF 0%, #DBEAFE 100%)", iconColor: "#0A77FF", name: "Net 60 Post Production End", trigger: "Production End", desc: "Payment is due 60 days after production is completed." },
-                                { type: "Customer", icon: "Pre", iconBg: "linear-gradient(135deg, #F0EBFF 0%, #E9DFFF 100%)", iconColor: "#7C3AED", name: "Full Advance Payment: Product...", trigger: "Production Start", desc: "A (X)% prepayment is required when production ends..." },
-                              ].map((pt) => (
-                                <div key={pt.type} className="rounded-xl border border-[#F1F5F9] bg-[#FAFBFC] overflow-hidden transition-all duration-200 hover:bg-white hover:border-[#BFDBFE] hover:shadow-[0_4px_12px_-4px_rgba(10,119,255,0.08)] group/pterm cursor-pointer">
-                                  <div className="px-3.5 py-2 border-b border-[#F1F5F9] bg-white/50">
-                                    <span className="text-[10px] text-[#64748B] uppercase tracking-wider" style={{ fontWeight: 600 }}>{pt.type}</span>
-                                  </div>
-                                  <div className="p-3.5 flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-xl flex items-center justify-center text-[11px] shrink-0 transition-transform duration-200 group-hover/pterm:scale-105" style={{ background: pt.iconBg, color: pt.iconColor, fontWeight: 800 }}>{pt.icon}</div>
-                                    <div className="min-w-0 flex-1">
-                                      <div className="flex items-center gap-1.5">
-                                        <p className="text-[12px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{pt.name}</p>
-                                        <span className="text-[9px] px-1.5 py-0.5 rounded-full border border-[#E2E8F0] bg-[#F8FAFC] text-[#64748B] shrink-0" style={{ fontWeight: 500 }}>{pt.trigger}</span>
-                                      </div>
-                                      <p className="text-[11px] text-[#94A3B8] mt-0.5 truncate">{pt.desc}</p>
-                                    </div>
-                                  </div>
-                                </div>
+                              {([
+                                PAYMENT_TERM_PRESETS.find(p => p.name === "Net 60 Post Production End") || PAYMENT_TERM_PRESETS[5],
+                                PAYMENT_TERM_PRESETS.find(p => p.category === "prepayment") || PAYMENT_TERM_PRESETS[7],
+                              ] as PaymentTermPreset[]).map((pt) => (
+                                <PaymentTermCard
+                                  key={pt.id}
+                                  term={pt}
+                                  readOnly
+                                  onClick={() => { setLocPtDetailTerm(pt); setLocPtDetailOpen(true); }}
+                                />
                               ))}
                             </div>
                           </div>
@@ -4055,6 +4011,11 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
           })()}
         </DialogContent>
       </Dialog>
+      <PaymentTermDetailModal
+        term={locPtDetailTerm}
+        open={locPtDetailOpen}
+        onClose={() => { setLocPtDetailOpen(false); setLocPtDetailTerm(null); }}
+      />
     </>
   );
 }
@@ -4302,49 +4263,26 @@ function PaymentTermsTab({ vendor, cfg }: { vendor: Vendor; cfg?: VendorConfigDa
       </ContentCard>
 
       {/* Applied Payment Term from Step 3 config */}
-      {hasPaymentTerm && (
+      {hasPaymentTerm ? (
         <ContentCard title="Applied Payment Term" icon={Receipt}>
-          <div className="rounded-md border border-[#E2E8F0] p-3 space-y-2 bg-[#FAFBFC]">
-            <div className="flex items-center gap-2">
-              <span
-                className="inline-flex items-center px-2 py-0.5 rounded text-[10px] text-white"
-                style={{
-                  fontWeight: 700,
-                  backgroundColor: cfg!.paymentTermConfig!.type === "NET" ? "#0A77FF" : cfg!.paymentTermConfig!.type === "Pre" ? "#7C3AED" : "#D97706",
-                }}
-              >
-                {cfg!.paymentTermConfig!.type}
-              </span>
-              <span className="text-[13px] text-[#0F172A]" style={{ fontWeight: 700 }}>{cfg!.paymentTermConfig!.name}</span>
-            </div>
-            <p className="text-[12px] text-[#64748B] leading-relaxed">{cfg!.paymentTermConfig!.description}</p>
-            <div className="flex gap-4 text-[11px]">
-              {cfg!.paymentTermConfig!.trigger && (
-                <div>
-                  <span className="text-[#94A3B8]">Trigger: </span>
-                  <span className="text-[#334155]" style={{ fontWeight: 500 }}>{cfg!.paymentTermConfig!.trigger}</span>
-                </div>
-              )}
-              {cfg!.paymentTermConfig!.duration && (
-                <div>
-                  <span className="text-[#94A3B8]">Duration: </span>
-                  <span className="text-[#334155]" style={{ fontWeight: 500 }}>{cfg!.paymentTermConfig!.duration} days</span>
-                </div>
-              )}
-            </div>
-            {cfg!.paymentTermConfig!.discountPercent && (
-              <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md bg-[#F0FDF4] border border-[#DCFCE7]">
-                <CheckCircle2 className="w-3 h-3 text-[#059669]" />
-                <span className="text-[11px] text-[#059669]" style={{ fontWeight: 600 }}>
-                  {cfg!.paymentTermConfig!.discountPercent}% discount if paid within {cfg!.paymentTermConfig!.discountPeriod || "—"} days
-                </span>
-              </div>
-            )}
-          </div>
+          <PaymentTermCard
+            term={{
+              id: "pt-applied",
+              name: cfg!.paymentTermConfig!.name,
+              category: (cfg!.paymentTermConfig!.type === "Pre" ? "prepayment" : cfg!.paymentTermConfig!.type === "Split" ? "split" : "net") as "net" | "prepayment" | "split",
+              typeBadge: cfg!.paymentTermConfig!.type,
+              badgeColor: cfg!.paymentTermConfig!.type === "Pre" ? "#7C3AED" : cfg!.paymentTermConfig!.type === "Split" ? "#D97706" : "#0A77FF",
+              trigger: cfg!.paymentTermConfig!.trigger,
+              description: cfg!.paymentTermConfig!.description,
+              vendorsApplied: 4,
+              duration: cfg!.paymentTermConfig!.duration,
+              discountPercent: cfg!.paymentTermConfig!.discountPercent,
+              discountPeriod: cfg!.paymentTermConfig!.discountPeriod,
+            }}
+            readOnly
+          />
         </ContentCard>
-      )}
-
-      {!hasPaymentTerm && (
+      ) : (
         <ContentCard title="Applied Payment Term" icon={Receipt}>
           <EmptyState icon={Receipt} title="No custom payment term" description="A custom payment term can be configured during partner creation." />
         </ContentCard>
