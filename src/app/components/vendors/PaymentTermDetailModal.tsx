@@ -21,6 +21,7 @@ import {
   ChevronDown,
   Package,
   Building2,
+  FileText,
   Paperclip,
   Clock,
   Zap,
