@@ -5566,12 +5566,12 @@ function ConfigPageContent({
                         { key: "prepayment", label: "Prepayment", color: "#7C3AED", bg: "#F5F3FF", icon: Clock },
                         { key: "split", label: "Split", color: "#D97706", bg: "#FFFBEB", icon: Copy },
                       ] as const).map((cat) => {
-                        const active = ptTypeFilter === cat.key;
+                        const active = ptTypeFilters.includes(cat.key);
                         const count = PAYMENT_TERM_PRESETS.filter((t) => t.category === cat.key).length;
                         return (
                           <button
                             key={cat.key}
-                            onClick={() => setPtTypeFilter(active ? null : cat.key)}
+                            onClick={() => setPtTypeFilters((prev) => prev.includes(cat.key) ? prev.filter((k) => k !== cat.key) : [...prev, cat.key])}
                             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs transition-all cursor-pointer ${
                               active ? "bg-white shadow-sm" : "hover:bg-white/60"
                             }`}
@@ -5595,8 +5595,9 @@ function ConfigPageContent({
                     {/* Quick Filter Pills */}
                     <FilterPills
                       options={(() => {
-                        // Counts respect the active type filter
-                        const base = ptTypeFilter ? PAYMENT_TERM_PRESETS.filter((t) => t.category === ptTypeFilter) : PAYMENT_TERM_PRESETS;
+                        const base = ptTypeFilters.length > 0
+                          ? PAYMENT_TERM_PRESETS.filter((t) => ptTypeFilters.includes(t.category))
+                          : PAYMENT_TERM_PRESETS;
                         const presetCount = base.filter((t) => !t.id.startsWith("pt-custom-")).length;
                         const customCount = base.filter((t) => t.id.startsWith("pt-custom-")).length;
                         const createdByMeCount = base.filter((t) => t.id.startsWith("pt-custom-")).length;
