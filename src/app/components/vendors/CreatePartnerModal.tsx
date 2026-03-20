@@ -5131,7 +5131,7 @@ function ConfigPageContent({
 
                 {/* ─── Step 1: Term Setup ─── */}
                 {createPtStep === 1 && (
-                  <div className="space-y-5">
+                  <div className="space-y-4">
                     {/* Payment Term Type — card selector matching pricing rule style */}
                     <div>
                       <div className="flex items-center gap-1.5 mb-3">
