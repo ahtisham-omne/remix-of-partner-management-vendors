@@ -3416,8 +3416,8 @@ function ConfigPageContent({
     else if (ptSidebarFilter === "split") terms = terms.filter((t) => t.category === "split");
     else if (ptSidebarFilter === "recent") terms = terms.slice(0, 3);
     else if (ptSidebarFilter === "vendors_applied") terms = terms.filter((t) => t.vendorsApplied >= 4);
-    else if (ptSidebarFilter === "created_by_me") terms = terms.slice(0, 4);
-    else if (ptSidebarFilter === "created_by_others") terms = terms.slice(4, 8);
+    else if (ptSidebarFilter === "created_by_me") terms = terms.filter((t) => t.id.startsWith("pt-custom-"));
+    else if (ptSidebarFilter === "created_by_others") terms = terms.filter((t) => !t.id.startsWith("pt-custom-") && !PAYMENT_TERM_PRESETS.some((p) => p.id === t.id));
     if (ptSearch.trim()) {
       const q = ptSearch.toLowerCase();
       terms = terms.filter((t) => t.name.toLowerCase().includes(q) || t.description.toLowerCase().includes(q));
