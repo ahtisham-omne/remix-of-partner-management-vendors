@@ -2085,6 +2085,8 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate }: {
       term={ptDetailTerm}
       open={ptDetailOpen}
       onClose={() => { setPtDetailOpen(false); setPtDetailTerm(null); }}
+      mode="view"
+      onDisable={(t) => toast.success(`"${t.name}" disabled for this partner`)}
     />
     </>
   );
