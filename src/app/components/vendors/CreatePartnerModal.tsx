@@ -5475,7 +5475,6 @@ function ConfigPageContent({
                 </div>
               </div>
             </div>
-            </div>
           </DialogContent>
         </Dialog>
 
