@@ -3560,8 +3560,8 @@ function ConfigPageContent({
 
   const filteredPaymentTermPresets = useMemo(() => {
     let terms = PAYMENT_TERM_PRESETS;
-    // Type filter (parallel, multi-select)
-    if (ptTypeFilters.length > 0) terms = terms.filter((t) => ptTypeFilters.includes(t.category));
+    // Type filter (single-select tab)
+    if (ptTypeFilters) terms = terms.filter((t) => t.category === ptTypeFilters);
     // Status filter (parallel)
     if (ptStatusFilter === "preset") terms = terms.filter((t) => !t.id.startsWith("pt-custom-"));
     else if (ptStatusFilter === "custom") terms = terms.filter((t) => t.id.startsWith("pt-custom-"));
