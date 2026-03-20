@@ -3422,7 +3422,7 @@ function ConfigPageContent({
   // Payment Terms Presets state
   const [selectedPaymentTermId, setSelectedPaymentTermId] = useState<string | null>(null);
   const [paymentTermsModalOpen, setPaymentTermsModalOpen] = useState(false);
-  const [ptTypeFilters, setPtTypeFilters] = useState<string[]>(["net"]);
+  const [ptTypeFilters, setPtTypeFilters] = useState<string>("net");
   const [ptStatusFilter, setPtStatusFilter] = useState("all");
   const [ptSearch, setPtSearch] = useState("");
   const [ptSortBy, setPtSortBy] = useState<"name" | "vendorsApplied" | "duration" | "category">("name");
@@ -3560,8 +3560,8 @@ function ConfigPageContent({
 
   const filteredPaymentTermPresets = useMemo(() => {
     let terms = PAYMENT_TERM_PRESETS;
-    // Type filter (parallel, multi-select)
-    if (ptTypeFilters.length > 0) terms = terms.filter((t) => ptTypeFilters.includes(t.category));
+    // Type filter (single-select tab)
+    if (ptTypeFilters) terms = terms.filter((t) => t.category === ptTypeFilters);
     // Status filter (parallel)
     if (ptStatusFilter === "preset") terms = terms.filter((t) => !t.id.startsWith("pt-custom-"));
     else if (ptStatusFilter === "custom") terms = terms.filter((t) => t.id.startsWith("pt-custom-"));
@@ -3589,7 +3589,7 @@ function ConfigPageContent({
   // Pricing Rules state
   const [selectedPricingRuleIds, setSelectedPricingRuleIds] = useState<string[]>([]);
   const [pricingRulesModalOpen, setPricingRulesModalOpen] = useState(false);
-  const [prTypeFilters, setPrTypeFilters] = useState<string[]>(["discount"]);
+  const [prTypeFilters, setPrTypeFilters] = useState<string>("discount");
   const [prStatusFilter, setPrStatusFilter] = useState("all");
   const [prSearch, setPrSearch] = useState("");
   const [prSortBy, setPrSortBy] = useState<"name" | "vendorsApplied" | "category" | "basis">("name");
@@ -3887,8 +3887,8 @@ function ConfigPageContent({
 
   const filteredPricingRulePresets = useMemo(() => {
     let rules = allPricingRulePresets;
-    // Type filter (parallel, multi-select)
-    if (prTypeFilters.length > 0) rules = rules.filter((r) => prTypeFilters.includes(r.category));
+    // Type filter (single-select tab)
+    if (prTypeFilters) rules = rules.filter((r) => r.category === prTypeFilters);
     // Status filter (parallel)
     if (prStatusFilter === "preset") rules = rules.filter((r) => !r.id.startsWith("pr-custom-"));
     else if (prStatusFilter === "custom") rules = rules.filter((r) => r.id.startsWith("pr-custom-"));
@@ -5174,7 +5174,7 @@ function ConfigPageContent({
                 <Plus className="w-3.5 h-3.5 text-[#64748B]" /> Create terms
               </button>
               <button
-                onClick={() => { setPtTypeFilters(["net"]); setPtStatusFilter("all"); setPtSearch(""); setPaymentTermsModalOpen(true); }}
+                onClick={() => { setPtTypeFilters("net"); setPtStatusFilter("all"); setPtSearch(""); setPaymentTermsModalOpen(true); }}
                 className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-[#DBEAFE] bg-[#EFF6FF] text-xs text-[#0A77FF] hover:bg-[#DBEAFE] transition-colors"
                 style={{ fontWeight: 500 }}
               >
@@ -5712,12 +5712,12 @@ function ConfigPageContent({
                         { key: "prepayment", label: "Prepayment", color: "#7C3AED", bg: "#F5F3FF", icon: Clock },
                         { key: "split", label: "Split", color: "#D97706", bg: "#FFFBEB", icon: Copy },
                       ] as const).map((cat) => {
-                        const active = ptTypeFilters.includes(cat.key);
+                        const active = ptTypeFilters === cat.key;
                         const count = PAYMENT_TERM_PRESETS.filter((t) => t.category === cat.key).length;
                         return (
                           <button
                             key={cat.key}
-                            onClick={() => setPtTypeFilters((prev) => prev.includes(cat.key) ? prev.filter((k) => k !== cat.key) : [...prev, cat.key])}
+                            onClick={() => setPtTypeFilters(cat.key)}
                             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs transition-all cursor-pointer ${
                               active ? "bg-white shadow-sm" : "hover:bg-white/60"
                             }`}
@@ -5741,8 +5741,8 @@ function ConfigPageContent({
                     {/* Quick Filter Pills */}
                     <FilterPills
                       options={(() => {
-                        const base = ptTypeFilters.length > 0
-                          ? PAYMENT_TERM_PRESETS.filter((t) => ptTypeFilters.includes(t.category))
+                        const base = ptTypeFilters
+                          ? PAYMENT_TERM_PRESETS.filter((t) => t.category === ptTypeFilters)
                           : PAYMENT_TERM_PRESETS;
                         const presetCount = base.filter((t) => !t.id.startsWith("pt-custom-")).length;
                         const customCount = base.filter((t) => t.id.startsWith("pt-custom-")).length;
@@ -5960,7 +5960,7 @@ function ConfigPageContent({
               <Plus className="w-3.5 h-3.5" /> Create rule
             </button>
             <button
-              onClick={() => { setPrTypeFilters(["discount"]); setPrStatusFilter("all"); setPrSearch(""); setPreviewPricingRuleId(null); setPrPreviewTab("preview"); setPricingRulesModalOpen(true); }}
+              onClick={() => { setPrTypeFilters("discount"); setPrStatusFilter("all"); setPrSearch(""); setPreviewPricingRuleId(null); setPrPreviewTab("preview"); setPricingRulesModalOpen(true); }}
               className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-[#DBEAFE] bg-[#EFF6FF] text-xs text-[#0A77FF] hover:bg-[#DBEAFE] transition-colors"
               style={{ fontWeight: 500 }}
             >
@@ -6585,12 +6585,12 @@ function ConfigPageContent({
                         { key: "discount", label: "Discounts", color: "#047857", bg: "#ECFDF5", icon: TrendingDown },
                         { key: "premium", label: "Premiums", color: "#7C3AED", bg: "#F5F3FF", icon: TrendingUp },
                       ] as const).map((cat) => {
-                        const active = prTypeFilters.includes(cat.key);
+                        const active = prTypeFilters === cat.key;
                         const count = allPricingRulePresets.filter((r) => r.category === cat.key).length;
                         return (
                           <button
                             key={cat.key}
-                            onClick={() => setPrTypeFilters((prev) => prev.includes(cat.key) ? prev.filter((k) => k !== cat.key) : [...prev, cat.key])}
+                            onClick={() => setPrTypeFilters(cat.key)}
                             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs transition-all cursor-pointer ${
                               active ? "bg-white shadow-sm" : "hover:bg-white/60"
                             }`}
@@ -6614,8 +6614,8 @@ function ConfigPageContent({
                     {/* Quick Filter Pills */}
                     <FilterPills
                       options={(() => {
-                        const base = prTypeFilters.length > 0
-                          ? allPricingRulePresets.filter((r) => prTypeFilters.includes(r.category))
+                        const base = prTypeFilters
+                          ? allPricingRulePresets.filter((r) => r.category === prTypeFilters)
                           : allPricingRulePresets;
                         const presetCount = base.filter((r) => !r.id.startsWith("pr-custom-")).length;
                         const customCount = base.filter((r) => r.id.startsWith("pr-custom-")).length;

@@ -1412,6 +1412,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
   const [explorePresetsOpen, setExplorePresetsOpen] = useState(false);
   const [explorePresetsFullscreen, setExplorePresetsFullscreen] = useState(false);
   const [explorePresetsSidebar, setExplorePresetsSidebar] = useState("all");
+  const [exploreCategoryTab, setExploreCategoryTab] = useState<"discount" | "premium">("discount");
   const [explorePresetsSearch, setExplorePresetsSearch] = useState("");
   const [exploreActiveTiers, setExploreActiveTiers] = useState<Record<string, number>>({});
 
@@ -1624,7 +1625,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
 
           <div className="w-px h-5 bg-border/60 mx-0.5 hidden sm:block" />
 
-          <button type="button" onClick={() => { setExplorePresetsOpen(true); setExplorePresetsSidebar("all"); setExplorePresetsSearch(""); }} className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg border border-[#E2E8F0] bg-white text-[#334155] hover:bg-[#F8FAFC] text-sm transition-colors cursor-pointer" style={{ fontWeight: 600 }}>
+          <button type="button" onClick={() => { setExplorePresetsOpen(true); setExplorePresetsSidebar("all"); setExploreCategoryTab("discount"); setExplorePresetsSearch(""); }} className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg border border-[#E2E8F0] bg-white text-[#334155] hover:bg-[#F8FAFC] text-sm transition-colors cursor-pointer" style={{ fontWeight: 600 }}>
             <BookOpen className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Templates</span>
           </button>
@@ -2435,18 +2436,52 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
               </div>
             </div>
 
-            {/* Filter pills */}
-            <div className="pb-3">
+            {/* Type Toggle + Status Filter Pills */}
+            <div className="flex items-center gap-3 overflow-x-auto pb-3">
+              {/* Type Toggle (mutually exclusive tabs) */}
+              <div className="inline-flex items-center rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-0.5 shrink-0">
+                {([
+                  { key: "discount" as const, label: "Discounts", color: "#047857", bg: "#ECFDF5", icon: TrendingDown },
+                  { key: "premium" as const, label: "Premiums", color: "#6D28D9", bg: "#F5F3FF", icon: TrendingUp },
+                ]).map((cat) => {
+                  const active = exploreCategoryTab === cat.key;
+                  const count = exploreCards.filter((c) => c.category === cat.key).length;
+                  return (
+                    <button
+                      key={cat.key}
+                      onClick={() => setExploreCategoryTab(cat.key)}
+                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs transition-all cursor-pointer ${
+                        active ? "bg-white shadow-sm" : "hover:bg-white/60"
+                      }`}
+                      style={{ fontWeight: active ? 600 : 500, color: active ? cat.color : "#64748B" }}
+                    >
+                      <cat.icon className="w-3 h-3" />
+                      {cat.label}
+                      <span
+                        className="text-[10px] rounded-full px-1.5 py-px min-w-[18px] text-center"
+                        style={{ fontWeight: 600, color: active ? cat.color : "#94A3B8", backgroundColor: active ? cat.bg : "#F1F5F9" }}
+                      >
+                        {count}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="w-px h-5 bg-[#E2E8F0] shrink-0" />
+
+              {/* Status pills (parallel with type tabs) */}
               <FilterPills
-                options={[
-                  { key: "all", label: "All Rules" },
-                  { key: "discount", label: "Discounts" },
-                  { key: "premium", label: "Premium" },
-                  { key: "recent", label: "Recently Used" },
-                  { key: "vendors_applied", label: "Vendors Applied" },
-                  { key: "created_by_me", label: "Created by Me" },
-                  { key: "created_by_others", label: "Created by Others" },
-                ]}
+                options={(() => {
+                  const base = exploreCards.filter((c) => c.category === exploreCategoryTab);
+                  return [
+                    { key: "all", label: "All", count: base.length, showCount: true },
+                    { key: "preset", label: "Preset", count: base.filter((c) => c.isPreset).length, showCount: true },
+                    { key: "custom", label: "Custom", count: base.filter((c) => !c.isPreset).length, showCount: true },
+                    { key: "created_by_me", label: "Created by Me", count: base.filter((c) => !c.isPreset && c.createdBy === "Ahtisham Ahmad").length, showCount: true },
+                    { key: "vendors_applied", label: "Vendors Applied", count: base.filter((c) => c.partnerCount >= 3).length, showCount: true },
+                  ];
+                })()}
                 activeKey={explorePresetsSidebar}
                 onSelect={(k) => setExplorePresetsSidebar(k)}
               />
@@ -2461,12 +2496,14 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
             {(() => {
               let cards = exploreCards;
 
-              if (explorePresetsSidebar === "discount") cards = cards.filter(c => c.category === "discount");
-              else if (explorePresetsSidebar === "premium") cards = cards.filter(c => c.category === "premium");
-              else if (explorePresetsSidebar === "recent") cards = cards.slice(0, 5);
-              else if (explorePresetsSidebar === "vendors_applied") cards = cards.filter(c => c.partnerCount >= 3);
+              // Type tab filter (mutually exclusive)
+              cards = cards.filter(c => c.category === exploreCategoryTab);
+
+              // Status filter (parallel)
+              if (explorePresetsSidebar === "preset") cards = cards.filter(c => c.isPreset);
+              else if (explorePresetsSidebar === "custom") cards = cards.filter(c => !c.isPreset);
               else if (explorePresetsSidebar === "created_by_me") cards = cards.filter(c => !c.isPreset && c.createdBy === "Ahtisham Ahmad");
-              else if (explorePresetsSidebar === "created_by_others") cards = cards.filter(c => !c.isPreset && c.createdBy !== "Ahtisham Ahmad" && c.createdBy !== "System");
+              else if (explorePresetsSidebar === "vendors_applied") cards = cards.filter(c => c.partnerCount >= 3);
 
               if (explorePresetsSearch.trim()) {
                 const q = explorePresetsSearch.toLowerCase();
