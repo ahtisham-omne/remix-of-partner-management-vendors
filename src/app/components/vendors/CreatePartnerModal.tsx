@@ -5864,7 +5864,7 @@ function ConfigPageContent({
                             key={term.id}
                             term={term}
                             isSelected={isSelected}
-                            onClick={() => setPreviewPaymentTermId(term.id)}
+                            onClick={() => { setStandalonePtDetailTerm(term); setStandalonePtDetailOpen(true); }}
                             onApply={(t) => { setSelectedPaymentTermId(t.id); setPaymentTermsModalOpen(false); }}
                             onDuplicate={(t) => handleDuplicatePaymentTerm(t)}
                             searchText={ptSearch}
