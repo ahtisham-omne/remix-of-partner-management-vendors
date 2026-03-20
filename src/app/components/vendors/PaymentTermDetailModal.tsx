@@ -25,7 +25,6 @@ import {
   Receipt,
   Lock,
   Ban,
-  ChevronDown,
 } from "lucide-react";
 import { toast } from "sonner";
 import { getAvatarTint } from "../../utils/avatarTints";
