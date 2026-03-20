@@ -3294,22 +3294,41 @@ function ConfigPageContent({
   const [createPtType, setCreatePtType] = useState<"net" | "prepayment" | "split">("net");
   const [createPtTrigger, setCreatePtTrigger] = useState("order_confirmation");
   const [createPtDuration, setCreatePtDuration] = useState("30");
+  const [createPtCustomDuration, setCreatePtCustomDuration] = useState("");
   const [createPtDescription, setCreatePtDescription] = useState("");
   const [createPtApplyDiscount, setCreatePtApplyDiscount] = useState(false);
   const [createPtDiscountPercent, setCreatePtDiscountPercent] = useState("");
   const [createPtDiscountPeriod, setCreatePtDiscountPeriod] = useState("30");
   const [createPtStep, setCreatePtStep] = useState<1 | 2>(1);
+  // Split payment events
+  const [createPtSplitEvents, setCreatePtSplitEvents] = useState<Array<{ event: string; percent: string }>>([
+    { event: "order_confirmation", percent: "50" },
+    { event: "delivery", percent: "50" },
+  ]);
+
+  const TRIGGER_TOOLTIPS: Record<string, string> = {
+    order_confirmation: "Payment clock starts when the purchase order is confirmed by both parties.",
+    production_start: "Payment clock starts when goods enter production or manufacturing begins.",
+    production_end: "Payment clock starts when production is completed and goods are ready.",
+    shipping: "Payment clock starts when goods are shipped from the supplier's facility.",
+    delivery: "Payment clock starts when goods are received at the destination.",
+  };
 
   function resetCreatePtForm() {
     setCreatePtName("");
     setCreatePtType("net");
     setCreatePtTrigger("order_confirmation");
     setCreatePtDuration("30");
+    setCreatePtCustomDuration("");
     setCreatePtDescription("");
     setCreatePtApplyDiscount(false);
     setCreatePtDiscountPercent("");
     setCreatePtDiscountPeriod("30");
     setCreatePtStep(1);
+    setCreatePtSplitEvents([
+      { event: "order_confirmation", percent: "50" },
+      { event: "delivery", percent: "50" },
+    ]);
   }
 
   function handleDuplicatePaymentTerm(term: PaymentTermPreset) {
