@@ -5176,7 +5176,7 @@ function ConfigPageContent({
                           );
                         })}
                       </div>
-
+                    </div>
 
                     {/* Payment Term Details */}
                     <div>
