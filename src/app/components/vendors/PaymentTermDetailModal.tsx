@@ -48,14 +48,14 @@ const PT_DETAIL_TABS = [
   { id: "activity", label: "Activity", icon: Clock },
 ];
 
-/* ─── Mock items ─── */
+/* ─── Mock items matching partner listing table ─── */
 const PT_MOCK_ITEMS = [
-  { id: "1", name: "Steel Bolts M10×40", partNo: "SB-M10-40", category: "Fasteners", price: 12.50, status: "Active" },
-  { id: "2", name: "Hex Nuts M10", partNo: "HN-M10", category: "Fasteners", price: 4.20, status: "Active" },
-  { id: "3", name: "Flat Washers M10", partNo: "FW-M10", category: "Fasteners", price: 2.80, status: "Active" },
-  { id: "4", name: "Spring Lock Washers M10", partNo: "SLW-M10", category: "Fasteners", price: 3.40, status: "Inactive" },
-  { id: "5", name: "Threaded Rods M12×1m", partNo: "TR-M12-1M", category: "Rods", price: 18.90, status: "Active" },
-  { id: "6", name: "Carriage Bolts 3/8×3", partNo: "CB-38-3", category: "Fasteners", price: 8.60, status: "Active" },
+  { id: "1", code: "FAST-HEX-001", desc: "Zinc-Plated Steel Hex Head Screw, 1/4\"-20 x 1\"", vendor: "BoltMaster Inc.", partNo: "BM-2520-100", status: "In Stock", controlType: "Non-Serialized", primaryCat: "Fasteners", additionalCat: ["Screws", "Hardware"], img: "🔩" },
+  { id: "2", code: "VALV-BAL-316", desc: "316 Stainless Steel Ball Valve, 2-Piece, 1\"", vendor: "FlowControl", partNo: "SS-BV-100", status: "Low Stock", controlType: "Serialized", primaryCat: "Plumbing", additionalCat: ["Valves", "Industrial"], img: "🔧" },
+  { id: "3", code: "SEAL-OR-012", desc: "Buna-N O-Ring, Dash Number 012, Hardness 70A", vendor: "SealTech", partNo: "BN-70-012", status: "In Stock", controlType: "Non-Serialized", primaryCat: "Seals", additionalCat: ["O-Rings", "Rubber Goods"], img: "⭕" },
+  { id: "4", code: "TOOL-EM-050", desc: "Solid Carbide Square End Mill, 1/2\" Cutting Dia", vendor: "PrecisionTools", partNo: "SC-EM-4F-500", status: "In Stock", controlType: "Non-Serialized", primaryCat: "Tools", additionalCat: ["Milling", "Carbide"], img: "⚙️" },
+  { id: "5", code: "MAT-AL-6061", desc: "6061-T6 Aluminum Sheet, 12\" x 24\" x 0.125\"", vendor: "AluSupply", partNo: "AL-6061-125", status: "Out of Stock", controlType: "Non-Serialized", primaryCat: "Raw Materials", additionalCat: ["Metals", "Sheet Stock"], img: "📦" },
+  { id: "6", code: "MECH-BRG-6204", desc: "Deep Groove Ball Bearing, 6204-2RS, Sealed", vendor: "MotionPro", partNo: "6204-2RS", status: "In Stock", controlType: "Serialized", primaryCat: "Power Trans", additionalCat: ["Bearings", "Mechanical"], img: "🔘" },
 ];
 
 /* ─── Mock vendors ─── */
