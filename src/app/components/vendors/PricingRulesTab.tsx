@@ -2496,12 +2496,14 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
             {(() => {
               let cards = exploreCards;
 
-              if (explorePresetsSidebar === "discount") cards = cards.filter(c => c.category === "discount");
-              else if (explorePresetsSidebar === "premium") cards = cards.filter(c => c.category === "premium");
-              else if (explorePresetsSidebar === "recent") cards = cards.slice(0, 5);
-              else if (explorePresetsSidebar === "vendors_applied") cards = cards.filter(c => c.partnerCount >= 3);
+              // Type tab filter (mutually exclusive)
+              cards = cards.filter(c => c.category === exploreCategoryTab);
+
+              // Status filter (parallel)
+              if (explorePresetsSidebar === "preset") cards = cards.filter(c => c.isPreset);
+              else if (explorePresetsSidebar === "custom") cards = cards.filter(c => !c.isPreset);
               else if (explorePresetsSidebar === "created_by_me") cards = cards.filter(c => !c.isPreset && c.createdBy === "Ahtisham Ahmad");
-              else if (explorePresetsSidebar === "created_by_others") cards = cards.filter(c => !c.isPreset && c.createdBy !== "Ahtisham Ahmad" && c.createdBy !== "System");
+              else if (explorePresetsSidebar === "vendors_applied") cards = cards.filter(c => c.partnerCount >= 3);
 
               if (explorePresetsSearch.trim()) {
                 const q = explorePresetsSearch.toLowerCase();
