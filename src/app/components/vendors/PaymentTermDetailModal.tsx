@@ -65,6 +65,9 @@ interface PaymentTermDetailModalProps {
   term: PaymentTermPreset | null;
   open: boolean;
   onClose: () => void;
+  /** "view" = read-only on details page, "create" = inside creation form with Use Template */
+  mode?: "view" | "create";
+  onDisable?: (term: PaymentTermPreset) => void;
 }
 
 function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalProps) {
