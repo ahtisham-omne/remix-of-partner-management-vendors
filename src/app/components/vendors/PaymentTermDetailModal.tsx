@@ -490,49 +490,6 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
                 </div>
               </PTInfoCard>
 
-              {/* Payment Configuration Card */}
-              <PTInfoCard title="Payment Configuration" icon={Tag}>
-                <div className="space-y-2.5">
-                  <div className="min-w-0">
-                    <PTInfoLabel>Payment Category</PTInfoLabel>
-                    <p className="text-[12px] text-[#334155]" style={{ fontWeight: 500 }}>{ptTypeLabel}</p>
-                  </div>
-                  <div className="grid grid-cols-2 gap-x-4">
-                    <div className="min-w-0">
-                      <PTInfoLabel>Net Days</PTInfoLabel>
-                      <p className="text-[12.5px] text-[#0F172A]" style={{ fontWeight: 600 }}>{ptDuration}</p>
-                    </div>
-                    <div className="min-w-0">
-                      <PTInfoLabel>Grace Period</PTInfoLabel>
-                      <p className="text-[12px] text-[#334155]" style={{ fontWeight: 500 }}>5 days</p>
-                    </div>
-                  </div>
-                  <div className="min-w-0">
-                    <PTInfoLabel>Payment Method</PTInfoLabel>
-                    <p className="text-[12px] text-[#334155]" style={{ fontWeight: 500 }}>Wire Transfer, ACH</p>
-                  </div>
-                  <div className="min-w-0">
-                    <PTInfoLabel>Currency</PTInfoLabel>
-                    <p className="text-[12.5px] text-[#0F172A]" style={{ fontWeight: 600 }}>USD ($)</p>
-                  </div>
-                </div>
-              </PTInfoCard>
-
-              {/* Compliance & Notes Card */}
-              <PTInfoCard title="Compliance & Notes" icon={Info} defaultOpen={false}>
-                <div className="space-y-2.5">
-                  <div className="min-w-0">
-                    <PTInfoLabel>Compliance Status</PTInfoLabel>
-                    <div className="mt-0.5">
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] bg-[#F0FDF4] text-[#16A34A] border border-[#BBF7D0]" style={{ fontWeight: 600 }}>Compliant</span>
-                    </div>
-                  </div>
-                  <div className="min-w-0">
-                    <PTInfoLabel>Internal Notes</PTInfoLabel>
-                    <p className="text-[11px] text-[#64748B] mt-0.5 leading-relaxed">Standard NET 30 terms applied to all vendor categories. Review annually.</p>
-                  </div>
-                </div>
-              </PTInfoCard>
 
             </div>
           </div>
