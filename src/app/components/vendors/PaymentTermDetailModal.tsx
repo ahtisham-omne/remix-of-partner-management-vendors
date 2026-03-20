@@ -332,37 +332,57 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
                     <thead className="sticky top-0 z-10">
                       <tr className="bg-[#F8FAFC]">
                         <th className="text-left pl-4 pr-2 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Partner</th>
-                        <th className="text-left pl-4 pr-2 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Code</th>
+                        <th className="text-left pl-4 pr-2 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Description</th>
+                        <th className="text-left pl-4 pr-2 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Status</th>
                         <th className="text-left pl-4 pr-2 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Type</th>
-                        <th className="text-left pl-4 pr-4 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Status</th>
+                        <th className="text-left pl-4 pr-2 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Category</th>
+                        <th className="text-left pl-4 pr-4 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Country</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {PT_MOCK_VENDORS.map((v) => {
-                        const vTint = getAvatarTint(v.name);
-                        const vInit = v.name.split(" ").map(w => w[0]).slice(0, 2).join("");
+                      {ptVendors.map((v) => {
+                        const vTint = getAvatarTint(v.companyName);
+                        const vInit = v.companyName.split(" ").map(w => w[0]).slice(0, 2).join("");
+                        const statusColor = v.status === "active"
+                          ? { bg: "#F0FDF4", text: "#16A34A", border: "#BBF7D0", dot: "#16A34A" }
+                          : v.status === "inactive"
+                            ? { bg: "#FFFBEB", text: "#D97706", border: "#FDE68A", dot: "#D97706" }
+                            : { bg: "#FEF2F2", text: "#DC2626", border: "#FECACA", dot: "#DC2626" };
                         return (
                           <tr key={v.id} className="bg-white hover:bg-[#F8FAFC] transition-colors border-b border-[#F1F5F9]">
-                            <td className="pl-4 pr-2 py-2.5">
-                              <div className="flex items-center gap-2.5">
-                                <div className="w-7 h-7 rounded-full flex items-center justify-center text-[9px] shrink-0" style={{ backgroundColor: vTint.bg, color: vTint.fg, fontWeight: 700 }}>
+                            <td className="pl-4 pr-2 py-3">
+                              <div className="flex items-center gap-3">
+                                <div className="w-9 h-9 rounded-full flex items-center justify-center text-[10px] shrink-0" style={{ backgroundColor: vTint.bg, color: vTint.fg, fontWeight: 700 }}>
                                   {vInit}
                                 </div>
-                                <span className="text-xs text-[#0F172A]" style={{ fontWeight: 500 }}>{v.name}</span>
+                                <div className="min-w-0">
+                                  <p className="text-[12px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{v.companyName}</p>
+                                  <p className="text-[10px] text-[#94A3B8] mt-0.5 font-mono">{v.code}</p>
+                                </div>
                               </div>
                             </td>
-                            <td className="pl-4 pr-2 py-2.5 font-mono text-[11px] text-[#64748B]">{v.code}</td>
-                            <td className="pl-4 pr-2 py-2.5">
-                              <span className="text-[10px] px-2 py-0.5 rounded-md bg-[#F1F5F9] text-[#475569] border border-[#E2E8F0]" style={{ fontWeight: 500 }}>{v.type}</span>
+                            <td className="pl-4 pr-2 py-3 max-w-[180px]">
+                              <p className="text-[12px] text-[#334155] truncate" style={{ fontWeight: 500 }}>{v.description || v.services}</p>
+                              <p className="text-[10px] text-[#94A3B8] mt-0.5">{v.country}</p>
                             </td>
-                            <td className="pl-4 pr-4 py-2.5">
-                              <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] ${
-                                v.status === "Active"
-                                  ? "bg-[#F0FDF4] text-[#16A34A] border border-[#BBF7D0]"
-                                  : "bg-[#FEF2F2] text-[#DC2626] border border-[#FECACA]"
-                              }`} style={{ fontWeight: 600 }}>
-                                {v.status}
+                            <td className="pl-4 pr-2 py-3 whitespace-nowrap">
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px]" style={{ fontWeight: 600, backgroundColor: statusColor.bg, color: statusColor.text, border: `1px solid ${statusColor.border}` }}>
+                                <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: statusColor.dot }} />
+                                {v.status.charAt(0).toUpperCase() + v.status.slice(1)}
                               </span>
+                            </td>
+                            <td className="pl-4 pr-2 py-3 whitespace-nowrap">
+                              <div className="flex items-center gap-1">
+                                {v.partnerTypes.map((t) => (
+                                  <span key={t} className={`text-[10px] px-2 py-0.5 rounded-md border ${t === "vendor" ? "bg-[#F0FDF4] border-[#BBF7D0] text-[#166534]" : "bg-[#EFF6FF] border-[#BFDBFE] text-[#1E40AF]"}`} style={{ fontWeight: 500 }}>
+                                    {t === "vendor" ? "Vendor" : "Customer"}
+                                  </span>
+                                ))}
+                              </div>
+                            </td>
+                            <td className="pl-4 pr-2 py-3 text-[12px] text-[#334155] whitespace-nowrap" style={{ fontWeight: 500 }}>{CATEGORY_LABELS[v.category]}</td>
+                            <td className="pl-4 pr-4 py-3 whitespace-nowrap">
+                              <span className="text-[12px] text-[#334155]" style={{ fontWeight: 500 }}>{v.countryFlag} {v.country}</span>
                             </td>
                           </tr>
                         );
