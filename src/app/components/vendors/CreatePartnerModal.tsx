@@ -6614,8 +6614,8 @@ function ConfigPageContent({
                     {/* Quick Filter Pills */}
                     <FilterPills
                       options={(() => {
-                        const base = prTypeFilters.length > 0
-                          ? allPricingRulePresets.filter((r) => prTypeFilters.includes(r.category))
+                        const base = prTypeFilters
+                          ? allPricingRulePresets.filter((r) => r.category === prTypeFilters)
                           : allPricingRulePresets;
                         const presetCount = base.filter((r) => !r.id.startsWith("pr-custom-")).length;
                         const customCount = base.filter((r) => r.id.startsWith("pr-custom-")).length;
