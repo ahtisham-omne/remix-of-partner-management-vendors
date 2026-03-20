@@ -5564,12 +5564,12 @@ function ConfigPageContent({
                         { key: "prepayment", label: "Prepayment", color: "#7C3AED", bg: "#F5F3FF", icon: Clock },
                         { key: "split", label: "Split", color: "#D97706", bg: "#FFFBEB", icon: Copy },
                       ] as const).map((cat) => {
-                        const active = ptSidebarFilter === cat.key;
+                        const active = ptTypeFilter === cat.key;
                         const count = PAYMENT_TERM_PRESETS.filter((t) => t.category === cat.key).length;
                         return (
                           <button
                             key={cat.key}
-                            onClick={() => setPtSidebarFilter(active ? "all" : cat.key)}
+                            onClick={() => setPtTypeFilter(active ? null : cat.key)}
                             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs transition-all cursor-pointer ${
                               active ? "bg-white shadow-sm" : "hover:bg-white/60"
                             }`}
@@ -5593,18 +5593,21 @@ function ConfigPageContent({
                     {/* Quick Filter Pills */}
                     <FilterPills
                       options={(() => {
-                        const all = PAYMENT_TERM_PRESETS;
-                        const presetCount = all.filter((t) => !t.id.startsWith("pt-custom-")).length;
-                        const customCount = all.filter((t) => t.id.startsWith("pt-custom-")).length;
+                        // Counts respect the active type filter
+                        const base = ptTypeFilter ? PAYMENT_TERM_PRESETS.filter((t) => t.category === ptTypeFilter) : PAYMENT_TERM_PRESETS;
+                        const presetCount = base.filter((t) => !t.id.startsWith("pt-custom-")).length;
+                        const customCount = base.filter((t) => t.id.startsWith("pt-custom-")).length;
+                        const createdByMeCount = base.filter((t) => t.id.startsWith("pt-custom-")).length;
                         return [
-                          { key: "all", label: "All", count: all.length, showCount: true },
+                          { key: "all", label: "All", count: base.length, showCount: true },
                           { key: "preset", label: "Preset", count: presetCount, showCount: true },
                           { key: "custom", label: "Custom", count: customCount, showCount: true },
-                          { key: "vendors_applied", label: "Vendors Applied", count: all.filter((t) => t.vendorsApplied >= 4).length, showCount: true },
+                          { key: "created_by_me", label: "Created by Me", count: createdByMeCount, showCount: true },
+                          { key: "vendors_applied", label: "Vendors Applied", count: base.filter((t) => t.vendorsApplied >= 4).length, showCount: true },
                         ];
                       })()}
-                      activeKey={ptSidebarFilter}
-                      onSelect={(k) => setPtSidebarFilter(k)}
+                      activeKey={ptStatusFilter}
+                      onSelect={(k) => setPtStatusFilter(k)}
                     />
                   </div>
                 </div>
