@@ -134,9 +134,16 @@ function PaymentTermDetailModal({ term, open, onClose, mode = "create", onDisabl
                 <Archive className="w-3.5 h-3.5" /> Archive
               </button>
               <button
-                onClick={() => isCustom && toast.info("Disable coming soon")}
-                disabled={isPreset}
-                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#334155] hover:bg-[#F8FAFC] transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white"
+                onClick={() => {
+                  if (term && onDisable) {
+                    onDisable(term);
+                    toast.success(`"${term.name}" has been disabled`);
+                    onClose();
+                  } else {
+                    toast.info("Disable coming soon");
+                  }
+                }}
+                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#334155] hover:bg-[#F8FAFC] transition-colors cursor-pointer"
                 style={{ fontWeight: 500 }}
               >
                 <Ban className="w-3.5 h-3.5" /> Disable
