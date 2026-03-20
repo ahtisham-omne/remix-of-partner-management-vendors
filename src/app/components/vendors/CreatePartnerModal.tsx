@@ -5421,7 +5421,7 @@ function ConfigPageContent({
                             <div>
                               <div className="flex items-center gap-1 mb-1.5">
                                 <label className="text-[12px] text-[#0F172A]" style={{ fontWeight: 500 }}>Eligible Payment Period</label>
-                                <Info className="w-3 h-3 text-[#CBD5E1]" />
+                                <Tooltip><TooltipTrigger asChild><span><Info className="w-3 h-3 text-[#CBD5E1]" /></span></TooltipTrigger><TooltipContent className="z-[300]"><p className="text-xs">Time window within which the discount applies.</p></TooltipContent></Tooltip>
                               </div>
                               <Select value={createPtDiscountPeriod} onValueChange={setCreatePtDiscountPeriod}>
                                 <SelectTrigger className="h-9 rounded-lg border-[#E2E8F0] bg-white text-[13px]">
