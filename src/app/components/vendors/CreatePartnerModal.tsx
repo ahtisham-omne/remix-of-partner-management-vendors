@@ -6662,7 +6662,7 @@ function ConfigPageContent({
                         />
                       ))}
                     </div>
-                  )
+                  )}
                 </div>
               </div>
             </div>
