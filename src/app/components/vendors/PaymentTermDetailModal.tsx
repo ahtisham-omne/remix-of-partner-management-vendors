@@ -68,9 +68,11 @@ interface PaymentTermDetailModalProps {
   /** "view" = read-only on details page, "create" = inside creation form with Use Template */
   mode?: "view" | "create";
   onDisable?: (term: PaymentTermPreset) => void;
+  onApply?: (term: PaymentTermPreset) => void;
+  onDuplicate?: (term: PaymentTermPreset) => void;
 }
 
-function PaymentTermDetailModal({ term, open, onClose, mode = "create", onDisable }: PaymentTermDetailModalProps) {
+function PaymentTermDetailModal({ term, open, onClose, mode = "create", onDisable, onApply, onDuplicate }: PaymentTermDetailModalProps) {
   const [tab, setTab] = useState("items");
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [itemFilter, setItemFilter] = useState("all");
