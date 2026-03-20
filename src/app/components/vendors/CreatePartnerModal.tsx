@@ -5712,12 +5712,12 @@ function ConfigPageContent({
                         { key: "prepayment", label: "Prepayment", color: "#7C3AED", bg: "#F5F3FF", icon: Clock },
                         { key: "split", label: "Split", color: "#D97706", bg: "#FFFBEB", icon: Copy },
                       ] as const).map((cat) => {
-                        const active = ptTypeFilters.includes(cat.key);
+                        const active = ptTypeFilters === cat.key;
                         const count = PAYMENT_TERM_PRESETS.filter((t) => t.category === cat.key).length;
                         return (
                           <button
                             key={cat.key}
-                            onClick={() => setPtTypeFilters((prev) => prev.includes(cat.key) ? prev.filter((k) => k !== cat.key) : [...prev, cat.key])}
+                            onClick={() => setPtTypeFilters(cat.key)}
                             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs transition-all cursor-pointer ${
                               active ? "bg-white shadow-sm" : "hover:bg-white/60"
                             }`}
