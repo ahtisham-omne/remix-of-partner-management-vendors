@@ -3379,7 +3379,7 @@ function ConfigPageContent({
       trigger: triggerLabel,
       description: autoDescription,
       vendorsApplied: 0,
-      duration: createPtDuration,
+      duration: createPtDuration === "custom" ? createPtCustomDuration : createPtDuration,
       applyDiscount: createPtApplyDiscount,
       discountPercent: createPtApplyDiscount ? createPtDiscountPercent : undefined,
       discountPeriod: createPtApplyDiscount ? createPtDiscountPeriod : undefined,
