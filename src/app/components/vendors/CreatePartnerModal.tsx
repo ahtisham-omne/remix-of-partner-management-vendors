@@ -5204,49 +5204,59 @@ function ConfigPageContent({
                               className="mt-1 rounded-lg border-[#E2E8F0] bg-white h-9 sm:h-10 text-sm text-[#0F172A] placeholder:text-[#94A3B8]"
                             />
                           </div>
-                          {/* Duration — NET only, otherwise empty cell */}
+                          {/* NET: Duration next to name */}
                           {createPtType === "net" ? (
                             <div>
                               <Label className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>NET Duration (Days)</Label>
-                              <div className="flex items-center gap-2 mt-1">
-                                <Select value={createPtDuration} onValueChange={(v) => { setCreatePtDuration(v); if (v !== "custom") setCreatePtCustomDuration(""); }}>
-                                  <SelectTrigger className={`h-9 sm:h-10 rounded-lg border-[#E2E8F0] bg-white text-sm ${createPtDuration === "custom" ? "flex-1" : "w-full"}`}>
-                                    <SelectValue />
-                                  </SelectTrigger>
-                                  <SelectContent className="z-[250] rounded-lg">
-                                    {CREATE_PT_DURATIONS.map((d) => (
-                                      <SelectItem key={d.id} value={d.id} className="py-2.5 px-3 text-sm">{d.label}</SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                                {createPtDuration === "custom" && (
-                                  <Input
-                                    type="number"
-                                    min="1"
-                                    value={createPtCustomDuration}
-                                    onChange={(e) => setCreatePtCustomDuration(e.target.value)}
-                                    placeholder="Days"
-                                    className="h-9 sm:h-10 rounded-lg border-[#E2E8F0] bg-white w-[100px] text-sm"
-                                  />
-                                )}
-                              </div>
+                              <Select value={createPtDuration} onValueChange={(v) => { setCreatePtDuration(v); if (v !== "custom") setCreatePtCustomDuration(""); }}>
+                                <SelectTrigger className="mt-1 h-9 sm:h-10 rounded-lg border-[#E2E8F0] bg-white text-sm w-full">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent className="z-[250] rounded-lg">
+                                  {CREATE_PT_DURATIONS.map((d) => (
+                                    <SelectItem key={d.id} value={d.id} className="py-2.5 px-3 text-sm">{d.label}</SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              {createPtDuration === "custom" && (
+                                <Input
+                                  type="number"
+                                  min="1"
+                                  value={createPtCustomDuration}
+                                  onChange={(e) => setCreatePtCustomDuration(e.target.value)}
+                                  placeholder="Enter custom days"
+                                  className="mt-1.5 h-9 sm:h-10 rounded-lg border-[#E2E8F0] bg-white text-sm w-full"
+                                />
+                              )}
                             </div>
                           ) : (
-                            <div />
+                            /* Prepayment/Split: Description next to name */
+                            <div>
+                              <Label className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>Description</Label>
+                              <Textarea
+                                value={createPtDescription}
+                                onChange={(e) => { if (e.target.value.length <= 150) setCreatePtDescription(e.target.value); }}
+                                placeholder="Brief summary of payment term purpose or context."
+                                className="mt-1 rounded-lg border-[#E2E8F0] bg-white min-h-[38px] resize-none text-sm placeholder:text-[#94A3B8]"
+                                rows={2}
+                              />
+                              <p className="text-right text-[10px] text-[#94A3B8] mt-0.5">{createPtDescription.length}/150</p>
+                            </div>
                           )}
-                          {/* Description — full width */}
-                          <div className="col-span-2">
-                            <Label className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>Description</Label>
-                            <Textarea
-                              value={createPtDescription}
-                              onChange={(e) => { if (e.target.value.length <= 150) setCreatePtDescription(e.target.value); }}
-                              placeholder="Brief summary of payment term purpose or context."
-                              className="mt-1 rounded-lg border-[#E2E8F0] bg-white min-h-[64px] resize-none text-sm placeholder:text-[#94A3B8]"
-                              rows={2}
-                            />
-                            <p className="text-right text-[10px] text-[#94A3B8] mt-0.5">{createPtDescription.length}/150</p>
-                          </div>
-                        </div>
+                          {/* NET: Description full width below */}
+                          {createPtType === "net" && (
+                            <div className="col-span-2">
+                              <Label className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>Description</Label>
+                              <Textarea
+                                value={createPtDescription}
+                                onChange={(e) => { if (e.target.value.length <= 150) setCreatePtDescription(e.target.value); }}
+                                placeholder="Brief summary of payment term purpose or context."
+                                className="mt-1 rounded-lg border-[#E2E8F0] bg-white min-h-[64px] resize-none text-sm placeholder:text-[#94A3B8]"
+                                rows={2}
+                              />
+                              <p className="text-right text-[10px] text-[#94A3B8] mt-0.5">{createPtDescription.length}/150</p>
+                            </div>
+                          )}
                       </div>
                     </div>
 
