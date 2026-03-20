@@ -5399,7 +5399,7 @@ function ConfigPageContent({
                               const total = createPtSplitEvents.reduce((sum, e) => sum + (parseFloat(e.percent) || 0), 0);
                               return Math.abs(total - 100) >= 0.01 ? (
                                 <div className="flex items-center gap-1.5 text-[11px] text-[#F59E0B]" style={{ fontWeight: 600 }}>
-                                  <AlertCircle className="w-3.5 h-3.5" />
+                                  <AlertTriangle className="w-3.5 h-3.5" />
                                   <span>Total is {total}% — must equal 100%</span>
                                 </div>
                               ) : null;
