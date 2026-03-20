@@ -3442,7 +3442,8 @@ function ConfigPageContent({
   // Pricing Rules state
   const [selectedPricingRuleIds, setSelectedPricingRuleIds] = useState<string[]>([]);
   const [pricingRulesModalOpen, setPricingRulesModalOpen] = useState(false);
-  const [prSidebarFilter, setPrSidebarFilter] = useState("all");
+  const [prTypeFilter, setPrTypeFilter] = useState<string | null>(null);
+  const [prStatusFilter, setPrStatusFilter] = useState("all");
   const [prSearch, setPrSearch] = useState("");
   const [prSortBy, setPrSortBy] = useState<"name" | "vendorsApplied" | "category" | "basis">("name");
   const [prSortDir, setPrSortDir] = useState<"asc" | "desc">("asc");
