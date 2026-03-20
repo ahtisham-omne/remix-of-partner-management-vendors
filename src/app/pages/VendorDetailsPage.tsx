@@ -4017,6 +4017,8 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
         term={locPtDetailTerm}
         open={locPtDetailOpen}
         onClose={() => { setLocPtDetailOpen(false); setLocPtDetailTerm(null); }}
+        mode="view"
+        onDisable={(t) => toast.success(`"${t.name}" disabled for this partner`)}
       />
     </>
   );
