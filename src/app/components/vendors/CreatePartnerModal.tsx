@@ -6585,12 +6585,12 @@ function ConfigPageContent({
                         { key: "discount", label: "Discounts", color: "#047857", bg: "#ECFDF5", icon: TrendingDown },
                         { key: "premium", label: "Premiums", color: "#7C3AED", bg: "#F5F3FF", icon: TrendingUp },
                       ] as const).map((cat) => {
-                        const active = prTypeFilters.includes(cat.key);
+                        const active = prTypeFilters === cat.key;
                         const count = allPricingRulePresets.filter((r) => r.category === cat.key).length;
                         return (
                           <button
                             key={cat.key}
-                            onClick={() => setPrTypeFilters((prev) => prev.includes(cat.key) ? prev.filter((k) => k !== cat.key) : [...prev, cat.key])}
+                            onClick={() => setPrTypeFilters(cat.key)}
                             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs transition-all cursor-pointer ${
                               active ? "bg-white shadow-sm" : "hover:bg-white/60"
                             }`}
