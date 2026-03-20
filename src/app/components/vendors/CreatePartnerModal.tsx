@@ -3589,7 +3589,7 @@ function ConfigPageContent({
   // Pricing Rules state
   const [selectedPricingRuleIds, setSelectedPricingRuleIds] = useState<string[]>([]);
   const [pricingRulesModalOpen, setPricingRulesModalOpen] = useState(false);
-  const [prTypeFilters, setPrTypeFilters] = useState<string[]>(["discount"]);
+  const [prTypeFilters, setPrTypeFilters] = useState<string>("discount");
   const [prStatusFilter, setPrStatusFilter] = useState("all");
   const [prSearch, setPrSearch] = useState("");
   const [prSortBy, setPrSortBy] = useState<"name" | "vendorsApplied" | "category" | "basis">("name");
