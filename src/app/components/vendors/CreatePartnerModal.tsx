@@ -5094,8 +5094,7 @@ function ConfigPageContent({
             <div className="flex-1 min-h-0 overflow-y-auto bg-[#FAFBFC] scrollbar-hide">
               <div className="px-4 py-4 transition-all duration-300 ease-out">
 
-                {/* ─── Step 1: Term Setup ─── */}
-                {createPtStep === 1 && (
+                {/* Term Setup */}
                   <div className="space-y-5">
                     {/* Payment Term Type — card selector matching partner type style */}
                     <div>
