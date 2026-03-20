@@ -68,9 +68,11 @@ interface PaymentTermDetailModalProps {
   /** "view" = read-only on details page, "create" = inside creation form with Use Template */
   mode?: "view" | "create";
   onDisable?: (term: PaymentTermPreset) => void;
+  onApply?: (term: PaymentTermPreset) => void;
+  onDuplicate?: (term: PaymentTermPreset) => void;
 }
 
-function PaymentTermDetailModal({ term, open, onClose, mode = "create", onDisable }: PaymentTermDetailModalProps) {
+function PaymentTermDetailModal({ term, open, onClose, mode = "create", onDisable, onApply, onDuplicate }: PaymentTermDetailModalProps) {
   const [tab, setTab] = useState("items");
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [itemFilter, setItemFilter] = useState("all");
@@ -100,8 +102,9 @@ function PaymentTermDetailModal({ term, open, onClose, mode = "create", onDisabl
   return (
     <Dialog open={open} onOpenChange={(v) => { if (!v) { onClose(); setIsFullscreen(false); setTab("items"); } }}>
       <DialogContent
-        className={`flex flex-col p-0 gap-0 border-0 sm:border z-[200] ${modalSizeClass}`}
+        className={`flex flex-col p-0 gap-0 border-0 sm:border z-[220] ${modalSizeClass}`}
         hideCloseButton
+        overlayClassName="z-[215]"
         style={{ boxShadow: "0 24px 48px -12px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.05)" }}
       >
         <DialogTitle className="sr-only">Payment Term Details — {term.name}</DialogTitle>
@@ -483,11 +486,17 @@ function PaymentTermDetailModal({ term, open, onClose, mode = "create", onDisabl
           <div className="px-5 py-2.5 flex items-center justify-between">
             <span className="text-[11px] text-[#64748B]">Reviewing: <span className="text-[#0F172A]" style={{ fontWeight: 600 }}>{term.name}</span></span>
             <div className="flex items-center gap-2">
-              <button className="h-8 px-3.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#334155] hover:bg-[#F8FAFC] transition-colors cursor-pointer inline-flex items-center gap-1.5" style={{ fontWeight: 500 }}>
+              <button
+                onClick={() => { if (term && onDuplicate) { onDuplicate(term); onClose(); } else { toast.info("Duplicate coming soon"); } }}
+                className="h-8 px-3.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#334155] hover:bg-[#F8FAFC] transition-colors cursor-pointer inline-flex items-center gap-1.5" style={{ fontWeight: 500 }}
+              >
                 <Copy className="w-3.5 h-3.5" /> Duplicate
               </button>
               {mode === "create" && (
-                <button className="h-8 px-3.5 rounded-lg bg-[#0A77FF] text-white text-xs hover:bg-[#0A77FF]/90 transition-colors cursor-pointer inline-flex items-center gap-1.5" style={{ fontWeight: 500 }}>
+                <button
+                  onClick={() => { if (term && onApply) { onApply(term); onClose(); } }}
+                  className="h-8 px-3.5 rounded-lg bg-[#0A77FF] text-white text-xs hover:bg-[#0A77FF]/90 transition-colors cursor-pointer inline-flex items-center gap-1.5" style={{ fontWeight: 500 }}
+                >
                   <Check className="w-3.5 h-3.5" /> Use Template
                 </button>
               )}
