@@ -3275,7 +3275,8 @@ function ConfigPageContent({
   // Payment Terms Presets state
   const [selectedPaymentTermId, setSelectedPaymentTermId] = useState<string | null>(null);
   const [paymentTermsModalOpen, setPaymentTermsModalOpen] = useState(false);
-  const [ptSidebarFilter, setPtSidebarFilter] = useState("all");
+  const [ptTypeFilter, setPtTypeFilter] = useState<string | null>(null);
+  const [ptStatusFilter, setPtStatusFilter] = useState("all");
   const [ptSearch, setPtSearch] = useState("");
   const [ptSortBy, setPtSortBy] = useState<"name" | "vendorsApplied" | "duration" | "category">("name");
   const [ptSortDir, setPtSortDir] = useState<"asc" | "desc">("asc");
@@ -3412,12 +3413,13 @@ function ConfigPageContent({
 
   const filteredPaymentTermPresets = useMemo(() => {
     let terms = PAYMENT_TERM_PRESETS;
-    if (ptSidebarFilter === "net") terms = terms.filter((t) => t.category === "net");
-    else if (ptSidebarFilter === "prepayment") terms = terms.filter((t) => t.category === "prepayment");
-    else if (ptSidebarFilter === "split") terms = terms.filter((t) => t.category === "split");
-    else if (ptSidebarFilter === "preset") terms = terms.filter((t) => !t.id.startsWith("pt-custom-"));
-    else if (ptSidebarFilter === "custom") terms = terms.filter((t) => t.id.startsWith("pt-custom-"));
-    else if (ptSidebarFilter === "vendors_applied") terms = terms.filter((t) => t.vendorsApplied >= 4);
+    // Type filter (parallel)
+    if (ptTypeFilter) terms = terms.filter((t) => t.category === ptTypeFilter);
+    // Status filter (parallel)
+    if (ptStatusFilter === "preset") terms = terms.filter((t) => !t.id.startsWith("pt-custom-"));
+    else if (ptStatusFilter === "custom") terms = terms.filter((t) => t.id.startsWith("pt-custom-"));
+    else if (ptStatusFilter === "created_by_me") terms = terms.filter((t) => t.id.startsWith("pt-custom-"));
+    else if (ptStatusFilter === "vendors_applied") terms = terms.filter((t) => t.vendorsApplied >= 4);
     if (ptSearch.trim()) {
       const q = ptSearch.toLowerCase();
       terms = terms.filter((t) => t.name.toLowerCase().includes(q) || t.description.toLowerCase().includes(q));
@@ -3435,12 +3437,13 @@ function ConfigPageContent({
       return ptSortDir === "asc" ? cmp : -cmp;
     });
     return sorted;
-  }, [ptSidebarFilter, ptSearch, ptSortBy, ptSortDir]);
+  }, [ptTypeFilter, ptStatusFilter, ptSearch, ptSortBy, ptSortDir]);
 
   // Pricing Rules state
   const [selectedPricingRuleIds, setSelectedPricingRuleIds] = useState<string[]>([]);
   const [pricingRulesModalOpen, setPricingRulesModalOpen] = useState(false);
-  const [prSidebarFilter, setPrSidebarFilter] = useState("all");
+  const [prTypeFilter, setPrTypeFilter] = useState<string | null>(null);
+  const [prStatusFilter, setPrStatusFilter] = useState("all");
   const [prSearch, setPrSearch] = useState("");
   const [prSortBy, setPrSortBy] = useState<"name" | "vendorsApplied" | "category" | "basis">("name");
   const [prSortDir, setPrSortDir] = useState<"asc" | "desc">("asc");
@@ -3737,13 +3740,14 @@ function ConfigPageContent({
 
   const filteredPricingRulePresets = useMemo(() => {
     let rules = allPricingRulePresets;
-    if (prSidebarFilter === "discount") rules = rules.filter((r) => r.category === "discount");
-    else if (prSidebarFilter === "premium") rules = rules.filter((r) => r.category === "premium");
-    else if (prSidebarFilter === "recent") rules = rules.slice(0, 3);
-    else if (prSidebarFilter === "favourites") rules = rules.slice(0, 4);
-    else if (prSidebarFilter === "vendors_applied") rules = rules.filter((r) => r.vendorsApplied >= 3);
-    else if (prSidebarFilter === "created_by_me") rules = rules.slice(0, 4);
-    else if (prSidebarFilter === "created_by_others") rules = rules.slice(4, 8);
+    // Type filter (parallel)
+    if (prTypeFilter === "discount") rules = rules.filter((r) => r.category === "discount");
+    else if (prTypeFilter === "premium") rules = rules.filter((r) => r.category === "premium");
+    // Status filter (parallel)
+    if (prStatusFilter === "preset") rules = rules.filter((r) => !r.id.startsWith("pr-custom-"));
+    else if (prStatusFilter === "custom") rules = rules.filter((r) => r.id.startsWith("pr-custom-"));
+    else if (prStatusFilter === "created_by_me") rules = rules.filter((r) => r.id.startsWith("pr-custom-"));
+    else if (prStatusFilter === "vendors_applied") rules = rules.filter((r) => r.vendorsApplied >= 3);
     if (prSearch.trim()) {
       const q = prSearch.toLowerCase();
       rules = rules.filter((r) => r.name.toLowerCase().includes(q) || r.description.toLowerCase().includes(q));
@@ -3758,7 +3762,7 @@ function ConfigPageContent({
       return prSortDir === "asc" ? cmp : -cmp;
     });
     return sorted;
-  }, [prSidebarFilter, prSearch, allPricingRulePresets, prSortBy, prSortDir]);
+  }, [prTypeFilter, prStatusFilter, prSearch, allPricingRulePresets, prSortBy, prSortDir]);
 
   const selectedPricingRules = useMemo(() => {
     return selectedPricingRuleIds.map((id) =>
@@ -5024,7 +5028,7 @@ function ConfigPageContent({
                 <Plus className="w-3.5 h-3.5 text-[#64748B]" /> Create terms
               </button>
               <button
-                onClick={() => { setPtSidebarFilter("all"); setPtSearch(""); setPaymentTermsModalOpen(true); }}
+                onClick={() => { setPtTypeFilter(null); setPtStatusFilter("all"); setPtSearch(""); setPaymentTermsModalOpen(true); }}
                 className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-[#DBEAFE] bg-[#EFF6FF] text-xs text-[#0A77FF] hover:bg-[#DBEAFE] transition-colors"
                 style={{ fontWeight: 500 }}
               >
@@ -5562,12 +5566,12 @@ function ConfigPageContent({
                         { key: "prepayment", label: "Prepayment", color: "#7C3AED", bg: "#F5F3FF", icon: Clock },
                         { key: "split", label: "Split", color: "#D97706", bg: "#FFFBEB", icon: Copy },
                       ] as const).map((cat) => {
-                        const active = ptSidebarFilter === cat.key;
+                        const active = ptTypeFilter === cat.key;
                         const count = PAYMENT_TERM_PRESETS.filter((t) => t.category === cat.key).length;
                         return (
                           <button
                             key={cat.key}
-                            onClick={() => setPtSidebarFilter(active ? "all" : cat.key)}
+                            onClick={() => setPtTypeFilter(active ? null : cat.key)}
                             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs transition-all cursor-pointer ${
                               active ? "bg-white shadow-sm" : "hover:bg-white/60"
                             }`}
@@ -5591,18 +5595,21 @@ function ConfigPageContent({
                     {/* Quick Filter Pills */}
                     <FilterPills
                       options={(() => {
-                        const all = PAYMENT_TERM_PRESETS;
-                        const presetCount = all.filter((t) => !t.id.startsWith("pt-custom-")).length;
-                        const customCount = all.filter((t) => t.id.startsWith("pt-custom-")).length;
+                        // Counts respect the active type filter
+                        const base = ptTypeFilter ? PAYMENT_TERM_PRESETS.filter((t) => t.category === ptTypeFilter) : PAYMENT_TERM_PRESETS;
+                        const presetCount = base.filter((t) => !t.id.startsWith("pt-custom-")).length;
+                        const customCount = base.filter((t) => t.id.startsWith("pt-custom-")).length;
+                        const createdByMeCount = base.filter((t) => t.id.startsWith("pt-custom-")).length;
                         return [
-                          { key: "all", label: "All", count: all.length, showCount: true },
+                          { key: "all", label: "All", count: base.length, showCount: true },
                           { key: "preset", label: "Preset", count: presetCount, showCount: true },
                           { key: "custom", label: "Custom", count: customCount, showCount: true },
-                          { key: "vendors_applied", label: "Vendors Applied", count: all.filter((t) => t.vendorsApplied >= 4).length, showCount: true },
+                          { key: "created_by_me", label: "Created by Me", count: createdByMeCount, showCount: true },
+                          { key: "vendors_applied", label: "Vendors Applied", count: base.filter((t) => t.vendorsApplied >= 4).length, showCount: true },
                         ];
                       })()}
-                      activeKey={ptSidebarFilter}
-                      onSelect={(k) => setPtSidebarFilter(k)}
+                      activeKey={ptStatusFilter}
+                      onSelect={(k) => setPtStatusFilter(k)}
                     />
                   </div>
                 </div>
@@ -5806,7 +5813,7 @@ function ConfigPageContent({
               <Plus className="w-3.5 h-3.5" /> Create rule
             </button>
             <button
-              onClick={() => { setPrSidebarFilter("all"); setPrSearch(""); setPreviewPricingRuleId(null); setPrPreviewTab("preview"); setPricingRulesModalOpen(true); }}
+              onClick={() => { setPrTypeFilter(null); setPrStatusFilter("all"); setPrSearch(""); setPreviewPricingRuleId(null); setPrPreviewTab("preview"); setPricingRulesModalOpen(true); }}
               className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-[#DBEAFE] bg-[#EFF6FF] text-xs text-[#0A77FF] hover:bg-[#DBEAFE] transition-colors"
               style={{ fontWeight: 500 }}
             >
@@ -6423,52 +6430,58 @@ function ConfigPageContent({
                     </div>
                   </div>
 
-                  {/* ── Filter tabs ── */}
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    {([
-                      { id: "all", label: "All Rules" },
-                      { id: "discount", label: "Discounts" },
-                      { id: "premium", label: "Premium" },
-                    ] as const).map((tab) => {
-                      const isActive = prSidebarFilter === tab.id;
-                      return (
-                        <button
-                          key={tab.id}
-                          onClick={() => setPrSidebarFilter(tab.id)}
-                          className={`px-3 py-1.5 rounded-md text-[12px] transition-all border ${
-                            isActive
-                              ? "bg-[#EFF6FF] text-[#0A77FF] border-[#DBEAFE]"
-                              : "bg-white text-[#475569] border-[#E8ECF1] hover:bg-[#F8FAFC] hover:text-[#0F172A] hover:border-[#CBD5E1]"
-                          }`}
-                          style={{ fontWeight: isActive ? 600 : 500 }}
-                        >
-                          {tab.label}
-                        </button>
-                      );
-                    })}
-                    <div className="w-px h-4 bg-[#E2E8F0] mx-0.5" />
-                    {([
-                      { id: "recent", label: "Recently Used" },
-                      { id: "vendors_applied", label: "Vendors Applied" },
-                      { id: "created_by_me", label: "Created by Me" },
-                      { id: "created_by_others", label: "Created by Others" },
-                    ] as const).map((tab) => {
-                      const isActive = prSidebarFilter === tab.id;
-                      return (
-                        <button
-                          key={tab.id}
-                          onClick={() => setPrSidebarFilter(tab.id)}
-                          className={`px-3 py-1.5 rounded-md text-[12px] transition-all border ${
-                            isActive
-                              ? "bg-[#EFF6FF] text-[#0A77FF] border-[#DBEAFE]"
-                              : "bg-white text-[#475569] border-[#E8ECF1] hover:bg-[#F8FAFC] hover:text-[#0F172A] hover:border-[#CBD5E1]"
-                          }`}
-                          style={{ fontWeight: isActive ? 600 : 500 }}
-                        >
-                          {tab.label}
-                        </button>
-                      );
-                    })}
+                  {/* ── Filter tabs — matching payment terms pattern ── */}
+                  <div className="flex items-center gap-3 overflow-x-auto">
+                    {/* Type Toggle */}
+                    <div className="inline-flex items-center rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-0.5 shrink-0">
+                      {([
+                        { key: "discount", label: "Discounts", color: "#047857", bg: "#ECFDF5", icon: TrendingDown },
+                        { key: "premium", label: "Premiums", color: "#7C3AED", bg: "#F5F3FF", icon: TrendingUp },
+                      ] as const).map((cat) => {
+                        const active = prTypeFilter === cat.key;
+                        const count = allPricingRulePresets.filter((r) => r.category === cat.key).length;
+                        return (
+                          <button
+                            key={cat.key}
+                            onClick={() => setPrTypeFilter(active ? null : cat.key)}
+                            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs transition-all cursor-pointer ${
+                              active ? "bg-white shadow-sm" : "hover:bg-white/60"
+                            }`}
+                            style={{ fontWeight: active ? 600 : 500, color: active ? cat.color : "#64748B" }}
+                          >
+                            <cat.icon className="w-3 h-3" />
+                            {cat.label}
+                            <span
+                              className="text-[10px] rounded-full px-1.5 py-px min-w-[18px] text-center"
+                              style={{ fontWeight: 600, color: active ? cat.color : "#94A3B8", backgroundColor: active ? cat.bg : "#F1F5F9" }}
+                            >
+                              {count}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    <div className="w-px h-5 bg-[#E2E8F0] shrink-0" />
+
+                    {/* Quick Filter Pills */}
+                    <FilterPills
+                      options={(() => {
+                        const base = prTypeFilter ? allPricingRulePresets.filter((r) => r.category === prTypeFilter) : allPricingRulePresets;
+                        const presetCount = base.filter((r) => !r.id.startsWith("pr-custom-")).length;
+                        const customCount = base.filter((r) => r.id.startsWith("pr-custom-")).length;
+                        const createdByMeCount = base.filter((r) => r.id.startsWith("pr-custom-")).length;
+                        return [
+                          { key: "all", label: "All", count: base.length, showCount: true },
+                          { key: "preset", label: "Preset", count: presetCount, showCount: true },
+                          { key: "custom", label: "Custom", count: customCount, showCount: true },
+                          { key: "created_by_me", label: "Created by Me", count: createdByMeCount, showCount: true },
+                          { key: "vendors_applied", label: "Vendors Applied", count: base.filter((r) => r.vendorsApplied >= 3).length, showCount: true },
+                        ];
+                      })()}
+                      activeKey={prStatusFilter}
+                      onSelect={(k) => setPrStatusFilter(k)}
+                    />
                   </div>
                 </div>
 
@@ -6483,88 +6496,103 @@ function ConfigPageContent({
                       <p className="text-[12px] text-[#94A3B8] mt-1">Try adjusting your search or filter</p>
                     </div>
                   ) : (
-                    <div className="space-y-1.5">
-                      {filteredPricingRulePresets.map((rule, ruleIdx) => {
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 3xl:grid-cols-4 auto-rows-fr gap-4">
+                      {filteredPricingRulePresets.map((rule) => {
                         const isApplied = selectedPricingRuleIds.includes(rule.id);
-                        const PR_VENDOR_NAMES = ["Acme Industrial", "Global Fasteners", "Berlin Technik", "Tokyo Materials", "Pacific Trading", "Nordic Supply", "Atlas Mfg"];
+                        const isDis = rule.category === "discount";
+                        const badgeColor = isDis ? "#047857" : "#7C3AED";
+                        const isCustom = rule.id.startsWith("pr-custom-");
                         return (
                           <div
                             key={rule.id}
-                            tabIndex={0}
                             onClick={() => setPreviewPricingRuleId(rule.id)}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setPreviewPricingRuleId(rule.id); }
-                              if (e.key === "ArrowDown") { e.preventDefault(); const next = e.currentTarget.nextElementSibling as HTMLElement; next?.focus(); }
-                              if (e.key === "ArrowUp") { e.preventDefault(); const prev = e.currentTarget.previousElementSibling as HTMLElement; prev?.focus(); }
-                            }}
-                            className={`group relative flex items-center gap-3.5 rounded-xl border transition-all duration-200 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-[#0A77FF]/30 px-4 py-3.5 ${
+                            className={`bg-white border rounded-xl cursor-pointer group transition-all duration-200 flex flex-col relative ${
                               isApplied
-                                ? "border-[#0A77FF]/25 bg-[#F7FAFF] shadow-[0_2px_12px_rgba(10,119,255,0.10)]"
-                                : "border-[#E8ECF1] bg-white shadow-[0_1px_3px_rgba(0,0,0,0.03)] hover:border-[#0A77FF]/20 hover:shadow-[0_4px_16px_rgba(10,119,255,0.08)]"
+                                ? "border-[#0A77FF]/25 shadow-[0_2px_12px_rgba(10,119,255,0.10)]"
+                                : "border-[#E8ECF1] shadow-[0_1px_3px_rgba(0,0,0,0.03)] hover:border-[#BFDBFE] hover:shadow-[0_4px_16px_-4px_rgba(10,119,255,0.10)]"
                             }`}
                           >
-                              {/* Icon — circle with abbreviation */}
-                              <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-colors ${
-                                isApplied
-                                  ? "bg-[#0A77FF]/10"
-                                  : "bg-[#F1F5F9] group-hover:bg-[#0A77FF]/8"
-                              }`}>
-                                <span className={`text-[11px] tracking-wide transition-colors ${
-                                  isApplied
-                                    ? "text-[#0A77FF]"
-                                    : "text-[#64748B] group-hover:text-[#0A77FF]"
-                                }`} style={{ fontWeight: 700 }}>{rule.category === "discount" ? "DIS" : "PRE"}</span>
+                            {isApplied && (
+                              <div className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-[#0A77FF] flex items-center justify-center z-10 shadow-sm">
+                                <Check className="w-3 h-3 text-white" />
                               </div>
+                            )}
 
-                              {/* Main info */}
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2 mb-0.5">
-                                  <h5 className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{highlightMatch(rule.name, prSearch)}</h5>
-                                </div>
-                                <p className="text-[11px] text-[#94A3B8] truncate leading-relaxed">{highlightMatch(rule.description, prSearch)}</p>
-                              </div>
-
-                              {/* Meta badges */}
-                              <div className="shrink-0 flex items-center gap-2">
-                                <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10px] bg-[#EFF6FF] border border-[#0A77FF]/12 text-[#0A77FF]" style={{ fontWeight: 600 }}>
-                                  {rule.tierType === "single" ? "1 tier" : `${rule.totalTiers} tiers`}
+                            <div className="p-3 flex-1 flex flex-col min-h-0 overflow-hidden">
+                              {/* Row 1: Type pill + Preset/Custom badge */}
+                              <div className="flex items-center justify-between gap-2 mb-2 shrink-0">
+                                <span className="inline-flex items-stretch rounded-full overflow-hidden border shrink-0" style={{ borderColor: badgeColor + "40" }}>
+                                  <span
+                                    className="inline-flex items-center gap-1 px-2 py-[2px] text-[10px]"
+                                    style={{ fontWeight: 600, color: badgeColor, backgroundColor: badgeColor + "15" }}
+                                  >
+                                    {isDis ? <TrendingDown className="w-3 h-3" /> : <TrendingUp className="w-3 h-3" />}
+                                    {isDis ? "Discount" : "Premium"}
+                                  </span>
+                                  <span className="inline-flex items-center px-2 py-[2px] text-[10px] bg-white text-[#64748B] border-l" style={{ fontWeight: 500, borderColor: badgeColor + "40" }}>
+                                    {rule.basis === "value" ? "Value" : "Volume"}
+                                  </span>
                                 </span>
-                                <span className="inline-flex items-center gap-1 px-1.5 py-1 rounded-md bg-[#F8FAFC] border border-[#E8ECF1] text-[10px] text-[#64748B] tabular-nums" style={{ fontWeight: 500 }}>
-                                  {rule.tiers[0]?.discount || "-"}
+                                <span className={`inline-flex items-center gap-1 px-1.5 py-[3px] rounded-md border text-[9px] shrink-0 ${
+                                  isCustom
+                                    ? "border-[#E2E8F0] bg-white text-[#64748B]"
+                                    : "bg-[#F1F5F9] border-[#E2E8F0] text-[#94A3B8]"
+                                }`} style={{ fontWeight: 600 }}>
+                                  {isCustom ? "Custom" : <><Lock className="w-2.5 h-2.5" /> PRESET</>}
                                 </span>
                               </div>
 
-                              {/* Actions — always visible */}
-                              <div className="shrink-0 flex items-center gap-1.5">
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    toast.success("Pricing rule duplicated.");
-                                  }}
-                                  className="p-1.5 rounded-md border border-[#E8ECF1] bg-white text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#334155] transition-colors"
-                                  title="Duplicate"
-                                >
-                                  <Copy className="w-3 h-3" />
-                                </button>
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setSelectedPricingRuleIds((prev) => prev.includes(rule.id) ? prev : [...prev, rule.id]);
-                                    setPricingRulesModalOpen(false);
-                                    toast.success("Pricing rule applied.");
-                                  }}
-                                  className="px-3 py-1 rounded-md bg-[#0A77FF] text-white text-[11px] hover:bg-[#0862D0] transition-colors"
-                                  style={{ fontWeight: 600 }}
-                                >
-                                  Apply
-                                </button>
+                              {/* Row 2: Name */}
+                              <div className="shrink-0 mb-1">
+                                <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{highlightMatch(rule.name, prSearch)}</p>
                               </div>
 
-                              {isApplied && (
-                                <div className="w-5 h-5 rounded-full bg-[#0A77FF] flex items-center justify-center shrink-0">
-                                  <Check className="w-3 h-3 text-white" />
+                              {/* Row 3: Description */}
+                              <div className="h-[32px] shrink-0 mb-2">
+                                <p className="text-[11px] text-[#64748B] line-clamp-2 leading-relaxed" style={{ fontWeight: 400 }}>{highlightMatch(rule.description, prSearch)}</p>
+                              </div>
+
+                              {/* Row 4: Tier info + vendor count */}
+                              <div className="flex items-baseline justify-between shrink-0">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-[22px] text-[#0F172A] tabular-nums leading-none tracking-tight" style={{ fontWeight: 600 }}>
+                                    {rule.tiers[0]?.discount || "-"}
+                                  </span>
+                                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] bg-[#F8FAFC] border border-[#E8ECF1] text-[#64748B]" style={{ fontWeight: 500 }}>
+                                    {rule.tierType === "single" ? "1 tier" : `${rule.totalTiers} tiers`}
+                                  </span>
                                 </div>
-                              )}
+                                <span className="inline-flex items-center gap-1 text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>
+                                  <Building2 className="w-3 h-3" /> {rule.vendorsApplied} vendors
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Footer — Apply + Duplicate */}
+                            <div className="grid grid-cols-2 border-t border-[#F1F5F9] shrink-0">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedPricingRuleIds((prev) => prev.includes(rule.id) ? prev : [...prev, rule.id]);
+                                  setPricingRulesModalOpen(false);
+                                  toast.success("Pricing rule applied.");
+                                }}
+                                className="inline-flex items-center justify-center gap-1 py-2 text-[11px] text-[#64748B] hover:text-[#0A77FF] hover:bg-[#F8FAFC] transition-colors border-r border-[#F1F5F9]"
+                                style={{ fontWeight: 500 }}
+                              >
+                                <Check className="w-3 h-3" /> Apply
+                              </button>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  toast.success("Pricing rule duplicated.");
+                                }}
+                                className="inline-flex items-center justify-center gap-1 py-2 text-[11px] text-[#64748B] hover:text-[#0A77FF] hover:bg-[#F8FAFC] transition-colors"
+                                style={{ fontWeight: 500 }}
+                              >
+                                <Copy className="w-3 h-3" /> Duplicate
+                              </button>
+                            </div>
                           </div>
                         );
                       })}
