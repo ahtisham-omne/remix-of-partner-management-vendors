@@ -6430,52 +6430,58 @@ function ConfigPageContent({
                     </div>
                   </div>
 
-                  {/* ── Filter tabs ── */}
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    {([
-                      { id: "all", label: "All Rules" },
-                      { id: "discount", label: "Discounts" },
-                      { id: "premium", label: "Premium" },
-                    ] as const).map((tab) => {
-                      const isActive = prSidebarFilter === tab.id;
-                      return (
-                        <button
-                          key={tab.id}
-                          onClick={() => setPrSidebarFilter(tab.id)}
-                          className={`px-3 py-1.5 rounded-md text-[12px] transition-all border ${
-                            isActive
-                              ? "bg-[#EFF6FF] text-[#0A77FF] border-[#DBEAFE]"
-                              : "bg-white text-[#475569] border-[#E8ECF1] hover:bg-[#F8FAFC] hover:text-[#0F172A] hover:border-[#CBD5E1]"
-                          }`}
-                          style={{ fontWeight: isActive ? 600 : 500 }}
-                        >
-                          {tab.label}
-                        </button>
-                      );
-                    })}
-                    <div className="w-px h-4 bg-[#E2E8F0] mx-0.5" />
-                    {([
-                      { id: "recent", label: "Recently Used" },
-                      { id: "vendors_applied", label: "Vendors Applied" },
-                      { id: "created_by_me", label: "Created by Me" },
-                      { id: "created_by_others", label: "Created by Others" },
-                    ] as const).map((tab) => {
-                      const isActive = prSidebarFilter === tab.id;
-                      return (
-                        <button
-                          key={tab.id}
-                          onClick={() => setPrSidebarFilter(tab.id)}
-                          className={`px-3 py-1.5 rounded-md text-[12px] transition-all border ${
-                            isActive
-                              ? "bg-[#EFF6FF] text-[#0A77FF] border-[#DBEAFE]"
-                              : "bg-white text-[#475569] border-[#E8ECF1] hover:bg-[#F8FAFC] hover:text-[#0F172A] hover:border-[#CBD5E1]"
-                          }`}
-                          style={{ fontWeight: isActive ? 600 : 500 }}
-                        >
-                          {tab.label}
-                        </button>
-                      );
-                    })}
+                  {/* ── Filter tabs — matching payment terms pattern ── */}
+                  <div className="flex items-center gap-3 overflow-x-auto">
+                    {/* Type Toggle */}
+                    <div className="inline-flex items-center rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-0.5 shrink-0">
+                      {([
+                        { key: "discount", label: "Discounts", color: "#047857", bg: "#ECFDF5", icon: TrendingDown },
+                        { key: "premium", label: "Premiums", color: "#7C3AED", bg: "#F5F3FF", icon: TrendingUp },
+                      ] as const).map((cat) => {
+                        const active = prTypeFilter === cat.key;
+                        const count = allPricingRulePresets.filter((r) => r.category === cat.key).length;
+                        return (
+                          <button
+                            key={cat.key}
+                            onClick={() => setPrTypeFilter(active ? null : cat.key)}
+                            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs transition-all cursor-pointer ${
+                              active ? "bg-white shadow-sm" : "hover:bg-white/60"
+                            }`}
+                            style={{ fontWeight: active ? 600 : 500, color: active ? cat.color : "#64748B" }}
+                          >
+                            <cat.icon className="w-3 h-3" />
+                            {cat.label}
+                            <span
+                              className="text-[10px] rounded-full px-1.5 py-px min-w-[18px] text-center"
+                              style={{ fontWeight: 600, color: active ? cat.color : "#94A3B8", backgroundColor: active ? cat.bg : "#F1F5F9" }}
+                            >
+                              {count}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    <div className="w-px h-5 bg-[#E2E8F0] shrink-0" />
+
+                    {/* Quick Filter Pills */}
+                    <FilterPills
+                      options={(() => {
+                        const base = prTypeFilter ? allPricingRulePresets.filter((r) => r.category === prTypeFilter) : allPricingRulePresets;
+                        const presetCount = base.filter((r) => !r.id.startsWith("pr-custom-")).length;
+                        const customCount = base.filter((r) => r.id.startsWith("pr-custom-")).length;
+                        const createdByMeCount = base.filter((r) => r.id.startsWith("pr-custom-")).length;
+                        return [
+                          { key: "all", label: "All", count: base.length, showCount: true },
+                          { key: "preset", label: "Preset", count: presetCount, showCount: true },
+                          { key: "custom", label: "Custom", count: customCount, showCount: true },
+                          { key: "created_by_me", label: "Created by Me", count: createdByMeCount, showCount: true },
+                          { key: "vendors_applied", label: "Vendors Applied", count: base.filter((r) => r.vendorsApplied >= 3).length, showCount: true },
+                        ];
+                      })()}
+                      activeKey={prStatusFilter}
+                      onSelect={(k) => setPrStatusFilter(k)}
+                    />
                   </div>
                 </div>
 
