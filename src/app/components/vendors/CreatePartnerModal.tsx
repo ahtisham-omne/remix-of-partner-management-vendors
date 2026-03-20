@@ -1619,9 +1619,9 @@ function PrTemplateCardInner({
           </div>
           <div className="flex items-center justify-between px-3 py-[6px] rounded-lg border border-[#E8ECF1] bg-[#FAFBFC] text-[11px] tabular-nums min-w-0">
             <div className="flex items-center gap-1.5 text-[#64748B] min-w-0">
-              <span style={{ fontWeight: 400 }}>{shownTier?.minQty}</span>
+              <span style={{ fontWeight: 400 }}>{shownTier?.minValue}</span>
               <span className="text-[#CBD5E1]">–</span>
-              <span style={{ fontWeight: 400 }}>{shownTier?.maxQty}</span>
+              <span style={{ fontWeight: 400 }}>{shownTier?.maxValue}</span>
             </div>
             <span className="shrink-0 ml-2 text-[#0F172A]" style={{ fontWeight: 600 }}>{shownTier?.discount}</span>
           </div>
