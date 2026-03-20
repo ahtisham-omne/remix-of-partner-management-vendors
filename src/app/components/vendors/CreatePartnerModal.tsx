@@ -5257,7 +5257,7 @@ function ConfigPageContent({
                               <p className="text-right text-[10px] text-[#94A3B8] mt-0.5">{createPtDescription.length}/150</p>
                             </div>
                           )}
-                      </div>
+                        </div>
                     </div>
 
                     {/* Split Payment Events */}
