@@ -3413,12 +3413,13 @@ function ConfigPageContent({
 
   const filteredPaymentTermPresets = useMemo(() => {
     let terms = PAYMENT_TERM_PRESETS;
-    if (ptSidebarFilter === "net") terms = terms.filter((t) => t.category === "net");
-    else if (ptSidebarFilter === "prepayment") terms = terms.filter((t) => t.category === "prepayment");
-    else if (ptSidebarFilter === "split") terms = terms.filter((t) => t.category === "split");
-    else if (ptSidebarFilter === "preset") terms = terms.filter((t) => !t.id.startsWith("pt-custom-"));
-    else if (ptSidebarFilter === "custom") terms = terms.filter((t) => t.id.startsWith("pt-custom-"));
-    else if (ptSidebarFilter === "vendors_applied") terms = terms.filter((t) => t.vendorsApplied >= 4);
+    // Type filter (parallel)
+    if (ptTypeFilter) terms = terms.filter((t) => t.category === ptTypeFilter);
+    // Status filter (parallel)
+    if (ptStatusFilter === "preset") terms = terms.filter((t) => !t.id.startsWith("pt-custom-"));
+    else if (ptStatusFilter === "custom") terms = terms.filter((t) => t.id.startsWith("pt-custom-"));
+    else if (ptStatusFilter === "created_by_me") terms = terms.filter((t) => t.id.startsWith("pt-custom-"));
+    else if (ptStatusFilter === "vendors_applied") terms = terms.filter((t) => t.vendorsApplied >= 4);
     if (ptSearch.trim()) {
       const q = ptSearch.toLowerCase();
       terms = terms.filter((t) => t.name.toLowerCase().includes(q) || t.description.toLowerCase().includes(q));
@@ -3436,7 +3437,7 @@ function ConfigPageContent({
       return ptSortDir === "asc" ? cmp : -cmp;
     });
     return sorted;
-  }, [ptSidebarFilter, ptSearch, ptSortBy, ptSortDir]);
+  }, [ptTypeFilter, ptStatusFilter, ptSearch, ptSortBy, ptSortDir]);
 
   // Pricing Rules state
   const [selectedPricingRuleIds, setSelectedPricingRuleIds] = useState<string[]>([]);
