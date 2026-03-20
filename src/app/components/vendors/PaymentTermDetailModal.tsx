@@ -21,10 +21,11 @@ import {
   SlidersHorizontal,
   Copy,
   Check,
-  Sparkles,
   Shield,
   Receipt,
   Lock,
+  Ban,
+  CalendarDays,
 } from "lucide-react";
 import { toast } from "sonner";
 import { getAvatarTint } from "../../utils/avatarTints";
@@ -44,7 +45,7 @@ const PT_DETAIL_TABS = [
   { id: "activity", label: "Activity", icon: Clock },
 ];
 
-/* ─── Mock items matching reference ─── */
+/* ─── Mock items ─── */
 const PT_MOCK_ITEMS = [
   { id: "1", name: "Steel Bolts M10×40", partNo: "SB-M10-40", category: "Fasteners", price: 12.50, status: "Active" },
   { id: "2", name: "Hex Nuts M10", partNo: "HN-M10", category: "Fasteners", price: 4.20, status: "Active" },
@@ -65,13 +66,6 @@ const PT_MOCK_VENDORS = [
   { id: "V-7", name: "Nordic Fastening Systems", code: "V-7", status: "Active" },
 ];
 
-/* ─── Filter pill options ─── */
-const ITEM_FILTER_OPTIONS: FilterPillOption[] = [
-  { key: "all", label: "All", showCount: false },
-  { key: "active", label: "Active", showCount: false },
-  { key: "inactive", label: "Inactive", showCount: false },
-];
-
 interface PaymentTermDetailModalProps {
   term: PaymentTermPreset | null;
   open: boolean;
@@ -86,8 +80,10 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
   if (!term) return null;
 
   const ptDuration = term.duration || (term.name.match(/\d+/) ? term.name.match(/\d+/)![0] : "30");
-  const ptTypeLabel = CREATE_PT_TYPES.find((t) => t.id === term.category)?.label || "NET Terms (After X Days of a Certain Event)";
+  const ptTypeLabel = CREATE_PT_TYPES.find((t) => t.id === term.category)?.label || "NET Terms";
   const badgeColor = term.badgeColor;
+  const isPreset = true; // TODO: derive from term data
+  const isCustom = !isPreset;
 
   const modalBaseClass = "!fixed !inset-0 !translate-x-0 !translate-y-0 !m-auto !w-full !h-full transition-[max-width,max-height,border-radius] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]";
   const modalSizeClass = isFullscreen
@@ -118,135 +114,175 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
               <button onClick={onClose} className="w-8 h-8 rounded-lg border border-border bg-card flex items-center justify-center hover:bg-accent transition-colors cursor-pointer shrink-0">
                 <ArrowLeft className="w-3.5 h-3.5 text-foreground" />
               </button>
-              <h2 className="text-sm font-semibold text-foreground truncate">{term.name}</h2>
-              <span
-                className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold tracking-wide shrink-0"
-                style={{ backgroundColor: `${badgeColor}18`, color: badgeColor }}
-              >
-                {term.typeBadge}
-              </span>
-              <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-secondary text-muted-foreground shrink-0">
-                {term.trigger || "Invoice Date"}
-              </span>
+              <h2 className="text-sm font-semibold text-foreground truncate">Payment Term Details</h2>
             </div>
             <div className="flex items-center gap-1.5 shrink-0">
-              <button onClick={() => toast.info("Edit coming soon")} className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-card text-xs font-medium text-foreground hover:bg-accent transition-colors cursor-pointer">
+              {/* Edit & Archive: disabled for preset, enabled for custom */}
+              <button
+                onClick={() => isCustom && toast.info("Edit coming soon")}
+                disabled={isPreset}
+                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-card text-xs font-medium text-foreground hover:bg-accent transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-card"
+              >
                 <Pencil className="w-3.5 h-3.5" /> Edit
               </button>
-              <button onClick={() => toast.info("Archive coming soon")} className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-card text-xs font-medium text-foreground hover:bg-accent transition-colors cursor-pointer">
+              <button
+                onClick={() => isCustom && toast.info("Archive coming soon")}
+                disabled={isPreset}
+                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-card text-xs font-medium text-foreground hover:bg-accent transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-card"
+              >
                 <Archive className="w-3.5 h-3.5" /> Archive
               </button>
-              <button onClick={() => setIsFullscreen(!isFullscreen)} className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-card text-xs font-medium text-foreground hover:bg-accent transition-colors cursor-pointer">
+              <button
+                onClick={() => isCustom && toast.info("Disable coming soon")}
+                disabled={isPreset}
+                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-card text-xs font-medium text-foreground hover:bg-accent transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-card"
+              >
+                <Ban className="w-3.5 h-3.5" /> Disable
+              </button>
+              <button onClick={() => setIsFullscreen(!isFullscreen)} className="w-8 h-8 rounded-lg border border-border bg-card flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent transition-all cursor-pointer">
                 {isFullscreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
-                Full view
               </button>
               <button onClick={() => { onClose(); setIsFullscreen(false); setTab("items"); }} className="w-8 h-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent transition-all cursor-pointer">
                 <X className="w-4 h-4" />
               </button>
             </div>
           </div>
-          <p className="px-5 pb-3 text-xs text-muted-foreground -mt-1">{term.description || `Payment is due ${ptDuration} days after the ${(term.trigger || "invoice date").toLowerCase()}.`}</p>
         </div>
 
         {/* ─── Body ─── */}
         <div className="flex flex-1 overflow-hidden min-h-0">
           {/* ─── LEFT SIDEBAR ─── */}
-          <div className="w-[280px] lg:w-[300px] border-r border-border flex flex-col shrink-0 overflow-y-auto bg-card">
-            {/* Card-style header matching PaymentTermCard */}
-            <div className="px-4 pt-4 pb-3">
-              {/* Type + Trigger pill — same as card */}
-              <div className="flex items-center justify-between gap-2 mb-3">
-                <span className="inline-flex items-stretch rounded-full overflow-hidden border shrink-0" style={{ borderColor: badgeColor + "40" }}>
-                  <span
-                    className="inline-flex items-center gap-1 px-2 py-[2px] text-[10px]"
-                    style={{ fontWeight: 600, color: badgeColor, backgroundColor: badgeColor + "15" }}
-                  >
-                    <Receipt className="w-3 h-3" />
-                    {term.typeBadge}
-                  </span>
-                  <span className="inline-flex items-center px-2 py-[2px] text-[10px] bg-card text-muted-foreground border-l" style={{ fontWeight: 500, borderColor: badgeColor + "40" }}>
-                    {term.trigger || "Invoice Date"}
-                  </span>
-                </span>
-                <span className="inline-flex items-center gap-1 px-1.5 py-[3px] rounded-md border border-border bg-secondary/50 text-[9px] text-muted-foreground shrink-0" style={{ fontWeight: 600 }}>
-                  <Lock className="w-2.5 h-2.5" /> PRESET
-                </span>
-              </div>
-
-              {/* Name */}
-              <p className="text-sm text-foreground mb-1" style={{ fontWeight: 600 }}>{term.name}</p>
-
-              {/* Description */}
-              <p className="text-[11px] text-muted-foreground leading-relaxed mb-3">
-                {term.description || `Payment is due ${ptDuration} days after the ${(term.trigger || "invoice date").toLowerCase()}.`}
-              </p>
-
-              {/* Hero duration + vendor count — same as card */}
-              <div className="flex items-baseline justify-between">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-[28px] text-foreground tabular-nums leading-none tracking-tight" style={{ fontWeight: 600 }}>{ptDuration}</span>
-                  <span className="text-[11px] text-muted-foreground" style={{ fontWeight: 500 }}>days</span>
-                </div>
-                <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground" style={{ fontWeight: 500 }}>
-                  <Building2 className="w-3 h-3" /> {vendorCount} vendors using
-                </span>
-              </div>
-
-              {/* Discount strip — same as card */}
-              {(term.applyDiscount || term.discountPercent) && (
-                <div className="pt-2">
-                  <div className="flex items-center px-2.5 py-[5px] rounded-lg border border-border bg-secondary/30 text-[11px] tabular-nums">
-                    <span className="text-muted-foreground" style={{ fontWeight: 400 }}>
-                      Early pay {term.discountPercent || "2"}% within {term.discountPeriod || "10"} days
+          <div className="w-[280px] lg:w-[300px] border-r border-border flex flex-col shrink-0 overflow-y-auto bg-secondary/30">
+            {/* Card-style header */}
+            <div className="p-4">
+              <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
+                {/* Top pills row */}
+                <div className="px-3.5 pt-3.5 pb-0 flex items-center justify-between gap-2">
+                  <span className="inline-flex items-stretch rounded-full overflow-hidden border shrink-0" style={{ borderColor: badgeColor + "40" }}>
+                    <span className="inline-flex items-center gap-1 px-2 py-[2px] text-[10px]" style={{ fontWeight: 600, color: badgeColor, backgroundColor: badgeColor + "15" }}>
+                      <Receipt className="w-3 h-3" />
+                      {term.typeBadge}
                     </span>
-                  </div>
+                    <span className="inline-flex items-center px-2 py-[2px] text-[10px] bg-card text-muted-foreground border-l" style={{ fontWeight: 500, borderColor: badgeColor + "40" }}>
+                      {term.trigger || "Invoice Date"}
+                    </span>
+                  </span>
+                  <span className="inline-flex items-center gap-1 px-1.5 py-[3px] rounded-md border border-border bg-secondary/50 text-[9px] text-muted-foreground shrink-0" style={{ fontWeight: 600 }}>
+                    <Lock className="w-2.5 h-2.5" /> PRESET
+                  </span>
                 </div>
-              )}
-            </div>
 
-            <div className="border-t border-border" />
-
-            {/* Metadata section */}
-            <div className="px-4 py-3 space-y-3">
-              <h4 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Details</h4>
-
-              <div className="grid grid-cols-2 gap-x-4 gap-y-3">
-                <div>
-                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Type</span>
-                  <p className="text-xs text-foreground mt-1 leading-snug">{ptTypeLabel}</p>
-                </div>
-                <div>
-                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Duration</span>
-                  <p className="text-xs text-foreground mt-1">{ptDuration} days</p>
-                </div>
-                <div>
-                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Trigger</span>
-                  <p className="text-xs text-foreground mt-1">{term.trigger || "Invoice Date"}</p>
-                </div>
-                <div>
-                  <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">Status</span>
-                  <p className="mt-1">
-                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-chart-2/10 text-chart-2">Active</span>
+                {/* Name + description */}
+                <div className="px-3.5 pt-2.5 pb-0">
+                  <p className="text-sm font-semibold text-foreground">{term.name}</p>
+                  <p className="text-[11px] text-muted-foreground leading-relaxed mt-1">
+                    {term.description || `Payment is due ${ptDuration} days after the ${(term.trigger || "invoice date").toLowerCase()}.`}
                   </p>
                 </div>
+
+                {/* Hero duration */}
+                <div className="px-3.5 pt-3 pb-3 flex items-baseline justify-between">
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-[28px] text-foreground tabular-nums leading-none tracking-tight font-semibold">{ptDuration}</span>
+                    <span className="text-[11px] text-muted-foreground font-medium">days</span>
+                  </div>
+                  <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground font-medium">
+                    <Building2 className="w-3 h-3" /> {vendorCount} vendors using
+                  </span>
+                </div>
+
+                {/* Discount strip */}
+                {(term.applyDiscount || term.discountPercent) && (
+                  <div className="px-3.5 pb-3">
+                    <div className="flex items-center px-2.5 py-[5px] rounded-lg border border-border bg-secondary/30 text-[11px] tabular-nums text-muted-foreground">
+                      Early pay {term.discountPercent || "2"}% within {term.discountPeriod || "10"} days
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
-            <div className="border-t border-border" />
+            {/* About this payment term — flat metadata like reference image */}
+            <div className="px-4 pb-4 flex-1">
+              <div className="rounded-xl border border-border bg-card shadow-sm p-4 space-y-4">
+                <h4 className="text-xs font-semibold text-foreground">About This Payment Term</h4>
 
-            {/* Created by */}
-            <div className="px-4 py-3">
-              <h4 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Created By</h4>
-              <div className="flex items-center gap-2">
-                <div
-                  className="w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-bold shrink-0"
-                  style={{ backgroundColor: creatorTint.bg, color: creatorTint.fg }}
-                >
-                  JD
+                <div className="space-y-3.5">
+                  {/* Term Name */}
+                  <div>
+                    <span className="text-[11px] font-medium text-primary/70">Term Name</span>
+                    <p className="text-sm font-semibold text-foreground mt-0.5">{term.name}</p>
+                  </div>
+
+                  {/* Description */}
+                  <div>
+                    <span className="text-[11px] font-medium text-primary/70">Description</span>
+                    <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
+                      {term.description || `Standard payment terms for this partner.`}
+                    </p>
+                  </div>
+
+                  {/* Two-col: Type + Duration */}
+                  <div className="grid grid-cols-2 gap-x-4">
+                    <div>
+                      <span className="text-[11px] font-medium text-primary/70">Type</span>
+                      <p className="text-xs font-medium text-foreground mt-0.5">{ptTypeLabel}</p>
+                    </div>
+                    <div>
+                      <span className="text-[11px] font-medium text-primary/70">Duration</span>
+                      <p className="text-xs font-medium text-foreground mt-0.5">{ptDuration} days</p>
+                    </div>
+                  </div>
+
+                  {/* Two-col: Trigger + Status */}
+                  <div className="grid grid-cols-2 gap-x-4">
+                    <div>
+                      <span className="text-[11px] font-medium text-primary/70">Trigger Event</span>
+                      <p className="text-xs font-medium text-foreground mt-0.5">{term.trigger || "Invoice Date"}</p>
+                    </div>
+                    <div>
+                      <span className="text-[11px] font-medium text-primary/70">Status</span>
+                      <p className="mt-0.5">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-chart-2/10 text-chart-2">Active</span>
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Early Payment Discount */}
+                  {(term.applyDiscount || term.discountPercent) && (
+                    <div>
+                      <span className="text-[11px] font-medium text-primary/70">Early Payment Discount</span>
+                      <p className="text-xs font-medium text-foreground mt-0.5">
+                        {term.discountPercent || "2"}% if paid within {term.discountPeriod || "10"} days
+                      </p>
+                    </div>
+                  )}
                 </div>
-                <div>
-                  <p className="text-xs font-medium text-foreground">John Doe</p>
-                  <p className="text-[10px] text-muted-foreground">Dec 15, 2025</p>
+
+                {/* Divider */}
+                <div className="border-t border-border" />
+
+                {/* Created By & Created On — separate fields */}
+                <div className="grid grid-cols-2 gap-x-4">
+                  <div>
+                    <span className="text-[11px] font-medium text-primary/70">Created By</span>
+                    <div className="flex items-center gap-2 mt-1.5">
+                      <div
+                        className="w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-bold shrink-0"
+                        style={{ backgroundColor: creatorTint.bg, color: creatorTint.fg }}
+                      >
+                        JD
+                      </div>
+                      <span className="text-xs font-medium text-foreground">John Doe</span>
+                    </div>
+                  </div>
+                  <div>
+                    <span className="text-[11px] font-medium text-primary/70">Created On</span>
+                    <div className="flex items-center gap-1.5 mt-1.5">
+                      <CalendarDays className="w-3.5 h-3.5 text-muted-foreground" />
+                      <span className="text-xs font-medium text-foreground">Dec 15, 2025</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -397,7 +433,7 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
                   </table>
                 </div>
                 <div className="flex items-center justify-between px-4 py-2.5 border-t border-border shrink-0 bg-card">
-                  <span className="text-[11px] text-muted-foreground">Showing <span className="text-foreground font-medium">{vendorCount}</span> of <span className="text-foreground font-medium">{vendorCount}</span> items</span>
+                  <span className="text-[11px] text-muted-foreground">Showing <span className="text-foreground font-medium">{vendorCount}</span> of <span className="text-foreground font-medium">{vendorCount}</span> partners</span>
                   <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
                     <span>Records per page</span>
                     <select className="h-6 px-1.5 rounded border border-border bg-card text-[11px] text-foreground cursor-pointer outline-none">
