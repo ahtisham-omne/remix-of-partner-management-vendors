@@ -3413,8 +3413,8 @@ function ConfigPageContent({
 
   const filteredPaymentTermPresets = useMemo(() => {
     let terms = PAYMENT_TERM_PRESETS;
-    // Type filter (parallel)
-    if (ptTypeFilter) terms = terms.filter((t) => t.category === ptTypeFilter);
+    // Type filter (parallel, multi-select)
+    if (ptTypeFilters.length > 0) terms = terms.filter((t) => ptTypeFilters.includes(t.category));
     // Status filter (parallel)
     if (ptStatusFilter === "preset") terms = terms.filter((t) => !t.id.startsWith("pt-custom-"));
     else if (ptStatusFilter === "custom") terms = terms.filter((t) => t.id.startsWith("pt-custom-"));
@@ -3437,7 +3437,7 @@ function ConfigPageContent({
       return ptSortDir === "asc" ? cmp : -cmp;
     });
     return sorted;
-  }, [ptTypeFilter, ptStatusFilter, ptSearch, ptSortBy, ptSortDir]);
+  }, [ptTypeFilters, ptStatusFilter, ptSearch, ptSortBy, ptSortDir]);
 
   // Pricing Rules state
   const [selectedPricingRuleIds, setSelectedPricingRuleIds] = useState<string[]>([]);
