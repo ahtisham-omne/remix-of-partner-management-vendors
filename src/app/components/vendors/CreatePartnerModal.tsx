@@ -5057,7 +5057,7 @@ function ConfigPageContent({
             <DialogDescription className="sr-only">Fill in the form to create a new payment term.</DialogDescription>
 
             {/* Header — matches pricing rule creation style */}
-            <div className="px-3 sm:px-4 lg:px-5 pt-3 sm:pt-4 pb-0 shrink-0 bg-white rounded-t-none sm:rounded-t-2xl border-b border-[#EEF2F6]">
+            <div className="px-3 sm:px-4 lg:px-5 pt-3 sm:pt-4 pb-3 sm:pb-4 shrink-0 bg-white rounded-t-none sm:rounded-t-2xl border-b border-[#EEF2F6]">
               {/* Title row */}
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
