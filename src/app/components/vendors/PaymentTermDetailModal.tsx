@@ -54,16 +54,9 @@ const PT_MOCK_ITEMS = [
   { id: "6", code: "MECH-BRG-6204", desc: "Deep Groove Ball Bearing, 6204-2RS, Sealed", vendor: "MotionPro", partNo: "6204-2RS", status: "In Stock", controlType: "Serialized", primaryCat: "Power Trans", additionalCat: ["Bearings", "Mechanical"], img: "🔘" },
 ];
 
-/* ─── Mock vendors ─── */
-const PT_MOCK_VENDORS = [
-  { id: "V-1", name: "Acme Industrial Supply Co.", code: "V-1", type: "Vendor", status: "Active" },
-  { id: "V-2", name: "Global Fasteners Inc.", code: "V-2", type: "Vendor", status: "Active" },
-  { id: "V-3", name: "Berlin Technik GmbH", code: "V-3", type: "Vendor • Seller", status: "Active" },
-  { id: "V-4", name: "Pacific Hardware Ltd.", code: "V-4", type: "Vendor", status: "Active" },
-  { id: "V-5", name: "Midwest Bolt & Nut Co.", code: "V-5", type: "Vendor • Buyer", status: "Active" },
-  { id: "V-6", name: "Atlas Steel Products", code: "V-6", type: "Vendor", status: "Inactive" },
-  { id: "V-7", name: "Nordic Fastening Systems", code: "V-7", type: "Vendor • Seller", status: "Active" },
-];
+/* ─── Vendors pulled from partner listing data ─── */
+import { useVendors } from "../../context/VendorContext";
+import { CATEGORY_LABELS } from "../../data/vendors";
 
 /* ─── Collapsible info card (matches DashInfoCard from VendorDetailsPage) ─── */
 function PTInfoCard({ title, icon: Icon, children, defaultOpen = true }: {
