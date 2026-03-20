@@ -26,10 +26,6 @@ import {
   Lock,
   Ban,
   ChevronDown,
-  Info,
-  CalendarDays,
-  Tag,
-  Zap,
 } from "lucide-react";
 import { toast } from "sonner";
 import { getAvatarTint } from "../../utils/avatarTints";
@@ -48,14 +44,14 @@ const PT_DETAIL_TABS = [
   { id: "activity", label: "Activity", icon: Clock },
 ];
 
-/* ─── Mock items ─── */
+/* ─── Mock items matching partner listing table ─── */
 const PT_MOCK_ITEMS = [
-  { id: "1", name: "Steel Bolts M10×40", partNo: "SB-M10-40", category: "Fasteners", price: 12.50, status: "Active" },
-  { id: "2", name: "Hex Nuts M10", partNo: "HN-M10", category: "Fasteners", price: 4.20, status: "Active" },
-  { id: "3", name: "Flat Washers M10", partNo: "FW-M10", category: "Fasteners", price: 2.80, status: "Active" },
-  { id: "4", name: "Spring Lock Washers M10", partNo: "SLW-M10", category: "Fasteners", price: 3.40, status: "Inactive" },
-  { id: "5", name: "Threaded Rods M12×1m", partNo: "TR-M12-1M", category: "Rods", price: 18.90, status: "Active" },
-  { id: "6", name: "Carriage Bolts 3/8×3", partNo: "CB-38-3", category: "Fasteners", price: 8.60, status: "Active" },
+  { id: "1", code: "FAST-HEX-001", desc: "Zinc-Plated Steel Hex Head Screw, 1/4\"-20 x 1\"", vendor: "BoltMaster Inc.", partNo: "BM-2520-100", status: "In Stock", controlType: "Non-Serialized", primaryCat: "Fasteners", additionalCat: ["Screws", "Hardware"], img: "🔩" },
+  { id: "2", code: "VALV-BAL-316", desc: "316 Stainless Steel Ball Valve, 2-Piece, 1\"", vendor: "FlowControl", partNo: "SS-BV-100", status: "Low Stock", controlType: "Serialized", primaryCat: "Plumbing", additionalCat: ["Valves", "Industrial"], img: "🔧" },
+  { id: "3", code: "SEAL-OR-012", desc: "Buna-N O-Ring, Dash Number 012, Hardness 70A", vendor: "SealTech", partNo: "BN-70-012", status: "In Stock", controlType: "Non-Serialized", primaryCat: "Seals", additionalCat: ["O-Rings", "Rubber Goods"], img: "⭕" },
+  { id: "4", code: "TOOL-EM-050", desc: "Solid Carbide Square End Mill, 1/2\" Cutting Dia", vendor: "PrecisionTools", partNo: "SC-EM-4F-500", status: "In Stock", controlType: "Non-Serialized", primaryCat: "Tools", additionalCat: ["Milling", "Carbide"], img: "⚙️" },
+  { id: "5", code: "MAT-AL-6061", desc: "6061-T6 Aluminum Sheet, 12\" x 24\" x 0.125\"", vendor: "AluSupply", partNo: "AL-6061-125", status: "Out of Stock", controlType: "Non-Serialized", primaryCat: "Raw Materials", additionalCat: ["Metals", "Sheet Stock"], img: "📦" },
+  { id: "6", code: "MECH-BRG-6204", desc: "Deep Groove Ball Bearing, 6204-2RS, Sealed", vendor: "MotionPro", partNo: "6204-2RS", status: "In Stock", controlType: "Serialized", primaryCat: "Power Trans", additionalCat: ["Bearings", "Mechanical"], img: "🔘" },
 ];
 
 /* ─── Mock vendors ─── */
@@ -145,8 +141,7 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
   const vendorCount = PT_MOCK_VENDORS.length;
   const creatorTint = getAvatarTint("Ahtisham Ahmad");
 
-  const filteredItems = itemFilter === "all" ? PT_MOCK_ITEMS
-    : PT_MOCK_ITEMS.filter(i => i.status.toLowerCase() === itemFilter);
+  const filteredItems = PT_MOCK_ITEMS;
 
   return (
     <Dialog open={open} onOpenChange={(v) => { if (!v) { onClose(); setIsFullscreen(false); setTab("items"); } }}>
@@ -258,32 +253,54 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
                     <thead className="sticky top-0 z-10">
                       <tr className="bg-[#F8FAFC]">
                         <th className="text-left pl-4 pr-2 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Item</th>
-                        <th className="text-left pl-4 pr-2 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Part No.</th>
-                        <th className="text-left pl-4 pr-2 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Category</th>
-                        <th className="text-right pl-4 pr-4 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Price</th>
-                        <th className="text-left pl-4 pr-4 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Status</th>
+                        <th className="text-left pl-4 pr-2 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Description</th>
+                        <th className="text-left pl-4 pr-2 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Status</th>
+                        <th className="text-left pl-4 pr-2 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Control Type</th>
+                        <th className="text-left pl-4 pr-2 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Primary Cat.</th>
+                        <th className="text-left pl-4 pr-4 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Additional Cat.</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {filteredItems.map((item) => (
-                        <tr key={item.id} className="bg-white hover:bg-[#F8FAFC] transition-colors border-b border-[#F1F5F9]">
-                          <td className="pl-4 pr-2 py-2.5 text-xs text-[#0F172A] whitespace-nowrap" style={{ fontWeight: 500 }}>{item.name}</td>
-                          <td className="pl-4 pr-2 py-2.5 whitespace-nowrap">
-                            <span className="font-mono text-[11px] text-[#64748B]">{item.partNo}</span>
-                          </td>
-                          <td className="pl-4 pr-2 py-2.5 text-xs text-[#64748B] whitespace-nowrap">{item.category}</td>
-                          <td className="pl-4 pr-4 py-2.5 text-right whitespace-nowrap tabular-nums text-xs text-[#0F172A]" style={{ fontWeight: 500 }}>${item.price.toFixed(2)}</td>
-                          <td className="pl-4 pr-4 py-2.5 whitespace-nowrap">
-                            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] ${
-                              item.status === "Active"
-                                ? "bg-[#F0FDF4] text-[#16A34A] border border-[#BBF7D0]"
-                                : "bg-[#FEF2F2] text-[#DC2626] border border-[#FECACA]"
-                            }`} style={{ fontWeight: 600 }}>
-                              {item.status}
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
+                      {filteredItems.map((item) => {
+                        const statusColor = item.status === "In Stock"
+                          ? { bg: "#F0FDF4", text: "#16A34A", border: "#BBF7D0", dot: "#16A34A" }
+                          : item.status === "Low Stock"
+                            ? { bg: "#FFFBEB", text: "#D97706", border: "#FDE68A", dot: "#D97706" }
+                            : { bg: "#FEF2F2", text: "#DC2626", border: "#FECACA", dot: "#DC2626" };
+                        return (
+                          <tr key={item.id} className="bg-white hover:bg-[#F8FAFC] transition-colors border-b border-[#F1F5F9]">
+                            <td className="pl-4 pr-2 py-3">
+                              <div className="flex items-center gap-3">
+                                <div className="w-9 h-9 rounded-lg bg-[#F1F5F9] flex items-center justify-center text-base shrink-0 border border-[#E2E8F0]">
+                                  {item.img}
+                                </div>
+                                <span className="font-mono text-[12px] text-[#0F172A] whitespace-nowrap" style={{ fontWeight: 600 }}>{item.code}</span>
+                              </div>
+                            </td>
+                            <td className="pl-4 pr-2 py-3 max-w-[220px]">
+                              <p className="text-[12px] text-[#0F172A] truncate" style={{ fontWeight: 500 }}>{item.desc}</p>
+                              <p className="text-[10px] text-[#94A3B8] mt-0.5 truncate">
+                                {item.vendor} <span className="mx-1">·</span> {item.partNo}
+                              </p>
+                            </td>
+                            <td className="pl-4 pr-2 py-3 whitespace-nowrap">
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px]" style={{ fontWeight: 600, backgroundColor: statusColor.bg, color: statusColor.text, border: `1px solid ${statusColor.border}` }}>
+                                <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: statusColor.dot }} />
+                                {item.status}
+                              </span>
+                            </td>
+                            <td className="pl-4 pr-2 py-3 text-[12px] text-[#334155] whitespace-nowrap" style={{ fontWeight: 500 }}>{item.controlType}</td>
+                            <td className="pl-4 pr-2 py-3 text-[12px] text-[#334155] whitespace-nowrap" style={{ fontWeight: 500 }}>{item.primaryCat}</td>
+                            <td className="pl-4 pr-4 py-3 whitespace-nowrap">
+                              <div className="flex items-center gap-1.5">
+                                {item.additionalCat.map((cat) => (
+                                  <span key={cat} className="text-[10px] px-2 py-0.5 rounded-md bg-[#F1F5F9] text-[#475569] border border-[#E2E8F0]" style={{ fontWeight: 500 }}>{cat}</span>
+                                ))}
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
@@ -468,49 +485,6 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
                 </div>
               </PTInfoCard>
 
-              {/* Payment Configuration Card */}
-              <PTInfoCard title="Payment Configuration" icon={Tag}>
-                <div className="space-y-2.5">
-                  <div className="min-w-0">
-                    <PTInfoLabel>Payment Category</PTInfoLabel>
-                    <p className="text-[12px] text-[#334155]" style={{ fontWeight: 500 }}>{ptTypeLabel}</p>
-                  </div>
-                  <div className="grid grid-cols-2 gap-x-4">
-                    <div className="min-w-0">
-                      <PTInfoLabel>Net Days</PTInfoLabel>
-                      <p className="text-[12.5px] text-[#0F172A]" style={{ fontWeight: 600 }}>{ptDuration}</p>
-                    </div>
-                    <div className="min-w-0">
-                      <PTInfoLabel>Grace Period</PTInfoLabel>
-                      <p className="text-[12px] text-[#334155]" style={{ fontWeight: 500 }}>5 days</p>
-                    </div>
-                  </div>
-                  <div className="min-w-0">
-                    <PTInfoLabel>Payment Method</PTInfoLabel>
-                    <p className="text-[12px] text-[#334155]" style={{ fontWeight: 500 }}>Wire Transfer, ACH</p>
-                  </div>
-                  <div className="min-w-0">
-                    <PTInfoLabel>Currency</PTInfoLabel>
-                    <p className="text-[12.5px] text-[#0F172A]" style={{ fontWeight: 600 }}>USD ($)</p>
-                  </div>
-                </div>
-              </PTInfoCard>
-
-              {/* Compliance & Notes Card */}
-              <PTInfoCard title="Compliance & Notes" icon={Info} defaultOpen={false}>
-                <div className="space-y-2.5">
-                  <div className="min-w-0">
-                    <PTInfoLabel>Compliance Status</PTInfoLabel>
-                    <div className="mt-0.5">
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] bg-[#F0FDF4] text-[#16A34A] border border-[#BBF7D0]" style={{ fontWeight: 600 }}>Compliant</span>
-                    </div>
-                  </div>
-                  <div className="min-w-0">
-                    <PTInfoLabel>Internal Notes</PTInfoLabel>
-                    <p className="text-[11px] text-[#64748B] mt-0.5 leading-relaxed">Standard NET 30 terms applied to all vendor categories. Review annually.</p>
-                  </div>
-                </div>
-              </PTInfoCard>
 
             </div>
           </div>
