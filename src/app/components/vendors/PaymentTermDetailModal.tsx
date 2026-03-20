@@ -116,6 +116,7 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
   const [tab, setTab] = useState("items");
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [itemFilter, setItemFilter] = useState("all");
+  const { vendors } = useVendors();
 
   if (!term) return null;
 
@@ -131,8 +132,10 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
     : `${modalBaseClass} !max-w-[100%] sm:!max-w-[960px] lg:!max-w-[1080px] !max-h-[100dvh] sm:!max-h-[90vh] rounded-none sm:!rounded-2xl`;
 
   const itemCount = PT_MOCK_ITEMS.length;
-  const vendorCount = PT_MOCK_VENDORS.length;
-  const creatorTint = getAvatarTint("Ahtisham Ahmad");
+  // Use first 7 vendors from real data
+  const ptVendors = vendors.slice(0, 7);
+  const vendorCount = ptVendors.length;
+  const creatorTint = getAvatarTint("Omnesoft");
 
   const filteredItems = PT_MOCK_ITEMS;
 
