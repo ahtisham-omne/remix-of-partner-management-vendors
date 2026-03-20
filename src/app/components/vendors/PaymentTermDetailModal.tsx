@@ -83,8 +83,8 @@ function PaymentTermDetailModal({ term, open, onClose, mode = "create", onDisabl
   const ptDuration = term.duration || (term.name.match(/\d+/) ? term.name.match(/\d+/)![0] : "30");
   const ptTypeLabel = CREATE_PT_TYPES.find((t) => t.id === term.category)?.label || "NET Terms";
   const badgeColor = term.badgeColor;
-  const isPreset = true;
-  const isCustom = !isPreset;
+  const isCustom = term.id.startsWith("pt-custom-");
+  const isPreset = !isCustom;
 
   const modalBaseClass = "!fixed !inset-0 !translate-x-0 !translate-y-0 !m-auto !w-full !h-full transition-[max-width,max-height,border-radius] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]";
   const modalSizeClass = isFullscreen
