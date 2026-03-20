@@ -5033,14 +5033,15 @@ function ConfigPageContent({
             </div>
           </div>
         ) : (
-          /* ── Selected Payment Term Card — reusable component ── */
-          <PaymentTermCard
-            term={selectedPaymentTermPreset}
-            onClick={() => { setStandalonePtDetailTerm(selectedPaymentTermPreset); setStandalonePtDetailOpen(true); }}
-            onRemove={() => { setSelectedPaymentTermId(null); customPaymentTermRef.current = null; }}
-            onDuplicate={() => toast.info("Duplicate flow coming soon.")}
-            onView={(t) => { setStandalonePtDetailTerm(t); setStandalonePtDetailOpen(true); }}
-          />
+          /* ── Selected Payment Term Card — read-only, matches template modal style ── */
+          <div className="max-w-[280px]">
+            <PaymentTermCard
+              term={selectedPaymentTermPreset}
+              onClick={() => { setStandalonePtDetailTerm(selectedPaymentTermPreset); setStandalonePtDetailOpen(true); }}
+              onRemove={() => { setSelectedPaymentTermId(null); customPaymentTermRef.current = null; }}
+              showPresetBadge
+            />
+          </div>
         )}
 
         {/* ── Create New Payment Terms Modal ── */}
