@@ -3422,7 +3422,7 @@ function ConfigPageContent({
   // Payment Terms Presets state
   const [selectedPaymentTermId, setSelectedPaymentTermId] = useState<string | null>(null);
   const [paymentTermsModalOpen, setPaymentTermsModalOpen] = useState(false);
-  const [ptTypeFilters, setPtTypeFilters] = useState<string[]>(["net"]);
+  const [ptTypeFilters, setPtTypeFilters] = useState<string>("net");
   const [ptStatusFilter, setPtStatusFilter] = useState("all");
   const [ptSearch, setPtSearch] = useState("");
   const [ptSortBy, setPtSortBy] = useState<"name" | "vendorsApplied" | "duration" | "category">("name");
