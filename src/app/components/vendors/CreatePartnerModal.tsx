@@ -3887,8 +3887,8 @@ function ConfigPageContent({
 
   const filteredPricingRulePresets = useMemo(() => {
     let rules = allPricingRulePresets;
-    // Type filter (parallel, multi-select)
-    if (prTypeFilters.length > 0) rules = rules.filter((r) => prTypeFilters.includes(r.category));
+    // Type filter (single-select tab)
+    if (prTypeFilters) rules = rules.filter((r) => r.category === prTypeFilters);
     // Status filter (parallel)
     if (prStatusFilter === "preset") rules = rules.filter((r) => !r.id.startsWith("pr-custom-"));
     else if (prStatusFilter === "custom") rules = rules.filter((r) => r.id.startsWith("pr-custom-"));
