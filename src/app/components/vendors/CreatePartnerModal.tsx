@@ -113,6 +113,7 @@ import {
 import { HoverCard, HoverCardTrigger, HoverCardContent } from "../ui/hover-card";
 import { getAvatarTint } from "../../utils/avatarTints";
 import { GroupChipsRow } from "./GroupChipsRow";
+import { FilterPills } from "./FilterPills";
 import { PaymentTermDetailModal } from "./PaymentTermDetailModal";
 import { PaymentTermCard } from "./PaymentTermCard";
 import { PaymentMethodsSection } from "./PaymentMethodsSection";
