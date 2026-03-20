@@ -70,7 +70,7 @@ interface PaymentTermDetailModalProps {
   onDisable?: (term: PaymentTermPreset) => void;
 }
 
-function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalProps) {
+function PaymentTermDetailModal({ term, open, onClose, mode = "create", onDisable }: PaymentTermDetailModalProps) {
   const [tab, setTab] = useState("items");
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [itemFilter, setItemFilter] = useState("all");
