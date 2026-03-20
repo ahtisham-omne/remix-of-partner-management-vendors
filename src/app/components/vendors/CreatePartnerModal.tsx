@@ -3298,6 +3298,7 @@ function ConfigPageContent({
   const [createPtApplyDiscount, setCreatePtApplyDiscount] = useState(false);
   const [createPtDiscountPercent, setCreatePtDiscountPercent] = useState("");
   const [createPtDiscountPeriod, setCreatePtDiscountPeriod] = useState("30");
+  const [createPtStep, setCreatePtStep] = useState<1 | 2>(1);
 
   function resetCreatePtForm() {
     setCreatePtName("");
@@ -3308,6 +3309,7 @@ function ConfigPageContent({
     setCreatePtApplyDiscount(false);
     setCreatePtDiscountPercent("");
     setCreatePtDiscountPeriod("30");
+    setCreatePtStep(1);
   }
 
   function handleDuplicatePaymentTerm(term: PaymentTermPreset) {
@@ -5025,10 +5027,10 @@ function ConfigPageContent({
         {/* ── Create New Payment Terms Modal ── */}
         <Dialog open={createPtModalOpen} onOpenChange={(open) => { setCreatePtModalOpen(open); if (!open) { resetCreatePtForm(); setCreatePtFullscreen(false); } }}>
           <DialogContent
-            className="p-0 gap-0 overflow-hidden z-[210] flex flex-col transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
+            className="p-0 gap-0 overflow-hidden z-[210] flex flex-col transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] border-0 shadow-[0_24px_80px_-12px_rgba(0,0,0,0.18)]"
             style={createPtFullscreen
               ? { maxWidth: "calc(100% - 1rem)", width: "calc(100% - 1rem)", height: "calc(100dvh - 1rem)", maxHeight: "calc(100dvh - 1rem)", borderRadius: 16 }
-              : { maxWidth: 680, width: "95vw", borderRadius: 16 }
+              : { maxWidth: 860, width: "92vw", height: "auto", maxHeight: "88vh", borderRadius: 16 }
             }
             hideCloseButton
           >
@@ -5036,221 +5038,331 @@ function ConfigPageContent({
             <DialogDescription className="sr-only">Fill in the form to create a new payment term.</DialogDescription>
 
             {/* Header — matches pricing rule creation style */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-[#E2E8F0] shrink-0">
-              <div className="flex items-center gap-3">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-[15px] text-[#0F172A]" style={{ fontWeight: 600 }}>Create New Payment Term</h3>
-                    <span className="inline-flex items-center gap-1 px-2 py-[2px] rounded-md text-[10px] border border-[#DBEAFE] bg-[#EFF6FF] text-[#0A77FF]" style={{ fontWeight: 600 }}>
+            <div className="px-3 sm:px-4 lg:px-5 pt-3 sm:pt-4 pb-0 shrink-0 bg-white rounded-t-none sm:rounded-t-2xl border-b border-[#EEF2F6]">
+              {/* Title row */}
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2.5">
+                    <h2 className="text-[15px] sm:text-[17px] text-[#0F172A]" style={{ fontWeight: 700 }}>Create New Payment Term</h2>
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#F1F5F9] text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>
                       <Receipt className="w-3 h-3" /> Payment Term
                     </span>
                   </div>
-                  <p className="text-[11px] text-muted-foreground mt-0.5">Configure the type, trigger, and duration for the new term.</p>
+                  <p className="text-[11px] sm:text-xs text-[#64748B] mt-0.5" style={{ fontWeight: 400 }}>
+                    Configure the type, trigger, and duration for the new term.
+                  </p>
+                </div>
+                <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
+                  <button
+                    onClick={() => setCreatePtFullscreen(!createPtFullscreen)}
+                    className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#475569] hover:bg-[#F8FAFC] hover:border-[#CBD5E1] transition-all cursor-pointer"
+                    style={{ fontWeight: 500 }}
+                  >
+                    {createPtFullscreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
+                    {createPtFullscreen ? "Exit full" : "Full view"}
+                  </button>
+                  <button
+                    onClick={() => { setCreatePtModalOpen(false); setCreatePtFullscreen(false); resetCreatePtForm(); }}
+                    className="w-8 h-8 rounded-lg flex items-center justify-center text-[#94A3B8] hover:text-[#64748B] hover:bg-[#F1F5F9] transition-all cursor-pointer"
+                  >
+                    <X className="w-4.5 h-4.5" />
+                  </button>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setCreatePtFullscreen(!createPtFullscreen)}
-                  className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#475569] hover:bg-[#F8FAFC] hover:border-[#CBD5E1] transition-all"
-                  style={{ fontWeight: 500 }}
-                >
-                  {createPtFullscreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
-                  {createPtFullscreen ? "Exit full" : "Full view"}
-                </button>
-                <button onClick={() => setCreatePtModalOpen(false)} className="w-8 h-8 rounded-lg flex items-center justify-center text-[#94A3B8] hover:text-[#0F172A] hover:bg-[#F1F5F9] transition-all cursor-pointer">
-                  <X className="w-4 h-4" />
-                </button>
+
+              {/* Step tabs */}
+              <div className="flex items-center gap-4 sm:gap-6 mt-3 sm:mt-3.5 overflow-x-auto -mb-px">
+                {[
+                  { num: 1 as const, label: "Term Setup", shortLabel: "Setup", active: createPtStep === 1, completed: createPtStep === 2 },
+                  { num: 2 as const, label: "Items & Attachments", shortLabel: "Items", active: createPtStep === 2, completed: false },
+                ].map((stepTab) => (
+                  <div
+                    key={stepTab.num}
+                    className={`relative flex items-center gap-2 pb-2.5 sm:pb-3 ${stepTab.num < createPtStep ? "cursor-pointer" : "cursor-default"}`}
+                    onClick={() => { if (stepTab.num < createPtStep) setCreatePtStep(stepTab.num); }}
+                  >
+                    <div
+                      className={`w-[22px] h-[22px] sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-[11px] sm:text-[12px] shrink-0 transition-all duration-200 ${
+                        stepTab.completed ? "bg-[#10B981] text-white" : stepTab.active ? "bg-[#0A77FF] text-white" : "border-[1.5px] border-[#CBD5E1] text-[#64748B] bg-white"
+                      }`}
+                      style={{ fontWeight: 600 }}
+                    >
+                      {stepTab.completed ? <Check className="w-3 h-3" /> : stepTab.num}
+                    </div>
+                    <span
+                      className={`text-[12px] sm:text-[13px] whitespace-nowrap transition-colors ${
+                        stepTab.active ? "text-[#0A77FF]" : stepTab.completed ? "text-[#10B981]" : "text-[#334155]"
+                      }`}
+                      style={{ fontWeight: stepTab.active || stepTab.completed ? 600 : 500 }}
+                    >
+                      <span className="hidden sm:inline">{stepTab.label}</span>
+                      <span className="sm:hidden">{stepTab.shortLabel}</span>
+                    </span>
+                    {(stepTab.active || stepTab.completed) && (
+                      <div className={`absolute bottom-0 left-0 right-0 h-[2px] rounded-t-full ${stepTab.completed ? "bg-[#10B981]" : "bg-[#0A77FF]"}`} />
+                    )}
+                  </div>
+                ))}
               </div>
             </div>
 
-            {/* Form body */}
-            <div className="px-6 py-5 space-y-5 overflow-y-auto flex-1 min-h-0">
-              {/* Payment Term Type — card selector */}
-              <div>
-                <Label className="text-[13px] text-foreground mb-2.5 flex items-center gap-1.5" style={{ fontWeight: 600 }}>
-                  Payment Term Type <Info className="w-3.5 h-3.5 text-muted-foreground" />
-                </Label>
-                <div className="grid grid-cols-3 gap-3">
-                  {CREATE_PT_TYPES.map((t) => {
-                    const isActive = createPtType === t.id;
-                    const icon = t.id === "net" ? <Clock className="w-5 h-5" /> : t.id === "prepayment" ? <Banknote className="w-5 h-5" /> : <ArrowUpDown className="w-5 h-5" />;
-                    const shortLabel = t.id === "net" ? "NET Terms" : t.id === "prepayment" ? "Prepayment" : "Split Payment";
-                    const shortDesc = t.id === "net" ? "Pay after X days" : t.id === "prepayment" ? "Pay before delivery" : "Multiple installments";
-                    return (
-                      <button
-                        key={t.id}
-                        onClick={() => setCreatePtType(t.id as "net" | "prepayment" | "split")}
-                        className={`relative flex items-start gap-3 p-4 rounded-xl border text-left transition-all cursor-pointer ${
-                          isActive
-                            ? "border-primary bg-white shadow-[0_0_0_1px_hsl(var(--primary)/0.2),0_2px_8px_-2px_hsl(var(--primary)/0.1)]"
-                            : "border-border bg-white hover:border-primary/30 hover:shadow-sm"
-                        }`}
-                      >
-                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${isActive ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>
-                          {icon}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-[13px] text-foreground" style={{ fontWeight: 600 }}>{shortLabel}</p>
-                          <p className="text-[11px] text-muted-foreground mt-0.5">{shortDesc}</p>
-                        </div>
-                        {isActive && (
-                          <div className="absolute top-3 right-3 w-5 h-5 rounded-full bg-primary flex items-center justify-center">
-                            <Check className="w-3 h-3 text-white" />
-                          </div>
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
+            {/* Body */}
+            <div className="flex-1 min-h-0 overflow-y-auto bg-[#FAFBFC] scrollbar-hide">
+              <div className="px-4 py-4 transition-all duration-300 ease-out">
 
-              {/* Trigger pills */}
-              <div>
-                <Label className="text-[13px] text-foreground mb-2 block" style={{ fontWeight: 600 }}>Trigger:</Label>
-                <div className="flex items-center gap-2 flex-wrap">
-                  {CREATE_PT_TRIGGERS.map((t) => {
-                    const isActive = createPtTrigger === t.id;
-                    return (
-                      <button
-                        key={t.id}
-                        onClick={() => setCreatePtTrigger(t.id)}
-                        className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full border text-xs transition-all cursor-pointer ${
-                          isActive
-                            ? "border-primary bg-primary/10 text-primary shadow-sm"
-                            : "border-border bg-white text-foreground hover:border-primary/30 hover:bg-muted/50"
-                        }`}
-                        style={{ fontWeight: isActive ? 600 : 500 }}
-                      >
-                        {t.id === "order_confirmation" && <ShoppingCart className="w-3.5 h-3.5" />}
-                        {t.id === "production_start" && <Cog className="w-3.5 h-3.5" />}
-                        {t.id === "shipment_date" && <Ship className="w-3.5 h-3.5" />}
-                        {t.id === "invoice_date" && <Receipt className="w-3.5 h-3.5" />}
-                        {t.id === "delivery_date" && <Truck className="w-3.5 h-3.5" />}
-                        {t.label}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Divider */}
-              <div className="border-t border-border" />
-
-              {/* Payment Term Details */}
-              <div>
-                <Label className="text-[13px] text-foreground mb-1 flex items-center gap-1.5" style={{ fontWeight: 600 }}>
-                  Payment Term Details <Info className="w-3.5 h-3.5 text-muted-foreground" />
-                </Label>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <Label className="text-[12px] text-muted-foreground mb-1.5 block" style={{ fontWeight: 500 }}>
-                    {createPtType === "net" ? "NET Term" : createPtType === "prepayment" ? "Prepayment Term" : "Split Term"} Name
-                  </Label>
-                  <Input
-                    value={createPtName}
-                    onChange={(e) => setCreatePtName(e.target.value)}
-                    placeholder={`e.g. ${createPtType === "net" ? "Net 30 Standard" : createPtType === "prepayment" ? "50% Upfront" : "3-Part Split"}`}
-                    className="h-10 rounded-lg border-border bg-white text-sm text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:ring-1 focus:ring-primary/20"
-                  />
-                </div>
-                <div>
-                  <Label className="text-[12px] text-muted-foreground mb-1.5 block" style={{ fontWeight: 500 }}>Description</Label>
-                  <div className="relative">
-                    <Input
-                      value={createPtDescription}
-                      onChange={(e) => { if (e.target.value.length <= 150) setCreatePtDescription(e.target.value); }}
-                      placeholder="Type here..."
-                      className="h-10 rounded-lg border-border bg-white text-sm text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:ring-1 focus:ring-primary/20 pr-14"
-                    />
-                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground">{createPtDescription.length}/150</span>
-                  </div>
-                </div>
-              </div>
-
-              {createPtType === "net" && (
-                <div className="flex items-center gap-3">
-                  <Switch
-                    checked={createPtDuration !== "30"}
-                    onCheckedChange={() => {}}
-                    className="data-[state=checked]:bg-primary"
-                  />
-                  <span className="text-[12px] text-foreground" style={{ fontWeight: 500 }}>Custom Duration</span>
-                </div>
-              )}
-
-              {createPtType === "net" && (
-                <div>
-                  <Label className="text-[12px] text-muted-foreground mb-1.5 block" style={{ fontWeight: 500 }}>NET Duration (Days)</Label>
-                  <Select value={createPtDuration} onValueChange={setCreatePtDuration}>
-                    <SelectTrigger className="h-10 rounded-lg border-border bg-white max-w-[200px]">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="z-[250] rounded-lg">
-                      {CREATE_PT_DURATIONS.map((d) => (
-                        <SelectItem key={d.id} value={d.id} className="py-2.5 px-3">
-                          <span className="text-sm">{d.label}</span>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
-
-              {/* Divider */}
-              <div className="border-t border-border" />
-
-              {/* Discount Terms — collapsible */}
-              <div className={`rounded-xl border p-4 transition-all ${createPtApplyDiscount ? "border-primary/25 bg-white shadow-sm" : "border-border bg-white"}`}>
-                <div className="flex items-center gap-3">
-                  <Switch
-                    checked={createPtApplyDiscount}
-                    onCheckedChange={(v) => setCreatePtApplyDiscount(v === true)}
-                    className="data-[state=checked]:bg-primary"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <h5 className="text-[13px] text-foreground" style={{ fontWeight: 600 }}>Apply Early Payment Discount</h5>
-                    <p className="text-[11px] text-muted-foreground mt-0.5">Enable early payment discounts based on the selected terms.</p>
-                  </div>
-                </div>
-
-                {createPtApplyDiscount && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 pt-4 border-t border-border">
+                {/* ─── Step 1: Term Setup ─── */}
+                {createPtStep === 1 && (
+                  <div className="space-y-5">
+                    {/* Payment Term Type — card selector matching pricing rule style */}
                     <div>
-                      <Label className="text-[12px] text-muted-foreground mb-1.5 flex items-center gap-1" style={{ fontWeight: 500 }}>
-                        Discount Percentage (%) <Info className="w-3 h-3 text-muted-foreground/60" />
-                      </Label>
-                      <div className="relative">
-                        <Input
-                          value={createPtDiscountPercent}
-                          onChange={(e) => setCreatePtDiscountPercent(e.target.value)}
-                          placeholder="Enter percentage (e.g., 50%)"
-                          className="h-10 rounded-lg border-border bg-white pr-8 text-sm text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:ring-1 focus:ring-primary/20"
-                        />
-                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">%</span>
+                      <div className="flex items-center gap-1.5 mb-3">
+                        <span className="text-sm text-[#0F172A]" style={{ fontWeight: 600 }}>Payment Term Type</span>
+                        <Info className="w-3.5 h-3.5 text-[#CBD5E1]" />
+                      </div>
+
+                      <div className="grid grid-cols-3 gap-3">
+                        {CREATE_PT_TYPES.map((t) => {
+                          const isActive = createPtType === t.id;
+                          const icon = t.id === "net" ? <Clock className="w-[18px] h-[18px]" /> : t.id === "prepayment" ? <Banknote className="w-[18px] h-[18px]" /> : <ArrowUpDown className="w-[18px] h-[18px]" />;
+                          const shortLabel = t.id === "net" ? "NET Terms" : t.id === "prepayment" ? "Prepayment" : "Split Payment";
+                          const shortDesc = t.id === "net" ? "Pay after X days" : t.id === "prepayment" ? "Pay before delivery" : "Multiple installments";
+                          const accentColor = t.id === "net" ? "#0A77FF" : t.id === "prepayment" ? "#7C3AED" : "#D97706";
+                          const accentBg = t.id === "net" ? "#EFF6FF" : t.id === "prepayment" ? "#F5F3FF" : "#FFFBEB";
+                          const accentBorder = t.id === "net" ? "#BFDBFE" : t.id === "prepayment" ? "#DDD6FE" : "#FDE68A";
+                          return (
+                            <div
+                              key={t.id}
+                              onClick={() => setCreatePtType(t.id as "net" | "prepayment" | "split")}
+                              className={`group relative rounded-xl overflow-hidden border transition-all duration-200 cursor-pointer ${
+                                isActive
+                                  ? `bg-white shadow-[0_1px_4px_rgba(0,0,0,0.06)]`
+                                  : "border-[#E2E8F0] bg-white hover:shadow-[0_4px_16px_-4px_rgba(0,0,0,0.08)]"
+                              }`}
+                              style={isActive ? { borderColor: `${accentBorder}` } : {}}
+                            >
+                              <div className={`absolute inset-0 transition-all duration-300 pointer-events-none ${isActive ? "opacity-100" : "opacity-0 group-hover:opacity-60"}`} style={{ background: `linear-gradient(135deg, ${accentBg}80 0%, transparent 70%)` }} />
+                              <div className="relative flex items-center gap-3 pl-3.5 pr-3 py-3">
+                                <div className={`w-9 h-9 rounded-[10px] flex items-center justify-center shrink-0 transition-all duration-200 ${isActive ? "" : "group-hover:scale-105"}`} style={{ background: `linear-gradient(135deg, ${accentBg}, ${accentBorder}40)`, color: accentColor }}>
+                                  {icon}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-[13px]" style={{ fontWeight: 600, color: isActive ? accentColor : "#0F172A" }}>{shortLabel}</p>
+                                  <p className="text-[11px] mt-0.5 truncate" style={{ color: isActive ? accentColor : "#94A3B8" }}>{shortDesc}</p>
+                                </div>
+                                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-200 shrink-0`} style={{ borderColor: isActive ? accentColor : "#CBD5E1", backgroundColor: isActive ? accentColor : "transparent" }}>
+                                  {isActive && <Check className="w-3 h-3 text-white" />}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+
+                      {/* Trigger selector pills */}
+                      <div className="flex items-center gap-2 mt-3">
+                        <span className="text-[12px] text-[#64748B] mr-1" style={{ fontWeight: 500 }}>Trigger:</span>
+                        {CREATE_PT_TRIGGERS.map((t) => {
+                          const isActive = createPtTrigger === t.id;
+                          const accentColor = createPtType === "net" ? "#0A77FF" : createPtType === "prepayment" ? "#7C3AED" : "#D97706";
+                          return (
+                            <button
+                              key={t.id}
+                              onClick={() => setCreatePtTrigger(t.id)}
+                              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[12px] transition-all cursor-pointer ${
+                                isActive ? "" : "border-[#E2E8F0] bg-white text-[#64748B] hover:border-[#CBD5E1] hover:bg-[#F8FAFC]"
+                              }`}
+                              style={isActive ? { fontWeight: 600, borderColor: `${accentColor}30`, backgroundColor: `${accentColor}08`, color: accentColor } : { fontWeight: 500 }}
+                            >
+                              {t.id === "order_confirmation" && <ShoppingCart className="w-3.5 h-3.5" />}
+                              {t.id === "production_start" && <Cog className="w-3.5 h-3.5" />}
+                              {t.id === "shipment_date" && <Ship className="w-3.5 h-3.5" />}
+                              {t.id === "invoice_date" && <Receipt className="w-3.5 h-3.5" />}
+                              {t.id === "delivery_date" && <Truck className="w-3.5 h-3.5" />}
+                              {t.label}
+                            </button>
+                          );
+                        })}
                       </div>
                     </div>
-                    <div className="flex items-end gap-3">
-                      <div className="flex-1">
-                        <Label className="text-[12px] text-muted-foreground mb-1.5 block" style={{ fontWeight: 500 }}>Eligible Payment Period</Label>
-                        <Select value={createPtDiscountPeriod} onValueChange={setCreatePtDiscountPeriod}>
-                          <SelectTrigger className="h-10 rounded-lg border-border bg-white">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent className="z-[250] rounded-lg">
-                            {CREATE_PT_DISCOUNT_PERIODS.map((d) => (
-                              <SelectItem key={d.id} value={d.id} className="py-2.5 px-3">
-                                <span className="text-sm">{d.label}</span>
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+
+                    {/* Payment Term Details */}
+                    <div>
+                      <div className="flex items-center gap-1.5 mb-3">
+                        <span className="text-sm text-[#0F172A]" style={{ fontWeight: 600 }}>Payment Term Details</span>
+                        <Info className="w-3.5 h-3.5 text-[#CBD5E1]" />
                       </div>
-                      <div className="flex items-center gap-2 pb-1">
-                        <Switch checked={false} onCheckedChange={() => {}} className="data-[state=checked]:bg-primary" />
-                        <span className="text-[11px] text-foreground whitespace-nowrap" style={{ fontWeight: 500 }}>Fix Discount Rate ($)</span>
-                        <Info className="w-3 h-3 text-muted-foreground/60" />
+                      <div className="rounded-xl border border-[#E2E8F0] bg-white p-4 space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className="text-[12px] text-[#0F172A] mb-1.5 block" style={{ fontWeight: 600 }}>
+                              {createPtType === "net" ? "NET Term" : createPtType === "prepayment" ? "Prepayment Term" : "Split Term"} Name
+                            </label>
+                            <Input
+                              value={createPtName}
+                              onChange={(e) => setCreatePtName(e.target.value)}
+                              placeholder={`e.g. ${createPtType === "net" ? "Net 30 Standard" : createPtType === "prepayment" ? "50% Upfront" : "3-Part Split"}`}
+                              className="rounded-lg border-[#E2E8F0] bg-white text-[13px]"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-[12px] text-[#0F172A] mb-1.5 block" style={{ fontWeight: 600 }}>Description</label>
+                            <Textarea
+                              value={createPtDescription}
+                              onChange={(e) => { if (e.target.value.length <= 150) setCreatePtDescription(e.target.value); }}
+                              placeholder="Type here..."
+                              className="rounded-lg border-[#E2E8F0] bg-white min-h-[38px] resize-none text-[13px]"
+                              rows={2}
+                            />
+                            <p className="text-right text-[10px] text-[#94A3B8] mt-0.5">{createPtDescription.length}/150</p>
+                          </div>
+                        </div>
+
+                        {/* Duration selector */}
+                        {createPtType === "net" && (
+                          <div>
+                            <label className="text-[12px] text-[#0F172A] mb-1.5 block" style={{ fontWeight: 600 }}>NET Duration (Days)</label>
+                            <Select value={createPtDuration} onValueChange={setCreatePtDuration}>
+                              <SelectTrigger className="h-9 rounded-lg border-[#E2E8F0] bg-white max-w-[200px] text-[13px]">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent className="z-[250] rounded-lg">
+                                {CREATE_PT_DURATIONS.map((d) => (
+                                  <SelectItem key={d.id} value={d.id} className="py-2.5 px-3">
+                                    <span className="text-sm">{d.label}</span>
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        )}
+
+                        {/* Date range toggle */}
+                        <div>
+                          <div className="flex items-center gap-2.5">
+                            <Switch checked={createPtDuration !== "30"} onCheckedChange={() => {}} />
+                            <span className="text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>Custom Duration</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Early Payment Discount — collapsible card */}
+                    <div>
+                      <div className="flex items-center gap-1.5 mb-3">
+                        <span className="text-sm text-[#0F172A]" style={{ fontWeight: 600 }}>Early Payment Discount</span>
+                        <span className="text-[11px] text-[#94A3B8] bg-[#F1F5F9] px-1.5 py-0.5 rounded" style={{ fontWeight: 600 }}>Optional</span>
+                      </div>
+
+                      <div className={`rounded-xl border p-4 transition-all ${createPtApplyDiscount ? "border-[#0A77FF]/25 bg-white shadow-sm" : "border-[#E2E8F0] bg-white"}`}>
+                        <div className="flex items-center gap-3">
+                          <Switch checked={createPtApplyDiscount} onCheckedChange={(v) => setCreatePtApplyDiscount(v === true)} />
+                          <div className="flex-1 min-w-0">
+                            <h5 className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Apply Early Payment Discount</h5>
+                            <p className="text-[11px] text-[#64748B] mt-0.5">Enable early payment discounts based on the selected terms.</p>
+                          </div>
+                        </div>
+
+                        {createPtApplyDiscount && (
+                          <div className="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-[#F1F5F9]">
+                            <div>
+                              <div className="flex items-center gap-1 mb-1.5">
+                                <label className="text-[12px] text-[#0F172A]" style={{ fontWeight: 500 }}>Discount Percentage (%)</label>
+                                <Info className="w-3 h-3 text-[#CBD5E1]" />
+                              </div>
+                              <div className="relative">
+                                <Input
+                                  value={createPtDiscountPercent}
+                                  onChange={(e) => setCreatePtDiscountPercent(e.target.value)}
+                                  placeholder="Enter percentage (e.g., 50%)"
+                                  className="rounded-lg border-[#E2E8F0] bg-white pr-8 text-[13px]"
+                                />
+                                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[13px] text-[#94A3B8]">%</span>
+                              </div>
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-1 mb-1.5">
+                                <label className="text-[12px] text-[#0F172A]" style={{ fontWeight: 500 }}>Eligible Payment Period</label>
+                                <Info className="w-3 h-3 text-[#CBD5E1]" />
+                              </div>
+                              <Select value={createPtDiscountPeriod} onValueChange={setCreatePtDiscountPeriod}>
+                                <SelectTrigger className="h-9 rounded-lg border-[#E2E8F0] bg-white text-[13px]">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent className="z-[250] rounded-lg">
+                                  {CREATE_PT_DISCOUNT_PERIODS.map((d) => (
+                                    <SelectItem key={d.id} value={d.id} className="py-2.5 px-3">
+                                      <span className="text-sm">{d.label}</span>
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* ─── Step 2: Items & Attachments ─── */}
+                {createPtStep === 2 && (
+                  <div className="space-y-5">
+                    {/* Summary banner */}
+                    <div className="rounded-xl border border-[#E2E8F0] bg-white p-3.5 flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-[10px] flex items-center justify-center shrink-0" style={{ background: createPtType === "net" ? "linear-gradient(135deg, #DBEAFE, #BFDBFE)" : createPtType === "prepayment" ? "linear-gradient(135deg, #EDE9FE, #DDD6FE)" : "linear-gradient(135deg, #FEF3C7, #FDE68A)" }}>
+                        {createPtType === "net" ? <Clock className="w-4.5 h-4.5 text-[#0A77FF]" /> : createPtType === "prepayment" ? <Banknote className="w-4.5 h-4.5 text-[#7C3AED]" /> : <ArrowUpDown className="w-4.5 h-4.5 text-[#D97706]" />}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{createPtName || "Untitled Term"}</p>
+                        <p className="text-[11px] text-[#64748B] truncate">
+                          {createPtType === "net" ? "NET Terms" : createPtType === "prepayment" ? "Prepayment" : "Split Payment"} · {CREATE_PT_TRIGGERS.find(t => t.id === createPtTrigger)?.label} · {createPtDuration} days
+                          {createPtApplyDiscount && createPtDiscountPercent ? ` · ${createPtDiscountPercent}% discount` : ""}
+                        </p>
+                      </div>
+                      <button onClick={() => setCreatePtStep(1)} className="text-[11px] text-[#0A77FF] hover:text-[#0862D0] transition-colors cursor-pointer shrink-0" style={{ fontWeight: 600 }}>
+                        Edit Setup
+                      </button>
+                    </div>
+
+                    {/* Items & Attachments card */}
+                    <div className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden">
+                      <div className="flex items-center gap-0 border-b border-[#E2E8F0] px-4">
+                        {([
+                          { key: "items" as const, label: "Items", icon: Package, count: 0 },
+                          { key: "attachments" as const, label: "Attachments", icon: Paperclip, count: 0 },
+                        ]).map((t) => (
+                          <button
+                            key={t.key}
+                            className={`relative px-3 py-2.5 text-[12px] flex items-center gap-1.5 transition-colors cursor-pointer ${t.key === "items" ? "text-[#0A77FF]" : "text-[#64748B] hover:text-[#334155]"}`}
+                            style={{ fontWeight: t.key === "items" ? 600 : 500 }}
+                          >
+                            <t.icon className="w-3.5 h-3.5" />
+                            {t.label}
+                            <span className={`px-1.5 py-0.5 rounded text-[10px] ${t.key === "items" ? "bg-[#DBEAFE] text-[#0A77FF]" : "bg-[#F1F5F9] text-[#94A3B8]"}`} style={{ fontWeight: 700 }}>{t.count}</span>
+                            {t.key === "items" && (
+                              <div className="absolute bottom-0 left-0 right-0 h-[2px] rounded-t-full bg-[#0A77FF]" />
+                            )}
+                          </button>
+                        ))}
+                      </div>
+
+                      <div className="p-4">
+                        <div className="flex items-center gap-2 mb-4">
+                          <div className="relative flex-1">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8]" />
+                            <Input placeholder="Search items to assign..." className="pl-9 rounded-lg border-[#E2E8F0] bg-[#F8FAFC] text-[13px] h-9" />
+                          </div>
+                          <button className="inline-flex items-center gap-1.5 h-9 px-3 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-[12px] shadow-sm transition-colors cursor-pointer" style={{ fontWeight: 600 }}>
+                            <Plus className="w-3.5 h-3.5" /> Add Items
+                          </button>
+                        </div>
+                        <div className="py-8 text-center">
+                          <div className="w-12 h-12 rounded-xl bg-[#F8FAFC] border border-[#E8ECF1] flex items-center justify-center mx-auto mb-3">
+                            <Package className="w-5.5 h-5.5 text-[#94A3B8]" />
+                          </div>
+                          <p className="text-[13px] text-[#334155] mb-1" style={{ fontWeight: 600 }}>No items assigned yet</p>
+                          <p className="text-[11px] text-[#94A3B8] max-w-[260px] mx-auto">Search and add items that should be affected by this payment term.</p>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -5258,23 +5370,55 @@ function ConfigPageContent({
               </div>
             </div>
 
-            {/* Footer */}
-            <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-[#E2E8F0]">
-              <button
-                onClick={() => { setCreatePtModalOpen(false); resetCreatePtForm(); }}
-                className="px-5 py-2.5 rounded-lg border border-[#E2E8F0] bg-white text-sm text-[#0F172A] hover:bg-[#F8FAFC] transition-colors"
-                style={{ fontWeight: 600 }}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSaveNewPaymentTerm}
-                disabled={!createPtName.trim()}
-                className="px-5 py-2.5 rounded-lg bg-primary text-white text-sm hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5"
-                style={{ fontWeight: 600 }}
-              >
-                Save & Apply <ChevronRight className="w-4 h-4" />
-              </button>
+            {/* Footer — matches pricing rule creation footer */}
+            <div className="flex items-center justify-end gap-2 px-3 sm:px-5 py-3 border-t border-[#EEF2F6] bg-white shrink-0 rounded-b-none sm:rounded-b-2xl">
+              {createPtStep === 1 ? (
+                <>
+                  <button
+                    onClick={() => { setCreatePtModalOpen(false); resetCreatePtForm(); setCreatePtFullscreen(false); }}
+                    className="px-3 sm:px-5 py-2 rounded-lg border border-[#E2E8F0] text-xs sm:text-[13px] text-[#64748B] hover:text-[#0F172A] hover:border-[#CBD5E1] hover:bg-[#F8FAFC] transition-colors cursor-pointer"
+                    style={{ fontWeight: 600 }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => { if (createPtName.trim()) setCreatePtStep(2); }}
+                    disabled={!createPtName.trim()}
+                    className="inline-flex items-center gap-1.5 px-3 sm:px-5 py-2 rounded-lg bg-[#0A77FF] text-white text-xs sm:text-[13px] hover:bg-[#0862D0] transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm cursor-pointer"
+                    style={{ fontWeight: 600 }}
+                  >
+                    Continue
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={() => setCreatePtStep(1)}
+                    className="inline-flex items-center gap-1.5 text-xs sm:text-[13px] text-[#64748B] hover:text-[#0F172A] transition-colors mr-auto cursor-pointer"
+                    style={{ fontWeight: 500 }}
+                  >
+                    <ArrowLeft className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">Back</span>
+                  </button>
+                  <button
+                    onClick={() => { setCreatePtModalOpen(false); resetCreatePtForm(); setCreatePtFullscreen(false); }}
+                    className="px-3 sm:px-5 py-2 rounded-lg border border-[#E2E8F0] text-xs sm:text-[13px] text-[#64748B] hover:text-[#0F172A] hover:border-[#CBD5E1] hover:bg-[#F8FAFC] transition-colors cursor-pointer"
+                    style={{ fontWeight: 600 }}
+                  >
+                    Discard
+                  </button>
+                  <button
+                    onClick={handleSaveNewPaymentTerm}
+                    className="inline-flex items-center gap-1.5 px-3 sm:px-5 py-2 rounded-lg bg-[#0A77FF] text-white text-xs sm:text-[13px] hover:bg-[#0862D0] transition-colors shadow-sm cursor-pointer"
+                    style={{ fontWeight: 600 }}
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">Save & Create</span>
+                    <span className="sm:hidden">Create</span>
+                  </button>
+                </>
+              )}
             </div>
           </DialogContent>
         </Dialog>

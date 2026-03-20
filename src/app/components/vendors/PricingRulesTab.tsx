@@ -854,24 +854,19 @@ function DetailModal({ rule, open, onClose }: { rule: PricingRule | null; open: 
   const [itemSearch, setItemSearch] = useState("");
   const [catSearch, setCatSearch] = useState("");
   const [partnerSearch, setPartnerSearch] = useState("");
-  const [aboutOpen, setAboutOpen] = useState(true);
-  const [tiersOpen, setTiersOpen] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [partnerFilter, setPartnerFilter] = useState<string>("all");
-  const [showOverflow, setShowOverflow] = useState(false);
 
   if (!rule) return null;
   const isDis = rule.category === "discount";
-  const accent = isDis ? "#059669" : "#7C3AED";
   const isPreset = rule.isPreset;
   const theme = isDis
-    ? { text: "#047857", pillBg: "#ECFDF5", pillBorder: "#D1FAE5", hoverBorder: "#D1FAE5", hoverShadow: "rgba(5,150,105,0.06)" }
-    : { text: "#6D28D9", pillBg: "#F5F3FF", pillBorder: "#EDE9FE", hoverBorder: "#EDE9FE", hoverShadow: "rgba(124,58,237,0.06)" };
+    ? { text: "#047857", pillBg: "#ECFDF5", pillBorder: "#D1FAE5" }
+    : { text: "#6D28D9", pillBg: "#F5F3FF", pillBorder: "#EDE9FE" };
 
   const modalBaseClass = "!fixed !inset-0 !translate-x-0 !translate-y-0 !m-auto !w-full !h-full transition-[max-width,max-height,border-radius] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]";
   const modalSizeClass = isFullscreen
     ? `${modalBaseClass} !max-w-[calc(100%-1rem)] sm:!max-w-[calc(100%-1.5rem)] lg:!max-w-[calc(100%-2rem)] !max-h-[calc(100%-1rem)] sm:!max-h-[calc(100%-1.5rem)] lg:!max-h-[calc(100%-2rem)] !rounded-2xl`
-    : `${modalBaseClass} !max-w-[100%] sm:!max-w-[1200px] !max-h-[100dvh] sm:!max-h-[88vh] rounded-none sm:!rounded-2xl`;
+    : `${modalBaseClass} !max-w-[100%] sm:!max-w-[960px] lg:!max-w-[1080px] !max-h-[100dvh] sm:!max-h-[90vh] rounded-none sm:!rounded-2xl`;
 
   const filteredItems = rule.items.filter((it) =>
     !itemSearch.trim() || it.partNo.toLowerCase().includes(itemSearch.toLowerCase()) || it.description.toLowerCase().includes(itemSearch.toLowerCase())
@@ -879,698 +874,505 @@ function DetailModal({ rule, open, onClose }: { rule: PricingRule | null; open: 
   const filteredCats = rule.categories.filter((c) =>
     !catSearch.trim() || c.name.toLowerCase().includes(catSearch.toLowerCase())
   );
-  const filteredPartners = rule.partners.filter((p) => {
-    const matchSearch = !partnerSearch.trim() || p.name.toLowerCase().includes(partnerSearch.toLowerCase());
-    if (!matchSearch) return false;
-    if (partnerFilter === "all") return true;
-    if (partnerFilter === "customers") return p.types.includes("Customer");
-    if (partnerFilter === "vendors") return p.types.includes("Vendor");
-    if (partnerFilter === "both") return p.types.includes("Vendor") || p.types.includes("Customer");
-    return true;
-  });
+  const filteredPartners = rule.partners.filter((p) =>
+    !partnerSearch.trim() || p.name.toLowerCase().includes(partnerSearch.toLowerCase())
+  );
+
+  const PR_DETAIL_TABS = [
+    { id: "items", label: "Items", icon: Package, count: rule.itemCount },
+    { id: "categories", label: "Categories", icon: Layers, count: rule.categoryCount },
+    { id: "partner", label: "Partners", icon: Users, count: rule.partnerCount },
+    { id: "notes", label: "Notes", icon: FileText, count: 0 },
+    { id: "files", label: "Files", icon: Paperclip, count: 0 },
+    { id: "activity", label: "Activity", icon: Activity, count: 0 },
+  ];
+
+  const creatorInitials = rule.createdBy.split(" ").map((n) => n[0]).join("");
 
   return (
-    <Dialog open={open} onOpenChange={(v) => { if (!v) { onClose(); setIsFullscreen(false); } }}>
+    <Dialog open={open} onOpenChange={(v) => { if (!v) { onClose(); setIsFullscreen(false); setTab("items"); } }}>
       <DialogContent
         className={`flex flex-col p-0 gap-0 border-0 sm:border z-[200] ${modalSizeClass}`}
         hideCloseButton
         style={{ boxShadow: "0 24px 48px -12px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.05)" }}
       >
-        <DialogTitle className="sr-only">Pricing Rule Details — {rule.ruleNo}</DialogTitle>
-        <DialogDescription className="sr-only">Detailed view of pricing rule {rule.ruleNo}</DialogDescription>
+        <DialogTitle className="sr-only">Pricing Rule Details — {rule.name}</DialogTitle>
+        <DialogDescription className="sr-only">Detailed view of pricing rule {rule.name}</DialogDescription>
 
-        {/* ─── Header Bar ─── */}
-        <div className="shrink-0 bg-white rounded-t-none sm:rounded-t-2xl border-b border-[#EEF2F6]">
-          <div className="px-3 sm:px-5 py-3 sm:py-3.5 flex items-center justify-between gap-3">
+        {/* ─── Header ─── */}
+        <div className="shrink-0 bg-white rounded-t-none sm:rounded-t-2xl border-b border-[#E2E8F0]">
+          <div className="px-4 sm:px-5 py-3 flex items-center justify-between gap-3">
             <div className="flex items-center gap-3 min-w-0">
-              <button onClick={onClose} className="w-8 h-8 rounded-lg border border-[#E2E8F0] flex items-center justify-center hover:bg-[#F8FAFC] hover:border-[#CBD5E1] transition-all shrink-0 cursor-pointer">
-                <ArrowLeft className="w-4 h-4 text-[#64748B]" />
+              <button onClick={onClose} className="w-8 h-8 rounded-lg border border-[#E2E8F0] bg-white flex items-center justify-center hover:bg-[#F8FAFC] transition-colors cursor-pointer shrink-0">
+                <ArrowLeft className="w-3.5 h-3.5 text-[#334155]" />
               </button>
-              <div className="min-w-0">
-                <div className="flex items-center gap-2.5">
-                  <h3 className="text-[15px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{rule.name}</h3>
-                  <span className="hidden sm:inline-flex items-stretch rounded-full overflow-hidden border shrink-0" style={{ borderColor: theme.pillBorder }}>
-                    <span className="inline-flex items-center gap-1 px-2 py-[2px] text-[10px]" style={{ fontWeight: 600, color: theme.text, backgroundColor: theme.pillBg }}>
-                      {isDis ? <TrendingDown className="w-3 h-3" /> : <TrendingUp className="w-3 h-3" />}
-                      {isDis ? "Discount" : "Premium"}
-                    </span>
-                    <span className="inline-flex items-center px-2 py-[2px] text-[10px] bg-white text-[#64748B] border-l" style={{ fontWeight: 500, borderColor: theme.pillBorder }}>
-                      {rule.basis === "volume" ? "Volume" : "Value"}-Based
-                    </span>
-                  </span>
-                  {isPreset && (
-                    <span className="hidden sm:inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] bg-[#EFF6FF] text-[#2563EB] border border-[#DBEAFE]" style={{ fontWeight: 600 }}>
-                      <Lock className="w-2.5 h-2.5" /> Preset
-                    </span>
-                  )}
-                </div>
-                <div className="flex items-center gap-2 mt-0.5">
-                  <span className="text-[11px] font-mono text-[#64748B]" style={{ fontWeight: 400 }}>{rule.ruleNo.replace("VPR# ", "PR-")}</span>
-                  <span className="w-1 h-1 rounded-full bg-[#CBD5E1]" />
-                  <span className="text-[11px] text-[#64748B] truncate max-w-[340px]" style={{ fontWeight: 400 }}>{rule.description}</span>
-                </div>
-              </div>
+              <h2 className="text-sm text-[#0F172A] truncate" style={{ fontWeight: 600 }}>Pricing Rule Details</h2>
             </div>
             <div className="flex items-center gap-1.5 shrink-0">
-              {!isPreset && (
-                <>
-                  <button
-                    onClick={() => toast.info("Edit coming soon")}
-                    className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#475569] hover:bg-[#F8FAFC] hover:border-[#CBD5E1] transition-all cursor-pointer"
-                    style={{ fontWeight: 500 }}
-                  >
-                    <Pencil className="w-3.5 h-3.5" />
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => toast.info("Archive coming soon")}
-                    className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#475569] hover:bg-[#F8FAFC] hover:border-[#CBD5E1] transition-all cursor-pointer"
-                    style={{ fontWeight: 500 }}
-                  >
-                    <Archive className="w-3.5 h-3.5" />
-                    Archive
-                  </button>
-                </>
-              )}
-              <div className="w-px h-5 bg-[#E2E8F0] mx-0.5 hidden sm:block" />
               <button
-                onClick={() => setIsFullscreen(!isFullscreen)}
-                className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#475569] hover:bg-[#F8FAFC] hover:border-[#CBD5E1] transition-all cursor-pointer"
+                onClick={() => !isPreset && toast.info("Edit coming soon")}
+                disabled={isPreset}
+                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#334155] hover:bg-[#F8FAFC] transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white"
                 style={{ fontWeight: 500 }}
               >
-                {isFullscreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
-                {isFullscreen ? "Exit full" : "Full view"}
+                <Pencil className="w-3.5 h-3.5" /> Edit
               </button>
-              <button onClick={onClose} className="w-8 h-8 rounded-lg flex items-center justify-center text-[#94A3B8] hover:text-[#64748B] hover:bg-[#F1F5F9] transition-all cursor-pointer">
+              <button
+                onClick={() => !isPreset && toast.info("Archive coming soon")}
+                disabled={isPreset}
+                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#334155] hover:bg-[#F8FAFC] transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white"
+                style={{ fontWeight: 500 }}
+              >
+                <Archive className="w-3.5 h-3.5" /> Archive
+              </button>
+              <button
+                onClick={() => toast.info("Disable coming soon")}
+                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#334155] hover:bg-[#F8FAFC] transition-colors cursor-pointer"
+                style={{ fontWeight: 500 }}
+              >
+                <ToggleLeft className="w-3.5 h-3.5" /> Disable
+              </button>
+              <button onClick={() => setIsFullscreen(!isFullscreen)} className="w-8 h-8 rounded-lg border border-[#E2E8F0] bg-white flex items-center justify-center text-[#64748B] hover:text-[#334155] hover:bg-[#F8FAFC] transition-all cursor-pointer">
+                {isFullscreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
+              </button>
+              <button onClick={() => { onClose(); setIsFullscreen(false); setTab("items"); }} className="w-8 h-8 rounded-lg flex items-center justify-center text-[#64748B] hover:text-[#334155] hover:bg-[#F8FAFC] transition-all cursor-pointer">
                 <X className="w-4 h-4" />
               </button>
             </div>
           </div>
         </div>
 
-        {/* ─── Body: Split Layout ─── */}
+        {/* ─── Body: LEFT = Tabs+Content, RIGHT = Info Cards ─── */}
         <div className="flex flex-1 overflow-hidden min-h-0">
-          {/* ─── LEFT PANEL ─── */}
-          <div className="w-[300px] border-r border-[#E8ECF1] flex flex-col bg-[#FAFBFC] shrink-0 overflow-y-auto">
-            {/* Hero value + status */}
-            <div className="px-4 pt-4 pb-3 border-b border-[#E8ECF1]">
-              <div className="flex items-baseline justify-between gap-3">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-[28px] tabular-nums leading-none tracking-tight" style={{ fontWeight: 600, color: theme.text }}>
-                    {rule.tiers[0]?.discount || "—"}
-                  </span>
-                  <span className="text-[12px] text-[#94A3B8]" style={{ fontWeight: 500 }}>
-                    {isDis ? "discount" : "premium"}
-                  </span>
-                </div>
-                <span className="px-2 py-[3px] rounded-full text-[10px] border shrink-0" style={{ fontWeight: 500, color: rule.status === "Active" ? "#059669" : "#D97706", backgroundColor: rule.status === "Active" ? "#ECFDF5" : "#FFFBEB", borderColor: rule.status === "Active" ? "#A7F3D0" : "#FDE68A" }}>
-                  {rule.status}
-                </span>
-              </div>
-              <div className="flex items-center gap-3 mt-3">
-                {[
-                  { label: "Items", value: rule.itemCount },
-                  { label: "Categories", value: rule.categoryCount },
-                  { label: "Partners", value: rule.partnerCount },
-                ].map((s, i) => (
-                  <div key={s.label} className="flex items-center gap-3">
-                    {i > 0 && <div className="w-px h-4 bg-[#E8ECF1]" />}
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-[14px] text-[#0F172A] tabular-nums" style={{ fontWeight: 600 }}>{s.value}</span>
-                      <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>{s.label}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
+
+          {/* ─── LEFT: TABS + DATA ─── */}
+          <div className="flex-1 flex flex-col overflow-hidden bg-[#F8FAFC]">
+            {/* Tabs */}
+            <div className="flex items-center border-b border-[#E2E8F0] shrink-0 px-1 bg-white">
+              {PR_DETAIL_TABS.map((t) => {
+                const active = tab === t.id;
+                const TabIcon = t.icon;
+                return (
+                  <button
+                    key={t.id}
+                    onClick={() => setTab(t.id)}
+                    className={`inline-flex items-center gap-1.5 px-4 py-3 text-xs border-b-2 transition-all cursor-pointer whitespace-nowrap ${
+                      active ? "border-[#0A77FF] text-[#0A77FF] font-semibold" : "border-transparent text-[#64748B] hover:text-[#334155] font-medium"
+                    }`}
+                  >
+                    <TabIcon className="w-3.5 h-3.5" />
+                    {t.label}
+                    {t.count > 0 && (
+                      <span className={`text-[9px] rounded-full px-1.5 py-0.5 min-w-[18px] text-center ${active ? "bg-[#EDF4FF] text-[#0A77FF]" : "bg-[#F1F5F9] text-[#64748B]"}`} style={{ fontWeight: 600 }}>
+                        {t.count}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
             </div>
 
-            {/* Quick actions */}
-            <div className="flex items-center gap-1.5 px-4 py-2.5 border-b border-[#E8ECF1]">
-              {[
-                { icon: Package, label: "Add item" },
-                { icon: Layers, label: "Add category" },
-                { icon: Users, label: "Add partner" },
-                { icon: MoreHorizontal, label: "More actions" },
-              ].map((a) => (
-                <Tooltip key={a.label}>
-                  <TooltipTrigger asChild>
-                    <button
-                      onClick={() => toast.info(`${a.label} coming soon`)}
-                      className="w-8 h-8 rounded-lg border border-[#E2E8F0] bg-white flex items-center justify-center cursor-pointer transition-all duration-150 hover:bg-[#F8FAFC] hover:border-[#CBD5E1] active:scale-[0.97]"
-                    >
-                      <a.icon className="w-3.5 h-3.5 text-[#64748B]" />
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom" sideOffset={6} className="z-[300] !bg-white !text-[#334155] !border !border-[#E2E8F0] !shadow-sm rounded-lg text-[11px] px-2.5 py-1.5" style={{ fontWeight: 500 }}>
-                    {a.label}
-                  </TooltipContent>
-                </Tooltip>
-              ))}
-            </div>
-
-            {/* About section (collapsible) */}
-            <div className="border-b border-[#E8ECF1]">
-              <button onClick={() => setAboutOpen(!aboutOpen)} className="w-full flex items-center justify-between px-4 py-2.5 text-[12px] text-[#0F172A] cursor-pointer hover:bg-white/60 transition-colors" style={{ fontWeight: 600 }}>
-                About
-                <ChevronDown className={`w-3.5 h-3.5 text-[#94A3B8] transition-transform duration-200 ${aboutOpen ? "rotate-180" : ""}`} />
-              </button>
-              <div className={`overflow-hidden transition-all duration-200 ${aboutOpen ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0"}`}>
-                <div className="px-4 pb-3 space-y-3">
-                  <p className="text-[11px] text-[#475569] leading-relaxed" style={{ fontWeight: 400 }}>{rule.aboutText}</p>
-
-                  <div className="flex items-center justify-between rounded-lg border px-3 py-2" style={{ backgroundColor: "white", borderColor: "#E8ECF1" }}>
-                    <div className="flex items-center gap-2">
-                      <CalendarDays className="w-3.5 h-3.5 text-[#94A3B8]" />
-                      <span className="text-[11px] text-[#334155]" style={{ fontWeight: 500 }}>Date limit</span>
-                    </div>
-                    <Switch checked={rule.hasDateLimit} disabled={isPreset} />
-                  </div>
-
-                  {rule.hasDateLimit && (
-                    <div className="grid grid-cols-2 gap-2">
-                      <div className="rounded-lg border border-[#E8ECF1] bg-white px-3 py-2">
-                        <p className="text-[9px] text-[#94A3B8] uppercase tracking-wide" style={{ fontWeight: 500 }}>From</p>
-                        <p className="text-[12px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>{rule.validFrom}</p>
-                      </div>
-                      <div className="rounded-lg border border-[#E8ECF1] bg-white px-3 py-2">
-                        <p className="text-[9px] text-[#94A3B8] uppercase tracking-wide" style={{ fontWeight: 500 }}>To</p>
-                        <p className="text-[12px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>{rule.validTo}</p>
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="rounded-lg border border-[#E8ECF1] bg-white px-3 py-2">
-                      <p className="text-[9px] text-[#94A3B8] uppercase tracking-wide" style={{ fontWeight: 500 }}>Created by</p>
-                      <div className="flex items-center gap-1.5 mt-1">
-                        <div className="w-5 h-5 rounded-full flex items-center justify-center text-[8px] shrink-0" style={{ backgroundColor: theme.pillBg, color: theme.text, fontWeight: 700 }}>
-                          {rule.createdBy.split(" ").map((n) => n[0]).join("")}
-                        </div>
-                        <span className="text-[11px] text-[#0F172A] truncate" style={{ fontWeight: 500 }}>{rule.createdBy}</span>
-                      </div>
-                    </div>
-                    <div className="rounded-lg border border-[#E8ECF1] bg-white px-3 py-2">
-                      <p className="text-[9px] text-[#94A3B8] uppercase tracking-wide" style={{ fontWeight: 500 }}>Created at</p>
-                      <p className="text-[11px] text-[#0F172A] mt-1" style={{ fontWeight: 500 }}>{rule.createdDate}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Tiers section (collapsible) */}
-            <div className="flex-1">
-              <button onClick={() => setTiersOpen(!tiersOpen)} className="w-full flex items-center justify-between px-4 py-2.5 text-[12px] text-[#0F172A] cursor-pointer hover:bg-white/60 transition-colors" style={{ fontWeight: 600 }}>
-                <span>Tiers ({rule.tiers.length})</span>
-                <div className="flex items-center gap-1.5">
-                  {!isPreset && (
-                    <span
-                      role="button"
-                      tabIndex={0}
-                      onClick={(e) => { e.stopPropagation(); toast.info("Add tier coming soon"); }}
-                      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.stopPropagation(); toast.info("Add tier coming soon"); } }}
-                      className="text-[11px] hover:opacity-70 cursor-pointer transition-colors"
-                      style={{ fontWeight: 600, color: theme.text }}
-                    >
-                      + Add
-                    </span>
-                  )}
-                  <ChevronDown className={`w-3.5 h-3.5 text-[#94A3B8] transition-transform duration-200 ${tiersOpen ? "rotate-180" : ""}`} />
-                </div>
-              </button>
-              <div className={`overflow-hidden transition-all duration-200 ${tiersOpen ? "max-h-[2000px] opacity-100" : "max-h-0 opacity-0"}`}>
-                <div className="px-4 pb-4 space-y-2">
-                  {rule.tiers.map((tier, idx) => (
-                    <div key={idx} className="rounded-xl border p-3 transition-all" style={{ backgroundColor: "white", borderColor: theme.pillBorder }}>
-                      <div className="flex items-center justify-between mb-2.5">
-                        <div className="flex items-center gap-1.5">
-                          <span className="w-5 h-5 rounded-md flex items-center justify-center text-[10px]" style={{ fontWeight: 700, backgroundColor: theme.pillBg, color: theme.text }}>{idx + 1}</span>
-                          <span className="text-[11px] text-[#334155]" style={{ fontWeight: 600 }}>Tier {idx + 1}</span>
-                          {tier.isFixRate && (
-                            <span className="px-1.5 py-px rounded text-[9px] bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A]" style={{ fontWeight: 600 }}>FIX RATE</span>
-                          )}
-                          {isPreset && (
-                            <Lock className="w-3 h-3 text-[#CBD5E1]" />
-                          )}
-                        </div>
-                        {!isPreset && (
-                          <div className="flex items-center gap-0.5">
-                            <button onClick={() => toast.info("Delete tier")} className="w-5 h-5 rounded flex items-center justify-center text-[#94A3B8] hover:text-[#EF4444] hover:bg-red-50 cursor-pointer transition-colors">
-                              <Trash2 className="w-3 h-3" />
-                            </button>
-                            <button onClick={() => toast.info("Edit tier")} className="w-5 h-5 rounded flex items-center justify-center text-[#94A3B8] hover:text-[#475569] hover:bg-[#F1F5F9] cursor-pointer transition-colors">
-                              <Pencil className="w-3 h-3" />
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                      <div className="grid grid-cols-3 gap-2">
-                        <div>
-                          <p className="text-[9px] text-[#94A3B8] uppercase tracking-wide" style={{ fontWeight: 500 }}>Min Order Quantity</p>
-                          <p className="text-[12px] text-[#0F172A] tabular-nums" style={{ fontWeight: 600 }}>{tier.minQty}</p>
-                        </div>
-                        <div>
-                          <p className="text-[9px] text-[#94A3B8] uppercase tracking-wide" style={{ fontWeight: 500 }}>Max Order Quantity</p>
-                          <p className="text-[12px] text-[#0F172A] tabular-nums" style={{ fontWeight: 600 }}>{tier.maxQty}</p>
-                        </div>
-                        <div>
-                          <p className="text-[9px] text-[#94A3B8] uppercase tracking-wide" style={{ fontWeight: 500 }}>{tier.isFixRate ? "Fix Rate" : "Discount"}</p>
-                          <p className="text-[13px] tabular-nums" style={{ fontWeight: 700, color: theme.text }}>{tier.discount}</p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* ─── RIGHT PANEL ─── */}
-          <div className="flex-1 flex flex-col overflow-hidden bg-white">
-            {/* Tabs row */}
-            <div className="flex items-center border-b border-[#E8ECF1] shrink-0">
-              <div className="flex items-center flex-1 overflow-x-auto px-2">
-                {DETAIL_TABS_VISIBLE.map((t) => {
-                  const active = tab === t.id;
-                  const count = t.id === "items" ? rule.itemCount : t.id === "categories" ? rule.categoryCount : t.id === "partner" ? rule.partnerCount : 0;
-                  return (
-                    <button
-                      key={t.id}
-                      onClick={() => setTab(t.id)}
-                      className={`inline-flex items-center gap-1.5 px-3 py-2.5 text-[12px] border-b-2 transition-all cursor-pointer whitespace-nowrap ${
-                        active ? "border-[#0A77FF] text-[#0A77FF] bg-white" : "border-transparent text-[#94A3B8] hover:text-[#64748B]"
-                      }`}
-                      style={{ fontWeight: active ? 600 : 500 }}
-                    >
-                      <t.icon className="w-3.5 h-3.5" />
-                      {t.label}
-                      {count > 0 && (
-                        <span className={`text-[9px] rounded-full px-1.5 py-px min-w-[16px] text-center ${active ? "bg-[#0A77FF]/10 text-[#0A77FF]" : "bg-[#F1F5F9] text-[#94A3B8]"}`} style={{ fontWeight: 700 }}>
-                          {count}
-                        </span>
-                      )}
-                    </button>
-                  );
-                })}
-                {/* Overflow "7 more..." */}
-                <div className="relative">
-                  
-                  {showOverflow && (
-                    <>
-                      <div className="fixed inset-0 z-[199]" onClick={() => setShowOverflow(false)} />
-                      <div className="absolute top-full left-0 mt-1 w-44 bg-white rounded-xl border border-[#E2E8F0] shadow-lg py-1.5 z-[200]">
-                        {DETAIL_TABS_OVERFLOW.map((t) => (
-                          <button
-                            key={t.id}
-                            onClick={() => { setTab(t.id); setShowOverflow(false); }}
-                            className={`w-full text-left px-3 py-2 text-[12px] hover:bg-[#F8FAFC] transition-colors cursor-pointer ${tab === t.id ? "bg-[#F8FAFC]" : ""}`}
-                            style={{ fontWeight: tab === t.id ? 600 : 400, color: tab === t.id ? "#0A77FF" : "#334155" }}
-                          >
-                            {t.label}
-                          </button>
-                        ))}
-                      </div>
-                    </>
-                  )}
-                </div>
-              </div>
-              {/* Add tab + */}
-              
-            </div>
-
-            {/* Items tab */}
+            {/* Items Tab */}
             {tab === "items" && (
               <div className="flex-1 flex flex-col overflow-hidden">
-                <div className="flex items-center justify-between gap-3 px-4 pt-3 pb-2 shrink-0">
-                  <div className="flex items-center gap-2 flex-1 min-w-0">
-                    <div className="relative flex-1 max-w-[220px]">
-                      <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8] pointer-events-none" />
-                      <Input placeholder="Search items..." value={itemSearch} onChange={(e) => setItemSearch(e.target.value)} className="pl-8 h-8 text-[12px] bg-white border-[#E2E8F0]" />
+                <div className="px-4 py-3 shrink-0 bg-white border-b border-[#E2E8F0]">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                      <div className="relative flex-1 max-w-[240px]">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8] pointer-events-none" />
+                        <input type="text" value={itemSearch} onChange={(e) => setItemSearch(e.target.value)} placeholder="Search items..." className="w-full pl-9 pr-3 h-8 text-xs bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg focus:outline-none focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 transition-colors placeholder:text-[#94A3B8]" />
+                      </div>
+                      <button className="h-8 px-3 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#334155] hover:bg-[#F8FAFC] cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 500 }}>
+                        <SlidersHorizontal className="w-3.5 h-3.5" /> Filters
+                      </button>
                     </div>
-                    <button className="h-8 px-2.5 rounded-lg border border-[#E2E8F0] bg-white text-[12px] text-[#475569] hover:bg-[#F8FAFC] cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 500 }}>
-                      <SlidersHorizontal className="w-3.5 h-3.5" /> Filters
+                    <button className="h-8 px-3 rounded-lg bg-[#0A77FF] text-white text-xs hover:bg-[#0A77FF]/90 cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 500 }}>
+                      + Add Item
                     </button>
                   </div>
-                  <button onClick={() => toast.info("Add new item coming soon")} className="h-8 px-3 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-[12px] shadow-sm cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 600 }}>
-                    <Plus className="w-3.5 h-3.5" /> Add item
-                  </button>
                 </div>
-
-                {/* Filter pills */}
-                <div className="flex items-center gap-1.5 px-4 pb-2 overflow-x-auto shrink-0">
-                  {[
-                    { label: "All", count: rule.items.length, active: true },
-                    { label: "Active", count: rule.items.filter((x) => x.status === "Active").length },
-                    { label: "Inactive", count: rule.items.filter((x) => x.status === "Inactive").length },
-                    { label: "Archived", count: 0 },
-                  ].map((f) => (
-                    <button
-                      key={f.label}
-                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[11px] whitespace-nowrap cursor-pointer transition-colors ${
-                        f.active ? "" : "border-[#E8ECF1] text-[#64748B] hover:bg-[#F8FAFC] hover:border-[#CBD5E1]"
-                      }`}
-                      style={f.active ? { fontWeight: 600, color: "#0A77FF", backgroundColor: "#EDF4FF", borderColor: "#BFDBFE" } : { fontWeight: 500 }}
-                    >
-                      {f.label}
-                      {f.count > 0 && (
-                        <span className="text-[9px] rounded-full px-1.5 py-px min-w-[14px] text-center" style={{ fontWeight: 600, backgroundColor: f.active ? "rgba(10,119,255,0.1)" : "#F1F5F9", color: f.active ? "#0A77FF" : "#94A3B8" }}>
-                          {f.count}
-                        </span>
-                      )}
-                    </button>
-                  ))}
-                </div>
-
-                <div className="h-px bg-[#E8ECF1] mx-4 shrink-0" />
 
                 <div className="flex-1 overflow-auto">
                   {filteredItems.length === 0 ? (
                     <div className="flex flex-col items-center gap-2 py-16 text-[#94A3B8]">
                       <Package className="w-8 h-8" />
                       <p className="text-[13px]" style={{ fontWeight: 500 }}>No items assigned</p>
-                      <p className="text-[11px]">Add items to apply this pricing rule.</p>
                     </div>
                   ) : (
-                    <Table>
-                      <TableHeader className="sticky top-0 bg-[#F8FAFC] z-10 [&_th]:border-b [&_th]:border-border/60">
-                        <TableRow>
-                          <TableHead className="text-xs !pl-3 w-[40px]" style={{ fontWeight: 600 }}><Checkbox /></TableHead>
-                          <TableHead className="text-xs !pl-3" style={{ fontWeight: 600, color: "#64748B" }}>Item</TableHead>
-                          <TableHead className="text-xs !pl-3" style={{ fontWeight: 600, color: "#64748B" }}>Description</TableHead>
-                          <TableHead className="text-xs !pl-3" style={{ fontWeight: 600, color: "#64748B" }}>Category</TableHead>
-                          <TableHead className="text-xs !pl-3" style={{ fontWeight: 600, color: "#64748B" }}>Status</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {filteredItems.map((item) => (
-                          <TableRow key={item.id} className="hover:bg-[#F8FBFF] transition-colors [&>td]:py-2.5 [&>td]:pl-3 [&>td]:pr-2">
-                            <TableCell className="!pl-3 !pr-0"><Checkbox /></TableCell>
-                            <TableCell>
-                              <div className="flex items-center gap-2.5 min-w-[120px]">
-                                <div className="w-8 h-8 rounded-lg bg-[#F1F5F9] border border-[#E2E8F0] flex items-center justify-center shrink-0">
-                                  <Package className="w-3.5 h-3.5 text-[#94A3B8]" />
+                    <table className="w-full text-xs">
+                      <thead className="sticky top-0 z-10">
+                        <tr className="bg-[#F8FAFC]">
+                          <th className="text-left pl-4 pr-2 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Item</th>
+                          <th className="text-left pl-4 pr-2 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Description</th>
+                          <th className="text-left pl-4 pr-2 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Category</th>
+                          <th className="text-left pl-4 pr-2 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Item Type</th>
+                          <th className="text-left pl-4 pr-4 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredItems.map((item) => {
+                          const statusColor = item.status === "Active"
+                            ? { bg: "#F0FDF4", text: "#16A34A", border: "#BBF7D0", dot: "#16A34A" }
+                            : { bg: "#FEF2F2", text: "#DC2626", border: "#FECACA", dot: "#DC2626" };
+                          return (
+                            <tr key={item.id} className="bg-white hover:bg-[#F8FAFC] transition-colors border-b border-[#F1F5F9]">
+                              <td className="pl-4 pr-2 py-3">
+                                <div className="flex items-center gap-3">
+                                  <div className="w-9 h-9 rounded-lg bg-[#F1F5F9] flex items-center justify-center shrink-0 border border-[#E2E8F0]">
+                                    <Package className="w-3.5 h-3.5 text-[#94A3B8]" />
+                                  </div>
+                                  <span className="font-mono text-[12px] text-[#0F172A] whitespace-nowrap" style={{ fontWeight: 600 }}>{item.partNo}</span>
                                 </div>
-                                <span className="text-[13px] text-[#0F172A] font-mono whitespace-nowrap" style={{ fontWeight: 500 }}>{item.partNo}</span>
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <p className="text-[13px] text-[#334155] truncate max-w-[220px]" style={{ fontWeight: 400 }}>{item.description}</p>
-                            </TableCell>
-                            <TableCell>
-                              <span className="text-[13px] text-[#475569] whitespace-nowrap">{item.category}</span>
-                            </TableCell>
-                            <TableCell>
-                              <span className="inline-flex px-2 py-0.5 rounded-full text-[10px] border" style={{ fontWeight: 500, color: item.status === "Active" ? "#059669" : "#DC2626", backgroundColor: item.status === "Active" ? "#ECFDF5" : "#FEF2F2", borderColor: item.status === "Active" ? "#A7F3D0" : "#FECACA" }}>
-                                {item.status}
-                              </span>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
+                              </td>
+                              <td className="pl-4 pr-2 py-3 max-w-[220px]">
+                                <p className="text-[12px] text-[#0F172A] truncate" style={{ fontWeight: 500 }}>{item.description}</p>
+                              </td>
+                              <td className="pl-4 pr-2 py-3 text-[12px] text-[#334155] whitespace-nowrap" style={{ fontWeight: 500 }}>{item.category}</td>
+                              <td className="pl-4 pr-2 py-3 whitespace-nowrap">
+                                <ItemTypeBadge type={item.itemType} />
+                              </td>
+                              <td className="pl-4 pr-4 py-3 whitespace-nowrap">
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px]" style={{ fontWeight: 600, backgroundColor: statusColor.bg, color: statusColor.text, border: `1px solid ${statusColor.border}` }}>
+                                  <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: statusColor.dot }} />
+                                  {item.status}
+                                </span>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
                   )}
                 </div>
 
-                {filteredItems.length > 0 && (
-                  <div className="flex items-center justify-between px-4 py-2 border-t border-[#E8ECF1] shrink-0 bg-[#FAFBFC]">
-                    <span className="text-[11px] text-[#94A3B8]">Showing {filteredItems.length} of {rule.items.length} items</span>
-                    <div className="flex items-center gap-2 text-[11px] text-[#94A3B8]">
-                      <span>Records per page</span>
-                      <select className="h-6 px-1.5 rounded border border-[#E2E8F0] text-[11px] cursor-pointer outline-none">
-                        <option>20</option><option>50</option>
-                      </select>
-                    </div>
+                <div className="flex items-center justify-between px-4 py-2.5 border-t border-[#E2E8F0] shrink-0 bg-white">
+                  <span className="text-[11px] text-[#64748B]">Showing <span className="text-[#0F172A]" style={{ fontWeight: 600 }}>{filteredItems.length}</span> of <span className="text-[#0F172A]" style={{ fontWeight: 600 }}>{rule.itemCount}</span> items</span>
+                  <div className="flex items-center gap-2 text-[11px] text-[#64748B]">
+                    <span>Records per page</span>
+                    <select className="h-6 px-1.5 rounded border border-[#E2E8F0] bg-white text-[11px] text-[#334155] cursor-pointer outline-none">
+                      <option>20</option><option>50</option>
+                    </select>
                   </div>
-                )}
+                </div>
               </div>
             )}
 
-            {/* Categories tab */}
+            {/* Categories Tab */}
             {tab === "categories" && (
               <div className="flex-1 flex flex-col overflow-hidden">
-                <div className="flex items-center justify-between gap-3 px-4 pt-3 pb-2 shrink-0">
-                  <div className="flex items-center gap-2 flex-1 min-w-0">
-                    <div className="relative flex-1 max-w-[220px]">
-                      <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8] pointer-events-none" />
-                      <Input placeholder="Search categories..." value={catSearch} onChange={(e) => setCatSearch(e.target.value)} className="pl-8 h-8 text-[12px] bg-white border-[#E2E8F0]" />
+                <div className="px-4 py-3 shrink-0 bg-white border-b border-[#E2E8F0]">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                      <div className="relative flex-1 max-w-[240px]">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8] pointer-events-none" />
+                        <input type="text" value={catSearch} onChange={(e) => setCatSearch(e.target.value)} placeholder="Search categories..." className="w-full pl-9 pr-3 h-8 text-xs bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg focus:outline-none focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 transition-colors placeholder:text-[#94A3B8]" />
+                      </div>
+                      <button className="h-8 px-3 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#334155] hover:bg-[#F8FAFC] cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 500 }}>
+                        <SlidersHorizontal className="w-3.5 h-3.5" /> Filters
+                      </button>
                     </div>
-                    <button className="h-8 px-2.5 rounded-lg border border-[#E2E8F0] bg-white text-[12px] text-[#475569] hover:bg-[#F8FAFC] cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 500 }}>
-                      <SlidersHorizontal className="w-3.5 h-3.5" /> Filters
+                    <button className="h-8 px-3 rounded-lg bg-[#0A77FF] text-white text-xs hover:bg-[#0A77FF]/90 cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 500 }}>
+                      + Add Category
                     </button>
                   </div>
-                  <button onClick={() => toast.info("Add category coming soon")} className="h-8 px-3 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-[12px] shadow-sm cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 600 }}>
-                    <Plus className="w-3.5 h-3.5" /> Add category
-                  </button>
                 </div>
-
-                <div className="flex items-center gap-1.5 px-4 pb-2 overflow-x-auto shrink-0">
-                  {[
-                    { label: "All", count: rule.categories.length, active: true },
-                    { label: "Active", count: rule.categories.filter((x) => x.status === "Active").length },
-                    { label: "Inactive", count: rule.categories.filter((x) => x.status === "Inactive").length },
-                    { label: "Archived", count: 0 },
-                  ].map((f) => (
-                    <button
-                      key={f.label}
-                      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[11px] whitespace-nowrap cursor-pointer transition-colors ${
-                        f.active ? "" : "border-[#E8ECF1] text-[#64748B] hover:bg-[#F8FAFC] hover:border-[#CBD5E1]"
-                      }`}
-                      style={f.active ? { fontWeight: 600, color: "#0A77FF", backgroundColor: "#EDF4FF", borderColor: "#BFDBFE" } : { fontWeight: 500 }}
-                    >
-                      {f.label}
-                      {f.count > 0 && (
-                        <span className="text-[9px] rounded-full px-1.5 py-px min-w-[14px] text-center" style={{ fontWeight: 600, backgroundColor: f.active ? "rgba(10,119,255,0.1)" : "#F1F5F9", color: f.active ? "#0A77FF" : "#94A3B8" }}>
-                          {f.count}
-                        </span>
-                      )}
-                    </button>
-                  ))}
-                </div>
-
-                <div className="h-px bg-[#E8ECF1] mx-4 shrink-0" />
-
                 <div className="flex-1 overflow-auto">
                   {filteredCats.length === 0 ? (
                     <div className="flex flex-col items-center gap-2 py-16 text-[#94A3B8]">
                       <Layers className="w-8 h-8" />
                       <p className="text-[13px]" style={{ fontWeight: 500 }}>No categories assigned</p>
-                      <p className="text-[11px]">Add categories to apply this pricing rule.</p>
                     </div>
                   ) : (
-                    <Table>
-                      <TableHeader className="sticky top-0 bg-[#F8FAFC] z-10 [&_th]:border-b [&_th]:border-border/60">
-                        <TableRow>
-                          <TableHead className="text-xs !pl-3 w-[40px]" style={{ fontWeight: 600 }}><Checkbox /></TableHead>
-                          <TableHead className="text-xs !pl-3" style={{ fontWeight: 600, color: "#64748B" }}>Code</TableHead>
-                          <TableHead className="text-xs !pl-3" style={{ fontWeight: 600, color: "#64748B" }}>Name</TableHead>
-                          <TableHead className="text-xs !pl-3" style={{ fontWeight: 600, color: "#64748B" }}>Description</TableHead>
-                          <TableHead className="text-xs !pl-3 text-right" style={{ fontWeight: 600, color: "#64748B" }}>Linked Items</TableHead>
-                          <TableHead className="text-xs !pl-3" style={{ fontWeight: 600, color: "#64748B" }}>Status</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {filteredCats.map((cat) => (
-                          <TableRow key={cat.id} className="hover:bg-[#F8FBFF] transition-colors [&>td]:py-2.5 [&>td]:pl-3 [&>td]:pr-2">
-                            <TableCell className="!pl-3 !pr-0"><Checkbox /></TableCell>
-                            <TableCell>
-                              <span className="text-[13px] text-[#0F172A] font-mono whitespace-nowrap" style={{ fontWeight: 500 }}>{cat.code}</span>
-                            </TableCell>
-                            <TableCell>
-                              <span className="text-[13px] text-[#334155]" style={{ fontWeight: 500 }}>{cat.name}</span>
-                            </TableCell>
-                            <TableCell>
-                              <span className="text-[13px] text-[#475569] truncate block max-w-[180px]" style={{ fontWeight: 400 }}>{cat.description}</span>
-                            </TableCell>
-                            <TableCell className="text-right !pr-3">
-                              <span className="text-[14px] text-[#0F172A] tabular-nums" style={{ fontWeight: 600 }}>{cat.linkedItems}</span>
-                            </TableCell>
-                            <TableCell>
-                              <span className="inline-flex px-2 py-0.5 rounded-full text-[10px] border" style={{ fontWeight: 500, color: cat.status === "Active" ? "#059669" : "#DC2626", backgroundColor: cat.status === "Active" ? "#ECFDF5" : "#FEF2F2", borderColor: cat.status === "Active" ? "#A7F3D0" : "#FECACA" }}>
-                                {cat.status}
-                              </span>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
+                    <table className="w-full text-xs">
+                      <thead className="sticky top-0 z-10">
+                        <tr className="bg-[#F8FAFC]">
+                          <th className="text-left pl-4 pr-2 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Code</th>
+                          <th className="text-left pl-4 pr-2 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Name</th>
+                          <th className="text-left pl-4 pr-2 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Description</th>
+                          <th className="text-right pl-4 pr-2 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Linked Items</th>
+                          <th className="text-left pl-4 pr-4 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredCats.map((cat) => {
+                          const statusColor = cat.status === "Active"
+                            ? { bg: "#F0FDF4", text: "#16A34A", border: "#BBF7D0", dot: "#16A34A" }
+                            : { bg: "#FEF2F2", text: "#DC2626", border: "#FECACA", dot: "#DC2626" };
+                          return (
+                            <tr key={cat.id} className="bg-white hover:bg-[#F8FAFC] transition-colors border-b border-[#F1F5F9]">
+                              <td className="pl-4 pr-2 py-3">
+                                <span className="font-mono text-[12px] text-[#0F172A]" style={{ fontWeight: 600 }}>{cat.code}</span>
+                              </td>
+                              <td className="pl-4 pr-2 py-3 text-[12px] text-[#334155]" style={{ fontWeight: 500 }}>{cat.name}</td>
+                              <td className="pl-4 pr-2 py-3 max-w-[180px]">
+                                <p className="text-[12px] text-[#475569] truncate">{cat.description}</p>
+                              </td>
+                              <td className="pl-4 pr-2 py-3 text-right">
+                                <span className="text-[14px] text-[#0F172A] tabular-nums" style={{ fontWeight: 600 }}>{cat.linkedItems}</span>
+                              </td>
+                              <td className="pl-4 pr-4 py-3 whitespace-nowrap">
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px]" style={{ fontWeight: 600, backgroundColor: statusColor.bg, color: statusColor.text, border: `1px solid ${statusColor.border}` }}>
+                                  <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: statusColor.dot }} />
+                                  {cat.status}
+                                </span>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
                   )}
+                </div>
+                <div className="flex items-center justify-between px-4 py-2.5 border-t border-[#E2E8F0] shrink-0 bg-white">
+                  <span className="text-[11px] text-[#64748B]">Showing <span className="text-[#0F172A]" style={{ fontWeight: 600 }}>{filteredCats.length}</span> of <span className="text-[#0F172A]" style={{ fontWeight: 600 }}>{rule.categoryCount}</span> categories</span>
+                  <div className="flex items-center gap-2 text-[11px] text-[#64748B]">
+                    <span>Records per page</span>
+                    <select className="h-6 px-1.5 rounded border border-[#E2E8F0] bg-white text-[11px] text-[#334155] cursor-pointer outline-none">
+                      <option>20</option><option>50</option>
+                    </select>
+                  </div>
                 </div>
               </div>
             )}
 
-            {/* Partner tab */}
+            {/* Partners Tab */}
             {tab === "partner" && (
               <div className="flex-1 flex flex-col overflow-hidden">
-                {/* Row 1: Search + Filters + density + Add partner */}
-                <div className="flex items-center justify-between gap-3 px-4 pt-3 pb-2 shrink-0">
-                  <div className="flex items-center gap-2 flex-1 min-w-0">
-                    <div className="relative flex-1 max-w-[260px]">
-                      <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8] pointer-events-none" />
-                      <Input placeholder="Search partner, location..." value={partnerSearch} onChange={(e) => setPartnerSearch(e.target.value)} className="pl-8 h-8 text-[12px] bg-white border-[#E2E8F0]" />
+                <div className="px-4 py-3 shrink-0 bg-white border-b border-[#E2E8F0]">
+                  <div className="flex items-center gap-2">
+                    <div className="relative flex-1 max-w-[240px]">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8] pointer-events-none" />
+                      <input type="text" value={partnerSearch} onChange={(e) => setPartnerSearch(e.target.value)} placeholder="Search partners..." className="w-full pl-9 pr-3 h-8 text-xs bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg focus:outline-none focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 transition-colors placeholder:text-[#94A3B8]" />
                     </div>
-                    <button className="h-8 px-2.5 rounded-lg border border-[#E2E8F0] bg-white text-[12px] text-[#475569] hover:bg-[#F8FAFC] cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 500 }}>
+                    <button className="h-8 px-3 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#334155] hover:bg-[#F8FAFC] cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 500 }}>
                       <SlidersHorizontal className="w-3.5 h-3.5" /> Filters
                     </button>
                   </div>
-                  <div className="flex items-center gap-1.5 shrink-0">
-                    {/* Records count */}
-                    <span className="text-[11px] text-[#94A3B8] tabular-nums mr-1" style={{ fontWeight: 500 }}>{rule.partners.length}</span>
-                    {/* Density controls */}
-                    <div className="flex items-center border border-[#E2E8F0] rounded-lg overflow-hidden">
-                      <button className="w-7 h-7 flex items-center justify-center bg-[#EDF4FF] text-[#0A77FF] cursor-pointer">
-                        <Rows3 className="w-3.5 h-3.5" />
-                      </button>
-                      <button className="w-7 h-7 flex items-center justify-center text-[#CBD5E1] hover:bg-[#F8FAFC] cursor-pointer transition-colors">
-                        <Grid2X2 className="w-3.5 h-3.5" />
-                      </button>
-                      <button className="w-7 h-7 flex items-center justify-center text-[#CBD5E1] hover:bg-[#F8FAFC] cursor-pointer transition-colors">
-                        <LayoutGrid className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                    <button onClick={() => toast.info("Add partner coming soon")} className="h-8 px-3 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-[12px] shadow-sm cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 600 }}>
-                      <Plus className="w-3.5 h-3.5" /> Add partner
-                    </button>
-                  </div>
                 </div>
-
-                {/* Row 2: Quick filter pills */}
-                <div className="flex items-center gap-1.5 px-4 pb-2 overflow-x-auto shrink-0">
-                  {[
-                    { key: "all", label: "All" },
-                    { key: "customers", label: "Customers" },
-                    { key: "vendors", label: "Vendors" },
-                    { key: "both", label: "Both" },
-                  ].map((f) => (
-                    <button
-                      key={f.key}
-                      onClick={() => setPartnerFilter(f.key)}
-                      className={`inline-flex items-center px-2.5 py-1 rounded-full border text-[11px] whitespace-nowrap cursor-pointer transition-colors ${
-                        partnerFilter === f.key ? "" : "border-[#E8ECF1] text-[#64748B] hover:bg-[#F8FAFC] hover:border-[#CBD5E1]"
-                      }`}
-                      style={partnerFilter === f.key ? { fontWeight: 600, color: "#0A77FF", backgroundColor: "#EDF4FF", borderColor: "#BFDBFE" } : { fontWeight: 500 }}
-                    >
-                      {f.label}
-                    </button>
-                  ))}
-                </div>
-
-                <div className="h-px bg-[#E8ECF1] mx-4 shrink-0" />
-
-                {/* Partner table */}
                 <div className="flex-1 overflow-auto">
                   {filteredPartners.length === 0 ? (
                     <div className="flex flex-col items-center gap-2 py-16 text-[#94A3B8]">
                       <Users className="w-8 h-8" />
                       <p className="text-[13px]" style={{ fontWeight: 500 }}>No partners found</p>
-                      <p className="text-[11px]">Add partners to apply this pricing rule.</p>
                     </div>
                   ) : (
-                    <Table>
-                      <TableHeader className="sticky top-0 bg-[#F8FAFC] z-10 [&_th]:border-b [&_th]:border-border/60">
-                        <TableRow>
-                          <TableHead className="text-xs !pl-3 w-[40px]" style={{ fontWeight: 600 }}><Checkbox /></TableHead>
-                          <TableHead className="text-xs !pl-3" style={{ fontWeight: 600, color: "#64748B" }}>Partner Name</TableHead>
-                          <TableHead className="text-xs !pl-3" style={{ fontWeight: 600, color: "#64748B" }}>Partner Type</TableHead>
-                          <TableHead className="text-xs !pl-3" style={{ fontWeight: 600, color: "#64748B" }}>Status</TableHead>
-                          <TableHead className="text-xs !pl-3 text-right" style={{ fontWeight: 600, color: "#64748B" }}>No. of Items</TableHead>
-                          <TableHead className="text-xs !pl-3 text-right !pr-3" style={{ fontWeight: 600, color: "#64748B" }}>Actions</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {filteredPartners.map((partner) => (
-                          <TableRow key={partner.id} className="hover:bg-[#F8FBFF] transition-colors [&>td]:py-2.5 [&>td]:pl-3 [&>td]:pr-2">
-                            <TableCell className="!pl-3 !pr-0"><Checkbox /></TableCell>
-                            <TableCell>
-                              <div className="flex items-center gap-2.5 min-w-[180px]">
-                                <div className="w-8 h-8 rounded-full bg-[#EBF3FF] flex items-center justify-center text-[11px] text-[#0A77FF] shrink-0" style={{ fontWeight: 600 }}>
-                                  {partner.avatar}
+                    <table className="w-full text-xs">
+                      <thead className="sticky top-0 z-10">
+                        <tr className="bg-[#F8FAFC]">
+                          <th className="text-left pl-4 pr-2 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Partner</th>
+                          <th className="text-left pl-4 pr-2 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Type</th>
+                          <th className="text-left pl-4 pr-2 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Status</th>
+                          <th className="text-right pl-4 pr-2 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Items</th>
+                          <th className="text-right pl-4 pr-4 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredPartners.map((partner) => {
+                          const statusColor = partner.status === "Active"
+                            ? { bg: "#F0FDF4", text: "#16A34A", border: "#BBF7D0", dot: "#16A34A" }
+                            : { bg: "#FEF2F2", text: "#DC2626", border: "#FECACA", dot: "#DC2626" };
+                          return (
+                            <tr key={partner.id} className="bg-white hover:bg-[#F8FAFC] transition-colors border-b border-[#F1F5F9]">
+                              <td className="pl-4 pr-2 py-3">
+                                <div className="flex items-center gap-3">
+                                  <div className="w-9 h-9 rounded-full bg-[#EBF3FF] flex items-center justify-center text-[10px] text-[#0A77FF] shrink-0" style={{ fontWeight: 600 }}>
+                                    {partner.avatar}
+                                  </div>
+                                  <span className="text-[12px] text-[#0F172A] truncate" style={{ fontWeight: 500 }}>{partner.name}</span>
                                 </div>
-                                <span className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 500 }}>{partner.name}</span>
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex items-center gap-1 flex-wrap">
-                                {partner.types.map((type) => {
-                                  const tc = PARTNER_TYPE_COLORS[type] || PARTNER_TYPE_COLORS["Vendor"];
-                                  return (
-                                    <span key={type} className="inline-flex px-1.5 py-0.5 rounded text-[10px] border" style={{ fontWeight: 500, color: tc.text, backgroundColor: tc.bg, borderColor: tc.border }}>
-                                      {type}
-                                    </span>
-                                  );
-                                })}
-                                {partner.types.length < 3 && (
-                                  <span className="text-[10px] text-[#0A77FF]" style={{ fontWeight: 500 }}>+{(partner.id.charCodeAt(partner.id.length - 1) % 3) + 1}</span>
-                                )}
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <span className="inline-flex px-2 py-0.5 rounded-full text-[10px] border" style={{ fontWeight: 500, color: partner.status === "Active" ? "#059669" : "#DC2626", backgroundColor: partner.status === "Active" ? "#ECFDF5" : "#FEF2F2", borderColor: partner.status === "Active" ? "#A7F3D0" : "#FECACA" }}>
-                                {partner.status}
-                              </span>
-                            </TableCell>
-                            <TableCell className="text-right">
-                              <div className="flex items-center justify-end gap-1.5">
+                              </td>
+                              <td className="pl-4 pr-2 py-3 whitespace-nowrap">
+                                <div className="flex items-center gap-1 flex-wrap">
+                                  {partner.types.slice(0, 2).map((type) => {
+                                    const tc = PARTNER_TYPE_COLORS[type] || PARTNER_TYPE_COLORS["Vendor"];
+                                    return (
+                                      <span key={type} className="inline-flex px-1.5 py-0.5 rounded text-[10px] border" style={{ fontWeight: 500, color: tc.text, backgroundColor: tc.bg, borderColor: tc.border }}>
+                                        {type}
+                                      </span>
+                                    );
+                                  })}
+                                </div>
+                              </td>
+                              <td className="pl-4 pr-2 py-3 whitespace-nowrap">
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px]" style={{ fontWeight: 600, backgroundColor: statusColor.bg, color: statusColor.text, border: `1px solid ${statusColor.border}` }}>
+                                  <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: statusColor.dot }} />
+                                  {partner.status}
+                                </span>
+                              </td>
+                              <td className="pl-4 pr-2 py-3 text-right">
                                 <span className="text-[14px] text-[#0F172A] tabular-nums" style={{ fontWeight: 600 }}>{partner.itemCount}</span>
-                                <span className="text-[10px] text-[#0A77FF]" style={{ fontWeight: 500 }}>{partner.additionalItems}</span>
-                              </div>
-                            </TableCell>
-                            <TableCell className="text-right !pr-3">
-                              <button className="w-6 h-6 rounded flex items-center justify-center text-[#94A3B8] hover:text-[#475569] hover:bg-[#F1F5F9] cursor-pointer transition-colors">
-                                <MoreHorizontal className="w-3.5 h-3.5" />
-                              </button>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
+                              </td>
+                              <td className="pl-4 pr-4 py-3 text-right">
+                                <button className="w-6 h-6 rounded flex items-center justify-center text-[#94A3B8] hover:text-[#475569] hover:bg-[#F1F5F9] cursor-pointer transition-colors">
+                                  <MoreHorizontal className="w-3.5 h-3.5" />
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
                   )}
                 </div>
-
-                {/* Pagination */}
-                {filteredPartners.length > 0 && (
-                  <div className="flex items-center justify-between px-4 py-2 border-t border-[#E8ECF1] shrink-0 bg-[#FAFBFC]">
-                    <div className="flex items-center gap-2 text-[11px] text-[#94A3B8]">
-                      <span>Records per page</span>
-                      <select className="h-6 px-1.5 rounded border border-[#E2E8F0] text-[11px] cursor-pointer outline-none">
-                        <option>20</option><option>50</option>
-                      </select>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <button className="w-7 h-7 rounded-lg border border-[#E2E8F0] flex items-center justify-center text-[#94A3B8] hover:bg-[#F8FAFC] cursor-pointer transition-colors">
-                        <ChevronsLeft className="w-3.5 h-3.5" />
-                      </button>
-                      <button className="w-7 h-7 rounded-lg border border-[#E2E8F0] flex items-center justify-center text-[#94A3B8] hover:bg-[#F8FAFC] cursor-pointer transition-colors">
-                        <ChevronLeft className="w-3.5 h-3.5" />
-                      </button>
-                      <span className="w-7 h-7 rounded-lg bg-[#0A77FF] text-white flex items-center justify-center text-[11px]" style={{ fontWeight: 600 }}>1</span>
-                      <button className="w-7 h-7 rounded-lg border border-[#E2E8F0] flex items-center justify-center text-[11px] text-[#475569] hover:bg-[#F8FAFC] cursor-pointer transition-colors">2</button>
-                      <span className="text-[11px] text-[#94A3B8] px-1">...</span>
-                      <button className="w-7 h-7 rounded-lg border border-[#E2E8F0] flex items-center justify-center text-[11px] text-[#475569] hover:bg-[#F8FAFC] cursor-pointer transition-colors">5</button>
-                      <button className="w-7 h-7 rounded-lg border border-[#E2E8F0] flex items-center justify-center text-[11px] text-[#475569] hover:bg-[#F8FAFC] cursor-pointer transition-colors">6</button>
-                      <button className="w-7 h-7 rounded-lg border border-[#E2E8F0] flex items-center justify-center text-[#475569] hover:bg-[#F8FAFC] cursor-pointer transition-colors">
-                        <ChevronRight className="w-3.5 h-3.5" />
-                      </button>
-                      <button className="w-7 h-7 rounded-lg border border-[#E2E8F0] flex items-center justify-center text-[#94A3B8] hover:bg-[#F8FAFC] cursor-pointer transition-colors">
-                        <ChevronsRight className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
+                <div className="flex items-center justify-between px-4 py-2.5 border-t border-[#E2E8F0] shrink-0 bg-white">
+                  <span className="text-[11px] text-[#64748B]">Showing <span className="text-[#0F172A]" style={{ fontWeight: 600 }}>{filteredPartners.length}</span> of <span className="text-[#0F172A]" style={{ fontWeight: 600 }}>{rule.partnerCount}</span> partners</span>
+                  <div className="flex items-center gap-2 text-[11px] text-[#64748B]">
+                    <span>Records per page</span>
+                    <select className="h-6 px-1.5 rounded border border-[#E2E8F0] bg-white text-[11px] text-[#334155] cursor-pointer outline-none">
+                      <option>20</option><option>50</option>
+                    </select>
                   </div>
-                )}
+                </div>
               </div>
             )}
 
-            {/* Placeholder tabs for remaining */}
+            {/* Placeholder tabs */}
             {tab !== "items" && tab !== "categories" && tab !== "partner" && (
               <div className="flex-1 flex items-center justify-center">
                 <div className="text-center">
-                  <div className="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3" style={{ backgroundColor: theme.pillBg, border: `1px solid ${theme.pillBorder}` }}>
-                    {(() => { const T = DETAIL_TABS_VISIBLE.find((x) => x.id === tab); return T ? <T.icon className="w-5 h-5" style={{ color: theme.text }} /> : null; })()}
+                  <div className="w-12 h-12 rounded-xl bg-[#F1F5F9] flex items-center justify-center mx-auto mb-3">
+                    {(() => { const T = PR_DETAIL_TABS.find((x) => x.id === tab); return T ? <T.icon className="w-5 h-5 text-[#94A3B8]" /> : null; })()}
                   </div>
-                  <p className="text-[13px] text-[#334155]" style={{ fontWeight: 500 }}>{DETAIL_TABS_VISIBLE.find((x) => x.id === tab)?.label || DETAIL_TABS_OVERFLOW.find((x) => x.id === tab)?.label || tab}</p>
-                  <p className="text-[11px] text-[#CBD5E1] mt-1" style={{ fontWeight: 400 }}>Coming soon</p>
+                  <p className="text-sm text-[#0F172A]" style={{ fontWeight: 600 }}>{PR_DETAIL_TABS.find((x) => x.id === tab)?.label || tab}</p>
+                  <p className="text-[11px] text-[#94A3B8] mt-1">Coming soon</p>
                 </div>
               </div>
             )}
+          </div>
+
+          {/* ─── RIGHT SIDEBAR: Info card ─── */}
+          <div className="w-[280px] xl:w-[300px] border-l border-[#E2E8F0] shrink-0 overflow-y-auto bg-[#F8FAFC]">
+            <div className="p-3.5">
+              <div className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
+                {/* Card header */}
+                <div className="px-3.5 py-2.5 border-b border-[#F1F5F9] flex items-center gap-2">
+                  <div className="w-6 h-6 rounded-md flex items-center justify-center shrink-0" style={{ backgroundColor: theme.pillBg }}>
+                    <ChartColumn className="w-3 h-3" style={{ color: theme.text }} />
+                  </div>
+                  <span className="text-[12px] text-[#0F172A]" style={{ fontWeight: 600 }}>Rule Overview</span>
+                </div>
+
+                <div className="px-3.5 py-3 space-y-3">
+                  {/* Rule Name */}
+                  <div>
+                    <p className="text-[10px] text-[#94A3B8] mb-px" style={{ fontWeight: 500 }}>Rule Name</p>
+                    <p className="text-[12.5px] text-[#0F172A]" style={{ fontWeight: 600 }}>{rule.name}</p>
+                    <p className="text-[11px] text-[#64748B] mt-0.5 leading-relaxed">{rule.description}</p>
+                  </div>
+
+                  {/* Type pills */}
+                  <div>
+                    <p className="text-[10px] text-[#94A3B8] mb-1" style={{ fontWeight: 500 }}>Rule Type</p>
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span
+                        className="inline-flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-md border"
+                        style={{ fontWeight: 500, backgroundColor: theme.pillBg, borderColor: theme.pillBorder, color: theme.text }}
+                      >
+                        {isDis ? <TrendingDown className="w-3 h-3" /> : <TrendingUp className="w-3 h-3" />}
+                        {isDis ? "Discount" : "Premium"}
+                      </span>
+                      <span className="inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded-md border border-[#E2E8F0] bg-[#F8FAFC] text-[#64748B]" style={{ fontWeight: 500 }}>
+                        {rule.basis === "volume" ? <ChartColumn className="w-3 h-3" /> : <DollarSign className="w-3 h-3" />}
+                        {rule.basis === "volume" ? "Volume" : "Value"}-Based
+                      </span>
+                      {isPreset && (
+                        <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-md border border-[#E2E8F0] bg-[#F1F5F9] text-[#64748B]" style={{ fontWeight: 600 }}>
+                          <Lock className="w-2.5 h-2.5" /> PRESET
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Hero discount value */}
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-2.5">
+                    <div className="min-w-0">
+                      <p className="text-[10px] text-[#94A3B8] mb-px" style={{ fontWeight: 500 }}>{isDis ? "Discount" : "Premium"}</p>
+                      <p className="text-[16px] text-[#0F172A] tabular-nums" style={{ fontWeight: 600 }}>{rule.tiers[0]?.discount || "—"}</p>
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[10px] text-[#94A3B8] mb-px" style={{ fontWeight: 500 }}>Tiers</p>
+                      <p className="text-[12.5px] text-[#0F172A]" style={{ fontWeight: 600 }}>{rule.tiers.length} {rule.tiers.length === 1 ? "tier" : "tiers"}</p>
+                    </div>
+                  </div>
+
+                  {/* Status + Scope */}
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-2.5">
+                    <div className="min-w-0">
+                      <p className="text-[10px] text-[#94A3B8] mb-0.5" style={{ fontWeight: 500 }}>Status</p>
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px]" style={{ fontWeight: 600, backgroundColor: rule.status === "Active" ? "#F0FDF4" : "#FFFBEB", color: rule.status === "Active" ? "#16A34A" : "#D97706", border: `1px solid ${rule.status === "Active" ? "#BBF7D0" : "#FDE68A"}` }}>
+                        {rule.status}
+                      </span>
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[10px] text-[#94A3B8] mb-px" style={{ fontWeight: 500 }}>Scope</p>
+                      <p className="text-[12px] text-[#334155] capitalize" style={{ fontWeight: 500 }}>{rule.scope}</p>
+                    </div>
+                  </div>
+
+                  {/* Date range */}
+                  {rule.hasDateLimit && (
+                    <div className="grid grid-cols-2 gap-x-4 pt-2.5 border-t border-[#F1F5F9]">
+                      <div className="min-w-0">
+                        <p className="text-[10px] text-[#94A3B8] mb-px" style={{ fontWeight: 500 }}>Valid From</p>
+                        <p className="text-[12px] text-[#334155]" style={{ fontWeight: 500 }}>{rule.validFrom}</p>
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-[10px] text-[#94A3B8] mb-px" style={{ fontWeight: 500 }}>Valid To</p>
+                        <p className="text-[12px] text-[#334155]" style={{ fontWeight: 500 }}>{rule.validTo}</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Tiers detail */}
+                  <div className="pt-2.5 border-t border-[#F1F5F9] space-y-1.5">
+                    <p className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Tier Breakdown</p>
+                    {rule.tiers.map((tier, idx) => (
+                      <div key={idx} className="flex items-center justify-between px-2.5 py-1.5 rounded-lg border border-[#E8ECF1] bg-[#FAFBFC] text-[11px] tabular-nums">
+                        <div className="flex items-center gap-1.5 text-[#64748B]">
+                          <span className="w-4 h-4 rounded flex items-center justify-center text-[9px]" style={{ backgroundColor: theme.pillBg, color: theme.text, fontWeight: 700 }}>{idx + 1}</span>
+                          <span>{tier.minQty}</span>
+                          <span className="text-[#CBD5E1]">–</span>
+                          <span>{tier.maxQty}</span>
+                        </div>
+                        <span className="text-[#0F172A]" style={{ fontWeight: 600 }}>{tier.discount}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Created By + Date */}
+                  <div className="grid grid-cols-2 gap-x-4 pt-2.5 border-t border-[#F1F5F9]">
+                    <div className="min-w-0">
+                      <p className="text-[10px] text-[#94A3B8] mb-0.5" style={{ fontWeight: 500 }}>Created By</p>
+                      <div className="flex items-center gap-1.5 mt-0.5">
+                        <div className="w-5 h-5 rounded-full flex items-center justify-center text-[8px] shrink-0" style={{ backgroundColor: isPreset ? "#EDF4FF" : theme.pillBg, color: isPreset ? "#0A77FF" : theme.text, fontWeight: 700 }}>
+                          {isPreset ? "OS" : creatorInitials}
+                        </div>
+                        <span className="text-[12px] text-[#334155] truncate" style={{ fontWeight: 500 }}>{isPreset ? "Omnesoft" : rule.createdBy}</span>
+                      </div>
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[10px] text-[#94A3B8] mb-px" style={{ fontWeight: 500 }}>Created On</p>
+                      <p className="text-[12px] text-[#334155] mt-0.5" style={{ fontWeight: 500 }}>{rule.createdDate}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ─── Footer ─── */}
+        <div className="shrink-0 border-t border-[#E2E8F0] bg-white rounded-b-none sm:rounded-b-2xl">
+          <div className="px-5 py-2.5 flex items-center justify-between">
+            <span className="text-[11px] text-[#64748B]">Reviewing: <span className="text-[#0F172A]" style={{ fontWeight: 600 }}>{rule.name}</span></span>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => toast.info("Duplicate coming soon")}
+                className="h-8 px-3.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#334155] hover:bg-[#F8FAFC] transition-colors cursor-pointer inline-flex items-center gap-1.5" style={{ fontWeight: 500 }}
+              >
+                <Copy className="w-3.5 h-3.5" /> Duplicate
+              </button>
+            </div>
           </div>
         </div>
       </DialogContent>
