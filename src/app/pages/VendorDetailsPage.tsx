@@ -2085,6 +2085,8 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate }: {
       term={ptDetailTerm}
       open={ptDetailOpen}
       onClose={() => { setPtDetailOpen(false); setPtDetailTerm(null); }}
+      mode="view"
+      onDisable={(t) => toast.success(`"${t.name}" disabled for this partner`)}
     />
     </>
   );
@@ -4015,6 +4017,8 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
         term={locPtDetailTerm}
         open={locPtDetailOpen}
         onClose={() => { setLocPtDetailOpen(false); setLocPtDetailTerm(null); }}
+        mode="view"
+        onDisable={(t) => toast.success(`"${t.name}" disabled for this partner`)}
       />
     </>
   );

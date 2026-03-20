@@ -5887,6 +5887,7 @@ function ConfigPageContent({
           term={standalonePtDetailTerm}
           open={standalonePtDetailOpen}
           onClose={() => { setStandalonePtDetailOpen(false); setStandalonePtDetailTerm(null); }}
+          mode="create"
         />
       </div>
     );

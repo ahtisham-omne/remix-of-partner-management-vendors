@@ -65,9 +65,12 @@ interface PaymentTermDetailModalProps {
   term: PaymentTermPreset | null;
   open: boolean;
   onClose: () => void;
+  /** "view" = read-only on details page, "create" = inside creation form with Use Template */
+  mode?: "view" | "create";
+  onDisable?: (term: PaymentTermPreset) => void;
 }
 
-function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalProps) {
+function PaymentTermDetailModal({ term, open, onClose, mode = "create", onDisable }: PaymentTermDetailModalProps) {
   const [tab, setTab] = useState("items");
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [itemFilter, setItemFilter] = useState("all");
@@ -131,9 +134,16 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
                 <Archive className="w-3.5 h-3.5" /> Archive
               </button>
               <button
-                onClick={() => isCustom && toast.info("Disable coming soon")}
-                disabled={isPreset}
-                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#334155] hover:bg-[#F8FAFC] transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white"
+                onClick={() => {
+                  if (term && onDisable) {
+                    onDisable(term);
+                    toast.success(`"${term.name}" has been disabled`);
+                    onClose();
+                  } else {
+                    toast.info("Disable coming soon");
+                  }
+                }}
+                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#334155] hover:bg-[#F8FAFC] transition-colors cursor-pointer"
                 style={{ fontWeight: 500 }}
               >
                 <Ban className="w-3.5 h-3.5" /> Disable
@@ -476,9 +486,11 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
               <button className="h-8 px-3.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#334155] hover:bg-[#F8FAFC] transition-colors cursor-pointer inline-flex items-center gap-1.5" style={{ fontWeight: 500 }}>
                 <Copy className="w-3.5 h-3.5" /> Duplicate
               </button>
-              <button className="h-8 px-3.5 rounded-lg bg-[#0A77FF] text-white text-xs hover:bg-[#0A77FF]/90 transition-colors cursor-pointer inline-flex items-center gap-1.5" style={{ fontWeight: 500 }}>
-                <Check className="w-3.5 h-3.5" /> Use Template
-              </button>
+              {mode === "create" && (
+                <button className="h-8 px-3.5 rounded-lg bg-[#0A77FF] text-white text-xs hover:bg-[#0A77FF]/90 transition-colors cursor-pointer inline-flex items-center gap-1.5" style={{ fontWeight: 500 }}>
+                  <Check className="w-3.5 h-3.5" /> Use Template
+                </button>
+              )}
             </div>
           </div>
         </div>
