@@ -141,8 +141,7 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
   const vendorCount = PT_MOCK_VENDORS.length;
   const creatorTint = getAvatarTint("Ahtisham Ahmad");
 
-  const filteredItems = itemFilter === "all" ? PT_MOCK_ITEMS
-    : PT_MOCK_ITEMS.filter(i => i.status.toLowerCase() === itemFilter);
+  const filteredItems = PT_MOCK_ITEMS;
 
   return (
     <Dialog open={open} onOpenChange={(v) => { if (!v) { onClose(); setIsFullscreen(false); setTab("items"); } }}>
