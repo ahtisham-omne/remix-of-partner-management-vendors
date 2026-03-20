@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -25,7 +25,6 @@ import {
   Receipt,
   Lock,
   Ban,
-  ChevronDown,
 } from "lucide-react";
 import { toast } from "sonner";
 import { getAvatarTint } from "../../utils/avatarTints";
@@ -54,60 +53,9 @@ const PT_MOCK_ITEMS = [
   { id: "6", code: "MECH-BRG-6204", desc: "Deep Groove Ball Bearing, 6204-2RS, Sealed", vendor: "MotionPro", partNo: "6204-2RS", status: "In Stock", controlType: "Serialized", primaryCat: "Power Trans", additionalCat: ["Bearings", "Mechanical"], img: "🔘" },
 ];
 
-/* ─── Mock vendors ─── */
-const PT_MOCK_VENDORS = [
-  { id: "V-1", name: "Acme Industrial Supply Co.", code: "V-1", type: "Vendor", status: "Active" },
-  { id: "V-2", name: "Global Fasteners Inc.", code: "V-2", type: "Vendor", status: "Active" },
-  { id: "V-3", name: "Berlin Technik GmbH", code: "V-3", type: "Vendor • Seller", status: "Active" },
-  { id: "V-4", name: "Pacific Hardware Ltd.", code: "V-4", type: "Vendor", status: "Active" },
-  { id: "V-5", name: "Midwest Bolt & Nut Co.", code: "V-5", type: "Vendor • Buyer", status: "Active" },
-  { id: "V-6", name: "Atlas Steel Products", code: "V-6", type: "Vendor", status: "Inactive" },
-  { id: "V-7", name: "Nordic Fastening Systems", code: "V-7", type: "Vendor • Seller", status: "Active" },
-];
-
-/* ─── Collapsible info card (matches DashInfoCard from VendorDetailsPage) ─── */
-function PTInfoCard({ title, icon: Icon, children, defaultOpen = true }: {
-  title: string; icon?: React.ElementType; children: React.ReactNode; defaultOpen?: boolean;
-}) {
-  const [isOpen, setIsOpen] = useState(defaultOpen);
-  const contentRef = useRef<HTMLDivElement>(null);
-  const [contentHeight, setContentHeight] = useState<number | undefined>(undefined);
-
-  useEffect(() => {
-    if (contentRef.current) setContentHeight(contentRef.current.scrollHeight);
-  }, [children]);
-
-  return (
-    <div className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
-      <button
-        type="button"
-        className="w-full px-3.5 py-2.5 flex items-center gap-2 cursor-pointer hover:bg-[#FAFBFC] transition-colors"
-        style={{ borderBottom: isOpen ? "1px solid #F1F5F9" : "none" }}
-        onClick={() => setIsOpen((v) => !v)}
-      >
-        {Icon && (
-          <div className="w-6 h-6 rounded-md bg-[#EDF4FF] flex items-center justify-center shrink-0">
-            <Icon className="w-3 h-3 text-[#0A77FF]" />
-          </div>
-        )}
-        <span className="text-[12px] text-[#0F172A] text-left" style={{ fontWeight: 600 }}>{title}</span>
-        <ChevronDown
-          className="w-3.5 h-3.5 text-[#94A3B8] shrink-0 ml-auto transition-transform duration-200"
-          style={{ transform: isOpen ? "rotate(0deg)" : "rotate(-90deg)" }}
-        />
-      </button>
-      <div
-        className="overflow-hidden transition-all duration-200 ease-in-out"
-        style={{
-          maxHeight: isOpen ? (contentHeight != null ? contentHeight + 24 + "px" : "1000px") : "0px",
-          opacity: isOpen ? 1 : 0,
-        }}
-      >
-        <div ref={contentRef} className="px-3.5 py-3">{children}</div>
-      </div>
-    </div>
-  );
-}
+/* ─── Vendors pulled from partner listing data ─── */
+import { useVendors } from "../../context/VendorContext";
+import { CATEGORY_LABELS } from "../../data/vendors";
 
 function PTInfoLabel({ children }: { children: React.ReactNode }) {
   return <p className="text-[10px] text-[#94A3B8] mb-px" style={{ fontWeight: 500 }}>{children}</p>;
@@ -123,6 +71,7 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
   const [tab, setTab] = useState("items");
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [itemFilter, setItemFilter] = useState("all");
+  const { vendors } = useVendors();
 
   if (!term) return null;
 
@@ -138,8 +87,10 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
     : `${modalBaseClass} !max-w-[100%] sm:!max-w-[960px] lg:!max-w-[1080px] !max-h-[100dvh] sm:!max-h-[90vh] rounded-none sm:!rounded-2xl`;
 
   const itemCount = PT_MOCK_ITEMS.length;
-  const vendorCount = PT_MOCK_VENDORS.length;
-  const creatorTint = getAvatarTint("Ahtisham Ahmad");
+  // Use first 7 vendors from real data
+  const ptVendors = vendors.slice(0, 7);
+  const vendorCount = ptVendors.length;
+  const creatorTint = getAvatarTint("Omnesoft");
 
   const filteredItems = PT_MOCK_ITEMS;
 
@@ -336,37 +287,57 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
                     <thead className="sticky top-0 z-10">
                       <tr className="bg-[#F8FAFC]">
                         <th className="text-left pl-4 pr-2 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Partner</th>
-                        <th className="text-left pl-4 pr-2 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Code</th>
+                        <th className="text-left pl-4 pr-2 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Description</th>
+                        <th className="text-left pl-4 pr-2 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Status</th>
                         <th className="text-left pl-4 pr-2 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Type</th>
-                        <th className="text-left pl-4 pr-4 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Status</th>
+                        <th className="text-left pl-4 pr-2 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Category</th>
+                        <th className="text-left pl-4 pr-4 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Country</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {PT_MOCK_VENDORS.map((v) => {
-                        const vTint = getAvatarTint(v.name);
-                        const vInit = v.name.split(" ").map(w => w[0]).slice(0, 2).join("");
+                      {ptVendors.map((v) => {
+                        const vTint = getAvatarTint(v.companyName);
+                        const vInit = v.companyName.split(" ").map(w => w[0]).slice(0, 2).join("");
+                        const statusColor = v.status === "active"
+                          ? { bg: "#F0FDF4", text: "#16A34A", border: "#BBF7D0", dot: "#16A34A" }
+                          : v.status === "inactive"
+                            ? { bg: "#FFFBEB", text: "#D97706", border: "#FDE68A", dot: "#D97706" }
+                            : { bg: "#FEF2F2", text: "#DC2626", border: "#FECACA", dot: "#DC2626" };
                         return (
                           <tr key={v.id} className="bg-white hover:bg-[#F8FAFC] transition-colors border-b border-[#F1F5F9]">
-                            <td className="pl-4 pr-2 py-2.5">
-                              <div className="flex items-center gap-2.5">
-                                <div className="w-7 h-7 rounded-full flex items-center justify-center text-[9px] shrink-0" style={{ backgroundColor: vTint.bg, color: vTint.fg, fontWeight: 700 }}>
+                            <td className="pl-4 pr-2 py-3">
+                              <div className="flex items-center gap-3">
+                                <div className="w-9 h-9 rounded-full flex items-center justify-center text-[10px] shrink-0" style={{ backgroundColor: vTint.bg, color: vTint.fg, fontWeight: 700 }}>
                                   {vInit}
                                 </div>
-                                <span className="text-xs text-[#0F172A]" style={{ fontWeight: 500 }}>{v.name}</span>
+                                <div className="min-w-0">
+                                  <p className="text-[12px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{v.companyName}</p>
+                                  <p className="text-[10px] text-[#94A3B8] mt-0.5 font-mono">{v.code}</p>
+                                </div>
                               </div>
                             </td>
-                            <td className="pl-4 pr-2 py-2.5 font-mono text-[11px] text-[#64748B]">{v.code}</td>
-                            <td className="pl-4 pr-2 py-2.5">
-                              <span className="text-[10px] px-2 py-0.5 rounded-md bg-[#F1F5F9] text-[#475569] border border-[#E2E8F0]" style={{ fontWeight: 500 }}>{v.type}</span>
+                            <td className="pl-4 pr-2 py-3 max-w-[180px]">
+                              <p className="text-[12px] text-[#334155] truncate" style={{ fontWeight: 500 }}>{v.description || v.services}</p>
+                              <p className="text-[10px] text-[#94A3B8] mt-0.5">{v.country}</p>
                             </td>
-                            <td className="pl-4 pr-4 py-2.5">
-                              <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] ${
-                                v.status === "Active"
-                                  ? "bg-[#F0FDF4] text-[#16A34A] border border-[#BBF7D0]"
-                                  : "bg-[#FEF2F2] text-[#DC2626] border border-[#FECACA]"
-                              }`} style={{ fontWeight: 600 }}>
-                                {v.status}
+                            <td className="pl-4 pr-2 py-3 whitespace-nowrap">
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px]" style={{ fontWeight: 600, backgroundColor: statusColor.bg, color: statusColor.text, border: `1px solid ${statusColor.border}` }}>
+                                <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: statusColor.dot }} />
+                                {v.status.charAt(0).toUpperCase() + v.status.slice(1)}
                               </span>
+                            </td>
+                            <td className="pl-4 pr-2 py-3 whitespace-nowrap">
+                              <div className="flex items-center gap-1">
+                                {v.partnerTypes.map((t) => (
+                                  <span key={t} className={`text-[10px] px-2 py-0.5 rounded-md border ${t === "vendor" ? "bg-[#F0FDF4] border-[#BBF7D0] text-[#166534]" : "bg-[#EFF6FF] border-[#BFDBFE] text-[#1E40AF]"}`} style={{ fontWeight: 500 }}>
+                                    {t === "vendor" ? "Vendor" : "Customer"}
+                                  </span>
+                                ))}
+                              </div>
+                            </td>
+                            <td className="pl-4 pr-2 py-3 text-[12px] text-[#334155] whitespace-nowrap" style={{ fontWeight: 500 }}>{CATEGORY_LABELS[v.category]}</td>
+                            <td className="pl-4 pr-4 py-3 whitespace-nowrap">
+                              <span className="text-[12px] text-[#334155]" style={{ fontWeight: 500 }}>{v.countryFlag} {v.country}</span>
                             </td>
                           </tr>
                         );
@@ -400,92 +371,99 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
             )}
           </div>
 
-          {/* ─── RIGHT SIDEBAR: Info Cards (matches dashboard) ─── */}
+          {/* ─── RIGHT SIDEBAR: Flat info card ─── */}
           <div className="w-[280px] xl:w-[300px] border-l border-[#E2E8F0] shrink-0 overflow-y-auto bg-[#F8FAFC]">
-            <div className="p-3.5 space-y-3.5">
-
-              {/* Term Overview Card */}
-              <PTInfoCard title="Term Overview" icon={Receipt}>
-                <div className="mb-3">
-                  <PTInfoLabel>Term Name</PTInfoLabel>
-                  <p className="text-[12.5px] text-[#0F172A]" style={{ fontWeight: 600 }}>{term.name}</p>
-                  <p className="text-[11px] text-[#64748B] mt-0.5 leading-relaxed">
-                    {term.description || `Payment is due ${ptDuration} days after the ${(term.trigger || "invoice date").toLowerCase()}.`}
-                  </p>
+            <div className="p-3.5">
+              <div className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
+                {/* Card header */}
+                <div className="px-3.5 py-2.5 border-b border-[#F1F5F9] flex items-center gap-2">
+                  <div className="w-6 h-6 rounded-md bg-[#EDF4FF] flex items-center justify-center shrink-0">
+                    <Receipt className="w-3 h-3 text-[#0A77FF]" />
+                  </div>
+                  <span className="text-[12px] text-[#0F172A]" style={{ fontWeight: 600 }}>Term Overview</span>
                 </div>
 
-                <div className="mb-3">
-                  <PTInfoLabel>Term Type</PTInfoLabel>
-                  <div className="flex items-center gap-1.5 mt-1">
-                    <span
-                      className="inline-flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-md border"
-                      style={{
-                        fontWeight: 500,
-                        backgroundColor: badgeColor + "12",
-                        borderColor: badgeColor + "30",
-                        color: badgeColor,
-                      }}
-                    >
-                      <Receipt className="w-3 h-3" />
-                      {term.typeBadge}
-                    </span>
-                    <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-md border border-[#E2E8F0] bg-[#F1F5F9] text-[#64748B]" style={{ fontWeight: 600 }}>
-                      <Lock className="w-2.5 h-2.5" /> PRESET
-                    </span>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 mb-2.5">
-                  <div className="min-w-0">
-                    <PTInfoLabel>Duration</PTInfoLabel>
-                    <p className="text-[12.5px] text-[#0F172A]" style={{ fontWeight: 600 }}>{ptDuration} days</p>
-                  </div>
-                  <div className="min-w-0">
-                    <PTInfoLabel>Trigger Event</PTInfoLabel>
-                    <p className="text-[12px] text-[#334155]" style={{ fontWeight: 500 }}>{term.trigger || "Invoice Date"}</p>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 mb-2.5">
-                  <div className="min-w-0">
-                    <PTInfoLabel>Status</PTInfoLabel>
-                    <div className="mt-0.5">
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] bg-[#F0FDF4] text-[#16A34A] border border-[#BBF7D0]" style={{ fontWeight: 600 }}>Active</span>
-                    </div>
-                  </div>
-                  <div className="min-w-0">
-                    <PTInfoLabel>Vendors Using</PTInfoLabel>
-                    <p className="text-[12.5px] text-[#0F172A]" style={{ fontWeight: 600 }}>{vendorCount}</p>
-                  </div>
-                </div>
-
-                {(term.applyDiscount || term.discountPercent) && (
-                  <div className="pt-2.5 border-t border-[#F1F5F9]">
-                    <PTInfoLabel>Early Payment Discount</PTInfoLabel>
-                    <p className="text-[12px] text-[#334155] mt-0.5" style={{ fontWeight: 500 }}>
-                      {term.discountPercent || "2"}% if paid within {term.discountPeriod || "10"} days
+                <div className="px-3.5 py-3 space-y-3">
+                  {/* Term Name */}
+                  <div>
+                    <PTInfoLabel>Term Name</PTInfoLabel>
+                    <p className="text-[12.5px] text-[#0F172A]" style={{ fontWeight: 600 }}>{term.name}</p>
+                    <p className="text-[11px] text-[#64748B] mt-0.5 leading-relaxed">
+                      {term.description || `Payment is due ${ptDuration} days after the ${(term.trigger || "invoice date").toLowerCase()}.`}
                     </p>
                   </div>
-                )}
 
-                <div className="grid grid-cols-2 gap-x-4 pt-2.5 border-t border-[#F1F5F9]">
-                  <div className="min-w-0">
-                    <PTInfoLabel>Created By</PTInfoLabel>
-                    <div className="flex items-center gap-1.5 mt-0.5">
-                      <div className="w-5 h-5 rounded-full flex items-center justify-center text-[8px] shrink-0" style={{ backgroundColor: creatorTint.bg, color: creatorTint.fg, fontWeight: 700 }}>
-                        AA
-                      </div>
-                      <span className="text-[12px] text-[#334155] truncate" style={{ fontWeight: 500 }}>Ahtisham Ahmad</span>
+                  {/* Term Type */}
+                  <div>
+                    <PTInfoLabel>Term Type</PTInfoLabel>
+                    <div className="flex items-center gap-1.5 mt-1">
+                      <span
+                        className="inline-flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-md border"
+                        style={{ fontWeight: 500, backgroundColor: badgeColor + "12", borderColor: badgeColor + "30", color: badgeColor }}
+                      >
+                        <Receipt className="w-3 h-3" />
+                        {term.typeBadge}
+                      </span>
+                      <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-md border border-[#E2E8F0] bg-[#F1F5F9] text-[#64748B]" style={{ fontWeight: 600 }}>
+                        <Lock className="w-2.5 h-2.5" /> PRESET
+                      </span>
                     </div>
                   </div>
-                  <div className="min-w-0">
-                    <PTInfoLabel>Last Updated</PTInfoLabel>
-                    <p className="text-[12px] text-[#334155] mt-0.5 truncate" style={{ fontWeight: 500 }}>Dec 15, 2025</p>
+
+                  {/* Duration + Trigger */}
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-2.5">
+                    <div className="min-w-0">
+                      <PTInfoLabel>Duration</PTInfoLabel>
+                      <p className="text-[12.5px] text-[#0F172A]" style={{ fontWeight: 600 }}>{ptDuration} days</p>
+                    </div>
+                    <div className="min-w-0">
+                      <PTInfoLabel>Trigger Event</PTInfoLabel>
+                      <p className="text-[12px] text-[#334155]" style={{ fontWeight: 500 }}>{term.trigger || "Invoice Date"}</p>
+                    </div>
+                  </div>
+
+                  {/* Status + Vendors Using */}
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-2.5">
+                    <div className="min-w-0">
+                      <PTInfoLabel>Status</PTInfoLabel>
+                      <div className="mt-0.5">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] bg-[#F0FDF4] text-[#16A34A] border border-[#BBF7D0]" style={{ fontWeight: 600 }}>Active</span>
+                      </div>
+                    </div>
+                    <div className="min-w-0">
+                      <PTInfoLabel>Vendors Using</PTInfoLabel>
+                      <p className="text-[12.5px] text-[#0F172A]" style={{ fontWeight: 600 }}>{vendorCount}</p>
+                    </div>
+                  </div>
+
+                  {/* Early Payment Discount */}
+                  {(term.applyDiscount || term.discountPercent) && (
+                    <div className="pt-2.5 border-t border-[#F1F5F9]">
+                      <PTInfoLabel>Early Payment Discount</PTInfoLabel>
+                      <p className="text-[12px] text-[#334155] mt-0.5" style={{ fontWeight: 500 }}>
+                        {term.discountPercent || "2"}% if paid within {term.discountPeriod || "10"} days
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Created By + Last Updated */}
+                  <div className="grid grid-cols-2 gap-x-4 pt-2.5 border-t border-[#F1F5F9]">
+                    <div className="min-w-0">
+                      <PTInfoLabel>Created By</PTInfoLabel>
+                      <div className="flex items-center gap-1.5 mt-0.5">
+                        <div className="w-5 h-5 rounded-full flex items-center justify-center text-[8px] shrink-0 bg-[#EDF4FF] text-[#0A77FF]" style={{ fontWeight: 700 }}>
+                          OS
+                        </div>
+                        <span className="text-[12px] text-[#334155] truncate" style={{ fontWeight: 500 }}>Omnesoft</span>
+                      </div>
+                    </div>
+                    <div className="min-w-0">
+                      <PTInfoLabel>Last Updated</PTInfoLabel>
+                      <p className="text-[12px] text-[#334155] mt-0.5 truncate" style={{ fontWeight: 500 }}>Dec 15, 2025</p>
+                    </div>
                   </div>
                 </div>
-              </PTInfoCard>
-
-
+              </div>
             </div>
           </div>
         </div>
