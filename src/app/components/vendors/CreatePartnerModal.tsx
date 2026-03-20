@@ -3275,7 +3275,8 @@ function ConfigPageContent({
   // Payment Terms Presets state
   const [selectedPaymentTermId, setSelectedPaymentTermId] = useState<string | null>(null);
   const [paymentTermsModalOpen, setPaymentTermsModalOpen] = useState(false);
-  const [ptSidebarFilter, setPtSidebarFilter] = useState("all");
+  const [ptTypeFilter, setPtTypeFilter] = useState<string | null>(null);
+  const [ptStatusFilter, setPtStatusFilter] = useState("all");
   const [ptSearch, setPtSearch] = useState("");
   const [ptSortBy, setPtSortBy] = useState<"name" | "vendorsApplied" | "duration" | "category">("name");
   const [ptSortDir, setPtSortDir] = useState<"asc" | "desc">("asc");
