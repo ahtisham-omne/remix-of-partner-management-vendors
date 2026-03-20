@@ -3740,9 +3740,8 @@ function ConfigPageContent({
 
   const filteredPricingRulePresets = useMemo(() => {
     let rules = allPricingRulePresets;
-    // Type filter (parallel)
-    if (prTypeFilter === "discount") rules = rules.filter((r) => r.category === "discount");
-    else if (prTypeFilter === "premium") rules = rules.filter((r) => r.category === "premium");
+    // Type filter (parallel, multi-select)
+    if (prTypeFilters.length > 0) rules = rules.filter((r) => prTypeFilters.includes(r.category));
     // Status filter (parallel)
     if (prStatusFilter === "preset") rules = rules.filter((r) => !r.id.startsWith("pr-custom-"));
     else if (prStatusFilter === "custom") rules = rules.filter((r) => r.id.startsWith("pr-custom-"));
@@ -3762,7 +3761,7 @@ function ConfigPageContent({
       return prSortDir === "asc" ? cmp : -cmp;
     });
     return sorted;
-  }, [prTypeFilter, prStatusFilter, prSearch, allPricingRulePresets, prSortBy, prSortDir]);
+  }, [prTypeFilters, prStatusFilter, prSearch, allPricingRulePresets, prSortBy, prSortDir]);
 
   const selectedPricingRules = useMemo(() => {
     return selectedPricingRuleIds.map((id) =>
