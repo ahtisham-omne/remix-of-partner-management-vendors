@@ -169,7 +169,7 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
             <div className="px-4 py-3">
               <h4 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-3">About</h4>
               <p className="text-xs text-foreground leading-relaxed mb-3">
-                {term.description || `${term.discount ? term.discount + " discount if paid in " + (term.discountDays || "10") + " days, otherwise net " + ptDuration : "Payment is due " + ptDuration + " days after the " + (term.trigger || "invoice date").toLowerCase()}.`}
+                {term.description || `Payment is due ${ptDuration} days after the ${(term.trigger || "invoice date").toLowerCase()}.`}
               </p>
 
               {/* Trigger row */}
