@@ -104,6 +104,7 @@ function PaymentTermDetailModal({ term, open, onClose, mode = "create", onDisabl
       <DialogContent
         className={`flex flex-col p-0 gap-0 border-0 sm:border z-[220] ${modalSizeClass}`}
         hideCloseButton
+        overlayClassName="z-[215]"
         style={{ boxShadow: "0 24px 48px -12px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.05)" }}
       >
         <DialogTitle className="sr-only">Payment Term Details — {term.name}</DialogTitle>
