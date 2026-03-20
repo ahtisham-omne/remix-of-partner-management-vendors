@@ -5089,41 +5089,6 @@ function ConfigPageContent({
                 </div>
               </div>
 
-              {/* Step tabs */}
-              <div className="flex items-center gap-4 sm:gap-6 mt-3 sm:mt-3.5 overflow-x-auto -mb-px">
-                {[
-                  { num: 1 as const, label: "Term Setup", shortLabel: "Setup", active: createPtStep === 1, completed: createPtStep === 2 },
-                  { num: 2 as const, label: "Items & Attachments", shortLabel: "Items", active: createPtStep === 2, completed: false },
-                ].map((stepTab) => (
-                  <div
-                    key={stepTab.num}
-                    className={`relative flex items-center gap-2 pb-2.5 sm:pb-3 ${stepTab.num < createPtStep ? "cursor-pointer" : "cursor-default"}`}
-                    onClick={() => { if (stepTab.num < createPtStep) setCreatePtStep(stepTab.num); }}
-                  >
-                    <div
-                      className={`w-[22px] h-[22px] sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-[11px] sm:text-[12px] shrink-0 transition-all duration-200 ${
-                        stepTab.completed ? "bg-[#10B981] text-white" : stepTab.active ? "bg-[#0A77FF] text-white" : "border-[1.5px] border-[#CBD5E1] text-[#64748B] bg-white"
-                      }`}
-                      style={{ fontWeight: 600 }}
-                    >
-                      {stepTab.completed ? <Check className="w-3 h-3" /> : stepTab.num}
-                    </div>
-                    <span
-                      className={`text-[12px] sm:text-[13px] whitespace-nowrap transition-colors ${
-                        stepTab.active ? "text-[#0A77FF]" : stepTab.completed ? "text-[#10B981]" : "text-[#334155]"
-                      }`}
-                      style={{ fontWeight: stepTab.active || stepTab.completed ? 600 : 500 }}
-                    >
-                      <span className="hidden sm:inline">{stepTab.label}</span>
-                      <span className="sm:hidden">{stepTab.shortLabel}</span>
-                    </span>
-                    {(stepTab.active || stepTab.completed) && (
-                      <div className={`absolute bottom-0 left-0 right-0 h-[2px] rounded-t-full ${stepTab.completed ? "bg-[#10B981]" : "bg-[#0A77FF]"}`} />
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
 
             {/* Body */}
             <div className="flex-1 min-h-0 overflow-y-auto bg-[#FAFBFC] scrollbar-hide">
