@@ -26,6 +26,9 @@ import {
   Check,
   CalendarDays,
   Image as ImageIcon,
+  Trash2,
+  Plus,
+  Info,
 } from "lucide-react";
 import { toast } from "sonner";
 import { getAvatarTint } from "../../utils/avatarTints";
@@ -44,28 +47,28 @@ const PT_DETAIL_TABS = [
   { id: "activity", label: "Recent Activity", icon: Clock },
 ];
 
-/* ─── Mock items matching reference screenshots ─── */
+/* ─── Mock items ─── */
 const PT_MOCK_ITEMS = [
-  { id: "1", partNo: "100219-42", description: "Front bulkhead cabinet lower cov...", category: "Ram Pro Master 2500...", controlType: "Non-Serialized", acquisitionMethod: "Both", acqPriority: "Purchased", stockingUnit: "m (Meter)", altUnit: "ly (Light Y...", status: "Active" },
-  { id: "2", partNo: "100219-51", description: "Box walls inlay cabinet", category: "Hardware", controlType: "Non-Serialized", acquisitionMethod: "Purchased", acqPriority: "-", stockingUnit: "km (Kilometer)", altUnit: "ly (Light Y...", status: "Active" },
-  { id: "3", partNo: "100219-51-01", description: "Box walls inlay cabinet with defib...", category: "Cabinet", controlType: "Serialized", acquisitionMethod: "Both", acqPriority: "Manufactured", stockingUnit: "in (Inch)", altUnit: "cm (centi...", status: "Active" },
-  { id: "4", partNo: "100219-51-01RC", description: "Box walls inlay cabinet with defib...", category: "Electronics", controlType: "Non-Serialized", acquisitionMethod: "Purchased", acqPriority: "-", stockingUnit: "ft (Feet)", altUnit: "EA (Each)", status: "Active" },
-  { id: "5", partNo: "100219-51-02", description: "Box walls inlay cabinet with refrig...", category: "Hardware", controlType: "Serialized", acquisitionMethod: "Manufactured", acqPriority: "-", stockingUnit: "ly (Light Year)", altUnit: "kg (Kilogra...", status: "Active" },
-  { id: "6", partNo: "100219-52", description: "Box closeout top cap inlay cabinet", category: "Electronics", controlType: "Non-Serialized", acquisitionMethod: "Purchased", acqPriority: "-", stockingUnit: "mm (millimeters)", altUnit: "EA (Each)", status: "Active" },
-  { id: "7", partNo: "100219-52-02", description: "Box closeout top cap inlay cabin...", category: "Cabinet", controlType: "Serialized", acquisitionMethod: "Both", acqPriority: "Purchased", stockingUnit: "cm (centimeters)", altUnit: "Roll100m (...", status: "Active" },
-  { id: "8", partNo: "100120-70", description: "Toyota long cut, emergency brak...", category: "Hardware", controlType: "Non-Serialized", acquisitionMethod: "Purchased", acqPriority: "-", stockingUnit: "yd (yards)", altUnit: "EA (Each)", status: "Active" },
-  { id: "9", partNo: "100120-71", description: "Toyota long cut, brake line bracket", category: "Electronics", controlType: "Serialized", acquisitionMethod: "Manufactured", acqPriority: "-", stockingUnit: "mi (miles)", altUnit: "EA (Each)", status: "Active" },
-  { id: "10", partNo: "100120-72", description: "Toyota long cut, 48 inch wide, re...", category: "Cabinet", controlType: "Non-Serialized", acquisitionMethod: "Purchased", acqPriority: "-", stockingUnit: "nmi (nautical mi...", altUnit: "EA (Each)", status: "Active" },
-  { id: "11", partNo: "100120-73", description: "Toyota long cut, 48 inch wide, re...", category: "Hardware", controlType: "Serialized", acquisitionMethod: "Both", acqPriority: "Manufactured", stockingUnit: "kg (Kilogram)", altUnit: "EA (Each)", status: "Active" },
-  { id: "12", partNo: "100120-74", description: "Toyota wide Black Diamond Trea...", category: "Electronics", controlType: "Serialized", acquisitionMethod: "Purchased", acqPriority: "-", stockingUnit: "g (Gram)", altUnit: "EA (Each)", status: "Active" },
-  { id: "13", partNo: "100120-75", description: "Toyota long cut, second row seat...", category: "Cabinet", controlType: "Non-Serialized", acquisitionMethod: "Manufactured", acqPriority: "-", stockingUnit: "mg (Milligram)", altUnit: "EA (Each)", status: "Active" },
-  { id: "14", partNo: "100120-75-01", description: "Second row seat base, driver sid...", category: "Hardware", controlType: "Non-Serialized", acquisitionMethod: "Purchased", acqPriority: "-", stockingUnit: "Roll100m (Roll...", altUnit: "EA (Each)", status: "Active" },
-  { id: "15", partNo: "100150-20", description: "Standard floor with kneeling syst...", category: "Electronics", controlType: "Serialized", acquisitionMethod: "Both", acqPriority: "Purchased", stockingUnit: "Bo12 (Box of 12)", altUnit: "EA (Each)", status: "Active" },
-  { id: "16", partNo: "000G110808T", description: "Phillips pan head screw steel, bla...", category: "Cabinet", controlType: "Non-Serialized", acquisitionMethod: "Manufactured", acqPriority: "-", stockingUnit: "Bo24 (Box of 24)", altUnit: "EA (Each)", status: "Active" },
-  { id: "17", partNo: "000G111012D", description: "#10-16 x 3/4* Phillips Drive Pan H...", category: "Hardware", controlType: "Serialized", acquisitionMethod: "Purchased", acqPriority: "-", stockingUnit: "cm (centimeters)", altUnit: "EA (Each)", status: "Active" },
-  { id: "18", partNo: "000G391016T", description: "#10 x 1° x .190* 10N100TXPS/A -...", category: "Electronics", controlType: "Non-Serialized", acquisitionMethod: "Both", acqPriority: "Manufactured", stockingUnit: "m (Meter)", altUnit: "EA (Each)", status: "Active" },
-  { id: "19", partNo: "02901201000", description: "Foam padding RF12 - 3/8\" X 72\"...", category: "Hardware", controlType: "Serialized", acquisitionMethod: "Purchased", acqPriority: "-", stockingUnit: "mg (Milligram)", altUnit: "EA (Each)", status: "Active" },
-  { id: "20", partNo: "100120-79", description: "Toyota long cut, brake line bracket", category: "Electronics", controlType: "Non-Serialized", acquisitionMethod: "Manufactured", acqPriority: "-", stockingUnit: "in (Inch)", altUnit: "EA (Each)", status: "Active" },
+  { id: "1", acquisitionMethod: "Both", acqPriority: "Purchased", stockingUnit: "m (Meter)", altUnit: "EA (Each)", status: "Active" },
+  { id: "2", acquisitionMethod: "Purchased", acqPriority: "-", stockingUnit: "km (Kilometer)", altUnit: "ly (Light Y...", status: "Active" },
+  { id: "3", acquisitionMethod: "Both", acqPriority: "Manufactured", stockingUnit: "in (Inch)", altUnit: "cm (centi...", status: "Active" },
+  { id: "4", acquisitionMethod: "Purchased", acqPriority: "-", stockingUnit: "ft (Feet)", altUnit: "EA (Each)", status: "Active" },
+  { id: "5", acquisitionMethod: "Manufactured", acqPriority: "-", stockingUnit: "ly (Light Year)", altUnit: "kg (Kilogra...", status: "Active" },
+  { id: "6", acquisitionMethod: "Purchased", acqPriority: "-", stockingUnit: "mm (millimeters)", altUnit: "EA (Each)", status: "Active" },
+  { id: "7", acquisitionMethod: "Both", acqPriority: "Purchased", stockingUnit: "cm (centimeters)", altUnit: "Roll100m (...", status: "Active" },
+  { id: "8", acquisitionMethod: "Purchased", acqPriority: "-", stockingUnit: "yd (yards)", altUnit: "EA (Each)", status: "Active" },
+  { id: "9", acquisitionMethod: "Manufactured", acqPriority: "-", stockingUnit: "mi (miles)", altUnit: "EA (Each)", status: "Active" },
+  { id: "10", acquisitionMethod: "Purchased", acqPriority: "-", stockingUnit: "nmi (nautical mi...)", altUnit: "EA (Each)", status: "Active" },
+  { id: "11", acquisitionMethod: "Both", acqPriority: "Manufactured", stockingUnit: "kg (Kilogram)", altUnit: "EA (Each)", status: "Active" },
+  { id: "12", acquisitionMethod: "Purchased", acqPriority: "-", stockingUnit: "g (Gram)", altUnit: "EA (Each)", status: "Active" },
+  { id: "13", acquisitionMethod: "Manufactured", acqPriority: "-", stockingUnit: "mg (Milligram)", altUnit: "EA (Each)", status: "Active" },
+  { id: "14", acquisitionMethod: "Purchased", acqPriority: "-", stockingUnit: "Roll100m (Roll...)", altUnit: "EA (Each)", status: "Active" },
+  { id: "15", acquisitionMethod: "Both", acqPriority: "Purchased", stockingUnit: "Bo12 (Box of 12)", altUnit: "EA (Each)", status: "Active" },
+  { id: "16", acquisitionMethod: "Manufactured", acqPriority: "-", stockingUnit: "Bo24 (Box of 24)", altUnit: "EA (Each)", status: "Active" },
+  { id: "17", acquisitionMethod: "Purchased", acqPriority: "-", stockingUnit: "cm (centimeters)", altUnit: "EA (Each)", status: "Active" },
+  { id: "18", acquisitionMethod: "Both", acqPriority: "Manufactured", stockingUnit: "m (Meter)", altUnit: "EA (Each)", status: "Active" },
+  { id: "19", acquisitionMethod: "Purchased", acqPriority: "-", stockingUnit: "mg (Milligram)", altUnit: "EA (Each)", status: "Active" },
+  { id: "20", acquisitionMethod: "Manufactured", acqPriority: "-", stockingUnit: "in (Inch)", altUnit: "EA (Each)", status: "Active" },
 ];
 
 /* ─── Mock vendors ─── */
@@ -79,7 +82,7 @@ const PT_MOCK_VENDORS_TABLE = [
   { id: "V-7", name: "Nordic Fastening Systems", types: ["Vendor • Sub-Contractor"], partNo: "SB-M10-40", moreItems: 18 },
 ];
 
-/* ─── Filter pill options for items ─── */
+/* ─── Filter pill options ─── */
 const ITEM_FILTER_OPTIONS: FilterPillOption[] = [
   { key: "all", label: "Me mode", showCount: false },
   { key: "parts", label: "Parts", showCount: false },
@@ -100,23 +103,31 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
   const [tab, setTab] = useState("items");
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(true);
+  const [discountOpen, setDiscountOpen] = useState(true);
   const [itemFilter, setItemFilter] = useState("all");
 
   if (!term) return null;
 
   const ptDuration = term.duration || (term.name.match(/\d+/) ? term.name.match(/\d+/)![0] : "30");
-  const ptTypeLabel = CREATE_PT_TYPES.find((t) => t.id === term.category)?.label || term.typeBadge;
+  const ptTypeLabel = CREATE_PT_TYPES.find((t) => t.id === term.category)?.label || "NET Terms (After X Days of a Certain Event)";
   const badgeColor = term.badgeColor;
 
   const modalBaseClass = "!fixed !inset-0 !translate-x-0 !translate-y-0 !m-auto !w-full !h-full transition-[max-width,max-height,border-radius] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]";
   const modalSizeClass = isFullscreen
     ? `${modalBaseClass} !max-w-[calc(100%-1rem)] sm:!max-w-[calc(100%-1.5rem)] lg:!max-w-[calc(100%-2rem)] !max-h-[calc(100%-1rem)] sm:!max-h-[calc(100%-1.5rem)] lg:!max-h-[calc(100%-2rem)] !rounded-2xl`
-    : `${modalBaseClass} !max-w-[100%] sm:!max-w-[960px] lg:!max-w-[1040px] !max-h-[100dvh] sm:!max-h-[88vh] rounded-none sm:!rounded-2xl`;
+    : `${modalBaseClass} !max-w-[100%] sm:!max-w-[960px] lg:!max-w-[1080px] !max-h-[100dvh] sm:!max-h-[90vh] rounded-none sm:!rounded-2xl`;
 
   const itemCount = PT_MOCK_ITEMS.length;
   const vendorCount = PT_MOCK_VENDORS_TABLE.length;
+  const creatorTint = getAvatarTint("Ahtisham Ahmad");
 
-  const creatorTint = getAvatarTint("John Doe");
+  /* ─── Sidebar info label ─── */
+  const InfoLabel = ({ children }: { children: React.ReactNode }) => (
+    <span className="text-[11px] text-muted-foreground flex items-center gap-1">
+      {children}
+      <Info className="w-3 h-3 text-muted-foreground/40" />
+    </span>
+  );
 
   return (
     <Dialog open={open} onOpenChange={(v) => { if (!v) { onClose(); setIsFullscreen(false); setTab("items"); } }}>
@@ -135,7 +146,7 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
               <button onClick={onClose} className="w-8 h-8 rounded-lg border border-border bg-card flex items-center justify-center hover:bg-accent transition-colors cursor-pointer shrink-0">
                 <ArrowLeft className="w-3.5 h-3.5 text-foreground" />
               </button>
-              <span className="text-[14px] font-semibold text-foreground truncate">{term.name}</span>
+              <span className="text-[14px] font-semibold text-foreground truncate">Select payment terms</span>
             </div>
             <div className="flex items-center gap-1.5 shrink-0">
               <button onClick={() => toast.info("Edit coming soon")} className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-card text-xs font-medium text-foreground hover:bg-accent transition-colors cursor-pointer">
@@ -147,9 +158,6 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
               <button onClick={() => setIsFullscreen(!isFullscreen)} className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-card text-xs font-medium text-foreground hover:bg-accent transition-colors cursor-pointer">
                 {isFullscreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
               </button>
-              <button onClick={() => toast.info("More options")} className="hidden sm:inline-flex items-center gap-1.5 px-2 py-1.5 rounded-lg border border-border bg-card text-xs font-medium text-foreground hover:bg-accent transition-colors cursor-pointer">
-                <MoreHorizontal className="w-3.5 h-3.5" />
-              </button>
               <button onClick={() => { onClose(); setIsFullscreen(false); setTab("items"); }} className="w-8 h-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent transition-all cursor-pointer">
                 <X className="w-4 h-4" />
               </button>
@@ -160,76 +168,133 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
         {/* ─── Body ─── */}
         <div className="flex flex-1 overflow-hidden min-h-0">
           {/* ─── LEFT SIDEBAR ─── */}
-          <div className="w-[340px] border-r border-border flex flex-col shrink-0 overflow-y-auto bg-secondary/30">
-            {/* Hero section */}
-            <div className="p-5 pb-4">
-              {/* Duration hero */}
-              <div className="flex items-baseline gap-2 mb-4">
-                <span className="text-[40px] font-extrabold text-foreground leading-none tabular-nums tracking-tight">{ptDuration}</span>
-                <span className="text-[15px] text-muted-foreground font-medium">days</span>
-              </div>
-
-              {/* Pills row */}
-              <div className="flex items-center gap-2 flex-wrap">
+          <div className="w-[320px] lg:w-[340px] border-r border-border flex flex-col shrink-0 overflow-y-auto bg-card">
+            {/* Hero: Badge + Name + Actions */}
+            <div className="px-5 pt-5 pb-4">
+              <div className="flex items-start gap-3">
+                {/* Category pill */}
                 <span
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold border"
-                  style={{ backgroundColor: `${badgeColor}12`, color: badgeColor, borderColor: `${badgeColor}30` }}
+                  className="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-bold tracking-wide shrink-0 mt-0.5"
+                  style={{ backgroundColor: `${badgeColor}18`, color: badgeColor }}
                 >
                   {term.typeBadge}
                 </span>
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium border border-border bg-card text-foreground">
-                  <CalendarDays className="w-3 h-3 text-muted-foreground" />
-                  {term.trigger}
-                </span>
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-chart-2/10 text-chart-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-chart-2" />
-                  Active
-                </span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-2">
+                    <h3 className="text-[16px] font-semibold text-foreground leading-snug">{term.name}</h3>
+                    <div className="flex items-center gap-1 shrink-0">
+                      <button onClick={() => toast.info("Delete")} className="w-7 h-7 rounded-md flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors cursor-pointer">
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                      <button onClick={() => toast.info("Add")} className="w-7 h-7 rounded-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent transition-colors cursor-pointer">
+                        <Plus className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                  <p className="text-[12px] text-muted-foreground leading-relaxed mt-1">
+                    Payment is due {ptDuration} days after the {(term.trigger || "invoice date").toLowerCase()}.
+                  </p>
+                </div>
               </div>
 
-              {/* Description */}
-              <p className="text-[12px] text-muted-foreground mt-3 leading-relaxed">{term.description}</p>
+              {/* Trigger pill */}
+              <div className="mt-3">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-secondary/50 text-[12px] font-medium text-foreground">
+                  <CalendarDays className="w-3.5 h-3.5 text-muted-foreground" />
+                  {term.trigger || "Invoice Date"}
+                </span>
+              </div>
             </div>
 
-            {/* Details section */}
+            {/* ─── About this payment term ─── */}
             <div className="border-t border-border">
-              <button onClick={() => setAboutOpen(!aboutOpen)} className="w-full flex items-center justify-between px-5 py-3 text-[11px] font-semibold text-muted-foreground cursor-pointer hover:bg-accent/50 transition-colors uppercase tracking-wider">
-                Details
-                {aboutOpen ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+              <button
+                onClick={() => setAboutOpen(!aboutOpen)}
+                className="w-full flex items-center justify-between px-5 py-3 text-[13px] font-semibold text-foreground cursor-pointer hover:bg-accent/40 transition-colors"
+              >
+                <span className="flex items-center gap-1.5">
+                  {aboutOpen ? <ChevronUp className="w-3.5 h-3.5 text-muted-foreground" /> : <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />}
+                  About this payment term
+                </span>
               </button>
               {aboutOpen && (
-                <div className="px-5 pb-5 space-y-3">
-                  {[
-                    { label: "Type", value: ptTypeLabel },
-                    { label: "Duration", value: `${ptDuration} days` },
-                    { label: "Trigger", value: term.trigger },
-                    { label: "Discount", value: term.description?.includes("discount") ? "2% / 10 days" : "None" },
-                    { label: "Vendors Applied", value: String(vendorCount) },
-                    { label: "Items", value: String(itemCount) },
-                  ].map((row) => (
-                    <div key={row.label} className="flex items-center justify-between">
-                      <span className="text-[11px] text-muted-foreground">{row.label}</span>
-                      <span className="text-[12px] font-medium text-foreground">{row.value}</span>
+                <div className="px-5 pb-5">
+                  {/* 2-col grid like reference */}
+                  <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+                    <div>
+                      <InfoLabel>Payment Term Name</InfoLabel>
+                      <p className="text-[13px] font-medium text-foreground mt-0.5">{term.name}</p>
                     </div>
-                  ))}
-
-                  {/* Separator */}
-                  <div className="border-t border-border pt-3 mt-3">
-                    <div className="flex items-center gap-2.5">
-                      <div
-                        className="w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-bold shrink-0"
-                        style={{ backgroundColor: creatorTint.bg, color: creatorTint.fg }}
-                      >
-                        JD
-                      </div>
-                      <div className="min-w-0">
-                        <span className="text-[11px] font-medium text-foreground">John Doe</span>
-                        <span className="text-[11px] text-muted-foreground ml-1.5">· Dec 15, 2025</span>
-                      </div>
+                    <div>
+                      <InfoLabel>Payment Term Type</InfoLabel>
+                      <p className="text-[13px] font-medium text-foreground mt-0.5 leading-snug">{ptTypeLabel}</p>
+                    </div>
+                    <div>
+                      <InfoLabel>NET Duration (Days)</InfoLabel>
+                      <p className="text-[13px] font-medium text-foreground mt-0.5">{ptDuration} days</p>
+                    </div>
+                    <div>
+                      <InfoLabel>Description</InfoLabel>
+                      <p className="text-[13px] text-muted-foreground mt-0.5">-</p>
+                    </div>
+                    <div className="col-span-2">
+                      <InfoLabel>Trigger Event</InfoLabel>
+                      <span className="inline-flex items-center gap-1.5 mt-1.5 px-3 py-1.5 rounded-lg border border-border bg-secondary/50 text-[12px] font-medium text-foreground">
+                        {term.trigger || "Invoice Date"}
+                      </span>
                     </div>
                   </div>
                 </div>
               )}
+            </div>
+
+            {/* ─── Discount Terms ─── */}
+            <div className="border-t border-border">
+              <button
+                onClick={() => setDiscountOpen(!discountOpen)}
+                className="w-full flex items-center justify-between px-5 py-3 text-[13px] font-semibold text-foreground cursor-pointer hover:bg-accent/40 transition-colors"
+              >
+                <span className="flex items-center gap-1.5">
+                  {discountOpen ? <ChevronUp className="w-3.5 h-3.5 text-muted-foreground" /> : <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />}
+                  Apply Discount Terms
+                </span>
+              </button>
+              {discountOpen && (
+                <div className="px-5 pb-5">
+                  <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+                    <div>
+                      <InfoLabel>Discount Percentage (%)</InfoLabel>
+                      <p className="text-[13px] text-muted-foreground mt-0.5">-</p>
+                    </div>
+                    <div>
+                      <InfoLabel>Eligible Payment Period (Days)</InfoLabel>
+                      <p className="text-[13px] text-muted-foreground mt-0.5">-</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* ─── Created by ─── */}
+            <div className="border-t border-border px-5 py-4 mt-auto">
+              <div className="grid grid-cols-2 gap-x-6">
+                <div>
+                  <InfoLabel>Created By</InfoLabel>
+                  <div className="flex items-center gap-2 mt-1.5">
+                    <div
+                      className="w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-bold shrink-0"
+                      style={{ backgroundColor: creatorTint.bg, color: creatorTint.fg }}
+                    >
+                      AA
+                    </div>
+                    <span className="text-[12px] font-medium text-foreground">Ahtisham Ahmad</span>
+                  </div>
+                </div>
+                <div>
+                  <InfoLabel>Created at</InfoLabel>
+                  <p className="text-[13px] font-medium text-foreground mt-1.5">Jan 16, 2025</p>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -240,6 +305,7 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
               {PT_DETAIL_TABS.map((t) => {
                 const active = tab === t.id;
                 const count = t.id === "items" ? itemCount : t.id === "vendors" ? vendorCount : 0;
+                const TabIcon = t.icon;
                 return (
                   <button
                     key={t.id}
@@ -248,6 +314,7 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
                       active ? "border-primary text-primary font-semibold" : "border-transparent text-muted-foreground hover:text-foreground font-medium"
                     }`}
                   >
+                    <TabIcon className="w-3.5 h-3.5" />
                     {t.label}
                     {count > 0 && (
                       <span className={`text-[9px] rounded-full px-1.5 py-0.5 min-w-[18px] text-center font-bold ${active ? "bg-primary/15 text-primary" : "bg-secondary text-muted-foreground"}`}>
@@ -262,7 +329,6 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
             {/* Items Tab */}
             {tab === "items" && (
               <div className="flex-1 flex flex-col overflow-hidden">
-                {/* Search + Filters bar */}
                 <div className="px-4 py-3 shrink-0 bg-card border-b border-border space-y-2.5">
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-2 flex-1 min-w-0">
@@ -274,42 +340,25 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
                         <SlidersHorizontal className="w-3.5 h-3.5" /> Filters
                       </button>
                     </div>
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                      <span className="text-[11px] tabular-nums font-medium">{itemCount}</span>
-                    </div>
+                    <span className="text-[11px] tabular-nums font-medium text-muted-foreground">{itemCount}</span>
                   </div>
                   <FilterPills options={ITEM_FILTER_OPTIONS} activeKey={itemFilter} onSelect={setItemFilter} />
                 </div>
 
-                {/* Data table */}
                 <div className="flex-1 overflow-auto">
                   <table className="w-full text-[12px]">
                     <thead className="sticky top-0 z-10">
                       <tr className="bg-secondary/60">
-                        <th className="text-left px-4 py-2 text-muted-foreground text-[11px] font-medium border-b border-border whitespace-nowrap">Part No. ↓</th>
-                        <th className="text-left px-4 py-2 text-muted-foreground text-[11px] font-medium border-b border-border whitespace-nowrap w-[32px]"></th>
-                        <th className="text-left px-4 py-2 text-muted-foreground text-[11px] font-medium border-b border-border whitespace-nowrap">Item Description</th>
-                        <th className="text-left px-4 py-2 text-muted-foreground text-[11px] font-medium border-b border-border whitespace-nowrap">Category ↓</th>
-                        <th className="text-left px-4 py-2 text-muted-foreground text-[11px] font-medium border-b border-border whitespace-nowrap">Item Control Type</th>
                         <th className="text-left px-4 py-2 text-muted-foreground text-[11px] font-medium border-b border-border whitespace-nowrap">Acquisition Method</th>
-                        <th className="text-left px-4 py-2 text-muted-foreground text-[11px] font-medium border-b border-border whitespace-nowrap">Acq. Method 1st Priority</th>
+                        <th className="text-left px-4 py-2 text-muted-foreground text-[11px] font-medium border-b border-border whitespace-nowrap">Acquisition Method 1st Priority</th>
                         <th className="text-left px-4 py-2 text-muted-foreground text-[11px] font-medium border-b border-border whitespace-nowrap">Default Stocking Unit</th>
-                        <th className="text-left px-4 py-2 text-muted-foreground text-[11px] font-medium border-b border-border whitespace-nowrap">Alt. Stocking Unit</th>
+                        <th className="text-left px-4 py-2 text-muted-foreground text-[11px] font-medium border-b border-border whitespace-nowrap">Alternative Stocking Unit</th>
                         <th className="text-left px-4 py-2 text-muted-foreground text-[11px] font-medium border-b border-border whitespace-nowrap">Status</th>
                       </tr>
                     </thead>
                     <tbody>
                       {PT_MOCK_ITEMS.map((item) => (
                         <tr key={item.id} className="hover:bg-accent/40 transition-colors border-b border-border">
-                          <td className="px-4 py-2.5 text-[12px] text-foreground font-medium whitespace-nowrap">{item.partNo}</td>
-                          <td className="px-1 py-2.5">
-                            <div className="w-7 h-7 rounded bg-secondary border border-border flex items-center justify-center shrink-0">
-                              <ImageIcon className="w-3 h-3 text-muted-foreground/60" />
-                            </div>
-                          </td>
-                          <td className="px-4 py-2.5 text-[12px] text-foreground max-w-[220px] truncate">{item.description}</td>
-                          <td className="px-4 py-2.5 text-[12px] text-foreground font-medium whitespace-nowrap">{item.category}</td>
-                          <td className="px-4 py-2.5 text-[12px] text-foreground whitespace-nowrap">{item.controlType}</td>
                           <td className="px-4 py-2.5 text-[12px] text-foreground whitespace-nowrap">{item.acquisitionMethod}</td>
                           <td className="px-4 py-2.5 whitespace-nowrap">
                             {item.acqPriority !== "-" ? (
@@ -321,13 +370,13 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
                                 {item.acqPriority}
                               </span>
                             ) : (
-                              <span className="text-[12px] text-muted-foreground">-</span>
+                              <span className="text-muted-foreground">-</span>
                             )}
                           </td>
                           <td className="px-4 py-2.5 text-[12px] text-foreground whitespace-nowrap">{item.stockingUnit}</td>
                           <td className="px-4 py-2.5 whitespace-nowrap">
                             <div className="flex items-center gap-1.5">
-                              <span className="text-[12px] text-foreground font-medium">{item.altUnit}</span>
+                              <span className="text-[12px] text-foreground">{item.altUnit}</span>
                               <span className="text-[11px] text-primary cursor-pointer hover:underline font-medium">+2 more</span>
                             </div>
                           </td>
@@ -344,13 +393,19 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
                   </table>
                 </div>
 
-                <div className="flex items-center justify-between px-4 py-2 border-t border-border shrink-0 bg-card">
-                  <span className="text-[11px] text-muted-foreground">Showing {itemCount} of {itemCount} items</span>
+                <div className="flex items-center justify-between px-4 py-2.5 border-t border-border shrink-0 bg-card">
                   <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
-                    <span>Per page</span>
+                    <span>Records per page</span>
                     <select className="h-6 px-1.5 rounded border border-border bg-card text-[11px] text-foreground cursor-pointer outline-none">
                       <option>20</option><option>50</option>
                     </select>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <button className="h-7 px-2 text-[11px] text-muted-foreground hover:text-foreground rounded transition-colors cursor-pointer">«</button>
+                    <button className="h-7 px-2 text-[11px] text-muted-foreground hover:text-foreground rounded transition-colors cursor-pointer">← Prev</button>
+                    <span className="h-7 w-7 flex items-center justify-center rounded-md bg-primary text-primary-foreground text-[11px] font-bold">1</span>
+                    <button className="h-7 px-2 text-[11px] text-muted-foreground hover:text-foreground rounded transition-colors cursor-pointer">Next →</button>
+                    <button className="h-7 px-2 text-[11px] text-muted-foreground hover:text-foreground rounded transition-colors cursor-pointer">»</button>
                   </div>
                 </div>
               </div>
@@ -416,13 +471,15 @@ function PaymentTermDetailModal({ term, open, onClose }: PaymentTermDetailModalP
                     </tbody>
                   </table>
                 </div>
-                <div className="flex items-center justify-between px-4 py-2 border-t border-border shrink-0 bg-card">
-                  <span className="text-[11px] text-muted-foreground">Showing {PT_MOCK_VENDORS_TABLE.length} of {vendorCount} partners</span>
+                <div className="flex items-center justify-between px-4 py-2.5 border-t border-border shrink-0 bg-card">
                   <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
-                    <span>Per page</span>
+                    <span>Records per page</span>
                     <select className="h-6 px-1.5 rounded border border-border bg-card text-[11px] text-foreground cursor-pointer outline-none">
                       <option>20</option><option>50</option>
                     </select>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <span className="h-7 w-7 flex items-center justify-center rounded-md bg-primary text-primary-foreground text-[11px] font-bold">1</span>
                   </div>
                 </div>
               </div>
