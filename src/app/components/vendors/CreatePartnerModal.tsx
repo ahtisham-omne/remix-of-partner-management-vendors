@@ -5290,7 +5290,6 @@ function ConfigPageContent({
             hideCloseButton
           >
             
-            <>
             <div className="flex items-center justify-between border-b border-[#EEF2F6] bg-card px-6 h-12 shrink-0">
               <div className="flex items-center gap-3">
                 <div>
