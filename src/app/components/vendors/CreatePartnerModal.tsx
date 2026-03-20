@@ -1502,6 +1502,153 @@ function highlightMatch(text: string, query: string): React.ReactNode {
   );
 }
 
+// ── Pricing Rule Template Card (matches PricingRulesTab card with tiers) ──
+function PrTemplateCardInner({
+  rule,
+  isApplied,
+  searchText,
+  onClick,
+  onApply,
+  onDuplicate,
+}: {
+  rule: PricingRulePreset;
+  isApplied: boolean;
+  searchText?: string;
+  onClick: () => void;
+  onApply: () => void;
+  onDuplicate: () => void;
+}) {
+  const [activeTier, setActiveTier] = useState(0);
+  const isDis = rule.category === "discount";
+  const isMulti = rule.tierType === "multiple" && rule.tiers.length > 1;
+  const shownTier = rule.tiers[isMulti ? activeTier : 0];
+  const isCustom = rule.id.startsWith("pr-custom-");
+  const pill = isDis
+    ? { text: "#047857", bg: "#ECFDF5", border: "#D1FAE5" }
+    : { text: "#6D28D9", bg: "#F5F3FF", border: "#EDE9FE" };
+
+  return (
+    <div
+      onClick={onClick}
+      className={`bg-white border rounded-xl cursor-pointer group transition-all duration-200 flex flex-col relative ${
+        isApplied
+          ? "border-[#0A77FF]/25 shadow-[0_2px_12px_rgba(10,119,255,0.10)]"
+          : "border-[#E8ECF1] shadow-[0_1px_3px_rgba(0,0,0,0.03)] hover:border-[#BFDBFE] hover:shadow-[0_4px_16px_-4px_rgba(10,119,255,0.10)]"
+      }`}
+    >
+      {isApplied && (
+        <div className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-[#0A77FF] flex items-center justify-center z-10 shadow-sm">
+          <Check className="w-3 h-3 text-white" />
+        </div>
+      )}
+
+      <div className="p-3.5 flex-1 flex flex-col min-h-0 overflow-hidden">
+        {/* Row 1: Type pill + Preset/Custom badge */}
+        <div className="flex items-center justify-between gap-2 mb-2 shrink-0">
+          <span className="inline-flex items-stretch rounded-full overflow-hidden border shrink-0" style={{ borderColor: pill.border }}>
+            <span
+              className="inline-flex items-center gap-1 px-2 py-[2px] text-[10px]"
+              style={{ fontWeight: 600, color: pill.text, backgroundColor: pill.bg }}
+            >
+              {isDis ? <TrendingDown className="w-3 h-3" /> : <TrendingUp className="w-3 h-3" />}
+              {isDis ? "Discount" : "Premium"}
+            </span>
+            <span className="inline-flex items-center px-2 py-[2px] text-[10px] bg-white text-[#64748B] border-l" style={{ fontWeight: 500, borderColor: pill.border }}>
+              {rule.basis === "volume" ? "Volume" : "Value"}
+            </span>
+          </span>
+          <span className={`inline-flex items-center gap-1 px-1.5 py-[3px] rounded-md border text-[9px] shrink-0 ${
+            isCustom
+              ? "border-[#E2E8F0] bg-white text-[#64748B]"
+              : "bg-[#F1F5F9] border-[#E2E8F0] text-[#94A3B8]"
+          }`} style={{ fontWeight: 600 }}>
+            {isCustom ? "Custom" : <><Lock className="w-2.5 h-2.5" /> PRESET</>}
+          </span>
+        </div>
+
+        {/* Row 2: Name */}
+        <div className="shrink-0 mb-1">
+          <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{highlightMatch(rule.name, searchText || "")}</p>
+        </div>
+
+        {/* Row 3: Description */}
+        <div className="h-[32px] shrink-0 mb-2">
+          <p className="text-[11px] text-[#64748B] line-clamp-2 leading-relaxed" style={{ fontWeight: 400 }}>{highlightMatch(rule.description, searchText || "")}</p>
+        </div>
+
+        {/* Row 4: Hero value + vendor count */}
+        <div className="flex items-baseline justify-between shrink-0">
+          <div className="flex items-baseline gap-2">
+            <span className="text-[22px] text-[#0F172A] tabular-nums leading-none tracking-tight" style={{ fontWeight: 600 }}>
+              {rule.tiers[0]?.discount ?? "—"}
+            </span>
+            <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>
+              {isDis ? "off" : "markup"}
+            </span>
+          </div>
+          <span className="inline-flex items-center gap-1 text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>
+            <Building2 className="w-3 h-3" /> {rule.vendorsApplied} vendors applied
+          </span>
+        </div>
+
+        {/* Row 5: Tier selector + detail */}
+        <div className="mt-auto pt-2 shrink-0" onClick={(e) => e.stopPropagation()}>
+          <div className={`h-[24px] mb-1.5 ${isMulti ? "flex items-center gap-[3px]" : ""}`}>
+            {isMulti && rule.tiers.map((_, i) => {
+              const isActive = activeTier === i;
+              return (
+                <button
+                  key={i}
+                  onClick={(e) => { e.stopPropagation(); setActiveTier(i); }}
+                  className={`h-[22px] rounded-md text-[10px] tabular-nums transition-all duration-200 cursor-pointer flex items-center justify-center px-2 ${
+                    isActive
+                      ? "bg-[#F1F5F9] text-[#334155] ring-1 ring-[#CBD5E1]"
+                      : "bg-transparent text-[#C0C9D4] hover:bg-[#F8FAFC] hover:text-[#94A3B8]"
+                  }`}
+                  style={{ fontWeight: isActive ? 600 : 500 }}
+                >
+                  T{i + 1}
+                  {isActive && (
+                    <span className="ml-1 text-[9px] text-[#94A3B8]" style={{ fontWeight: 400 }}>
+                      {shownTier?.discount}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+          <div className="flex items-center justify-between px-3 py-[6px] rounded-lg border border-[#E8ECF1] bg-[#FAFBFC] text-[11px] tabular-nums min-w-0">
+            <div className="flex items-center gap-1.5 text-[#64748B] min-w-0">
+              <span style={{ fontWeight: 400 }}>{shownTier?.minValue}</span>
+              <span className="text-[#CBD5E1]">–</span>
+              <span style={{ fontWeight: 400 }}>{shownTier?.maxValue}</span>
+            </div>
+            <span className="shrink-0 ml-2 text-[#0F172A]" style={{ fontWeight: 600 }}>{shownTier?.discount}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer — Apply + Duplicate */}
+      <div className="grid grid-cols-2 border-t border-[#F1F5F9] shrink-0">
+        <button
+          onClick={(e) => { e.stopPropagation(); onApply(); }}
+          className="inline-flex items-center justify-center gap-1 py-2 text-[11px] text-[#64748B] hover:text-[#0A77FF] hover:bg-[#F8FAFC] transition-colors border-r border-[#F1F5F9]"
+          style={{ fontWeight: 500 }}
+        >
+          <Check className="w-3 h-3" /> Apply
+        </button>
+        <button
+          onClick={(e) => { e.stopPropagation(); onDuplicate(); }}
+          className="inline-flex items-center justify-center gap-1 py-2 text-[11px] text-[#64748B] hover:text-[#0A77FF] hover:bg-[#F8FAFC] transition-colors"
+          style={{ fontWeight: 500 }}
+        >
+          <Copy className="w-3 h-3" /> Duplicate
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function GroupCard({
   group,
   isSelected,
@@ -6499,105 +6646,21 @@ function ConfigPageContent({
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 3xl:grid-cols-4 auto-rows-fr gap-4">
-                      {filteredPricingRulePresets.map((rule) => {
-                        const isApplied = selectedPricingRuleIds.includes(rule.id);
-                        const isDis = rule.category === "discount";
-                        const badgeColor = isDis ? "#047857" : "#7C3AED";
-                        const isCustom = rule.id.startsWith("pr-custom-");
-                        return (
-                          <div
-                            key={rule.id}
-                            onClick={() => setPreviewPricingRuleId(rule.id)}
-                            className={`bg-white border rounded-xl cursor-pointer group transition-all duration-200 flex flex-col relative ${
-                              isApplied
-                                ? "border-[#0A77FF]/25 shadow-[0_2px_12px_rgba(10,119,255,0.10)]"
-                                : "border-[#E8ECF1] shadow-[0_1px_3px_rgba(0,0,0,0.03)] hover:border-[#BFDBFE] hover:shadow-[0_4px_16px_-4px_rgba(10,119,255,0.10)]"
-                            }`}
-                          >
-                            {isApplied && (
-                              <div className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-[#0A77FF] flex items-center justify-center z-10 shadow-sm">
-                                <Check className="w-3 h-3 text-white" />
-                              </div>
-                            )}
-
-                            <div className="p-3 flex-1 flex flex-col min-h-0 overflow-hidden">
-                              {/* Row 1: Type pill + Preset/Custom badge */}
-                              <div className="flex items-center justify-between gap-2 mb-2 shrink-0">
-                                <span className="inline-flex items-stretch rounded-full overflow-hidden border shrink-0" style={{ borderColor: badgeColor + "40" }}>
-                                  <span
-                                    className="inline-flex items-center gap-1 px-2 py-[2px] text-[10px]"
-                                    style={{ fontWeight: 600, color: badgeColor, backgroundColor: badgeColor + "15" }}
-                                  >
-                                    {isDis ? <TrendingDown className="w-3 h-3" /> : <TrendingUp className="w-3 h-3" />}
-                                    {isDis ? "Discount" : "Premium"}
-                                  </span>
-                                  <span className="inline-flex items-center px-2 py-[2px] text-[10px] bg-white text-[#64748B] border-l" style={{ fontWeight: 500, borderColor: badgeColor + "40" }}>
-                                    {rule.basis === "value" ? "Value" : "Volume"}
-                                  </span>
-                                </span>
-                                <span className={`inline-flex items-center gap-1 px-1.5 py-[3px] rounded-md border text-[9px] shrink-0 ${
-                                  isCustom
-                                    ? "border-[#E2E8F0] bg-white text-[#64748B]"
-                                    : "bg-[#F1F5F9] border-[#E2E8F0] text-[#94A3B8]"
-                                }`} style={{ fontWeight: 600 }}>
-                                  {isCustom ? "Custom" : <><Lock className="w-2.5 h-2.5" /> PRESET</>}
-                                </span>
-                              </div>
-
-                              {/* Row 2: Name */}
-                              <div className="shrink-0 mb-1">
-                                <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{highlightMatch(rule.name, prSearch)}</p>
-                              </div>
-
-                              {/* Row 3: Description */}
-                              <div className="h-[32px] shrink-0 mb-2">
-                                <p className="text-[11px] text-[#64748B] line-clamp-2 leading-relaxed" style={{ fontWeight: 400 }}>{highlightMatch(rule.description, prSearch)}</p>
-                              </div>
-
-                              {/* Row 4: Tier info + vendor count */}
-                              <div className="flex items-baseline justify-between shrink-0">
-                                <div className="flex items-center gap-2">
-                                  <span className="text-[22px] text-[#0F172A] tabular-nums leading-none tracking-tight" style={{ fontWeight: 600 }}>
-                                    {rule.tiers[0]?.discount || "-"}
-                                  </span>
-                                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] bg-[#F8FAFC] border border-[#E8ECF1] text-[#64748B]" style={{ fontWeight: 500 }}>
-                                    {rule.tierType === "single" ? "1 tier" : `${rule.totalTiers} tiers`}
-                                  </span>
-                                </div>
-                                <span className="inline-flex items-center gap-1 text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>
-                                  <Building2 className="w-3 h-3" /> {rule.vendorsApplied} vendors
-                                </span>
-                              </div>
-                            </div>
-
-                            {/* Footer — Apply + Duplicate */}
-                            <div className="grid grid-cols-2 border-t border-[#F1F5F9] shrink-0">
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setSelectedPricingRuleIds((prev) => prev.includes(rule.id) ? prev : [...prev, rule.id]);
-                                  setPricingRulesModalOpen(false);
-                                  toast.success("Pricing rule applied.");
-                                }}
-                                className="inline-flex items-center justify-center gap-1 py-2 text-[11px] text-[#64748B] hover:text-[#0A77FF] hover:bg-[#F8FAFC] transition-colors border-r border-[#F1F5F9]"
-                                style={{ fontWeight: 500 }}
-                              >
-                                <Check className="w-3 h-3" /> Apply
-                              </button>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  toast.success("Pricing rule duplicated.");
-                                }}
-                                className="inline-flex items-center justify-center gap-1 py-2 text-[11px] text-[#64748B] hover:text-[#0A77FF] hover:bg-[#F8FAFC] transition-colors"
-                                style={{ fontWeight: 500 }}
-                              >
-                                <Copy className="w-3 h-3" /> Duplicate
-                              </button>
-                            </div>
-                          </div>
-                        );
-                      })}
+                      {filteredPricingRulePresets.map((rule) => (
+                        <PrTemplateCardInner
+                          key={rule.id}
+                          rule={rule}
+                          isApplied={selectedPricingRuleIds.includes(rule.id)}
+                          searchText={prSearch}
+                          onClick={() => setPreviewPricingRuleId(rule.id)}
+                          onApply={() => {
+                            setSelectedPricingRuleIds((prev) => prev.includes(rule.id) ? prev : [...prev, rule.id]);
+                            setPricingRulesModalOpen(false);
+                            toast.success("Pricing rule applied.");
+                          }}
+                          onDuplicate={() => toast.success("Pricing rule duplicated.")}
+                        />
+                      ))}
                     </div>
                   )}
                 </div>
