@@ -1629,6 +1629,14 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
             <BookOpen className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Templates</span>
           </button>
+        </div>
+      </div>
+      {/* --- PLACEHOLDER to fix line refs --- */}
+    </div>
+    );
+    // NOTE: This is just for search reference — real code below
+    void 0;
+          </button>
           <button type="button" onClick={() => { resetCreateForm(); setCreateModalOpen(true); }} className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-sm shadow-sm transition-colors cursor-pointer" style={{ fontWeight: 600 }}>
             <Plus className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Create new</span>
