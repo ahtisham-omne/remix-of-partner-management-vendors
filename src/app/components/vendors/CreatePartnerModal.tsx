@@ -3740,13 +3740,14 @@ function ConfigPageContent({
 
   const filteredPricingRulePresets = useMemo(() => {
     let rules = allPricingRulePresets;
-    if (prSidebarFilter === "discount") rules = rules.filter((r) => r.category === "discount");
-    else if (prSidebarFilter === "premium") rules = rules.filter((r) => r.category === "premium");
-    else if (prSidebarFilter === "recent") rules = rules.slice(0, 3);
-    else if (prSidebarFilter === "favourites") rules = rules.slice(0, 4);
-    else if (prSidebarFilter === "vendors_applied") rules = rules.filter((r) => r.vendorsApplied >= 3);
-    else if (prSidebarFilter === "created_by_me") rules = rules.slice(0, 4);
-    else if (prSidebarFilter === "created_by_others") rules = rules.slice(4, 8);
+    // Type filter (parallel)
+    if (prTypeFilter === "discount") rules = rules.filter((r) => r.category === "discount");
+    else if (prTypeFilter === "premium") rules = rules.filter((r) => r.category === "premium");
+    // Status filter (parallel)
+    if (prStatusFilter === "preset") rules = rules.filter((r) => !r.id.startsWith("pr-custom-"));
+    else if (prStatusFilter === "custom") rules = rules.filter((r) => r.id.startsWith("pr-custom-"));
+    else if (prStatusFilter === "created_by_me") rules = rules.filter((r) => r.id.startsWith("pr-custom-"));
+    else if (prStatusFilter === "vendors_applied") rules = rules.filter((r) => r.vendorsApplied >= 3);
     if (prSearch.trim()) {
       const q = prSearch.toLowerCase();
       rules = rules.filter((r) => r.name.toLowerCase().includes(q) || r.description.toLowerCase().includes(q));
@@ -3761,7 +3762,7 @@ function ConfigPageContent({
       return prSortDir === "asc" ? cmp : -cmp;
     });
     return sorted;
-  }, [prSidebarFilter, prSearch, allPricingRulePresets, prSortBy, prSortDir]);
+  }, [prTypeFilter, prStatusFilter, prSearch, allPricingRulePresets, prSortBy, prSortDir]);
 
   const selectedPricingRules = useMemo(() => {
     return selectedPricingRuleIds.map((id) =>
