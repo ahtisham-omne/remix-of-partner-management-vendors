@@ -3299,6 +3299,11 @@ function ConfigPageContent({
   const [createPtDiscountPercent, setCreatePtDiscountPercent] = useState("");
   const [createPtDiscountPeriod, setCreatePtDiscountPeriod] = useState("30");
   const [createPtStep, setCreatePtStep] = useState<1 | 2>(1);
+  const [createPtCustomDuration, setCreatePtCustomDuration] = useState("");
+  const [createPtSplitEvents, setCreatePtSplitEvents] = useState<Array<{ percent: string; trigger: string }>>([
+    { percent: "", trigger: "order_confirmation" },
+    { percent: "", trigger: "production_start" },
+  ]);
 
   function resetCreatePtForm() {
     setCreatePtName("");
@@ -3310,6 +3315,11 @@ function ConfigPageContent({
     setCreatePtDiscountPercent("");
     setCreatePtDiscountPeriod("30");
     setCreatePtStep(1);
+    setCreatePtCustomDuration("");
+    setCreatePtSplitEvents([
+      { percent: "", trigger: "order_confirmation" },
+      { percent: "", trigger: "production_start" },
+    ]);
   }
 
   function handleDuplicatePaymentTerm(term: PaymentTermPreset) {
