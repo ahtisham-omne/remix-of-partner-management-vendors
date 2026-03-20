@@ -169,7 +169,7 @@ export function PaymentTermCard({
             <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>days</span>
           </div>
           <span className="inline-flex items-center gap-1 text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>
-            <Building2 className="w-3 h-3" /> {term.vendorsApplied} vendors using
+            <Building2 className="w-3 h-3" /> {term.vendorsApplied} vendors applied
           </span>
         </div>
 
