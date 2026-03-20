@@ -1412,6 +1412,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
   const [explorePresetsOpen, setExplorePresetsOpen] = useState(false);
   const [explorePresetsFullscreen, setExplorePresetsFullscreen] = useState(false);
   const [explorePresetsSidebar, setExplorePresetsSidebar] = useState("all");
+  const [exploreCategoryTab, setExploreCategoryTab] = useState<"discount" | "premium">("discount");
   const [explorePresetsSearch, setExplorePresetsSearch] = useState("");
   const [exploreActiveTiers, setExploreActiveTiers] = useState<Record<string, number>>({});
 
