@@ -5131,12 +5131,12 @@ function ConfigPageContent({
 
                 {/* ─── Step 1: Term Setup ─── */}
                 {createPtStep === 1 && (
-                  <div className="space-y-4">
+                  <div className="space-y-5">
                     {/* Payment Term Type — card selector matching pricing rule style */}
                     <div>
                       <div className="flex items-center gap-1.5 mb-3">
                         <span className="text-sm text-[#0F172A]" style={{ fontWeight: 600 }}>Payment Term Type</span>
-                        <Info className="w-3.5 h-3.5 text-[#CBD5E1]" />
+                        <Tooltip><TooltipTrigger asChild><span><Info className="w-3.5 h-3.5 text-[#CBD5E1]" /></span></TooltipTrigger><TooltipContent className="z-[300]"><p className="text-xs">Choose how payment will be structured for this term.</p></TooltipContent></Tooltip>
                       </div>
 
                       <div className="grid grid-cols-3 gap-3">
@@ -5176,200 +5176,210 @@ function ConfigPageContent({
                           );
                         })}
                       </div>
+
+                      {/* Trigger selector pills — NET & Prepayment only */}
+                      {createPtType !== "split" && (
+                        <div className="flex items-center gap-2 mt-3">
+                          <span className="text-[12px] text-[#64748B] mr-1" style={{ fontWeight: 500 }}>Trigger:</span>
+                          {CREATE_PT_TRIGGERS.map((t) => {
+                            const isActive = createPtTrigger === t.id;
+                            const accentColor = createPtType === "net" ? "#0A77FF" : "#7C3AED";
+                            return (
+                              <Tooltip key={t.id}>
+                                <TooltipTrigger asChild>
+                                  <button
+                                    onClick={() => setCreatePtTrigger(t.id)}
+                                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[12px] transition-all cursor-pointer ${
+                                      isActive ? "" : "border-[#E2E8F0] bg-white text-[#64748B] hover:border-[#CBD5E1] hover:bg-[#F8FAFC]"
+                                    }`}
+                                    style={isActive ? { fontWeight: 600, borderColor: `${accentColor}30`, backgroundColor: `${accentColor}08`, color: accentColor } : { fontWeight: 500 }}
+                                  >
+                                    {t.id === "order_confirmation" && <ShoppingCart className="w-3.5 h-3.5" />}
+                                    {t.id === "production_start" && <Cog className="w-3.5 h-3.5" />}
+                                    {t.id === "production_end" && <Package className="w-3.5 h-3.5" />}
+                                    {t.id === "shipping" && <Ship className="w-3.5 h-3.5" />}
+                                    {t.id === "delivery" && <Truck className="w-3.5 h-3.5" />}
+                                    {t.label}
+                                  </button>
+                                </TooltipTrigger>
+                                <TooltipContent side="bottom" className="max-w-[240px] text-[11px] z-[300]">
+                                  {TRIGGER_TOOLTIPS[t.id] || t.label}
+                                </TooltipContent>
+                              </Tooltip>
+                            );
+                          })}
+                        </div>
+                      )}
                     </div>
 
                     {/* Payment Term Details */}
                     <div>
-                      <div className="flex items-center gap-1.5 mb-2">
+                      <div className="flex items-center gap-1.5 mb-3">
                         <span className="text-sm text-[#0F172A]" style={{ fontWeight: 600 }}>Payment Term Details</span>
+                        <Tooltip><TooltipTrigger asChild><span><Info className="w-3.5 h-3.5 text-[#CBD5E1]" /></span></TooltipTrigger><TooltipContent className="z-[300]"><p className="text-xs">Name and describe this payment term.</p></TooltipContent></Tooltip>
                       </div>
-                      <div className="rounded-xl border border-[#E2E8F0] bg-white p-4 space-y-3">
-                        {/* Row 1: Name + Type display */}
+                      <div className="rounded-xl border border-[#E2E8F0] bg-white p-4 space-y-4">
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <label className="text-[12px] text-[#0F172A] mb-1 block" style={{ fontWeight: 600 }}>Payment Term Name</label>
+                            <label className="text-[12px] text-[#0F172A] mb-1.5 block" style={{ fontWeight: 600 }}>
+                              {createPtType === "net" ? "NET Term" : createPtType === "prepayment" ? "Prepayment Term" : "Split Term"} Name
+                            </label>
                             <Input
                               value={createPtName}
                               onChange={(e) => setCreatePtName(e.target.value)}
-                              placeholder="Enter the payment term name"
+                              placeholder={`e.g. ${createPtType === "net" ? "Net 30 Standard" : createPtType === "prepayment" ? "50% Upfront" : "3-Part Split"}`}
                               className="rounded-lg border-[#E2E8F0] bg-white text-[13px]"
                             />
-                            <p className="text-[11px] text-[#94A3B8] mt-1">Payment Term Name</p>
                           </div>
-                          {createPtType === "split" ? (
-                            <div>
-                              <label className="text-[12px] text-[#0F172A] mb-1 block" style={{ fontWeight: 600 }}>Payment Term Type</label>
-                              <div className="h-9 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 flex items-center text-[13px] text-[#0F172A]">Split Terms</div>
-                              <p className="text-[11px] text-[#94A3B8] mt-1">Set the name for custom payment term.</p>
-                            </div>
-                          ) : (
-                            <div>
-                              <label className="text-[12px] text-[#0F172A] mb-1 block" style={{ fontWeight: 600 }}>Payment Term Type</label>
-                              <div className="h-9 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] px-3 flex items-center text-[13px] text-[#0F172A]">
-                                {createPtType === "net" ? "NET Terms (After X Days of a Certain Event)" : "Prepayment (Before Delivery)"}
-                              </div>
-                              <p className="text-[11px] text-[#94A3B8] mt-1">Set the name for custom payment term.</p>
-                            </div>
-                          )}
+                          <div>
+                            <label className="text-[12px] text-[#0F172A] mb-1.5 block" style={{ fontWeight: 600 }}>Description</label>
+                            <Textarea
+                              value={createPtDescription}
+                              onChange={(e) => { if (e.target.value.length <= 150) setCreatePtDescription(e.target.value); }}
+                              placeholder="Type here..."
+                              className="rounded-lg border-[#E2E8F0] bg-white min-h-[38px] resize-none text-[13px]"
+                              rows={2}
+                            />
+                            <p className="text-right text-[10px] text-[#94A3B8] mt-0.5">{createPtDescription.length}/150</p>
+                          </div>
                         </div>
 
-                        {/* Row 2: NET — Trigger + Duration side by side */}
+                        {/* Duration selector — NET only */}
                         {createPtType === "net" && (
-                          <div className="grid grid-cols-2 gap-4">
-                            <div>
-                              <label className="text-[12px] text-[#0F172A] mb-1 block" style={{ fontWeight: 600 }}>Trigger Event</label>
-                              <Select value={createPtTrigger} onValueChange={setCreatePtTrigger}>
-                                <SelectTrigger className="h-9 rounded-lg border-[#E2E8F0] bg-white text-[13px]">
+                          <div>
+                            <div className="flex items-center gap-1 mb-1.5">
+                              <label className="text-[12px] text-[#0F172A]" style={{ fontWeight: 600 }}>NET Duration (Days)</label>
+                              <Tooltip><TooltipTrigger asChild><span><Info className="w-3 h-3 text-[#CBD5E1]" /></span></TooltipTrigger><TooltipContent className="z-[300]"><p className="text-xs">Number of days after the trigger event when payment is due.</p></TooltipContent></Tooltip>
+                            </div>
+                            <div className="flex items-center gap-3">
+                              <Select value={createPtDuration} onValueChange={(v) => { setCreatePtDuration(v); if (v !== "custom") setCreatePtCustomDuration(""); }}>
+                                <SelectTrigger className="h-9 rounded-lg border-[#E2E8F0] bg-white max-w-[200px] text-[13px]">
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent className="z-[250] rounded-lg">
-                                  {CREATE_PT_TRIGGERS.map((t) => (
-                                    <SelectItem key={t.id} value={t.id} className="py-2.5 px-3 text-sm">{t.label}</SelectItem>
+                                  {CREATE_PT_DURATIONS.map((d) => (
+                                    <SelectItem key={d.id} value={d.id} className="py-2.5 px-3">
+                                      <span className="text-sm">{d.label}</span>
+                                    </SelectItem>
                                   ))}
                                 </SelectContent>
                               </Select>
-                              <p className="text-[11px] text-[#94A3B8] mt-1">Select the event that triggers the NET term.</p>
-                            </div>
-                            <div>
-                              <label className="text-[12px] text-[#0F172A] mb-1 block" style={{ fontWeight: 600 }}>NET Duration (Days)</label>
-                              <div className="flex items-center gap-2">
-                                <Select value={createPtDuration} onValueChange={(v) => { setCreatePtDuration(v); if (v !== "custom") setCreatePtCustomDuration(""); }}>
-                                  <SelectTrigger className={`h-9 rounded-lg border-[#E2E8F0] bg-white text-[13px] ${createPtDuration === "custom" ? "flex-1" : "w-full"}`}>
-                                    <SelectValue />
-                                  </SelectTrigger>
-                                  <SelectContent className="z-[250] rounded-lg">
-                                    {CREATE_PT_DURATIONS.map((d) => (
-                                      <SelectItem key={d.id} value={d.id} className="py-2.5 px-3 text-sm">{d.label}</SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                                {createPtDuration === "custom" && (
+                              {createPtDuration === "custom" && (
+                                <div className="flex items-center gap-2">
                                   <Input
                                     type="number"
                                     min="1"
                                     value={createPtCustomDuration}
                                     onChange={(e) => setCreatePtCustomDuration(e.target.value)}
-                                    placeholder="Days"
-                                    className="h-9 rounded-lg border-[#E2E8F0] bg-white w-[100px] text-[13px]"
+                                    placeholder="Enter days"
+                                    className="h-9 rounded-lg border-[#E2E8F0] bg-white w-[120px] text-[13px]"
                                   />
-                                )}
-                              </div>
-                              <p className="text-[11px] text-[#94A3B8] mt-1">Enter days after the event for payment.</p>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Prepayment — only Trigger, no duration */}
-                        {createPtType === "prepayment" && (
-                          <div className="grid grid-cols-2 gap-4">
-                            <div>
-                              <label className="text-[12px] text-[#0F172A] mb-1 block" style={{ fontWeight: 600 }}>Trigger Event</label>
-                              <Select value={createPtTrigger} onValueChange={setCreatePtTrigger}>
-                                <SelectTrigger className="h-9 rounded-lg border-[#E2E8F0] bg-white text-[13px]">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent className="z-[250] rounded-lg">
-                                  {CREATE_PT_TRIGGERS.map((t) => (
-                                    <SelectItem key={t.id} value={t.id} className="py-2.5 px-3 text-sm">{t.label}</SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                              <p className="text-[11px] text-[#94A3B8] mt-1">Select the event that triggers the prepayment.</p>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Description — full width */}
-                        <div>
-                          <label className="text-[12px] text-[#0F172A] mb-1 block" style={{ fontWeight: 600 }}>Description</label>
-                          <Textarea
-                            value={createPtDescription}
-                            onChange={(e) => { if (e.target.value.length <= 150) setCreatePtDescription(e.target.value); }}
-                            placeholder="type here..."
-                            className="rounded-lg border-[#E2E8F0] bg-white min-h-[80px] resize-none text-[13px]"
-                            rows={3}
-                          />
-                          <p className="text-right text-[10px] text-[#94A3B8] mt-0.5">{createPtDescription.length}/150</p>
-                        </div>
-
-                        {/* Split Payment Events — wide card layout matching reference */}
-                        {createPtType === "split" && (
-                          <div className="space-y-3">
-                            {createPtSplitEvents.map((evt, idx) => (
-                              <div key={idx} className="relative rounded-xl border border-[#E2E8F0] bg-[#FAFBFC] p-4">
-                                {createPtSplitEvents.length > 2 && (
-                                  <button
-                                    onClick={() => setCreatePtSplitEvents(createPtSplitEvents.filter((_, i) => i !== idx))}
-                                    className="absolute top-3 right-3 w-6 h-6 rounded-full border border-[#E2E8F0] flex items-center justify-center text-[#94A3B8] hover:text-red-500 hover:border-red-200 hover:bg-red-50 transition-colors cursor-pointer"
-                                  >
-                                    <X className="w-3 h-3" />
-                                  </button>
-                                )}
-                                <div className="flex items-center gap-2 mb-3">
-                                  <span className="text-[12px] text-[#0A77FF]" style={{ fontWeight: 700 }}>#{idx + 1}</span>
-                                  <span className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Event Split</span>
+                                  <span className="text-[12px] text-[#64748B]">days</span>
                                 </div>
-                                <div className="grid grid-cols-2 gap-4">
-                                  <div>
-                                    <label className="text-[12px] text-[#0F172A] mb-1 block" style={{ fontWeight: 500 }}>Event Value (%)</label>
-                                    <div className="relative">
-                                      <Input
-                                        type="number"
-                                        min="0"
-                                        max="100"
-                                        value={evt.percent}
-                                        onChange={(e) => {
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Split Payment Events */}
+                        {createPtType === "split" && (
+                          <div>
+                            <div className="flex items-center justify-between mb-3">
+                              <div className="flex items-center gap-1.5">
+                                <label className="text-[12px] text-[#0F172A]" style={{ fontWeight: 600 }}>Payment Split Events</label>
+                                <span className="text-[11px] text-[#94A3B8] bg-[#F1F5F9] px-1.5 py-0.5 rounded" style={{ fontWeight: 600 }}>{createPtSplitEvents.length}</span>
+                              </div>
+                            </div>
+
+                            <div className="space-y-3">
+                              {createPtSplitEvents.map((evt, idx) => (
+                                <div key={idx} className="rounded-xl border border-[#E2E8F0] bg-[#FAFBFC] p-4 relative">
+                                  {/* Event header */}
+                                  <div className="flex items-center justify-between mb-3">
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-[11px] text-[#D97706]" style={{ fontWeight: 600 }}>#{idx + 1}</span>
+                                      <span className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Event Split</span>
+                                    </div>
+                                    {createPtSplitEvents.length > 2 && (
+                                      <button
+                                        onClick={() => setCreatePtSplitEvents(createPtSplitEvents.filter((_, i) => i !== idx))}
+                                        className="w-7 h-7 rounded-full border border-[#FEE2E2] bg-[#FEF2F2] flex items-center justify-center text-[#EF4444] hover:bg-[#FEE2E2] hover:border-[#FECACA] transition-all cursor-pointer"
+                                      >
+                                        <X className="w-3.5 h-3.5" />
+                                      </button>
+                                    )}
+                                  </div>
+
+                                  {/* Percentage + Trigger side by side */}
+                                  <div className="flex items-start gap-4">
+                                    <div className="flex-1">
+                                      <div className="flex items-center gap-1 mb-1.5">
+                                        <label className="text-[12px] text-[#0F172A]" style={{ fontWeight: 500 }}>Event Value (%)</label>
+                                        <Tooltip><TooltipTrigger asChild><span><Info className="w-3 h-3 text-[#CBD5E1]" /></span></TooltipTrigger><TooltipContent className="z-[300]"><p className="text-xs">Percentage of total payment due at this event.</p></TooltipContent></Tooltip>
+                                      </div>
+                                      <div className="relative">
+                                        <Input
+                                          type="number"
+                                          min="0"
+                                          max="100"
+                                          value={evt.percent}
+                                          onChange={(e) => {
+                                            const updated = [...createPtSplitEvents];
+                                            updated[idx] = { ...updated[idx], percent: e.target.value };
+                                            setCreatePtSplitEvents(updated);
+                                          }}
+                                          placeholder="Enter percentage (e.g., 50%)"
+                                          className="h-9 rounded-lg border-[#E2E8F0] bg-white pr-8 text-[13px]"
+                                        />
+                                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[13px] text-[#94A3B8]">%</span>
+                                      </div>
+                                    </div>
+                                    <div className="flex-1">
+                                      <div className="flex items-center gap-1 mb-1.5">
+                                        <label className="text-[12px] text-[#0F172A]" style={{ fontWeight: 500 }}>Trigger Event</label>
+                                        <Tooltip><TooltipTrigger asChild><span><Info className="w-3 h-3 text-[#CBD5E1]" /></span></TooltipTrigger><TooltipContent className="z-[300]"><p className="text-xs">The event that triggers this split payment.</p></TooltipContent></Tooltip>
+                                      </div>
+                                      <Select
+                                        value={evt.event}
+                                        onValueChange={(v) => {
                                           const updated = [...createPtSplitEvents];
-                                          updated[idx] = { ...updated[idx], percent: e.target.value };
+                                          updated[idx] = { ...updated[idx], event: v };
                                           setCreatePtSplitEvents(updated);
                                         }}
-                                        placeholder="Enter percentage (e.g., 50%)"
-                                        className="h-9 rounded-lg border-[#E2E8F0] bg-white pr-8 text-[13px]"
-                                      />
-                                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] text-[#94A3B8]">%</span>
+                                      >
+                                        <SelectTrigger className="h-9 rounded-lg border-[#E2E8F0] bg-white text-[13px]">
+                                          <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent className="z-[250] rounded-lg">
+                                          {CREATE_PT_TRIGGERS.map((t) => (
+                                            <SelectItem key={t.id} value={t.id} className="py-2.5 px-3 text-sm">{t.label}</SelectItem>
+                                          ))}
+                                        </SelectContent>
+                                      </Select>
                                     </div>
-                                    <p className="text-[11px] text-[#94A3B8] mt-1">Specify the percentage of payment for the event.</p>
-                                  </div>
-                                  <div>
-                                    <label className="text-[12px] text-[#0F172A] mb-1 block" style={{ fontWeight: 500 }}>Trigger Events</label>
-                                    <Select
-                                      value={evt.event}
-                                      onValueChange={(v) => {
-                                        const updated = [...createPtSplitEvents];
-                                        updated[idx] = { ...updated[idx], event: v };
-                                        setCreatePtSplitEvents(updated);
-                                      }}
-                                    >
-                                      <SelectTrigger className="h-9 rounded-lg border-[#E2E8F0] bg-white text-[13px]">
-                                        <SelectValue />
-                                      </SelectTrigger>
-                                      <SelectContent className="z-[250] rounded-lg">
-                                        {CREATE_PT_TRIGGERS.map((t) => (
-                                          <SelectItem key={t.id} value={t.id} className="py-2.5 px-3 text-sm">{t.label}</SelectItem>
-                                        ))}
-                                      </SelectContent>
-                                    </Select>
-                                    <p className="text-[11px] text-[#94A3B8] mt-1">Select the event that triggers the split payment term.</p>
                                   </div>
                                 </div>
-                              </div>
-                            ))}
-                            <button
-                              onClick={() => setCreatePtSplitEvents([...createPtSplitEvents, { event: "delivery", percent: "" }])}
-                              className="inline-flex items-center gap-1.5 text-[12px] text-[#0A77FF] hover:text-[#0862D0] transition-colors cursor-pointer"
-                              style={{ fontWeight: 600 }}
-                            >
-                              <Plus className="w-3.5 h-3.5" /> Add Event
-                            </button>
-                            {(() => {
-                              const total = createPtSplitEvents.reduce((sum, e) => sum + (parseFloat(e.percent) || 0), 0);
-                              return Math.abs(total - 100) >= 0.01 ? (
-                                <div className="flex items-center gap-1.5 text-[11px] text-[#F59E0B]" style={{ fontWeight: 600 }}>
-                                  <AlertTriangle className="w-3.5 h-3.5" />
-                                  <span>Total is {total}% — must equal 100%</span>
-                                </div>
-                              ) : null;
-                            })()}
+                              ))}
+                            </div>
+
+                            {/* Add event + total validation */}
+                            <div className="flex items-center justify-between mt-3">
+                              <button
+                                onClick={() => setCreatePtSplitEvents([...createPtSplitEvents, { event: "delivery", percent: "" }])}
+                                className="inline-flex items-center gap-1 text-[12px] text-[#D97706] hover:text-[#B45309] transition-colors cursor-pointer"
+                                style={{ fontWeight: 600 }}
+                              >
+                                <Plus className="w-3.5 h-3.5" /> Add Event
+                              </button>
+                              {(() => {
+                                const total = createPtSplitEvents.reduce((sum, e) => sum + (parseFloat(e.percent) || 0), 0);
+                                return (
+                                  <span className={`text-[11px] ${Math.abs(total - 100) < 0.01 ? "text-[#10B981]" : "text-[#F59E0B]"}`} style={{ fontWeight: 600 }}>
+                                    Total: {total}%{Math.abs(total - 100) >= 0.01 ? " — must equal 100%" : " ✓"}
+                                  </span>
+                                );
+                              })()}
+                            </div>
                           </div>
                         )}
                       </div>
