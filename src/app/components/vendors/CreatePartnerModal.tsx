@@ -5813,7 +5813,7 @@ function ConfigPageContent({
               <Plus className="w-3.5 h-3.5" /> Create rule
             </button>
             <button
-              onClick={() => { setPrSidebarFilter("all"); setPrSearch(""); setPreviewPricingRuleId(null); setPrPreviewTab("preview"); setPricingRulesModalOpen(true); }}
+              onClick={() => { setPrTypeFilter(null); setPrStatusFilter("all"); setPrSearch(""); setPreviewPricingRuleId(null); setPrPreviewTab("preview"); setPricingRulesModalOpen(true); }}
               className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-[#DBEAFE] bg-[#EFF6FF] text-xs text-[#0A77FF] hover:bg-[#DBEAFE] transition-colors"
               style={{ fontWeight: 500 }}
             >
