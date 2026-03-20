@@ -486,9 +486,11 @@ function PaymentTermDetailModal({ term, open, onClose, mode = "create", onDisabl
               <button className="h-8 px-3.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#334155] hover:bg-[#F8FAFC] transition-colors cursor-pointer inline-flex items-center gap-1.5" style={{ fontWeight: 500 }}>
                 <Copy className="w-3.5 h-3.5" /> Duplicate
               </button>
-              <button className="h-8 px-3.5 rounded-lg bg-[#0A77FF] text-white text-xs hover:bg-[#0A77FF]/90 transition-colors cursor-pointer inline-flex items-center gap-1.5" style={{ fontWeight: 500 }}>
-                <Check className="w-3.5 h-3.5" /> Use Template
-              </button>
+              {mode === "create" && (
+                <button className="h-8 px-3.5 rounded-lg bg-[#0A77FF] text-white text-xs hover:bg-[#0A77FF]/90 transition-colors cursor-pointer inline-flex items-center gap-1.5" style={{ fontWeight: 500 }}>
+                  <Check className="w-3.5 h-3.5" /> Use Template
+                </button>
+              )}
             </div>
           </div>
         </div>
