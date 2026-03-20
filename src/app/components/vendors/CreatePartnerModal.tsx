@@ -1649,6 +1649,7 @@ function PrTemplateCardInner({
   );
 }
 
+function GroupCard({
   group,
   isSelected,
   isPrimary,
