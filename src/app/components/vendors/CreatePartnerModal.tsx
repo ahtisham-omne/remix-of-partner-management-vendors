@@ -5057,7 +5057,7 @@ function ConfigPageContent({
             <DialogDescription className="sr-only">Fill in the form to create a new payment term.</DialogDescription>
 
             {/* Header — matches pricing rule creation style */}
-            <div className="px-3 sm:px-4 lg:px-5 pt-3 sm:pt-4 pb-0 shrink-0 bg-white rounded-t-none sm:rounded-t-2xl border-b border-[#EEF2F6]">
+            <div className="px-3 sm:px-4 lg:px-5 pt-3 sm:pt-4 pb-3 sm:pb-4 shrink-0 bg-white rounded-t-none sm:rounded-t-2xl border-b border-[#EEF2F6]">
               {/* Title row */}
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
@@ -5088,49 +5088,13 @@ function ConfigPageContent({
                   </button>
                 </div>
               </div>
-
-              {/* Step tabs */}
-              <div className="flex items-center gap-4 sm:gap-6 mt-3 sm:mt-3.5 overflow-x-auto -mb-px">
-                {[
-                  { num: 1 as const, label: "Term Setup", shortLabel: "Setup", active: createPtStep === 1, completed: createPtStep === 2 },
-                  { num: 2 as const, label: "Items & Attachments", shortLabel: "Items", active: createPtStep === 2, completed: false },
-                ].map((stepTab) => (
-                  <div
-                    key={stepTab.num}
-                    className={`relative flex items-center gap-2 pb-2.5 sm:pb-3 ${stepTab.num < createPtStep ? "cursor-pointer" : "cursor-default"}`}
-                    onClick={() => { if (stepTab.num < createPtStep) setCreatePtStep(stepTab.num); }}
-                  >
-                    <div
-                      className={`w-[22px] h-[22px] sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-[11px] sm:text-[12px] shrink-0 transition-all duration-200 ${
-                        stepTab.completed ? "bg-[#10B981] text-white" : stepTab.active ? "bg-[#0A77FF] text-white" : "border-[1.5px] border-[#CBD5E1] text-[#64748B] bg-white"
-                      }`}
-                      style={{ fontWeight: 600 }}
-                    >
-                      {stepTab.completed ? <Check className="w-3 h-3" /> : stepTab.num}
-                    </div>
-                    <span
-                      className={`text-[12px] sm:text-[13px] whitespace-nowrap transition-colors ${
-                        stepTab.active ? "text-[#0A77FF]" : stepTab.completed ? "text-[#10B981]" : "text-[#334155]"
-                      }`}
-                      style={{ fontWeight: stepTab.active || stepTab.completed ? 600 : 500 }}
-                    >
-                      <span className="hidden sm:inline">{stepTab.label}</span>
-                      <span className="sm:hidden">{stepTab.shortLabel}</span>
-                    </span>
-                    {(stepTab.active || stepTab.completed) && (
-                      <div className={`absolute bottom-0 left-0 right-0 h-[2px] rounded-t-full ${stepTab.completed ? "bg-[#10B981]" : "bg-[#0A77FF]"}`} />
-                    )}
-                  </div>
-                ))}
-              </div>
             </div>
 
             {/* Body */}
             <div className="flex-1 min-h-0 overflow-y-auto bg-[#FAFBFC] scrollbar-hide">
               <div className="px-4 py-4 transition-all duration-300 ease-out">
 
-                {/* ─── Step 1: Term Setup ─── */}
-                {createPtStep === 1 && (
+                {/* Term Setup */}
                   <div className="space-y-5">
                     {/* Payment Term Type — card selector matching partner type style */}
                     <div>
@@ -5240,48 +5204,59 @@ function ConfigPageContent({
                               className="mt-1 rounded-lg border-[#E2E8F0] bg-white h-9 sm:h-10 text-sm text-[#0F172A] placeholder:text-[#94A3B8]"
                             />
                           </div>
-                          {/* Duration — NET only, otherwise empty cell */}
+                          {/* NET: Duration next to name */}
                           {createPtType === "net" ? (
                             <div>
                               <Label className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>NET Duration (Days)</Label>
-                              <div className="flex items-center gap-2 mt-1">
-                                <Select value={createPtDuration} onValueChange={(v) => { setCreatePtDuration(v); if (v !== "custom") setCreatePtCustomDuration(""); }}>
-                                  <SelectTrigger className={`h-9 sm:h-10 rounded-lg border-[#E2E8F0] bg-white text-sm ${createPtDuration === "custom" ? "flex-1" : "w-full"}`}>
-                                    <SelectValue />
-                                  </SelectTrigger>
-                                  <SelectContent className="z-[250] rounded-lg">
-                                    {CREATE_PT_DURATIONS.map((d) => (
-                                      <SelectItem key={d.id} value={d.id} className="py-2.5 px-3 text-sm">{d.label}</SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                                {createPtDuration === "custom" && (
-                                  <Input
-                                    type="number"
-                                    min="1"
-                                    value={createPtCustomDuration}
-                                    onChange={(e) => setCreatePtCustomDuration(e.target.value)}
-                                    placeholder="Days"
-                                    className="h-9 sm:h-10 rounded-lg border-[#E2E8F0] bg-white w-[100px] text-sm"
-                                  />
-                                )}
-                              </div>
+                              <Select value={createPtDuration} onValueChange={(v) => { setCreatePtDuration(v); if (v !== "custom") setCreatePtCustomDuration(""); }}>
+                                <SelectTrigger className="mt-1 h-9 sm:h-10 rounded-lg border-[#E2E8F0] bg-white text-sm w-full">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent className="z-[250] rounded-lg">
+                                  {CREATE_PT_DURATIONS.map((d) => (
+                                    <SelectItem key={d.id} value={d.id} className="py-2.5 px-3 text-sm">{d.label}</SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              {createPtDuration === "custom" && (
+                                <Input
+                                  type="number"
+                                  min="1"
+                                  value={createPtCustomDuration}
+                                  onChange={(e) => setCreatePtCustomDuration(e.target.value)}
+                                  placeholder="Enter custom days"
+                                  className="mt-1.5 h-9 sm:h-10 rounded-lg border-[#E2E8F0] bg-white text-sm w-full"
+                                />
+                              )}
                             </div>
                           ) : (
-                            <div />
+                            /* Prepayment/Split: Description next to name */
+                            <div>
+                              <Label className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>Description</Label>
+                              <Textarea
+                                value={createPtDescription}
+                                onChange={(e) => { if (e.target.value.length <= 150) setCreatePtDescription(e.target.value); }}
+                                placeholder="Brief summary of payment term purpose or context."
+                                className="mt-1 rounded-lg border-[#E2E8F0] bg-white min-h-[38px] resize-none text-sm placeholder:text-[#94A3B8]"
+                                rows={2}
+                              />
+                              <p className="text-right text-[10px] text-[#94A3B8] mt-0.5">{createPtDescription.length}/150</p>
+                            </div>
                           )}
-                          {/* Description — full width */}
-                          <div className="col-span-2">
-                            <Label className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>Description</Label>
-                            <Textarea
-                              value={createPtDescription}
-                              onChange={(e) => { if (e.target.value.length <= 150) setCreatePtDescription(e.target.value); }}
-                              placeholder="Brief summary of payment term purpose or context."
-                              className="mt-1 rounded-lg border-[#E2E8F0] bg-white min-h-[64px] resize-none text-sm placeholder:text-[#94A3B8]"
-                              rows={2}
-                            />
-                            <p className="text-right text-[10px] text-[#94A3B8] mt-0.5">{createPtDescription.length}/150</p>
-                          </div>
+                          {/* NET: Description full width below */}
+                          {createPtType === "net" && (
+                            <div className="col-span-2">
+                              <Label className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>Description</Label>
+                              <Textarea
+                                value={createPtDescription}
+                                onChange={(e) => { if (e.target.value.length <= 150) setCreatePtDescription(e.target.value); }}
+                                placeholder="Brief summary of payment term purpose or context."
+                                className="mt-1 rounded-lg border-[#E2E8F0] bg-white min-h-[64px] resize-none text-sm placeholder:text-[#94A3B8]"
+                                rows={2}
+                              />
+                              <p className="text-right text-[10px] text-[#94A3B8] mt-0.5">{createPtDescription.length}/150</p>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -5436,123 +5411,28 @@ function ConfigPageContent({
                       </div>
                     </div>
                   </div>
-                )}
-
-                {/* ─── Step 2: Items & Attachments ─── */}
-                {createPtStep === 2 && (
-                  <div className="space-y-5">
-                    {/* Summary banner */}
-                    <div className="rounded-xl border border-[#E2E8F0] bg-white p-3.5 flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-[10px] flex items-center justify-center shrink-0" style={{ background: createPtType === "net" ? "linear-gradient(135deg, #DBEAFE, #BFDBFE)" : createPtType === "prepayment" ? "linear-gradient(135deg, #EDE9FE, #DDD6FE)" : "linear-gradient(135deg, #FEF3C7, #FDE68A)" }}>
-                        {createPtType === "net" ? <Clock className="w-4.5 h-4.5 text-[#0A77FF]" /> : createPtType === "prepayment" ? <Banknote className="w-4.5 h-4.5 text-[#7C3AED]" /> : <ArrowUpDown className="w-4.5 h-4.5 text-[#D97706]" />}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{createPtName || "Untitled Term"}</p>
-                        <p className="text-[11px] text-[#64748B] truncate">
-                          {createPtType === "net" ? "NET Terms" : createPtType === "prepayment" ? "Prepayment" : "Split Payment"} · {CREATE_PT_TRIGGERS.find(t => t.id === createPtTrigger)?.label} · {createPtDuration} days
-                          {createPtApplyDiscount && createPtDiscountPercent ? ` · ${createPtDiscountPercent}% discount` : ""}
-                        </p>
-                      </div>
-                      <button onClick={() => setCreatePtStep(1)} className="text-[11px] text-[#0A77FF] hover:text-[#0862D0] transition-colors cursor-pointer shrink-0" style={{ fontWeight: 600 }}>
-                        Edit Setup
-                      </button>
-                    </div>
-
-                    {/* Items & Attachments card */}
-                    <div className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden">
-                      <div className="flex items-center gap-0 border-b border-[#E2E8F0] px-4">
-                        {([
-                          { key: "items" as const, label: "Items", icon: Package, count: 0 },
-                          { key: "attachments" as const, label: "Attachments", icon: Paperclip, count: 0 },
-                        ]).map((t) => (
-                          <button
-                            key={t.key}
-                            className={`relative px-3 py-2.5 text-[12px] flex items-center gap-1.5 transition-colors cursor-pointer ${t.key === "items" ? "text-[#0A77FF]" : "text-[#64748B] hover:text-[#334155]"}`}
-                            style={{ fontWeight: t.key === "items" ? 600 : 500 }}
-                          >
-                            <t.icon className="w-3.5 h-3.5" />
-                            {t.label}
-                            <span className={`px-1.5 py-0.5 rounded text-[10px] ${t.key === "items" ? "bg-[#DBEAFE] text-[#0A77FF]" : "bg-[#F1F5F9] text-[#94A3B8]"}`} style={{ fontWeight: 700 }}>{t.count}</span>
-                            {t.key === "items" && (
-                              <div className="absolute bottom-0 left-0 right-0 h-[2px] rounded-t-full bg-[#0A77FF]" />
-                            )}
-                          </button>
-                        ))}
-                      </div>
-
-                      <div className="p-4">
-                        <div className="flex items-center gap-2 mb-4">
-                          <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8]" />
-                            <Input placeholder="Search items to assign..." className="pl-9 rounded-lg border-[#E2E8F0] bg-[#F8FAFC] text-[13px] h-9" />
-                          </div>
-                          <button className="inline-flex items-center gap-1.5 h-9 px-3 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-[12px] shadow-sm transition-colors cursor-pointer" style={{ fontWeight: 600 }}>
-                            <Plus className="w-3.5 h-3.5" /> Add Items
-                          </button>
-                        </div>
-                        <div className="py-8 text-center">
-                          <div className="w-12 h-12 rounded-xl bg-[#F8FAFC] border border-[#E8ECF1] flex items-center justify-center mx-auto mb-3">
-                            <Package className="w-5.5 h-5.5 text-[#94A3B8]" />
-                          </div>
-                          <p className="text-[13px] text-[#334155] mb-1" style={{ fontWeight: 600 }}>No items assigned yet</p>
-                          <p className="text-[11px] text-[#94A3B8] max-w-[260px] mx-auto">Search and add items that should be affected by this payment term.</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
 
-            {/* Footer — matches pricing rule creation footer */}
+            {/* Footer */}
             <div className="flex items-center justify-end gap-2 px-3 sm:px-5 py-3 border-t border-[#EEF2F6] bg-white shrink-0 rounded-b-none sm:rounded-b-2xl">
-              {createPtStep === 1 ? (
-                <>
-                  <button
-                    onClick={() => { setCreatePtModalOpen(false); resetCreatePtForm(); setCreatePtFullscreen(false); }}
-                    className="px-3 sm:px-5 py-2 rounded-lg border border-[#E2E8F0] text-xs sm:text-[13px] text-[#64748B] hover:text-[#0F172A] hover:border-[#CBD5E1] hover:bg-[#F8FAFC] transition-colors cursor-pointer"
-                    style={{ fontWeight: 600 }}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={() => { if (createPtName.trim()) setCreatePtStep(2); }}
-                    disabled={!createPtName.trim()}
-                    className="inline-flex items-center gap-1.5 px-3 sm:px-5 py-2 rounded-lg bg-[#0A77FF] text-white text-xs sm:text-[13px] hover:bg-[#0862D0] transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm cursor-pointer"
-                    style={{ fontWeight: 600 }}
-                  >
-                    Continue
-                    <ChevronRight className="w-3.5 h-3.5" />
-                  </button>
-                </>
-              ) : (
-                <>
-                  <button
-                    onClick={() => setCreatePtStep(1)}
-                    className="inline-flex items-center gap-1.5 text-xs sm:text-[13px] text-[#64748B] hover:text-[#0F172A] transition-colors mr-auto cursor-pointer"
-                    style={{ fontWeight: 500 }}
-                  >
-                    <ArrowLeft className="w-3.5 h-3.5" />
-                    <span className="hidden sm:inline">Back</span>
-                  </button>
-                  <button
-                    onClick={() => { setCreatePtModalOpen(false); resetCreatePtForm(); setCreatePtFullscreen(false); }}
-                    className="px-3 sm:px-5 py-2 rounded-lg border border-[#E2E8F0] text-xs sm:text-[13px] text-[#64748B] hover:text-[#0F172A] hover:border-[#CBD5E1] hover:bg-[#F8FAFC] transition-colors cursor-pointer"
-                    style={{ fontWeight: 600 }}
-                  >
-                    Discard
-                  </button>
-                  <button
-                    onClick={handleSaveNewPaymentTerm}
-                    className="inline-flex items-center gap-1.5 px-3 sm:px-5 py-2 rounded-lg bg-[#0A77FF] text-white text-xs sm:text-[13px] hover:bg-[#0862D0] transition-colors shadow-sm cursor-pointer"
-                    style={{ fontWeight: 600 }}
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                    <span className="hidden sm:inline">Save & Create</span>
-                    <span className="sm:hidden">Create</span>
-                  </button>
-                </>
-              )}
+              <button
+                onClick={() => { setCreatePtModalOpen(false); resetCreatePtForm(); setCreatePtFullscreen(false); }}
+                className="px-3 sm:px-5 py-2 rounded-lg border border-[#E2E8F0] text-xs sm:text-[13px] text-[#64748B] hover:text-[#0F172A] hover:border-[#CBD5E1] hover:bg-[#F8FAFC] transition-colors cursor-pointer"
+                style={{ fontWeight: 600 }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveNewPaymentTerm}
+                disabled={!createPtName.trim()}
+                className="inline-flex items-center gap-1.5 px-3 sm:px-5 py-2 rounded-lg bg-[#0A77FF] text-white text-xs sm:text-[13px] hover:bg-[#0862D0] transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm cursor-pointer"
+                style={{ fontWeight: 600 }}
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Save & Create</span>
+                <span className="sm:hidden">Create</span>
+              </button>
             </div>
           </DialogContent>
         </Dialog>
