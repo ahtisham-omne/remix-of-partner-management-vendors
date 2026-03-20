@@ -5486,6 +5486,8 @@ function ConfigPageContent({
           open={standalonePtDetailOpen}
           onClose={() => { setStandalonePtDetailOpen(false); setStandalonePtDetailTerm(null); }}
           mode="create"
+          onApply={(t) => { setSelectedPaymentTermId(t.id); setPaymentTermsModalOpen(false); }}
+          onDuplicate={(t) => handleDuplicatePaymentTerm(t)}
         />
       </div>
     );
