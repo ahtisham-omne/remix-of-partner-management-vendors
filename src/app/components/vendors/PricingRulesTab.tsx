@@ -1938,10 +1938,12 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                               createCategory === "discount" ? "text-[#22C55E]" : "text-[#94A3B8]"
                             }`}>Lower price adjustment</p>
                           </div>
-                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-200 shrink-0 ${
-                            createCategory === "discount" ? "border-[#16A34A] bg-[#16A34A]" : "border-[#CBD5E1] group-hover:border-[#86EFAC]"
-                          }`}>
-                            {createCategory === "discount" && <Check className="w-3 h-3 text-white" />}
+                          <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-all duration-200 shrink-0 ${
+                            createCategory === "discount"
+                              ? ""
+                              : "border-[1.5px] border-[#D1D5DB] bg-white group-hover:border-[#86EFAC]"
+                          }`} style={createCategory === "discount" ? { backgroundColor: "#16A34A", boxShadow: "0 0 0 2px rgba(22,163,74,0.15)" } : {}}>
+                            {createCategory === "discount" && <Check className="w-3 h-3 text-white" strokeWidth={2.5} />}
                           </div>
                         </div>
                       </div>
