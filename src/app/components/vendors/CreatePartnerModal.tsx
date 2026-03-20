@@ -5741,8 +5741,8 @@ function ConfigPageContent({
                     {/* Quick Filter Pills */}
                     <FilterPills
                       options={(() => {
-                        const base = ptTypeFilters.length > 0
-                          ? PAYMENT_TERM_PRESETS.filter((t) => ptTypeFilters.includes(t.category))
+                        const base = ptTypeFilters
+                          ? PAYMENT_TERM_PRESETS.filter((t) => t.category === ptTypeFilters)
                           : PAYMENT_TERM_PRESETS;
                         const presetCount = base.filter((t) => !t.id.startsWith("pt-custom-")).length;
                         const customCount = base.filter((t) => t.id.startsWith("pt-custom-")).length;
