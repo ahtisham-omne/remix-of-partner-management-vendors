@@ -3298,6 +3298,7 @@ function ConfigPageContent({
   const [createPtApplyDiscount, setCreatePtApplyDiscount] = useState(false);
   const [createPtDiscountPercent, setCreatePtDiscountPercent] = useState("");
   const [createPtDiscountPeriod, setCreatePtDiscountPeriod] = useState("30");
+  const [createPtStep, setCreatePtStep] = useState<1 | 2>(1);
 
   function resetCreatePtForm() {
     setCreatePtName("");
@@ -3308,6 +3309,7 @@ function ConfigPageContent({
     setCreatePtApplyDiscount(false);
     setCreatePtDiscountPercent("");
     setCreatePtDiscountPeriod("30");
+    setCreatePtStep(1);
   }
 
   function handleDuplicatePaymentTerm(term: PaymentTermPreset) {
