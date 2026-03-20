@@ -5406,7 +5406,7 @@ function ConfigPageContent({
                             <div>
                               <div className="flex items-center gap-1 mb-1.5">
                                 <label className="text-[12px] text-[#0F172A]" style={{ fontWeight: 500 }}>Discount Percentage (%)</label>
-                                <Info className="w-3 h-3 text-[#CBD5E1]" />
+                                <Tooltip><TooltipTrigger asChild><span><Info className="w-3 h-3 text-[#CBD5E1]" /></span></TooltipTrigger><TooltipContent className="z-[300]"><p className="text-xs">Percentage discount applied for early payment.</p></TooltipContent></Tooltip>
                               </div>
                               <div className="relative">
                                 <Input
