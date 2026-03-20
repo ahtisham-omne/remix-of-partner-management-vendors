@@ -5553,52 +5553,57 @@ function ConfigPageContent({
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    {([
-                      { id: "all", label: "All Terms" },
-                      { id: "net", label: "NET" },
-                      { id: "prepayment", label: "Prepayment" },
-                      { id: "split", label: "Split" },
-                    ] as const).map((tab) => {
-                      const isActive = ptSidebarFilter === tab.id;
-                      return (
-                        <button
-                          key={tab.id}
-                          onClick={() => setPtSidebarFilter(tab.id)}
-                          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                            isActive
-                              ? "border-primary bg-[#EDF4FF] hover:bg-[#D6E8FF] active:bg-[#ADD1FF]"
-                              : "border-border text-muted-foreground hover:bg-muted/60 hover:text-foreground hover:border-muted-foreground/30 active:bg-muted"
-                          }`}
-                          style={{ fontWeight: isActive ? 500 : 400, color: isActive ? "#0A77FF" : undefined }}
-                        >
-                          {tab.label}
-                        </button>
-                      );
-                    })}
-                    <div className="w-px h-4 bg-[#E2E8F0] mx-0.5" />
-                    {([
-                      { id: "recent", label: "Recently Used" },
-                      { id: "vendors_applied", label: "Vendors Applied" },
-                      { id: "created_by_me", label: "Created by Me" },
-                      { id: "created_by_others", label: "Created by Others" },
-                    ] as const).map((tab) => {
-                      const isActive = ptSidebarFilter === tab.id;
-                      return (
-                        <button
-                          key={tab.id}
-                          onClick={() => setPtSidebarFilter(tab.id)}
-                          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                            isActive
-                              ? "border-primary bg-[#EDF4FF] hover:bg-[#D6E8FF] active:bg-[#ADD1FF]"
-                              : "border-border text-muted-foreground hover:bg-muted/60 hover:text-foreground hover:border-muted-foreground/30 active:bg-muted"
-                          }`}
-                          style={{ fontWeight: isActive ? 500 : 400, color: isActive ? "#0A77FF" : undefined }}
-                        >
-                          {tab.label}
-                        </button>
-                      );
-                    })}
+                  {/* Row 2: Type toggle (NET / Pre / Split) + Quick Filter Pills */}
+                  <div className="flex items-center gap-3 overflow-x-auto">
+                    {/* Type Toggle */}
+                    <div className="inline-flex items-center rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-0.5 shrink-0">
+                      {([
+                        { key: "net", label: "NET", color: "#0A77FF", bg: "#EFF6FF", icon: Receipt },
+                        { key: "prepayment", label: "Prepayment", color: "#7C3AED", bg: "#F5F3FF", icon: Clock },
+                        { key: "split", label: "Split", color: "#D97706", bg: "#FFFBEB", icon: Copy },
+                      ] as const).map((cat) => {
+                        const active = ptSidebarFilter === cat.key;
+                        const count = PAYMENT_TERM_PRESETS.filter((t) => t.category === cat.key).length;
+                        return (
+                          <button
+                            key={cat.key}
+                            onClick={() => setPtSidebarFilter(active ? "all" : cat.key)}
+                            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs transition-all cursor-pointer ${
+                              active ? "bg-white shadow-sm" : "hover:bg-white/60"
+                            }`}
+                            style={{ fontWeight: active ? 600 : 500, color: active ? cat.color : "#64748B" }}
+                          >
+                            <cat.icon className="w-3 h-3" />
+                            {cat.label}
+                            <span
+                              className="text-[10px] rounded-full px-1.5 py-px min-w-[18px] text-center"
+                              style={{ fontWeight: 600, color: active ? cat.color : "#94A3B8", backgroundColor: active ? cat.bg : "#F1F5F9" }}
+                            >
+                              {count}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    <div className="w-px h-5 bg-[#E2E8F0] shrink-0" />
+
+                    {/* Quick Filter Pills */}
+                    <FilterPills
+                      options={(() => {
+                        const all = PAYMENT_TERM_PRESETS;
+                        const presetCount = all.filter((t) => !t.id.startsWith("pt-custom-")).length;
+                        const customCount = all.filter((t) => t.id.startsWith("pt-custom-")).length;
+                        return [
+                          { key: "all", label: "All", count: all.length, showCount: true },
+                          { key: "preset", label: "Preset", count: presetCount, showCount: true },
+                          { key: "custom", label: "Custom", count: customCount, showCount: true },
+                          { key: "vendors_applied", label: "Vendors Applied", count: all.filter((t) => t.vendorsApplied >= 4).length, showCount: true },
+                        ];
+                      })()}
+                      activeKey={ptSidebarFilter}
+                      onSelect={(k) => setPtSidebarFilter(k)}
+                    />
                   </div>
                 </div>
 
