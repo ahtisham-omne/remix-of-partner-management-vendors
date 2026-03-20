@@ -5258,6 +5258,7 @@ function ConfigPageContent({
                             </div>
                           )}
                         </div>
+                      </div>
                     </div>
 
                     {/* Split Payment Events */}
