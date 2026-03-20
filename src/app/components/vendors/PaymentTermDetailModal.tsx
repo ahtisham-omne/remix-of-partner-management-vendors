@@ -23,6 +23,8 @@ import {
   Check,
   Sparkles,
   Shield,
+  Receipt,
+  Lock,
 } from "lucide-react";
 import { toast } from "sonner";
 import { getAvatarTint } from "../../utils/avatarTints";
