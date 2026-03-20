@@ -642,11 +642,14 @@ export const CREATE_PT_TYPES = [
 ] as const;
 
 export const CREATE_PT_TRIGGERS = [
-  { id: "order_confirmation", label: "Order Confirmation" },
-  { id: "production_start", label: "Production Start" },
-  { id: "production_end", label: "Production End" },
-  { id: "shipping", label: "Shipping" },
-  { id: "delivery", label: "Delivery" },
+  { id: "order_confirmation", label: "Order Confirmation", description: "Payment is triggered once the purchase order is confirmed by the vendor." },
+  { id: "production_start", label: "Production Start", description: "Payment is triggered when the vendor begins production of the ordered goods." },
+  { id: "production_end", label: "Production End", description: "Payment is triggered upon completion of the production process." },
+  { id: "shipping", label: "Shipping", description: "Payment is triggered when goods are shipped from the vendor's facility." },
+  { id: "delivery", label: "Delivery", description: "Payment is triggered upon confirmed delivery of goods at the destination." },
+  { id: "invoice_date", label: "Invoice Date", description: "Payment is triggered based on the date the invoice is issued by the vendor." },
+  { id: "before_order", label: "Before Order Confirmation", description: "Payment is required before the order is confirmed with the vendor." },
+  { id: "after_order", label: "After Order Confirmation", description: "Payment is required after the order has been confirmed with the vendor." },
 ];
 
 export const CREATE_PT_DURATIONS = [
