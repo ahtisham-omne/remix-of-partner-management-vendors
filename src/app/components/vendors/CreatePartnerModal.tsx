@@ -5177,40 +5177,6 @@ function ConfigPageContent({
                         })}
                       </div>
 
-                      {/* Trigger selector pills with tooltips */}
-                      {createPtType !== "split" && (
-                        <div className="flex items-center gap-2 mt-3 flex-wrap">
-                          <span className="text-[12px] text-[#64748B] mr-1" style={{ fontWeight: 500 }}>Trigger:</span>
-                          {CREATE_PT_TRIGGERS.map((t) => {
-                            const isActive = createPtTrigger === t.id;
-                            const accentColor = createPtType === "net" ? "#0A77FF" : "#7C3AED";
-                            return (
-                              <Tooltip key={t.id}>
-                                <TooltipTrigger asChild>
-                                  <button
-                                    onClick={() => setCreatePtTrigger(t.id)}
-                                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[12px] transition-all cursor-pointer ${
-                                      isActive ? "" : "border-[#E2E8F0] bg-white text-[#64748B] hover:border-[#CBD5E1] hover:bg-[#F8FAFC]"
-                                    }`}
-                                    style={isActive ? { fontWeight: 600, borderColor: `${accentColor}30`, backgroundColor: `${accentColor}08`, color: accentColor } : { fontWeight: 500 }}
-                                  >
-                                    {t.id === "order_confirmation" && <ShoppingCart className="w-3.5 h-3.5" />}
-                                    {t.id === "production_start" && <Cog className="w-3.5 h-3.5" />}
-                                    {t.id === "production_end" && <Package className="w-3.5 h-3.5" />}
-                                    {t.id === "shipping" && <Ship className="w-3.5 h-3.5" />}
-                                    {t.id === "delivery" && <Truck className="w-3.5 h-3.5" />}
-                                    {t.label}
-                                  </button>
-                                </TooltipTrigger>
-                                <TooltipContent side="bottom" className="max-w-[240px] text-[11px] z-[300]">
-                                  {TRIGGER_TOOLTIPS[t.id] || t.label}
-                                </TooltipContent>
-                              </Tooltip>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
 
                     {/* Payment Term Details */}
                     <div>
