@@ -3482,6 +3482,15 @@ function ConfigPageContent({
   const [carrierSearches, setCarrierSearches] = useState<Record<string, string>>({});
   const [carrierDropdownOpen, setCarrierDropdownOpen] = useState<Record<string, boolean>>({});
   const [methodDropdownOpen, setMethodDropdownOpen] = useState<Record<string, boolean>>({});
+  const [methodSearches, setMethodSearches] = useState<Record<string, string>>({});
+  const [recentlyUsedCarriers, setRecentlyUsedCarriers] = useState<string[]>(["fedex", "dhl", "ups"]);
+  // Create Shipping Method modal state
+  const [createShippingMethodOpen, setCreateShippingMethodOpen] = useState(false);
+  const [createSmForEntry, setCreateSmForEntry] = useState<string>(""); // which vendor pref entry triggered it
+  const [createSmForCarrier, setCreateSmForCarrier] = useState<string>(""); // carrier id
+  const [createSmMethods, setCreateSmMethods] = useState<Array<{ id: string; name: string; description: string; minDuration: number; maxDuration: number; isDefault: boolean }>>([
+    { id: `csm-1`, name: "", description: "", minDuration: 1, maxDuration: 30, isDefault: true },
+  ]);
 
   const TRIGGER_TOOLTIPS: Record<string, string> = {
     order_confirmation: "Payment clock starts when the purchase order is confirmed by both parties.",
