@@ -2722,12 +2722,12 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                           className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10.5px] shadow-sm backdrop-blur-sm border"
                           style={{
                             fontWeight: 600,
-                            backgroundColor: loc.status === "active" ? "rgba(236,253,245,0.92)" : "rgba(255,251,235,0.92)",
-                            color: loc.status === "active" ? "#065F46" : "#92400E",
-                            borderColor: loc.status === "active" ? "#A7F3D0" : "#FDE68A",
+                            backgroundColor: loc.status === "active" ? "rgba(236,253,245,0.92)" : "rgba(254,242,242,0.92)",
+                            color: loc.status === "active" ? "#065F46" : "#991B1B",
+                            borderColor: loc.status === "active" ? "#A7F3D0" : "#FECACA",
                           }}
                         >
-                          <span className="w-[5px] h-[5px] rounded-full" style={{ backgroundColor: loc.status === "active" ? "#059669" : "#D97706" }} />
+                          <span className="w-[5px] h-[5px] rounded-full" style={{ backgroundColor: loc.status === "active" ? "#059669" : "#DC2626" }} />
                           {loc.status === "active" ? "Active" : "Inactive"}
                         </span>
                         <span
