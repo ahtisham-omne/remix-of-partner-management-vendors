@@ -5822,6 +5822,22 @@ function ConfigPageContent({
           onApply={(t) => { setSelectedPaymentTermId(t.id); setPaymentTermsModalOpen(false); }}
           onDuplicate={(t) => handleDuplicatePaymentTerm(t)}
         />
+
+        {/* Shared Pricing Rule Detail Modal (same as VendorDetailsPage) */}
+        <PricingRuleDetailModal
+          rule={prDetailRule}
+          open={prDetailOpen}
+          onClose={() => { setPrDetailOpen(false); setPrDetailRule(null); }}
+          mode="create"
+          onApply={(r) => {
+            toast.success(`"${r.name}" applied to this partner.`);
+            setPrDetailOpen(false);
+          }}
+          onDuplicate={(r) => {
+            toast.info(`Duplicated "${r.name}"`);
+            setPrDetailOpen(false);
+          }}
+        />
       </div>
     );
   }
