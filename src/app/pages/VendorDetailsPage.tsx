@@ -1156,8 +1156,119 @@ function StatBox({ label, value, icon: Icon, color }: { label: string; value: st
 }
 
 // ══════════════════════════════════════════════
-// CONTENT CARD WRAPPER
+// CARRIER SHIPPING CARD (with tier-style method selector)
 // ══════════════════════════════════════════════
+
+function CarrierShippingCard({ carrier }: {
+  carrier: {
+    id: string;
+    name: string;
+    desc: string;
+    isDefault: boolean;
+    status: "active" | "inactive";
+    methods: { id: string; name: string; desc: string; minDays: number; maxDays: number; isDefault: boolean; cost: string }[];
+  };
+}) {
+  const [selectedMethodIdx, setSelectedMethodIdx] = useState(
+    Math.max(0, carrier.methods.findIndex((m) => m.isDefault))
+  );
+  const activeMethod = carrier.methods[selectedMethodIdx];
+
+  return (
+    <div
+      className="bg-white border border-[#E2E8F0] rounded-xl cursor-pointer group transition-all duration-200 flex flex-col relative"
+      onMouseEnter={(e) => { e.currentTarget.style.borderColor = "#BFDBFE"; e.currentTarget.style.boxShadow = "0 4px 16px -4px rgba(10,119,255,0.10), 0 0 0 1px #BFDBFE"; }}
+      onMouseLeave={(e) => { e.currentTarget.style.borderColor = "#E2E8F0"; e.currentTarget.style.boxShadow = "none"; }}
+    >
+      <div className="p-3.5 flex-1 flex flex-col min-h-0 overflow-hidden">
+        {/* Row 1: Status & type pills */}
+        <div className="flex items-center justify-between gap-2 mb-2 shrink-0">
+          <span className="inline-flex items-stretch rounded-full overflow-hidden border border-[#BFDBFE] shrink-0">
+            <span className="inline-flex items-center gap-1 px-2 py-[2px] text-[10px] text-[#1E40AF] bg-[#EFF6FF]" style={{ fontWeight: 600 }}>
+              <Truck className="w-3 h-3" /> Carrier
+            </span>
+            <span className="inline-flex items-center px-2 py-[2px] text-[10px] bg-white text-[#64748B] border-l border-[#BFDBFE]" style={{ fontWeight: 500 }}>
+              {carrier.methods.length} Method{carrier.methods.length !== 1 ? "s" : ""}
+            </span>
+          </span>
+          <div className="flex items-center gap-1.5">
+            {carrier.isDefault && (
+              <span className="px-1.5 py-[2px] rounded-md text-[10px] border border-[#BFDBFE] bg-[#EFF6FF] text-[#1E40AF]" style={{ fontWeight: 600 }}>Default</span>
+            )}
+            <span className={`px-1.5 py-[2px] rounded-md text-[10px] border ${carrier.status === "active" ? "border-[#BBF7D0] bg-[#F0FDF4] text-[#166534]" : "border-[#E2E8F0] bg-[#F8FAFC] text-[#94A3B8]"}`} style={{ fontWeight: 500 }}>
+              {carrier.status === "active" ? "Active" : "Inactive"}
+            </span>
+          </div>
+        </div>
+
+        {/* Row 2: Carrier name */}
+        <p className="text-[13px] text-[#0F172A] truncate shrink-0 mb-0.5" style={{ fontWeight: 600 }}>{carrier.name}</p>
+        <p className="text-[11px] text-[#64748B] leading-relaxed line-clamp-1 mb-2.5">{carrier.desc}</p>
+
+        {/* Row 3: Hero metric - active method cost */}
+        <div className="flex items-end gap-1.5 mb-2.5 shrink-0">
+          <span className="text-[22px] text-[#0F172A] leading-none tracking-tight" style={{ fontWeight: 700 }}>{activeMethod.cost}</span>
+          <span className="text-[11px] text-[#94A3B8] pb-0.5" style={{ fontWeight: 500 }}>/ shipment</span>
+        </div>
+
+        {/* Row 4: Shipping method tier selector */}
+        {carrier.methods.length > 1 && (
+          <div className="mb-2.5 shrink-0">
+            <p className="text-[10px] text-[#94A3B8] mb-1.5" style={{ fontWeight: 600, letterSpacing: "0.04em" }}>SHIPPING METHODS</p>
+            <div className="flex items-center gap-1 flex-wrap">
+              {carrier.methods.map((m, idx) => (
+                <button
+                  key={m.id}
+                  onClick={(e) => { e.stopPropagation(); setSelectedMethodIdx(idx); }}
+                  className={`px-2 py-[3px] rounded-md text-[10px] border transition-all cursor-pointer ${
+                    idx === selectedMethodIdx
+                      ? "bg-[#0A77FF] text-white border-[#0A77FF] shadow-sm"
+                      : "bg-[#F8FAFC] text-[#64748B] border-[#E2E8F0] hover:border-[#CBD5E1] hover:bg-[#F1F5F9]"
+                  }`}
+                  style={{ fontWeight: idx === selectedMethodIdx ? 600 : 500 }}
+                >
+                  {m.name.split(" ")[0]}{m.isDefault ? " ★" : ""}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Row 5: Active method details */}
+        <div className="rounded-lg border border-[#E8ECF1] bg-[#FAFBFC] p-2.5 space-y-1.5">
+          <div className="flex items-center gap-1.5">
+            <Package className="w-3 h-3 text-[#94A3B8]" />
+            <p className="text-[11px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{activeMethod.name}</p>
+            {activeMethod.isDefault && <span className="text-[9px] px-1 py-[1px] rounded bg-[#EFF6FF] text-[#1E40AF] border border-[#BFDBFE]" style={{ fontWeight: 600 }}>Default</span>}
+          </div>
+          <p className="text-[10px] text-[#64748B] leading-relaxed line-clamp-2">{activeMethod.desc}</p>
+          <div className="flex items-center gap-3 pt-1.5 border-t border-[#E8ECF1]">
+            <div className="flex items-center gap-1 text-[11px]">
+              <Clock className="w-3 h-3 text-[#94A3B8]" />
+              <span className="text-[#94A3B8]">Min</span>
+              <span className="text-[#0F172A]" style={{ fontWeight: 600 }}>{activeMethod.minDays}d</span>
+            </div>
+            <div className="w-px h-3 bg-[#E8ECF1]" />
+            <div className="flex items-center gap-1 text-[11px]">
+              <span className="text-[#94A3B8]">Max</span>
+              <span className="text-[#0F172A]" style={{ fontWeight: 600 }}>{activeMethod.maxDays}d</span>
+            </div>
+            <div className="ml-auto text-[11px] text-[#0F172A]" style={{ fontWeight: 600 }}>{activeMethod.cost}</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="px-3.5 py-2 border-t border-[#F1F5F9] flex items-center gap-3">
+        <button onClick={(e) => { e.stopPropagation(); toast.info("Edit carrier coming soon"); }} className="text-[11px] text-[#64748B] hover:text-[#0A77FF] transition-colors cursor-pointer" style={{ fontWeight: 500 }}>Edit</button>
+        <div className="w-px h-3 bg-[#E8ECF1]" />
+        <button onClick={(e) => { e.stopPropagation(); toast.info("Duplicate carrier coming soon"); }} className="text-[11px] text-[#64748B] hover:text-[#0A77FF] transition-colors cursor-pointer" style={{ fontWeight: 500 }}>Duplicate</button>
+      </div>
+    </div>
+  );
+}
+
+
 
 function ContentCard({ title, icon: Icon, count, children, action }: {
   title: string;
