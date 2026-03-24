@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useCallback, useRef, useEffect, type ReactNode } from "react";
+import { ShippingMethodChipsRow } from "./ShippingMethodChipsRow";
 import fedexLogo from "@/assets/carriers/fedex.png";
 import dhlLogo from "@/assets/carriers/dhl.png";
 import upsLogo from "@/assets/carriers/ups.png";
