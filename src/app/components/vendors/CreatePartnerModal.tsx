@@ -174,12 +174,30 @@ interface CreatePartnerModalProps {
   initialProfile?: string;
 }
 
-export function CreatePartnerModal({ open, onOpenChange, onPartnerCreated }: CreatePartnerModalProps) {
+export function CreatePartnerModal({ open, onOpenChange, onPartnerCreated, initialProfile }: CreatePartnerModalProps) {
   // Steps: 1 = Partner Group Selection, 2 = Partner Form, 3 = Configuration Sub-page
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [configType, setConfigType] = useState<"vendor" | "customer">("vendor");
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [showCancelConfirmation, setShowCancelConfirmation] = useState(false);
+  const [initialProfileHandled, setInitialProfileHandled] = useState(false);
+
+  // Auto-navigate to the specified profile (e.g. carrier) when modal opens
+  useEffect(() => {
+    if (open && initialProfile && !initialProfileHandled) {
+      setInitialProfileHandled(true);
+      // Skip to step 2 (partner info) then step 3 (config) with carrier enabled
+      setSelectedPartnerTypes(new Set(["vendor"]));
+      setSelectedVendorSubTypes(new Set(["seller_items", initialProfile]));
+      setActiveSubTypeTab(initialProfile);
+      setConfigType("vendor");
+      setActiveConfigSection("shipping_methods");
+      setStep(3);
+    }
+    if (!open) {
+      setInitialProfileHandled(false);
+    }
+  }, [open, initialProfile, initialProfileHandled]);
 
   // Step 1 state
   const [groupSearch, setGroupSearch] = useState("");
