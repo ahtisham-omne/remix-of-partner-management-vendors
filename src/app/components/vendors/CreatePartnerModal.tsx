@@ -3499,6 +3499,11 @@ function ConfigPageContent({
   const [createSmMethods, setCreateSmMethods] = useState<Array<{ id: string; name: string; description: string; minDuration: number; maxDuration: number; isDefault: boolean }>>([
     { id: `csm-1`, name: "", description: "", minDuration: 1, maxDuration: 30, isDefault: true },
   ]);
+  const [recentlyUsedMethods, setRecentlyUsedMethods] = useState<Record<string, string[]>>({
+    fedex: ["fedex-air", "fedex-ground"],
+    dhl: ["dhl-express"],
+    ups: ["ups-next-day"],
+  });
 
   const TRIGGER_TOOLTIPS: Record<string, string> = {
     order_confirmation: "Payment clock starts when the purchase order is confirmed by both parties.",
