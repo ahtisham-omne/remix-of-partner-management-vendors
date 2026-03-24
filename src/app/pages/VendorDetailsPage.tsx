@@ -2600,9 +2600,10 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
     const newContact: PartnerContact = {
       id: `C-LOC-${Date.now()}`,
       name: locNewPocName.trim(),
+      company: selectedLocation?.name || "Location",
       department: locNewPocDepartment,
-      role: locNewPocRole.trim() || "Contact",
-      primaryPhone: `${locNewPocMobileCode} ${locNewPocMobile.trim()}`,
+      phone: `${locNewPocMobileCode} ${locNewPocMobile.trim()}`,
+      phoneExt: "",
       secondaryPhone: `${locNewPocLandlineCode} ${locNewPocLandline.trim()}`,
       secondaryPhoneExt: locNewPocExt.trim(),
       email: locNewPocEmail.trim(),
