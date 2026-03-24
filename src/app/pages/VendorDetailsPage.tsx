@@ -2549,7 +2549,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
     if (locPocCategoryFilter !== "all") list = list.filter((c) => c.department === locPocCategoryFilter);
     if (locPocSearch.trim()) {
       const q = locPocSearch.toLowerCase();
-      list = list.filter((c) => c.name.toLowerCase().includes(q) || c.role.toLowerCase().includes(q) || c.department.toLowerCase().includes(q) || c.email.toLowerCase().includes(q));
+      list = list.filter((c) => c.name.toLowerCase().includes(q) || c.company.toLowerCase().includes(q) || c.department.toLowerCase().includes(q) || c.email.toLowerCase().includes(q));
     }
     return list;
   }, [locContactDictionary, locPocCategoryFilter, locPocSearch]);
