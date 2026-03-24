@@ -2534,6 +2534,91 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
     setTimeout(() => setSelectedLocation(null), 200);
   }, []);
 
+  // ── Location POC contact dictionary (local copy) ──
+  const [locContactDictionary, setLocContactDictionary] = useState<PartnerContact[]>([...CONTACT_DICTIONARY]);
+  const [locSelectedPocIds, setLocSelectedPocIds] = useState<Set<string>>(new Set(["C-001", "C-003", "C-006"]));
+
+  const locPocDeptCounts = useMemo(() => {
+    const counts: Record<string, number> = { Sales: 0, "Supply Chain Management": 0, Finance: 0 };
+    locContactDictionary.forEach((c) => { counts[c.department] = (counts[c.department] || 0) + 1; });
+    return counts;
+  }, [locContactDictionary]);
+
+  const locFilteredContacts = useMemo(() => {
+    let list = locContactDictionary;
+    if (locPocCategoryFilter !== "all") list = list.filter((c) => c.department === locPocCategoryFilter);
+    if (locPocSearch.trim()) {
+      const q = locPocSearch.toLowerCase();
+      list = list.filter((c) => c.name.toLowerCase().includes(q) || c.role.toLowerCase().includes(q) || c.department.toLowerCase().includes(q) || c.email.toLowerCase().includes(q));
+    }
+    return list;
+  }, [locContactDictionary, locPocCategoryFilter, locPocSearch]);
+
+  const LOC_POC_PER_PAGE = 20;
+  const locPocTotalPages = Math.max(1, Math.ceil(locFilteredContacts.length / LOC_POC_PER_PAGE));
+  const locPocPagedContacts = locFilteredContacts.slice((locPocPage - 1) * LOC_POC_PER_PAGE, locPocPage * LOC_POC_PER_PAGE);
+
+  const handleLocOpenSelectModal = useCallback(() => {
+    setLocPocTempSelected(new Set(locSelectedPocIds));
+    setLocPocSearch("");
+    setLocPocCategoryFilter("all");
+    setLocPocPage(1);
+    setLocShowSelectModal(true);
+  }, [locSelectedPocIds]);
+
+  const handleLocTogglePocTemp = useCallback((id: string) => {
+    setLocPocTempSelected((prev) => { const next = new Set(prev); next.has(id) ? next.delete(id) : next.add(id); return next; });
+  }, []);
+
+  const handleLocConfirmSelect = useCallback(() => {
+    setLocSelectedPocIds(new Set(locPocTempSelected));
+    setLocShowSelectModal(false);
+    toast.success("Location contacts updated");
+  }, [locPocTempSelected]);
+
+  const locResetCreateForm = useCallback(() => {
+    setLocNewPocName(""); setLocNewPocDepartment("Sales"); setLocNewPocRole("");
+    setLocNewPocLandline(""); setLocNewPocLandlineCode("+1"); setLocNewPocExt("");
+    setLocNewPocMobile(""); setLocNewPocMobileCode("+1"); setLocNewPocEmail("");
+    setLocSaveAndCreate(false);
+  }, []);
+
+  const handleLocOpenCreate = useCallback(() => {
+    locResetCreateForm();
+    setLocShowCreateModal(true);
+  }, [locResetCreateForm]);
+
+  const handleLocOpenCreateFromSelect = useCallback(() => {
+    setLocShowSelectModal(false);
+    locResetCreateForm();
+    setLocShowCreateModal(true);
+  }, [locResetCreateForm]);
+
+  const handleLocSavePoc = useCallback(() => {
+    if (!locNewPocName.trim()) { toast.error("Name is required."); return; }
+    const AVATAR_COLORS = ["#0A77FF", "#7C3AED", "#059669", "#D97706"];
+    const newContact: PartnerContact = {
+      id: `C-LOC-${Date.now()}`,
+      name: locNewPocName.trim(),
+      department: locNewPocDepartment,
+      role: locNewPocRole.trim() || "Contact",
+      primaryPhone: `${locNewPocMobileCode} ${locNewPocMobile.trim()}`,
+      secondaryPhone: `${locNewPocLandlineCode} ${locNewPocLandline.trim()}`,
+      secondaryPhoneExt: locNewPocExt.trim(),
+      email: locNewPocEmail.trim(),
+      avatarColor: AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)],
+    };
+    setLocContactDictionary((prev) => [newContact, ...prev]);
+    setLocSelectedPocIds((prev) => new Set([...prev, newContact.id]));
+    toast.success(`"${newContact.name}" created and assigned to this location.`);
+    if (locSaveAndCreate) {
+      locResetCreateForm();
+    } else {
+      locResetCreateForm();
+      setLocShowCreateModal(false);
+    }
+  }, [locNewPocName, locNewPocDepartment, locNewPocRole, locNewPocLandline, locNewPocLandlineCode, locNewPocExt, locNewPocMobile, locNewPocMobileCode, locNewPocEmail, locSaveAndCreate, locResetCreateForm]);
+
   const modalBaseClass = "!fixed !inset-0 !translate-x-0 !translate-y-0 !m-auto !w-full !h-full transition-[max-width,max-height,border-radius] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]";
 
   const modalSizeClass = isFullScreen
