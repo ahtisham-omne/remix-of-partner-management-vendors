@@ -91,7 +91,7 @@ import {
 // Types
 // ──────────────────────────────────────────────
 
-interface TierData {
+export interface TierData {
   minQty: string;
   maxQty: string;
   discount: string;
