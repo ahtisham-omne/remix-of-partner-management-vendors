@@ -1432,6 +1432,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
   const [recordsPerPage, setRecordsPerPage] = useState(20);
   const [selectedRule, setSelectedRule] = useState<PricingRule | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
+  const [detailMode, setDetailMode] = useState<"view" | "create">("view");
 
   // ── Explore Presets Modal state ──
   const [explorePresetsOpen, setExplorePresetsOpen] = useState(false);
