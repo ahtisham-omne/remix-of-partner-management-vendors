@@ -6214,7 +6214,6 @@ function ConfigPageContent({
                 </div>
               </div>
             </div>
-            )}
           </DialogContent>
         </Dialog>
 
