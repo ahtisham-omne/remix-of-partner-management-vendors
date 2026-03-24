@@ -849,7 +849,7 @@ function ItemTypeBadge({ type }: { type: string }) {
   );
 }
 
-function DetailModal({ rule, open, onClose }: { rule: PricingRule | null; open: boolean; onClose: () => void }) {
+function DetailModal({ rule, open, onClose, mode = "create", onApply, onDuplicate, onDisable }: { rule: PricingRule | null; open: boolean; onClose: () => void; mode?: "view" | "create"; onApply?: (rule: PricingRule) => void; onDuplicate?: (rule: PricingRule) => void; onDisable?: (rule: PricingRule) => void }) {
   const [tab, setTab] = useState<string>("items");
   const [itemSearch, setItemSearch] = useState("");
   const [catSearch, setCatSearch] = useState("");
@@ -909,29 +909,41 @@ function DetailModal({ rule, open, onClose }: { rule: PricingRule | null; open: 
               <h2 className="text-sm text-[#0F172A] truncate" style={{ fontWeight: 600 }}>Pricing Rule Details</h2>
             </div>
             <div className="flex items-center gap-1.5 shrink-0">
-              <button
-                onClick={() => !isPreset && toast.info("Edit coming soon")}
-                disabled={isPreset}
-                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#334155] hover:bg-[#F8FAFC] transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white"
-                style={{ fontWeight: 500 }}
-              >
-                <Pencil className="w-3.5 h-3.5" /> Edit
-              </button>
-              <button
-                onClick={() => !isPreset && toast.info("Archive coming soon")}
-                disabled={isPreset}
-                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#334155] hover:bg-[#F8FAFC] transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white"
-                style={{ fontWeight: 500 }}
-              >
-                <Archive className="w-3.5 h-3.5" /> Archive
-              </button>
-              <button
-                onClick={() => toast.info("Disable coming soon")}
-                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#334155] hover:bg-[#F8FAFC] transition-colors cursor-pointer"
-                style={{ fontWeight: 500 }}
-              >
-                <ToggleLeft className="w-3.5 h-3.5" /> Disable
-              </button>
+              {mode === "view" && (
+                <>
+                  <button
+                    onClick={() => !isPreset && toast.info("Edit coming soon")}
+                    disabled={isPreset}
+                    className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#334155] hover:bg-[#F8FAFC] transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white"
+                    style={{ fontWeight: 500 }}
+                  >
+                    <Pencil className="w-3.5 h-3.5" /> Edit
+                  </button>
+                  <button
+                    onClick={() => !isPreset && toast.info("Archive coming soon")}
+                    disabled={isPreset}
+                    className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#334155] hover:bg-[#F8FAFC] transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white"
+                    style={{ fontWeight: 500 }}
+                  >
+                    <Archive className="w-3.5 h-3.5" /> Archive
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (rule && onDisable) {
+                        onDisable(rule);
+                        toast.success(`"${rule.name}" has been disabled`);
+                        onClose();
+                      } else {
+                        toast.info("Disable coming soon");
+                      }
+                    }}
+                    className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#334155] hover:bg-[#F8FAFC] transition-colors cursor-pointer"
+                    style={{ fontWeight: 500 }}
+                  >
+                    <ToggleLeft className="w-3.5 h-3.5" /> Disable
+                  </button>
+                </>
+              )}
               <button onClick={() => setIsFullscreen(!isFullscreen)} className="w-8 h-8 rounded-lg border border-[#E2E8F0] bg-white flex items-center justify-center text-[#64748B] hover:text-[#334155] hover:bg-[#F8FAFC] transition-all cursor-pointer">
                 {isFullscreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
               </button>
@@ -1367,11 +1379,24 @@ function DetailModal({ rule, open, onClose }: { rule: PricingRule | null; open: 
             <span className="text-[11px] text-[#64748B]">Reviewing: <span className="text-[#0F172A]" style={{ fontWeight: 600 }}>{rule.name}</span></span>
             <div className="flex items-center gap-2">
               <button
-                onClick={() => toast.info("Duplicate coming soon")}
+                onClick={() => {
+                  if (rule && onDuplicate) { onDuplicate(rule); onClose(); }
+                  else { toast.info("Duplicate coming soon"); }
+                }}
                 className="h-8 px-3.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#334155] hover:bg-[#F8FAFC] transition-colors cursor-pointer inline-flex items-center gap-1.5" style={{ fontWeight: 500 }}
               >
                 <Copy className="w-3.5 h-3.5" /> Duplicate
               </button>
+              {mode === "create" && (
+                <button
+                  onClick={() => {
+                    if (rule && onApply) { onApply(rule); onClose(); }
+                  }}
+                  className="h-8 px-3.5 rounded-lg bg-[#0A77FF] text-white text-xs hover:bg-[#0A77FF]/90 transition-colors cursor-pointer inline-flex items-center gap-1.5" style={{ fontWeight: 500 }}
+                >
+                  <Check className="w-3.5 h-3.5" /> Use Template
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -1407,6 +1432,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
   const [recordsPerPage, setRecordsPerPage] = useState(20);
   const [selectedRule, setSelectedRule] = useState<PricingRule | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
+  const [detailMode, setDetailMode] = useState<"view" | "create">("view");
 
   // ── Explore Presets Modal state ──
   const [explorePresetsOpen, setExplorePresetsOpen] = useState(false);
@@ -1508,8 +1534,9 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
     resetCreateForm();
     setCreateFullscreen(false);
   }
-  const openDetail = useCallback((rule: PricingRule) => {
+  const openDetail = useCallback((rule: PricingRule, openMode: "view" | "create" = "view") => {
     setSelectedRule(rule);
+    setDetailMode(openMode);
     setDetailOpen(true);
   }, []);
 
@@ -1563,7 +1590,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
 
   return (
     <div className="border border-border rounded-xl bg-card overflow-clip flex flex-col" style={{ minHeight: 400 }}>
-      <DetailModal rule={selectedRule} open={detailOpen} onClose={() => setDetailOpen(false)} />
+      <DetailModal rule={selectedRule} open={detailOpen} onClose={() => setDetailOpen(false)} mode={detailMode} onApply={(r) => { toast.success(`"${r.name}" applied to this partner.`); }} onDuplicate={(r) => toast.info(`Duplicated "${r.name}"`)} onDisable={(r) => toast.success(`"${r.name}" disabled`)} />
 
       {/* Sub-tabs */}
       <div className="flex items-center border-b border-[#EEF2F6] bg-[#F8FAFC] shrink-0">
@@ -2551,6 +2578,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                         key={card.id}
                         onClick={() => {
                           setSelectedRule(card);
+                          setDetailMode("create");
                           setDetailOpen(true);
                         }}
                         className="bg-white border border-[#E2E8F0] rounded-xl cursor-pointer group transition-all duration-200 flex flex-col relative"
@@ -2593,7 +2621,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                                   </button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end" className="w-[180px] p-1 z-[200]">
-                                  <DropdownMenuItem className="gap-2 py-1.5 cursor-pointer text-[13px]" onSelect={() => { setSelectedRule(card); setDetailOpen(true); }}>
+                                  <DropdownMenuItem className="gap-2 py-1.5 cursor-pointer text-[13px]" onSelect={() => { setSelectedRule(card); setDetailMode("create"); setDetailOpen(true); }}>
                                     <Eye className="w-3.5 h-3.5 text-[#64748B]" /> View Details
                                   </DropdownMenuItem>
                                   <DropdownMenuItem className="gap-2 py-1.5 cursor-pointer text-[13px]" onSelect={() => {
