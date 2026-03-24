@@ -7690,7 +7690,7 @@ function ConfigPageContent({
                     : CARRIER_CATALOG;
 
                   return (
-                    <div key={entry.id} className="rounded-lg border border-border bg-card overflow-hidden shadow-sm">
+                    <div key={entry.id} className="rounded-lg border border-border bg-card shadow-sm">
                       {/* Card header */}
                       <div className="flex items-center justify-between px-3.5 py-2.5 bg-muted/30 border-b border-border">
                         <div className="flex items-center gap-2">
