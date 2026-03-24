@@ -3676,6 +3676,9 @@ function ConfigPageContent({
   const [createPrMode, setCreatePrMode] = useState<"create" | "view">("create");
   const [editingPrRuleId, setEditingPrRuleId] = useState<string | null>(null);
 
+  // ── Shared Pricing Rule Detail Modal (reuses PricingRulesTab's DetailModal) ──
+  const [prDetailRule, setPrDetailRule] = useState<PricingRule | null>(null);
+  const [prDetailOpen, setPrDetailOpen] = useState(false);
   interface CpmItemRow { id: string; partNo: string; description: string; category: string; itemType: string; status: "Active" | "Inactive"; }
   interface CpmCatRow { id: string; code: string; name: string; description: string; linkedItems: number; status: "Active" | "Inactive"; }
   interface CpmAttachment { id: string; name: string; size: string; type: string; uploadedAt: string; }
