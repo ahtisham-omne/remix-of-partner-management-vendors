@@ -2578,6 +2578,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                         key={card.id}
                         onClick={() => {
                           setSelectedRule(card);
+                          setDetailMode("create");
                           setDetailOpen(true);
                         }}
                         className="bg-white border border-[#E2E8F0] rounded-xl cursor-pointer group transition-all duration-200 flex flex-col relative"
