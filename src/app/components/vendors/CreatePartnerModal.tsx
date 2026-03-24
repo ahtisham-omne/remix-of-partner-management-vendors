@@ -126,6 +126,7 @@ import { getAvatarTint } from "../../utils/avatarTints";
 import { GroupChipsRow } from "./GroupChipsRow";
 import { FilterPills } from "./FilterPills";
 import { PaymentTermDetailModal } from "./PaymentTermDetailModal";
+import { PricingRuleDetailModal, presetToPricingRule, type PricingRule } from "./PricingRulesTab";
 import { PaymentTermCard } from "./PaymentTermCard";
 import { PaymentMethodsSection } from "./PaymentMethodsSection";
 import {
