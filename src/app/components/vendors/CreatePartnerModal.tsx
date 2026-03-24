@@ -11,6 +11,7 @@ import { Label } from "../ui/label";
 import { Switch } from "../ui/switch";
 import { Textarea } from "../ui/textarea";
 import { Checkbox } from "../ui/checkbox";
+import { Slider } from "../ui/slider";
 import {
   Select,
   SelectContent,
