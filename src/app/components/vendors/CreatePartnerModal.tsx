@@ -3766,44 +3766,9 @@ function ConfigPageContent({
   function cpmRemoveAttachment(id: string) { setCpmAttachments(prev => prev.filter(a => a.id !== id)); }
 
   function handleOpenRuleDetails(rule: PricingRulePreset) {
-    setCreatePrMode("view");
-    setEditingPrRuleId(rule.id);
-    setCreatePrName(rule.name);
-    setCreatePrDescription(rule.description);
-    setCreatePrCategory(rule.category === "all" ? "discount" : rule.category);
-    setCreatePrBasis(rule.basis);
-    const tiers: CpmTierState[] = rule.tiers.map(t => {
-      const discVal = t.discount?.replace(/[%$]/g, "") || "";
-      const isFix = t.discount?.includes("$") || false;
-      return {
-        discount: discVal,
-        fixRate: isFix,
-        qtyLimits: t.minValue !== "-" || t.maxValue !== "-",
-        minQty: t.minValue === "-" ? "" : t.minValue.replace(/[,$]/g, ""),
-        maxQty: t.maxValue === "-" ? "" : t.maxValue.replace(/[,$]/g, ""),
-      };
-    });
-    setCreatePrTiers(tiers.length > 0 ? tiers : [makeCpmTier()]);
-    setCreatePrLimitDateRange(true);
-    setCreatePrValidFrom("2025-04-01");
-    setCreatePrValidTo("2025-12-31");
-    const isCustom = rule.id.startsWith("pr-custom-");
-    if (!isCustom) {
-      setCpmSelectedItems(CPM_AVAILABLE_ITEMS.slice(0, Math.min(3, Math.floor(rule.vendorsApplied / 2) + 1)));
-      setCpmSelectedCats(CPM_AVAILABLE_CATS.slice(0, Math.min(2, Math.floor(rule.vendorsApplied / 3) + 1)));
-    } else {
-      setCpmSelectedItems([]);
-      setCpmSelectedCats([]);
-    }
-    setCpmAttachments([]);
-    setCreatePrStep(1);
-    setCreatePrItemsTab("items");
-    setCpmItemSearch("");
-    setCpmCatSearch("");
-    setCpmShowItemPicker(false);
-    setCpmShowCatPicker(false);
-    setCreatePrFullscreen(false);
-    setCreatePrModalOpen(true);
+    const converted = presetToPricingRule(rule);
+    setPrDetailRule(converted);
+    setPrDetailOpen(true);
   }
 
   // ── Preview-panel editable state ──
