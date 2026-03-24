@@ -6003,7 +6003,7 @@ function ConfigPageContent({
         </div>
 
         {/* ── Explore Pricing Rules Presets Modal ── */}
-        <Dialog open={pricingRulesModalOpen} onOpenChange={(v) => { setPricingRulesModalOpen(v); if (!v) { setPreviewPricingRuleId(null); setPrPreviewTab("preview"); setPrFullscreen(false); } }}>
+        <Dialog open={pricingRulesModalOpen} onOpenChange={(v) => { setPricingRulesModalOpen(v); if (!v) { setPrFullscreen(false); } }}>
           <DialogContent
             className="p-0 gap-0 overflow-hidden z-[210] border-0 shadow-[0_24px_80px_-12px_rgba(0,0,0,0.18)] transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] flex flex-col"
             style={prFullscreen
