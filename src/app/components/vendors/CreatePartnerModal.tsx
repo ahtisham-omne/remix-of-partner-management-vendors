@@ -7725,32 +7725,32 @@ function ConfigPageContent({
                         <div className="grid grid-cols-2 gap-3">
                           {/* Carrier Selector */}
                           <div className="relative">
-                            <Label className="text-[11px] text-foreground" style={{ fontWeight: 600 }}>Shipping Carrier</Label>
+                            <Label className="text-[11px] text-[#0F172A]" style={{ fontWeight: 600 }}>Shipping Carrier</Label>
                             <button
                               onClick={() => setCarrierDropdownOpen((prev) => ({ ...prev, [entry.id]: !prev[entry.id] }))}
-                              className="mt-1 w-full flex items-center justify-between h-9 px-3 rounded-lg border border-border bg-background text-sm hover:border-muted-foreground/30 transition-colors"
+                              className="mt-1 w-full flex items-center justify-between h-9 sm:h-10 px-3 rounded-lg border border-[#E2E8F0] bg-white text-sm hover:border-[#CBD5E1] transition-colors focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
                             >
                               {selectedCarrier ? (
                                 <div className="flex items-center gap-2">
                                   <span className="text-base">{selectedCarrier.logo}</span>
-                                  <span className="text-foreground text-sm truncate">{selectedCarrier.name.split(" ")[0]}</span>
+                                  <span className="text-[#0F172A] text-sm truncate">{selectedCarrier.name.split(" ")[0]}</span>
                                 </div>
                               ) : (
-                                <span className="text-muted-foreground/50 text-xs">Select a shipping carrier</span>
+                                <span className="text-[#94A3B8] text-sm">Select a shipping carrier</span>
                               )}
-                              <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
+                              <ChevronDown className="w-3.5 h-3.5 text-[#94A3B8]" />
                             </button>
 
                             {carrierDropdownOpen[entry.id] && (
-                              <div className="absolute z-[260] top-full left-0 right-0 mt-1 rounded-lg border border-border bg-popover shadow-lg max-h-[280px] overflow-hidden">
-                                <div className="p-2 border-b border-border">
+                              <div className="absolute z-[260] top-full left-0 right-0 mt-1 rounded-lg border border-[#E2E8F0] bg-white shadow-lg max-h-[280px] overflow-hidden">
+                                <div className="p-2 border-b border-[#F1F5F9]">
                                   <div className="relative">
-                                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8]" />
                                     <input
                                       value={searchVal}
                                       onChange={(e) => setCarrierSearches((prev) => ({ ...prev, [entry.id]: e.target.value }))}
                                       placeholder="Search shipping carrier..."
-                                      className="w-full h-8 pl-8 pr-3 rounded-md border border-border bg-background text-sm outline-none focus:border-primary transition-colors placeholder:text-muted-foreground/50 placeholder:text-xs"
+                                      className="w-full h-8 pl-8 pr-3 rounded-md border border-[#E2E8F0] bg-white text-sm text-[#0F172A] outline-none focus:border-[#0A77FF] transition-colors placeholder:text-[#94A3B8]"
                                       autoFocus
                                     />
                                   </div>
