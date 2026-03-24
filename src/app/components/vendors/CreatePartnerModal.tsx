@@ -170,6 +170,8 @@ interface CreatePartnerModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onPartnerCreated?: (data: Record<string, unknown>) => void;
+  /** Auto-navigate to a specific vendor profile on open (e.g. "carrier") */
+  initialProfile?: string;
 }
 
 export function CreatePartnerModal({ open, onOpenChange, onPartnerCreated }: CreatePartnerModalProps) {
