@@ -2620,7 +2620,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                                   </button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end" className="w-[180px] p-1 z-[200]">
-                                  <DropdownMenuItem className="gap-2 py-1.5 cursor-pointer text-[13px]" onSelect={() => { setSelectedRule(card); setDetailOpen(true); }}>
+                                  <DropdownMenuItem className="gap-2 py-1.5 cursor-pointer text-[13px]" onSelect={() => { setSelectedRule(card); setDetailMode("create"); setDetailOpen(true); }}>
                                     <Eye className="w-3.5 h-3.5 text-[#64748B]" /> View Details
                                   </DropdownMenuItem>
                                   <DropdownMenuItem className="gap-2 py-1.5 cursor-pointer text-[13px]" onSelect={() => {
