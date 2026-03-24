@@ -1379,11 +1379,24 @@ function DetailModal({ rule, open, onClose, mode = "create", onApply, onDuplicat
             <span className="text-[11px] text-[#64748B]">Reviewing: <span className="text-[#0F172A]" style={{ fontWeight: 600 }}>{rule.name}</span></span>
             <div className="flex items-center gap-2">
               <button
-                onClick={() => toast.info("Duplicate coming soon")}
+                onClick={() => {
+                  if (rule && onDuplicate) { onDuplicate(rule); onClose(); }
+                  else { toast.info("Duplicate coming soon"); }
+                }}
                 className="h-8 px-3.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#334155] hover:bg-[#F8FAFC] transition-colors cursor-pointer inline-flex items-center gap-1.5" style={{ fontWeight: 500 }}
               >
                 <Copy className="w-3.5 h-3.5" /> Duplicate
               </button>
+              {mode === "create" && (
+                <button
+                  onClick={() => {
+                    if (rule && onApply) { onApply(rule); onClose(); }
+                  }}
+                  className="h-8 px-3.5 rounded-lg bg-[#0A77FF] text-white text-xs hover:bg-[#0A77FF]/90 transition-colors cursor-pointer inline-flex items-center gap-1.5" style={{ fontWeight: 500 }}
+                >
+                  <Check className="w-3.5 h-3.5" /> Use Template
+                </button>
+              )}
             </div>
           </div>
         </div>
