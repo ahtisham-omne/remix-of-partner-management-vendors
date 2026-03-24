@@ -7598,10 +7598,10 @@ function ConfigPageContent({
 
                       {/* Duration range */}
                       <div>
-                        <Label className="text-[11px] text-foreground" style={{ fontWeight: 600 }}>Duration (calendar days)</Label>
-                        <div className="mt-1.5 flex items-center gap-3 bg-muted/30 rounded-lg p-2.5 border border-border/50">
+                        <Label className="text-[11px] text-[#0F172A]" style={{ fontWeight: 600 }}>Duration (calendar days)</Label>
+                        <div className="mt-1.5 flex items-center gap-3 bg-white rounded-lg p-2.5 border border-[#E2E8F0]">
                           <div className="flex items-center gap-1.5">
-                            <span className="text-[11px] text-muted-foreground" style={{ fontWeight: 500 }}>Min</span>
+                            <span className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Min</span>
                             <Input
                               type="number"
                               value={entry.minDuration}
@@ -7609,11 +7609,11 @@ function ConfigPageContent({
                                 const val = Math.max(1, parseInt(e.target.value) || 1);
                                 updateCarrierService(entry.id, { minDuration: val, maxDuration: Math.max(val, entry.maxDuration) });
                               }}
-                              className="w-16 h-8 rounded-md border-border bg-background text-sm text-center placeholder:text-muted-foreground/50"
+                              className="w-16 h-8 rounded-md border-[#E2E8F0] bg-white text-sm text-center text-[#0F172A] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
                             />
                           </div>
                           {/* Visual range bar */}
-                          <div className="flex-1 relative h-1.5 bg-border rounded-full">
+                          <div className="flex-1 relative h-1.5 bg-[#E2E8F0] rounded-full">
                             <div
                               className="absolute top-0 h-full bg-primary rounded-full transition-all"
                               style={{
@@ -7622,11 +7622,11 @@ function ConfigPageContent({
                               }}
                             />
                             <div
-                              className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-background border-2 border-primary rounded-full shadow-sm"
+                              className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-white border-2 border-primary rounded-full shadow-sm"
                               style={{ left: `calc(${((entry.minDuration - 1) / 59) * 100}% - 6px)` }}
                             />
                             <div
-                              className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-background border-2 border-primary rounded-full shadow-sm"
+                              className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-white border-2 border-primary rounded-full shadow-sm"
                               style={{ left: `calc(${((entry.maxDuration - 1) / 59) * 100}% - 6px)` }}
                             />
                           </div>
@@ -7638,9 +7638,9 @@ function ConfigPageContent({
                                 const val = Math.min(60, parseInt(e.target.value) || 60);
                                 updateCarrierService(entry.id, { maxDuration: val, minDuration: Math.min(val, entry.minDuration) });
                               }}
-                              className="w-16 h-8 rounded-md border-border bg-background text-sm text-center placeholder:text-muted-foreground/50"
+                              className="w-16 h-8 rounded-md border-[#E2E8F0] bg-white text-sm text-center text-[#0F172A] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
                             />
-                            <span className="text-[11px] text-muted-foreground" style={{ fontWeight: 500 }}>Max</span>
+                            <span className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Max</span>
                           </div>
                         </div>
                       </div>
