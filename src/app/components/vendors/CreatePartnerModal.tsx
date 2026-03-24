@@ -7413,14 +7413,14 @@ function ConfigPageContent({
   if (sectionId === "shipping_methods") {
     /* ── Carrier logos map ── */
     const CARRIER_CATALOG = [
-      { id: "fedex", name: "FedEx Express", logo: "🟣", color: "#4D148C" },
-      { id: "tcs", name: "TCS (Tranzum Courier Service)", logo: "🔴", color: "#D32F2F" },
-      { id: "dhl", name: "DHL Express", logo: "🟡", color: "#FFCC00" },
-      { id: "ups", name: "UPS (United Parcel Service)", logo: "🟤", color: "#351C15" },
-      { id: "sf", name: "SF Express", logo: "⚫", color: "#1A1A1A" },
-      { id: "usps", name: "USPS", logo: "🔵", color: "#004B87" },
-      { id: "aramex", name: "Aramex", logo: "🟠", color: "#E65100" },
-      { id: "maersk", name: "Maersk", logo: "🔵", color: "#0067A5" },
+      { id: "fedex", name: "FedEx Express", logoImg: fedexLogo, color: "#4D148C" },
+      { id: "tcs", name: "TCS (Tranzum Courier Service)", logoImg: tcsLogo, color: "#D32F2F" },
+      { id: "dhl", name: "DHL Express", logoImg: dhlLogo, color: "#FFCC00" },
+      { id: "ups", name: "UPS (United Parcel Service)", logoImg: upsLogo, color: "#351C15" },
+      { id: "sf", name: "SF Express", logoImg: sfLogo, color: "#1A1A1A" },
+      { id: "usps", name: "USPS", logoImg: uspsLogo, color: "#004B87" },
+      { id: "aramex", name: "Aramex", logoImg: aramexLogo, color: "#E65100" },
+      { id: "maersk", name: "Maersk", logoImg: maerskLogo, color: "#0067A5" },
     ];
     const CARRIER_METHODS: Record<string, Array<{ id: string; name: string; desc: string; days: string; isDefault?: boolean }>> = {
       fedex: [
