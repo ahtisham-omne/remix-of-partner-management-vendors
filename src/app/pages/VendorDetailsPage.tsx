@@ -2408,6 +2408,24 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
   const [locPtOpen, setLocPtOpen] = useState(false);
   const [createLocationModalOpen, setCreateLocationModalOpen] = useState(false);
 
+  // ── Location POC modals state ──
+  const [locShowSelectModal, setLocShowSelectModal] = useState(false);
+  const [locShowCreateModal, setLocShowCreateModal] = useState(false);
+  const [locPocSearch, setLocPocSearch] = useState("");
+  const [locPocCategoryFilter, setLocPocCategoryFilter] = useState<"all" | "Sales" | "Supply Chain Management" | "Finance">("all");
+  const [locPocPage, setLocPocPage] = useState(1);
+  const [locPocTempSelected, setLocPocTempSelected] = useState<Set<string>>(new Set());
+  const [locNewPocName, setLocNewPocName] = useState("");
+  const [locNewPocDepartment, setLocNewPocDepartment] = useState<"Sales" | "Supply Chain Management" | "Finance">("Sales");
+  const [locNewPocRole, setLocNewPocRole] = useState("");
+  const [locNewPocLandline, setLocNewPocLandline] = useState("");
+  const [locNewPocLandlineCode, setLocNewPocLandlineCode] = useState("+1");
+  const [locNewPocExt, setLocNewPocExt] = useState("");
+  const [locNewPocMobile, setLocNewPocMobile] = useState("");
+  const [locNewPocMobileCode, setLocNewPocMobileCode] = useState("+1");
+  const [locNewPocEmail, setLocNewPocEmail] = useState("");
+  const [locSaveAndCreate, setLocSaveAndCreate] = useState(false);
+
   type LocDensity = "condensed" | "comfort" | "card";
   const LOC_DENSITY_CONFIG: { key: LocDensity; label: string; description: string; icon: "align-justify" | "list" | "layout-grid" }[] = [
     { key: "condensed", label: "Condensed", description: "Compact view", icon: "align-justify" },
@@ -2515,6 +2533,92 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
     setLocPtOpen(false);
     setTimeout(() => setSelectedLocation(null), 200);
   }, []);
+
+  // ── Location POC contact dictionary (local copy) ──
+  const [locContactDictionary, setLocContactDictionary] = useState<PartnerContact[]>([...CONTACT_DICTIONARY]);
+  const [locSelectedPocIds, setLocSelectedPocIds] = useState<Set<string>>(new Set(["C-001", "C-003", "C-006"]));
+
+  const locPocDeptCounts = useMemo(() => {
+    const counts: Record<string, number> = { Sales: 0, "Supply Chain Management": 0, Finance: 0 };
+    locContactDictionary.forEach((c) => { counts[c.department] = (counts[c.department] || 0) + 1; });
+    return counts;
+  }, [locContactDictionary]);
+
+  const locFilteredContacts = useMemo(() => {
+    let list = locContactDictionary;
+    if (locPocCategoryFilter !== "all") list = list.filter((c) => c.department === locPocCategoryFilter);
+    if (locPocSearch.trim()) {
+      const q = locPocSearch.toLowerCase();
+      list = list.filter((c) => c.name.toLowerCase().includes(q) || c.company.toLowerCase().includes(q) || c.department.toLowerCase().includes(q) || c.email.toLowerCase().includes(q));
+    }
+    return list;
+  }, [locContactDictionary, locPocCategoryFilter, locPocSearch]);
+
+  const LOC_POC_PER_PAGE = 20;
+  const locPocTotalPages = Math.max(1, Math.ceil(locFilteredContacts.length / LOC_POC_PER_PAGE));
+  const locPocPagedContacts = locFilteredContacts.slice((locPocPage - 1) * LOC_POC_PER_PAGE, locPocPage * LOC_POC_PER_PAGE);
+
+  const handleLocOpenSelectModal = useCallback(() => {
+    setLocPocTempSelected(new Set(locSelectedPocIds));
+    setLocPocSearch("");
+    setLocPocCategoryFilter("all");
+    setLocPocPage(1);
+    setLocShowSelectModal(true);
+  }, [locSelectedPocIds]);
+
+  const handleLocTogglePocTemp = useCallback((id: string) => {
+    setLocPocTempSelected((prev) => { const next = new Set(prev); next.has(id) ? next.delete(id) : next.add(id); return next; });
+  }, []);
+
+  const handleLocConfirmSelect = useCallback(() => {
+    setLocSelectedPocIds(new Set(locPocTempSelected));
+    setLocShowSelectModal(false);
+    toast.success("Location contacts updated");
+  }, [locPocTempSelected]);
+
+  const locResetCreateForm = useCallback(() => {
+    setLocNewPocName(""); setLocNewPocDepartment("Sales"); setLocNewPocRole("");
+    setLocNewPocLandline(""); setLocNewPocLandlineCode("+1"); setLocNewPocExt("");
+    setLocNewPocMobile(""); setLocNewPocMobileCode("+1"); setLocNewPocEmail("");
+    setLocSaveAndCreate(false);
+  }, []);
+
+  const handleLocOpenCreate = useCallback(() => {
+    locResetCreateForm();
+    setLocShowCreateModal(true);
+  }, [locResetCreateForm]);
+
+  const handleLocOpenCreateFromSelect = useCallback(() => {
+    setLocShowSelectModal(false);
+    locResetCreateForm();
+    setLocShowCreateModal(true);
+  }, [locResetCreateForm]);
+
+  const handleLocSavePoc = useCallback(() => {
+    if (!locNewPocName.trim()) { toast.error("Name is required."); return; }
+    const AVATAR_COLORS = ["#0A77FF", "#7C3AED", "#059669", "#D97706"];
+    const newContact: PartnerContact = {
+      id: `C-LOC-${Date.now()}`,
+      name: locNewPocName.trim(),
+      company: selectedLocation?.name || "Location",
+      department: locNewPocDepartment,
+      phone: `${locNewPocMobileCode} ${locNewPocMobile.trim()}`,
+      phoneExt: "",
+      secondaryPhone: `${locNewPocLandlineCode} ${locNewPocLandline.trim()}`,
+      secondaryPhoneExt: locNewPocExt.trim(),
+      email: locNewPocEmail.trim(),
+      avatarColor: AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)],
+    };
+    setLocContactDictionary((prev) => [newContact, ...prev]);
+    setLocSelectedPocIds((prev) => new Set([...prev, newContact.id]));
+    toast.success(`"${newContact.name}" created and assigned to this location.`);
+    if (locSaveAndCreate) {
+      locResetCreateForm();
+    } else {
+      locResetCreateForm();
+      setLocShowCreateModal(false);
+    }
+  }, [locNewPocName, locNewPocDepartment, locNewPocRole, locNewPocLandline, locNewPocLandlineCode, locNewPocExt, locNewPocMobile, locNewPocMobileCode, locNewPocEmail, locSaveAndCreate, locResetCreateForm]);
 
   const modalBaseClass = "!fixed !inset-0 !translate-x-0 !translate-y-0 !m-auto !w-full !h-full transition-[max-width,max-height,border-radius] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]";
 
@@ -3381,7 +3485,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                 <div className="flex-1 flex flex-col overflow-hidden bg-white">
                   {/* Tabs row */}
                   <div className="flex items-center border-b border-[#E8ECF1] shrink-0">
-                    <div className="flex items-center flex-1 overflow-x-auto px-2">
+                    <div className="flex items-center flex-1 overflow-x-auto scrollbar-hide px-2">
                       {LOC_TABS.map((t) => {
                         const active = locDetailTab === t.id;
                         const count = t.id === "poc" ? LOC_POC_DATA.length : t.id === "items" ? LOC_ITEMS_DATA.length : t.id === "carrier_shipping" ? LOC_CARRIER_DATA.length : t.id === "pricing_rules" ? LOC_PRICING_DATA.length : t.id === "purchase_orders" ? 5 : t.id === "quotes" ? 3 : t.id === "sales_orders" ? 4 : 0;
@@ -3461,10 +3565,10 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                             </DropdownMenuContent>
                           </DropdownMenu>
                           <div className="w-px h-5 bg-[#E8ECF1] mx-0.5 hidden sm:block" />
-                          <button onClick={() => toast.info("Contact directory coming soon")} className="h-8 px-2.5 rounded-lg border border-[#E2E8F0] bg-white text-[12px] text-[#475569] hover:bg-[#F8FAFC] cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 500 }}>
+                          <button onClick={handleLocOpenSelectModal} className="h-8 px-2.5 rounded-lg border border-[#E2E8F0] bg-white text-[12px] text-[#475569] hover:bg-[#F8FAFC] cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 500 }}>
                             <Users className="w-3.5 h-3.5 text-[#94A3B8]" /> Contact Directory
                           </button>
-                          <button onClick={() => toast.info("Create contact coming soon")} className="h-8 px-3 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-[12px] shadow-sm cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 600 }}>
+                          <button onClick={handleLocOpenCreate} className="h-8 px-3 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-[12px] shadow-sm cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 600 }}>
                             <Plus className="w-3.5 h-3.5" /> Create New Contact
                           </button>
                         </div>
@@ -4126,6 +4230,55 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
         onClose={() => { setLocPtDetailOpen(false); setLocPtDetailTerm(null); }}
         mode="view"
         onDisable={(t) => toast.success(`"${t.name}" disabled for this partner`)}
+      />
+
+      {/* ══════ Location POC: Select from Directory Modal ══════ */}
+      <SelectPocDictionaryModal
+        open={locShowSelectModal}
+        onOpenChange={setLocShowSelectModal}
+        contactDictionary={locContactDictionary}
+        pocSearch={locPocSearch}
+        onPocSearchChange={(v) => { setLocPocSearch(v); setLocPocPage(1); }}
+        pocCategoryFilter={locPocCategoryFilter}
+        onPocCategoryFilterChange={(v) => { setLocPocCategoryFilter(v as any); setLocPocPage(1); }}
+        pocDepartmentCounts={locPocDeptCounts}
+        pocPagedContacts={locPocPagedContacts}
+        pocPage={locPocPage}
+        pocTotalPages={locPocTotalPages}
+        onPocPageChange={setLocPocPage}
+        pocTempSelected={locPocTempSelected}
+        onTogglePocTemp={handleLocTogglePocTemp}
+        onConfirm={handleLocConfirmSelect}
+        onOpenCreatePoc={handleLocOpenCreateFromSelect}
+        contextLabel={selectedLocation?.name || "this location"}
+      />
+
+      {/* ══════ Location POC: Create New Contact Modal ══════ */}
+      <CreatePocModal
+        open={locShowCreateModal}
+        onOpenChange={setLocShowCreateModal}
+        contextName={selectedLocation?.name || "Location"}
+        newPocName={locNewPocName}
+        onNewPocNameChange={setLocNewPocName}
+        newPocDepartment={locNewPocDepartment}
+        onNewPocDepartmentChange={setLocNewPocDepartment}
+        newPocRole={locNewPocRole}
+        onNewPocRoleChange={setLocNewPocRole}
+        newPocLandline={locNewPocLandline}
+        onNewPocLandlineChange={setLocNewPocLandline}
+        newPocLandlineCode={locNewPocLandlineCode}
+        onNewPocLandlineCodeChange={setLocNewPocLandlineCode}
+        newPocExt={locNewPocExt}
+        onNewPocExtChange={setLocNewPocExt}
+        newPocMobile={locNewPocMobile}
+        onNewPocMobileChange={setLocNewPocMobile}
+        newPocMobileCode={locNewPocMobileCode}
+        onNewPocMobileCodeChange={setLocNewPocMobileCode}
+        newPocEmail={locNewPocEmail}
+        onNewPocEmailChange={setLocNewPocEmail}
+        saveAndCreateAnother={locSaveAndCreate}
+        onSaveAndCreateAnotherChange={setLocSaveAndCreate}
+        onSave={handleLocSavePoc}
       />
     </>
   );
