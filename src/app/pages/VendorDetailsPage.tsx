@@ -3381,7 +3381,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                 <div className="flex-1 flex flex-col overflow-hidden bg-white">
                   {/* Tabs row */}
                   <div className="flex items-center border-b border-[#E8ECF1] shrink-0">
-                    <div className="flex items-center flex-1 overflow-x-auto px-2">
+                    <div className="flex items-center flex-1 overflow-x-auto scrollbar-hide px-2">
                       {LOC_TABS.map((t) => {
                         const active = locDetailTab === t.id;
                         const count = t.id === "poc" ? LOC_POC_DATA.length : t.id === "items" ? LOC_ITEMS_DATA.length : t.id === "carrier_shipping" ? LOC_CARRIER_DATA.length : t.id === "pricing_rules" ? LOC_PRICING_DATA.length : t.id === "purchase_orders" ? 5 : t.id === "quotes" ? 3 : t.id === "sales_orders" ? 4 : 0;
