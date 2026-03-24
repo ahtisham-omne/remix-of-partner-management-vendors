@@ -1406,8 +1406,45 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
 }
 
 // ──────────────────────────────────────────────
+// Helper: Convert PricingRulePreset → PricingRule for DetailModal
+// ──────────────────────────────────────────────
+export function presetToPricingRule(preset: import("./partnerConstants").PricingRulePreset): PricingRule {
+  const rng = seededRng(preset.id.split("").reduce((a, c) => a + c.charCodeAt(0), 0) * 1000);
+  const ic = Math.floor(rng() * 12) + 3;
+  const cc = Math.floor(rng() * 4) + 1;
+  const pc = preset.vendorsApplied || Math.floor(rng() * 6) + 1;
+  return {
+    id: preset.id,
+    ruleNo: `PRE-${(preset.id.split("-")[1] || "0").padStart(3, "0")}`,
+    name: preset.name,
+    category: (preset.category === "all" ? "discount" : preset.category) as "discount" | "premium",
+    basis: preset.basis,
+    tierType: preset.tierType,
+    totalTiers: preset.totalTiers,
+    description: preset.description,
+    aboutText: preset.aboutText || preset.description,
+    status: "Active",
+    scope: "both",
+    validFrom: "Jan 01, 2025",
+    validTo: "Dec 31, 2025",
+    hasDateLimit: false,
+    durationDays: 365,
+    itemCount: ic,
+    categoryCount: cc,
+    partnerCount: pc,
+    tiers: preset.tiers.map(t => ({ minQty: t.minValue, maxQty: t.maxValue, discount: t.discount })),
+    createdBy: preset.id.startsWith("pr-custom-") ? "Ahtisham Ahmad" : "Omnesoft",
+    createdDate: "Mar 01, 2025",
+    isPreset: !preset.id.startsWith("pr-custom-"),
+    items: genItems(rng, ic),
+    categories: genCategories(rng, cc),
+    partners: genPartners(rng, pc),
+  };
+}
+
+// ──────────────────────────────────────────────
 // Main Component
-// ───────────────────────��──────────────────────
+// ──────────────────────────────────────────────
 
 type SubTab = "vendor" | "customer";
 type CategoryView = "discount" | "premium";
