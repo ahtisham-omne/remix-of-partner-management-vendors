@@ -3455,6 +3455,13 @@ function ConfigPageContent({
     { event: "delivery", percent: "50" },
   ]);
 
+  // Shipping Methods section states (must be at top level, not inside conditional)
+  const [carrierSectionOpen, setCarrierSectionOpen] = useState(true);
+  const [vendorPrefSectionOpen, setVendorPrefSectionOpen] = useState(true);
+  const [carrierSearches, setCarrierSearches] = useState<Record<string, string>>({});
+  const [carrierDropdownOpen, setCarrierDropdownOpen] = useState<Record<string, boolean>>({});
+  const [methodDropdownOpen, setMethodDropdownOpen] = useState<Record<string, boolean>>({});
+
   const TRIGGER_TOOLTIPS: Record<string, string> = {
     order_confirmation: "Payment clock starts when the purchase order is confirmed by both parties.",
     production_start: "Payment clock starts when goods enter production or manufacturing begins.",
@@ -7465,14 +7472,7 @@ function ConfigPageContent({
       setVendorShippingPrefs((prev) => prev.map((s) => (s.id === id ? { ...s, ...updates } : s)));
     }
 
-    // ── Collapsible section states ──
-    const [carrierSectionOpen, setCarrierSectionOpen] = React.useState(true);
-    const [vendorPrefSectionOpen, setVendorPrefSectionOpen] = React.useState(true);
-
-    // ── Carrier search for Vendor Prefs ──
-    const [carrierSearches, setCarrierSearches] = React.useState<Record<string, string>>({});
-    const [carrierDropdownOpen, setCarrierDropdownOpen] = React.useState<Record<string, boolean>>({});
-    const [methodDropdownOpen, setMethodDropdownOpen] = React.useState<Record<string, boolean>>({});
+    // (Collapsible + search states moved to top of ConfigPageContent)
 
     return (
       <div className="space-y-4">
