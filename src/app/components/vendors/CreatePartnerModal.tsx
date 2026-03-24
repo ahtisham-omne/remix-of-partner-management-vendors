@@ -8004,29 +8004,17 @@ function ConfigPageContent({
                           </div>
                         </div>
 
-                        {/* Selected methods chips */}
+                        {/* Selected methods chips — single row with overflow */}
                         {selectedMethodIds.length > 0 && (
-                          <div className="flex flex-wrap gap-1.5 mt-1">
-                            {selectedMethodIds.map((mid) => {
-                              const method = carrierMethods.find((m) => m.id === mid);
-                              if (!method) return null;
-                              return (
-                                <span key={mid} className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-muted/50 border border-border text-[11px] text-foreground" style={{ fontWeight: 500 }}>
-                                  {method.name}
-                                  <span className="text-muted-foreground ml-0.5">{method.days}</span>
-                                  <button
-                                    onClick={() => {
-                                      const next = selectedMethodIds.filter((m) => m !== mid);
-                                      updateVendorShippingPref(entry.id, { methods: next.join(",") });
-                                    }}
-                                    className="ml-0.5 text-muted-foreground hover:text-destructive transition-colors"
-                                  >
-                                    <X className="w-3 h-3" />
-                                  </button>
-                                </span>
-                              );
-                            })}
-                          </div>
+                          <ShippingMethodChipsRow
+                            methods={selectedMethodIds
+                              .map((mid) => carrierMethods.find((m) => m.id === mid))
+                              .filter(Boolean) as Array<{ id: string; name: string; desc: string; days: string; isDefault?: boolean }>}
+                            onRemove={(mid) => {
+                              const next = selectedMethodIds.filter((m) => m !== mid);
+                              updateVendorShippingPref(entry.id, { methods: next.join(",") });
+                            }}
+                          />
                         )}
                       </div>
                     </div>
