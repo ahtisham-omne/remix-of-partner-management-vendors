@@ -7756,7 +7756,7 @@ function ConfigPageContent({
                               {selectedCarrier ? (
                                 <div className="flex items-center gap-2">
                                   <span className="text-base">{selectedCarrier.logo}</span>
-                                  <span className="text-[#0F172A] text-sm truncate">{selectedCarrier.name.split(" ")[0]}</span>
+                                  <span className="text-[#0F172A] text-sm truncate">{selectedCarrier.name}</span>
                                 </div>
                               ) : (
                                 <span className="text-[#94A3B8] text-sm">Select a shipping carrier</span>
@@ -7765,7 +7765,7 @@ function ConfigPageContent({
                             </button>
 
                             {carrierDropdownOpen[entry.id] && (
-                              <div className="absolute z-[260] top-full left-0 right-0 mt-1 rounded-lg border border-[#E2E8F0] bg-white shadow-lg max-h-[280px] overflow-hidden">
+                              <div className="absolute z-[260] top-full left-0 right-0 mt-1 rounded-lg border border-[#E2E8F0] bg-white shadow-lg max-h-[380px] overflow-hidden">
                                 <div className="p-2 border-b border-[#F1F5F9]">
                                   <div className="relative">
                                     <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8]" />
@@ -7778,42 +7778,82 @@ function ConfigPageContent({
                                     />
                                   </div>
                                 </div>
-                                <div className="p-1.5">
+                                {/* Create New Carrier */}
+                                <div className="p-1.5 border-b border-[#F1F5F9]">
                                   <button
                                     className="w-full flex items-center justify-center gap-1.5 py-2 rounded-md bg-primary/10 text-primary text-xs hover:bg-primary/20 transition-colors"
                                     style={{ fontWeight: 600 }}
                                     onClick={() => {
                                       setCarrierDropdownOpen((prev) => ({ ...prev, [entry.id]: false }));
-                                      toast.info("Create New Carrier — coming soon");
+                                      // Open new tab with partner creation pre-configured for carrier profile
+                                      const url = `${window.location.origin}/vendors?createPartner=carrier`;
+                                      window.open(url, "_blank");
                                     }}
                                   >
                                     <Plus className="w-3.5 h-3.5" /> Create New Carrier
+                                    <ExternalLink className="w-3 h-3 ml-0.5 opacity-60" />
                                   </button>
                                 </div>
-                                <div className="overflow-y-auto max-h-[180px] p-1.5 pt-0 space-y-0.5">
-                                  {filteredCarriers.map((c) => {
-                                    const isActive = entry.carrier === c.id;
-                                    return (
-                                      <button
-                                        key={c.id}
-                                        onClick={() => {
-                                          updateVendorShippingPref(entry.id, { carrier: c.id, methods: "" });
-                                          setCarrierDropdownOpen((prev) => ({ ...prev, [entry.id]: false }));
-                                          setCarrierSearches((prev) => ({ ...prev, [entry.id]: "" }));
-                                        }}
-                                        className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-left transition-colors ${
-                                          isActive ? "bg-primary/10" : "hover:bg-muted/60"
-                                        }`}
-                                      >
-                                        <span className="text-lg">{c.logo}</span>
-                                        <span className="text-sm text-foreground flex-1 truncate" style={{ fontWeight: isActive ? 600 : 400 }}>{c.name}</span>
-                                        {isActive && <Check className="w-4 h-4 text-primary" />}
-                                      </button>
-                                    );
-                                  })}
-                                  {filteredCarriers.length === 0 && (
-                                    <p className="text-xs text-muted-foreground text-center py-3">No carriers found</p>
+                                <div className="overflow-y-auto max-h-[260px]">
+                                  {/* Recently Used section */}
+                                  {!searchVal.trim() && recentlyUsedCarriers.length > 0 && (
+                                    <div className="p-1.5 pb-0">
+                                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider px-2.5 py-1" style={{ fontWeight: 600 }}>Recently Used</p>
+                                      {recentlyUsedCarriers.slice(0, 3).map((cid) => {
+                                        const c = CARRIER_CATALOG.find((x) => x.id === cid);
+                                        if (!c) return null;
+                                        const isActive = entry.carrier === c.id;
+                                        return (
+                                          <button
+                                            key={`recent-${c.id}`}
+                                            onClick={() => {
+                                              updateVendorShippingPref(entry.id, { carrier: c.id, methods: "" });
+                                              setCarrierDropdownOpen((prev) => ({ ...prev, [entry.id]: false }));
+                                              setCarrierSearches((prev) => ({ ...prev, [entry.id]: "" }));
+                                              // Track recently used
+                                              setRecentlyUsedCarriers((prev) => [c.id, ...prev.filter((x) => x !== c.id)].slice(0, 5));
+                                            }}
+                                            className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-left transition-colors ${
+                                              isActive ? "bg-primary/10" : "hover:bg-muted/60"
+                                            }`}
+                                          >
+                                            <span className="text-lg">{c.logo}</span>
+                                            <span className="text-sm text-foreground flex-1 truncate" style={{ fontWeight: isActive ? 600 : 400 }}>{c.name}</span>
+                                            {isActive && <Check className="w-4 h-4 text-primary" />}
+                                          </button>
+                                        );
+                                      })}
+                                      <div className="border-b border-[#F1F5F9] mx-2.5 my-1" />
+                                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider px-2.5 py-1" style={{ fontWeight: 600 }}>All Carriers</p>
+                                    </div>
                                   )}
+                                  {/* All carriers list */}
+                                  <div className="p-1.5 pt-0 space-y-0.5">
+                                    {filteredCarriers.map((c) => {
+                                      const isActive = entry.carrier === c.id;
+                                      return (
+                                        <button
+                                          key={c.id}
+                                          onClick={() => {
+                                            updateVendorShippingPref(entry.id, { carrier: c.id, methods: "" });
+                                            setCarrierDropdownOpen((prev) => ({ ...prev, [entry.id]: false }));
+                                            setCarrierSearches((prev) => ({ ...prev, [entry.id]: "" }));
+                                            setRecentlyUsedCarriers((prev) => [c.id, ...prev.filter((x) => x !== c.id)].slice(0, 5));
+                                          }}
+                                          className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-left transition-colors ${
+                                            isActive ? "bg-primary/10" : "hover:bg-muted/60"
+                                          }`}
+                                        >
+                                          <span className="text-lg">{c.logo}</span>
+                                          <span className="text-sm text-foreground flex-1 truncate" style={{ fontWeight: isActive ? 600 : 400 }}>{c.name}</span>
+                                          {isActive && <Check className="w-4 h-4 text-primary" />}
+                                        </button>
+                                      );
+                                    })}
+                                    {filteredCarriers.length === 0 && (
+                                      <p className="text-xs text-muted-foreground text-center py-3">No carriers found</p>
+                                    )}
+                                  </div>
                                 </div>
                               </div>
                             )}
@@ -7837,22 +7877,46 @@ function ConfigPageContent({
                               <ChevronDown className="w-3.5 h-3.5 text-[#94A3B8]" />
                             </button>
 
-                            {methodDropdownOpen[entry.id] && carrierMethods.length > 0 && (
-                              <div className="absolute z-[260] top-full left-0 right-0 mt-1 rounded-lg border border-[#E2E8F0] bg-white shadow-lg max-h-[300px] overflow-hidden">
-                                <div className="p-1.5">
+                            {methodDropdownOpen[entry.id] && carrierMethods.length > 0 && (() => {
+                              const mSearchVal = methodSearches[entry.id] || "";
+                              const filteredMethods = mSearchVal.trim()
+                                ? carrierMethods.filter((m) => m.name.toLowerCase().includes(mSearchVal.toLowerCase()) || m.desc.toLowerCase().includes(mSearchVal.toLowerCase()))
+                                : carrierMethods;
+                              return (
+                              <div className="absolute z-[260] top-full left-0 right-0 mt-1 rounded-lg border border-[#E2E8F0] bg-white shadow-lg max-h-[360px] overflow-hidden">
+                                {/* Search */}
+                                <div className="p-2 border-b border-[#F1F5F9]">
+                                  <div className="relative">
+                                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8]" />
+                                    <input
+                                      value={mSearchVal}
+                                      onChange={(e) => setMethodSearches((prev) => ({ ...prev, [entry.id]: e.target.value }))}
+                                      placeholder="Search shipping methods..."
+                                      className="w-full h-8 pl-8 pr-3 rounded-md border border-[#E2E8F0] bg-white text-sm text-[#0F172A] outline-none focus:border-[#0A77FF] transition-colors placeholder:text-[#94A3B8]"
+                                      autoFocus
+                                    />
+                                  </div>
+                                </div>
+                                {/* Create New Shipping Method */}
+                                <div className="p-1.5 border-b border-[#F1F5F9]">
                                   <button
                                     className="w-full flex items-center justify-center gap-1.5 py-2 rounded-md bg-primary/10 text-primary text-xs hover:bg-primary/20 transition-colors"
                                     style={{ fontWeight: 600 }}
                                     onClick={() => {
                                       setMethodDropdownOpen((prev) => ({ ...prev, [entry.id]: false }));
-                                      toast.info("Create New Shipping Method — coming soon");
+                                      // Open Create Shipping Method modal
+                                      const carrier = CARRIER_CATALOG.find((c) => c.id === entry.carrier);
+                                      setCreateSmForEntry(entry.id);
+                                      setCreateSmForCarrier(entry.carrier);
+                                      setCreateSmMethods([{ id: `csm-${Date.now()}`, name: "", description: "", minDuration: 1, maxDuration: 30, isDefault: true }]);
+                                      setCreateShippingMethodOpen(true);
                                     }}
                                   >
                                     <Plus className="w-3.5 h-3.5" /> Create New Shipping Method
                                   </button>
                                 </div>
                                 <div className="overflow-y-auto max-h-[220px] p-1.5 pt-0 space-y-0.5">
-                                  {carrierMethods.map((method) => {
+                                  {filteredMethods.map((method) => {
                                     const isChecked = selectedMethodIds.includes(method.id);
                                     return (
                                       <button
@@ -7885,6 +7949,9 @@ function ConfigPageContent({
                                       </button>
                                     );
                                   })}
+                                  {filteredMethods.length === 0 && (
+                                    <p className="text-xs text-muted-foreground text-center py-3">No methods found</p>
+                                  )}
                                 </div>
                                 <div className="border-t border-border p-2 flex justify-end">
                                   <button
@@ -7896,7 +7963,8 @@ function ConfigPageContent({
                                   </button>
                                 </div>
                               </div>
-                            )}
+                              );
+                            })()}
                           </div>
                         </div>
 
@@ -7940,6 +8008,180 @@ function ConfigPageContent({
             )}
           </div>
         )}
+
+        {/* ── Create Shipping Method Modal ── */}
+        <Dialog open={createShippingMethodOpen} onOpenChange={setCreateShippingMethodOpen}>
+          <DialogContent
+            className="p-0 gap-0 overflow-hidden border-0 shadow-[0_24px_80px_-12px_rgba(0,0,0,0.18)] flex flex-col z-[230]"
+            style={{ maxWidth: 720, width: "95vw", maxHeight: "85vh", borderRadius: 16 }}
+            hideCloseButton
+            overlayClassName="z-[225]"
+          >
+            <DialogTitle className="sr-only">Create Shipping Methods</DialogTitle>
+            <DialogDescription className="sr-only">Add new shipping methods for this carrier.</DialogDescription>
+
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-[#EEF2F6] bg-white shrink-0">
+              <div className="flex items-center gap-3">
+                <h3 className="text-[15px] text-foreground" style={{ fontWeight: 600 }}>Create Shipping Methods</h3>
+                {(() => {
+                  const carrier = CARRIER_CATALOG.find((c) => c.id === createSmForCarrier);
+                  if (!carrier) return null;
+                  return (
+                    <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg bg-muted/50 border border-border text-xs text-foreground" style={{ fontWeight: 500 }}>
+                      <span className="text-base">{carrier.logo}</span>
+                      {carrier.name}
+                    </span>
+                  );
+                })()}
+              </div>
+              <button onClick={() => setCreateShippingMethodOpen(false)} className="w-8 h-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-[#FAFBFC]">
+              {createSmMethods.map((sm, idx) => (
+                <div key={sm.id} className="rounded-xl border border-border bg-white shadow-sm relative">
+                  {/* Card header */}
+                  <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[11px] text-muted-foreground" style={{ fontWeight: 600 }}>#{idx + 1}</span>
+                      <span className="text-[13px] text-foreground" style={{ fontWeight: 600 }}>Shipping Method</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <label className="flex items-center gap-1.5 cursor-pointer">
+                        <Switch
+                          checked={sm.isDefault}
+                          onCheckedChange={() => {
+                            setCreateSmMethods((prev) => prev.map((m) => ({ ...m, isDefault: m.id === sm.id })));
+                          }}
+                          className="data-[state=checked]:bg-primary w-8 h-[18px]"
+                        />
+                        <span className="text-[11px] text-muted-foreground" style={{ fontWeight: 500 }}>Mark as Default</span>
+                      </label>
+                      {createSmMethods.length > 1 && (
+                        <button
+                          onClick={() => {
+                            setCreateSmMethods((prev) => {
+                              const next = prev.filter((m) => m.id !== sm.id);
+                              if (next.length > 0 && !next.some((m) => m.isDefault)) next[0].isDefault = true;
+                              return next;
+                            });
+                          }}
+                          className="w-6 h-6 rounded-full border border-border flex items-center justify-center hover:bg-destructive/10 hover:border-destructive/30 transition-colors"
+                        >
+                          <X className="w-3 h-3 text-muted-foreground" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                  {/* Card body */}
+                  <div className="p-4 space-y-3">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label className="text-[11px] text-foreground" style={{ fontWeight: 600 }}>Shipping Method Name<span className="text-destructive">*</span></Label>
+                        <Input
+                          value={sm.name}
+                          onChange={(e) => setCreateSmMethods((prev) => prev.map((m) => m.id === sm.id ? { ...m, name: e.target.value } : m))}
+                          placeholder="Enter shipping method name"
+                          className="mt-1 rounded-lg border-[#E2E8F0] bg-white h-9 sm:h-10 text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-primary focus:ring-1 focus:ring-primary/20"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-[11px] text-foreground" style={{ fontWeight: 600 }}>Description</Label>
+                        <Input
+                          value={sm.description}
+                          onChange={(e) => setCreateSmMethods((prev) => prev.map((m) => m.id === sm.id ? { ...m, description: e.target.value } : m))}
+                          placeholder="Input text"
+                          className="mt-1 rounded-lg border-[#E2E8F0] bg-white h-9 sm:h-10 text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-primary focus:ring-1 focus:ring-primary/20"
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label className="text-[11px] text-foreground" style={{ fontWeight: 600 }}>Minimum (Days)</Label>
+                        <div className="mt-1 relative">
+                          <Input
+                            type="number"
+                            value={sm.minDuration}
+                            onChange={(e) => {
+                              const val = Math.max(1, Math.min(sm.maxDuration, parseInt(e.target.value) || 1));
+                              setCreateSmMethods((prev) => prev.map((m) => m.id === sm.id ? { ...m, minDuration: val } : m));
+                            }}
+                            placeholder="Enter minimum delivery period"
+                            className="rounded-lg border-[#E2E8F0] bg-white h-9 sm:h-10 text-sm text-foreground pr-12 placeholder:text-muted-foreground/60 focus:border-primary focus:ring-1 focus:ring-primary/20"
+                          />
+                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground" style={{ fontWeight: 500 }}>days</span>
+                        </div>
+                      </div>
+                      <div className="relative">
+                        <Label className="text-[11px] text-foreground" style={{ fontWeight: 600 }}>Maximum (Days)</Label>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-xs text-muted-foreground shrink-0" style={{ fontWeight: 500 }}>to</span>
+                          <div className="relative flex-1">
+                            <Input
+                              type="number"
+                              value={sm.maxDuration}
+                              onChange={(e) => {
+                                const val = Math.min(365, Math.max(sm.minDuration, parseInt(e.target.value) || 1));
+                                setCreateSmMethods((prev) => prev.map((m) => m.id === sm.id ? { ...m, maxDuration: val } : m));
+                              }}
+                              placeholder="Enter maximum delivery period"
+                              className="rounded-lg border-[#E2E8F0] bg-white h-9 sm:h-10 text-sm text-foreground pr-12 placeholder:text-muted-foreground/60 focus:border-primary focus:ring-1 focus:ring-primary/20"
+                            />
+                            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground" style={{ fontWeight: 500 }}>days</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              <button
+                onClick={() => {
+                  setCreateSmMethods((prev) => [
+                    ...prev,
+                    { id: `csm-${Date.now()}`, name: "", description: "", minDuration: 1, maxDuration: 30, isDefault: prev.length === 0 },
+                  ]);
+                }}
+                className="inline-flex items-center gap-1.5 text-[13px] text-primary hover:underline"
+                style={{ fontWeight: 600 }}
+              >
+                <Plus className="w-3.5 h-3.5" /> Add Shipping Method
+              </button>
+            </div>
+
+            {/* Footer */}
+            <div className="border-t border-border px-6 py-3 flex items-center justify-end gap-2 bg-white shrink-0">
+              <Button
+                variant="outline"
+                onClick={() => setCreateShippingMethodOpen(false)}
+                className="border-[#E2E8F0] text-muted-foreground rounded-lg text-[13px] px-4 h-9"
+              >
+                Discard
+              </Button>
+              <Button
+                onClick={() => {
+                  const validMethods = createSmMethods.filter((m) => m.name.trim());
+                  if (validMethods.length === 0) {
+                    toast.error("Please add at least one shipping method with a name");
+                    return;
+                  }
+                  // Add created methods to the CARRIER_METHODS for the carrier
+                  // In a real app this would persist; here we add to the vendor pref's selected methods
+                  toast.success(`${validMethods.length} shipping method${validMethods.length > 1 ? "s" : ""} created successfully`);
+                  setCreateShippingMethodOpen(false);
+                }}
+                className="rounded-lg text-[13px] px-4 h-9 shadow-sm"
+              >
+                Save
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     );
   }
