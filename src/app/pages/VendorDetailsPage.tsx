@@ -2399,7 +2399,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
   const [selectedLocation, setSelectedLocation] = useState<PartnerLocationData | null>(null);
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
-  const [locDetailTab, setLocDetailTab] = useState("overview");
+  const [locDetailTab, setLocDetailTab] = useState("poc");
   const [locAboutOpen, setLocAboutOpen] = useState(true);
   const [locPocOpen, setLocPocOpen] = useState(true);
   const [locBillingOpen, setLocBillingOpen] = useState(true);
