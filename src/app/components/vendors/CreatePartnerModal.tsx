@@ -605,8 +605,8 @@ export function CreatePartnerModal({ open, onOpenChange, onPartnerCreated, initi
                     );
                   }
 
-                  if (!isSeller) {
-                    // State 2: Enabled non-seller — Coming Soon with educational copy & Omne branding
+                  if (!isSeller && activeSubTypeTab !== "carrier") {
+                    // State 2: Enabled non-seller (except carrier) — Coming Soon with educational copy & Omne branding
                     return (
                       <div className="absolute inset-0 z-10 flex items-center justify-center bg-white overflow-hidden">
                         {/* Orbiting rings in light blue tints */}
@@ -637,7 +637,7 @@ export function CreatePartnerModal({ open, onOpenChange, onPartnerCreated, initi
                     );
                   }
 
-                  // State 3: Seller enabled — show full config
+                  // State 3: Seller or Carrier enabled — show full config
                   return (
                     <div className="p-4">
                       <ConfigPageContent
