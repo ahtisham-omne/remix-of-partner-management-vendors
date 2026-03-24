@@ -6685,7 +6685,10 @@ function ConfigPageContent({
                           rule={rule}
                           isApplied={selectedPricingRuleIds.includes(rule.id)}
                           searchText={prSearch}
-                          onClick={() => setPreviewPricingRuleId(rule.id)}
+                          onClick={() => {
+                            setPrDetailRule(presetToPricingRule(rule));
+                            setPrDetailOpen(true);
+                          }}
                           onApply={() => {
                             setSelectedPricingRuleIds((prev) => prev.includes(rule.id) ? prev : [...prev, rule.id]);
                             setPricingRulesModalOpen(false);
