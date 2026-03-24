@@ -91,7 +91,7 @@ import {
 // Types
 // ──────────────────────────────────────────────
 
-interface TierData {
+export interface TierData {
   minQty: string;
   maxQty: string;
   discount: string;
@@ -127,7 +127,7 @@ interface AssociatedPartner {
   status: "Active" | "Inactive";
 }
 
-interface PricingRule {
+export interface PricingRule {
   id: string;
   ruleNo: string;
   name: string;
@@ -849,7 +849,7 @@ function ItemTypeBadge({ type }: { type: string }) {
   );
 }
 
-function DetailModal({ rule, open, onClose, mode = "create", onApply, onDuplicate, onDisable }: { rule: PricingRule | null; open: boolean; onClose: () => void; mode?: "view" | "create"; onApply?: (rule: PricingRule) => void; onDuplicate?: (rule: PricingRule) => void; onDisable?: (rule: PricingRule) => void }) {
+export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", onApply, onDuplicate, onDisable }: { rule: PricingRule | null; open: boolean; onClose: () => void; mode?: "view" | "create"; onApply?: (rule: PricingRule) => void; onDuplicate?: (rule: PricingRule) => void; onDisable?: (rule: PricingRule) => void }) {
   const [tab, setTab] = useState<string>("items");
   const [itemSearch, setItemSearch] = useState("");
   const [catSearch, setCatSearch] = useState("");
@@ -892,8 +892,9 @@ function DetailModal({ rule, open, onClose, mode = "create", onApply, onDuplicat
   return (
     <Dialog open={open} onOpenChange={(v) => { if (!v) { onClose(); setIsFullscreen(false); setTab("items"); } }}>
       <DialogContent
-        className={`flex flex-col p-0 gap-0 border-0 sm:border z-[200] ${modalSizeClass}`}
+        className={`flex flex-col p-0 gap-0 border-0 sm:border z-[220] ${modalSizeClass}`}
         hideCloseButton
+        overlayClassName="z-[215]"
         style={{ boxShadow: "0 24px 48px -12px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.05)" }}
       >
         <DialogTitle className="sr-only">Pricing Rule Details — {rule.name}</DialogTitle>
@@ -1406,8 +1407,45 @@ function DetailModal({ rule, open, onClose, mode = "create", onApply, onDuplicat
 }
 
 // ──────────────────────────────────────────────
+// Helper: Convert PricingRulePreset → PricingRule for DetailModal
+// ──────────────────────────────────────────────
+export function presetToPricingRule(preset: import("./partnerConstants").PricingRulePreset): PricingRule {
+  const rng = seededRng(preset.id.split("").reduce((a, c) => a + c.charCodeAt(0), 0) * 1000);
+  const ic = Math.floor(rng() * 12) + 3;
+  const cc = Math.floor(rng() * 4) + 1;
+  const pc = preset.vendorsApplied || Math.floor(rng() * 6) + 1;
+  return {
+    id: preset.id,
+    ruleNo: `PRE-${(preset.id.split("-")[1] || "0").padStart(3, "0")}`,
+    name: preset.name,
+    category: (preset.category === "all" ? "discount" : preset.category) as "discount" | "premium",
+    basis: preset.basis,
+    tierType: preset.tierType,
+    totalTiers: preset.totalTiers,
+    description: preset.description,
+    aboutText: preset.aboutText || preset.description,
+    status: "Active",
+    scope: "both",
+    validFrom: "Jan 01, 2025",
+    validTo: "Dec 31, 2025",
+    hasDateLimit: false,
+    durationDays: 365,
+    itemCount: ic,
+    categoryCount: cc,
+    partnerCount: pc,
+    tiers: preset.tiers.map(t => ({ minQty: t.minValue, maxQty: t.maxValue, discount: t.discount })),
+    createdBy: preset.id.startsWith("pr-custom-") ? "Ahtisham Ahmad" : "Omnesoft",
+    createdDate: "Mar 01, 2025",
+    isPreset: !preset.id.startsWith("pr-custom-"),
+    items: genItems(rng, ic),
+    categories: genCategories(rng, cc),
+    partners: genPartners(rng, pc),
+  };
+}
+
+// ──────────────────────────────────────────────
 // Main Component
-// ───────────────────────��──────────────────────
+// ──────────────────────────────────────────────
 
 type SubTab = "vendor" | "customer";
 type CategoryView = "discount" | "premium";
@@ -1590,7 +1628,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
 
   return (
     <div className="border border-border rounded-xl bg-card overflow-clip flex flex-col" style={{ minHeight: 400 }}>
-      <DetailModal rule={selectedRule} open={detailOpen} onClose={() => setDetailOpen(false)} mode={detailMode} onApply={(r) => { toast.success(`"${r.name}" applied to this partner.`); }} onDuplicate={(r) => toast.info(`Duplicated "${r.name}"`)} onDisable={(r) => toast.success(`"${r.name}" disabled`)} />
+      <PricingRuleDetailModal rule={selectedRule} open={detailOpen} onClose={() => setDetailOpen(false)} mode={detailMode} onApply={(r) => { toast.success(`"${r.name}" applied to this partner.`); }} onDuplicate={(r) => toast.info(`Duplicated "${r.name}"`)} onDisable={(r) => toast.success(`"${r.name}" disabled`)} />
 
       {/* Sub-tabs */}
       <div className="flex items-center border-b border-[#EEF2F6] bg-[#F8FAFC] shrink-0">

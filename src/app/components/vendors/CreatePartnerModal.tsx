@@ -126,6 +126,7 @@ import { getAvatarTint } from "../../utils/avatarTints";
 import { GroupChipsRow } from "./GroupChipsRow";
 import { FilterPills } from "./FilterPills";
 import { PaymentTermDetailModal } from "./PaymentTermDetailModal";
+import { PricingRuleDetailModal, presetToPricingRule, type PricingRule } from "./PricingRulesTab";
 import { PaymentTermCard } from "./PaymentTermCard";
 import { PaymentMethodsSection } from "./PaymentMethodsSection";
 import {
@@ -3675,6 +3676,9 @@ function ConfigPageContent({
   const [createPrMode, setCreatePrMode] = useState<"create" | "view">("create");
   const [editingPrRuleId, setEditingPrRuleId] = useState<string | null>(null);
 
+  // ── Shared Pricing Rule Detail Modal (reuses PricingRulesTab's DetailModal) ──
+  const [prDetailRule, setPrDetailRule] = useState<PricingRule | null>(null);
+  const [prDetailOpen, setPrDetailOpen] = useState(false);
   interface CpmItemRow { id: string; partNo: string; description: string; category: string; itemType: string; status: "Active" | "Inactive"; }
   interface CpmCatRow { id: string; code: string; name: string; description: string; linkedItems: number; status: "Active" | "Inactive"; }
   interface CpmAttachment { id: string; name: string; size: string; type: string; uploadedAt: string; }
@@ -3762,44 +3766,9 @@ function ConfigPageContent({
   function cpmRemoveAttachment(id: string) { setCpmAttachments(prev => prev.filter(a => a.id !== id)); }
 
   function handleOpenRuleDetails(rule: PricingRulePreset) {
-    setCreatePrMode("view");
-    setEditingPrRuleId(rule.id);
-    setCreatePrName(rule.name);
-    setCreatePrDescription(rule.description);
-    setCreatePrCategory(rule.category === "all" ? "discount" : rule.category);
-    setCreatePrBasis(rule.basis);
-    const tiers: CpmTierState[] = rule.tiers.map(t => {
-      const discVal = t.discount?.replace(/[%$]/g, "") || "";
-      const isFix = t.discount?.includes("$") || false;
-      return {
-        discount: discVal,
-        fixRate: isFix,
-        qtyLimits: t.minValue !== "-" || t.maxValue !== "-",
-        minQty: t.minValue === "-" ? "" : t.minValue.replace(/[,$]/g, ""),
-        maxQty: t.maxValue === "-" ? "" : t.maxValue.replace(/[,$]/g, ""),
-      };
-    });
-    setCreatePrTiers(tiers.length > 0 ? tiers : [makeCpmTier()]);
-    setCreatePrLimitDateRange(true);
-    setCreatePrValidFrom("2025-04-01");
-    setCreatePrValidTo("2025-12-31");
-    const isCustom = rule.id.startsWith("pr-custom-");
-    if (!isCustom) {
-      setCpmSelectedItems(CPM_AVAILABLE_ITEMS.slice(0, Math.min(3, Math.floor(rule.vendorsApplied / 2) + 1)));
-      setCpmSelectedCats(CPM_AVAILABLE_CATS.slice(0, Math.min(2, Math.floor(rule.vendorsApplied / 3) + 1)));
-    } else {
-      setCpmSelectedItems([]);
-      setCpmSelectedCats([]);
-    }
-    setCpmAttachments([]);
-    setCreatePrStep(1);
-    setCreatePrItemsTab("items");
-    setCpmItemSearch("");
-    setCpmCatSearch("");
-    setCpmShowItemPicker(false);
-    setCpmShowCatPicker(false);
-    setCreatePrFullscreen(false);
-    setCreatePrModalOpen(true);
+    const converted = presetToPricingRule(rule);
+    setPrDetailRule(converted);
+    setPrDetailOpen(true);
   }
 
   // ── Preview-panel editable state ──
@@ -5852,6 +5821,22 @@ function ConfigPageContent({
           mode="create"
           onApply={(t) => { setSelectedPaymentTermId(t.id); setPaymentTermsModalOpen(false); }}
           onDuplicate={(t) => handleDuplicatePaymentTerm(t)}
+        />
+
+        {/* Shared Pricing Rule Detail Modal (same as VendorDetailsPage) */}
+        <PricingRuleDetailModal
+          rule={prDetailRule}
+          open={prDetailOpen}
+          onClose={() => { setPrDetailOpen(false); setPrDetailRule(null); }}
+          mode="create"
+          onApply={(r) => {
+            toast.success(`"${r.name}" applied to this partner.`);
+            setPrDetailOpen(false);
+          }}
+          onDuplicate={(r) => {
+            toast.info(`Duplicated "${r.name}"`);
+            setPrDetailOpen(false);
+          }}
         />
       </div>
     );
