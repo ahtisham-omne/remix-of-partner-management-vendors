@@ -1,4 +1,12 @@
 import React, { useState, useMemo, useCallback, useRef, useEffect, type ReactNode } from "react";
+import fedexLogo from "@/assets/carriers/fedex.png";
+import dhlLogo from "@/assets/carriers/dhl.png";
+import upsLogo from "@/assets/carriers/ups.png";
+import tcsLogo from "@/assets/carriers/tcs.png";
+import sfLogo from "@/assets/carriers/sf.png";
+import uspsLogo from "@/assets/carriers/usps.png";
+import aramexLogo from "@/assets/carriers/aramex.png";
+import maerskLogo from "@/assets/carriers/maersk.png";
 import {
   Dialog,
   DialogContent,
