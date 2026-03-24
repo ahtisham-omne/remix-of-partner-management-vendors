@@ -2707,18 +2707,42 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                         alt={loc.name}
                         className="w-full h-full object-cover transition-transform duration-300 group-hover/card:scale-105"
                       />
-                      {/* "NEW" badge for freshly created */}
-                      {isHighlighted && (
-                        <div className="absolute top-2.5 left-2.5 z-10">
+                      {/* Bottom-left: Status + Country pills on image */}
+                      <div className="absolute bottom-2.5 left-2.5 flex items-center gap-1.5 z-10">
+                        {isHighlighted && (
                           <span
-                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#0A77FF] text-white text-[10px] tracking-wider uppercase shadow-sm"
-                            style={{ fontWeight: 700 }}
+                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] tracking-wider uppercase shadow-sm backdrop-blur-sm"
+                            style={{ fontWeight: 700, backgroundColor: "rgba(10,119,255,0.9)", color: "#fff" }}
                           >
                             <Sparkles className="w-3 h-3" />
                             NEW
                           </span>
-                        </div>
-                      )}
+                        )}
+                        <span
+                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10.5px] shadow-sm backdrop-blur-sm border"
+                          style={{
+                            fontWeight: 600,
+                            backgroundColor: loc.status === "active" ? "rgba(236,253,245,0.92)" : "rgba(255,251,235,0.92)",
+                            color: loc.status === "active" ? "#065F46" : "#92400E",
+                            borderColor: loc.status === "active" ? "#A7F3D0" : "#FDE68A",
+                          }}
+                        >
+                          <span className="w-[5px] h-[5px] rounded-full" style={{ backgroundColor: loc.status === "active" ? "#059669" : "#D97706" }} />
+                          {loc.status === "active" ? "Active" : "Inactive"}
+                        </span>
+                        <span
+                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10.5px] shadow-sm backdrop-blur-sm border"
+                          style={{
+                            fontWeight: 500,
+                            backgroundColor: "rgba(241,245,249,0.92)",
+                            color: "#334155",
+                            borderColor: "#CBD5E1",
+                          }}
+                        >
+                          <Globe className="w-3 h-3" />
+                          {loc.country}
+                        </span>
+                      </div>
                       {/* 3-dot menu on image */}
                       <div className="absolute top-2.5 right-2.5">
                         <DropdownMenu>
@@ -2744,21 +2768,6 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
 
                     {/* Card Body */}
                     <div className="flex flex-col flex-1">
-                      {/* Status + Country row */}
-                      <div className="px-3.5 pt-3 pb-0 flex items-center gap-1.5">
-                        <span
-                          className="inline-flex items-center gap-1 text-[10.5px]"
-                          style={{
-                            fontWeight: 600,
-                            color: loc.status === "active" ? "#15803D" : "#DC2626",
-                          }}
-                        >
-                          <span className="w-[5px] h-[5px] rounded-full" style={{ backgroundColor: loc.status === "active" ? "#22C55E" : "#EF4444" }} />
-                          {loc.status === "active" ? "ACTIVE" : "INACTIVE"}
-                        </span>
-                        <span className="text-[#CBD5E1] text-[10px]">·</span>
-                        <span className="text-[10.5px] text-[#64748B]" style={{ fontWeight: 500 }}>{loc.country}</span>
-                      </div>
 
                       {/* Title + Address */}
                       <div className="px-3.5 pt-1.5 pb-0">
