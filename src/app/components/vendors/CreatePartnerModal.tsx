@@ -8049,7 +8049,7 @@ function ConfigPageContent({
         {/* ── Create New Point of Contact Modal ── */}
         <Dialog open={showCreatePocModal} onOpenChange={setShowCreatePocModal}>
           <DialogContent
-            className="w-full max-w-none rounded-none sm:rounded-2xl sm:max-w-[640px] max-h-[100dvh] h-auto flex flex-col p-0 gap-0 sm:max-h-[92vh]"
+            className="w-full max-w-none rounded-none sm:rounded-2xl sm:max-w-[640px] max-h-[100dvh] h-auto flex flex-col p-0 gap-0 sm:max-h-fit"
             style={{ zIndex: 210 }}
             hideCloseButton
           >
