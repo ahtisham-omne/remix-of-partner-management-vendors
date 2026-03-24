@@ -909,29 +909,41 @@ function DetailModal({ rule, open, onClose, mode = "create", onApply, onDuplicat
               <h2 className="text-sm text-[#0F172A] truncate" style={{ fontWeight: 600 }}>Pricing Rule Details</h2>
             </div>
             <div className="flex items-center gap-1.5 shrink-0">
-              <button
-                onClick={() => !isPreset && toast.info("Edit coming soon")}
-                disabled={isPreset}
-                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#334155] hover:bg-[#F8FAFC] transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white"
-                style={{ fontWeight: 500 }}
-              >
-                <Pencil className="w-3.5 h-3.5" /> Edit
-              </button>
-              <button
-                onClick={() => !isPreset && toast.info("Archive coming soon")}
-                disabled={isPreset}
-                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#334155] hover:bg-[#F8FAFC] transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white"
-                style={{ fontWeight: 500 }}
-              >
-                <Archive className="w-3.5 h-3.5" /> Archive
-              </button>
-              <button
-                onClick={() => toast.info("Disable coming soon")}
-                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#334155] hover:bg-[#F8FAFC] transition-colors cursor-pointer"
-                style={{ fontWeight: 500 }}
-              >
-                <ToggleLeft className="w-3.5 h-3.5" /> Disable
-              </button>
+              {mode === "view" && (
+                <>
+                  <button
+                    onClick={() => !isPreset && toast.info("Edit coming soon")}
+                    disabled={isPreset}
+                    className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#334155] hover:bg-[#F8FAFC] transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white"
+                    style={{ fontWeight: 500 }}
+                  >
+                    <Pencil className="w-3.5 h-3.5" /> Edit
+                  </button>
+                  <button
+                    onClick={() => !isPreset && toast.info("Archive coming soon")}
+                    disabled={isPreset}
+                    className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#334155] hover:bg-[#F8FAFC] transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white"
+                    style={{ fontWeight: 500 }}
+                  >
+                    <Archive className="w-3.5 h-3.5" /> Archive
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (rule && onDisable) {
+                        onDisable(rule);
+                        toast.success(`"${rule.name}" has been disabled`);
+                        onClose();
+                      } else {
+                        toast.info("Disable coming soon");
+                      }
+                    }}
+                    className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#334155] hover:bg-[#F8FAFC] transition-colors cursor-pointer"
+                    style={{ fontWeight: 500 }}
+                  >
+                    <ToggleLeft className="w-3.5 h-3.5" /> Disable
+                  </button>
+                </>
+              )}
               <button onClick={() => setIsFullscreen(!isFullscreen)} className="w-8 h-8 rounded-lg border border-[#E2E8F0] bg-white flex items-center justify-center text-[#64748B] hover:text-[#334155] hover:bg-[#F8FAFC] transition-all cursor-pointer">
                 {isFullscreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
               </button>
