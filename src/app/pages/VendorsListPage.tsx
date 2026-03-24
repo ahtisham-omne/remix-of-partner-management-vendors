@@ -178,6 +178,7 @@ import { getAvatarTint } from "../utils/avatarTints";
 /* Partners listing — lazy loaded via routes.ts */
 export function VendorsListPage() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { vendors, getVendor, addVendor, updateVendor, archiveVendor, restoreVendor, deleteVendor } = useVendors();
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -195,6 +196,23 @@ export function VendorsListPage() {
   const [advFilters, setAdvFilters] = useState<AdvancedFilters>({ ...DEFAULT_FILTERS });
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [createModalOpen, setCreateModalOpen] = useState(false);
+
+  // Read URL param for auto-opening create modal with a specific profile
+  const createPartnerProfile = searchParams.get("createPartner");
+  useEffect(() => {
+    if (createPartnerProfile) {
+      setCreateModalOpen(true);
+    }
+  }, [createPartnerProfile]);
+
+  const handleCreateModalClose = useCallback((open: boolean) => {
+    setCreateModalOpen(open);
+    if (!open && createPartnerProfile) {
+      // Clear the URL param when modal closes
+      searchParams.delete("createPartner");
+      setSearchParams(searchParams, { replace: true });
+    }
+  }, [createPartnerProfile, searchParams, setSearchParams]);
 
   // Track newly created vendor for flash animation
   const [newlyCreatedId, setNewlyCreatedId] = useState<string | null>(null);
