@@ -3222,10 +3222,24 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
             ];
 
             const LOC_CARRIER_DATA = [
-              { id: "C-1", name: "FedEx Express", desc: "For fastest delivery in USA", method: "FedEx Express (Air)", methodDesc: "A cost-effective shipping method that uses road transportation to deliver packages.", minDays: 1, maxDays: 2, isDefault: true },
-              { id: "C-2", name: "TCS (Tranzum Courier)", desc: "Get your packages delivered in record time", method: "Ocean Freight (Sea)", methodDesc: "A budget-friendly delivery option that relies on road transportation.", minDays: 5, maxDays: 6, isDefault: true },
-              { id: "C-3", name: "DHL Express", desc: "Experience lightning-fast shipping throughout the U.S.", method: "Ground Shipping (Land)", methodDesc: "An affordable shipping solution utilizing road transport for package delivery.", minDays: 3, maxDays: 4, isDefault: true },
-              { id: "C-4", name: "UPS (United Parcel Service)", desc: "Enjoy rapid shipping services all over the U.S.", method: "Express Delivery (Air)", methodDesc: "A cost-efficient method for shipping that employs road transport to deliver parcels.", minDays: 7, maxDays: 8, isDefault: true },
+              { id: "C-1", name: "FedEx Express", desc: "For fastest delivery in USA", isDefault: true, status: "active" as const, methods: [
+                { id: "M-1", name: "FedEx Express (Air)", desc: "Premium air freight for time-critical shipments.", minDays: 1, maxDays: 2, isDefault: true, cost: "$45.00" },
+                { id: "M-2", name: "FedEx Ground", desc: "Cost-effective road transportation for standard deliveries.", minDays: 3, maxDays: 5, isDefault: false, cost: "$12.50" },
+                { id: "M-3", name: "FedEx Freight (LTL)", desc: "Less-than-truckload freight for larger shipments.", minDays: 5, maxDays: 7, isDefault: false, cost: "$85.00" },
+              ]},
+              { id: "C-2", name: "TCS (Tranzum Courier)", desc: "Regional courier with strong South Asian network coverage", isDefault: false, status: "active" as const, methods: [
+                { id: "M-4", name: "Ocean Freight (Sea)", desc: "Budget-friendly bulk shipping via sea routes.", minDays: 15, maxDays: 30, isDefault: true, cost: "$8.00" },
+                { id: "M-5", name: "TCS Overnight", desc: "Next-day delivery within covered regions.", minDays: 1, maxDays: 1, isDefault: false, cost: "$22.00" },
+              ]},
+              { id: "C-3", name: "DHL Express", desc: "International express shipping with global reach", isDefault: true, status: "active" as const, methods: [
+                { id: "M-6", name: "DHL Express Worldwide", desc: "Door-to-door international express delivery.", minDays: 2, maxDays: 4, isDefault: true, cost: "$55.00" },
+                { id: "M-7", name: "DHL Economy Select", desc: "Affordable road freight for less urgent shipments.", minDays: 5, maxDays: 8, isDefault: false, cost: "$18.00" },
+                { id: "M-8", name: "DHL Global Forwarding", desc: "Custom logistics solutions for complex supply chains.", minDays: 7, maxDays: 14, isDefault: false, cost: "$120.00" },
+                { id: "M-9", name: "DHL Same Day", desc: "Urgent same-day delivery within metro areas.", minDays: 0, maxDays: 1, isDefault: false, cost: "$95.00" },
+              ]},
+              { id: "C-4", name: "UPS (United Parcel Service)", desc: "Reliable domestic and international parcel service", isDefault: false, status: "inactive" as const, methods: [
+                { id: "M-10", name: "UPS Ground", desc: "Standard ground shipping across the continental US.", minDays: 3, maxDays: 5, isDefault: true, cost: "$11.00" },
+              ]},
             ];
 
             const LOC_PRICING_DATA = [
