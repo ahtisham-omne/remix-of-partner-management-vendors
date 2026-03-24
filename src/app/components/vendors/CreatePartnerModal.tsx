@@ -7577,21 +7577,21 @@ function ConfigPageContent({
                     <div className="p-3.5 space-y-3">
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <Label className="text-[11px] text-foreground" style={{ fontWeight: 600 }}>Shipping Method Name<span className="text-destructive">*</span></Label>
+                          <Label className="text-[11px] text-[#0F172A]" style={{ fontWeight: 600 }}>Shipping Method Name<span className="text-destructive">*</span></Label>
                           <Input
                             value={entry.name}
                             onChange={(e) => updateCarrierService(entry.id, { name: e.target.value })}
                             placeholder="e.g. Economical Shipping"
-                            className="mt-1 rounded-lg border-border h-9 bg-background text-sm placeholder:text-muted-foreground/50 placeholder:text-xs"
+                            className="mt-1 rounded-lg border-[#E2E8F0] bg-white h-9 sm:h-10 text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
                           />
                         </div>
                         <div>
-                          <Label className="text-[11px] text-foreground" style={{ fontWeight: 600 }}>Description</Label>
+                          <Label className="text-[11px] text-[#0F172A]" style={{ fontWeight: 600 }}>Description</Label>
                           <Input
                             value={entry.description}
                             onChange={(e) => updateCarrierService(entry.id, { description: e.target.value })}
                             placeholder="Brief description of this method"
-                            className="mt-1 rounded-lg border-border h-9 bg-background text-sm placeholder:text-muted-foreground/50 placeholder:text-xs"
+                            className="mt-1 rounded-lg border-[#E2E8F0] bg-white h-9 sm:h-10 text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
                           />
                         </div>
                       </div>
