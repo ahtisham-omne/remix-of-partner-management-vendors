@@ -1534,8 +1534,9 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
     resetCreateForm();
     setCreateFullscreen(false);
   }
-  const openDetail = useCallback((rule: PricingRule) => {
+  const openDetail = useCallback((rule: PricingRule, openMode: "view" | "create" = "view") => {
     setSelectedRule(rule);
+    setDetailMode(openMode);
     setDetailOpen(true);
   }, []);
 
