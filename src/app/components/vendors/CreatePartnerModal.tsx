@@ -7370,19 +7370,69 @@ function ConfigPageContent({
   }
 
   if (sectionId === "shipping_methods") {
+    /* ── Carrier logos map ── */
+    const CARRIER_CATALOG = [
+      { id: "fedex", name: "FedEx Express", logo: "🟣", color: "#4D148C" },
+      { id: "tcs", name: "TCS (Tranzum Courier Service)", logo: "🔴", color: "#D32F2F" },
+      { id: "dhl", name: "DHL Express", logo: "🟡", color: "#FFCC00" },
+      { id: "ups", name: "UPS (United Parcel Service)", logo: "🟤", color: "#351C15" },
+      { id: "sf", name: "SF Express", logo: "⚫", color: "#1A1A1A" },
+      { id: "usps", name: "USPS", logo: "🔵", color: "#004B87" },
+      { id: "aramex", name: "Aramex", logo: "🟠", color: "#E65100" },
+      { id: "maersk", name: "Maersk", logo: "🔵", color: "#0067A5" },
+    ];
+    const CARRIER_METHODS: Record<string, Array<{ id: string; name: string; desc: string; days: string; isDefault?: boolean }>> = {
+      fedex: [
+        { id: "fedex-air", name: "FedEx Express (Air)", desc: "Priority overnight & international air freight", days: "1-2 days", isDefault: true },
+        { id: "fedex-ground", name: "FedEx Ground (Land)", desc: "Cost-effective ground shipping across regions", days: "5-7 days" },
+        { id: "fedex-freight", name: "FedEx Freight", desc: "For larger shipments & palletized cargo", days: "7-14 days" },
+        { id: "fedex-intl-priority", name: "FedEx International Priority", desc: "Fast customs-cleared international delivery", days: "1-2 days" },
+        { id: "fedex-intl-econ", name: "FedEx International Economy", desc: "Budget-friendly international shipping", days: "14-20 days" },
+      ],
+      tcs: [
+        { id: "tcs-overnight", name: "TCS Overnight", desc: "Next-day delivery within country", days: "1 day", isDefault: true },
+        { id: "tcs-detain", name: "TCS Detain", desc: "Hold at destination for pickup", days: "2-3 days" },
+      ],
+      dhl: [
+        { id: "dhl-express", name: "DHL Express Worldwide", desc: "Door-to-door international express", days: "1-3 days", isDefault: true },
+        { id: "dhl-ecommerce", name: "DHL eCommerce", desc: "Lightweight parcel delivery", days: "5-10 days" },
+        { id: "dhl-freight", name: "DHL Freight", desc: "Road & rail freight forwarding", days: "7-14 days" },
+      ],
+      ups: [
+        { id: "ups-next-day", name: "UPS Next Day Air", desc: "Guaranteed next business day", days: "1 day", isDefault: true },
+        { id: "ups-ground", name: "UPS Ground", desc: "Reliable ground shipping", days: "5-7 days" },
+        { id: "ups-worldwide", name: "UPS Worldwide Economy", desc: "Most economical international option", days: "3-12 days" },
+      ],
+      sf: [
+        { id: "sf-standard", name: "SF Standard Express", desc: "Standard domestic delivery", days: "2-4 days", isDefault: true },
+        { id: "sf-international", name: "SF International", desc: "Cross-border parcel delivery", days: "5-10 days" },
+      ],
+      usps: [
+        { id: "usps-priority", name: "USPS Priority Mail", desc: "Fast domestic delivery with tracking", days: "1-3 days", isDefault: true },
+        { id: "usps-ground-adv", name: "USPS Ground Advantage", desc: "Affordable ground delivery", days: "2-5 days" },
+      ],
+      aramex: [
+        { id: "aramex-express", name: "Aramex Priority Express", desc: "Time-definite international express", days: "1-3 days", isDefault: true },
+        { id: "aramex-domestic", name: "Aramex Domestic Express", desc: "Fast local delivery", days: "1-2 days" },
+      ],
+      maersk: [
+        { id: "maersk-ocean", name: "Maersk Ocean Freight", desc: "Full container sea freight", days: "20-45 days", isDefault: true },
+        { id: "maersk-air", name: "Maersk Air Freight", desc: "Air cargo forwarding", days: "3-7 days" },
+      ],
+    };
+
+    // ── Carrier Services CRUD ──
     function addCarrierService() {
       csCounter.current += 1;
       setCarrierServices((prev) => [
         ...prev,
-        { id: `cs-${Date.now()}`, name: "", description: "", minDuration: 1, maxDuration: 30, isDefault: false },
+        { id: `cs-${Date.now()}`, name: "", description: "", minDuration: 1, maxDuration: 30, isDefault: prev.length === 0 },
       ]);
     }
     function removeCarrierService(id: string) {
       setCarrierServices((prev) => {
         const next = prev.filter((s) => s.id !== id);
-        if (next.length > 0 && !next.some((s) => s.isDefault)) {
-          next[0].isDefault = true;
-        }
+        if (next.length > 0 && !next.some((s) => s.isDefault)) next[0].isDefault = true;
         return next;
       });
     }
@@ -7392,19 +7442,19 @@ function ConfigPageContent({
     function updateCarrierService(id: string, updates: Partial<typeof carrierServices[0]>) {
       setCarrierServices((prev) => prev.map((s) => (s.id === id ? { ...s, ...updates } : s)));
     }
+
+    // ── Vendor Shipping Preferences CRUD ──
     function addVendorShippingPref() {
       vspCounter.current += 1;
       setVendorShippingPrefs((prev) => [
         ...prev,
-        { id: `vsp-${Date.now()}`, carrier: "", methods: "", isDefault: false },
+        { id: `vsp-${Date.now()}`, carrier: "", methods: "", isDefault: prev.length === 0 },
       ]);
     }
     function removeVendorShippingPref(id: string) {
       setVendorShippingPrefs((prev) => {
         const next = prev.filter((s) => s.id !== id);
-        if (next.length > 0 && !next.some((s) => s.isDefault)) {
-          next[0].isDefault = true;
-        }
+        if (next.length > 0 && !next.some((s) => s.isDefault)) next[0].isDefault = true;
         return next;
       });
     }
@@ -7415,242 +7465,19 @@ function ConfigPageContent({
       setVendorShippingPrefs((prev) => prev.map((s) => (s.id === id ? { ...s, ...updates } : s)));
     }
 
-    const SHIPPING_TAB_CARDS: { id: "carrier" | "vendor"; label: string; description: string; icon: typeof Truck }[] = [
-      { id: "carrier", label: "Carrier Services", description: "Define shipping services with delivery durations and defaults.", icon: Truck },
-      { id: "vendor", label: "Vendor Shipping Preferences", description: "Map vendor-specific carrier and method preferences.", icon: Ship },
-    ];
+    // ── Collapsible section states ──
+    const [carrierSectionOpen, setCarrierSectionOpen] = React.useState(true);
+    const [vendorPrefSectionOpen, setVendorPrefSectionOpen] = React.useState(true);
 
-    /* Render the right-column content for the active tab */
-    const renderRightColumn = () => {
-      if (shippingTab === "carrier") {
-        if (carrierServices.length === 0) {
-          return (
-            <div className="py-6 flex flex-col items-center justify-center text-center">
-              <div className="w-10 h-10 rounded-lg bg-[#F8FAFC] border border-[#E8ECF1] flex items-center justify-center mb-2.5">
-                <Truck className="w-5 h-5 text-[#94A3B8]" />
-              </div>
-              <p className="text-sm text-[#64748B]" style={{ fontWeight: 600 }}>No carrier service added yet</p>
-              <p className="text-xs text-[#94A3B8] mt-1 max-w-[240px]">Select a shipping type on the left, then click below to add details.</p>
-              <button
-                onClick={addCarrierService}
-                className="mt-3 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#0A77FF] text-white text-xs transition-colors hover:bg-[#0862D0]"
-                style={{ fontWeight: 600 }}
-              >
-                <Plus className="w-3.5 h-3.5" /> Add Carrier Service
-              </button>
-            </div>
-          );
-        }
-        return (
-          <div className="space-y-4">
-            {carrierServices.map((entry, idx) => (
-              <div key={entry.id} className="rounded-lg border border-[#E8ECF1] bg-white p-3 space-y-3 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
-                {/* Entry header */}
-                <div className="flex items-center justify-between">
-                  <h5 className="text-sm text-[#0F172A]" style={{ fontWeight: 600 }}>
-                    <span className="text-[#94A3B8]">#{idx + 1}</span>{" "}Shipping Method
-                  </h5>
-                  <div className="flex items-center gap-3">
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <Switch
-                        checked={entry.isDefault}
-                        onCheckedChange={() => toggleCarrierDefault(entry.id)}
-                        className="data-[state=checked]:bg-[#0A77FF] h-5 w-9"
-                      />
-                      <span className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Mark as Default</span>
-                    </label>
-                    {carrierServices.length > 1 && (
-                      <button
-                        onClick={() => removeCarrierService(entry.id)}
-                        className="w-7 h-7 rounded-full border border-[#E2E8F0] flex items-center justify-center hover:bg-[#FEF2F2] hover:border-[#FECACA] transition-colors"
-                      >
-                        <X className="w-3.5 h-3.5 text-[#94A3B8]" />
-                      </button>
-                    )}
-                  </div>
-                </div>
-
-                {/* Form fields - single column stacked */}
-                <div className="space-y-3">
-                  <div>
-                    <Label className="text-xs text-[#0F172A]" style={{ fontWeight: 600 }}>Shipping method name<span className="text-red-500">*</span></Label>
-                    <Input
-                      value={entry.name}
-                      onChange={(e) => updateCarrierService(entry.id, { name: e.target.value })}
-                      placeholder="Economical Shipping"
-                      className="mt-1 rounded-lg border-[#E2E8F0] h-9 bg-white"
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-xs text-[#0F172A]" style={{ fontWeight: 600 }}>Description</Label>
-                    <Input
-                      value={entry.description}
-                      onChange={(e) => updateCarrierService(entry.id, { description: e.target.value })}
-                      placeholder="UPS Worldwide Economy® is our most econo..."
-                      className="mt-1 rounded-lg border-[#E2E8F0] h-9 bg-white"
-                    />
-                  </div>
-
-                  {/* Duration */}
-                  <div>
-                    <Label className="text-xs text-[#0F172A]" style={{ fontWeight: 600 }}>Duration (calendar days)</Label>
-                  <div className="mt-1 bg-[#F8FAFC] rounded-lg p-2.5 space-y-2.5">
-                    <div>
-                      <span className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Minimum</span>
-                      <Input
-                        type="number"
-                        value={entry.minDuration}
-                        onChange={(e) => updateCarrierService(entry.id, { minDuration: Math.max(1, parseInt(e.target.value) || 1) })}
-                        className="mt-1.5 h-9 rounded-lg border-[#E2E8F0] bg-white text-sm"
-                      />
-                    </div>
-                    <div className="relative h-2">
-                      <div className="absolute inset-0 bg-[#E2E8F0] rounded-full" />
-                      <div
-                        className="absolute top-0 h-full bg-[#0A77FF] rounded-full"
-                        style={{
-                          left: `${((entry.minDuration - 1) / 29) * 100}%`,
-                          right: `${100 - ((entry.maxDuration - 1) / 29) * 100}%`,
-                        }}
-                      />
-                      <div
-                        className="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-white border-2 border-[#0A77FF] rounded-full shadow-sm"
-                        style={{ left: `calc(${((entry.minDuration - 1) / 29) * 100}% - 8px)` }}
-                      />
-                      <div
-                        className="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-white border-2 border-[#0A77FF] rounded-full shadow-sm"
-                        style={{ left: `calc(${((entry.maxDuration - 1) / 29) * 100}% - 8px)` }}
-                      />
-                    </div>
-                    <div>
-                      <span className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Maximum</span>
-                      <Input
-                        type="number"
-                        value={entry.maxDuration}
-                        onChange={(e) => updateCarrierService(entry.id, { maxDuration: Math.min(30, parseInt(e.target.value) || 30) })}
-                        className="mt-1.5 h-9 rounded-lg border-[#E2E8F0] bg-white text-sm"
-                      />
-                    </div>
-                  </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-
-            {/* + Add */}
-            <button
-              onClick={addCarrierService}
-              className="inline-flex items-center gap-1.5 text-sm text-[#0A77FF] hover:underline"
-              style={{ fontWeight: 600 }}
-            >
-              <Plus className="w-4 h-4" /> Add
-            </button>
-          </div>
-        );
-      }
-
-      /* Vendor Shipping Preferences */
-      if (vendorShippingPrefs.length === 0) {
-        return (
-          <div className="py-6 flex flex-col items-center justify-center text-center">
-            <div className="w-10 h-10 rounded-lg bg-[#F8FAFC] border border-[#E8ECF1] flex items-center justify-center mb-2.5">
-              <Ship className="w-5 h-5 text-[#94A3B8]" />
-            </div>
-            <p className="text-sm text-[#64748B]" style={{ fontWeight: 600 }}>No vendor shipping preference added yet</p>
-            <p className="text-xs text-[#94A3B8] mt-1 max-w-[240px]">Select a shipping type on the left, then click below to add details.</p>
-            <button
-              onClick={addVendorShippingPref}
-              className="mt-3 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#0A77FF] text-white text-xs transition-colors hover:bg-[#0862D0]"
-              style={{ fontWeight: 600 }}
-            >
-              <Plus className="w-3.5 h-3.5" /> Add Vendor Preference
-            </button>
-          </div>
-        );
-      }
-
-      return (
-        <div className="space-y-4">
-          {vendorShippingPrefs.map((entry, idx) => (
-            <div key={entry.id} className="rounded-lg border border-[#E8ECF1] bg-white p-3 space-y-3 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
-              {/* Entry header */}
-              <div className="flex items-center justify-between">
-                <h5 className="text-sm text-[#0F172A]" style={{ fontWeight: 600 }}>
-                  <span className="text-[#94A3B8]">#{idx + 1}</span>{" "}Vendor Shipping Methods
-                </h5>
-                <div className="flex items-center gap-3">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <Switch
-                      checked={entry.isDefault}
-                      onCheckedChange={() => toggleVendorDefault(entry.id)}
-                      className="data-[state=checked]:bg-[#0A77FF] h-5 w-9"
-                    />
-                    <span className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Mark as Default</span>
-                  </label>
-                  {vendorShippingPrefs.length > 1 && (
-                    <button
-                      onClick={() => removeVendorShippingPref(entry.id)}
-                      className="w-7 h-7 rounded-full border border-[#E2E8F0] flex items-center justify-center hover:bg-[#FEF2F2] hover:border-[#FECACA] transition-colors"
-                    >
-                      <X className="w-3.5 h-3.5 text-[#94A3B8]" />
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              {/* Form fields - single column stacked */}
-              <div className="space-y-3">
-                <div>
-                  <Label className="text-xs text-[#0F172A]" style={{ fontWeight: 600 }}>Carrier</Label>
-                  <Select value={entry.carrier} onValueChange={(v) => updateVendorShippingPref(entry.id, { carrier: v })}>
-                    <SelectTrigger className="mt-1 rounded-lg border-[#E2E8F0] h-9 bg-white">
-                      <SelectValue placeholder="Select carrier" />
-                    </SelectTrigger>
-                    <SelectContent className="z-[250]">
-                      <SelectItem value="ups">UPS</SelectItem>
-                      <SelectItem value="fedex">FedEx</SelectItem>
-                      <SelectItem value="dhl">DHL</SelectItem>
-                      <SelectItem value="usps">USPS</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <p className="text-[11px] text-[#94A3B8] mt-1">Choose the vendor's preferred carrier.</p>
-                </div>
-                <div>
-                  <Label className="text-xs text-[#0F172A]" style={{ fontWeight: 600 }}>Shipping methods</Label>
-                  <Select value={entry.methods} onValueChange={(v) => updateVendorShippingPref(entry.id, { methods: v })}>
-                    <SelectTrigger className="mt-1 rounded-lg border-[#E2E8F0] h-9 bg-white">
-                      <SelectValue placeholder="Select methods" />
-                    </SelectTrigger>
-                    <SelectContent className="z-[250]">
-                      <SelectItem value="ground">Ground</SelectItem>
-                      <SelectItem value="express">Express</SelectItem>
-                      <SelectItem value="overnight">Overnight</SelectItem>
-                      <SelectItem value="freight">Freight</SelectItem>
-                      <SelectItem value="economy">Economy</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <p className="text-[11px] text-[#94A3B8] mt-1">Choose the vendor's preferred delivery methods.</p>
-                </div>
-              </div>
-            </div>
-          ))}
-
-          {/* + Add */}
-          <button
-            onClick={addVendorShippingPref}
-            className="inline-flex items-center gap-1.5 text-sm text-[#0A77FF] hover:underline"
-            style={{ fontWeight: 600 }}
-          >
-            <Plus className="w-4 h-4" /> Add
-          </button>
-        </div>
-      );
-    };
+    // ── Carrier search for Vendor Prefs ──
+    const [carrierSearches, setCarrierSearches] = React.useState<Record<string, string>>({});
+    const [carrierDropdownOpen, setCarrierDropdownOpen] = React.useState<Record<string, boolean>>({});
+    const [methodDropdownOpen, setMethodDropdownOpen] = React.useState<Record<string, boolean>>({});
 
     return (
-      <div className="space-y-3">
-        {/* ── Heading + Helper Copy ── */}
-        <div className="mb-1">
+      <div className="space-y-4">
+        {/* ── Section Header ── */}
+        <div>
           <h4 className="text-sm text-[#0F172A]" style={{ fontWeight: 700 }}>Shipping Methods</h4>
           <p className="text-xs text-[#64748B] mt-0.5 leading-relaxed">
             Set up carrier-grade shipping services and vendor-specific delivery methods to ensure accurate lead times and tracking for all shipments involving this partner.{" "}
@@ -7660,60 +7487,451 @@ function ConfigPageContent({
           </p>
         </div>
 
-        {/* ── Two Column Layout ── */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {/* ── Left Column: Tab Selector Cards ── */}
-          <div className="rounded-lg border border-[#E8ECF1] bg-white p-3 space-y-3 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
-            <h5 className="text-xs text-[#64748B]" style={{ fontWeight: 600 }}>Select shipping type</h5>
-
-            <div className="space-y-2">
-              {SHIPPING_TAB_CARDS.map((tab) => {
-                const Icon = tab.icon;
-                const isSelected = shippingTab === tab.id;
-                const count = tab.id === "carrier" ? carrierServices.length : vendorShippingPrefs.length;
-                return (
-                  <button
-                    key={tab.id}
-                    onClick={() => setShippingTab(tab.id)}
-                    className={`w-full flex items-start gap-2.5 p-2.5 rounded-lg border transition-all text-left ${
-                      isSelected
-                        ? "border-[1.5px] border-[#0A77FF] bg-white shadow-[0_1px_4px_rgba(10,119,255,0.1)]"
-                        : "border-[#E8ECF1] bg-white hover:border-[#CBD5E1]"
-                    }`}
-                  >
-                    <div className={`w-8 h-8 rounded-md flex items-center justify-center shrink-0 ${
-                      isSelected ? "bg-[#EFF6FF]" : "bg-[#F8FAFC]"
-                    }`}>
-                      <Icon className={`w-5 h-5 ${isSelected ? "text-[#0A77FF]" : "text-[#94A3B8]"}`} />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2">
-                        <span className={`text-sm truncate ${isSelected ? "text-[#0A77FF]" : "text-[#0F172A]"}`} style={{ fontWeight: 600 }}>
-                          {tab.label}
-                        </span>
-                        {count > 0 && (
-                          <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
-                            isSelected ? "bg-[#0A77FF] text-white" : "bg-[#E2E8F0] text-[#64748B]"
-                          }`} style={{ fontWeight: 600 }}>
-                            {count}
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-xs text-[#94A3B8] mt-0.5 line-clamp-2">{tab.description}</p>
-                    </div>
-                  </button>
-                );
-              })}
+        {/* ═══════════ SECTION 1: Carrier Services ═══════════ */}
+        <div className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+          {/* Collapsible header */}
+          <button
+            onClick={() => setCarrierSectionOpen(!carrierSectionOpen)}
+            className="w-full flex items-center justify-between px-4 py-3 bg-[#FAFBFC] hover:bg-[#F1F5F9] transition-colors text-left"
+          >
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-[#EFF6FF] flex items-center justify-center">
+                <Truck className="w-4 h-4 text-[#0A77FF]" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Carrier Services</span>
+                  {carrierServices.length > 0 && (
+                    <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#0A77FF]/10 text-[#0A77FF]" style={{ fontWeight: 600 }}>{carrierServices.length}</span>
+                  )}
+                </div>
+                <p className="text-[11px] text-[#94A3B8]">Define custom shipping methods with delivery timeframes</p>
+              </div>
             </div>
-          </div>
+            {carrierSectionOpen
+              ? <ChevronUp className="w-4 h-4 text-[#94A3B8]" />
+              : <ChevronDown className="w-4 h-4 text-[#94A3B8]" />
+            }
+          </button>
 
-          {/* ── Right Column: Details ── */}
-          <div className="rounded-lg border border-[#E8ECF1] bg-white p-3 space-y-3 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
-            <h5 className="text-xs text-[#64748B]" style={{ fontWeight: 600 }}>
-              {shippingTab === "carrier" ? "Carrier service details" : "Vendor preference details"}
-            </h5>
-            {renderRightColumn()}
-          </div>
+          {carrierSectionOpen && (
+            <div className="px-4 pb-4 pt-1">
+              {carrierServices.length === 0 ? (
+                <div className="py-8 flex flex-col items-center justify-center text-center">
+                  <div className="w-12 h-12 rounded-xl bg-[#F8FAFC] border border-dashed border-[#CBD5E1] flex items-center justify-center mb-3">
+                    <Truck className="w-5 h-5 text-[#94A3B8]" />
+                  </div>
+                  <p className="text-sm text-[#64748B]" style={{ fontWeight: 600 }}>No carrier services yet</p>
+                  <p className="text-xs text-[#94A3B8] mt-1 max-w-[260px]">Create custom shipping methods with name, description, and delivery duration range.</p>
+                  <button
+                    onClick={addCarrierService}
+                    className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#0A77FF] text-white text-xs transition-colors hover:bg-[#0862D0]"
+                    style={{ fontWeight: 600 }}
+                  >
+                    <Plus className="w-3.5 h-3.5" /> Add Carrier Service
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-3 mt-2">
+                  {carrierServices.map((entry, idx) => (
+                    <div key={entry.id} className="rounded-lg border border-[#E8ECF1] bg-white overflow-hidden shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
+                      {/* Card header */}
+                      <div className="flex items-center justify-between px-3.5 py-2.5 bg-[#FAFBFC] border-b border-[#F1F5F9]">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 600 }}>#{idx + 1}</span>
+                          <span className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>
+                            {entry.name || "Shipping Method"}
+                          </span>
+                          {entry.isDefault && (
+                            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#0A77FF]/10 text-[#0A77FF] border border-[#0A77FF]/20" style={{ fontWeight: 600 }}>Default</span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <label className="flex items-center gap-1.5 cursor-pointer">
+                            <Switch
+                              checked={entry.isDefault}
+                              onCheckedChange={() => toggleCarrierDefault(entry.id)}
+                              className="data-[state=checked]:bg-[#0A77FF] w-8 h-[18px]"
+                            />
+                            <span className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Default</span>
+                          </label>
+                          {carrierServices.length > 1 && (
+                            <button
+                              onClick={() => removeCarrierService(entry.id)}
+                              className="w-6 h-6 rounded-full border border-[#E2E8F0] flex items-center justify-center hover:bg-[#FEF2F2] hover:border-[#FECACA] transition-colors"
+                            >
+                              <X className="w-3 h-3 text-[#94A3B8]" />
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                      {/* Card body */}
+                      <div className="p-3.5 space-y-3">
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <Label className="text-[11px] text-[#0F172A]" style={{ fontWeight: 600 }}>Shipping Method Name<span className="text-red-500">*</span></Label>
+                            <Input
+                              value={entry.name}
+                              onChange={(e) => updateCarrierService(entry.id, { name: e.target.value })}
+                              placeholder="e.g. Economical Shipping"
+                              className="mt-1 rounded-lg border-[#E2E8F0] h-9 bg-white text-sm"
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-[11px] text-[#0F172A]" style={{ fontWeight: 600 }}>Description</Label>
+                            <Input
+                              value={entry.description}
+                              onChange={(e) => updateCarrierService(entry.id, { description: e.target.value })}
+                              placeholder="Brief description..."
+                              className="mt-1 rounded-lg border-[#E2E8F0] h-9 bg-white text-sm"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Duration range - inline layout */}
+                        <div>
+                          <Label className="text-[11px] text-[#0F172A]" style={{ fontWeight: 600 }}>Duration (calendar days)</Label>
+                          <div className="mt-1.5 flex items-center gap-3 bg-[#F8FAFC] rounded-lg p-2.5 border border-[#F1F5F9]">
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Minimum</span>
+                              <Input
+                                type="number"
+                                value={entry.minDuration}
+                                onChange={(e) => updateCarrierService(entry.id, { minDuration: Math.max(1, parseInt(e.target.value) || 1) })}
+                                className="w-16 h-8 rounded-md border-[#E2E8F0] bg-white text-sm text-center"
+                              />
+                            </div>
+                            {/* Visual range bar */}
+                            <div className="flex-1 relative h-1.5 bg-[#E2E8F0] rounded-full">
+                              <div
+                                className="absolute top-0 h-full bg-[#0A77FF] rounded-full transition-all"
+                                style={{
+                                  left: `${((entry.minDuration - 1) / 29) * 100}%`,
+                                  right: `${100 - ((entry.maxDuration - 1) / 29) * 100}%`,
+                                }}
+                              />
+                              <div
+                                className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-white border-2 border-[#0A77FF] rounded-full shadow-sm"
+                                style={{ left: `calc(${((entry.minDuration - 1) / 29) * 100}% - 6px)` }}
+                              />
+                              <div
+                                className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-white border-2 border-[#0A77FF] rounded-full shadow-sm"
+                                style={{ left: `calc(${((entry.maxDuration - 1) / 29) * 100}% - 6px)` }}
+                              />
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                              <Input
+                                type="number"
+                                value={entry.maxDuration}
+                                onChange={(e) => updateCarrierService(entry.id, { maxDuration: Math.min(30, parseInt(e.target.value) || 30) })}
+                                className="w-16 h-8 rounded-md border-[#E2E8F0] bg-white text-sm text-center"
+                              />
+                              <span className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Maximum</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+
+                  <button
+                    onClick={addCarrierService}
+                    className="inline-flex items-center gap-1.5 text-[13px] text-[#0A77FF] hover:underline mt-1"
+                    style={{ fontWeight: 600 }}
+                  >
+                    <Plus className="w-3.5 h-3.5" /> Add
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* ═══════════ SECTION 2: Vendor Shipping Preferences ═══════════ */}
+        <div className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+          {/* Collapsible header */}
+          <button
+            onClick={() => setVendorPrefSectionOpen(!vendorPrefSectionOpen)}
+            className="w-full flex items-center justify-between px-4 py-3 bg-[#FAFBFC] hover:bg-[#F1F5F9] transition-colors text-left"
+          >
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-[#F0FDF4] flex items-center justify-center">
+                <Ship className="w-4 h-4 text-[#22C55E]" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Vendor Shipping Preferences</span>
+                  {vendorShippingPrefs.length > 0 && (
+                    <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#22C55E]/10 text-[#22C55E]" style={{ fontWeight: 600 }}>{vendorShippingPrefs.length}</span>
+                  )}
+                </div>
+                <p className="text-[11px] text-[#94A3B8]">Select carriers and their shipping methods for this vendor</p>
+              </div>
+            </div>
+            {vendorPrefSectionOpen
+              ? <ChevronUp className="w-4 h-4 text-[#94A3B8]" />
+              : <ChevronDown className="w-4 h-4 text-[#94A3B8]" />
+            }
+          </button>
+
+          {vendorPrefSectionOpen && (
+            <div className="px-4 pb-4 pt-1">
+              {vendorShippingPrefs.length === 0 ? (
+                <div className="py-8 flex flex-col items-center justify-center text-center">
+                  <div className="w-12 h-12 rounded-xl bg-[#F8FAFC] border border-dashed border-[#CBD5E1] flex items-center justify-center mb-3">
+                    <Ship className="w-5 h-5 text-[#94A3B8]" />
+                  </div>
+                  <p className="text-sm text-[#64748B]" style={{ fontWeight: 600 }}>No vendor preferences yet</p>
+                  <p className="text-xs text-[#94A3B8] mt-1 max-w-[260px]">Map vendor-specific carrier and shipping method preferences.</p>
+                  <button
+                    onClick={addVendorShippingPref}
+                    className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#22C55E] text-white text-xs transition-colors hover:bg-[#16A34A]"
+                    style={{ fontWeight: 600 }}
+                  >
+                    <Plus className="w-3.5 h-3.5" /> Add Vendor Preference
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-3 mt-2">
+                  {vendorShippingPrefs.map((entry, idx) => {
+                    const selectedCarrier = CARRIER_CATALOG.find((c) => c.id === entry.carrier);
+                    const carrierMethods = entry.carrier ? (CARRIER_METHODS[entry.carrier] || []) : [];
+                    const selectedMethodIds = entry.methods ? entry.methods.split(",").filter(Boolean) : [];
+                    const searchVal = carrierSearches[entry.id] || "";
+                    const filteredCarriers = searchVal.trim()
+                      ? CARRIER_CATALOG.filter((c) => c.name.toLowerCase().includes(searchVal.toLowerCase()))
+                      : CARRIER_CATALOG;
+
+                    return (
+                      <div key={entry.id} className="rounded-lg border border-[#E8ECF1] bg-white overflow-hidden shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
+                        {/* Card header */}
+                        <div className="flex items-center justify-between px-3.5 py-2.5 bg-[#FAFBFC] border-b border-[#F1F5F9]">
+                          <div className="flex items-center gap-2">
+                            <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 600 }}>#{idx + 1}</span>
+                            <span className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>
+                              {selectedCarrier ? selectedCarrier.name : "Vendor Shipping Preference"}
+                            </span>
+                            {entry.isDefault && (
+                              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#22C55E]/10 text-[#22C55E] border border-[#22C55E]/20" style={{ fontWeight: 600 }}>Default</span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <label className="flex items-center gap-1.5 cursor-pointer">
+                              <Switch
+                                checked={entry.isDefault}
+                                onCheckedChange={() => toggleVendorDefault(entry.id)}
+                                className="data-[state=checked]:bg-[#22C55E] w-8 h-[18px]"
+                              />
+                              <span className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Default</span>
+                            </label>
+                            {vendorShippingPrefs.length > 1 && (
+                              <button
+                                onClick={() => removeVendorShippingPref(entry.id)}
+                                className="w-6 h-6 rounded-full border border-[#E2E8F0] flex items-center justify-center hover:bg-[#FEF2F2] hover:border-[#FECACA] transition-colors"
+                              >
+                                <X className="w-3 h-3 text-[#94A3B8]" />
+                              </button>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Card body */}
+                        <div className="p-3.5 space-y-3">
+                          {/* Carrier Selector */}
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="relative">
+                              <Label className="text-[11px] text-[#0F172A]" style={{ fontWeight: 600 }}>Shipping Carrier</Label>
+                              <button
+                                onClick={() => setCarrierDropdownOpen((prev) => ({ ...prev, [entry.id]: !prev[entry.id] }))}
+                                className="mt-1 w-full flex items-center justify-between h-9 px-3 rounded-lg border border-[#E2E8F0] bg-white text-sm hover:border-[#CBD5E1] transition-colors"
+                              >
+                                {selectedCarrier ? (
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-base">{selectedCarrier.logo}</span>
+                                    <span className="text-[#0F172A] text-sm truncate">{selectedCarrier.name.split(" ")[0]}</span>
+                                  </div>
+                                ) : (
+                                  <span className="text-[#94A3B8] text-sm">Select carrier</span>
+                                )}
+                                <ChevronDown className="w-3.5 h-3.5 text-[#94A3B8]" />
+                              </button>
+
+                              {carrierDropdownOpen[entry.id] && (
+                                <div className="absolute z-[260] top-full left-0 right-0 mt-1 rounded-lg border border-[#E2E8F0] bg-white shadow-lg max-h-[280px] overflow-hidden">
+                                  <div className="p-2 border-b border-[#F1F5F9]">
+                                    <div className="relative">
+                                      <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8]" />
+                                      <input
+                                        value={searchVal}
+                                        onChange={(e) => setCarrierSearches((prev) => ({ ...prev, [entry.id]: e.target.value }))}
+                                        placeholder="Search shipping carrier..."
+                                        className="w-full h-8 pl-8 pr-3 rounded-md border border-[#E2E8F0] bg-white text-sm outline-none focus:border-[#0A77FF] transition-colors"
+                                        autoFocus
+                                      />
+                                    </div>
+                                  </div>
+                                  <div className="p-1.5">
+                                    <button
+                                      className="w-full flex items-center justify-center gap-1.5 py-2 rounded-md bg-[#EFF6FF] text-[#0A77FF] text-xs hover:bg-[#DBEAFE] transition-colors"
+                                      style={{ fontWeight: 600 }}
+                                      onClick={() => {
+                                        setCarrierDropdownOpen((prev) => ({ ...prev, [entry.id]: false }));
+                                        toast.info("Create New Carrier — coming soon");
+                                      }}
+                                    >
+                                      <Plus className="w-3.5 h-3.5" /> Create New Carrier
+                                    </button>
+                                  </div>
+                                  <div className="overflow-y-auto max-h-[180px] p-1.5 pt-0 space-y-0.5">
+                                    {filteredCarriers.map((c) => {
+                                      const isActive = entry.carrier === c.id;
+                                      return (
+                                        <button
+                                          key={c.id}
+                                          onClick={() => {
+                                            updateVendorShippingPref(entry.id, { carrier: c.id, methods: "" });
+                                            setCarrierDropdownOpen((prev) => ({ ...prev, [entry.id]: false }));
+                                            setCarrierSearches((prev) => ({ ...prev, [entry.id]: "" }));
+                                          }}
+                                          className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-left transition-colors ${
+                                            isActive ? "bg-[#EFF6FF]" : "hover:bg-[#F8FAFC]"
+                                          }`}
+                                        >
+                                          <span className="text-lg">{c.logo}</span>
+                                          <span className="text-sm text-[#0F172A] flex-1 truncate" style={{ fontWeight: isActive ? 600 : 400 }}>{c.name}</span>
+                                          {isActive && <Check className="w-4 h-4 text-[#0A77FF]" />}
+                                        </button>
+                                      );
+                                    })}
+                                    {filteredCarriers.length === 0 && (
+                                      <p className="text-xs text-[#94A3B8] text-center py-3">No carriers found</p>
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Shipping Methods multi-select */}
+                            <div className="relative">
+                              <Label className="text-[11px] text-[#0F172A]" style={{ fontWeight: 600 }}>Shipping Methods</Label>
+                              <button
+                                onClick={() => {
+                                  if (!entry.carrier) { toast.info("Please select a carrier first"); return; }
+                                  setMethodDropdownOpen((prev) => ({ ...prev, [entry.id]: !prev[entry.id] }));
+                                }}
+                                className="mt-1 w-full flex items-center justify-between h-9 px-3 rounded-lg border border-[#E2E8F0] bg-white text-sm hover:border-[#CBD5E1] transition-colors"
+                              >
+                                {selectedMethodIds.length > 0 ? (
+                                  <span className="text-[#0F172A] text-sm truncate">{selectedMethodIds.length} method{selectedMethodIds.length !== 1 ? "s" : ""} selected</span>
+                                ) : (
+                                  <span className="text-[#94A3B8] text-sm">Select methods</span>
+                                )}
+                                <ChevronDown className="w-3.5 h-3.5 text-[#94A3B8]" />
+                              </button>
+
+                              {methodDropdownOpen[entry.id] && carrierMethods.length > 0 && (
+                                <div className="absolute z-[260] top-full left-0 right-0 mt-1 rounded-lg border border-[#E2E8F0] bg-white shadow-lg max-h-[300px] overflow-hidden">
+                                  <div className="p-1.5">
+                                    <button
+                                      className="w-full flex items-center justify-center gap-1.5 py-2 rounded-md bg-[#F0FDF4] text-[#22C55E] text-xs hover:bg-[#DCFCE7] transition-colors"
+                                      style={{ fontWeight: 600 }}
+                                      onClick={() => {
+                                        setMethodDropdownOpen((prev) => ({ ...prev, [entry.id]: false }));
+                                        toast.info("Create New Shipping Method — coming soon");
+                                      }}
+                                    >
+                                      <Plus className="w-3.5 h-3.5" /> Create New Shipping Method
+                                    </button>
+                                  </div>
+                                  <div className="overflow-y-auto max-h-[220px] p-1.5 pt-0 space-y-0.5">
+                                    {carrierMethods.map((method) => {
+                                      const isChecked = selectedMethodIds.includes(method.id);
+                                      return (
+                                        <button
+                                          key={method.id}
+                                          onClick={() => {
+                                            const next = isChecked
+                                              ? selectedMethodIds.filter((m) => m !== method.id)
+                                              : [...selectedMethodIds, method.id];
+                                            updateVendorShippingPref(entry.id, { methods: next.join(",") });
+                                          }}
+                                          className={`w-full flex items-start gap-2.5 px-2.5 py-2 rounded-md text-left transition-colors ${
+                                            isChecked ? "bg-[#F0FDF4]" : "hover:bg-[#F8FAFC]"
+                                          }`}
+                                        >
+                                          <div className={`mt-0.5 w-4 h-4 rounded border-[1.5px] flex items-center justify-center shrink-0 transition-colors ${
+                                            isChecked ? "border-[#22C55E] bg-[#22C55E]" : "border-[#CBD5E1] bg-white"
+                                          }`}>
+                                            {isChecked && <Check className="w-2.5 h-2.5 text-white" />}
+                                          </div>
+                                          <div className="flex-1 min-w-0">
+                                            <div className="flex items-center gap-2">
+                                              <span className="text-sm text-[#0F172A] truncate" style={{ fontWeight: 500 }}>{method.name}</span>
+                                              {method.isDefault && (
+                                                <span className="text-[9px] px-1.5 py-0.5 rounded-full border border-[#0A77FF]/20 bg-[#EFF6FF] text-[#0A77FF]" style={{ fontWeight: 600 }}>Default</span>
+                                              )}
+                                            </div>
+                                            <p className="text-[11px] text-[#94A3B8] truncate mt-0.5">{method.desc}</p>
+                                          </div>
+                                          <span className="text-[11px] text-[#64748B] shrink-0 mt-0.5" style={{ fontWeight: 500 }}>{method.days}</span>
+                                        </button>
+                                      );
+                                    })}
+                                  </div>
+                                  <div className="border-t border-[#F1F5F9] p-2 flex justify-end">
+                                    <button
+                                      onClick={() => setMethodDropdownOpen((prev) => ({ ...prev, [entry.id]: false }))}
+                                      className="px-3 py-1.5 rounded-md bg-[#0F172A] text-white text-xs"
+                                      style={{ fontWeight: 600 }}
+                                    >
+                                      Done
+                                    </button>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Selected methods chips */}
+                          {selectedMethodIds.length > 0 && (
+                            <div className="flex flex-wrap gap-1.5 mt-1">
+                              {selectedMethodIds.map((mid) => {
+                                const method = carrierMethods.find((m) => m.id === mid);
+                                if (!method) return null;
+                                return (
+                                  <span key={mid} className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-[#F8FAFC] border border-[#E8ECF1] text-[11px] text-[#0F172A]" style={{ fontWeight: 500 }}>
+                                    {method.name}
+                                    <span className="text-[#94A3B8] ml-0.5">{method.days}</span>
+                                    <button
+                                      onClick={() => {
+                                        const next = selectedMethodIds.filter((m) => m !== mid);
+                                        updateVendorShippingPref(entry.id, { methods: next.join(",") });
+                                      }}
+                                      className="ml-0.5 text-[#94A3B8] hover:text-[#EF4444] transition-colors"
+                                    >
+                                      <X className="w-3 h-3" />
+                                    </button>
+                                  </span>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+
+                  <button
+                    onClick={addVendorShippingPref}
+                    className="inline-flex items-center gap-1.5 text-[13px] text-[#22C55E] hover:underline mt-1"
+                    style={{ fontWeight: 600 }}
+                  >
+                    <Plus className="w-3.5 h-3.5" /> Add
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     );
