@@ -4231,6 +4231,55 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
         mode="view"
         onDisable={(t) => toast.success(`"${t.name}" disabled for this partner`)}
       />
+
+      {/* ══════ Location POC: Select from Directory Modal ══════ */}
+      <SelectPocDictionaryModal
+        open={locShowSelectModal}
+        onOpenChange={setLocShowSelectModal}
+        contactDictionary={locContactDictionary}
+        pocSearch={locPocSearch}
+        onPocSearchChange={(v) => { setLocPocSearch(v); setLocPocPage(1); }}
+        pocCategoryFilter={locPocCategoryFilter}
+        onPocCategoryFilterChange={(v) => { setLocPocCategoryFilter(v as any); setLocPocPage(1); }}
+        pocDepartmentCounts={locPocDeptCounts}
+        pocPagedContacts={locPocPagedContacts}
+        pocPage={locPocPage}
+        pocTotalPages={locPocTotalPages}
+        onPocPageChange={setLocPocPage}
+        pocTempSelected={locPocTempSelected}
+        onTogglePocTemp={handleLocTogglePocTemp}
+        onConfirm={handleLocConfirmSelect}
+        onOpenCreatePoc={handleLocOpenCreateFromSelect}
+        contextLabel={selectedLocation?.name || "this location"}
+      />
+
+      {/* ══════ Location POC: Create New Contact Modal ══════ */}
+      <CreatePocModal
+        open={locShowCreateModal}
+        onOpenChange={setLocShowCreateModal}
+        contextName={selectedLocation?.name || "Location"}
+        newPocName={locNewPocName}
+        onNewPocNameChange={setLocNewPocName}
+        newPocDepartment={locNewPocDepartment}
+        onNewPocDepartmentChange={setLocNewPocDepartment}
+        newPocRole={locNewPocRole}
+        onNewPocRoleChange={setLocNewPocRole}
+        newPocLandline={locNewPocLandline}
+        onNewPocLandlineChange={setLocNewPocLandline}
+        newPocLandlineCode={locNewPocLandlineCode}
+        onNewPocLandlineCodeChange={setLocNewPocLandlineCode}
+        newPocExt={locNewPocExt}
+        onNewPocExtChange={setLocNewPocExt}
+        newPocMobile={locNewPocMobile}
+        onNewPocMobileChange={setLocNewPocMobile}
+        newPocMobileCode={locNewPocMobileCode}
+        onNewPocMobileCodeChange={setLocNewPocMobileCode}
+        newPocEmail={locNewPocEmail}
+        onNewPocEmailChange={setLocNewPocEmail}
+        saveAndCreateAnother={locSaveAndCreate}
+        onSaveAndCreateAnotherChange={setLocSaveAndCreate}
+        onSave={handleLocSavePoc}
+      />
     </>
   );
 }
