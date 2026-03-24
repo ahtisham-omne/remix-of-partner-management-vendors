@@ -3938,12 +3938,8 @@ function ConfigPageContent({
 
   // Shipping Methods state
   const [shippingTab, setShippingTab] = useState<"carrier" | "vendor">("carrier");
-  const [carrierServices, setCarrierServices] = useState<Array<{ id: string; name: string; description: string; minDuration: number; maxDuration: number; isDefault: boolean }>>([
-    { id: "cs-1", name: "Economical Shipping", description: "UPS Worldwide Economy® is our most econo...", minDuration: 3, maxDuration: 12, isDefault: true },
-  ]);
-  const [vendorShippingPrefs, setVendorShippingPrefs] = useState<Array<{ id: string; carrier: string; methods: string; isDefault: boolean }>>([
-    { id: "vsp-1", carrier: "", methods: "", isDefault: true },
-  ]);
+  const [carrierServices, setCarrierServices] = useState<Array<{ id: string; name: string; description: string; minDuration: number; maxDuration: number; isDefault: boolean }>>([]);
+  const [vendorShippingPrefs, setVendorShippingPrefs] = useState<Array<{ id: string; carrier: string; methods: string; isDefault: boolean }>>([]);
   const csCounter = useRef(1);
   const vspCounter = useRef(1);
 
