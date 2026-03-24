@@ -3707,76 +3707,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                   {/* ── Items tab ── */}
                   {locDetailTab === "items" && (
                     <div className="flex-1 flex flex-col overflow-hidden">
-                      <div className="flex items-center justify-between gap-3 px-4 pt-3 pb-2 shrink-0">
-                        <div className="flex items-center gap-2 flex-1 min-w-0">
-                          <div className="relative flex-1 max-w-[220px]">
-                            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8] pointer-events-none" />
-                            <input type="text" placeholder="Search items..." className="w-full pl-8 h-8 text-[12px] bg-white border border-[#E2E8F0] rounded-lg px-3 py-1.5 focus:outline-none focus:border-[#0A77FF] transition-colors" />
-                          </div>
-                          <button className="h-8 px-2.5 rounded-lg border border-[#E2E8F0] bg-white text-[12px] text-[#475569] hover:bg-[#F8FAFC] cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 500 }}>
-                            <SlidersHorizontal className="w-3.5 h-3.5" /> Filters
-                          </button>
-                        </div>
-                        <button onClick={() => toast.info("Add new item coming soon")} className="h-8 px-3 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-[12px] shadow-sm cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 600 }}>
-                          <Plus className="w-3.5 h-3.5" /> Add new item
-                        </button>
-                      </div>
-                      {/* Item type filter chips */}
-                      <div className="flex items-center gap-1.5 px-4 pb-2 flex-wrap">
-                        {["Me mode", "Parts", "Equipment - Capital", "Equipment - Non-Capital", "Miscellaneous", "Active", "Inactive"].map((chip) => (
-                          <span key={chip} className="text-[11px] px-2.5 py-1 rounded-full cursor-pointer transition-colors bg-[#F8FAFC] text-[#64748B] border border-[#E2E8F0] hover:bg-[#F1F5F9]" style={{ fontWeight: 500 }}>
-                            {chip}
-                          </span>
-                        ))}
-                      </div>
-                      <div className="h-px bg-[#E8ECF1] mx-4 shrink-0" />
-                      <div className="flex-1 overflow-auto">
-                        <table className="w-full text-[12px]">
-                          <thead className="sticky top-0 bg-[#F8FAFC] z-10">
-                            <tr>
-                              <th className="text-left px-4 py-2.5 text-[#94A3B8] text-[11px] border-b border-[#E8ECF1]" style={{ fontWeight: 600 }}>Part No.</th>
-                              <th className="text-left px-4 py-2.5 text-[#94A3B8] text-[11px] border-b border-[#E8ECF1]" style={{ fontWeight: 600 }}>Item Description</th>
-                              <th className="text-left px-4 py-2.5 text-[#94A3B8] text-[11px] border-b border-[#E8ECF1]" style={{ fontWeight: 600 }}>Category</th>
-                              <th className="text-left px-4 py-2.5 text-[#94A3B8] text-[11px] border-b border-[#E8ECF1]" style={{ fontWeight: 600 }}>Item Type</th>
-                              <th className="text-left px-4 py-2.5 text-[#94A3B8] text-[11px] border-b border-[#E8ECF1]" style={{ fontWeight: 600 }}>Item Control</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {LOC_ITEMS_DATA.map((item) => (
-                              <tr key={item.partNo} className="hover:bg-[#F8FBFF] transition-colors">
-                                <td className="px-4 py-2.5">
-                                  <code className="text-[11px] text-[#334155]">{item.partNo}</code>
-                                </td>
-                                <td className="px-4 py-2.5">
-                                  <div className="flex items-center gap-2">
-                                    <div className="w-7 h-7 rounded bg-[#F1F5F9] border border-[#E2E8F0] flex items-center justify-center shrink-0">
-                                      <Package className="w-3 h-3 text-[#94A3B8]" />
-                                    </div>
-                                    <span className="text-[12px] text-[#0F172A] truncate max-w-[200px]" style={{ fontWeight: 500 }}>{item.desc}</span>
-                                  </div>
-                                </td>
-                                <td className="px-4 py-2.5">
-                                  <span className="text-[12px] text-[#475569]">{item.category}</span>
-                                </td>
-                                <td className="px-4 py-2.5">
-                                  <span className="inline-flex px-2 py-0.5 rounded text-[10px] border" style={{ fontWeight: 500, backgroundColor: item.typeBg, color: item.typeColor, borderColor: item.typeColor + "30" }}>
-                                    {item.type}
-                                  </span>
-                                </td>
-                                <td className="px-4 py-2.5">
-                                  <span className="text-[12px] text-[#475569]">{item.control}</span>
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                      <div className="flex items-center justify-between px-4 py-2 border-t border-[#E8ECF1] shrink-0 bg-[#FAFBFC]">
-                        <span className="text-[11px] text-[#94A3B8]">Records per page <select className="h-6 px-1.5 rounded border border-[#E2E8F0] text-[11px] cursor-pointer outline-none ml-1"><option>20</option><option>50</option></select></span>
-                        <div className="flex items-center gap-1 text-[11px] text-[#94A3B8]">
-                          <span className="px-2 py-0.5 rounded bg-[#0A77FF] text-white" style={{ fontWeight: 600 }}>1</span>
-                        </div>
-                      </div>
+                      <PartnerItemsTab vendor={vendor} />
                     </div>
                   )}
 
