@@ -7607,37 +7607,30 @@ function ConfigPageContent({
                               type="number"
                               value={entry.minDuration}
                               onChange={(e) => {
-                                const val = Math.max(1, parseInt(e.target.value) || 1);
-                                updateCarrierService(entry.id, { minDuration: val, maxDuration: Math.max(val, entry.maxDuration) });
+                                const val = Math.max(1, Math.min(entry.maxDuration, parseInt(e.target.value) || 1));
+                                updateCarrierService(entry.id, { minDuration: val });
                               }}
                               className="w-16 h-8 rounded-md border-[#E2E8F0] bg-white text-sm text-center text-[#0F172A] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
                             />
                           </div>
-                          {/* Visual range bar */}
-                          <div className="flex-1 relative h-1.5 bg-[#E2E8F0] rounded-full">
-                            <div
-                              className="absolute top-0 h-full bg-primary rounded-full transition-all"
-                              style={{
-                                left: `${((entry.minDuration - 1) / 59) * 100}%`,
-                                right: `${100 - ((entry.maxDuration - 1) / 59) * 100}%`,
-                              }}
-                            />
-                            <div
-                              className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-white border-2 border-primary rounded-full shadow-sm"
-                              style={{ left: `calc(${((entry.minDuration - 1) / 59) * 100}% - 6px)` }}
-                            />
-                            <div
-                              className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-white border-2 border-primary rounded-full shadow-sm"
-                              style={{ left: `calc(${((entry.maxDuration - 1) / 59) * 100}% - 6px)` }}
-                            />
-                          </div>
+                          {/* Interactive dual-thumb slider */}
+                          <Slider
+                            value={[entry.minDuration, entry.maxDuration]}
+                            min={1}
+                            max={60}
+                            step={1}
+                            onValueChange={([min, max]: number[]) => {
+                              updateCarrierService(entry.id, { minDuration: min, maxDuration: max });
+                            }}
+                            className="flex-1"
+                          />
                           <div className="flex items-center gap-1.5">
                             <Input
                               type="number"
                               value={entry.maxDuration}
                               onChange={(e) => {
-                                const val = Math.min(60, parseInt(e.target.value) || 60);
-                                updateCarrierService(entry.id, { maxDuration: val, minDuration: Math.min(val, entry.minDuration) });
+                                const val = Math.min(60, Math.max(entry.minDuration, parseInt(e.target.value) || 60));
+                                updateCarrierService(entry.id, { maxDuration: val });
                               }}
                               className="w-16 h-8 rounded-md border-[#E2E8F0] bg-white text-sm text-center text-[#0F172A] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
                             />
