@@ -8048,17 +8048,23 @@ function ConfigPageContent({
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-[#EEF2F6] bg-white shrink-0">
               <div className="flex items-center gap-3">
-                <h3 className="text-[15px] text-foreground leading-tight" style={{ fontWeight: 600 }}>Create Shipping Methods</h3>
-                {(() => {
-                  const carrier = CARRIER_CATALOG.find((c) => c.id === createSmForCarrier);
-                  if (!carrier) return null;
-                  return (
-                    <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg bg-muted/50 border border-border text-xs text-foreground" style={{ fontWeight: 500 }}>
-                      <img src={carrier.logoImg} alt={carrier.name} className="w-5 h-5 rounded object-contain" />
-                      {carrier.name}
-                    </span>
-                  );
-                })()}
+                <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <Package className="w-4 h-4 text-primary" />
+                </div>
+                <div>
+                  <h3 className="text-[15px] text-foreground leading-tight" style={{ fontWeight: 600 }}>Create Shipping Methods</h3>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">
+                    {(() => {
+                      const carrier = CARRIER_CATALOG.find((c) => c.id === createSmForCarrier);
+                      return carrier ? (
+                        <span className="inline-flex items-center gap-1">
+                          <img src={carrier.logoImg} alt={carrier.name} className="w-3.5 h-3.5 rounded-sm object-contain" />
+                          {carrier.name}
+                        </span>
+                      ) : "Configure delivery options";
+                    })()}
+                  </p>
+                </div>
               </div>
               <button onClick={() => setCreateShippingMethodOpen(false)} className="w-8 h-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all">
                 <X className="w-4 h-4" />
@@ -8066,13 +8072,14 @@ function ConfigPageContent({
             </div>
 
             {/* Body */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-[#FAFBFC]">
+            <div className="flex-1 overflow-y-auto p-6 space-y-3 bg-[#FAFBFC]">
               {createSmMethods.map((sm, idx) => (
-                <div key={sm.id} className="rounded-xl border border-[#E2E8F0] bg-white relative">
-                  {/* Top actions row */}
-                  <div className="flex items-center justify-between px-5 pt-4 pb-1">
+                <div key={sm.id} className="rounded-xl border border-border bg-white shadow-sm relative">
+                  {/* Card header */}
+                  <div className="flex items-center justify-between px-4 py-3 border-b border-border">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs text-muted-foreground" style={{ fontWeight: 600 }}>#{idx + 1}</span>
+                      <span className="text-[11px] text-muted-foreground" style={{ fontWeight: 600 }}>#{idx + 1}</span>
+                      <span className="text-[13px] text-foreground" style={{ fontWeight: 600 }}>Shipping Method</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <label className="flex items-center gap-1.5 cursor-pointer">
@@ -8101,34 +8108,32 @@ function ConfigPageContent({
                       )}
                     </div>
                   </div>
-                  {/* Fields */}
-                  <div className="px-5 pb-5 pt-2 space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
+                  {/* Card body */}
+                  <div className="p-4 space-y-3">
+                    <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <Label className="text-sm text-foreground mb-1.5 block" style={{ fontWeight: 600 }}>
-                          Method Name <span className="text-destructive">*</span>
-                        </Label>
+                        <Label className="text-[11px] text-foreground" style={{ fontWeight: 600 }}>Shipping Method Name<span className="text-destructive">*</span></Label>
                         <Input
                           value={sm.name}
                           onChange={(e) => setCreateSmMethods((prev) => prev.map((m) => m.id === sm.id ? { ...m, name: e.target.value } : m))}
-                          placeholder="e.g. Express Delivery"
-                          className="rounded-lg border-[#E2E8F0] bg-white h-10 text-sm text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:ring-1 focus:ring-primary/20"
+                          placeholder="Enter shipping method name"
+                          className="mt-1 rounded-lg border-[#E2E8F0] bg-white h-9 sm:h-10 text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-primary focus:ring-1 focus:ring-primary/20"
                         />
                       </div>
                       <div>
-                        <Label className="text-sm text-foreground mb-1.5 block" style={{ fontWeight: 600 }}>Description</Label>
+                        <Label className="text-[11px] text-foreground" style={{ fontWeight: 600 }}>Description</Label>
                         <Input
                           value={sm.description}
                           onChange={(e) => setCreateSmMethods((prev) => prev.map((m) => m.id === sm.id ? { ...m, description: e.target.value } : m))}
-                          placeholder="Brief summary of shipping method."
-                          className="rounded-lg border-[#E2E8F0] bg-white h-10 text-sm text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:ring-1 focus:ring-primary/20"
+                          placeholder="Enter description"
+                          className="mt-1 rounded-lg border-[#E2E8F0] bg-white h-9 sm:h-10 text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-primary focus:ring-1 focus:ring-primary/20"
                         />
                       </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <Label className="text-sm text-foreground mb-1.5 block" style={{ fontWeight: 600 }}>Minimum (Days)</Label>
-                        <div className="relative">
+                        <Label className="text-[11px] text-foreground" style={{ fontWeight: 600 }}>Minimum (Days)</Label>
+                        <div className="mt-1 relative">
                           <Input
                             type="number"
                             value={sm.minDuration}
@@ -8136,26 +8141,29 @@ function ConfigPageContent({
                               const val = Math.max(1, Math.min(sm.maxDuration, parseInt(e.target.value) || 1));
                               setCreateSmMethods((prev) => prev.map((m) => m.id === sm.id ? { ...m, minDuration: val } : m));
                             }}
-                            placeholder="e.g. 3"
-                            className="rounded-lg border-[#E2E8F0] bg-white h-10 text-sm text-foreground pr-12 placeholder:text-muted-foreground/50 focus:border-primary focus:ring-1 focus:ring-primary/20"
+                            placeholder="Enter minimum delivery period"
+                            className="rounded-lg border-[#E2E8F0] bg-white h-9 sm:h-10 text-sm text-foreground pr-12 placeholder:text-muted-foreground/60 focus:border-primary focus:ring-1 focus:ring-primary/20"
                           />
                           <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground" style={{ fontWeight: 500 }}>days</span>
                         </div>
                       </div>
-                      <div>
-                        <Label className="text-sm text-foreground mb-1.5 block" style={{ fontWeight: 600 }}>Maximum (Days)</Label>
-                        <div className="relative">
-                          <Input
-                            type="number"
-                            value={sm.maxDuration}
-                            onChange={(e) => {
-                              const val = Math.min(365, Math.max(sm.minDuration, parseInt(e.target.value) || 1));
-                              setCreateSmMethods((prev) => prev.map((m) => m.id === sm.id ? { ...m, maxDuration: val } : m));
-                            }}
-                            placeholder="e.g. 7"
-                            className="rounded-lg border-[#E2E8F0] bg-white h-10 text-sm text-foreground pr-12 placeholder:text-muted-foreground/50 focus:border-primary focus:ring-1 focus:ring-primary/20"
-                          />
-                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground" style={{ fontWeight: 500 }}>days</span>
+                      <div className="relative">
+                        <Label className="text-[11px] text-foreground" style={{ fontWeight: 600 }}>Maximum (Days)</Label>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-xs text-muted-foreground shrink-0" style={{ fontWeight: 500 }}>to</span>
+                          <div className="relative flex-1">
+                            <Input
+                              type="number"
+                              value={sm.maxDuration}
+                              onChange={(e) => {
+                                const val = Math.min(365, Math.max(sm.minDuration, parseInt(e.target.value) || 1));
+                                setCreateSmMethods((prev) => prev.map((m) => m.id === sm.id ? { ...m, maxDuration: val } : m));
+                              }}
+                              placeholder="Enter maximum delivery period"
+                              className="rounded-lg border-[#E2E8F0] bg-white h-9 sm:h-10 text-sm text-foreground pr-12 placeholder:text-muted-foreground/60 focus:border-primary focus:ring-1 focus:ring-primary/20"
+                            />
+                            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground" style={{ fontWeight: 500 }}>days</span>
+                          </div>
                         </div>
                       </div>
                     </div>
