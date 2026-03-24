@@ -7472,14 +7472,7 @@ function ConfigPageContent({
       setVendorShippingPrefs((prev) => prev.map((s) => (s.id === id ? { ...s, ...updates } : s)));
     }
 
-    // ── Collapsible section states ──
-    const [carrierSectionOpen, setCarrierSectionOpen] = React.useState(true);
-    const [vendorPrefSectionOpen, setVendorPrefSectionOpen] = React.useState(true);
-
-    // ── Carrier search for Vendor Prefs ──
-    const [carrierSearches, setCarrierSearches] = React.useState<Record<string, string>>({});
-    const [carrierDropdownOpen, setCarrierDropdownOpen] = React.useState<Record<string, boolean>>({});
-    const [methodDropdownOpen, setMethodDropdownOpen] = React.useState<Record<string, boolean>>({});
+    // (Collapsible + search states moved to top of ConfigPageContent)
 
     return (
       <div className="space-y-4">
