@@ -849,7 +849,7 @@ function ItemTypeBadge({ type }: { type: string }) {
   );
 }
 
-function DetailModal({ rule, open, onClose, mode = "create", onApply, onDuplicate, onDisable }: { rule: PricingRule | null; open: boolean; onClose: () => void; mode?: "view" | "create"; onApply?: (rule: PricingRule) => void; onDuplicate?: (rule: PricingRule) => void; onDisable?: (rule: PricingRule) => void }) {
+export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", onApply, onDuplicate, onDisable }: { rule: PricingRule | null; open: boolean; onClose: () => void; mode?: "view" | "create"; onApply?: (rule: PricingRule) => void; onDuplicate?: (rule: PricingRule) => void; onDisable?: (rule: PricingRule) => void }) {
   const [tab, setTab] = useState<string>("items");
   const [itemSearch, setItemSearch] = useState("");
   const [catSearch, setCatSearch] = useState("");
