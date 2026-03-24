@@ -127,7 +127,7 @@ interface AssociatedPartner {
   status: "Active" | "Inactive";
 }
 
-interface PricingRule {
+export interface PricingRule {
   id: string;
   ruleNo: string;
   name: string;
