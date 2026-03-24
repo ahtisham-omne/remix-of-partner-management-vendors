@@ -2506,7 +2506,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
   const handleCloseDetailModal = useCallback(() => {
     setDetailModalOpen(false);
     setIsFullScreen(false);
-    setLocDetailTab("overview");
+    setLocDetailTab("poc");
     setLocAboutOpen(true);
     setLocPocOpen(true);
     setLocBillingOpen(true);
