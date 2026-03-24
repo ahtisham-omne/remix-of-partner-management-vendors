@@ -2166,8 +2166,9 @@ export function VendorsListPage() {
       {/* Create Partner Modal */}
       <CreatePartnerModal
         open={createModalOpen}
-        onOpenChange={setCreateModalOpen}
+        onOpenChange={handleCreateModalClose}
         onPartnerCreated={handlePartnerCreated}
+        initialProfile={createPartnerProfile || undefined}
       />
 
       {/* Mark as Active Dialog */}
