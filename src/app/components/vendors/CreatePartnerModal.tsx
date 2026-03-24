@@ -8036,55 +8036,73 @@ function ConfigPageContent({
         {/* ── Create Shipping Method Modal ── */}
         <Dialog open={createShippingMethodOpen} onOpenChange={setCreateShippingMethodOpen}>
           <DialogContent
-            className="p-0 gap-0 overflow-hidden border-0 shadow-[0_24px_80px_-12px_rgba(0,0,0,0.18)] flex flex-col z-[230]"
-            style={{ maxWidth: 720, width: "95vw", maxHeight: "85vh", borderRadius: 16 }}
+            className="p-0 gap-0 overflow-hidden border-0 shadow-[0_32px_100px_-16px_rgba(0,0,0,0.2)] flex flex-col z-[230]"
+            style={{ maxWidth: 680, width: "95vw", maxHeight: "85vh", borderRadius: 20 }}
             hideCloseButton
             overlayClassName="z-[225]"
           >
             <DialogTitle className="sr-only">Create Shipping Methods</DialogTitle>
             <DialogDescription className="sr-only">Add new shipping methods for this carrier.</DialogDescription>
 
-            {/* Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-[#EEF2F6] bg-white shrink-0">
-              <div className="flex items-center gap-3">
-                <h3 className="text-[15px] text-foreground" style={{ fontWeight: 600 }}>Create Shipping Methods</h3>
-                {(() => {
-                  const carrier = CARRIER_CATALOG.find((c) => c.id === createSmForCarrier);
-                  if (!carrier) return null;
-                  return (
-                    <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg bg-muted/50 border border-border text-xs text-foreground" style={{ fontWeight: 500 }}>
-                      <img src={carrier.logoImg} alt={carrier.name} className="w-5 h-5 rounded object-contain" />
-                      {carrier.name}
-                    </span>
-                  );
-                })()}
+            {/* Header — gradient accent bar + clean layout */}
+            <div className="relative shrink-0">
+              <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary via-primary/70 to-primary/40 rounded-t-[20px]" />
+              <div className="flex items-center justify-between px-6 pt-5 pb-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center">
+                    <Package className="w-4.5 h-4.5 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="text-[15px] text-foreground leading-tight" style={{ fontWeight: 700 }}>New Shipping Method</h3>
+                    <p className="text-[11px] text-muted-foreground mt-0.5">
+                      {(() => {
+                        const carrier = CARRIER_CATALOG.find((c) => c.id === createSmForCarrier);
+                        return carrier ? (
+                          <span className="inline-flex items-center gap-1">
+                            <img src={carrier.logoImg} alt={carrier.name} className="w-3.5 h-3.5 rounded-sm object-contain" />
+                            {carrier.name}
+                          </span>
+                        ) : "Configure delivery options";
+                      })()}
+                    </p>
+                  </div>
+                </div>
+                <button onClick={() => setCreateShippingMethodOpen(false)} className="w-8 h-8 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-all">
+                  <X className="w-4 h-4" />
+                </button>
               </div>
-              <button onClick={() => setCreateShippingMethodOpen(false)} className="w-8 h-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all">
-                <X className="w-4 h-4" />
-              </button>
             </div>
 
             {/* Body */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-[#FAFBFC]">
+            <div className="flex-1 overflow-y-auto px-6 pb-5 space-y-3">
               {createSmMethods.map((sm, idx) => (
-                <div key={sm.id} className="rounded-xl border border-border bg-white shadow-sm relative">
-                  {/* Card header */}
-                  <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+                <div
+                  key={sm.id}
+                  className={cn(
+                    "rounded-2xl border bg-white relative transition-all duration-200",
+                    sm.isDefault ? "border-primary/30 shadow-[0_0_0_1px_hsl(var(--primary)/0.1),0_4px_16px_-4px_hsl(var(--primary)/0.12)]" : "border-border shadow-sm hover:shadow-md"
+                  )}
+                >
+                  {/* Card top bar */}
+                  <div className="flex items-center justify-between px-4 py-2.5">
                     <div className="flex items-center gap-2">
-                      <span className="text-[11px] text-muted-foreground" style={{ fontWeight: 600 }}>#{idx + 1}</span>
-                      <span className="text-[13px] text-foreground" style={{ fontWeight: 600 }}>Shipping Method</span>
+                      <span className="w-5 h-5 rounded-md bg-muted flex items-center justify-center text-[10px] text-muted-foreground" style={{ fontWeight: 700 }}>{idx + 1}</span>
+                      {sm.isDefault && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px]" style={{ fontWeight: 600 }}>
+                          <Star className="w-2.5 h-2.5 fill-primary" /> Default
+                        </span>
+                      )}
                     </div>
-                    <div className="flex items-center gap-2">
-                      <label className="flex items-center gap-1.5 cursor-pointer">
-                        <Switch
-                          checked={sm.isDefault}
-                          onCheckedChange={() => {
-                            setCreateSmMethods((prev) => prev.map((m) => ({ ...m, isDefault: m.id === sm.id })));
-                          }}
-                          className="data-[state=checked]:bg-primary w-8 h-[18px]"
-                        />
-                        <span className="text-[11px] text-muted-foreground" style={{ fontWeight: 500 }}>Mark as Default</span>
-                      </label>
+                    <div className="flex items-center gap-1.5">
+                      {!sm.isDefault && (
+                        <button
+                          onClick={() => setCreateSmMethods((prev) => prev.map((m) => ({ ...m, isDefault: m.id === sm.id })))}
+                          className="text-[10px] text-muted-foreground hover:text-primary px-2 py-1 rounded-md hover:bg-primary/5 transition-colors"
+                          style={{ fontWeight: 500 }}
+                        >
+                          Set Default
+                        </button>
+                      )}
                       {createSmMethods.length > 1 && (
                         <button
                           onClick={() => {
@@ -8094,39 +8112,45 @@ function ConfigPageContent({
                               return next;
                             });
                           }}
-                          className="w-6 h-6 rounded-full border border-border flex items-center justify-center hover:bg-destructive/10 hover:border-destructive/30 transition-colors"
+                          className="w-6 h-6 rounded-full flex items-center justify-center text-muted-foreground/50 hover:text-destructive hover:bg-destructive/8 transition-colors"
                         >
-                          <X className="w-3 h-3 text-muted-foreground" />
+                          <Trash2 className="w-3 h-3" />
                         </button>
                       )}
                     </div>
                   </div>
-                  {/* Card body */}
-                  <div className="p-4 space-y-3">
+
+                  {/* Card fields */}
+                  <div className="px-4 pb-4 space-y-3">
+                    {/* Row 1: Name + Description */}
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <Label className="text-[11px] text-foreground" style={{ fontWeight: 600 }}>Shipping Method Name<span className="text-destructive">*</span></Label>
+                        <Label className="text-[11px] text-muted-foreground mb-1.5 block" style={{ fontWeight: 600 }}>
+                          Method Name <span className="text-destructive">*</span>
+                        </Label>
                         <Input
                           value={sm.name}
                           onChange={(e) => setCreateSmMethods((prev) => prev.map((m) => m.id === sm.id ? { ...m, name: e.target.value } : m))}
-                          placeholder="Enter shipping method name"
-                          className="mt-1 rounded-lg border-[#E2E8F0] bg-white h-9 sm:h-10 text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-primary focus:ring-1 focus:ring-primary/20"
+                          placeholder="e.g. Express Delivery"
+                          className="rounded-xl border-[#E2E8F0] bg-white h-9 text-[13px] text-foreground placeholder:text-muted-foreground/40 focus:border-primary focus:ring-1 focus:ring-primary/20"
                         />
                       </div>
                       <div>
-                        <Label className="text-[11px] text-foreground" style={{ fontWeight: 600 }}>Description</Label>
+                        <Label className="text-[11px] text-muted-foreground mb-1.5 block" style={{ fontWeight: 600 }}>Description</Label>
                         <Input
                           value={sm.description}
                           onChange={(e) => setCreateSmMethods((prev) => prev.map((m) => m.id === sm.id ? { ...m, description: e.target.value } : m))}
-                          placeholder="Input text"
-                          className="mt-1 rounded-lg border-[#E2E8F0] bg-white h-9 sm:h-10 text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-primary focus:ring-1 focus:ring-primary/20"
+                          placeholder="e.g. 2-day guaranteed"
+                          className="rounded-xl border-[#E2E8F0] bg-white h-9 text-[13px] text-foreground placeholder:text-muted-foreground/40 focus:border-primary focus:ring-1 focus:ring-primary/20"
                         />
                       </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <Label className="text-[11px] text-foreground" style={{ fontWeight: 600 }}>Minimum (Days)</Label>
-                        <div className="mt-1 relative">
+
+                    {/* Row 2: Delivery Duration — connected inputs */}
+                    <div>
+                      <Label className="text-[11px] text-muted-foreground mb-1.5 block" style={{ fontWeight: 600 }}>Delivery Duration</Label>
+                      <div className="flex items-center gap-0 rounded-xl border border-[#E2E8F0] bg-white overflow-hidden focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/20">
+                        <div className="flex-1 flex items-center px-3">
                           <Input
                             type="number"
                             value={sm.minDuration}
@@ -8134,29 +8158,26 @@ function ConfigPageContent({
                               const val = Math.max(1, Math.min(sm.maxDuration, parseInt(e.target.value) || 1));
                               setCreateSmMethods((prev) => prev.map((m) => m.id === sm.id ? { ...m, minDuration: val } : m));
                             }}
-                            placeholder="Enter minimum delivery period"
-                            className="rounded-lg border-[#E2E8F0] bg-white h-9 sm:h-10 text-sm text-foreground pr-12 placeholder:text-muted-foreground/60 focus:border-primary focus:ring-1 focus:ring-primary/20"
+                            placeholder="Min"
+                            className="border-0 bg-transparent h-9 text-[13px] text-foreground p-0 focus:ring-0 focus:border-0 shadow-none placeholder:text-muted-foreground/40 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                           />
-                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground" style={{ fontWeight: 500 }}>days</span>
+                          <span className="text-[11px] text-muted-foreground/60 shrink-0 ml-1" style={{ fontWeight: 500 }}>days</span>
                         </div>
-                      </div>
-                      <div className="relative">
-                        <Label className="text-[11px] text-foreground" style={{ fontWeight: 600 }}>Maximum (Days)</Label>
-                        <div className="flex items-center gap-2 mt-1">
-                          <span className="text-xs text-muted-foreground shrink-0" style={{ fontWeight: 500 }}>to</span>
-                          <div className="relative flex-1">
-                            <Input
-                              type="number"
-                              value={sm.maxDuration}
-                              onChange={(e) => {
-                                const val = Math.min(365, Math.max(sm.minDuration, parseInt(e.target.value) || 1));
-                                setCreateSmMethods((prev) => prev.map((m) => m.id === sm.id ? { ...m, maxDuration: val } : m));
-                              }}
-                              placeholder="Enter maximum delivery period"
-                              className="rounded-lg border-[#E2E8F0] bg-white h-9 sm:h-10 text-sm text-foreground pr-12 placeholder:text-muted-foreground/60 focus:border-primary focus:ring-1 focus:ring-primary/20"
-                            />
-                            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground" style={{ fontWeight: 500 }}>days</span>
-                          </div>
+                        <div className="w-px h-5 bg-border" />
+                        <div className="px-3 text-[11px] text-muted-foreground/50 shrink-0" style={{ fontWeight: 600 }}>to</div>
+                        <div className="w-px h-5 bg-border" />
+                        <div className="flex-1 flex items-center px-3">
+                          <Input
+                            type="number"
+                            value={sm.maxDuration}
+                            onChange={(e) => {
+                              const val = Math.min(365, Math.max(sm.minDuration, parseInt(e.target.value) || 1));
+                              setCreateSmMethods((prev) => prev.map((m) => m.id === sm.id ? { ...m, maxDuration: val } : m));
+                            }}
+                            placeholder="Max"
+                            className="border-0 bg-transparent h-9 text-[13px] text-foreground p-0 focus:ring-0 focus:border-0 shadow-none placeholder:text-muted-foreground/40 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          />
+                          <span className="text-[11px] text-muted-foreground/60 shrink-0 ml-1" style={{ fontWeight: 500 }}>days</span>
                         </div>
                       </div>
                     </div>
@@ -8164,6 +8185,7 @@ function ConfigPageContent({
                 </div>
               ))}
 
+              {/* Add another */}
               <button
                 onClick={() => {
                   setCreateSmMethods((prev) => [
@@ -8171,38 +8193,41 @@ function ConfigPageContent({
                     { id: `csm-${Date.now()}`, name: "", description: "", minDuration: 1, maxDuration: 30, isDefault: prev.length === 0 },
                   ]);
                 }}
-                className="inline-flex items-center gap-1.5 text-[13px] text-primary hover:underline"
+                className="w-full py-2.5 rounded-2xl border-2 border-dashed border-border hover:border-primary/40 flex items-center justify-center gap-1.5 text-[12px] text-muted-foreground hover:text-primary transition-all group"
                 style={{ fontWeight: 600 }}
               >
-                <Plus className="w-3.5 h-3.5" /> Add Shipping Method
+                <Plus className="w-3.5 h-3.5 group-hover:scale-110 transition-transform" /> Add Another Method
               </button>
             </div>
 
             {/* Footer */}
-            <div className="border-t border-border px-6 py-3 flex items-center justify-end gap-2 bg-white shrink-0">
-              <Button
-                variant="outline"
-                onClick={() => setCreateShippingMethodOpen(false)}
-                className="border-[#E2E8F0] text-muted-foreground rounded-lg text-[13px] px-4 h-9"
-              >
-                Discard
-              </Button>
-              <Button
-                onClick={() => {
-                  const validMethods = createSmMethods.filter((m) => m.name.trim());
-                  if (validMethods.length === 0) {
-                    toast.error("Please add at least one shipping method with a name");
-                    return;
-                  }
-                  // Add created methods to the CARRIER_METHODS for the carrier
-                  // In a real app this would persist; here we add to the vendor pref's selected methods
-                  toast.success(`${validMethods.length} shipping method${validMethods.length > 1 ? "s" : ""} created successfully`);
-                  setCreateShippingMethodOpen(false);
-                }}
-                className="rounded-lg text-[13px] px-4 h-9 shadow-sm"
-              >
-                Save
-              </Button>
+            <div className="border-t border-border/60 px-6 py-3.5 flex items-center justify-between bg-white shrink-0">
+              <p className="text-[11px] text-muted-foreground">
+                {createSmMethods.length} method{createSmMethods.length !== 1 ? "s" : ""} configured
+              </p>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  onClick={() => setCreateShippingMethodOpen(false)}
+                  className="text-muted-foreground rounded-xl text-[13px] px-4 h-9 hover:bg-muted/50"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={() => {
+                    const validMethods = createSmMethods.filter((m) => m.name.trim());
+                    if (validMethods.length === 0) {
+                      toast.error("Please add at least one shipping method with a name");
+                      return;
+                    }
+                    toast.success(`${validMethods.length} shipping method${validMethods.length > 1 ? "s" : ""} created successfully`);
+                    setCreateShippingMethodOpen(false);
+                  }}
+                  className="rounded-xl text-[13px] px-5 h-9 shadow-sm bg-primary hover:bg-primary/90"
+                >
+                  Create Methods
+                </Button>
+              </div>
             </div>
           </DialogContent>
         </Dialog>
