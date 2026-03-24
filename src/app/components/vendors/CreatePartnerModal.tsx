@@ -8042,7 +8042,7 @@ function ConfigPageContent({
                   if (!carrier) return null;
                   return (
                     <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg bg-muted/50 border border-border text-xs text-foreground" style={{ fontWeight: 500 }}>
-                      <span className="text-base">{carrier.logo}</span>
+                      <img src={carrier.logoImg} alt={carrier.name} className="w-5 h-5 rounded object-contain" />
                       {carrier.name}
                     </span>
                   );
