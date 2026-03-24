@@ -2399,7 +2399,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
   const [selectedLocation, setSelectedLocation] = useState<PartnerLocationData | null>(null);
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
-  const [locDetailTab, setLocDetailTab] = useState("overview");
+  const [locDetailTab, setLocDetailTab] = useState("poc");
   const [locAboutOpen, setLocAboutOpen] = useState(true);
   const [locPocOpen, setLocPocOpen] = useState(true);
   const [locBillingOpen, setLocBillingOpen] = useState(true);
@@ -2506,7 +2506,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
   const handleCloseDetailModal = useCallback(() => {
     setDetailModalOpen(false);
     setIsFullScreen(false);
-    setLocDetailTab("overview");
+    setLocDetailTab("poc");
     setLocAboutOpen(true);
     setLocPocOpen(true);
     setLocBillingOpen(true);
@@ -2722,12 +2722,12 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                           className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10.5px] shadow-sm backdrop-blur-sm border"
                           style={{
                             fontWeight: 600,
-                            backgroundColor: loc.status === "active" ? "rgba(236,253,245,0.92)" : "rgba(255,251,235,0.92)",
-                            color: loc.status === "active" ? "#065F46" : "#92400E",
-                            borderColor: loc.status === "active" ? "#A7F3D0" : "#FDE68A",
+                            backgroundColor: loc.status === "active" ? "rgba(236,253,245,0.92)" : "rgba(254,242,242,0.92)",
+                            color: loc.status === "active" ? "#065F46" : "#991B1B",
+                            borderColor: loc.status === "active" ? "#A7F3D0" : "#FECACA",
                           }}
                         >
-                          <span className="w-[5px] h-[5px] rounded-full" style={{ backgroundColor: loc.status === "active" ? "#059669" : "#D97706" }} />
+                          <span className="w-[5px] h-[5px] rounded-full" style={{ backgroundColor: loc.status === "active" ? "#059669" : "#DC2626" }} />
                           {loc.status === "active" ? "Active" : "Inactive"}
                         </span>
                         <span
@@ -3079,16 +3079,17 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
             const locLandline = `(${loc.phone.replace(/[^\d]/g, "").slice(1, 4)}) ${loc.phone.replace(/[^\d]/g, "").slice(4, 7)}-${loc.phone.replace(/[^\d]/g, "").slice(7, 11)}`;
 
             const LOC_TABS = [
-              { id: "overview", label: "Overview", icon: Eye },
               { id: "poc", label: "Point of Contacts", icon: Users },
               { id: "items", label: "Items", icon: Package },
-              { id: "service_centers", label: "Service Centers", icon: Wrench },
+              { id: "service_centers", label: "Service Center", icon: Wrench },
               { id: "carrier_shipping", label: "Carrier & Shipping", icon: Truck },
               { id: "pricing_rules", label: "Pricing Rules", icon: Tag },
-              { id: "partner_compliance", label: "Partner Co...", icon: Shield },
+              { id: "partner_communication", label: "Communication", icon: Mail },
+              { id: "purchase_orders", label: "Purchase Orders", icon: ShoppingCart },
+              { id: "quotes", label: "Quotes", icon: StickyNote },
+              { id: "sales_orders", label: "Sales Orders", icon: FileText },
               { id: "notes", label: "Notes", icon: FileText },
               { id: "attachments", label: "Files", icon: Paperclip },
-              { id: "audit", label: "Audit", icon: Clock },
               { id: "activity", label: "Activity", icon: ChartColumn },
             ];
 
@@ -3383,7 +3384,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                     <div className="flex items-center flex-1 overflow-x-auto px-2">
                       {LOC_TABS.map((t) => {
                         const active = locDetailTab === t.id;
-                        const count = t.id === "poc" ? LOC_POC_DATA.length : t.id === "items" ? LOC_ITEMS_DATA.length : t.id === "carrier_shipping" ? LOC_CARRIER_DATA.length : t.id === "pricing_rules" ? LOC_PRICING_DATA.length : 0;
+                        const count = t.id === "poc" ? LOC_POC_DATA.length : t.id === "items" ? LOC_ITEMS_DATA.length : t.id === "carrier_shipping" ? LOC_CARRIER_DATA.length : t.id === "pricing_rules" ? LOC_PRICING_DATA.length : t.id === "purchase_orders" ? 5 : t.id === "quotes" ? 3 : t.id === "sales_orders" ? 4 : 0;
                         return (
                           <button
                             key={t.id}
@@ -3406,148 +3407,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                     </div>
                   </div>
 
-                  {/* ── Overview tab ── */}
-                  {locDetailTab === "overview" && (
-                    <div className="flex-1 overflow-auto bg-[#F8FAFC]">
-                      <div className="p-5 space-y-4">
-
-                        {/* ── Billing & Shipping ── */}
-                        <div className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-                          <div className="px-4 py-3 border-b border-[#F1F5F9] flex items-center justify-between">
-                            <div className="flex items-center gap-2.5">
-                              <div className="w-7 h-7 rounded-lg bg-[#EDF4FF] flex items-center justify-center shrink-0">
-                                <CreditCard className="w-3.5 h-3.5 text-[#0A77FF]" />
-                              </div>
-                              <h3 className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Billing & Shipping</h3>
-                            </div>
-                            <span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>4 fields</span>
-                          </div>
-                          <div className="p-4">
-                            <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
-                              {[
-                                { label: "Currency", value: "USD ($)", icon: DollarSign, color: "#0A77FF", bg: "linear-gradient(135deg, #EBF3FF 0%, #DBEAFE 100%)" },
-                                { label: "Funded By", value: "FR Conversions", icon: Building2, color: "#7C3AED", bg: "linear-gradient(135deg, #F0EBFF 0%, #E9DFFF 100%)" },
-                                { label: "Pay To", value: vendor.companyName, icon: CreditCard, color: "#059669", bg: "linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%)" },
-                                { label: "Ship To", value: loc.address, icon: Truck, color: "#D97706", bg: "linear-gradient(135deg, #FEF5E7 0%, #FDE8C8 100%)" },
-                              ].map((item) => (
-                                <div key={item.label} className="rounded-xl border border-[#F1F5F9] bg-[#FAFBFC] p-3.5 transition-all duration-200 hover:bg-white hover:border-[#BFDBFE] hover:shadow-[0_4px_12px_-4px_rgba(10,119,255,0.08)] group/bcard cursor-pointer">
-                                  <div className="flex items-center gap-2 mb-2.5">
-                                    <div className="w-6 h-6 rounded-lg flex items-center justify-center transition-transform duration-200 group-hover/bcard:scale-110" style={{ background: item.bg }}>
-                                      <item.icon className="w-3 h-3" style={{ color: item.color }} />
-                                    </div>
-                                    <span className="text-[9px] text-[#B0BEC5] uppercase tracking-wider" style={{ fontWeight: 600 }}>{item.label}</span>
-                                  </div>
-                                  <p className="text-[12px] text-[#1E293B] truncate" style={{ fontWeight: 600 }}>{item.value}</p>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* ── Credit Limits ── */}
-                        <div className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-                          <div className="px-4 py-3 border-b border-[#F1F5F9] flex items-center justify-between">
-                            <div className="flex items-center gap-2.5">
-                              <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" style={{ background: creditPctLoc > 80 ? "linear-gradient(135deg, #FEE2E2, #FECACA)" : creditPctLoc > 50 ? "linear-gradient(135deg, #FEF3C7, #FDE68A)" : "linear-gradient(135deg, #D1FAE5, #A7F3D0)" }}>
-                                <TrendingUp className="w-3.5 h-3.5" style={{ color: creditPctLoc > 80 ? "#EF4444" : creditPctLoc > 50 ? "#D97706" : "#059669" }} />
-                              </div>
-                              <h3 className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Credit Limits</h3>
-                            </div>
-                            <span className="text-[9px] px-2 py-0.5 rounded-full" style={{ fontWeight: 600, color: creditPctLoc > 80 ? "#DC2626" : creditPctLoc > 50 ? "#D97706" : "#059669", backgroundColor: creditPctLoc > 80 ? "#FEE2E2" : creditPctLoc > 50 ? "#FEF3C7" : "#D1FAE5" }}>{creditPctLoc > 80 ? "Critical" : creditPctLoc > 50 ? "Warning" : "Healthy"}</span>
-                          </div>
-                          <div className="p-4">
-                            <div className="grid grid-cols-3 gap-4 mb-4">
-                              {[
-                                { label: "Credit Limit", value: `$${creditLimit.toLocaleString()}.00`, color: "#0F172A" },
-                                { label: "Utilized", value: `$${creditUsed.toLocaleString()}.00`, color: "#0F172A" },
-                                { label: "Available", value: `$${(creditLimit - creditUsed).toLocaleString()}.00`, color: "#10B981" },
-                              ].map((stat) => (
-                                <div key={stat.label} className="rounded-xl bg-[#FAFBFC] border border-[#F1F5F9] p-3 text-center">
-                                  <p className="text-[9px] text-[#B0BEC5] uppercase tracking-wider mb-1" style={{ fontWeight: 600 }}>{stat.label}</p>
-                                  <p className="text-[17px] tabular-nums" style={{ fontWeight: 700, color: stat.color }}>{stat.value}</p>
-                                </div>
-                              ))}
-                            </div>
-                            <div className="h-3 rounded-full overflow-hidden" style={{ backgroundColor: creditPctLoc > 80 ? "#FEE2E2" : creditPctLoc > 50 ? "#FEF3C7" : "#D1FAE5" }}>
-                              <div className="h-full rounded-full transition-all duration-700 ease-out" style={{ width: `${creditPctLoc}%`, background: creditPctLoc > 80 ? "linear-gradient(90deg, #F87171, #EF4444)" : creditPctLoc > 50 ? "linear-gradient(90deg, #FBBF24, #F59E0B)" : "linear-gradient(90deg, #34D399, #10B981)" }} />
-                            </div>
-                            <div className="flex items-center justify-between mt-2">
-                              <span className="text-[11px] tabular-nums" style={{ fontWeight: 600, color: creditPctLoc > 80 ? "#EF4444" : creditPctLoc > 50 ? "#F59E0B" : "#10B981" }}>{creditPctLoc}% utilized</span>
-                              <span className="text-[10px] text-[#94A3B8]">${(creditLimit - creditUsed).toLocaleString()} remaining</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* ── Default Carrier & Shipping ── */}
-                        <div className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-                          <div className="px-4 py-3 border-b border-[#F1F5F9] flex items-center justify-between">
-                            <div className="flex items-center gap-2.5">
-                              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#FEF5E7] to-[#FDE8C8] flex items-center justify-center shrink-0">
-                                <Truck className="w-3.5 h-3.5 text-[#D97706]" />
-                              </div>
-                              <h3 className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Default Carrier & Shipping</h3>
-                            </div>
-                            <span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>2 carriers</span>
-                          </div>
-                          <div className="p-4">
-                            <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
-                              {[
-                                { type: "Vendor", carrier: "FedEx Express", desc: "For fastest delivery in USA", method: "FedEx Express (Air)", days: "1-2 days" },
-                                { type: "Customer", carrier: "FedEx Express", desc: "For fastest delivery in USA", method: "FedEx Express (Air)", days: "1-2 days" },
-                              ].map((c) => (
-                                <div key={c.type} className="rounded-xl border border-[#F1F5F9] bg-[#FAFBFC] overflow-hidden transition-all duration-200 hover:bg-white hover:border-[#BFDBFE] hover:shadow-[0_4px_12px_-4px_rgba(10,119,255,0.08)] group/carrier cursor-pointer">
-                                  <div className="px-3.5 py-2 border-b border-[#F1F5F9] flex items-center justify-between bg-white/50">
-                                    <span className="text-[10px] text-[#64748B] uppercase tracking-wider" style={{ fontWeight: 600 }}>{c.type}</span>
-                                    <span className="text-[9px] px-1.5 py-0.5 rounded-full border border-[#BFDBFE] bg-[#EFF6FF] text-[#1E40AF]" style={{ fontWeight: 600 }}>Default</span>
-                                  </div>
-                                  <div className="p-3.5 flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-xl bg-[#1B1464] flex items-center justify-center text-white text-[8px] shrink-0 transition-transform duration-200 group-hover/carrier:scale-105" style={{ fontWeight: 800 }}>FedEx</div>
-                                    <div className="min-w-0 flex-1">
-                                      <p className="text-[12px] text-[#0F172A]" style={{ fontWeight: 600 }}>{c.carrier}</p>
-                                      <p className="text-[11px] text-[#64748B] mt-0.5">{c.method}</p>
-                                      <div className="flex items-center gap-2 mt-1.5">
-                                        <span className="text-[10px] text-[#94A3B8]">{c.desc}</span>
-                                        <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-[#F1F5F9] text-[#475569]" style={{ fontWeight: 600 }}>{c.days}</span>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* ── Payment Terms ── */}
-                        <div className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-                          <div className="px-4 py-3 border-b border-[#F1F5F9] flex items-center justify-between">
-                            <div className="flex items-center gap-2.5">
-                              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#F0EBFF] to-[#E9DFFF] flex items-center justify-center shrink-0">
-                                <Clock className="w-3.5 h-3.5 text-[#7C3AED]" />
-                              </div>
-                              <h3 className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Payment Terms</h3>
-                            </div>
-                            <span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>2 terms</span>
-                          </div>
-                          <div className="p-4">
-                            <div className="grid grid-cols-1 xl:grid-cols-2 gap-3">
-                              {([
-                                PAYMENT_TERM_PRESETS.find(p => p.name === "Net 60 Post Production End") || PAYMENT_TERM_PRESETS[5],
-                                PAYMENT_TERM_PRESETS.find(p => p.category === "prepayment") || PAYMENT_TERM_PRESETS[7],
-                              ] as PaymentTermPreset[]).map((pt) => (
-                                <PaymentTermCard
-                                  key={pt.id}
-                                  term={pt}
-                                  readOnly
-                                  onClick={() => { setLocPtDetailTerm(pt); setLocPtDetailOpen(true); }}
-                                />
-                              ))}
-                            </div>
-                          </div>
-                        </div>
-
-                      </div>
-                    </div>
-                  )}
+                  {/* Overview tab removed — POC is now default */}
 
                   {/* ── Point of Contacts tab ── */}
                   {locDetailTab === "poc" && (
@@ -4003,8 +3863,246 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                     </div>
                   )}
 
-                  {/* ── Placeholder tabs ── */}
-                  {!["overview", "poc", "items", "carrier_shipping", "pricing_rules"].includes(locDetailTab) && (
+                  {/* ── Service Center (Coming Soon with animation) ── */}
+                  {locDetailTab === "service_centers" && (
+                    <div className="flex-1 flex items-center justify-center">
+                      <div className="text-center">
+                        <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 bg-gradient-to-br from-[#FEF5E7] to-[#FDE8C8] border border-[#FDE68A]/30 animate-pulse">
+                          <Wrench className="w-7 h-7 text-[#D97706]" />
+                        </div>
+                        <p className="text-[15px] text-[#334155]" style={{ fontWeight: 600 }}>Service Center</p>
+                        <p className="text-[12px] text-[#94A3B8] mt-1.5 max-w-[260px] mx-auto leading-relaxed">Manage service centers associated with this location. This feature is currently under development.</p>
+                        <div className="mt-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#FEF5E7] border border-[#FDE68A]/40 text-[11px] text-[#D97706]" style={{ fontWeight: 600 }}>
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#D97706] animate-pulse" />
+                          Coming Soon
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* ── Partner Communication (Coming Soon with animation) ── */}
+                  {locDetailTab === "partner_communication" && (
+                    <div className="flex-1 flex items-center justify-center">
+                      <div className="text-center">
+                        <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 bg-gradient-to-br from-[#EBF3FF] to-[#DBEAFE] border border-[#BFDBFE]/30 animate-pulse">
+                          <Mail className="w-7 h-7 text-[#0A77FF]" />
+                        </div>
+                        <p className="text-[15px] text-[#334155]" style={{ fontWeight: 600 }}>Partner Communication</p>
+                        <p className="text-[12px] text-[#94A3B8] mt-1.5 max-w-[260px] mx-auto leading-relaxed">Track and manage communications with this partner location. This feature is currently under development.</p>
+                        <div className="mt-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#EDF4FF] border border-[#BFDBFE]/40 text-[11px] text-[#0A77FF]" style={{ fontWeight: 600 }}>
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#0A77FF] animate-pulse" />
+                          Coming Soon
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* ── Purchase Orders tab ── */}
+                  {locDetailTab === "purchase_orders" && (
+                    <div className="flex-1 flex flex-col overflow-hidden">
+                      <div className="flex items-center justify-between gap-3 px-4 pt-3 pb-2 shrink-0">
+                        <div className="flex items-center gap-2 flex-1 min-w-0">
+                          <div className="relative flex-1 max-w-[220px]">
+                            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8] pointer-events-none" />
+                            <input type="text" placeholder="Search purchase orders..." className="w-full pl-8 h-8 text-[12px] bg-white border border-[#E2E8F0] rounded-lg px-3 py-1.5 focus:outline-none focus:border-[#0A77FF] transition-colors" />
+                          </div>
+                          <button className="h-8 px-2.5 rounded-lg border border-[#E2E8F0] bg-white text-[12px] text-[#475569] hover:bg-[#F8FAFC] cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 500 }}>
+                            <SlidersHorizontal className="w-3.5 h-3.5" /> Filters
+                          </button>
+                        </div>
+                        <button onClick={() => toast.info("Create purchase order coming soon")} className="h-8 px-3 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-[12px] shadow-sm cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 600 }}>
+                          <Plus className="w-3.5 h-3.5" /> Create PO
+                        </button>
+                      </div>
+                      <div className="flex items-center gap-1.5 px-4 pb-2">
+                        {["All", "Draft", "Pending", "Approved", "Received"].map((chip, i) => (
+                          <span key={chip} className={`text-[11px] px-2.5 py-1 rounded-full cursor-pointer transition-colors inline-flex items-center gap-1 ${i === 0 ? "bg-[#EDF4FF] text-[#0A77FF] border border-[#0A77FF]/25" : "bg-[#F8FAFC] text-[#64748B] border border-[#E2E8F0] hover:bg-[#F1F5F9]"}`} style={{ fontWeight: 500 }}>
+                            {chip}
+                          </span>
+                        ))}
+                      </div>
+                      <div className="h-px bg-[#E8ECF1] mx-4 shrink-0" />
+                      <div className="flex-1 overflow-auto">
+                        <table className="w-full text-[12px]">
+                          <thead className="sticky top-0 bg-[#F8FAFC] z-10">
+                            <tr>
+                              <th className="text-left px-4 py-2.5 text-[#94A3B8] text-[11px] border-b border-[#E8ECF1]" style={{ fontWeight: 600 }}>PO Number</th>
+                              <th className="text-left px-4 py-2.5 text-[#94A3B8] text-[11px] border-b border-[#E8ECF1]" style={{ fontWeight: 600 }}>Date</th>
+                              <th className="text-left px-4 py-2.5 text-[#94A3B8] text-[11px] border-b border-[#E8ECF1]" style={{ fontWeight: 600 }}>Items</th>
+                              <th className="text-right px-4 py-2.5 text-[#94A3B8] text-[11px] border-b border-[#E8ECF1]" style={{ fontWeight: 600 }}>Total</th>
+                              <th className="text-left px-4 py-2.5 text-[#94A3B8] text-[11px] border-b border-[#E8ECF1]" style={{ fontWeight: 600 }}>Status</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {[
+                              { id: "PO-2025-0041", date: "15 Mar 2025", items: 12, total: "$24,500.00", status: "Approved", statusColor: "#16A34A", statusBg: "#F0FDF4", statusBorder: "#BBF7D0" },
+                              { id: "PO-2025-0038", date: "10 Mar 2025", items: 5, total: "$8,200.00", status: "Pending", statusColor: "#D97706", statusBg: "#FFFBEB", statusBorder: "#FDE68A" },
+                              { id: "PO-2025-0035", date: "02 Mar 2025", items: 8, total: "$15,750.00", status: "Received", statusColor: "#0A77FF", statusBg: "#EDF4FF", statusBorder: "#BFDBFE" },
+                              { id: "PO-2025-0029", date: "20 Feb 2025", items: 3, total: "$4,300.00", status: "Approved", statusColor: "#16A34A", statusBg: "#F0FDF4", statusBorder: "#BBF7D0" },
+                              { id: "PO-2025-0022", date: "10 Feb 2025", items: 15, total: "$32,100.00", status: "Received", statusColor: "#0A77FF", statusBg: "#EDF4FF", statusBorder: "#BFDBFE" },
+                            ].map((po) => (
+                              <tr key={po.id} className="hover:bg-[#F8FBFF] transition-colors cursor-pointer border-b border-[#F1F5F9]">
+                                <td className="px-4 py-2.5">
+                                  <span className="font-mono text-[12px] text-[#0A77FF]" style={{ fontWeight: 600 }}>{po.id}</span>
+                                </td>
+                                <td className="px-4 py-2.5 text-[12px] text-[#475569]">{po.date}</td>
+                                <td className="px-4 py-2.5 text-[12px] text-[#334155] tabular-nums" style={{ fontWeight: 500 }}>{po.items} items</td>
+                                <td className="px-4 py-2.5 text-right text-[12px] text-[#0F172A] tabular-nums" style={{ fontWeight: 600 }}>{po.total}</td>
+                                <td className="px-4 py-2.5">
+                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px]" style={{ fontWeight: 600, backgroundColor: po.statusBg, color: po.statusColor, border: `1px solid ${po.statusBorder}` }}>
+                                    <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: po.statusColor }} />
+                                    {po.status}
+                                  </span>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                      <div className="flex items-center justify-between px-4 py-2 border-t border-[#E8ECF1] shrink-0 bg-[#FAFBFC]">
+                        <span className="text-[11px] text-[#94A3B8]">Showing <span className="text-[#0F172A]" style={{ fontWeight: 600 }}>5</span> of <span className="text-[#0F172A]" style={{ fontWeight: 600 }}>5</span> orders</span>
+                        <span className="text-[11px] text-[#94A3B8]">Records per page <select className="h-6 px-1.5 rounded border border-[#E2E8F0] text-[11px] cursor-pointer outline-none ml-1"><option>20</option><option>50</option></select></span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* ── Quotes tab ── */}
+                  {locDetailTab === "quotes" && (
+                    <div className="flex-1 flex flex-col overflow-hidden">
+                      <div className="flex items-center justify-between gap-3 px-4 pt-3 pb-2 shrink-0">
+                        <div className="flex items-center gap-2 flex-1 min-w-0">
+                          <div className="relative flex-1 max-w-[220px]">
+                            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8] pointer-events-none" />
+                            <input type="text" placeholder="Search quotes..." className="w-full pl-8 h-8 text-[12px] bg-white border border-[#E2E8F0] rounded-lg px-3 py-1.5 focus:outline-none focus:border-[#0A77FF] transition-colors" />
+                          </div>
+                          <button className="h-8 px-2.5 rounded-lg border border-[#E2E8F0] bg-white text-[12px] text-[#475569] hover:bg-[#F8FAFC] cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 500 }}>
+                            <SlidersHorizontal className="w-3.5 h-3.5" /> Filters
+                          </button>
+                        </div>
+                        <button onClick={() => toast.info("Create quote coming soon")} className="h-8 px-3 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-[12px] shadow-sm cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 600 }}>
+                          <Plus className="w-3.5 h-3.5" /> Create Quote
+                        </button>
+                      </div>
+                      <div className="flex items-center gap-1.5 px-4 pb-2">
+                        {["All", "Draft", "Sent", "Accepted", "Expired"].map((chip, i) => (
+                          <span key={chip} className={`text-[11px] px-2.5 py-1 rounded-full cursor-pointer transition-colors inline-flex items-center gap-1 ${i === 0 ? "bg-[#EDF4FF] text-[#0A77FF] border border-[#0A77FF]/25" : "bg-[#F8FAFC] text-[#64748B] border border-[#E2E8F0] hover:bg-[#F1F5F9]"}`} style={{ fontWeight: 500 }}>
+                            {chip}
+                          </span>
+                        ))}
+                      </div>
+                      <div className="h-px bg-[#E8ECF1] mx-4 shrink-0" />
+                      <div className="flex-1 overflow-auto">
+                        <table className="w-full text-[12px]">
+                          <thead className="sticky top-0 bg-[#F8FAFC] z-10">
+                            <tr>
+                              <th className="text-left px-4 py-2.5 text-[#94A3B8] text-[11px] border-b border-[#E8ECF1]" style={{ fontWeight: 600 }}>Quote ID</th>
+                              <th className="text-left px-4 py-2.5 text-[#94A3B8] text-[11px] border-b border-[#E8ECF1]" style={{ fontWeight: 600 }}>Date</th>
+                              <th className="text-left px-4 py-2.5 text-[#94A3B8] text-[11px] border-b border-[#E8ECF1]" style={{ fontWeight: 600 }}>Valid Until</th>
+                              <th className="text-right px-4 py-2.5 text-[#94A3B8] text-[11px] border-b border-[#E8ECF1]" style={{ fontWeight: 600 }}>Amount</th>
+                              <th className="text-left px-4 py-2.5 text-[#94A3B8] text-[11px] border-b border-[#E8ECF1]" style={{ fontWeight: 600 }}>Status</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {[
+                              { id: "QT-2025-0018", date: "12 Mar 2025", valid: "12 Apr 2025", amount: "$18,400.00", status: "Sent", statusColor: "#0A77FF", statusBg: "#EDF4FF", statusBorder: "#BFDBFE" },
+                              { id: "QT-2025-0015", date: "01 Mar 2025", valid: "01 Apr 2025", amount: "$6,750.00", status: "Accepted", statusColor: "#16A34A", statusBg: "#F0FDF4", statusBorder: "#BBF7D0" },
+                              { id: "QT-2025-0011", date: "15 Feb 2025", valid: "15 Mar 2025", amount: "$12,300.00", status: "Expired", statusColor: "#DC2626", statusBg: "#FEF2F2", statusBorder: "#FECACA" },
+                            ].map((qt) => (
+                              <tr key={qt.id} className="hover:bg-[#F8FBFF] transition-colors cursor-pointer border-b border-[#F1F5F9]">
+                                <td className="px-4 py-2.5">
+                                  <span className="font-mono text-[12px] text-[#0A77FF]" style={{ fontWeight: 600 }}>{qt.id}</span>
+                                </td>
+                                <td className="px-4 py-2.5 text-[12px] text-[#475569]">{qt.date}</td>
+                                <td className="px-4 py-2.5 text-[12px] text-[#475569]">{qt.valid}</td>
+                                <td className="px-4 py-2.5 text-right text-[12px] text-[#0F172A] tabular-nums" style={{ fontWeight: 600 }}>{qt.amount}</td>
+                                <td className="px-4 py-2.5">
+                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px]" style={{ fontWeight: 600, backgroundColor: qt.statusBg, color: qt.statusColor, border: `1px solid ${qt.statusBorder}` }}>
+                                    <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: qt.statusColor }} />
+                                    {qt.status}
+                                  </span>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                      <div className="flex items-center justify-between px-4 py-2 border-t border-[#E8ECF1] shrink-0 bg-[#FAFBFC]">
+                        <span className="text-[11px] text-[#94A3B8]">Showing <span className="text-[#0F172A]" style={{ fontWeight: 600 }}>3</span> of <span className="text-[#0F172A]" style={{ fontWeight: 600 }}>3</span> quotes</span>
+                        <span className="text-[11px] text-[#94A3B8]">Records per page <select className="h-6 px-1.5 rounded border border-[#E2E8F0] text-[11px] cursor-pointer outline-none ml-1"><option>20</option><option>50</option></select></span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* ── Sales Orders tab ── */}
+                  {locDetailTab === "sales_orders" && (
+                    <div className="flex-1 flex flex-col overflow-hidden">
+                      <div className="flex items-center justify-between gap-3 px-4 pt-3 pb-2 shrink-0">
+                        <div className="flex items-center gap-2 flex-1 min-w-0">
+                          <div className="relative flex-1 max-w-[220px]">
+                            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8] pointer-events-none" />
+                            <input type="text" placeholder="Search sales orders..." className="w-full pl-8 h-8 text-[12px] bg-white border border-[#E2E8F0] rounded-lg px-3 py-1.5 focus:outline-none focus:border-[#0A77FF] transition-colors" />
+                          </div>
+                          <button className="h-8 px-2.5 rounded-lg border border-[#E2E8F0] bg-white text-[12px] text-[#475569] hover:bg-[#F8FAFC] cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 500 }}>
+                            <SlidersHorizontal className="w-3.5 h-3.5" /> Filters
+                          </button>
+                        </div>
+                        <button onClick={() => toast.info("Create sales order coming soon")} className="h-8 px-3 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-[12px] shadow-sm cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 600 }}>
+                          <Plus className="w-3.5 h-3.5" /> Create Sales Order
+                        </button>
+                      </div>
+                      <div className="flex items-center gap-1.5 px-4 pb-2">
+                        {["All", "Open", "Processing", "Shipped", "Completed"].map((chip, i) => (
+                          <span key={chip} className={`text-[11px] px-2.5 py-1 rounded-full cursor-pointer transition-colors inline-flex items-center gap-1 ${i === 0 ? "bg-[#EDF4FF] text-[#0A77FF] border border-[#0A77FF]/25" : "bg-[#F8FAFC] text-[#64748B] border border-[#E2E8F0] hover:bg-[#F1F5F9]"}`} style={{ fontWeight: 500 }}>
+                            {chip}
+                          </span>
+                        ))}
+                      </div>
+                      <div className="h-px bg-[#E8ECF1] mx-4 shrink-0" />
+                      <div className="flex-1 overflow-auto">
+                        <table className="w-full text-[12px]">
+                          <thead className="sticky top-0 bg-[#F8FAFC] z-10">
+                            <tr>
+                              <th className="text-left px-4 py-2.5 text-[#94A3B8] text-[11px] border-b border-[#E8ECF1]" style={{ fontWeight: 600 }}>SO Number</th>
+                              <th className="text-left px-4 py-2.5 text-[#94A3B8] text-[11px] border-b border-[#E8ECF1]" style={{ fontWeight: 600 }}>Date</th>
+                              <th className="text-left px-4 py-2.5 text-[#94A3B8] text-[11px] border-b border-[#E8ECF1]" style={{ fontWeight: 600 }}>Customer</th>
+                              <th className="text-right px-4 py-2.5 text-[#94A3B8] text-[11px] border-b border-[#E8ECF1]" style={{ fontWeight: 600 }}>Total</th>
+                              <th className="text-left px-4 py-2.5 text-[#94A3B8] text-[11px] border-b border-[#E8ECF1]" style={{ fontWeight: 600 }}>Status</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {[
+                              { id: "SO-2025-0067", date: "14 Mar 2025", customer: "Acme Industries", total: "$19,800.00", status: "Processing", statusColor: "#D97706", statusBg: "#FFFBEB", statusBorder: "#FDE68A" },
+                              { id: "SO-2025-0062", date: "08 Mar 2025", customer: "TechCorp Ltd", total: "$7,450.00", status: "Shipped", statusColor: "#0A77FF", statusBg: "#EDF4FF", statusBorder: "#BFDBFE" },
+                              { id: "SO-2025-0055", date: "25 Feb 2025", customer: "GlobalTech Inc", total: "$31,200.00", status: "Completed", statusColor: "#16A34A", statusBg: "#F0FDF4", statusBorder: "#BBF7D0" },
+                              { id: "SO-2025-0048", date: "18 Feb 2025", customer: "Pacific Solutions", total: "$12,600.00", status: "Completed", statusColor: "#16A34A", statusBg: "#F0FDF4", statusBorder: "#BBF7D0" },
+                            ].map((so) => (
+                              <tr key={so.id} className="hover:bg-[#F8FBFF] transition-colors cursor-pointer border-b border-[#F1F5F9]">
+                                <td className="px-4 py-2.5">
+                                  <span className="font-mono text-[12px] text-[#0A77FF]" style={{ fontWeight: 600 }}>{so.id}</span>
+                                </td>
+                                <td className="px-4 py-2.5 text-[12px] text-[#475569]">{so.date}</td>
+                                <td className="px-4 py-2.5 text-[12px] text-[#334155]" style={{ fontWeight: 500 }}>{so.customer}</td>
+                                <td className="px-4 py-2.5 text-right text-[12px] text-[#0F172A] tabular-nums" style={{ fontWeight: 600 }}>{so.total}</td>
+                                <td className="px-4 py-2.5">
+                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px]" style={{ fontWeight: 600, backgroundColor: so.statusBg, color: so.statusColor, border: `1px solid ${so.statusBorder}` }}>
+                                    <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: so.statusColor }} />
+                                    {so.status}
+                                  </span>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                      <div className="flex items-center justify-between px-4 py-2 border-t border-[#E8ECF1] shrink-0 bg-[#FAFBFC]">
+                        <span className="text-[11px] text-[#94A3B8]">Showing <span className="text-[#0F172A]" style={{ fontWeight: 600 }}>4</span> of <span className="text-[#0F172A]" style={{ fontWeight: 600 }}>4</span> orders</span>
+                        <span className="text-[11px] text-[#94A3B8]">Records per page <select className="h-6 px-1.5 rounded border border-[#E2E8F0] text-[11px] cursor-pointer outline-none ml-1"><option>20</option><option>50</option></select></span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* ── Generic placeholder for Notes, Attachments, Activity ── */}
+                  {!["poc", "items", "carrier_shipping", "pricing_rules", "service_centers", "partner_communication", "purchase_orders", "quotes", "sales_orders"].includes(locDetailTab) && (
                     <div className="flex-1 flex items-center justify-center">
                       <div className="text-center">
                         <div className="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3 bg-[#EDF4FF] border border-[#0A77FF]/15">
