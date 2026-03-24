@@ -7857,7 +7857,7 @@ function ConfigPageContent({
                                             isActive ? "bg-primary/10" : "hover:bg-muted/60"
                                           }`}
                                         >
-                                          <span className="text-lg">{c.logo}</span>
+                                          <img src={c.logoImg} alt={c.name} className="w-6 h-6 rounded object-contain" />
                                           <span className="text-sm text-foreground flex-1 truncate" style={{ fontWeight: isActive ? 600 : 400 }}>{c.name}</span>
                                           {isActive && <Check className="w-4 h-4 text-primary" />}
                                         </button>
