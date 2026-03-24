@@ -3565,10 +3565,10 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                             </DropdownMenuContent>
                           </DropdownMenu>
                           <div className="w-px h-5 bg-[#E8ECF1] mx-0.5 hidden sm:block" />
-                          <button onClick={() => toast.info("Contact directory coming soon")} className="h-8 px-2.5 rounded-lg border border-[#E2E8F0] bg-white text-[12px] text-[#475569] hover:bg-[#F8FAFC] cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 500 }}>
+                          <button onClick={handleLocOpenSelectModal} className="h-8 px-2.5 rounded-lg border border-[#E2E8F0] bg-white text-[12px] text-[#475569] hover:bg-[#F8FAFC] cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 500 }}>
                             <Users className="w-3.5 h-3.5 text-[#94A3B8]" /> Contact Directory
                           </button>
-                          <button onClick={() => toast.info("Create contact coming soon")} className="h-8 px-3 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-[12px] shadow-sm cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 600 }}>
+                          <button onClick={handleLocOpenCreate} className="h-8 px-3 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-[12px] shadow-sm cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 600 }}>
                             <Plus className="w-3.5 h-3.5" /> Create New Contact
                           </button>
                         </div>
