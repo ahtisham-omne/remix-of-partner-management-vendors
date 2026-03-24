@@ -7798,24 +7798,24 @@ function ConfigPageContent({
 
                           {/* Shipping Methods multi-select */}
                           <div className="relative">
-                            <Label className="text-[11px] text-foreground" style={{ fontWeight: 600 }}>Shipping Methods</Label>
+                            <Label className="text-[11px] text-[#0F172A]" style={{ fontWeight: 600 }}>Shipping Methods</Label>
                             <button
                               onClick={() => {
                                 if (!entry.carrier) { toast.info("Please select a carrier first"); return; }
                                 setMethodDropdownOpen((prev) => ({ ...prev, [entry.id]: !prev[entry.id] }));
                               }}
-                              className="mt-1 w-full flex items-center justify-between h-9 px-3 rounded-lg border border-border bg-background text-sm hover:border-muted-foreground/30 transition-colors"
+                              className="mt-1 w-full flex items-center justify-between h-9 sm:h-10 px-3 rounded-lg border border-[#E2E8F0] bg-white text-sm hover:border-[#CBD5E1] transition-colors"
                             >
                               {selectedMethodIds.length > 0 ? (
-                                <span className="text-foreground text-sm truncate">{selectedMethodIds.length} method{selectedMethodIds.length !== 1 ? "s" : ""} selected</span>
+                                <span className="text-[#0F172A] text-sm truncate">{selectedMethodIds.length} method{selectedMethodIds.length !== 1 ? "s" : ""} selected</span>
                               ) : (
-                                <span className="text-muted-foreground/50 text-xs">Select shipping methods</span>
+                                <span className="text-[#94A3B8] text-sm">Select shipping methods</span>
                               )}
-                              <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
+                              <ChevronDown className="w-3.5 h-3.5 text-[#94A3B8]" />
                             </button>
 
                             {methodDropdownOpen[entry.id] && carrierMethods.length > 0 && (
-                              <div className="absolute z-[260] top-full left-0 right-0 mt-1 rounded-lg border border-border bg-popover shadow-lg max-h-[300px] overflow-hidden">
+                              <div className="absolute z-[260] top-full left-0 right-0 mt-1 rounded-lg border border-[#E2E8F0] bg-white shadow-lg max-h-[300px] overflow-hidden">
                                 <div className="p-1.5">
                                   <button
                                     className="w-full flex items-center justify-center gap-1.5 py-2 rounded-md bg-primary/10 text-primary text-xs hover:bg-primary/20 transition-colors"
