@@ -1,4 +1,12 @@
 import React, { useState, useMemo, useCallback, useRef, useEffect, type ReactNode } from "react";
+import fedexLogo from "@/assets/carriers/fedex.png";
+import dhlLogo from "@/assets/carriers/dhl.png";
+import upsLogo from "@/assets/carriers/ups.png";
+import tcsLogo from "@/assets/carriers/tcs.png";
+import sfLogo from "@/assets/carriers/sf.png";
+import uspsLogo from "@/assets/carriers/usps.png";
+import aramexLogo from "@/assets/carriers/aramex.png";
+import maerskLogo from "@/assets/carriers/maersk.png";
 import {
   Dialog,
   DialogContent,
@@ -3491,6 +3499,11 @@ function ConfigPageContent({
   const [createSmMethods, setCreateSmMethods] = useState<Array<{ id: string; name: string; description: string; minDuration: number; maxDuration: number; isDefault: boolean }>>([
     { id: `csm-1`, name: "", description: "", minDuration: 1, maxDuration: 30, isDefault: true },
   ]);
+  const [recentlyUsedMethods, setRecentlyUsedMethods] = useState<Record<string, string[]>>({
+    fedex: ["fedex-air", "fedex-ground"],
+    dhl: ["dhl-express"],
+    ups: ["ups-next-day"],
+  });
 
   const TRIGGER_TOOLTIPS: Record<string, string> = {
     order_confirmation: "Payment clock starts when the purchase order is confirmed by both parties.",
@@ -7405,14 +7418,14 @@ function ConfigPageContent({
   if (sectionId === "shipping_methods") {
     /* ── Carrier logos map ── */
     const CARRIER_CATALOG = [
-      { id: "fedex", name: "FedEx Express", logo: "🟣", color: "#4D148C" },
-      { id: "tcs", name: "TCS (Tranzum Courier Service)", logo: "🔴", color: "#D32F2F" },
-      { id: "dhl", name: "DHL Express", logo: "🟡", color: "#FFCC00" },
-      { id: "ups", name: "UPS (United Parcel Service)", logo: "🟤", color: "#351C15" },
-      { id: "sf", name: "SF Express", logo: "⚫", color: "#1A1A1A" },
-      { id: "usps", name: "USPS", logo: "🔵", color: "#004B87" },
-      { id: "aramex", name: "Aramex", logo: "🟠", color: "#E65100" },
-      { id: "maersk", name: "Maersk", logo: "🔵", color: "#0067A5" },
+      { id: "fedex", name: "FedEx Express", logoImg: fedexLogo, color: "#4D148C" },
+      { id: "tcs", name: "TCS (Tranzum Courier Service)", logoImg: tcsLogo, color: "#D32F2F" },
+      { id: "dhl", name: "DHL Express", logoImg: dhlLogo, color: "#FFCC00" },
+      { id: "ups", name: "UPS (United Parcel Service)", logoImg: upsLogo, color: "#351C15" },
+      { id: "sf", name: "SF Express", logoImg: sfLogo, color: "#1A1A1A" },
+      { id: "usps", name: "USPS", logoImg: uspsLogo, color: "#004B87" },
+      { id: "aramex", name: "Aramex", logoImg: aramexLogo, color: "#E65100" },
+      { id: "maersk", name: "Maersk", logoImg: maerskLogo, color: "#0067A5" },
     ];
     const CARRIER_METHODS: Record<string, Array<{ id: string; name: string; desc: string; days: string; isDefault?: boolean }>> = {
       fedex: [
@@ -7755,7 +7768,7 @@ function ConfigPageContent({
                             >
                               {selectedCarrier ? (
                                 <div className="flex items-center gap-2">
-                                  <span className="text-base">{selectedCarrier.logo}</span>
+                                  <img src={selectedCarrier.logoImg} alt={selectedCarrier.name} className="w-6 h-6 rounded object-contain" />
                                   <span className="text-[#0F172A] text-sm truncate">{selectedCarrier.name}</span>
                                 </div>
                               ) : (
@@ -7817,7 +7830,7 @@ function ConfigPageContent({
                                               isActive ? "bg-primary/10" : "hover:bg-muted/60"
                                             }`}
                                           >
-                                            <span className="text-lg">{c.logo}</span>
+                                            <img src={c.logoImg} alt={c.name} className="w-6 h-6 rounded object-contain" />
                                             <span className="text-sm text-foreground flex-1 truncate" style={{ fontWeight: isActive ? 600 : 400 }}>{c.name}</span>
                                             {isActive && <Check className="w-4 h-4 text-primary" />}
                                           </button>
@@ -7844,7 +7857,7 @@ function ConfigPageContent({
                                             isActive ? "bg-primary/10" : "hover:bg-muted/60"
                                           }`}
                                         >
-                                          <span className="text-lg">{c.logo}</span>
+                                          <img src={c.logoImg} alt={c.name} className="w-6 h-6 rounded object-contain" />
                                           <span className="text-sm text-foreground flex-1 truncate" style={{ fontWeight: isActive ? 600 : 400 }}>{c.name}</span>
                                           {isActive && <Check className="w-4 h-4 text-primary" />}
                                         </button>
@@ -7882,8 +7895,48 @@ function ConfigPageContent({
                               const filteredMethods = mSearchVal.trim()
                                 ? carrierMethods.filter((m) => m.name.toLowerCase().includes(mSearchVal.toLowerCase()) || m.desc.toLowerCase().includes(mSearchVal.toLowerCase()))
                                 : carrierMethods;
+                              const recentIds = recentlyUsedMethods[entry.carrier] || [];
+                              const handleMethodToggle = (methodId: string) => {
+                                const next = selectedMethodIds.includes(methodId)
+                                  ? selectedMethodIds.filter((m) => m !== methodId)
+                                  : [...selectedMethodIds, methodId];
+                                updateVendorShippingPref(entry.id, { methods: next.join(",") });
+                                // Track recently used
+                                setRecentlyUsedMethods((prev) => ({
+                                  ...prev,
+                                  [entry.carrier]: [methodId, ...(prev[entry.carrier] || []).filter((x) => x !== methodId)].slice(0, 5),
+                                }));
+                              };
+                              const renderMethodItem = (method: typeof carrierMethods[0]) => {
+                                const isChecked = selectedMethodIds.includes(method.id);
+                                return (
+                                  <button
+                                    key={method.id}
+                                    onClick={() => handleMethodToggle(method.id)}
+                                    className={`w-full flex items-start gap-2.5 px-2.5 py-2 rounded-md text-left transition-colors ${
+                                      isChecked ? "bg-primary/5" : "hover:bg-muted/60"
+                                    }`}
+                                  >
+                                    <div className={`mt-0.5 w-4 h-4 rounded border-[1.5px] flex items-center justify-center shrink-0 transition-colors ${
+                                      isChecked ? "border-primary bg-primary" : "border-border bg-background"
+                                    }`}>
+                                      {isChecked && <Check className="w-2.5 h-2.5 text-primary-foreground" />}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                      <div className="flex items-center gap-2">
+                                        <span className="text-sm text-foreground truncate" style={{ fontWeight: 500 }}>{method.name}</span>
+                                        {method.isDefault && (
+                                          <span className="text-[9px] px-1.5 py-0.5 rounded-full border border-primary/20 bg-primary/10 text-primary" style={{ fontWeight: 600 }}>Default</span>
+                                        )}
+                                      </div>
+                                      <p className="text-[11px] text-muted-foreground truncate mt-0.5">{method.desc}</p>
+                                    </div>
+                                    <span className="text-[11px] text-muted-foreground shrink-0 mt-0.5" style={{ fontWeight: 500 }}>{method.days}</span>
+                                  </button>
+                                );
+                              };
                               return (
-                              <div className="absolute z-[260] top-full left-0 right-0 mt-1 rounded-lg border border-[#E2E8F0] bg-white shadow-lg max-h-[360px] overflow-hidden">
+                              <div className="absolute z-[260] top-full left-0 right-0 mt-1 rounded-lg border border-[#E2E8F0] bg-white shadow-lg max-h-[400px] overflow-hidden">
                                 {/* Search */}
                                 <div className="p-2 border-b border-[#F1F5F9]">
                                   <div className="relative">
@@ -7904,8 +7957,6 @@ function ConfigPageContent({
                                     style={{ fontWeight: 600 }}
                                     onClick={() => {
                                       setMethodDropdownOpen((prev) => ({ ...prev, [entry.id]: false }));
-                                      // Open Create Shipping Method modal
-                                      const carrier = CARRIER_CATALOG.find((c) => c.id === entry.carrier);
                                       setCreateSmForEntry(entry.id);
                                       setCreateSmForCarrier(entry.carrier);
                                       setCreateSmMethods([{ id: `csm-${Date.now()}`, name: "", description: "", minDuration: 1, maxDuration: 30, isDefault: true }]);
@@ -7915,43 +7966,27 @@ function ConfigPageContent({
                                     <Plus className="w-3.5 h-3.5" /> Create New Shipping Method
                                   </button>
                                 </div>
-                                <div className="overflow-y-auto max-h-[220px] p-1.5 pt-0 space-y-0.5">
-                                  {filteredMethods.map((method) => {
-                                    const isChecked = selectedMethodIds.includes(method.id);
-                                    return (
-                                      <button
-                                        key={method.id}
-                                        onClick={() => {
-                                          const next = isChecked
-                                            ? selectedMethodIds.filter((m) => m !== method.id)
-                                            : [...selectedMethodIds, method.id];
-                                          updateVendorShippingPref(entry.id, { methods: next.join(",") });
-                                        }}
-                                        className={`w-full flex items-start gap-2.5 px-2.5 py-2 rounded-md text-left transition-colors ${
-                                          isChecked ? "bg-primary/5" : "hover:bg-muted/60"
-                                        }`}
-                                      >
-                                        <div className={`mt-0.5 w-4 h-4 rounded border-[1.5px] flex items-center justify-center shrink-0 transition-colors ${
-                                          isChecked ? "border-primary bg-primary" : "border-border bg-background"
-                                        }`}>
-                                          {isChecked && <Check className="w-2.5 h-2.5 text-primary-foreground" />}
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                          <div className="flex items-center gap-2">
-                                            <span className="text-sm text-foreground truncate" style={{ fontWeight: 500 }}>{method.name}</span>
-                                            {method.isDefault && (
-                                              <span className="text-[9px] px-1.5 py-0.5 rounded-full border border-primary/20 bg-primary/10 text-primary" style={{ fontWeight: 600 }}>Default</span>
-                                            )}
-                                          </div>
-                                          <p className="text-[11px] text-muted-foreground truncate mt-0.5">{method.desc}</p>
-                                        </div>
-                                        <span className="text-[11px] text-muted-foreground shrink-0 mt-0.5" style={{ fontWeight: 500 }}>{method.days}</span>
-                                      </button>
-                                    );
-                                  })}
-                                  {filteredMethods.length === 0 && (
-                                    <p className="text-xs text-muted-foreground text-center py-3">No methods found</p>
+                                <div className="overflow-y-auto max-h-[260px]">
+                                  {/* Recently Used section */}
+                                  {!mSearchVal.trim() && recentIds.length > 0 && (
+                                    <div className="p-1.5 pb-0">
+                                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider px-2.5 py-1" style={{ fontWeight: 600 }}>Recently Used</p>
+                                      {recentIds.slice(0, 3).map((mid) => {
+                                        const method = carrierMethods.find((m) => m.id === mid);
+                                        if (!method) return null;
+                                        return renderMethodItem(method);
+                                      })}
+                                      <div className="border-b border-[#F1F5F9] mx-2.5 my-1" />
+                                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider px-2.5 py-1" style={{ fontWeight: 600 }}>All Methods</p>
+                                    </div>
                                   )}
+                                  {/* All methods list */}
+                                  <div className="p-1.5 pt-0 space-y-0.5">
+                                    {filteredMethods.map((method) => renderMethodItem(method))}
+                                    {filteredMethods.length === 0 && (
+                                      <p className="text-xs text-muted-foreground text-center py-3">No methods found</p>
+                                    )}
+                                  </div>
                                 </div>
                                 <div className="border-t border-border p-2 flex justify-end">
                                   <button
@@ -8029,7 +8064,7 @@ function ConfigPageContent({
                   if (!carrier) return null;
                   return (
                     <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg bg-muted/50 border border-border text-xs text-foreground" style={{ fontWeight: 500 }}>
-                      <span className="text-base">{carrier.logo}</span>
+                      <img src={carrier.logoImg} alt={carrier.name} className="w-5 h-5 rounded object-contain" />
                       {carrier.name}
                     </span>
                   );
