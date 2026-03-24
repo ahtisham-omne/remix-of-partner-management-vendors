@@ -7768,7 +7768,7 @@ function ConfigPageContent({
                             >
                               {selectedCarrier ? (
                                 <div className="flex items-center gap-2">
-                                  <span className="text-base">{selectedCarrier.logo}</span>
+                                  <img src={selectedCarrier.logoImg} alt={selectedCarrier.name} className="w-6 h-6 rounded object-contain" />
                                   <span className="text-[#0F172A] text-sm truncate">{selectedCarrier.name}</span>
                                 </div>
                               ) : (
