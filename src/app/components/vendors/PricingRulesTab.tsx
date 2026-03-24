@@ -1590,7 +1590,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
 
   return (
     <div className="border border-border rounded-xl bg-card overflow-clip flex flex-col" style={{ minHeight: 400 }}>
-      <DetailModal rule={selectedRule} open={detailOpen} onClose={() => setDetailOpen(false)} mode="view" onDuplicate={(r) => toast.info(`Duplicated "${r.name}"`)} onDisable={(r) => toast.success(`"${r.name}" disabled`)} />
+      <DetailModal rule={selectedRule} open={detailOpen} onClose={() => setDetailOpen(false)} mode={detailMode} onApply={(r) => { toast.success(`"${r.name}" applied to this partner.`); }} onDuplicate={(r) => toast.info(`Duplicated "${r.name}"`)} onDisable={(r) => toast.success(`"${r.name}" disabled`)} />
 
       {/* Sub-tabs */}
       <div className="flex items-center border-b border-[#EEF2F6] bg-[#F8FAFC] shrink-0">
