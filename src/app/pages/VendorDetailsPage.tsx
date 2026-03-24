@@ -3079,16 +3079,17 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
             const locLandline = `(${loc.phone.replace(/[^\d]/g, "").slice(1, 4)}) ${loc.phone.replace(/[^\d]/g, "").slice(4, 7)}-${loc.phone.replace(/[^\d]/g, "").slice(7, 11)}`;
 
             const LOC_TABS = [
-              { id: "overview", label: "Overview", icon: Eye },
               { id: "poc", label: "Point of Contacts", icon: Users },
               { id: "items", label: "Items", icon: Package },
-              { id: "service_centers", label: "Service Centers", icon: Wrench },
+              { id: "service_centers", label: "Service Center", icon: Wrench },
               { id: "carrier_shipping", label: "Carrier & Shipping", icon: Truck },
               { id: "pricing_rules", label: "Pricing Rules", icon: Tag },
-              { id: "partner_compliance", label: "Partner Co...", icon: Shield },
+              { id: "partner_communication", label: "Communication", icon: Mail },
+              { id: "purchase_orders", label: "Purchase Orders", icon: ShoppingCart },
+              { id: "quotes", label: "Quotes", icon: StickyNote },
+              { id: "sales_orders", label: "Sales Orders", icon: FileText },
               { id: "notes", label: "Notes", icon: FileText },
               { id: "attachments", label: "Files", icon: Paperclip },
-              { id: "audit", label: "Audit", icon: Clock },
               { id: "activity", label: "Activity", icon: ChartColumn },
             ];
 
