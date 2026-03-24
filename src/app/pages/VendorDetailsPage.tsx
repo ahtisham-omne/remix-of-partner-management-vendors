@@ -2408,6 +2408,24 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
   const [locPtOpen, setLocPtOpen] = useState(false);
   const [createLocationModalOpen, setCreateLocationModalOpen] = useState(false);
 
+  // ── Location POC modals state ──
+  const [locShowSelectModal, setLocShowSelectModal] = useState(false);
+  const [locShowCreateModal, setLocShowCreateModal] = useState(false);
+  const [locPocSearch, setLocPocSearch] = useState("");
+  const [locPocCategoryFilter, setLocPocCategoryFilter] = useState<"all" | "Sales" | "Supply Chain Management" | "Finance">("all");
+  const [locPocPage, setLocPocPage] = useState(1);
+  const [locPocTempSelected, setLocPocTempSelected] = useState<Set<string>>(new Set());
+  const [locNewPocName, setLocNewPocName] = useState("");
+  const [locNewPocDepartment, setLocNewPocDepartment] = useState<"Sales" | "Supply Chain Management" | "Finance">("Sales");
+  const [locNewPocRole, setLocNewPocRole] = useState("");
+  const [locNewPocLandline, setLocNewPocLandline] = useState("");
+  const [locNewPocLandlineCode, setLocNewPocLandlineCode] = useState("+1");
+  const [locNewPocExt, setLocNewPocExt] = useState("");
+  const [locNewPocMobile, setLocNewPocMobile] = useState("");
+  const [locNewPocMobileCode, setLocNewPocMobileCode] = useState("+1");
+  const [locNewPocEmail, setLocNewPocEmail] = useState("");
+  const [locSaveAndCreate, setLocSaveAndCreate] = useState(false);
+
   type LocDensity = "condensed" | "comfort" | "card";
   const LOC_DENSITY_CONFIG: { key: LocDensity; label: string; description: string; icon: "align-justify" | "list" | "layout-grid" }[] = [
     { key: "condensed", label: "Condensed", description: "Compact view", icon: "align-justify" },
