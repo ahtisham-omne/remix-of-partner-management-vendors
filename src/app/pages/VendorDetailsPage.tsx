@@ -2558,6 +2558,21 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
   const [locPocDensity, setLocPocDensity] = useState<LocDensity>("card");
   const [currentPage, setCurrentPage] = useState(1);
   const [recordsPerPage, setRecordsPerPage] = useState(20);
+
+  // ── Carrier & Shipping tab state ──
+  type CarrierSubTab = "vendor" | "customer";
+  type CarrierFilter = "all" | "active" | "default" | "Air" | "Sea" | "Ground" | "Freight";
+  const [carrierSubTab, setCarrierSubTab] = useState<CarrierSubTab>("vendor");
+  const [carrierSearch, setCarrierSearch] = useState("");
+  const [carrierFilter, setCarrierFilter] = useState<CarrierFilter>("all");
+  const [addCarrierModalOpen, setAddCarrierModalOpen] = useState(false);
+  const [newCarrierName, setNewCarrierName] = useState("");
+  const [newCarrierDesc, setNewCarrierDesc] = useState("");
+  const [newCarrierStatus, setNewCarrierStatus] = useState<"active" | "inactive">("active");
+  const [newCarrierIsDefault, setNewCarrierIsDefault] = useState(false);
+  const [newCarrierMethods, setNewCarrierMethods] = useState<{ name: string; shortName: string; minDays: string; maxDays: string; cost: string; isDefault: boolean }[]>([
+    { name: "", shortName: "Air", minDays: "", maxDays: "", cost: "", isDefault: true },
+  ]);
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
   const [locPtDetailOpen, setLocPtDetailOpen] = useState(false);
   const [locPtDetailTerm, setLocPtDetailTerm] = useState<PaymentTermPreset | null>(null);
@@ -3848,15 +3863,48 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                   )}
 
                   {/* ── Carrier & Shipping Methods tab ── */}
-                  {locDetailTab === "carrier_shipping" && (
+                  {locDetailTab === "carrier_shipping" && (() => {
+                    const CARRIER_SUB_TABS: { key: CarrierSubTab; label: string }[] = [
+                      { key: "vendor", label: "Vendor Carriers" },
+                      { key: "customer", label: "Customer Carriers" },
+                    ];
+
+                    // Filter carriers based on sub-tab, search, and filter
+                    const filteredCarriers = LOC_CARRIER_DATA.filter((c) => {
+                      // Search filter
+                      if (carrierSearch.trim()) {
+                        const q = carrierSearch.toLowerCase();
+                        if (!c.name.toLowerCase().includes(q) && !c.desc.toLowerCase().includes(q)) return false;
+                      }
+                      // Status/type filter
+                      if (carrierFilter === "active") return c.status === "active";
+                      if (carrierFilter === "default") return c.isDefault;
+                      if (["Air", "Sea", "Ground", "Freight"].includes(carrierFilter)) {
+                        return c.methods.some((m) => m.shortName === carrierFilter);
+                      }
+                      return true;
+                    });
+
+                    const CARRIER_FILTERS: { key: CarrierFilter; label: string; count: number }[] = [
+                      { key: "all", label: "All Carriers", count: LOC_CARRIER_DATA.length },
+                      { key: "active", label: "Active", count: LOC_CARRIER_DATA.filter((c) => c.status === "active").length },
+                      { key: "default", label: "Default Only", count: LOC_CARRIER_DATA.filter((c) => c.isDefault).length },
+                      { key: "Air", label: "Air", count: LOC_CARRIER_DATA.filter((c) => c.methods.some((m) => m.shortName === "Air")).length },
+                      { key: "Sea", label: "Sea", count: LOC_CARRIER_DATA.filter((c) => c.methods.some((m) => m.shortName === "Sea")).length },
+                      { key: "Ground", label: "Ground", count: LOC_CARRIER_DATA.filter((c) => c.methods.some((m) => m.shortName === "Ground")).length },
+                      { key: "Freight", label: "Freight", count: LOC_CARRIER_DATA.filter((c) => c.methods.some((m) => m.shortName === "Freight")).length },
+                    ];
+
+                    return (
                     <div className="flex-1 flex flex-col overflow-hidden">
-                      {/* Sub-tabs: Vendor / Customer — matching Items tab pattern exactly */}
+                      {/* Sub-tabs — exact Items tab pattern */}
                       <div className="flex items-center border-b border-[#EEF2F6] bg-[#F8FAFC] px-1 shrink-0">
-                        {[{ key: "vendor", label: "Vendor Carriers" }, { key: "customer", label: "Customer Carriers" }].map((t, i) => {
-                          const isActive = i === 0;
+                        {CARRIER_SUB_TABS.map((t) => {
+                          const isActive = carrierSubTab === t.key;
                           return (
                             <button
                               key={t.key}
+                              onClick={() => { setCarrierSubTab(t.key); setCarrierFilter("all"); setCarrierSearch(""); }}
                               className={`flex-1 text-center py-2.5 text-sm transition-colors cursor-pointer relative ${
                                 isActive ? "text-[#0A77FF]" : "text-[#64748B] hover:text-[#334155]"
                               }`}
@@ -3871,48 +3919,364 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                         })}
                       </div>
 
-                      {/* Toolbar row */}
-                      <div className="flex items-center justify-between gap-3 px-4 pt-3 pb-2 shrink-0">
-                        <div className="flex items-center gap-2 flex-1 min-w-0">
-                          <div className="relative flex-1 max-w-[220px]">
-                            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
-                            <input type="text" placeholder="Search carriers..." className="w-full pl-8 h-8 text-[12px] bg-background border border-border rounded-lg px-3 py-1.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors" />
+                      {/* Toolbar — matching Items tab */}
+                      <div className="flex items-center justify-between gap-3 px-4 pt-3.5 pb-2 shrink-0">
+                        <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                          <div className="relative flex-1 max-w-xs">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70 pointer-events-none" />
+                            <Input
+                              placeholder="Search carriers..."
+                              value={carrierSearch}
+                              onChange={(e) => setCarrierSearch(e.target.value)}
+                              className="pl-9 pr-8 h-9 text-sm bg-white border-border/80 shadow-sm placeholder:text-muted-foreground/50 focus-visible:border-primary focus-visible:ring-primary/20"
+                            />
+                            {carrierSearch && (
+                              <button
+                                onClick={() => setCarrierSearch("")}
+                                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded-full hover:bg-muted/60 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                              >
+                                <X className="w-3.5 h-3.5" />
+                              </button>
+                            )}
                           </div>
-                          <button className="h-8 px-2.5 rounded-lg border border-border bg-background text-[12px] text-muted-foreground hover:bg-muted cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 500 }}>
-                            <SlidersHorizontal className="w-3.5 h-3.5" /> Filters
+                          <button
+                            type="button"
+                            onClick={() => toast.info("Advanced filters coming soon!")}
+                            className="inline-flex items-center justify-center h-9 gap-1.5 px-3 rounded-lg border border-border/80 bg-white shadow-sm hover:bg-muted/50 transition-colors cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-ring/50 shrink-0 text-foreground"
+                          >
+                            <SlidersHorizontal className="w-3.5 h-3.5 text-muted-foreground" />
+                            <span className="text-sm" style={{ fontWeight: 500 }}>Filters</span>
                           </button>
-                          <span className="text-[12px] text-muted-foreground"><span className="text-foreground" style={{ fontWeight: 600 }}>{LOC_CARRIER_DATA.length}</span> carriers</span>
                         </div>
-                        <button onClick={() => toast.info("Add carrier coming soon")} className="h-8 px-3 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground text-[12px] shadow-sm cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 600 }}>
-                          <Plus className="w-3.5 h-3.5" /> Add new carrier
-                        </button>
-                      </div>
 
-                      {/* Filter chips */}
-                      <div className="flex items-center gap-1.5 px-4 pb-2">
-                        {[{ label: "All Carriers", count: LOC_CARRIER_DATA.length }, { label: "Active", count: LOC_CARRIER_DATA.filter(c => c.status === "active").length }, { label: "Default Only", count: LOC_CARRIER_DATA.filter(c => c.isDefault).length }, { label: "Air", count: null }, { label: "Sea", count: null }, { label: "Ground", count: null }, { label: "Freight", count: null }].map((chip, i) => (
-                          <span key={chip.label} className={`text-[11px] px-2.5 py-1 rounded-full cursor-pointer transition-colors border inline-flex items-center gap-1 ${i === 0 ? "bg-primary/10 text-primary border-primary/25" : "bg-muted text-muted-foreground border-border hover:bg-accent"}`} style={{ fontWeight: 500 }}>
-                            {chip.label}{chip.count !== null && <span className="text-[10px] ml-0.5 opacity-70">{chip.count}</span>}
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          <span className="text-sm tabular-nums mr-1 hidden sm:inline" style={{ fontWeight: 500 }}>
+                            {filteredCarriers.length !== LOC_CARRIER_DATA.length ? (
+                              <>
+                                <span className="text-foreground">{filteredCarriers.length}</span>
+                                <span className="text-muted-foreground/60"> of </span>
+                                <span className="text-muted-foreground">{LOC_CARRIER_DATA.length}</span>
+                                <span className="text-muted-foreground/70"> carriers</span>
+                              </>
+                            ) : (
+                              <>
+                                <span className="text-foreground">{LOC_CARRIER_DATA.length}</span>
+                                <span className="text-muted-foreground/70"> carriers</span>
+                              </>
+                            )}
                           </span>
-                        ))}
-                      </div>
 
-                      <div className="h-px bg-border mx-4 shrink-0" />
-                      <div className="flex-1 overflow-auto p-4">
-                        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3">
-                          {LOC_CARRIER_DATA.map((carrier) => (
-                            <CarrierShippingCard key={carrier.id} carrier={carrier} />
-                          ))}
+                          <div className="w-px h-5 bg-border/60 mx-0.5 hidden sm:block" />
+
+                          {/* Add carrier button */}
+                          <button
+                            type="button"
+                            onClick={() => setAddCarrierModalOpen(true)}
+                            className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-sm shadow-sm transition-colors cursor-pointer"
+                            style={{ fontWeight: 600 }}
+                          >
+                            <Plus className="w-3.5 h-3.5" />
+                            <span className="hidden sm:inline">Add new carrier</span>
+                          </button>
                         </div>
                       </div>
+
+                      {/* Filter pills — matching Items tab */}
+                      <div className="flex items-center gap-1.5 overflow-x-auto px-4 pb-3 shrink-0">
+                        {CARRIER_FILTERS.map((f) => {
+                          const isActive = carrierFilter === f.key;
+                          return (
+                            <button
+                              key={f.key}
+                              onClick={() => setCarrierFilter(f.key)}
+                              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                                isActive
+                                  ? "border-primary bg-[#EDF4FF] hover:bg-[#D6E8FF] active:bg-[#ADD1FF]"
+                                  : "border-border text-muted-foreground hover:bg-muted/60 hover:text-foreground hover:border-muted-foreground/30 active:bg-muted"
+                              }`}
+                              style={{ fontWeight: isActive ? 500 : 400, color: isActive ? "#0A77FF" : undefined }}
+                            >
+                              {f.label}
+                              <span
+                                className={`text-[10px] rounded-full px-1.5 py-px min-w-[18px] text-center ${isActive ? "bg-primary/10" : "bg-muted"}`}
+                                style={{ fontWeight: 600, color: isActive ? "#0A77FF" : "#475569" }}
+                              >
+                                {f.count}
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+
+                      {/* Divider */}
+                      <div className="border-t border-border shrink-0" />
+
+                      {/* Cards grid */}
+                      <div className="flex-1 overflow-auto p-4">
+                        {filteredCarriers.length === 0 ? (
+                          <div className="flex items-center justify-center py-16">
+                            <div className="text-center">
+                              <Truck className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" />
+                              <p className="text-sm text-muted-foreground" style={{ fontWeight: 500 }}>No carriers found</p>
+                              <p className="text-xs text-muted-foreground/60 mt-1">Try adjusting your search or filters</p>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3">
+                            {filteredCarriers.map((carrier) => (
+                              <CarrierShippingCard key={carrier.id} carrier={carrier} />
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Footer pagination */}
                       <div className="flex items-center justify-between px-4 py-2 border-t border-border shrink-0 bg-muted/30">
                         <span className="text-[11px] text-muted-foreground">Records per page <select className="h-6 px-1.5 rounded border border-border text-[11px] cursor-pointer outline-none ml-1 bg-background"><option>20</option><option>50</option></select></span>
                         <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
                           <span className="px-2 py-0.5 rounded bg-primary text-primary-foreground" style={{ fontWeight: 600 }}>1</span>
                         </div>
                       </div>
+
+                      {/* ── Add New Carrier Modal ── */}
+                      <Dialog open={addCarrierModalOpen} onOpenChange={setAddCarrierModalOpen}>
+                        <DialogContent
+                          className="!fixed !inset-0 !translate-x-0 !translate-y-0 !m-auto !w-full !h-full !max-w-[100%] sm:!max-w-[640px] !max-h-[100dvh] sm:!max-h-[85vh] rounded-none sm:!rounded-2xl flex flex-col p-0 gap-0 border-0 sm:border"
+                          hideCloseButton
+                          style={{ boxShadow: "0 24px 48px -12px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.05)" }}
+                        >
+                          <DialogTitle className="sr-only">Add New Carrier</DialogTitle>
+                          <DialogDescription className="sr-only">Create a new carrier with shipping methods</DialogDescription>
+
+                          {/* Modal header */}
+                          <div className="flex items-center justify-between px-5 py-4 border-b border-[#EEF2F6] shrink-0">
+                            <div className="flex items-center gap-3">
+                              <div className="w-9 h-9 rounded-xl bg-[#EDF4FF] flex items-center justify-center">
+                                <Truck className="w-4.5 h-4.5 text-[#0A77FF]" />
+                              </div>
+                              <div>
+                                <h3 className="text-[15px] text-[#0F172A]" style={{ fontWeight: 600 }}>Add New Carrier</h3>
+                                <p className="text-[12px] text-[#94A3B8]">Configure carrier details and shipping methods</p>
+                              </div>
+                            </div>
+                            <button onClick={() => setAddCarrierModalOpen(false)} className="w-8 h-8 rounded-lg border border-[#E2E8F0] flex items-center justify-center hover:bg-[#F8FAFC] transition-colors cursor-pointer">
+                              <X className="w-4 h-4 text-[#64748B]" />
+                            </button>
+                          </div>
+
+                          {/* Modal body */}
+                          <div className="flex-1 overflow-auto px-5 py-4 space-y-5">
+                            {/* Carrier Name */}
+                            <div>
+                              <label className="text-xs text-[#0F172A] mb-1.5 block" style={{ fontWeight: 600 }}>Carrier Name <span className="text-[#DC2626]">*</span></label>
+                              <Input
+                                placeholder="e.g., FedEx Express, DHL International"
+                                value={newCarrierName}
+                                onChange={(e) => setNewCarrierName(e.target.value)}
+                                className="h-10"
+                              />
+                            </div>
+
+                            {/* Description */}
+                            <div>
+                              <label className="text-xs text-[#0F172A] mb-1.5 block" style={{ fontWeight: 600 }}>Description</label>
+                              <Input
+                                placeholder="Brief description of this carrier"
+                                value={newCarrierDesc}
+                                onChange={(e) => setNewCarrierDesc(e.target.value)}
+                                className="h-10"
+                              />
+                            </div>
+
+                            {/* Status + Default row */}
+                            <div className="flex items-center gap-4">
+                              <div className="flex-1">
+                                <label className="text-xs text-[#0F172A] mb-1.5 block" style={{ fontWeight: 600 }}>Status</label>
+                                <div className="flex items-center gap-2">
+                                  {(["active", "inactive"] as const).map((s) => (
+                                    <button
+                                      key={s}
+                                      onClick={() => setNewCarrierStatus(s)}
+                                      className={`px-3 py-2 rounded-lg border text-xs transition-all ${
+                                        newCarrierStatus === s
+                                          ? "border-[#0A77FF] bg-[#EDF4FF] text-[#0A77FF]"
+                                          : "border-[#E2E8F0] bg-white text-[#334155] hover:border-[#CBD5E1]"
+                                      }`}
+                                      style={{ fontWeight: newCarrierStatus === s ? 600 : 500 }}
+                                    >
+                                      {s === "active" ? "Active" : "Inactive"}
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-2 pt-5">
+                                <Checkbox
+                                  checked={newCarrierIsDefault}
+                                  onCheckedChange={(v) => setNewCarrierIsDefault(!!v)}
+                                  className="w-4 h-4"
+                                />
+                                <span className="text-xs text-[#334155]" style={{ fontWeight: 500 }}>Set as default carrier</span>
+                              </div>
+                            </div>
+
+                            {/* Shipping Methods */}
+                            <div>
+                              <div className="flex items-center justify-between mb-2">
+                                <label className="text-xs text-[#0F172A]" style={{ fontWeight: 600 }}>Shipping Methods</label>
+                                <button
+                                  onClick={() => setNewCarrierMethods((prev) => [...prev, { name: "", shortName: "Air", minDays: "", maxDays: "", cost: "", isDefault: false }])}
+                                  className="text-[11px] text-[#0A77FF] hover:text-[#0862D0] transition-colors cursor-pointer inline-flex items-center gap-1"
+                                  style={{ fontWeight: 600 }}
+                                >
+                                  <Plus className="w-3 h-3" /> Add Method
+                                </button>
+                              </div>
+                              <div className="space-y-3">
+                                {newCarrierMethods.map((method, idx) => (
+                                  <div key={idx} className="border border-[#E2E8F0] rounded-xl p-3.5 bg-[#FAFBFC] relative">
+                                    <div className="flex items-center justify-between mb-3">
+                                      <span className="text-[11px] text-[#64748B]" style={{ fontWeight: 600 }}>Method {idx + 1}</span>
+                                      <div className="flex items-center gap-2">
+                                        {newCarrierMethods.length > 1 && (
+                                          <button
+                                            onClick={() => setNewCarrierMethods((prev) => prev.filter((_, i) => i !== idx))}
+                                            className="text-[11px] text-[#DC2626] hover:text-[#B91C1C] cursor-pointer"
+                                            style={{ fontWeight: 500 }}
+                                          >
+                                            Remove
+                                          </button>
+                                        )}
+                                      </div>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-3 mb-3">
+                                      <div>
+                                        <label className="text-[11px] text-[#64748B] mb-1 block" style={{ fontWeight: 500 }}>Method Name</label>
+                                        <Input
+                                          placeholder="e.g., Express Air"
+                                          value={method.name}
+                                          onChange={(e) => {
+                                            const updated = [...newCarrierMethods];
+                                            updated[idx] = { ...updated[idx], name: e.target.value };
+                                            setNewCarrierMethods(updated);
+                                          }}
+                                          className="h-9 text-xs"
+                                        />
+                                      </div>
+                                      <div>
+                                        <label className="text-[11px] text-[#64748B] mb-1 block" style={{ fontWeight: 500 }}>Type</label>
+                                        <select
+                                          value={method.shortName}
+                                          onChange={(e) => {
+                                            const updated = [...newCarrierMethods];
+                                            updated[idx] = { ...updated[idx], shortName: e.target.value };
+                                            setNewCarrierMethods(updated);
+                                          }}
+                                          className="w-full h-9 px-3 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#0F172A] focus:outline-none focus:border-[#0A77FF] cursor-pointer"
+                                        >
+                                          {["Air", "Sea", "Ground", "Freight", "Express", "Same Day"].map((t) => (
+                                            <option key={t} value={t}>{t}</option>
+                                          ))}
+                                        </select>
+                                      </div>
+                                    </div>
+                                    <div className="grid grid-cols-3 gap-3">
+                                      <div>
+                                        <label className="text-[11px] text-[#64748B] mb-1 block" style={{ fontWeight: 500 }}>Delivery Duration</label>
+                                        <div className="flex items-center gap-1.5">
+                                          <Input
+                                            placeholder="Min"
+                                            value={method.minDays}
+                                            onChange={(e) => {
+                                              const updated = [...newCarrierMethods];
+                                              updated[idx] = { ...updated[idx], minDays: e.target.value };
+                                              setNewCarrierMethods(updated);
+                                            }}
+                                            className="h-9 text-xs text-center"
+                                          />
+                                          <span className="text-[11px] text-[#94A3B8] shrink-0">to</span>
+                                          <Input
+                                            placeholder="Max"
+                                            value={method.maxDays}
+                                            onChange={(e) => {
+                                              const updated = [...newCarrierMethods];
+                                              updated[idx] = { ...updated[idx], maxDays: e.target.value };
+                                              setNewCarrierMethods(updated);
+                                            }}
+                                            className="h-9 text-xs text-center"
+                                          />
+                                          <span className="text-[11px] text-[#94A3B8] shrink-0">days</span>
+                                        </div>
+                                      </div>
+                                      <div>
+                                        <label className="text-[11px] text-[#64748B] mb-1 block" style={{ fontWeight: 500 }}>Cost / Shipment</label>
+                                        <Input
+                                          placeholder="$0.00"
+                                          value={method.cost}
+                                          onChange={(e) => {
+                                            const updated = [...newCarrierMethods];
+                                            updated[idx] = { ...updated[idx], cost: e.target.value };
+                                            setNewCarrierMethods(updated);
+                                          }}
+                                          className="h-9 text-xs"
+                                        />
+                                      </div>
+                                      <div className="flex items-end pb-0.5">
+                                        <div className="flex items-center gap-2">
+                                          <Checkbox
+                                            checked={method.isDefault}
+                                            onCheckedChange={(v) => {
+                                              const updated = newCarrierMethods.map((m, i) => ({
+                                                ...m,
+                                                isDefault: i === idx ? !!v : false,
+                                              }));
+                                              setNewCarrierMethods(updated);
+                                            }}
+                                            className="w-3.5 h-3.5"
+                                          />
+                                          <span className="text-[11px] text-[#334155]" style={{ fontWeight: 500 }}>Default</span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Modal footer */}
+                          <div className="flex items-center justify-between px-5 py-3.5 border-t border-[#EEF2F6] shrink-0 bg-[#FAFBFC] sm:rounded-b-2xl">
+                            <button
+                              onClick={() => setAddCarrierModalOpen(false)}
+                              className="h-9 px-4 rounded-lg border border-[#E2E8F0] bg-white text-[#64748B] text-sm hover:bg-[#F8FAFC] transition-colors cursor-pointer"
+                              style={{ fontWeight: 500 }}
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              onClick={() => {
+                                if (!newCarrierName.trim()) {
+                                  toast.error("Please enter a carrier name");
+                                  return;
+                                }
+                                toast.success(`Carrier "${newCarrierName}" created successfully`);
+                                setAddCarrierModalOpen(false);
+                                setNewCarrierName("");
+                                setNewCarrierDesc("");
+                                setNewCarrierStatus("active");
+                                setNewCarrierIsDefault(false);
+                                setNewCarrierMethods([{ name: "", shortName: "Air", minDays: "", maxDays: "", cost: "", isDefault: true }]);
+                              }}
+                              className="h-9 px-5 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-sm shadow-sm transition-colors cursor-pointer inline-flex items-center gap-1.5"
+                              style={{ fontWeight: 600 }}
+                            >
+                              <Plus className="w-3.5 h-3.5" /> Create Carrier
+                            </button>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
                     </div>
-                  )}
+                    );
+                  })()}
 
                   {/* ── Pricing Rules tab ── */}
                   {locDetailTab === "pricing_rules" && (
