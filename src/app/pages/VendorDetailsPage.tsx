@@ -4138,7 +4138,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                                     <Truck className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" />
                                     <p className="text-sm text-muted-foreground" style={{ fontWeight: 500 }}>No carriers match your search</p>
                                     <button
-                                      onClick={() => { setAddCarrierModalOpen(false); resetAddCarrierModal(); navigate("/vendors?createPartner=carrier"); }}
+                                      onClick={() => { setAddCarrierModalOpen(false); resetAddCarrierModal(); window.location.href = "/vendors?createPartner=carrier"; }}
                                       className="text-xs text-primary hover:underline mt-2 cursor-pointer"
                                     >
                                       Create a new carrier instead
