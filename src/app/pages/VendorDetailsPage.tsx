@@ -3850,39 +3850,48 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                   {/* ── Carrier & Shipping Methods tab ── */}
                   {locDetailTab === "carrier_shipping" && (
                     <div className="flex-1 flex flex-col overflow-hidden">
+                      {/* Sub-tabs: All Carriers / Vendor / Customer — matching Items tab pattern */}
+                      <div className="border-b border-border shrink-0">
+                        <div className="flex">
+                          {["All Carriers", "Vendor Carriers", "Customer Carriers"].map((label, i) => (
+                            <button
+                              key={label}
+                              className={`flex-1 py-2.5 text-[13px] text-center transition-colors cursor-pointer ${i === 0 ? "text-primary border-b-2 border-primary" : "text-muted-foreground hover:text-foreground border-b-2 border-transparent"}`}
+                              style={{ fontWeight: i === 0 ? 600 : 400 }}
+                            >
+                              {label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Toolbar row */}
                       <div className="flex items-center justify-between gap-3 px-4 pt-3 pb-2 shrink-0">
                         <div className="flex items-center gap-2 flex-1 min-w-0">
                           <div className="relative flex-1 max-w-[220px]">
-                            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8] pointer-events-none" />
-                            <input type="text" placeholder="Search carriers..." className="w-full pl-8 h-8 text-[12px] bg-white border border-[#E2E8F0] rounded-lg px-3 py-1.5 focus:outline-none focus:border-[#0A77FF] transition-colors" />
+                            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
+                            <input type="text" placeholder="Search carriers..." className="w-full pl-8 h-8 text-[12px] bg-background border border-border rounded-lg px-3 py-1.5 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors" />
                           </div>
-                          <button className="h-8 px-2.5 rounded-lg border border-[#E2E8F0] bg-white text-[12px] text-[#475569] hover:bg-[#F8FAFC] cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 500 }}>
+                          <button className="h-8 px-2.5 rounded-lg border border-border bg-background text-[12px] text-muted-foreground hover:bg-muted cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 500 }}>
                             <SlidersHorizontal className="w-3.5 h-3.5" /> Filters
                           </button>
+                          <span className="text-[12px] text-muted-foreground"><span className="text-foreground" style={{ fontWeight: 600 }}>{LOC_CARRIER_DATA.length}</span> carriers</span>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <button onClick={() => toast.info("Add carrier coming soon")} className="h-8 px-3 rounded-lg border border-[#DC2626] bg-white text-[#DC2626] text-[12px] cursor-pointer transition-colors inline-flex items-center gap-1.5 hover:bg-[#FEF2F2]" style={{ fontWeight: 600 }}>
-                            <Plus className="w-3.5 h-3.5" /> Add New Carrier
-                          </button>
-                          <button onClick={() => toast.info("Templates coming soon")} className="h-8 px-3 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-[12px] shadow-sm cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 600 }}>
-                            <Sparkles className="w-3.5 h-3.5" /> Templates
-                          </button>
-                        </div>
+                        <button onClick={() => toast.info("Add carrier coming soon")} className="h-8 px-3 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground text-[12px] shadow-sm cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 600 }}>
+                          <Plus className="w-3.5 h-3.5" /> Add new carrier
+                        </button>
                       </div>
-                      {/* Vendor / Customer toggle */}
-                      <div className="flex items-center mx-4 mb-2 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] overflow-hidden">
-                        <button className="flex-1 py-2 text-[12px] text-white bg-[#0A77FF] text-center" style={{ fontWeight: 600 }}>Vendor</button>
-                        <button className="flex-1 py-2 text-[12px] text-[#64748B] bg-white text-center hover:bg-[#F8FAFC] cursor-pointer transition-colors" style={{ fontWeight: 500 }}>Customer</button>
-                      </div>
+
                       {/* Filter chips */}
                       <div className="flex items-center gap-1.5 px-4 pb-2">
-                        {["All Carriers", "Active", "Default Only", "Air", "Sea", "Ground", "Freight"].map((chip, i) => (
-                          <span key={chip} className={`text-[11px] px-2.5 py-1 rounded-full cursor-pointer transition-colors border ${i === 0 ? "bg-primary/10 text-primary border-primary/25" : "bg-[#F8FAFC] text-[#64748B] border-[#E2E8F0] hover:bg-[#F1F5F9]"}`} style={{ fontWeight: 500 }}>
-                            {chip}
+                        {[{ label: "All Carriers", count: LOC_CARRIER_DATA.length }, { label: "Active", count: LOC_CARRIER_DATA.filter(c => c.status === "active").length }, { label: "Default Only", count: LOC_CARRIER_DATA.filter(c => c.isDefault).length }, { label: "Air", count: null }, { label: "Sea", count: null }, { label: "Ground", count: null }, { label: "Freight", count: null }].map((chip, i) => (
+                          <span key={chip.label} className={`text-[11px] px-2.5 py-1 rounded-full cursor-pointer transition-colors border inline-flex items-center gap-1 ${i === 0 ? "bg-primary/10 text-primary border-primary/25" : "bg-muted text-muted-foreground border-border hover:bg-accent"}`} style={{ fontWeight: 500 }}>
+                            {chip.label}{chip.count !== null && <span className="text-[10px] ml-0.5 opacity-70">{chip.count}</span>}
                           </span>
                         ))}
                       </div>
-                      <div className="h-px bg-[#E8ECF1] mx-4 shrink-0" />
+
+                      <div className="h-px bg-border mx-4 shrink-0" />
                       <div className="flex-1 overflow-auto p-4">
                         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3">
                           {LOC_CARRIER_DATA.map((carrier) => (
@@ -3890,10 +3899,10 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                           ))}
                         </div>
                       </div>
-                      <div className="flex items-center justify-between px-4 py-2 border-t border-[#E8ECF1] shrink-0 bg-[#FAFBFC]">
-                        <span className="text-[11px] text-[#94A3B8]">Records per page <select className="h-6 px-1.5 rounded border border-[#E2E8F0] text-[11px] cursor-pointer outline-none ml-1"><option>20</option><option>50</option></select></span>
-                        <div className="flex items-center gap-1 text-[11px] text-[#94A3B8]">
-                          <span className="px-2 py-0.5 rounded bg-[#0A77FF] text-white" style={{ fontWeight: 600 }}>1</span>
+                      <div className="flex items-center justify-between px-4 py-2 border-t border-border shrink-0 bg-muted/30">
+                        <span className="text-[11px] text-muted-foreground">Records per page <select className="h-6 px-1.5 rounded border border-border text-[11px] cursor-pointer outline-none ml-1 bg-background"><option>20</option><option>50</option></select></span>
+                        <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                          <span className="px-2 py-0.5 rounded bg-primary text-primary-foreground" style={{ fontWeight: 600 }}>1</span>
                         </div>
                       </div>
                     </div>
