@@ -4074,239 +4074,367 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                       </div>
 
                       {/* ── Add New Carrier Modal ── */}
-                      <Dialog open={addCarrierModalOpen} onOpenChange={setAddCarrierModalOpen}>
+                      <Dialog open={addCarrierModalOpen} onOpenChange={(open) => { setAddCarrierModalOpen(open); if (!open) resetCreateCarrierForm(); }}>
                         <DialogContent
-                          className="!fixed !inset-0 !translate-x-0 !translate-y-0 !m-auto !w-full !h-full !max-w-[100%] sm:!max-w-[640px] !max-h-[100dvh] sm:!max-h-[85vh] rounded-none sm:!rounded-2xl flex flex-col p-0 gap-0 border-0 sm:border"
+                          className="!fixed !inset-0 !translate-x-0 !translate-y-0 !m-auto !w-full !h-full !max-w-[100%] sm:!max-w-[780px] !max-h-[100dvh] sm:!max-h-[88vh] rounded-none sm:!rounded-2xl flex flex-col p-0 gap-0 border-0 sm:border"
                           hideCloseButton
                           style={{ boxShadow: "0 24px 48px -12px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.05)" }}
                         >
-                          <DialogTitle className="sr-only">Add New Carrier</DialogTitle>
-                          <DialogDescription className="sr-only">Create a new carrier with shipping methods</DialogDescription>
+                          <DialogTitle className="sr-only">Add Carrier</DialogTitle>
+                          <DialogDescription className="sr-only">Select an existing carrier or create a new one</DialogDescription>
 
-                          {/* Modal header */}
-                          <div className="flex items-center justify-between px-5 py-4 border-b border-[#EEF2F6] shrink-0">
-                            <div className="flex items-center gap-3">
-                              <div className="w-9 h-9 rounded-xl bg-[#EDF4FF] flex items-center justify-center">
-                                <Truck className="w-4.5 h-4.5 text-[#0A77FF]" />
-                              </div>
-                              <div>
-                                <h3 className="text-[15px] text-[#0F172A]" style={{ fontWeight: 600 }}>Add New Carrier</h3>
-                                <p className="text-[12px] text-[#94A3B8]">Configure carrier details and shipping methods</p>
-                              </div>
-                            </div>
-                            <button onClick={() => setAddCarrierModalOpen(false)} className="w-8 h-8 rounded-lg border border-[#E2E8F0] flex items-center justify-center hover:bg-[#F8FAFC] transition-colors cursor-pointer">
-                              <X className="w-4 h-4 text-[#64748B]" />
-                            </button>
-                          </div>
-
-                          {/* Modal body */}
-                          <div className="flex-1 overflow-auto px-5 py-4 space-y-5">
-                            {/* Carrier Name */}
-                            <div>
-                              <label className="text-xs text-[#0F172A] mb-1.5 block" style={{ fontWeight: 600 }}>Carrier Name <span className="text-[#DC2626]">*</span></label>
-                              <Input
-                                placeholder="e.g., FedEx Express, DHL International"
-                                value={newCarrierName}
-                                onChange={(e) => setNewCarrierName(e.target.value)}
-                                className="h-10"
-                              />
-                            </div>
-
-                            {/* Description */}
-                            <div>
-                              <label className="text-xs text-[#0F172A] mb-1.5 block" style={{ fontWeight: 600 }}>Description</label>
-                              <Input
-                                placeholder="Brief description of this carrier"
-                                value={newCarrierDesc}
-                                onChange={(e) => setNewCarrierDesc(e.target.value)}
-                                className="h-10"
-                              />
-                            </div>
-
-                            {/* Status + Default row */}
-                            <div className="flex items-center gap-4">
-                              <div className="flex-1">
-                                <label className="text-xs text-[#0F172A] mb-1.5 block" style={{ fontWeight: 600 }}>Status</label>
-                                <div className="flex items-center gap-2">
-                                  {(["active", "inactive"] as const).map((s) => (
-                                    <button
-                                      key={s}
-                                      onClick={() => setNewCarrierStatus(s)}
-                                      className={`px-3 py-2 rounded-lg border text-xs transition-all ${
-                                        newCarrierStatus === s
-                                          ? "border-[#0A77FF] bg-[#EDF4FF] text-[#0A77FF]"
-                                          : "border-[#E2E8F0] bg-white text-[#334155] hover:border-[#CBD5E1]"
-                                      }`}
-                                      style={{ fontWeight: newCarrierStatus === s ? 600 : 500 }}
-                                    >
-                                      {s === "active" ? "Active" : "Inactive"}
-                                    </button>
-                                  ))}
+                          {createCarrierView === "select" ? (
+                            <>
+                              {/* ─── Selection View Header ─── */}
+                              <div className="flex items-center justify-between px-5 py-4 border-b border-border shrink-0">
+                                <div className="flex items-center gap-3">
+                                  <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center">
+                                    <Truck className="w-4.5 h-4.5 text-primary" />
+                                  </div>
+                                  <div>
+                                    <h3 className="text-[15px] text-foreground" style={{ fontWeight: 600 }}>Add Carrier</h3>
+                                    <p className="text-[12px] text-muted-foreground">Select from existing carriers or create a new one</p>
+                                  </div>
                                 </div>
-                              </div>
-                              <div className="flex items-center gap-2 pt-5">
-                                <Checkbox
-                                  checked={newCarrierIsDefault}
-                                  onCheckedChange={(v) => setNewCarrierIsDefault(!!v)}
-                                  className="w-4 h-4"
-                                />
-                                <span className="text-xs text-[#334155]" style={{ fontWeight: 500 }}>Set as default carrier</span>
-                              </div>
-                            </div>
-
-                            {/* Shipping Methods */}
-                            <div>
-                              <div className="flex items-center justify-between mb-2">
-                                <label className="text-xs text-[#0F172A]" style={{ fontWeight: 600 }}>Shipping Methods</label>
-                                <button
-                                  onClick={() => setNewCarrierMethods((prev) => [...prev, { name: "", shortName: "Air", minDays: "", maxDays: "", cost: "", isDefault: false }])}
-                                  className="text-[11px] text-[#0A77FF] hover:text-[#0862D0] transition-colors cursor-pointer inline-flex items-center gap-1"
-                                  style={{ fontWeight: 600 }}
-                                >
-                                  <Plus className="w-3 h-3" /> Add Method
+                                <button onClick={() => { setAddCarrierModalOpen(false); resetCreateCarrierForm(); }} className="w-8 h-8 rounded-lg border border-border flex items-center justify-center hover:bg-muted/50 transition-colors cursor-pointer">
+                                  <X className="w-4 h-4 text-muted-foreground" />
                                 </button>
                               </div>
-                              <div className="space-y-3">
-                                {newCarrierMethods.map((method, idx) => (
-                                  <div key={idx} className="border border-[#E2E8F0] rounded-xl p-3.5 bg-[#FAFBFC] relative">
-                                    <div className="flex items-center justify-between mb-3">
-                                      <span className="text-[11px] text-[#64748B]" style={{ fontWeight: 600 }}>Method {idx + 1}</span>
-                                      <div className="flex items-center gap-2">
-                                        {newCarrierMethods.length > 1 && (
-                                          <button
-                                            onClick={() => setNewCarrierMethods((prev) => prev.filter((_, i) => i !== idx))}
-                                            className="text-[11px] text-[#DC2626] hover:text-[#B91C1C] cursor-pointer"
-                                            style={{ fontWeight: 500 }}
-                                          >
-                                            Remove
-                                          </button>
-                                        )}
+
+                              {/* Search + Create New button */}
+                              <div className="flex items-center gap-2.5 px-5 pt-4 pb-2 shrink-0">
+                                <div className="relative flex-1">
+                                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70 pointer-events-none" />
+                                  <Input
+                                    placeholder="Search carriers by name or type..."
+                                    value={addCarrierSearch}
+                                    onChange={(e) => setAddCarrierSearch(e.target.value)}
+                                    className="pl-9 pr-8 h-9 text-sm bg-background border-border/80 shadow-sm placeholder:text-muted-foreground/50 focus-visible:border-primary focus-visible:ring-primary/20"
+                                  />
+                                  {addCarrierSearch && (
+                                    <button onClick={() => setAddCarrierSearch("")} className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded-full hover:bg-muted/60 text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
+                                      <X className="w-3.5 h-3.5" />
+                                    </button>
+                                  )}
+                                </div>
+                                <button
+                                  onClick={() => setCreateCarrierView("create")}
+                                  className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground text-sm shadow-sm transition-colors cursor-pointer shrink-0"
+                                  style={{ fontWeight: 600 }}
+                                >
+                                  <Plus className="w-3.5 h-3.5" />
+                                  Create new carrier
+                                </button>
+                              </div>
+
+                              {/* Carrier list */}
+                              <div className="flex-1 overflow-auto px-5 pb-2">
+                                {(() => {
+                                  const q = addCarrierSearch.toLowerCase();
+                                  const filteredMaster = MASTER_CARRIERS.filter(c =>
+                                    c.name.toLowerCase().includes(q) || c.type.toLowerCase().includes(q)
+                                  );
+                                  const alreadyAdded = new Set(LOC_CARRIER_DATA.map(c => c.name));
+                                  return filteredMaster.length === 0 ? (
+                                    <div className="flex items-center justify-center py-16">
+                                      <div className="text-center">
+                                        <Truck className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" />
+                                        <p className="text-sm text-muted-foreground" style={{ fontWeight: 500 }}>No carriers match your search</p>
+                                        <button onClick={() => setCreateCarrierView("create")} className="text-xs text-primary hover:underline mt-2 cursor-pointer">Create a new carrier instead</button>
                                       </div>
                                     </div>
-                                    <div className="grid grid-cols-2 gap-3 mb-3">
+                                  ) : (
+                                    <div className="space-y-1.5 mt-1">
+                                      {filteredMaster.map((carrier) => {
+                                        const isAdded = alreadyAdded.has(carrier.name);
+                                        const isSelected = addCarrierSelectedIds.has(carrier.id);
+                                        const statusColors: Record<string, { bg: string; text: string }> = {
+                                          Active: { bg: "hsl(var(--chart-2) / 0.12)", text: "hsl(var(--chart-2))" },
+                                          "Under Review": { bg: "hsl(var(--chart-4) / 0.12)", text: "hsl(var(--chart-4))" },
+                                          Inactive: { bg: "hsl(var(--muted))", text: "hsl(var(--muted-foreground))" },
+                                        };
+                                        const colors = statusColors[carrier.status] || statusColors.Active;
+                                        return (
+                                          <div
+                                            key={carrier.id}
+                                            onClick={() => {
+                                              if (isAdded) return;
+                                              setAddCarrierSelectedIds(prev => {
+                                                const next = new Set(prev);
+                                                if (next.has(carrier.id)) next.delete(carrier.id);
+                                                else next.add(carrier.id);
+                                                return next;
+                                              });
+                                            }}
+                                            className={`flex items-center gap-3 p-3 rounded-xl border transition-all ${
+                                              isAdded
+                                                ? "border-border/50 bg-muted/30 opacity-60 cursor-not-allowed"
+                                                : isSelected
+                                                ? "border-primary bg-primary/5 cursor-pointer ring-1 ring-primary/20"
+                                                : "border-border hover:border-primary/30 hover:bg-muted/30 cursor-pointer"
+                                            }`}
+                                          >
+                                            <div className="shrink-0">
+                                              <Checkbox
+                                                checked={isSelected || isAdded}
+                                                disabled={isAdded}
+                                                onCheckedChange={() => {
+                                                  if (isAdded) return;
+                                                  setAddCarrierSelectedIds(prev => {
+                                                    const next = new Set(prev);
+                                                    if (next.has(carrier.id)) next.delete(carrier.id);
+                                                    else next.add(carrier.id);
+                                                    return next;
+                                                  });
+                                                }}
+                                                className="w-4 h-4"
+                                              />
+                                            </div>
+                                            <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                                              <Truck className="w-4 h-4 text-primary" />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                              <div className="flex items-center gap-2">
+                                                <span className="text-[13px] text-foreground truncate" style={{ fontWeight: 500 }}>{carrier.name}</span>
+                                                {isAdded && (
+                                                  <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-primary/10 text-primary shrink-0" style={{ fontWeight: 600 }}>Already added</span>
+                                                )}
+                                              </div>
+                                              <div className="flex items-center gap-2 mt-0.5">
+                                                <span className="text-[11px] text-muted-foreground">{carrier.type}</span>
+                                                <span className="text-muted-foreground/30">·</span>
+                                                <span className="text-[11px] text-muted-foreground">{carrier.avgDelivery}</span>
+                                                <span className="text-muted-foreground/30">·</span>
+                                                <span className="text-[11px] text-muted-foreground">{carrier.regions.join(", ")}</span>
+                                              </div>
+                                            </div>
+                                            <div className="flex items-center gap-2 shrink-0">
+                                              <div className="flex items-center gap-1">
+                                                <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
+                                                <span className="text-[11px] text-muted-foreground" style={{ fontWeight: 500 }}>{carrier.rating}</span>
+                                              </div>
+                                              <span className="text-[10px] px-2 py-0.5 rounded-full" style={{ fontWeight: 500, backgroundColor: colors.bg, color: colors.text }}>{carrier.status}</span>
+                                            </div>
+                                          </div>
+                                        );
+                                      })}
+                                    </div>
+                                  );
+                                })()}
+                              </div>
+
+                              {/* Footer */}
+                              <div className="flex items-center justify-between px-5 py-3.5 border-t border-border shrink-0 bg-muted/30 sm:rounded-b-2xl">
+                                <button onClick={() => { setAddCarrierModalOpen(false); resetCreateCarrierForm(); }} className="h-9 px-4 rounded-lg border border-border bg-background text-muted-foreground text-sm hover:bg-muted/50 transition-colors cursor-pointer" style={{ fontWeight: 500 }}>Cancel</button>
+                                <div className="flex items-center gap-2">
+                                  {addCarrierSelectedIds.size > 0 && (
+                                    <span className="text-xs text-muted-foreground">{addCarrierSelectedIds.size} selected</span>
+                                  )}
+                                  <button
+                                    onClick={() => {
+                                      if (addCarrierSelectedIds.size === 0) { toast.error("Please select at least one carrier"); return; }
+                                      const names = MASTER_CARRIERS.filter(c => addCarrierSelectedIds.has(c.id)).map(c => c.name);
+                                      toast.success(`${names.length} carrier${names.length > 1 ? "s" : ""} added successfully`);
+                                      setAddCarrierModalOpen(false);
+                                      resetCreateCarrierForm();
+                                    }}
+                                    disabled={addCarrierSelectedIds.size === 0}
+                                    className="h-9 px-5 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground text-sm shadow-sm transition-colors cursor-pointer inline-flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    style={{ fontWeight: 600 }}
+                                  >
+                                    <Plus className="w-3.5 h-3.5" /> Add Selected
+                                  </button>
+                                </div>
+                              </div>
+                            </>
+                          ) : (
+                            <>
+                              {/* ─── Create New Carrier View (tab-based like partner creation) ─── */}
+                              <div className="flex items-center justify-between px-5 py-4 border-b border-border shrink-0">
+                                <div className="flex items-center gap-3">
+                                  <button onClick={() => setCreateCarrierView("select")} className="w-8 h-8 rounded-lg border border-border flex items-center justify-center hover:bg-muted/50 transition-colors cursor-pointer">
+                                    <ArrowLeft className="w-4 h-4 text-muted-foreground" />
+                                  </button>
+                                  <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center">
+                                    <Truck className="w-4.5 h-4.5 text-primary" />
+                                  </div>
+                                  <div>
+                                    <h3 className="text-[15px] text-foreground" style={{ fontWeight: 600 }}>Create New Carrier</h3>
+                                    <p className="text-[12px] text-muted-foreground">Configure carrier details, shipping methods & settings</p>
+                                  </div>
+                                </div>
+                                <button onClick={() => { setAddCarrierModalOpen(false); resetCreateCarrierForm(); }} className="w-8 h-8 rounded-lg border border-border flex items-center justify-center hover:bg-muted/50 transition-colors cursor-pointer">
+                                  <X className="w-4 h-4 text-muted-foreground" />
+                                </button>
+                              </div>
+
+                              {/* Content area with left nav + form */}
+                              <div className="flex-1 flex overflow-hidden">
+                                {/* Left sidebar nav — like partner creation */}
+                                <div className="w-[200px] shrink-0 border-r border-border bg-muted/20 py-3 overflow-y-auto">
+                                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider px-4 mb-2" style={{ fontWeight: 600 }}>Configuration</p>
+                                  {([
+                                    { key: "basic_info" as CreateCarrierSection, label: "Basic Information", icon: Info },
+                                    { key: "shipping_methods" as CreateCarrierSection, label: "Shipping Methods", icon: Package },
+                                    { key: "settings" as CreateCarrierSection, label: "Settings", icon: Sliders },
+                                  ]).map((section) => {
+                                    const isActive = createCarrierSection === section.key;
+                                    const Icon = section.icon;
+                                    const isComplete = section.key === "basic_info" ? !!newCarrierName.trim() : section.key === "shipping_methods" ? newCarrierMethods.some(m => m.name.trim()) : false;
+                                    return (
+                                      <button
+                                        key={section.key}
+                                        onClick={() => setCreateCarrierSection(section.key)}
+                                        className={`flex items-center gap-2.5 w-full px-4 py-2.5 text-left transition-all ${
+                                          isActive
+                                            ? "bg-primary/8 text-primary border-r-2 border-primary"
+                                            : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                                        }`}
+                                      >
+                                        <div className={`w-6 h-6 rounded-md flex items-center justify-center shrink-0 ${
+                                          isComplete ? "bg-green-100 text-green-600" : isActive ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
+                                        }`}>
+                                          {isComplete ? <Check className="w-3.5 h-3.5" /> : <Icon className="w-3.5 h-3.5" />}
+                                        </div>
+                                        <span className="text-[12px] truncate" style={{ fontWeight: isActive ? 600 : 500 }}>{section.label}</span>
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+
+                                {/* Right form area */}
+                                <div className="flex-1 overflow-auto p-5 space-y-5">
+                                  {createCarrierSection === "basic_info" && (
+                                    <>
                                       <div>
-                                        <label className="text-[11px] text-[#64748B] mb-1 block" style={{ fontWeight: 500 }}>Method Name</label>
-                                        <Input
-                                          placeholder="e.g., Express Air"
-                                          value={method.name}
-                                          onChange={(e) => {
-                                            const updated = [...newCarrierMethods];
-                                            updated[idx] = { ...updated[idx], name: e.target.value };
-                                            setNewCarrierMethods(updated);
-                                          }}
-                                          className="h-9 text-xs"
-                                        />
+                                        <label className="text-xs text-foreground mb-1.5 block" style={{ fontWeight: 600 }}>Carrier Name <span className="text-destructive">*</span></label>
+                                        <Input placeholder="e.g., FedEx Express, DHL International" value={newCarrierName} onChange={(e) => setNewCarrierName(e.target.value)} className="h-10" />
                                       </div>
                                       <div>
-                                        <label className="text-[11px] text-[#64748B] mb-1 block" style={{ fontWeight: 500 }}>Type</label>
-                                        <select
-                                          value={method.shortName}
-                                          onChange={(e) => {
-                                            const updated = [...newCarrierMethods];
-                                            updated[idx] = { ...updated[idx], shortName: e.target.value };
-                                            setNewCarrierMethods(updated);
-                                          }}
-                                          className="w-full h-9 px-3 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#0F172A] focus:outline-none focus:border-[#0A77FF] cursor-pointer"
-                                        >
-                                          {["Air", "Sea", "Ground", "Freight", "Express", "Same Day"].map((t) => (
-                                            <option key={t} value={t}>{t}</option>
-                                          ))}
+                                        <label className="text-xs text-foreground mb-1.5 block" style={{ fontWeight: 600 }}>Description</label>
+                                        <Input placeholder="Brief description of this carrier" value={newCarrierDesc} onChange={(e) => setNewCarrierDesc(e.target.value)} className="h-10" />
+                                      </div>
+                                      <div>
+                                        <label className="text-xs text-foreground mb-1.5 block" style={{ fontWeight: 600 }}>Carrier Type</label>
+                                        <select value={newCarrierType} onChange={(e) => setNewCarrierType(e.target.value)} className="w-full h-10 px-3 rounded-lg border border-border bg-background text-sm text-foreground focus:outline-none focus:border-primary cursor-pointer">
+                                          {["Air & Ground", "International", "Ground & Freight", "Ocean Freight", "LTL & Freight", "Ground", "Regional", "Express"].map(t => <option key={t} value={t}>{t}</option>)}
                                         </select>
                                       </div>
-                                    </div>
-                                    <div className="grid grid-cols-3 gap-3">
                                       <div>
-                                        <label className="text-[11px] text-[#64748B] mb-1 block" style={{ fontWeight: 500 }}>Delivery Duration</label>
-                                        <div className="flex items-center gap-1.5">
-                                          <Input
-                                            placeholder="Min"
-                                            value={method.minDays}
-                                            onChange={(e) => {
-                                              const updated = [...newCarrierMethods];
-                                              updated[idx] = { ...updated[idx], minDays: e.target.value };
-                                              setNewCarrierMethods(updated);
-                                            }}
-                                            className="h-9 text-xs text-center"
-                                          />
-                                          <span className="text-[11px] text-[#94A3B8] shrink-0">to</span>
-                                          <Input
-                                            placeholder="Max"
-                                            value={method.maxDays}
-                                            onChange={(e) => {
-                                              const updated = [...newCarrierMethods];
-                                              updated[idx] = { ...updated[idx], maxDays: e.target.value };
-                                              setNewCarrierMethods(updated);
-                                            }}
-                                            className="h-9 text-xs text-center"
-                                          />
-                                          <span className="text-[11px] text-[#94A3B8] shrink-0">days</span>
+                                        <label className="text-xs text-foreground mb-1.5 block" style={{ fontWeight: 600 }}>Regions</label>
+                                        <div className="flex flex-wrap gap-1.5">
+                                          {["North America", "Europe", "South Asia", "Middle East", "Global"].map(r => {
+                                            const isOn = newCarrierRegions.includes(r);
+                                            return (
+                                              <button key={r} onClick={() => setNewCarrierRegions(prev => isOn ? prev.filter(x => x !== r) : [...prev, r])}
+                                                className={`px-3 py-1.5 rounded-full border text-xs transition-all cursor-pointer ${isOn ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:border-primary/30"}`}
+                                                style={{ fontWeight: isOn ? 500 : 400 }}
+                                              >{r}</button>
+                                            );
+                                          })}
                                         </div>
                                       </div>
-                                      <div>
-                                        <label className="text-[11px] text-[#64748B] mb-1 block" style={{ fontWeight: 500 }}>Cost / Shipment</label>
-                                        <Input
-                                          placeholder="$0.00"
-                                          value={method.cost}
-                                          onChange={(e) => {
-                                            const updated = [...newCarrierMethods];
-                                            updated[idx] = { ...updated[idx], cost: e.target.value };
-                                            setNewCarrierMethods(updated);
-                                          }}
-                                          className="h-9 text-xs"
-                                        />
-                                      </div>
-                                      <div className="flex items-end pb-0.5">
-                                        <div className="flex items-center gap-2">
-                                          <Checkbox
-                                            checked={method.isDefault}
-                                            onCheckedChange={(v) => {
-                                              const updated = newCarrierMethods.map((m, i) => ({
-                                                ...m,
-                                                isDefault: i === idx ? !!v : false,
-                                              }));
-                                              setNewCarrierMethods(updated);
-                                            }}
-                                            className="w-3.5 h-3.5"
-                                          />
-                                          <span className="text-[11px] text-[#334155]" style={{ fontWeight: 500 }}>Default</span>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          </div>
+                                    </>
+                                  )}
 
-                          {/* Modal footer */}
-                          <div className="flex items-center justify-between px-5 py-3.5 border-t border-[#EEF2F6] shrink-0 bg-[#FAFBFC] sm:rounded-b-2xl">
-                            <button
-                              onClick={() => setAddCarrierModalOpen(false)}
-                              className="h-9 px-4 rounded-lg border border-[#E2E8F0] bg-white text-[#64748B] text-sm hover:bg-[#F8FAFC] transition-colors cursor-pointer"
-                              style={{ fontWeight: 500 }}
-                            >
-                              Cancel
-                            </button>
-                            <button
-                              onClick={() => {
-                                if (!newCarrierName.trim()) {
-                                  toast.error("Please enter a carrier name");
-                                  return;
-                                }
-                                toast.success(`Carrier "${newCarrierName}" created successfully`);
-                                setAddCarrierModalOpen(false);
-                                setNewCarrierName("");
-                                setNewCarrierDesc("");
-                                setNewCarrierStatus("active");
-                                setNewCarrierIsDefault(false);
-                                setNewCarrierMethods([{ name: "", shortName: "Air", minDays: "", maxDays: "", cost: "", isDefault: true }]);
-                              }}
-                              className="h-9 px-5 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-sm shadow-sm transition-colors cursor-pointer inline-flex items-center gap-1.5"
-                              style={{ fontWeight: 600 }}
-                            >
-                              <Plus className="w-3.5 h-3.5" /> Create Carrier
-                            </button>
-                          </div>
+                                  {createCarrierSection === "shipping_methods" && (
+                                    <>
+                                      <div className="flex items-center justify-between">
+                                        <label className="text-xs text-foreground" style={{ fontWeight: 600 }}>Shipping Methods</label>
+                                        <button onClick={() => setNewCarrierMethods(prev => [...prev, { name: "", shortName: "Air", minDays: "", maxDays: "", cost: "", isDefault: false }])} className="text-[11px] text-primary hover:text-primary/80 transition-colors cursor-pointer inline-flex items-center gap-1" style={{ fontWeight: 600 }}>
+                                          <Plus className="w-3 h-3" /> Add Method
+                                        </button>
+                                      </div>
+                                      <div className="space-y-3">
+                                        {newCarrierMethods.map((method, idx) => (
+                                          <div key={idx} className="border border-border rounded-xl p-3.5 bg-muted/20 relative">
+                                            <div className="flex items-center justify-between mb-3">
+                                              <span className="text-[11px] text-muted-foreground" style={{ fontWeight: 600 }}>Method {idx + 1}</span>
+                                              {newCarrierMethods.length > 1 && (
+                                                <button onClick={() => setNewCarrierMethods(prev => prev.filter((_, i) => i !== idx))} className="text-[11px] text-destructive hover:text-destructive/80 cursor-pointer" style={{ fontWeight: 500 }}>Remove</button>
+                                              )}
+                                            </div>
+                                            <div className="grid grid-cols-2 gap-3 mb-3">
+                                              <div>
+                                                <label className="text-[11px] text-muted-foreground mb-1 block" style={{ fontWeight: 500 }}>Method Name</label>
+                                                <Input placeholder="e.g., Express Air" value={method.name} onChange={(e) => { const u = [...newCarrierMethods]; u[idx] = { ...u[idx], name: e.target.value }; setNewCarrierMethods(u); }} className="h-9 text-xs" />
+                                              </div>
+                                              <div>
+                                                <label className="text-[11px] text-muted-foreground mb-1 block" style={{ fontWeight: 500 }}>Type</label>
+                                                <select value={method.shortName} onChange={(e) => { const u = [...newCarrierMethods]; u[idx] = { ...u[idx], shortName: e.target.value }; setNewCarrierMethods(u); }} className="w-full h-9 px-3 rounded-lg border border-border bg-background text-xs text-foreground focus:outline-none focus:border-primary cursor-pointer">
+                                                  {["Air", "Sea", "Ground", "Freight", "Express", "Same Day"].map(t => <option key={t} value={t}>{t}</option>)}
+                                                </select>
+                                              </div>
+                                            </div>
+                                            <div className="grid grid-cols-3 gap-3">
+                                              <div>
+                                                <label className="text-[11px] text-muted-foreground mb-1 block" style={{ fontWeight: 500 }}>Delivery Duration</label>
+                                                <div className="flex items-center gap-1.5">
+                                                  <Input placeholder="Min" value={method.minDays} onChange={(e) => { const u = [...newCarrierMethods]; u[idx] = { ...u[idx], minDays: e.target.value }; setNewCarrierMethods(u); }} className="h-9 text-xs text-center" />
+                                                  <span className="text-[11px] text-muted-foreground/60 shrink-0">to</span>
+                                                  <Input placeholder="Max" value={method.maxDays} onChange={(e) => { const u = [...newCarrierMethods]; u[idx] = { ...u[idx], maxDays: e.target.value }; setNewCarrierMethods(u); }} className="h-9 text-xs text-center" />
+                                                  <span className="text-[11px] text-muted-foreground/60 shrink-0">days</span>
+                                                </div>
+                                              </div>
+                                              <div>
+                                                <label className="text-[11px] text-muted-foreground mb-1 block" style={{ fontWeight: 500 }}>Cost / Shipment</label>
+                                                <Input placeholder="$0.00" value={method.cost} onChange={(e) => { const u = [...newCarrierMethods]; u[idx] = { ...u[idx], cost: e.target.value }; setNewCarrierMethods(u); }} className="h-9 text-xs" />
+                                              </div>
+                                              <div className="flex items-end pb-0.5">
+                                                <div className="flex items-center gap-2">
+                                                  <Checkbox checked={method.isDefault} onCheckedChange={(v) => { const u = newCarrierMethods.map((m, i) => ({ ...m, isDefault: i === idx ? !!v : false })); setNewCarrierMethods(u); }} className="w-3.5 h-3.5" />
+                                                  <span className="text-[11px] text-foreground/80" style={{ fontWeight: 500 }}>Default</span>
+                                                </div>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </>
+                                  )}
+
+                                  {createCarrierSection === "settings" && (
+                                    <>
+                                      <div>
+                                        <label className="text-xs text-foreground mb-1.5 block" style={{ fontWeight: 600 }}>Status</label>
+                                        <div className="flex items-center gap-2">
+                                          {(["active", "inactive"] as const).map(s => (
+                                            <button key={s} onClick={() => setNewCarrierStatus(s)} className={`px-3 py-2 rounded-lg border text-xs transition-all cursor-pointer ${newCarrierStatus === s ? "border-primary bg-primary/10 text-primary" : "border-border bg-background text-foreground/70 hover:border-primary/30"}`} style={{ fontWeight: newCarrierStatus === s ? 600 : 500 }}>{s === "active" ? "Active" : "Inactive"}</button>
+                                          ))}
+                                        </div>
+                                      </div>
+                                      <div className="flex items-center gap-2 p-3 rounded-xl border border-border bg-muted/20">
+                                        <Checkbox checked={newCarrierIsDefault} onCheckedChange={(v) => setNewCarrierIsDefault(!!v)} className="w-4 h-4" />
+                                        <div>
+                                          <span className="text-xs text-foreground block" style={{ fontWeight: 500 }}>Set as default carrier</span>
+                                          <span className="text-[11px] text-muted-foreground">This carrier will be pre-selected for new shipments</span>
+                                        </div>
+                                      </div>
+                                    </>
+                                  )}
+                                </div>
+                              </div>
+
+                              {/* Footer */}
+                              <div className="flex items-center justify-between px-5 py-3.5 border-t border-border shrink-0 bg-muted/30 sm:rounded-b-2xl">
+                                <button onClick={() => setCreateCarrierView("select")} className="h-9 px-4 rounded-lg border border-border bg-background text-muted-foreground text-sm hover:bg-muted/50 transition-colors cursor-pointer" style={{ fontWeight: 500 }}>
+                                  <span className="inline-flex items-center gap-1.5"><ArrowLeft className="w-3.5 h-3.5" /> Back</span>
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    if (!newCarrierName.trim()) { toast.error("Please enter a carrier name"); setCreateCarrierSection("basic_info"); return; }
+                                    toast.success(`Carrier "${newCarrierName}" created successfully`);
+                                    setAddCarrierModalOpen(false);
+                                    resetCreateCarrierForm();
+                                  }}
+                                  className="h-9 px-5 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground text-sm shadow-sm transition-colors cursor-pointer inline-flex items-center gap-1.5"
+                                  style={{ fontWeight: 600 }}
+                                >
+                                  <Plus className="w-3.5 h-3.5" /> Create Carrier
+                                </button>
+                              </div>
+                            </>
+                          )}
                         </DialogContent>
                       </Dialog>
                     </div>
