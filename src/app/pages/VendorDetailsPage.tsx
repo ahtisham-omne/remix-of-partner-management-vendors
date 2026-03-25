@@ -3850,19 +3850,25 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                   {/* ── Carrier & Shipping Methods tab ── */}
                   {locDetailTab === "carrier_shipping" && (
                     <div className="flex-1 flex flex-col overflow-hidden">
-                      {/* Sub-tabs: All Carriers / Vendor / Customer — matching Items tab pattern */}
-                      <div className="border-b border-border shrink-0">
-                        <div className="flex">
-                          {["All Carriers", "Vendor Carriers", "Customer Carriers"].map((label, i) => (
+                      {/* Sub-tabs: Vendor / Customer — matching Items tab pattern exactly */}
+                      <div className="flex items-center border-b border-[#EEF2F6] bg-[#F8FAFC] px-1 shrink-0">
+                        {[{ key: "vendor", label: "Vendor Carriers" }, { key: "customer", label: "Customer Carriers" }].map((t, i) => {
+                          const isActive = i === 0;
+                          return (
                             <button
-                              key={label}
-                              className={`flex-1 py-2.5 text-[13px] text-center transition-colors cursor-pointer ${i === 0 ? "text-primary border-b-2 border-primary" : "text-muted-foreground hover:text-foreground border-b-2 border-transparent"}`}
-                              style={{ fontWeight: i === 0 ? 600 : 400 }}
+                              key={t.key}
+                              className={`flex-1 text-center py-2.5 text-sm transition-colors cursor-pointer relative ${
+                                isActive ? "text-[#0A77FF]" : "text-[#64748B] hover:text-[#334155]"
+                              }`}
+                              style={{ fontWeight: isActive ? 600 : 500 }}
                             >
-                              {label}
+                              {t.label}
+                              {isActive && (
+                                <div className="absolute bottom-0 left-2 right-2 h-[2px] rounded-t-full bg-[#0A77FF]" />
+                              )}
                             </button>
-                          ))}
-                        </div>
+                          );
+                        })}
                       </div>
 
                       {/* Toolbar row */}
