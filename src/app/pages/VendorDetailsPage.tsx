@@ -2558,6 +2558,21 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
   const [locPocDensity, setLocPocDensity] = useState<LocDensity>("card");
   const [currentPage, setCurrentPage] = useState(1);
   const [recordsPerPage, setRecordsPerPage] = useState(20);
+
+  // ── Carrier & Shipping tab state ──
+  type CarrierSubTab = "vendor" | "customer";
+  type CarrierFilter = "all" | "active" | "default" | "Air" | "Sea" | "Ground" | "Freight";
+  const [carrierSubTab, setCarrierSubTab] = useState<CarrierSubTab>("vendor");
+  const [carrierSearch, setCarrierSearch] = useState("");
+  const [carrierFilter, setCarrierFilter] = useState<CarrierFilter>("all");
+  const [addCarrierModalOpen, setAddCarrierModalOpen] = useState(false);
+  const [newCarrierName, setNewCarrierName] = useState("");
+  const [newCarrierDesc, setNewCarrierDesc] = useState("");
+  const [newCarrierStatus, setNewCarrierStatus] = useState<"active" | "inactive">("active");
+  const [newCarrierIsDefault, setNewCarrierIsDefault] = useState(false);
+  const [newCarrierMethods, setNewCarrierMethods] = useState<{ name: string; shortName: string; minDays: string; maxDays: string; cost: string; isDefault: boolean }[]>([
+    { name: "", shortName: "Air", minDays: "", maxDays: "", cost: "", isDefault: true },
+  ]);
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
   const [locPtDetailOpen, setLocPtDetailOpen] = useState(false);
   const [locPtDetailTerm, setLocPtDetailTerm] = useState<PaymentTermPreset | null>(null);
