@@ -2566,13 +2566,48 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
   const [carrierSearch, setCarrierSearch] = useState("");
   const [carrierFilter, setCarrierFilter] = useState<CarrierFilter>("all");
   const [addCarrierModalOpen, setAddCarrierModalOpen] = useState(false);
+  const [addCarrierSearch, setAddCarrierSearch] = useState("");
+  const [addCarrierSelectedIds, setAddCarrierSelectedIds] = useState<Set<string>>(new Set());
+  // Create new carrier form state (tab-based like partner creation)
+  type CreateCarrierView = "select" | "create";
+  const [createCarrierView, setCreateCarrierView] = useState<CreateCarrierView>("select");
+  type CreateCarrierSection = "basic_info" | "shipping_methods" | "settings";
+  const [createCarrierSection, setCreateCarrierSection] = useState<CreateCarrierSection>("basic_info");
   const [newCarrierName, setNewCarrierName] = useState("");
   const [newCarrierDesc, setNewCarrierDesc] = useState("");
+  const [newCarrierType, setNewCarrierType] = useState("Air & Ground");
   const [newCarrierStatus, setNewCarrierStatus] = useState<"active" | "inactive">("active");
   const [newCarrierIsDefault, setNewCarrierIsDefault] = useState(false);
+  const [newCarrierRegions, setNewCarrierRegions] = useState<string[]>([]);
   const [newCarrierMethods, setNewCarrierMethods] = useState<{ name: string; shortName: string; minDays: string; maxDays: string; cost: string; isDefault: boolean }[]>([
     { name: "", shortName: "Air", minDays: "", maxDays: "", cost: "", isDefault: true },
   ]);
+
+  // Master carrier list (from Carrier Management)
+  const MASTER_CARRIERS = [
+    { id: "MC-1", name: "FedEx Express", type: "Air & Ground", rating: 4.8, avgDelivery: "2-3 days", regions: ["North America", "Europe"], status: "Active", shipments: 1245 },
+    { id: "MC-2", name: "DHL International", type: "International", rating: 4.6, avgDelivery: "3-5 days", regions: ["Global"], status: "Active", shipments: 892 },
+    { id: "MC-3", name: "UPS Freight", type: "Ground & Freight", rating: 4.5, avgDelivery: "3-7 days", regions: ["North America"], status: "Active", shipments: 634 },
+    { id: "MC-4", name: "Maersk Line", type: "Ocean Freight", rating: 4.3, avgDelivery: "14-21 days", regions: ["Global"], status: "Active", shipments: 156 },
+    { id: "MC-5", name: "XPO Logistics", type: "LTL & Freight", rating: 4.1, avgDelivery: "5-10 days", regions: ["North America", "Europe"], status: "Under Review", shipments: 423 },
+    { id: "MC-6", name: "Swift Transport", type: "Ground", rating: 3.9, avgDelivery: "4-6 days", regions: ["North America"], status: "Inactive", shipments: 0 },
+    { id: "MC-7", name: "TCS (Tranzum Courier)", type: "Regional", rating: 4.2, avgDelivery: "1-3 days", regions: ["South Asia"], status: "Active", shipments: 312 },
+    { id: "MC-8", name: "Aramex", type: "International", rating: 4.4, avgDelivery: "3-7 days", regions: ["Middle East", "Global"], status: "Active", shipments: 578 },
+  ];
+
+  const resetCreateCarrierForm = () => {
+    setCreateCarrierView("select");
+    setCreateCarrierSection("basic_info");
+    setAddCarrierSearch("");
+    setAddCarrierSelectedIds(new Set());
+    setNewCarrierName("");
+    setNewCarrierDesc("");
+    setNewCarrierType("Air & Ground");
+    setNewCarrierStatus("active");
+    setNewCarrierIsDefault(false);
+    setNewCarrierRegions([]);
+    setNewCarrierMethods([{ name: "", shortName: "Air", minDays: "", maxDays: "", cost: "", isDefault: true }]);
+  };
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
   const [locPtDetailOpen, setLocPtDetailOpen] = useState(false);
   const [locPtDetailTerm, setLocPtDetailTerm] = useState<PaymentTermPreset | null>(null);
