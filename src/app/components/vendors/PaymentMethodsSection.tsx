@@ -611,8 +611,7 @@ export function PaymentMethodsSection({
 
       {/* Saved Grid */}
       {savedPaymentEntries.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 3xl:grid-cols-3 [&]:has-[_]:grid-cols-1 gap-3" style={{ gridTemplateColumns: undefined }} data-payment-grid>
-        {/* Responsive: 1 col mobile, 2 cols up to 1920px, 3 cols 1921-2560, 4 cols 2560+ */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 3xl:grid-cols-3 min-[2560px]:grid-cols-4 gap-3">
           {filteredSaved.map((pe) => (
             <PaymentMethodCard
               key={pe.id}
