@@ -3854,23 +3854,29 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                         <div className="flex items-center gap-2 flex-1 min-w-0">
                           <div className="relative flex-1 max-w-[220px]">
                             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8] pointer-events-none" />
-                            <input type="text" placeholder="Search carrier, shipping method..." className="w-full pl-8 h-8 text-[12px] bg-white border border-[#E2E8F0] rounded-lg px-3 py-1.5 focus:outline-none focus:border-[#0A77FF] transition-colors" />
+                            <input type="text" placeholder="Search carriers..." className="w-full pl-8 h-8 text-[12px] bg-white border border-[#E2E8F0] rounded-lg px-3 py-1.5 focus:outline-none focus:border-[#0A77FF] transition-colors" />
                           </div>
                           <button className="h-8 px-2.5 rounded-lg border border-[#E2E8F0] bg-white text-[12px] text-[#475569] hover:bg-[#F8FAFC] cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 500 }}>
                             <SlidersHorizontal className="w-3.5 h-3.5" /> Filters
                           </button>
                         </div>
-                        <button onClick={() => toast.info("Add carrier coming soon")} className="h-8 px-3 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-[12px] shadow-sm cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 600 }}>
-                          <Plus className="w-3.5 h-3.5" /> Add Carrier
-                        </button>
+                        <div className="flex items-center gap-2">
+                          <button onClick={() => toast.info("Add carrier coming soon")} className="h-8 px-3 rounded-lg border border-[#DC2626] bg-white text-[#DC2626] text-[12px] cursor-pointer transition-colors inline-flex items-center gap-1.5 hover:bg-[#FEF2F2]" style={{ fontWeight: 600 }}>
+                            <Plus className="w-3.5 h-3.5" /> Add New Carrier
+                          </button>
+                          <button onClick={() => toast.info("Templates coming soon")} className="h-8 px-3 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-[12px] shadow-sm cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 600 }}>
+                            <Sparkles className="w-3.5 h-3.5" /> Templates
+                          </button>
+                        </div>
                       </div>
                       {/* Vendor / Customer toggle */}
                       <div className="flex items-center mx-4 mb-2 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] overflow-hidden">
-                        <button className="flex-1 py-2 text-[12px] text-white bg-[#0A77FF] text-center" style={{ fontWeight: 600 }}>Carrier & Shipping Method for Vendor</button>
-                        <button className="flex-1 py-2 text-[12px] text-[#64748B] bg-white text-center hover:bg-[#F8FAFC] cursor-pointer transition-colors" style={{ fontWeight: 500 }}>Carrier & Shipping Method for Customer</button>
+                        <button className="flex-1 py-2 text-[12px] text-white bg-[#0A77FF] text-center" style={{ fontWeight: 600 }}>Vendor</button>
+                        <button className="flex-1 py-2 text-[12px] text-[#64748B] bg-white text-center hover:bg-[#F8FAFC] cursor-pointer transition-colors" style={{ fontWeight: 500 }}>Customer</button>
                       </div>
+                      {/* Filter chips */}
                       <div className="flex items-center gap-1.5 px-4 pb-2">
-                        {["All Carriers", "Active", "Default Only", "Express", "Freight"].map((chip, i) => (
+                        {["All Carriers", "Active", "Default Only", "Air", "Sea", "Ground", "Freight"].map((chip, i) => (
                           <span key={chip} className={`text-[11px] px-2.5 py-1 rounded-full cursor-pointer transition-colors border ${i === 0 ? "bg-primary/10 text-primary border-primary/25" : "bg-[#F8FAFC] text-[#64748B] border-[#E2E8F0] hover:bg-[#F1F5F9]"}`} style={{ fontWeight: 500 }}>
                             {chip}
                           </span>
@@ -3878,14 +3884,14 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                       </div>
                       <div className="h-px bg-[#E8ECF1] mx-4 shrink-0" />
                       <div className="flex-1 overflow-auto p-4">
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3">
                           {LOC_CARRIER_DATA.map((carrier) => (
                             <CarrierShippingCard key={carrier.id} carrier={carrier} />
                           ))}
                         </div>
                       </div>
                       <div className="flex items-center justify-between px-4 py-2 border-t border-[#E8ECF1] shrink-0 bg-[#FAFBFC]">
-                        <span className="text-[11px] text-[#94A3B8]">Showing {LOC_CARRIER_DATA.length} carrier{LOC_CARRIER_DATA.length !== 1 ? "s" : ""}</span>
+                        <span className="text-[11px] text-[#94A3B8]">Records per page <select className="h-6 px-1.5 rounded border border-[#E2E8F0] text-[11px] cursor-pointer outline-none ml-1"><option>20</option><option>50</option></select></span>
                         <div className="flex items-center gap-1 text-[11px] text-[#94A3B8]">
                           <span className="px-2 py-0.5 rounded bg-[#0A77FF] text-white" style={{ fontWeight: 600 }}>1</span>
                         </div>
