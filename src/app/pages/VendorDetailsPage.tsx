@@ -4083,7 +4083,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                               onClick={() => {
                                 setAddCarrierModalOpen(false);
                                 resetAddCarrierModal();
-                                navigate("/vendors?createPartner=carrier");
+                                window.location.href = "/vendors?createPartner=carrier";
                               }}
                               className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground text-sm shadow-sm transition-colors cursor-pointer shrink-0"
                               style={{ fontWeight: 600 }}
