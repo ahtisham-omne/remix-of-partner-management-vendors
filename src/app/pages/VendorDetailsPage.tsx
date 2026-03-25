@@ -1166,7 +1166,7 @@ function CarrierShippingCard({ carrier }: {
     desc: string;
     isDefault: boolean;
     status: "active" | "inactive";
-    methods: { id: string; name: string; desc: string; minDays: number; maxDays: number; isDefault: boolean; cost: string }[];
+    methods: { id: string; name: string; shortName: string; desc: string; minDays: number; maxDays: number; isDefault: boolean; cost: string }[];
   };
 }) {
   const [selectedMethodIdx, setSelectedMethodIdx] = useState(
@@ -1176,12 +1176,12 @@ function CarrierShippingCard({ carrier }: {
 
   return (
     <div
-      className="bg-white border border-[#E2E8F0] rounded-xl cursor-pointer group transition-all duration-200 flex flex-col relative"
+      className="bg-white border border-[#E2E8F0] rounded-xl cursor-pointer group transition-all duration-200 flex flex-col relative shadow-[0_1px_3px_rgba(0,0,0,0.03)]"
       onMouseEnter={(e) => { e.currentTarget.style.borderColor = "#BFDBFE"; e.currentTarget.style.boxShadow = "0 4px 16px -4px rgba(10,119,255,0.10), 0 0 0 1px #BFDBFE"; }}
-      onMouseLeave={(e) => { e.currentTarget.style.borderColor = "#E2E8F0"; e.currentTarget.style.boxShadow = "none"; }}
+      onMouseLeave={(e) => { e.currentTarget.style.borderColor = "#E2E8F0"; e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.03)"; }}
     >
-      <div className="p-3.5 flex-1 flex flex-col min-h-0 overflow-hidden">
-        {/* Row 1: Status & type pills */}
+      <div className="p-3 flex-1 flex flex-col min-h-0 overflow-hidden">
+        {/* Row 1: Type pill + badges */}
         <div className="flex items-center justify-between gap-2 mb-2 shrink-0">
           <span className="inline-flex items-stretch rounded-full overflow-hidden border border-[#BFDBFE] shrink-0">
             <span className="inline-flex items-center gap-1 px-2 py-[2px] text-[10px] text-[#1E40AF] bg-[#EFF6FF]" style={{ fontWeight: 600 }}>
@@ -1202,19 +1202,31 @@ function CarrierShippingCard({ carrier }: {
         </div>
 
         {/* Row 2: Carrier name */}
-        <p className="text-[13px] text-[#0F172A] truncate shrink-0 mb-0.5" style={{ fontWeight: 600 }}>{carrier.name}</p>
-        <p className="text-[11px] text-[#64748B] leading-relaxed line-clamp-1 mb-2.5">{carrier.desc}</p>
-
-        {/* Row 3: Hero metric - active method cost */}
-        <div className="flex items-end gap-1.5 mb-2.5 shrink-0">
-          <span className="text-[22px] text-[#0F172A] leading-none tracking-tight" style={{ fontWeight: 700 }}>{activeMethod.cost}</span>
-          <span className="text-[11px] text-[#94A3B8] pb-0.5" style={{ fontWeight: 500 }}>/ shipment</span>
+        <div className="shrink-0 mb-1">
+          <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{carrier.name}</p>
         </div>
 
-        {/* Row 4: Shipping method tier selector */}
+        {/* Row 3: Description */}
+        <div className="h-[32px] shrink-0 mb-2">
+          <p className="text-[11px] text-[#64748B] line-clamp-2 leading-relaxed" style={{ fontWeight: 400 }}>{carrier.desc}</p>
+        </div>
+
+        {/* Row 4: Hero metric + vendor count inline */}
+        <div className="flex items-baseline justify-between shrink-0">
+          <div className="flex items-baseline gap-2">
+            <span className="text-[22px] text-[#0F172A] tabular-nums leading-none tracking-tight" style={{ fontWeight: 600 }}>
+              {activeMethod.cost}
+            </span>
+            <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>/ shipment</span>
+          </div>
+          <span className="inline-flex items-center gap-1 text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>
+            <Clock className="w-3 h-3" /> {activeMethod.minDays}–{activeMethod.maxDays} days
+          </span>
+        </div>
+
+        {/* Row 5: Shipping method tier selector */}
         {carrier.methods.length > 1 && (
-          <div className="mb-2.5 shrink-0">
-            <p className="text-[10px] text-[#94A3B8] mb-1.5" style={{ fontWeight: 600, letterSpacing: "0.04em" }}>SHIPPING METHODS</p>
+          <div className="pt-2 shrink-0">
             <div className="flex items-center gap-1 flex-wrap">
               {carrier.methods.map((m, idx) => (
                 <button
@@ -1227,42 +1239,41 @@ function CarrierShippingCard({ carrier }: {
                   }`}
                   style={{ fontWeight: idx === selectedMethodIdx ? 600 : 500 }}
                 >
-                  {m.name.split(" ")[0]}{m.isDefault ? " ★" : ""}
+                  {m.shortName}{m.isDefault ? " ★" : ""}
                 </button>
               ))}
             </div>
           </div>
         )}
 
-        {/* Row 5: Active method details */}
-        <div className="rounded-lg border border-[#E8ECF1] bg-[#FAFBFC] p-2.5 space-y-1.5">
-          <div className="flex items-center gap-1.5">
-            <Package className="w-3 h-3 text-[#94A3B8]" />
-            <p className="text-[11px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{activeMethod.name}</p>
-            {activeMethod.isDefault && <span className="text-[9px] px-1 py-[1px] rounded bg-[#EFF6FF] text-[#1E40AF] border border-[#BFDBFE]" style={{ fontWeight: 600 }}>Default</span>}
-          </div>
-          <p className="text-[10px] text-[#64748B] leading-relaxed line-clamp-2">{activeMethod.desc}</p>
-          <div className="flex items-center gap-3 pt-1.5 border-t border-[#E8ECF1]">
-            <div className="flex items-center gap-1 text-[11px]">
-              <Clock className="w-3 h-3 text-[#94A3B8]" />
-              <span className="text-[#94A3B8]">Min</span>
-              <span className="text-[#0F172A]" style={{ fontWeight: 600 }}>{activeMethod.minDays}d</span>
+        {/* Row 6: Active method detail strip */}
+        <div className="mt-auto pt-2 shrink-0">
+          <div className="flex items-center justify-between px-2.5 py-[5px] rounded-lg border border-[#E8ECF1] bg-[#FAFBFC] text-[11px] tabular-nums">
+            <div className="flex items-center gap-1.5 text-[#64748B] min-w-0">
+              <Package className="w-3 h-3 text-[#94A3B8] shrink-0" />
+              <span className="truncate" style={{ fontWeight: 400 }}>{activeMethod.name}</span>
             </div>
-            <div className="w-px h-3 bg-[#E8ECF1]" />
-            <div className="flex items-center gap-1 text-[11px]">
-              <span className="text-[#94A3B8]">Max</span>
-              <span className="text-[#0F172A]" style={{ fontWeight: 600 }}>{activeMethod.maxDays}d</span>
-            </div>
-            <div className="ml-auto text-[11px] text-[#0F172A]" style={{ fontWeight: 600 }}>{activeMethod.cost}</div>
+            <span className="shrink-0 ml-2 text-[#0F172A]" style={{ fontWeight: 600 }}>{activeMethod.cost}</span>
           </div>
         </div>
       </div>
 
-      {/* Footer */}
-      <div className="px-3.5 py-2 border-t border-[#F1F5F9] flex items-center gap-3">
-        <button onClick={(e) => { e.stopPropagation(); toast.info("Edit carrier coming soon"); }} className="text-[11px] text-[#64748B] hover:text-[#0A77FF] transition-colors cursor-pointer" style={{ fontWeight: 500 }}>Edit</button>
-        <div className="w-px h-3 bg-[#E8ECF1]" />
-        <button onClick={(e) => { e.stopPropagation(); toast.info("Duplicate carrier coming soon"); }} className="text-[11px] text-[#64748B] hover:text-[#0A77FF] transition-colors cursor-pointer" style={{ fontWeight: 500 }}>Duplicate</button>
+      {/* Footer — full-width 2-col CTAs matching pricing rules */}
+      <div className="grid grid-cols-2 border-t border-[#F1F5F9] shrink-0">
+        <button
+          onClick={(e) => { e.stopPropagation(); toast.info("Edit carrier coming soon"); }}
+          className="inline-flex items-center justify-center gap-1 py-2 text-[11px] text-[#64748B] hover:text-[#0A77FF] hover:bg-[#F8FAFC] transition-colors border-r border-[#F1F5F9] cursor-pointer"
+          style={{ fontWeight: 500 }}
+        >
+          <Pencil className="w-3 h-3" /> Edit
+        </button>
+        <button
+          onClick={(e) => { e.stopPropagation(); toast.info("Duplicate carrier coming soon"); }}
+          className="inline-flex items-center justify-center gap-1 py-2 text-[11px] text-[#64748B] hover:text-[#0A77FF] hover:bg-[#F8FAFC] transition-colors cursor-pointer"
+          style={{ fontWeight: 500 }}
+        >
+          <Copy className="w-3 h-3" /> Duplicate
+        </button>
       </div>
     </div>
   );
