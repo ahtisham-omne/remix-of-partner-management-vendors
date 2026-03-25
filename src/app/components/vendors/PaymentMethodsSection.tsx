@@ -611,7 +611,7 @@ export function PaymentMethodsSection({
 
       {/* Saved Grid */}
       {savedPaymentEntries.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 3xl:grid-cols-3 min-[2560px]:grid-cols-4 gap-3">
           {filteredSaved.map((pe) => (
             <PaymentMethodCard
               key={pe.id}
@@ -646,7 +646,7 @@ export function PaymentMethodsSection({
       {pmModalOpen && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center">
           <div className="absolute inset-0 bg-black/40" onClick={handleModalCancel} />
-          <div className="relative bg-white rounded-2xl shadow-2xl border border-[#E2E8F0]/60 w-[calc(100%-2rem)] max-w-[580px] max-h-[85vh] flex flex-col animate-in fade-in-0 zoom-in-95 duration-150">
+          <div className="relative bg-white rounded-2xl shadow-2xl border border-[#E2E8F0]/60 w-[calc(100%-2rem)] max-w-[580px] 3xl:max-w-[680px] min-[2560px]:max-w-[780px] max-h-[85vh] flex flex-col animate-in fade-in-0 zoom-in-95 duration-150">
             {/* Header */}
             <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#E8ECF1] shrink-0">
               <div className="flex items-center gap-2.5">
