@@ -699,14 +699,6 @@ export function PaymentMethodsSection({
             <div className="flex-1 overflow-y-auto px-5 py-4">
               {pmModalStep === "select" ? (
                 <div className="space-y-4">
-                  <FilterPills
-                    options={[
-                      { key: "All", label: "All Types" },
-                      ...categories.map((cat) => ({ key: cat, label: cat })),
-                    ]}
-                    activeKey={pmModalTypeFilter}
-                    onSelect={(k) => setPmModalTypeFilter(k as PaymentTypeCategory | "All")}
-                  />
                   <div className="grid grid-cols-2 gap-2">
                     {filteredTypeCards.map((t) => {
                       const Icon = t.icon;
