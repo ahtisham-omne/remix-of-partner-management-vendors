@@ -5005,7 +5005,8 @@ function PricingRulesTab({ cfg }: { cfg?: VendorConfigData }) {
     <div className="space-y-4">
       <ContentCard title="Applied Pricing Rules" icon={Tag} count={hasPricingRules ? cfg!.pricingRules!.length : undefined}>
         {hasPricingRules ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <div className="@container/prdetail">
+          <div className="grid grid-cols-1 @[400px]/prdetail:grid-cols-2 @[750px]/prdetail:grid-cols-3 gap-2">
             {cfg!.pricingRules!.map((rule) => (
               <div key={rule.id} className="rounded-md border border-[#E2E8F0] p-3 space-y-1.5 hover:border-[#CBD5E1] transition-colors">
                 <div className="flex items-center gap-2">
@@ -5036,6 +5037,7 @@ function PricingRulesTab({ cfg }: { cfg?: VendorConfigData }) {
                 )}
               </div>
             ))}
+          </div>
           </div>
         ) : (
           <EmptyState icon={Tag} title="No pricing rules applied" description="Pricing rules can be configured during partner creation or editing." />
