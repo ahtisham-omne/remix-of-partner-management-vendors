@@ -3940,7 +3940,7 @@ function ConfigPageContent({
   }, [selectedPricingRuleIds, allPricingRulePresets]);
 
   // Billing & Shipping state
-  const [currency, setCurrency] = useState("");
+  const [currency, setCurrency] = useState("usd");
   const [shipTo, setShipTo] = useState<string | null>("pl-1"); // FR Conversions, Westminster default
   const [payTo, setPayTo] = useState<string | null>("pl-3"); // Toyota International default
   const [fundedBy, setFundedBy] = useState<string | null>("pl-7"); // FR Conversions default
@@ -4729,35 +4729,33 @@ function ConfigPageContent({
                 )}
               </div>
 
-              {/* 4. Funded By – same width as other cards, improved disabled state */}
-              <div className={`${allowAltFunding ? fieldCardBase : "relative rounded-xl border border-border/40 bg-muted/30 transition-all duration-200"} p-3 h-[88px] flex flex-col justify-between`} onClick={allowAltFunding ? () => setFundedByDialogOpen(true) : undefined}>
+              {/* 4. Funded By */}
+              <div className={`${allowAltFunding ? fieldCardBase : disabledCardBase} p-3 h-[88px] flex flex-col justify-between`} onClick={allowAltFunding ? () => setFundedByDialogOpen(true) : undefined}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
-                    <Landmark className={`w-3.5 h-3.5 ${allowAltFunding ? "text-muted-foreground/60" : "text-muted-foreground/30"}`} />
-                    <span className={`text-[11px] ${allowAltFunding ? "text-muted-foreground" : "text-muted-foreground/50"}`} style={{ fontWeight: 500 }}>Funded By</span>
-                    {allowAltFunding && <span className="text-[9px] text-[#F59E0B] bg-[#FFFBEB] border border-[#F59E0B]/20 px-1.5 py-0.5 rounded" style={{ fontWeight: 600 }}>Overridden</span>}
+                    <Landmark className={`w-3.5 h-3.5 ${allowAltFunding ? "text-[#94A3B8]" : "text-[#CBD5E1]"}`} />
+                    <span className={`text-[11px] ${allowAltFunding ? "text-[#64748B]" : "text-[#94A3B8]"}`} style={{ fontWeight: 500 }}>Funded By</span>
+                    <InfoTooltip>Enable to override the default funding source for this partner.</InfoTooltip>
                   </div>
-                  <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                  <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
                     <Switch
                       checked={allowAltFunding}
                       onCheckedChange={(val) => { setAllowAltFunding(val); if (!val) setFundedBy("pl-7"); }}
                     />
-                    <span className={`text-[11px] ${allowAltFunding ? "text-muted-foreground" : "text-muted-foreground/50"}`} style={{ fontWeight: 500 }}>Allow Alternative Funding Source</span>
-                    <InfoTooltip>Enable to override the default funding source for this partner.</InfoTooltip>
                   </div>
                 </div>
-                <div className={allowAltFunding ? "" : "opacity-40"}>
+                <div className={allowAltFunding ? "" : "opacity-30"}>
                   {fbObj ? (
                     <div className="flex items-center gap-2.5">
                       <PartnerLogo item={fbObj} size={36} />
-                      <p className={`text-[13px] truncate ${allowAltFunding ? "text-foreground" : "text-muted-foreground"}`} style={{ fontWeight: 600 }}>{fbObj.name}</p>
+                      <p className={`text-[13px] truncate ${allowAltFunding ? "text-[#0F172A]" : "text-[#94A3B8]"}`} style={{ fontWeight: 600 }}>{fbObj.name}</p>
                     </div>
                   ) : (
                     <div className="flex items-center gap-2.5">
-                      <div className="w-9 h-9 rounded-lg bg-muted/50 border border-dashed border-border/40 flex items-center justify-center shrink-0">
-                        <Landmark className="w-4 h-4 text-muted-foreground/30" />
+                      <div className="w-9 h-9 rounded-lg bg-[#F8FAFC] border border-dashed border-[#CBD5E1] flex items-center justify-center shrink-0">
+                        <Landmark className="w-4 h-4 text-[#CBD5E1]" />
                       </div>
-                      <p className="text-[12px] text-muted-foreground/40" style={{ fontWeight: 500 }}>Select funding source</p>
+                      <p className="text-[12px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Select funding source</p>
                     </div>
                   )}
                 </div>
