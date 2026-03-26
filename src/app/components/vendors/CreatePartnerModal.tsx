@@ -4742,16 +4742,8 @@ function ConfigPageContent({
                       checked={allowAltFunding}
                       onCheckedChange={(val) => { setAllowAltFunding(val); if (!val) setFundedBy("pl-7"); }}
                     />
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <button type="button" className="inline-flex" tabIndex={-1}>
-                          <Info className="w-3 h-3 text-muted-foreground/30 hover:text-muted-foreground/60 transition-colors" />
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent side="top" sideOffset={6}>
-                        Enable to override the default funding source for this partner.
-                      </TooltipContent>
-                    </Tooltip>
+                    <span className={`text-[11px] ${allowAltFunding ? "text-muted-foreground" : "text-muted-foreground/50"}`} style={{ fontWeight: 500 }}>Allow Alternative Funding Source</span>
+                    <InfoTooltip>Enable to override the default funding source for this partner.</InfoTooltip>
                   </div>
                 </div>
                 <div className={allowAltFunding ? "" : "opacity-40"}>
