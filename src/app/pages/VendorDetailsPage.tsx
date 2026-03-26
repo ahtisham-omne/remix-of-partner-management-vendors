@@ -668,7 +668,7 @@ export function VendorDetailsPage() {
               {/* KPI Cards — draggable responsive grid */}
               {activeKpiDefs.length > 0 && (
                 <DndProvider backend={HTML5Backend}>
-                  <div className="grid gap-2.5" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(210px, 1fr))" }}>
+                  <div className="grid gap-2.5" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))" }}>
                     {activeKpiDefs.map((kpi, idx) => {
                       const computed = computeDashKpiValue(kpi.key, vendor, formatCurrency, formatDate);
                       return (
