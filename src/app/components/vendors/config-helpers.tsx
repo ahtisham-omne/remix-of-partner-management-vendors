@@ -5,6 +5,12 @@ import {
   PopoverTrigger,
 } from "../ui/popover";
 import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from "../ui/dialog";
+import {
   Tooltip,
   TooltipTrigger,
   TooltipContent,
@@ -16,6 +22,9 @@ import {
   ChevronUp,
   Info,
   MapPin,
+  X,
+  Building2,
+  Truck,
 } from "lucide-react";
 import {
   type PartnerLocationItem,
