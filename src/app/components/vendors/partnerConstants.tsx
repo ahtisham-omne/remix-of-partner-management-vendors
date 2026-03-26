@@ -650,7 +650,7 @@ export const PAYMENT_TYPE_CARDS: { id: PaymentMethodType; label: string; descrip
   { id: "wire", label: "Wire Transfer", description: "Domestic or international bank wire transfer", icon: Landmark, category: "Bank" },
   { id: "card", label: "Credit / Debit Card", description: "Visa, Mastercard, Amex and other card networks", icon: CreditCard, category: "Card" },
   { id: "digital_wallet", label: "Digital Wallet", description: "PayPal, Venmo, Stripe, Apple Pay, Google Pay", icon: Wallet, category: "Digital" },
-  { id: "check", label: "Cheque (Paper)", description: "Physical paper cheque payment via mail", icon: Receipt, category: "Traditional" },
+  { id: "check", label: "Check (Paper)", description: "Physical paper check payment via mail", icon: Receipt, category: "Traditional" },
   { id: "cash", label: "Cash", description: "Physical cash payment at collection point", icon: Banknote, category: "Traditional" },
   { id: "other", label: "Other (Record Only)", description: "Custom payment method for record-keeping", icon: FileText, category: "Other" },
 ];
@@ -670,6 +670,7 @@ export interface PaymentTermPreset {
   duration?: string;
   applyDiscount?: boolean;
   discountPercent?: string;
+  discountMode?: "percent" | "fixed";
   discountPeriod?: string;
 }
 
@@ -927,7 +928,7 @@ export interface PaymentMethodEntry {
   accountNumber: string;
   routingNumber: string;
   swiftCode: string;
-  accountType: string; // "checking" | "saving"
+  accountType: string; // "checking" | "savings" | "money_market" | "cd" | "loan"
   // Card fields
   cardholderName: string;
   cardNumber: string;
@@ -937,7 +938,7 @@ export interface PaymentMethodEntry {
   // Digital wallet
   walletProvider: string;
   walletId: string;
-  // Cheque
+  // Check
   payeeName: string;
   mailingAddress: string;
   // Cash
@@ -953,7 +954,9 @@ export interface PaymentMethodEntry {
   specialInstructions: string;
   applyDiscount: boolean;
   discountPercent: string;
+  discountMode: "percent" | "fixed"; // % or $
   additionalCharges: string;
+  additionalChargesMode: "percent" | "fixed"; // % or $
 }
 
 // ── Contact Dictionary (Point of Contact) ──

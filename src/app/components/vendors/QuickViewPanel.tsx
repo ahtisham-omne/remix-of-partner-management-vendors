@@ -310,9 +310,8 @@ export function QuickViewPanel({ data, onClose }: QuickViewPanelProps) {
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 z-[200] bg-black/40"
+        className="fixed inset-0 z-[200] bg-black/50 animate-modal-overlay"
         onClick={onClose}
-        style={{ animation: "overflowTooltipIn 150ms ease-out forwards" }}
       />
 
       {/* Panel */}

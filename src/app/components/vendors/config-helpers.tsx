@@ -692,6 +692,8 @@ export function createEmptyPaymentEntry(type: PaymentMethodType): PaymentMethodE
     specialInstructions: "",
     applyDiscount: false,
     discountPercent: "",
+    discountMode: "percent",
     additionalCharges: "",
+    additionalChargesMode: "percent",
   };
 }

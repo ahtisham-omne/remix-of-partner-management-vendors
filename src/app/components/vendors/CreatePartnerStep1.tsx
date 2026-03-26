@@ -439,10 +439,10 @@ function GroupQuickViewOverlay({
   const visible = filtered.slice(0, visibleCount);
 
   return (
-    <div className="fixed inset-0 z-[250] flex items-center justify-center bg-black/30 backdrop-blur-[1px]">
+    <div className="fixed inset-0 z-[250] flex items-center justify-center bg-black/50">
       <div
         ref={overlayRef}
-        className="bg-white rounded-xl shadow-2xl border border-[#E2E8F0] w-[calc(100%-1rem)] sm:w-full max-w-[700px] max-h-[85vh] sm:max-h-[600px] flex flex-col animate-in fade-in-0 zoom-in-95 duration-150 mx-auto"
+        className="bg-white rounded-xl shadow-2xl border border-[#E2E8F0] w-[calc(100%-1rem)] sm:w-full max-w-[700px] max-h-[85vh] sm:max-h-[600px] flex flex-col animate-modal-pop mx-auto"
       >
         {/* Header */}
         <div className="px-4 sm:px-5 pt-4 sm:pt-5 pb-3 shrink-0">

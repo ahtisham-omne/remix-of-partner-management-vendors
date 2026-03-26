@@ -8,6 +8,7 @@ import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../ui/select";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "../ui/dialog";
 import { Tooltip, TooltipTrigger, TooltipContent } from "../ui/tooltip";
 import { FilterPills, type FilterPillOption } from "./FilterPills";
 import {
@@ -18,7 +19,33 @@ import {
 } from "./partnerConstants";
 import { createEmptyPaymentEntry } from "./config-helpers";
 
-const inputCls = "mt-1.5 rounded-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20";
+const inputCls = "mt-1.5 rounded-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#CBD5E1] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20";
+
+// ── Auto-format helpers ──
+function formatRoutingNumber(v: string): string {
+  return v.replace(/\D/g, "").slice(0, 9);
+}
+function formatAccountNumber(v: string): string {
+  return v.replace(/\D/g, "").slice(0, 17);
+}
+function formatCardNumber(v: string): string {
+  const digits = v.replace(/\D/g, "").slice(0, 16);
+  return digits.replace(/(\d{4})(?=\d)/g, "$1 ");
+}
+function formatExpiry(v: string): string {
+  const digits = v.replace(/\D/g, "").slice(0, 4);
+  if (digits.length > 2) return `${digits.slice(0, 2)}/${digits.slice(2)}`;
+  return digits;
+}
+function formatCVV(v: string): string {
+  return v.replace(/\D/g, "").slice(0, 4);
+}
+function formatPhone(v: string): string {
+  const digits = v.replace(/\D/g, "").slice(0, 10);
+  if (digits.length > 6) return `${digits.slice(0, 3)} ${digits.slice(3, 6)} ${digits.slice(6)}`;
+  if (digits.length > 3) return `${digits.slice(0, 3)} ${digits.slice(3)}`;
+  return digits;
+}
 
 const catColor: Record<string, string> = {
   Bank: "#0A77FF",
@@ -97,11 +124,11 @@ function PaymentFormFields({
           </div>
           <div>
             <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Account Number <span className="text-[#EF4444]">*</span></Label>
-            <Input value={e.accountNumber} onChange={(ev) => updateEntry(e.id, { accountNumber: ev.target.value })} placeholder="Enter account number" className={inputCls} />
+            <Input value={e.accountNumber} onChange={(ev) => updateEntry(e.id, { accountNumber: formatAccountNumber(ev.target.value) })} placeholder="Enter account number" className={inputCls} inputMode="numeric" />
           </div>
           <div>
             <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Routing Number <span className="text-[#EF4444]">*</span></Label>
-            <Input value={e.routingNumber} onChange={(ev) => updateEntry(e.id, { routingNumber: ev.target.value })} placeholder="e.g. 021000021" className={inputCls} />
+            <Input value={e.routingNumber} onChange={(ev) => updateEntry(e.id, { routingNumber: formatRoutingNumber(ev.target.value) })} placeholder="e.g. 021000021" className={inputCls} inputMode="numeric" />
           </div>
           <div>
             <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Account Type</Label>
@@ -111,7 +138,10 @@ function PaymentFormFields({
               </SelectTrigger>
               <SelectContent className="z-[250] rounded-lg">
                 <SelectItem value="checking">Checking</SelectItem>
-                <SelectItem value="saving">Saving</SelectItem>
+                <SelectItem value="savings">Savings</SelectItem>
+                <SelectItem value="money_market">Money Market</SelectItem>
+                <SelectItem value="cd">Certificate of Deposit (CD)</SelectItem>
+                <SelectItem value="loan">Loan</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -131,11 +161,11 @@ function PaymentFormFields({
           </div>
           <div>
             <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Account Number <span className="text-[#EF4444]">*</span></Label>
-            <Input value={e.accountNumber} onChange={(ev) => updateEntry(e.id, { accountNumber: ev.target.value })} placeholder="Enter account number" className={inputCls} />
+            <Input value={e.accountNumber} onChange={(ev) => updateEntry(e.id, { accountNumber: formatAccountNumber(ev.target.value) })} placeholder="Enter account number" className={inputCls} inputMode="numeric" />
           </div>
           <div>
             <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Routing Number <span className="text-[#EF4444]">*</span></Label>
-            <Input value={e.routingNumber} onChange={(ev) => updateEntry(e.id, { routingNumber: ev.target.value })} placeholder="e.g. 021000021" className={inputCls} />
+            <Input value={e.routingNumber} onChange={(ev) => updateEntry(e.id, { routingNumber: formatRoutingNumber(ev.target.value) })} placeholder="e.g. 021000021" className={inputCls} inputMode="numeric" />
           </div>
           <div>
             <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>SWIFT Code <span className="text-[10px] text-[#94A3B8] font-normal">(optional — international wire only)</span></Label>
@@ -153,16 +183,16 @@ function PaymentFormFields({
           </div>
           <div>
             <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Card Number <span className="text-[#EF4444]">*</span></Label>
-            <Input value={e.cardNumber} onChange={(ev) => updateEntry(e.id, { cardNumber: ev.target.value })} placeholder="Enter card number" className={inputCls} />
+            <Input value={e.cardNumber} onChange={(ev) => updateEntry(e.id, { cardNumber: formatCardNumber(ev.target.value) })} placeholder="0000 0000 0000 0000" className={inputCls} inputMode="numeric" />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Expiry Date <span className="text-[#EF4444]">*</span></Label>
-              <Input value={e.expiryDate} onChange={(ev) => updateEntry(e.id, { expiryDate: ev.target.value })} placeholder="MM/YY" className={inputCls} />
+              <Input value={e.expiryDate} onChange={(ev) => updateEntry(e.id, { expiryDate: formatExpiry(ev.target.value) })} placeholder="MM/YY" className={inputCls} inputMode="numeric" />
             </div>
             <div>
               <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>CVV <span className="text-[#EF4444]">*</span></Label>
-              <Input value={e.cvv} onChange={(ev) => updateEntry(e.id, { cvv: ev.target.value })} placeholder="Enter CVV" className={inputCls} />
+              <Input value={e.cvv} onChange={(ev) => updateEntry(e.id, { cvv: formatCVV(ev.target.value) })} placeholder="000" className={inputCls} inputMode="numeric" />
             </div>
           </div>
           <div>
@@ -186,7 +216,7 @@ function PaymentFormFields({
         </>
       )}
 
-      {/* Cheque (Paper) */}
+      {/* Check (Paper) */}
       {e.type === "check" && (
         <>
           <div>
@@ -227,7 +257,7 @@ function PaymentFormFields({
               value={e.description}
               onChange={(ev) => updateEntry(e.id, { description: ev.target.value })}
               placeholder="Describe this payment arrangement..."
-              className="mt-1.5 rounded-lg border-[#E2E8F0] bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 min-h-[80px]"
+              className="mt-1.5 rounded-lg border-[#E2E8F0] bg-white text-sm text-[#0F172A] placeholder:text-[#CBD5E1] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 min-h-[80px]"
             />
           </div>
           <div>
@@ -247,7 +277,7 @@ function PaymentFormFields({
               <span style={{ fontWeight: 500 }}>{e.countryCode}</span>
               <ChevronDown className="w-3 h-3 text-[#94A3B8]" />
             </div>
-            <Input value={e.phone} onChange={(ev) => updateEntry(e.id, { phone: ev.target.value })} placeholder="xxx xxx xxxx" className="rounded-l-none rounded-r-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+            <Input value={e.phone} onChange={(ev) => updateEntry(e.id, { phone: formatPhone(ev.target.value) })} placeholder="xxx xxx xxxx" inputMode="numeric" className="rounded-l-none rounded-r-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#CBD5E1] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
           </div>
         </div>
       )}
@@ -262,32 +292,84 @@ function PaymentFormFields({
 
       {/* Discount */}
       <div className="pt-1 border-t border-[#E2E8F0]">
-        <label className="flex items-center gap-2.5 cursor-pointer select-none pt-3">
+        <div
+          className="flex items-center gap-2.5 cursor-pointer select-none pt-3 group/disc"
+          onClick={() => updateEntry(e.id, { applyDiscount: !e.applyDiscount })}
+        >
           <div
-            onClick={() => updateEntry(e.id, { applyDiscount: !e.applyDiscount })}
-            className={`w-[18px] h-[18px] rounded flex items-center justify-center shrink-0 transition-colors cursor-pointer ${
-              e.applyDiscount ? "bg-[#0A77FF]" : "border-2 border-[#CBD5E1] bg-white"
+            className={`w-[16px] h-[16px] rounded-[4px] flex items-center justify-center shrink-0 transition-colors ${
+              e.applyDiscount ? "bg-[#0A77FF]" : "border-[1.5px] border-[#CBD5E1] bg-white group-hover/disc:border-[#94A3B8]"
             }`}
           >
-            {e.applyDiscount && <Check className="w-3 h-3 text-white" />}
+            {e.applyDiscount && <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />}
           </div>
-          <span className="text-xs text-[#0F172A]" style={{ fontWeight: 500 }}>Apply Discount Terms or Additional Charges</span>
-        </label>
+          <span className="text-xs text-[#334155]" style={{ fontWeight: 500 }}>Apply Discount Terms or Additional Charges</span>
+        </div>
       </div>
       {e.applyDiscount && (
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Discount (%)</Label>
+            <div className="flex items-center justify-between">
+              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Discount</Label>
+              <div className="inline-flex items-center h-[22px] rounded-full bg-[#F1F5F9] p-0.5">
+                <button
+                  type="button"
+                  onClick={() => updateEntry(e.id, { discountMode: "percent" })}
+                  className={`px-2 h-[18px] rounded-full text-[10px] transition-all ${(e.discountMode ?? "percent") === "percent" ? "bg-white text-[#0A77FF] shadow-sm" : "text-[#64748B] hover:text-[#334155]"}`}
+                  style={{ fontWeight: 600 }}
+                >
+                  %
+                </button>
+                <button
+                  type="button"
+                  onClick={() => updateEntry(e.id, { discountMode: "fixed" })}
+                  className={`px-2 h-[18px] rounded-full text-[10px] transition-all ${(e.discountMode ?? "percent") === "fixed" ? "bg-white text-[#0A77FF] shadow-sm" : "text-[#64748B] hover:text-[#334155]"}`}
+                  style={{ fontWeight: 600 }}
+                >
+                  $
+                </button>
+              </div>
+            </div>
             <div className="relative mt-1.5">
-              <Input value={e.discountPercent} onChange={(ev) => updateEntry(e.id, { discountPercent: ev.target.value })} placeholder="e.g. 5" className="rounded-lg border-[#E2E8F0] h-10 pr-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
-              <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-sm text-[#94A3B8]">%</span>
+              {(e.discountMode ?? "percent") === "fixed" && (
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#94A3B8]">$</span>
+              )}
+              <Input value={e.discountPercent} onChange={(ev) => updateEntry(e.id, { discountPercent: ev.target.value })} placeholder={`e.g. ${(e.discountMode ?? "percent") === "percent" ? "5" : "25.00"}`} className={`rounded-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#CBD5E1] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 ${(e.discountMode ?? "percent") === "fixed" ? "pl-7 pr-3" : "pr-8"}`} />
+              {(e.discountMode ?? "percent") === "percent" && (
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-[#94A3B8]">%</span>
+              )}
             </div>
           </div>
           <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Add. Charges (%)</Label>
+            <div className="flex items-center justify-between">
+              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Add. Charges</Label>
+              <div className="inline-flex items-center h-[22px] rounded-full bg-[#F1F5F9] p-0.5">
+                <button
+                  type="button"
+                  onClick={() => updateEntry(e.id, { additionalChargesMode: "percent" })}
+                  className={`px-2 h-[18px] rounded-full text-[10px] transition-all ${(e.additionalChargesMode ?? "percent") === "percent" ? "bg-white text-[#0A77FF] shadow-sm" : "text-[#64748B] hover:text-[#334155]"}`}
+                  style={{ fontWeight: 600 }}
+                >
+                  %
+                </button>
+                <button
+                  type="button"
+                  onClick={() => updateEntry(e.id, { additionalChargesMode: "fixed" })}
+                  className={`px-2 h-[18px] rounded-full text-[10px] transition-all ${(e.additionalChargesMode ?? "percent") === "fixed" ? "bg-white text-[#0A77FF] shadow-sm" : "text-[#64748B] hover:text-[#334155]"}`}
+                  style={{ fontWeight: 600 }}
+                >
+                  $
+                </button>
+              </div>
+            </div>
             <div className="relative mt-1.5">
-              <Input value={e.additionalCharges} onChange={(ev) => updateEntry(e.id, { additionalCharges: ev.target.value })} placeholder="e.g. 2" className="rounded-lg border-[#E2E8F0] h-10 pr-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
-              <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-sm text-[#94A3B8]">%</span>
+              {(e.additionalChargesMode ?? "percent") === "fixed" && (
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#94A3B8]">$</span>
+              )}
+              <Input value={e.additionalCharges} onChange={(ev) => updateEntry(e.id, { additionalCharges: ev.target.value })} placeholder={`e.g. ${(e.additionalChargesMode ?? "percent") === "percent" ? "2" : "50.00"}`} className={`rounded-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#CBD5E1] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 ${(e.additionalChargesMode ?? "percent") === "fixed" ? "pl-7 pr-3" : "pr-8"}`} />
+              {(e.additionalChargesMode ?? "percent") === "percent" && (
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-[#94A3B8]">%</span>
+              )}
             </div>
           </div>
         </div>
@@ -329,7 +411,7 @@ function getEntryDataRows(e: PaymentMethodEntry): { icon: React.ElementType; lab
     rows.push({ icon: User, label: "Account", value: e.accountTitle });
     rows.push({ icon: Hash, label: "Acct #", value: e.accountNumber, sensitive: true });
     rows.push({ icon: Hash, label: "Routing", value: e.routingNumber, sensitive: true });
-    if (e.type === "ach" && e.accountType) rows.push({ icon: FileText, label: "Type", value: e.accountType === "checking" ? "Checking" : "Saving" });
+    if (e.type === "ach" && e.accountType) rows.push({ icon: FileText, label: "Type", value: { checking: "Checking", savings: "Savings", money_market: "Money Market", cd: "Certificate of Deposit", loan: "Loan" }[e.accountType] || e.accountType });
     if (e.type === "wire" && e.swiftCode) rows.push({ icon: Hash, label: "SWIFT", value: e.swiftCode, sensitive: true });
   }
   if (e.type === "card") {
@@ -451,12 +533,12 @@ export function PaymentMethodCard({
               <Percent className="w-2.5 h-2.5 text-primary" />
               <span className="text-[10px] text-muted-foreground" style={{ fontWeight: 500 }}>Discount</span>
             </div>
-            <span className="text-[10px] text-foreground tabular-nums" style={{ fontWeight: 600 }}>{pe.discountPercent || "0"}%</span>
+            <span className="text-[10px] text-foreground tabular-nums" style={{ fontWeight: 600 }}>{(pe.discountMode ?? "percent") === "fixed" ? "$" : ""}{pe.discountPercent || "0"}{(pe.discountMode ?? "percent") === "percent" ? "%" : ""}</span>
             {pe.additionalCharges && (
               <>
                 <span className="text-[10px] text-muted-foreground mx-1">|</span>
                 <span className="text-[10px] text-muted-foreground" style={{ fontWeight: 500 }}>Charges</span>
-                <span className="text-[10px] text-foreground tabular-nums ml-1" style={{ fontWeight: 600 }}>{pe.additionalCharges}%</span>
+                <span className="text-[10px] text-foreground tabular-nums ml-1" style={{ fontWeight: 600 }}>{(pe.additionalChargesMode ?? "percent") === "fixed" ? "$" : ""}{pe.additionalCharges}{(pe.additionalChargesMode ?? "percent") === "percent" ? "%" : ""}</span>
               </>
             )}
           </div>
@@ -645,12 +727,19 @@ export function PaymentMethodsSection({
       )}
 
       {/* Modal */}
-      {pmModalOpen && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/40" onClick={handleModalCancel} />
-          <div className="relative bg-white rounded-2xl shadow-2xl border border-[#E2E8F0]/60 w-[calc(100%-2rem)] max-w-[580px] 3xl:max-w-[680px] min-[2560px]:max-w-[780px] max-h-[85vh] flex flex-col animate-in fade-in-0 zoom-in-95 duration-150">
+      <Dialog open={pmModalOpen} onOpenChange={(open) => { if (!open) handleModalCancel(); }}>
+        <DialogContent
+          className="!p-0 !gap-0 !bg-white overflow-hidden flex flex-col z-[250] !border-[#E2E8F0]/60"
+          overlayClassName="!bg-black/20 !z-[250]"
+          style={{ maxWidth: 580, width: "calc(100% - 2rem)", maxHeight: "85vh", borderRadius: 16, boxShadow: "0 24px 80px -12px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.05)" }}
+          hideCloseButton
+          onPointerDownOutside={(e) => e.preventDefault()}
+        >
+          <DialogTitle className="sr-only">Add Payment Method</DialogTitle>
+          <DialogDescription className="sr-only">Choose a payment method type and fill in the details.</DialogDescription>
+
             {/* Header */}
-            <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#E8ECF1] shrink-0">
+            <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#E8ECF1] bg-white shrink-0">
               <div className="flex items-center gap-2.5">
                 {pmModalStep === "form" && !modalEntry?.isSaved && (
                   <button
@@ -698,7 +787,7 @@ export function PaymentMethodsSection({
             </div>
 
             {/* Body */}
-            <div className="flex-1 overflow-y-auto px-5 py-4">
+            <div className="flex-1 min-h-0 overflow-y-auto px-5 py-4 bg-white scrollbar-hide">
               {pmModalStep === "select" ? (
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-2">
@@ -733,7 +822,7 @@ export function PaymentMethodsSection({
 
             {/* Footer */}
             {pmModalStep === "form" && (
-              <div className="flex items-center justify-end gap-2 px-5 py-3 border-t border-[#E8ECF1] shrink-0">
+              <div className="flex items-center justify-end gap-2 px-5 py-3 border-t border-[#E8ECF1] bg-white shrink-0">
                 <button onClick={handleModalCancel} className="px-3.5 py-2 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#64748B] hover:bg-[#F1F5F9] transition-colors cursor-pointer" style={{ fontWeight: 500 }}>
                   Cancel
                 </button>
@@ -742,9 +831,8 @@ export function PaymentMethodsSection({
                 </button>
               </div>
             )}
-          </div>
-        </div>
-      )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

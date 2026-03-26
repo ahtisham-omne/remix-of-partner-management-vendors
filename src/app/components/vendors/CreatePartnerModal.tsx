@@ -1900,10 +1900,10 @@ function GroupQuickViewOverlay({
   const visible = filtered.slice(0, visibleCount);
 
   return (
-    <div className="fixed inset-0 z-[250] flex items-center justify-center bg-black/30 backdrop-blur-[1px]">
+    <div className="fixed inset-0 z-[250] flex items-center justify-center bg-black/50">
       <div
         ref={overlayRef}
-        className="bg-white rounded-xl shadow-2xl border border-[#E2E8F0] w-[calc(100%-1rem)] sm:w-full max-w-[700px] max-h-[85vh] sm:max-h-[600px] flex flex-col animate-in fade-in-0 zoom-in-95 duration-150 mx-auto"
+        className="bg-white rounded-xl shadow-2xl border border-[#E2E8F0] w-[calc(100%-1rem)] sm:w-full max-w-[700px] max-h-[85vh] sm:max-h-[600px] flex flex-col animate-modal-pop mx-auto"
       >
         {/* Header */}
         <div className="px-4 sm:px-5 pt-4 sm:pt-5 pb-3 shrink-0">
@@ -3481,6 +3481,7 @@ function ConfigPageContent({
   const [createPtDescription, setCreatePtDescription] = useState("");
   const [createPtApplyDiscount, setCreatePtApplyDiscount] = useState(false);
   const [createPtDiscountPercent, setCreatePtDiscountPercent] = useState("");
+  const [createPtDiscountMode, setCreatePtDiscountMode] = useState<"percent" | "fixed">("percent");
   const [createPtDiscountPeriod, setCreatePtDiscountPeriod] = useState("30");
   const [createPtStep, setCreatePtStep] = useState<1 | 2>(1);
   // Split payment events
@@ -3527,6 +3528,7 @@ function ConfigPageContent({
     setCreatePtDescription("");
     setCreatePtApplyDiscount(false);
     setCreatePtDiscountPercent("");
+    setCreatePtDiscountMode("percent");
     setCreatePtDiscountPeriod("30");
     setCreatePtStep(1);
     setCreatePtSplitEvents([
@@ -3579,7 +3581,8 @@ function ConfigPageContent({
       }
       if (createPtApplyDiscount && createPtDiscountPercent) {
         const discPeriodLabel = CREATE_PT_DURATIONS.find((d) => d.id === createPtDiscountPeriod)?.label || `${createPtDiscountPeriod} days`;
-        autoDescription += ` ${createPtDiscountPercent}% discount if paid within ${discPeriodLabel}.`;
+        const discValue = createPtDiscountMode === "fixed" ? `$${createPtDiscountPercent}` : `${createPtDiscountPercent}%`;
+        autoDescription += ` ${discValue} discount if paid within ${discPeriodLabel}.`;
       }
     }
 
@@ -3595,6 +3598,7 @@ function ConfigPageContent({
       duration: createPtDuration,
       applyDiscount: createPtApplyDiscount,
       discountPercent: createPtApplyDiscount ? createPtDiscountPercent : undefined,
+      discountMode: createPtApplyDiscount ? createPtDiscountMode : undefined,
       discountPeriod: createPtApplyDiscount ? createPtDiscountPeriod : undefined,
     };
     setSelectedPaymentTermId(newPreset.id);
@@ -4969,37 +4973,89 @@ function ConfigPageContent({
 
         {/* Discount / Additional Charges checkbox */}
         <div className="pt-1 border-t border-[#E2E8F0]">
-          <label className="flex items-center gap-2.5 cursor-pointer select-none pt-3">
+          <div
+            className="flex items-center gap-2.5 cursor-pointer select-none pt-3 group/disc"
+            onClick={() => updatePaymentEntry(e.id, { applyDiscount: !e.applyDiscount })}
+          >
             <div
-              onClick={() => updatePaymentEntry(e.id, { applyDiscount: !e.applyDiscount })}
-              className={`w-[18px] h-[18px] rounded flex items-center justify-center shrink-0 transition-colors cursor-pointer ${
-                e.applyDiscount ? "bg-[#0A77FF]" : "border-2 border-[#CBD5E1] bg-white"
+              className={`w-[16px] h-[16px] rounded-[4px] flex items-center justify-center shrink-0 transition-colors ${
+                e.applyDiscount ? "bg-[#0A77FF]" : "border-[1.5px] border-[#CBD5E1] bg-white group-hover/disc:border-[#94A3B8]"
               }`}
             >
-              {e.applyDiscount && <Check className="w-3 h-3 text-white" />}
+              {e.applyDiscount && <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />}
             </div>
-            <span className="text-xs text-[#0F172A]" style={{ fontWeight: 500 }}>Apply Discount Terms or Additional Charges</span>
-          </label>
+            <span className="text-xs text-[#334155]" style={{ fontWeight: 500 }}>Apply Discount Terms or Additional Charges</span>
+          </div>
         </div>
 
         {/* Discount fields */}
         {e.applyDiscount && (
-          <>
+          <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Discount Percentage (%)</Label>
+              <div className="flex items-center justify-between">
+                <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Discount</Label>
+                <div className="inline-flex items-center h-[22px] rounded-full bg-[#F1F5F9] p-0.5">
+                  <button
+                    type="button"
+                    onClick={() => updatePaymentEntry(e.id, { discountMode: "percent" })}
+                    className={`px-2 h-[18px] rounded-full text-[10px] transition-all ${(e.discountMode ?? "percent") === "percent" ? "bg-white text-[#0A77FF] shadow-sm" : "text-[#64748B] hover:text-[#334155]"}`}
+                    style={{ fontWeight: 600 }}
+                  >
+                    %
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => updatePaymentEntry(e.id, { discountMode: "fixed" })}
+                    className={`px-2 h-[18px] rounded-full text-[10px] transition-all ${(e.discountMode ?? "percent") === "fixed" ? "bg-white text-[#0A77FF] shadow-sm" : "text-[#64748B] hover:text-[#334155]"}`}
+                    style={{ fontWeight: 600 }}
+                  >
+                    $
+                  </button>
+                </div>
+              </div>
               <div className="relative mt-1.5">
-                <Input value={e.discountPercent} onChange={(ev) => updatePaymentEntry(e.id, { discountPercent: ev.target.value })} placeholder="e.g. 5" className="rounded-lg border-[#E2E8F0] h-10 pr-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
-                <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-sm text-[#94A3B8]">%</span>
+                {(e.discountMode ?? "percent") === "fixed" && (
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#94A3B8]">$</span>
+                )}
+                <Input value={e.discountPercent} onChange={(ev) => updatePaymentEntry(e.id, { discountPercent: ev.target.value })} placeholder={`e.g. ${(e.discountMode ?? "percent") === "percent" ? "5" : "25.00"}`} className={`rounded-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 ${(e.discountMode ?? "percent") === "fixed" ? "pl-7 pr-3" : "pr-8"}`} />
+                {(e.discountMode ?? "percent") === "percent" && (
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-[#94A3B8]">%</span>
+                )}
               </div>
             </div>
             <div>
-              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Additional Charges (%)</Label>
+              <div className="flex items-center justify-between">
+                <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Add. Charges</Label>
+                <div className="inline-flex items-center h-[22px] rounded-full bg-[#F1F5F9] p-0.5">
+                  <button
+                    type="button"
+                    onClick={() => updatePaymentEntry(e.id, { additionalChargesMode: "percent" })}
+                    className={`px-2 h-[18px] rounded-full text-[10px] transition-all ${(e.additionalChargesMode ?? "percent") === "percent" ? "bg-white text-[#0A77FF] shadow-sm" : "text-[#64748B] hover:text-[#334155]"}`}
+                    style={{ fontWeight: 600 }}
+                  >
+                    %
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => updatePaymentEntry(e.id, { additionalChargesMode: "fixed" })}
+                    className={`px-2 h-[18px] rounded-full text-[10px] transition-all ${(e.additionalChargesMode ?? "percent") === "fixed" ? "bg-white text-[#0A77FF] shadow-sm" : "text-[#64748B] hover:text-[#334155]"}`}
+                    style={{ fontWeight: 600 }}
+                  >
+                    $
+                  </button>
+                </div>
+              </div>
               <div className="relative mt-1.5">
-                <Input value={e.additionalCharges} onChange={(ev) => updatePaymentEntry(e.id, { additionalCharges: ev.target.value })} placeholder="e.g. 2" className="rounded-lg border-[#E2E8F0] h-10 pr-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
-                <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-sm text-[#94A3B8]">%</span>
+                {(e.additionalChargesMode ?? "percent") === "fixed" && (
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#94A3B8]">$</span>
+                )}
+                <Input value={e.additionalCharges} onChange={(ev) => updatePaymentEntry(e.id, { additionalCharges: ev.target.value })} placeholder={`e.g. ${(e.additionalChargesMode ?? "percent") === "percent" ? "2" : "50.00"}`} className={`rounded-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 ${(e.additionalChargesMode ?? "percent") === "fixed" ? "pl-7 pr-3" : "pr-8"}`} />
+                {(e.additionalChargesMode ?? "percent") === "percent" && (
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-[#94A3B8]">%</span>
+                )}
               </div>
             </div>
-          </>
+          </div>
         )}
       </>
     );
@@ -5202,8 +5258,8 @@ function ConfigPageContent({
                   {entry.phone && <div><p className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Phone</p><p className="text-[13px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>{entry.countryCode} {entry.phone}</p></div>}
                   {entry.applyDiscount && (
                     <div className="flex gap-4">
-                      {entry.discountPercent && <div><p className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Discount</p><p className="text-[13px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>{entry.discountPercent}%</p></div>}
-                      {entry.additionalCharges && <div><p className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Add. Charges</p><p className="text-[13px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>{entry.additionalCharges}%</p></div>}
+                      {entry.discountPercent && <div><p className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Discount</p><p className="text-[13px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>{(entry.discountMode ?? "percent") === "fixed" ? "$" : ""}{entry.discountPercent}{(entry.discountMode ?? "percent") === "percent" ? "%" : ""}</p></div>}
+                      {entry.additionalCharges && <div><p className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Add. Charges</p><p className="text-[13px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>{(entry.additionalChargesMode ?? "percent") === "fixed" ? "$" : ""}{entry.additionalCharges}{(entry.additionalChargesMode ?? "percent") === "percent" ? "%" : ""}</p></div>}
                     </div>
                   )}
                 </div>
@@ -5824,18 +5880,43 @@ function ConfigPageContent({
                         {createPtApplyDiscount && (
                           <div className="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-[#F1F5F9]">
                             <div>
-                              <div className="flex items-center gap-1 mb-1.5">
-                                <label className="text-[12px] text-[#0F172A]" style={{ fontWeight: 500 }}>Discount Percentage (%)</label>
-                                <Tooltip><TooltipTrigger asChild><span><Info className="w-3 h-3 text-[#CBD5E1]" /></span></TooltipTrigger><TooltipContent className="z-[300]"><p className="text-xs">Percentage discount applied for early payment.</p></TooltipContent></Tooltip>
+                              <div className="flex items-center justify-between mb-1.5">
+                                <div className="flex items-center gap-1">
+                                  <label className="text-[12px] text-[#0F172A]" style={{ fontWeight: 500 }}>Discount</label>
+                                  <Tooltip><TooltipTrigger asChild><span><Info className="w-3 h-3 text-[#CBD5E1]" /></span></TooltipTrigger><TooltipContent className="z-[300]"><p className="text-xs">Discount applied for early payment.</p></TooltipContent></Tooltip>
+                                </div>
+                                <div className="inline-flex items-center h-[22px] rounded-full bg-[#F1F5F9] p-0.5">
+                                  <button
+                                    type="button"
+                                    onClick={() => setCreatePtDiscountMode("percent")}
+                                    className={`px-2 h-[18px] rounded-full text-[10px] transition-all ${createPtDiscountMode === "percent" ? "bg-white text-[#0A77FF] shadow-sm" : "text-[#64748B] hover:text-[#334155]"}`}
+                                    style={{ fontWeight: 600 }}
+                                  >
+                                    %
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => setCreatePtDiscountMode("fixed")}
+                                    className={`px-2 h-[18px] rounded-full text-[10px] transition-all ${createPtDiscountMode === "fixed" ? "bg-white text-[#0A77FF] shadow-sm" : "text-[#64748B] hover:text-[#334155]"}`}
+                                    style={{ fontWeight: 600 }}
+                                  >
+                                    $
+                                  </button>
+                                </div>
                               </div>
                               <div className="relative">
+                                {createPtDiscountMode === "fixed" && (
+                                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[13px] text-[#94A3B8]">$</span>
+                                )}
                                 <Input
                                   value={createPtDiscountPercent}
                                   onChange={(e) => setCreatePtDiscountPercent(e.target.value)}
-                                  placeholder="Enter percentage (e.g., 50%)"
-                                  className="rounded-lg border-[#E2E8F0] bg-white pr-8 text-[13px]"
+                                  placeholder={createPtDiscountMode === "percent" ? "e.g. 5" : "e.g. 25.00"}
+                                  className={`rounded-lg border-[#E2E8F0] bg-white text-[13px] ${createPtDiscountMode === "fixed" ? "pl-7 pr-3" : "pr-8"}`}
                                 />
-                                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[13px] text-[#94A3B8]">%</span>
+                                {createPtDiscountMode === "percent" && (
+                                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[13px] text-[#94A3B8]">%</span>
+                                )}
                               </div>
                             </div>
                             <div>
@@ -6775,70 +6856,103 @@ function ConfigPageContent({
                         <span className="text-[11px] text-[#94A3B8] bg-[#F1F5F9] px-1.5 py-0.5 rounded" style={{ fontWeight: 600 }}>{createPrTiers.length}</span>
                       </div>
                     </div>
-                    <div className="space-y-3">
-                      {createPrTiers.map((tier, idx) => (
-                        <div key={idx} className="rounded-xl border border-[#E2E8F0] bg-white p-4 relative">
-                          <div className="flex items-center justify-between mb-3">
+                    <div className="space-y-2.5">
+                      {createPrTiers.map((tier, idx) => {
+                        const isDis = createPrCategory === "discount";
+                        const accent = isDis ? "#16A34A" : "#7C3AED";
+                        const accentBg = isDis ? "#F0FDF4" : "#F5F3FF";
+                        const accentBorder = isDis ? "#BBF7D0" : "#DDD6FE";
+                        return (
+                        <div key={idx} className="rounded-xl border bg-white overflow-hidden transition-all" style={{ borderColor: tier.qtyLimits ? accentBorder : "#E2E8F0" }}>
+                          {/* Header */}
+                          <div className="flex items-center justify-between px-3.5 py-2 border-b border-[#F1F5F9]" style={{ backgroundColor: accentBg }}>
                             <div className="flex items-center gap-2">
-                              <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 600 }}>#{idx + 1}</span>
-                              <span className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>{createPrCategory === "discount" ? "Discount" : "Premium"} Tier</span>
+                              <span className="w-5 h-5 rounded-md flex items-center justify-center text-[10px] text-white" style={{ fontWeight: 700, backgroundColor: accent }}>{idx + 1}</span>
+                              <span className="text-[12px] text-[#0F172A]" style={{ fontWeight: 600 }}>Tier {idx + 1}</span>
                             </div>
                             {idx > 0 && (
-                              <button onClick={() => removeCpmTier(idx)} className="w-7 h-7 rounded-full border border-[#FEE2E2] bg-[#FEF2F2] flex items-center justify-center text-[#EF4444] hover:bg-[#FEE2E2] hover:border-[#FECACA] transition-all cursor-pointer">
+                              <button
+                                onClick={() => removeCpmTier(idx)}
+                                className="w-6 h-6 rounded-md flex items-center justify-center text-[#94A3B8] hover:text-[#EF4444] hover:bg-white/60 transition-all cursor-pointer"
+                              >
                                 <X className="w-3.5 h-3.5" />
                               </button>
                             )}
                           </div>
-                          <div className="flex items-start gap-4 mb-3">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-1 mb-1.5">
-                                <label className="text-[12px] text-[#0F172A]" style={{ fontWeight: 500 }}>
-                                  {tier.fixRate ? `${createPrCategory === "discount" ? "Discount" : "Premium"} Price ($)` : `${createPrCategory === "discount" ? "Discount" : "Premium"} Percentage (%)`}
-                                </label>
-                                <Tooltip><TooltipTrigger asChild><span><Info className="w-3 h-3 text-[#CBD5E1]" /></span></TooltipTrigger><TooltipContent className="z-[300]"><p className="text-xs">{tier.fixRate ? "Fixed dollar amount adjustment." : "Percentage-based adjustment."}</p></TooltipContent></Tooltip>
-                              </div>
-                              <div className="relative">
-                                <Input value={tier.discount} onChange={(e) => updateCpmTier(idx, { discount: e.target.value })} placeholder={tier.fixRate ? "Enter price (e.g., 5$)" : "Enter percentage (e.g., 50%)"} className="rounded-lg border-[#E2E8F0] bg-white text-[13px] pr-8 text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
-                                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[13px] text-[#94A3B8]">{tier.fixRate ? "$" : "%"}</span>
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-2 pt-7">
-                              <Switch checked={tier.fixRate} onCheckedChange={(v) => updateCpmTier(idx, { fixRate: v })} />
-                              <div className="flex items-center gap-1">
-                                <span className="text-[12px] text-[#0F172A] whitespace-nowrap" style={{ fontWeight: 500 }}>Fix {createPrCategory === "discount" ? "Discount" : "Premium"} Rate ($)</span>
-                                <Tooltip><TooltipTrigger asChild><span><Info className="w-3 h-3 text-[#CBD5E1]" /></span></TooltipTrigger><TooltipContent className="z-[300]"><p className="text-xs">Toggle between percentage and fixed dollar amount.</p></TooltipContent></Tooltip>
-                              </div>
-                            </div>
-                          </div>
-                          <div>
-                            <div className="flex items-center gap-2.5">
-                              <Switch checked={tier.qtyLimits} onCheckedChange={(v) => updateCpmTier(idx, { qtyLimits: v })} />
-                              <span className="text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>Enable order quantity limits</span>
-                            </div>
-                            {tier.qtyLimits && (
-                              <div className="grid grid-cols-2 gap-4 mt-3 pt-3 border-t border-[#F1F5F9]">
-                                <div>
-                                  <div className="flex items-center gap-1 mb-1.5">
-                                    <label className="text-[12px] text-[#0F172A]" style={{ fontWeight: 500 }}>Minimum Order Quantity</label>
-                                    <Tooltip><TooltipTrigger asChild><span><Info className="w-3 h-3 text-[#CBD5E1]" /></span></TooltipTrigger><TooltipContent className="z-[300]"><p className="text-xs">Minimum units for this tier to apply.</p></TooltipContent></Tooltip>
+
+                          {/* Body */}
+                          <div className="px-3.5 py-3">
+                            <div className="grid grid-cols-2 gap-3">
+                              {/* Discount / Premium field */}
+                              <div>
+                                <div className="flex items-center justify-between mb-1.5">
+                                  <label className="text-[12px] text-[#0F172A]" style={{ fontWeight: 500 }}>
+                                    {isDis ? "Discount" : "Premium"} {tier.fixRate ? "Amount" : "Rate"}
+                                  </label>
+                                  <div className="inline-flex items-center h-[22px] rounded-full bg-[#F1F5F9] p-0.5">
+                                    <button
+                                      type="button"
+                                      onClick={() => updateCpmTier(idx, { fixRate: false })}
+                                      className={`px-2 h-[18px] rounded-full text-[10px] transition-all ${!tier.fixRate ? "bg-white text-[#0A77FF] shadow-sm" : "text-[#64748B] hover:text-[#334155]"}`}
+                                      style={{ fontWeight: 600 }}
+                                    >
+                                      %
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => updateCpmTier(idx, { fixRate: true })}
+                                      className={`px-2 h-[18px] rounded-full text-[10px] transition-all ${tier.fixRate ? "bg-white text-[#0A77FF] shadow-sm" : "text-[#64748B] hover:text-[#334155]"}`}
+                                      style={{ fontWeight: 600 }}
+                                    >
+                                      $
+                                    </button>
                                   </div>
-                                  <Input value={tier.minQty} onChange={(e) => updateCpmTier(idx, { minQty: e.target.value })} placeholder="Enter minimum units" className="rounded-lg border-[#E2E8F0] bg-white text-[13px] text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+                                </div>
+                                <div className="relative">
+                                  {tier.fixRate && (
+                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[13px] text-[#94A3B8]">$</span>
+                                  )}
+                                  <Input value={tier.discount} onChange={(e) => updateCpmTier(idx, { discount: e.target.value })} placeholder={tier.fixRate ? "e.g. 25.00" : "e.g. 50"} className={`rounded-lg border-[#E2E8F0] bg-white text-[13px] h-9 text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 ${tier.fixRate ? "pl-7 pr-3" : "pr-8"}`} />
+                                  {!tier.fixRate && (
+                                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[13px] text-[#94A3B8]">%</span>
+                                  )}
+                                </div>
+                              </div>
+
+                              {/* Quantity limits toggle */}
+                              <div className="flex items-end h-full pb-[7px]">
+                                <label
+                                  className="flex items-center gap-2 cursor-pointer select-none"
+                                  onClick={() => updateCpmTier(idx, { qtyLimits: !tier.qtyLimits })}
+                                >
+                                  <div className={`w-[16px] h-[16px] rounded-[4px] flex items-center justify-center shrink-0 transition-colors ${tier.qtyLimits ? "bg-[#0A77FF]" : "border-[1.5px] border-[#CBD5E1] bg-white hover:border-[#94A3B8]"}`}>
+                                    {tier.qtyLimits && <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />}
+                                  </div>
+                                  <span className="text-[12px] text-[#334155]" style={{ fontWeight: 500 }}>Order Qty Limits</span>
+                                </label>
+                              </div>
+                            </div>
+
+                            {/* Expanded qty fields */}
+                            {tier.qtyLimits && (
+                              <div className="grid grid-cols-2 gap-3 mt-3 pt-3 border-t border-[#F1F5F9]">
+                                <div>
+                                  <label className="text-[12px] text-[#0F172A] mb-1.5 block" style={{ fontWeight: 500 }}>Min Qty</label>
+                                  <Input value={tier.minQty} onChange={(e) => updateCpmTier(idx, { minQty: e.target.value })} placeholder="e.g. 100" className="rounded-lg border-[#E2E8F0] bg-white text-[13px] h-9 text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
                                 </div>
                                 <div>
-                                  <div className="flex items-center gap-1 mb-1.5">
-                                    <label className="text-[12px] text-[#0F172A]" style={{ fontWeight: 500 }}>Maximum Order Quantity</label>
-                                    <Tooltip><TooltipTrigger asChild><span><Info className="w-3 h-3 text-[#CBD5E1]" /></span></TooltipTrigger><TooltipContent className="z-[300]"><p className="text-xs">Maximum units for this tier to apply.</p></TooltipContent></Tooltip>
-                                  </div>
-                                  <Input value={tier.maxQty} onChange={(e) => updateCpmTier(idx, { maxQty: e.target.value })} placeholder="Enter maximum units" className="rounded-lg border-[#E2E8F0] bg-white text-[13px] text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+                                  <label className="text-[12px] text-[#0F172A] mb-1.5 block" style={{ fontWeight: 500 }}>Max Qty</label>
+                                  <Input value={tier.maxQty} onChange={(e) => updateCpmTier(idx, { maxQty: e.target.value })} placeholder="e.g. 500" className="rounded-lg border-[#E2E8F0] bg-white text-[13px] h-9 text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
                                 </div>
                               </div>
                             )}
                           </div>
                         </div>
-                      ))}
+                        );
+                      })}
                     </div>
-                    <button onClick={addCpmTier} className={`inline-flex items-center gap-1.5 mt-3 text-[12px] transition-colors cursor-pointer ${createPrCategory === "discount" ? "text-[#16A34A] hover:text-[#15803D]" : "text-[#7C3AED] hover:text-[#6D28D9]"}`} style={{ fontWeight: 600 }}>
-                      <Plus className="w-3.5 h-3.5" /> Add {createPrCategory === "discount" ? "Discount" : "Premium"} Tier
+                    <button onClick={addCpmTier} className={`inline-flex items-center gap-1.5 mt-3 px-3 py-1.5 rounded-lg border border-dashed text-[12px] transition-all cursor-pointer w-full justify-center ${createPrCategory === "discount" ? "border-[#BBF7D0] text-[#16A34A] hover:bg-[#F0FDF4] hover:border-[#86EFAC]" : "border-[#DDD6FE] text-[#7C3AED] hover:bg-[#F5F3FF] hover:border-[#C4B5FD]"}`} style={{ fontWeight: 600 }}>
+                      <Plus className="w-3.5 h-3.5" /> Add Tier
                     </button>
                   </div>
                 </div>

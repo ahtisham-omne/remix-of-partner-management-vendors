@@ -454,7 +454,7 @@ function PaymentTermDetailModal({ term, open, onClose, mode = "create", onDisabl
                     <div className="pt-2.5 border-t border-[#F1F5F9]">
                       <PTInfoLabel>Early Payment Discount</PTInfoLabel>
                       <p className="text-[12px] text-[#334155] mt-0.5" style={{ fontWeight: 500 }}>
-                        {term.discountPercent || "2"}% if paid within {term.discountPeriod || "10"} days
+                        {(term.discountMode ?? "percent") === "fixed" ? "$" : ""}{term.discountPercent || "2"}{(term.discountMode ?? "percent") === "percent" ? "%" : ""} if paid within {term.discountPeriod || "10"} days
                       </p>
                     </div>
                   )}

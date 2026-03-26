@@ -1924,10 +1924,11 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                 <div
                   key={tab.num}
                   className={`relative flex items-center gap-2 pb-2.5 sm:pb-3 ${
-                    tab.num < createStep ? "cursor-pointer" : "cursor-default"
+                    tab.num < createStep || (tab.num === 2 && createStep === 1 && createName.trim()) ? "cursor-pointer" : "cursor-default"
                   }`}
                   onClick={() => {
                     if (tab.num < createStep) setCreateStep(tab.num);
+                    if (tab.num === 2 && createStep === 1 && createName.trim()) setCreateStep(2);
                   }}
                 >
                   <div
@@ -2159,100 +2160,123 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                       </div>
                     </div>
 
-                    <div className="space-y-3">
-                      {createTiers.map((tier, idx) => (
-                        <div key={idx} className="rounded-xl border border-[#E2E8F0] bg-white p-4 relative">
-                          {/* Tier header row */}
-                          <div className="flex items-center justify-between mb-3">
+                    <div className="space-y-2.5">
+                      {createTiers.map((tier, idx) => {
+                        const isDis = createCategory === "discount";
+                        const accent = isDis ? "#16A34A" : "#7C3AED";
+                        const accentBg = isDis ? "#F0FDF4" : "#F5F3FF";
+                        const accentBorder = isDis ? "#BBF7D0" : "#DDD6FE";
+                        return (
+                        <div key={idx} className="rounded-xl border bg-white overflow-hidden transition-all" style={{ borderColor: tier.qtyLimits ? accentBorder : "#E2E8F0" }}>
+                          {/* Header */}
+                          <div className="flex items-center justify-between px-3.5 py-2 border-b border-[#F1F5F9]" style={{ backgroundColor: accentBg }}>
                             <div className="flex items-center gap-2">
-                              <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 600 }}>#{idx + 1}</span>
-                              <span className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>{createCategory === "discount" ? "Discount" : "Premium"} Tier</span>
+                              <span className="w-5 h-5 rounded-md flex items-center justify-center text-[10px] text-white" style={{ fontWeight: 700, backgroundColor: accent }}>{idx + 1}</span>
+                              <span className="text-[12px] text-[#0F172A]" style={{ fontWeight: 600 }}>Tier {idx + 1}</span>
                             </div>
                             {idx > 0 && (
                               <button
                                 onClick={() => removeTier(idx)}
-                                className="w-7 h-7 rounded-full border border-[#FEE2E2] bg-[#FEF2F2] flex items-center justify-center text-[#EF4444] hover:bg-[#FEE2E2] hover:border-[#FECACA] transition-all cursor-pointer"
+                                className="w-6 h-6 rounded-md flex items-center justify-center text-[#94A3B8] hover:text-[#EF4444] hover:bg-white/60 transition-all cursor-pointer"
                               >
                                 <X className="w-3.5 h-3.5" />
                               </button>
                             )}
                           </div>
 
-                          {/* Percentage / Price row */}
-                          <div className="flex items-start gap-4 mb-3">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-1 mb-1.5">
-                                <label className="text-[12px] text-[#0F172A]" style={{ fontWeight: 500 }}>
-                                  {tier.fixRate
-                                    ? `${createCategory === "discount" ? "Discount" : "Premium"} Price ($)`
-                                    : `${createCategory === "discount" ? "Discount" : "Premium"} Percentage (%)`}
-                                </label>
-                                <Tooltip><TooltipTrigger asChild><span><Info className="w-3 h-3 text-[#CBD5E1]" /></span></TooltipTrigger><TooltipContent className="z-[300]"><p className="text-xs">{tier.fixRate ? "Fixed dollar amount adjustment." : "Percentage-based adjustment."}</p></TooltipContent></Tooltip>
-                              </div>
-                              <div className="relative">
-                                <Input
-                                  value={tier.discount}
-                                  onChange={(e) => updateTier(idx, { discount: e.target.value })}
-                                  placeholder={tier.fixRate ? "Enter price (e.g., 5$)" : "Enter percentage (e.g., 50%)"}
-                                  className="rounded-lg border-[#E2E8F0] bg-white text-[13px] pr-8"
-                                />
-                                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[13px] text-[#94A3B8]">{tier.fixRate ? "$" : "%"}</span>
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-2 pt-7">
-                              <Switch checked={tier.fixRate} onCheckedChange={(v) => updateTier(idx, { fixRate: v })} />
-                              <div className="flex items-center gap-1">
-                                <span className="text-[12px] text-[#0F172A] whitespace-nowrap" style={{ fontWeight: 500 }}>Fix {createCategory === "discount" ? "Discount" : "Premium"} Rate ($)</span>
-                                <Tooltip><TooltipTrigger asChild><span><Info className="w-3 h-3 text-[#CBD5E1]" /></span></TooltipTrigger><TooltipContent className="z-[300]"><p className="text-xs">Toggle between percentage and fixed dollar amount.</p></TooltipContent></Tooltip>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Quantity limits toggle + conditional fields */}
-                          <div>
-                            <div className="flex items-center gap-2.5">
-                              <Switch checked={tier.qtyLimits} onCheckedChange={(v) => updateTier(idx, { qtyLimits: v })} />
-                              <span className="text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>Enable order quantity limits</span>
-                            </div>
-                            {tier.qtyLimits && (
-                              <div className="grid grid-cols-2 gap-4 mt-3 pt-3 border-t border-[#F1F5F9]">
-                                <div>
-                                  <div className="flex items-center gap-1 mb-1.5">
-                                    <label className="text-[12px] text-[#0F172A]" style={{ fontWeight: 500 }}>Minimum Order Quantity</label>
-                                    <Tooltip><TooltipTrigger asChild><span><Info className="w-3 h-3 text-[#CBD5E1]" /></span></TooltipTrigger><TooltipContent className="z-[300]"><p className="text-xs">Minimum units for this tier to apply.</p></TooltipContent></Tooltip>
+                          {/* Body */}
+                          <div className="px-3.5 py-3">
+                            <div className="grid grid-cols-2 gap-3">
+                              {/* Discount / Premium field */}
+                              <div>
+                                <div className="flex items-center justify-between mb-1.5">
+                                  <label className="text-[12px] text-[#0F172A]" style={{ fontWeight: 500 }}>
+                                    {isDis ? "Discount" : "Premium"} {tier.fixRate ? "Amount" : "Rate"}
+                                  </label>
+                                  <div className="inline-flex items-center h-[22px] rounded-full bg-[#F1F5F9] p-0.5">
+                                    <button
+                                      type="button"
+                                      onClick={() => updateTier(idx, { fixRate: false })}
+                                      className={`px-2 h-[18px] rounded-full text-[10px] transition-all ${!tier.fixRate ? "bg-white text-[#0A77FF] shadow-sm" : "text-[#64748B] hover:text-[#334155]"}`}
+                                      style={{ fontWeight: 600 }}
+                                    >
+                                      %
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => updateTier(idx, { fixRate: true })}
+                                      className={`px-2 h-[18px] rounded-full text-[10px] transition-all ${tier.fixRate ? "bg-white text-[#0A77FF] shadow-sm" : "text-[#64748B] hover:text-[#334155]"}`}
+                                      style={{ fontWeight: 600 }}
+                                    >
+                                      $
+                                    </button>
                                   </div>
+                                </div>
+                                <div className="relative">
+                                  {tier.fixRate && (
+                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[13px] text-[#94A3B8]">$</span>
+                                  )}
+                                  <Input
+                                    value={tier.discount}
+                                    onChange={(e) => updateTier(idx, { discount: e.target.value })}
+                                    placeholder={tier.fixRate ? "e.g. 25.00" : "e.g. 50"}
+                                    className={`rounded-lg border-[#E2E8F0] bg-white text-[13px] h-9 text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 ${tier.fixRate ? "pl-7 pr-3" : "pr-8"}`}
+                                  />
+                                  {!tier.fixRate && (
+                                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[13px] text-[#94A3B8]">%</span>
+                                  )}
+                                </div>
+                              </div>
+
+                              {/* Quantity limits toggle */}
+                              <div className="flex items-end h-full pb-[7px]">
+                                <label
+                                  className="flex items-center gap-2 cursor-pointer select-none"
+                                  onClick={() => updateTier(idx, { qtyLimits: !tier.qtyLimits })}
+                                >
+                                  <div className={`w-[16px] h-[16px] rounded-[4px] flex items-center justify-center shrink-0 transition-colors ${tier.qtyLimits ? "bg-[#0A77FF]" : "border-[1.5px] border-[#CBD5E1] bg-white hover:border-[#94A3B8]"}`}>
+                                    {tier.qtyLimits && <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />}
+                                  </div>
+                                  <span className="text-[12px] text-[#334155]" style={{ fontWeight: 500 }}>Order Qty Limits</span>
+                                </label>
+                              </div>
+                            </div>
+
+                            {/* Expanded qty fields */}
+                            {tier.qtyLimits && (
+                              <div className="grid grid-cols-2 gap-3 mt-3 pt-3 border-t border-[#F1F5F9]">
+                                <div>
+                                  <label className="text-[12px] text-[#0F172A] mb-1.5 block" style={{ fontWeight: 500 }}>Min Qty</label>
                                   <Input
                                     value={tier.minQty}
                                     onChange={(e) => updateTier(idx, { minQty: e.target.value })}
-                                    placeholder="Enter minimum units"
-                                    className="rounded-lg border-[#E2E8F0] bg-white text-[13px]"
+                                    placeholder="e.g. 100"
+                                    className="rounded-lg border-[#E2E8F0] bg-white text-[13px] h-9 text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
                                   />
                                 </div>
                                 <div>
-                                  <div className="flex items-center gap-1 mb-1.5">
-                                    <label className="text-[12px] text-[#0F172A]" style={{ fontWeight: 500 }}>Maximum Order Quantity</label>
-                                    <Tooltip><TooltipTrigger asChild><span><Info className="w-3 h-3 text-[#CBD5E1]" /></span></TooltipTrigger><TooltipContent className="z-[300]"><p className="text-xs">Maximum units for this tier to apply.</p></TooltipContent></Tooltip>
-                                  </div>
+                                  <label className="text-[12px] text-[#0F172A] mb-1.5 block" style={{ fontWeight: 500 }}>Max Qty</label>
                                   <Input
                                     value={tier.maxQty}
                                     onChange={(e) => updateTier(idx, { maxQty: e.target.value })}
-                                    placeholder="Enter maximum units"
-                                    className="rounded-lg border-[#E2E8F0] bg-white text-[13px]"
+                                    placeholder="e.g. 500"
+                                    className="rounded-lg border-[#E2E8F0] bg-white text-[13px] h-9 text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
                                   />
                                 </div>
                               </div>
                             )}
                           </div>
                         </div>
-                      ))}
+                        );
+                      })}
                     </div>
 
                     <button
                       onClick={addTier}
-                      className={`inline-flex items-center gap-1.5 mt-3 text-[12px] transition-colors cursor-pointer ${createCategory === "discount" ? "text-[#16A34A] hover:text-[#15803D]" : "text-[#7C3AED] hover:text-[#6D28D9]"}`}
+                      className={`inline-flex items-center gap-1.5 mt-3 px-3 py-1.5 rounded-lg border border-dashed text-[12px] transition-all cursor-pointer w-full justify-center ${createCategory === "discount" ? "border-[#BBF7D0] text-[#16A34A] hover:bg-[#F0FDF4] hover:border-[#86EFAC]" : "border-[#DDD6FE] text-[#7C3AED] hover:bg-[#F5F3FF] hover:border-[#C4B5FD]"}`}
                       style={{ fontWeight: 600 }}
                     >
-                      <Plus className="w-3.5 h-3.5" /> Add {createCategory === "discount" ? "Discount" : "Premium"} Tier
+                      <Plus className="w-3.5 h-3.5" /> Add Tier
                     </button>
                   </div>
                 </div>

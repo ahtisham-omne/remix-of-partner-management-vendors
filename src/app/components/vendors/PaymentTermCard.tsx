@@ -178,7 +178,7 @@ export function PaymentTermCard({
           <div className="pt-1.5 shrink-0">
             <div className="flex items-center px-2.5 py-[5px] rounded-lg border border-[#E8ECF1] bg-[#FAFBFC] text-[11px] tabular-nums">
               <span className="text-[#64748B]" style={{ fontWeight: 400 }}>
-                Early pay {term.discountPercent || "2"}% within {term.discountPeriod || "10"} days
+                Early pay {(term.discountMode ?? "percent") === "fixed" ? "$" : ""}{term.discountPercent || "2"}{(term.discountMode ?? "percent") === "percent" ? "%" : ""} within {term.discountPeriod || "10"} days
               </span>
             </div>
           </div>

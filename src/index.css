@@ -139,6 +139,56 @@
   display: none;
 }
 
+/* ─── Modal pop-up animation ─── */
+@keyframes modal-pop-in {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.92); }
+  40% { opacity: 1; }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+@keyframes modal-pop-out {
+  0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(0.92); }
+}
+@keyframes modal-overlay-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes modal-overlay-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+[data-slot="dialog-overlay"][data-state="open"],
+[data-slot="alert-dialog-overlay"][data-state="open"] {
+  animation: modal-overlay-in 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+[data-slot="dialog-overlay"][data-state="closed"],
+[data-slot="alert-dialog-overlay"][data-state="closed"] {
+  animation: modal-overlay-out 0.15s ease-in forwards;
+}
+
+[data-slot="dialog-content"][data-state="open"],
+[data-slot="alert-dialog-content"][data-state="open"] {
+  animation: modal-pop-in 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+[data-slot="dialog-content"][data-state="closed"],
+[data-slot="alert-dialog-content"][data-state="closed"] {
+  animation: modal-pop-out 0.15s cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
+/* ─── Flex-centered modal pop (no translate offset) ─── */
+@keyframes modal-pop-center {
+  0% { opacity: 0; transform: scale(0.92); }
+  40% { opacity: 1; }
+  100% { opacity: 1; transform: scale(1); }
+}
+.animate-modal-pop {
+  animation: modal-pop-center 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+.animate-modal-overlay {
+  animation: modal-overlay-in 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
 /* ─── Animations ─── */
 @keyframes overflowTooltipIn {
   from { opacity: 0; transform: scale(0.96) translateY(2px); }
