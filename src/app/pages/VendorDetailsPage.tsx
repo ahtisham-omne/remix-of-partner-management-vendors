@@ -709,16 +709,16 @@ export function VendorDetailsPage() {
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                 {LOC_FIXED_KPIS.map((kpi) => (
                   <div key={kpi.label} className="border border-[#E2E8F0] rounded-lg bg-white group relative min-w-0 transition-all duration-200 overflow-hidden hover:-translate-y-[1px] hover:border-[#93B8F7] hover:shadow-[0_2px_8px_-3px_rgba(10,119,255,0.06)]">
-                    <div className="px-3 py-2">
+                    <div className="px-3.5 py-2.5">
                       <div className="flex items-center justify-between gap-1 mb-1">
-                        <p className="text-[10.5px] text-[#64748B] whitespace-nowrap" style={{ fontWeight: 500 }}>{kpi.label}</p>
+                        <p className="text-[11.5px] text-[#64748B] whitespace-nowrap" style={{ fontWeight: 500 }}>{kpi.label}</p>
                         <DashKpiIcon name={kpi.iconName} className="w-3.5 h-3.5 shrink-0" style={{ color: "#94A3B8" }} />
                       </div>
                       <div className="flex items-baseline gap-1.5">
                         {kpi.change && (
-                          <span className="text-[10px] shrink-0" style={{ fontWeight: 500, color: kpi.changeColor || "#059669" }}>{kpi.change}</span>
+                          <span className="text-[10.5px] shrink-0" style={{ fontWeight: 500, color: kpi.changeColor || "#059669" }}>{kpi.change}</span>
                         )}
-                        <p className="text-[15px] text-[#0F172A] tracking-tight whitespace-nowrap" style={{ fontWeight: 600, lineHeight: 1.2 }}>{kpi.value}</p>
+                        <p className="text-[16px] text-[#0F172A] tracking-tight whitespace-nowrap" style={{ fontWeight: 600, lineHeight: 1.2 }}>{kpi.value}</p>
                       </div>
                     </div>
                   </div>
