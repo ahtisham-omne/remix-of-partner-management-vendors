@@ -6152,6 +6152,31 @@ function ConfigPageContent({
           </p>
         </div>
 
+        {/* CTA card — always on top */}
+        <div className={`rounded-lg border-2 border-dashed border-[#E2E8F0] bg-white ${selectedPricingRules.length > 0 ? "py-4" : "py-6"} flex flex-col items-center justify-center gap-3`}>
+          {selectedPricingRules.length === 0 && (
+            <div className="w-10 h-10 rounded-lg bg-[#F8FAFC] border border-[#E8ECF1] flex items-center justify-center">
+              <FileText className="w-5 h-5 text-[#94A3B8]" />
+            </div>
+          )}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => { resetCreatePrForm(); setCreatePrModalOpen(true); }}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#0F172A] hover:bg-[#F8FAFC] transition-colors"
+              style={{ fontWeight: 500 }}
+            >
+              <Plus className="w-3.5 h-3.5" /> Create rule
+            </button>
+            <button
+              onClick={() => { setPrTypeFilters("discount"); setPrStatusFilter("all"); setPrSearch(""); setPreviewPricingRuleId(null); setPrPreviewTab("preview"); setPricingRulesModalOpen(true); }}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-[#DBEAFE] bg-[#EFF6FF] text-xs text-[#0A77FF] hover:bg-[#DBEAFE] transition-colors"
+              style={{ fontWeight: 500 }}
+            >
+              <FileText className="w-3.5 h-3.5" /> Templates
+            </button>
+          </div>
+        </div>
+
         {/* Selected pricing rules */}
         {selectedPricingRules.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -6261,30 +6286,6 @@ function ConfigPageContent({
           </div>
         )}
 
-        {/* Empty state / Add more */}
-        <div className={`rounded-lg border-2 border-dashed border-[#E2E8F0] bg-white ${selectedPricingRules.length > 0 ? "py-4" : "py-6"} flex flex-col items-center justify-center gap-3`}>
-          {selectedPricingRules.length === 0 && (
-            <div className="w-10 h-10 rounded-lg bg-[#F8FAFC] border border-[#E8ECF1] flex items-center justify-center">
-              <FileText className="w-5 h-5 text-[#94A3B8]" />
-            </div>
-          )}
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => { resetCreatePrForm(); setCreatePrModalOpen(true); }}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#0F172A] hover:bg-[#F8FAFC] transition-colors"
-              style={{ fontWeight: 500 }}
-            >
-              <Plus className="w-3.5 h-3.5" /> Create rule
-            </button>
-            <button
-              onClick={() => { setPrTypeFilters("discount"); setPrStatusFilter("all"); setPrSearch(""); setPreviewPricingRuleId(null); setPrPreviewTab("preview"); setPricingRulesModalOpen(true); }}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-[#DBEAFE] bg-[#EFF6FF] text-xs text-[#0A77FF] hover:bg-[#DBEAFE] transition-colors"
-              style={{ fontWeight: 500 }}
-            >
-              <FileText className="w-3.5 h-3.5" /> Templates
-            </button>
-          </div>
-        </div>
 
         {/* ── Explore Pricing Rules Presets Modal ── */}
         <Dialog open={pricingRulesModalOpen} onOpenChange={(v) => { setPricingRulesModalOpen(v); if (!v) { setPrFullscreen(false); } }}>
