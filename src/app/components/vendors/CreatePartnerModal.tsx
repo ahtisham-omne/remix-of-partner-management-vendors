@@ -121,6 +121,7 @@ import {
   TooltipTrigger,
   TooltipContent,
 } from "../ui/tooltip";
+import { InfoTooltip } from "../ui/info-tooltip";
 import { HoverCard, HoverCardTrigger, HoverCardContent } from "../ui/hover-card";
 import { getAvatarTint } from "../../utils/avatarTints";
 import { GroupChipsRow } from "./GroupChipsRow";
