@@ -2328,22 +2328,22 @@ function DraggableKpiCard({ index, kpiKey, label, value, subtitle, iconName, cha
       {isOver && (
         <div className="absolute inset-0 rounded-lg bg-[#0A77FF]/[0.02] pointer-events-none" />
       )}
-      <div className="px-3 py-2">
+      <div className="px-3.5 py-2.5">
         {/* Drag handle — top-right pill (visual cue only, whole card is draggable) */}
         <div className="absolute top-1.5 right-1.5 opacity-0 group-hover:opacity-100 transition-all duration-150 flex items-center bg-[#F1F5F9] rounded-md p-1 z-10 pointer-events-none">
           <GripVertical className="w-3.5 h-3.5 text-[#64748B]" />
         </div>
         {/* Label row: label + icon */}
         <div className="flex items-center justify-between gap-1 mb-1">
-          <p className="text-[10.5px] text-[#64748B] whitespace-nowrap" style={{ fontWeight: 500 }}>{label}</p>
+          <p className="text-[11.5px] text-[#64748B] whitespace-nowrap" style={{ fontWeight: 500 }}>{label}</p>
           {iconName && <DashKpiIcon name={iconName} className="w-3.5 h-3.5 shrink-0" style={{ color: "#94A3B8" }} />}
         </div>
         {/* Value row with optional change indicator */}
         <div className="flex items-baseline gap-1.5">
           {change && (
-            <span className="text-[10px] shrink-0" style={{ fontWeight: 500, color: changeColor || "#059669" }}>{change}</span>
+            <span className="text-[10.5px] shrink-0" style={{ fontWeight: 500, color: changeColor || "#059669" }}>{change}</span>
           )}
-          <p className="text-[15px] text-[#0F172A] tracking-tight whitespace-nowrap" style={{ fontWeight: 600, lineHeight: 1.2 }}>{value}</p>
+          <p className="text-[16px] text-[#0F172A] tracking-tight whitespace-nowrap" style={{ fontWeight: 600, lineHeight: 1.2 }}>{value}</p>
         </div>
       </div>
       {/* Remove button — bottom-right on hover */}
