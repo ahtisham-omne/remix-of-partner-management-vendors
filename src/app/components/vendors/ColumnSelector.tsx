@@ -540,35 +540,6 @@ export function ColumnSelector({
         )}
       </div>
 
-      {/* ─── Floating drag preview (portal) ─── */}
-      {draggingKey && previewPos && draggingLabel && createPortal(
-        <div
-          style={{
-            position: "fixed",
-            left: previewPos.x + 12,
-            top: previewPos.y - 16,
-            zIndex: 9999,
-            pointerEvents: "none",
-            transform: "translateZ(0)",
-          }}
-        >
-          <div
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white border border-[#0A77FF]/20 max-w-[180px]"
-            style={{
-              boxShadow: "0 8px 24px -4px rgba(10, 119, 255, 0.15), 0 2px 8px -2px rgba(0, 0, 0, 0.08)",
-            }}
-          >
-            <GripVertical className="w-3 h-3 text-[#0A77FF]/50 shrink-0" />
-            <span
-              className="text-[12px] text-foreground truncate"
-              style={{ fontWeight: 500 }}
-            >
-              {draggingLabel}
-            </span>
-          </div>
-        </div>,
-        document.body
-      )}
     </div>
   );
 }
