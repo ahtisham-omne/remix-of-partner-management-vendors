@@ -3953,6 +3953,7 @@ function ConfigPageContent({
   const [payToDialogSearch, setPayToDialogSearch] = useState("");
   const [fundedByDialogOpen, setFundedByDialogOpen] = useState(false);
   const [fundedByDialogSearch, setFundedByDialogSearch] = useState("");
+  const [dialogExpandedPartners, setDialogExpandedPartners] = useState<Set<string>>(new Set());
 
   // Payment Methods state
   const [paymentEntries, setPaymentEntries] = useState<PaymentMethodEntry[]>([]);
