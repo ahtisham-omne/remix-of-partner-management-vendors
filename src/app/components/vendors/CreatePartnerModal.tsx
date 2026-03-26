@@ -4688,7 +4688,7 @@ function ConfigPageContent({
                           <Info className="w-3 h-3 text-[#CBD5E1] hover:text-[#94A3B8] transition-colors" />
                         </button>
                       </TooltipTrigger>
-                      <TooltipContent side="top" sideOffset={6} className="bg-[#1E293B] text-white text-[12px] leading-[1.5] rounded-lg max-w-[240px] px-3 py-2.5 shadow-lg z-[300]">
+                      <TooltipContent side="top" sideOffset={6} className="max-w-[240px]">
                         The destination where goods or services will be delivered.
                       </TooltipContent>
                     </Tooltip>
