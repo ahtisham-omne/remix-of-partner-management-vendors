@@ -623,6 +623,7 @@ export function PaymentMethodsSection({
             />
           ))}
         </div>
+        </div>
       ) : (
         <div className="rounded-xl border-2 border-dashed border-[#E2E8F0] bg-[#FAFBFC] py-10 px-4 flex flex-col items-center justify-center text-center">
           <div className="w-12 h-12 rounded-xl bg-[#EDF4FF] border border-[#DBEAFE] flex items-center justify-center mb-3">
