@@ -728,10 +728,11 @@ export function CreatePartnerModal({ open, onOpenChange, onPartnerCreated, initi
                   <div
                     key={tab.num}
                     className={`relative flex items-center gap-2 pb-2.5 sm:pb-3 ${
-                      tab.num < step ? "cursor-pointer" : "cursor-default"
+                      tab.num < step || (tab.num === 2 && step === 1 && selectedGroups.length > 0 && primaryGroupId) ? "cursor-pointer" : "cursor-default"
                     }`}
                     onClick={() => {
                       if (tab.num < step) setStep(tab.num as 1 | 2);
+                      if (tab.num === 2 && step === 1 && selectedGroups.length > 0 && primaryGroupId) setStep(2);
                     }}
                   >
                     <div
