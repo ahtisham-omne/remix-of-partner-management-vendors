@@ -4675,10 +4675,10 @@ function ConfigPageContent({
 
               {/* 2. Ship To */}
               <div
-                className={fieldCardBase + " p-3"}
+                className={fieldCardBase + " p-3 h-[88px] flex flex-col justify-between"}
                 onClick={() => setShipToDialogOpen(true)}
               >
-                <div className="flex items-center justify-between mb-2.5">
+                <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
                     <Truck className="w-3.5 h-3.5 text-[#94A3B8]" />
                     <span className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Ship To</span>
@@ -4697,9 +4697,7 @@ function ConfigPageContent({
                 </div>
                 {stObj ? (
                   <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-lg flex items-center justify-center text-white text-[11px] shrink-0" style={{ backgroundColor: stObj.logoColor, fontWeight: 700 }}>
-                      {stObj.logoText}
-                    </div>
+                    <PartnerLogo item={stObj} size={36} />
                     <div className="min-w-0">
                       <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{stObj.name}</p>
                       {stObj.location && (
@@ -4720,12 +4718,12 @@ function ConfigPageContent({
                 )}
               </div>
 
-              {/* 3. Pay To */}
+              {/* 3. Pay To – entity name only, no address */}
               <div
-                className={fieldCardBase + " p-3"}
+                className={fieldCardBase + " p-3 h-[88px] flex flex-col justify-between"}
                 onClick={() => setPayToDialogOpen(true)}
               >
-                <div className="flex items-center justify-between mb-2.5">
+                <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
                     <Receipt className="w-3.5 h-3.5 text-[#94A3B8]" />
                     <span className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Pay To</span>
@@ -4744,13 +4742,8 @@ function ConfigPageContent({
                 </div>
                 {ptObj ? (
                   <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-lg flex items-center justify-center text-white text-[11px] shrink-0" style={{ backgroundColor: ptObj.logoColor, fontWeight: 700 }}>
-                      {ptObj.logoText}
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{ptObj.name}</p>
-                      <p className="text-[11px] text-[#64748B] truncate">Payment recipient</p>
-                    </div>
+                    <PartnerLogo item={ptObj} size={36} />
+                    <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{ptObj.name}</p>
                   </div>
                 ) : (
                   <div className="flex items-center gap-2.5">
@@ -4762,76 +4755,37 @@ function ConfigPageContent({
                 )}
               </div>
 
-              {/* 4. Funded By – with disabled state + toggle */}
-              {!allowAltFunding ? (
-                <div className={disabledCardBase + " p-3"}>
-                  <div className="flex items-center justify-between mb-2.5">
-                    <div className="flex items-center gap-1.5">
-                      <Landmark className="w-3.5 h-3.5 text-[#CBD5E1]" />
-                      <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Funded By</span>
-                      {fbObj?.isDefault && (
-                        <span className="text-[9px] text-[#94A3B8] bg-[#F1F5F9] border border-[#E2E8F0] px-1.5 py-0.5 rounded" style={{ fontWeight: 600 }}>Default</span>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
-                      <span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Override</span>
-                      <Switch
-                        checked={allowAltFunding}
-                        onCheckedChange={setAllowAltFunding}
-                      />
-                    </div>
+              {/* 4. Funded By – consistent height, toggle with label matching reference */}
+              <div className={`${allowAltFunding ? fieldCardBase : disabledCardBase} p-3 h-[88px] flex flex-col justify-between`} onClick={allowAltFunding ? () => setFundedByDialogOpen(true) : undefined}>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <Landmark className={`w-3.5 h-3.5 ${allowAltFunding ? "text-[#94A3B8]" : "text-[#CBD5E1]"}`} />
+                    <span className={`text-[11px] ${allowAltFunding ? "text-[#64748B]" : "text-[#94A3B8]"}`} style={{ fontWeight: 500 }}>Funded By</span>
+                    {allowAltFunding && <span className="text-[9px] text-[#F59E0B] bg-[#FFFBEB] border border-[#F59E0B]/20 px-1.5 py-0.5 rounded" style={{ fontWeight: 600 }}>Overridden</span>}
                   </div>
-                  <div className="flex items-center gap-2.5 opacity-50">
-                    {fbObj ? (
-                      <>
-                        <div className="w-9 h-9 rounded-lg flex items-center justify-center text-white text-[11px] shrink-0" style={{ backgroundColor: fbObj.logoColor, fontWeight: 700 }}>
-                          {fbObj.logoText}
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-[13px] text-[#64748B] truncate" style={{ fontWeight: 600 }}>{fbObj.name}</p>
-                          <p className="text-[11px] text-[#94A3B8] truncate">Funding source</p>
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <div className="w-9 h-9 rounded-lg bg-[#F1F5F9] border border-dashed border-[#E2E8F0] flex items-center justify-center shrink-0">
-                          <Landmark className="w-4 h-4 text-[#CBD5E1]" />
-                        </div>
-                        <p className="text-[12px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Funding source locked</p>
-                      </>
-                    )}
+                  <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                    <Switch
+                      checked={allowAltFunding}
+                      onCheckedChange={(val) => { setAllowAltFunding(val); if (!val) setFundedBy("pl-7"); }}
+                    />
+                    <span className="text-[12px] text-[#64748B]" style={{ fontWeight: 500 }}>Allow Alternative Funding Source</span>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button type="button" className="inline-flex" tabIndex={-1}>
+                          <Info className="w-3 h-3 text-[#CBD5E1] hover:text-[#94A3B8] transition-colors" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="top" sideOffset={6} className="bg-[#1E293B] text-white text-[12px] leading-[1.5] rounded-lg max-w-[240px] px-3 py-2.5 shadow-lg z-[300]">
+                        Enable to override the default funding source for this partner.
+                      </TooltipContent>
+                    </Tooltip>
                   </div>
                 </div>
-              ) : (
-                <div
-                  className={fieldCardBase + " p-3"}
-                  onClick={() => setFundedByDialogOpen(true)}
-                >
-                  <div className="flex items-center justify-between mb-2.5">
-                    <div className="flex items-center gap-1.5">
-                      <Landmark className="w-3.5 h-3.5 text-[#94A3B8]" />
-                      <span className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Funded By</span>
-                      <span className="text-[9px] text-[#F59E0B] bg-[#FFFBEB] border border-[#F59E0B]/20 px-1.5 py-0.5 rounded" style={{ fontWeight: 600 }}>Overridden</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div onClick={(e) => e.stopPropagation()}>
-                        <Switch
-                          checked={allowAltFunding}
-                          onCheckedChange={(val) => { setAllowAltFunding(val); if (!val) setFundedBy("pl-7"); }}
-                        />
-                      </div>
-                      <Pencil className="w-3 h-3 text-[#CBD5E1] opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </div>
-                  </div>
+                <div className={allowAltFunding ? "" : "opacity-50"}>
                   {fbObj ? (
                     <div className="flex items-center gap-2.5">
-                      <div className="w-9 h-9 rounded-lg flex items-center justify-center text-white text-[11px] shrink-0" style={{ backgroundColor: fbObj.logoColor, fontWeight: 700 }}>
-                        {fbObj.logoText}
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{fbObj.name}</p>
-                        <p className="text-[11px] text-[#64748B] truncate">Funding source</p>
-                      </div>
+                      <PartnerLogo item={fbObj} size={36} />
+                      <p className={`text-[13px] truncate ${allowAltFunding ? "text-[#0F172A]" : "text-[#64748B]"}`} style={{ fontWeight: 600 }}>{fbObj.name}</p>
                     </div>
                   ) : (
                     <div className="flex items-center gap-2.5">
@@ -4842,7 +4796,7 @@ function ConfigPageContent({
                     </div>
                   )}
                 </div>
-              )}
+              </div>
 
               {/* ── Ship To Dialog ── */}
               {renderPartnerSelectionDialog(
