@@ -121,6 +121,7 @@ import {
   TooltipTrigger,
   TooltipContent,
 } from "../ui/tooltip";
+import { InfoTooltip } from "../ui/info-tooltip";
 import { HoverCard, HoverCardTrigger, HoverCardContent } from "../ui/hover-card";
 import { getAvatarTint } from "../../utils/avatarTints";
 import { GroupChipsRow } from "./GroupChipsRow";
@@ -4607,16 +4608,7 @@ function ConfigPageContent({
                       <div className="flex items-center gap-1.5">
                         <DollarSign className="w-3.5 h-3.5 text-[#94A3B8]" />
                         <span className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Currency</span>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <button type="button" className="inline-flex" tabIndex={-1} onClick={(e) => e.stopPropagation()}>
-                              <Info className="w-3 h-3 text-[#CBD5E1] hover:text-[#94A3B8] transition-colors" />
-                            </button>
-                          </TooltipTrigger>
-                          <TooltipContent side="top" sideOffset={6} className="max-w-[240px]">
-                            The currency used for all transactions with this partner.
-                          </TooltipContent>
-                        </Tooltip>
+                        <InfoTooltip>The currency used for all transactions with this partner.</InfoTooltip>
                       </div>
                       <Pencil className="w-3 h-3 text-[#CBD5E1] opacity-0 group-hover:opacity-100 transition-opacity" />
                     </div>
@@ -4682,16 +4674,7 @@ function ConfigPageContent({
                   <div className="flex items-center gap-1.5">
                     <Truck className="w-3.5 h-3.5 text-[#94A3B8]" />
                     <span className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Ship To</span>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <button type="button" className="inline-flex" tabIndex={-1} onClick={(e) => e.stopPropagation()}>
-                          <Info className="w-3 h-3 text-[#CBD5E1] hover:text-[#94A3B8] transition-colors" />
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent side="top" sideOffset={6} className="max-w-[240px]">
-                        The destination where goods or services will be delivered.
-                      </TooltipContent>
-                    </Tooltip>
+                    <InfoTooltip>The destination where goods or services will be delivered.</InfoTooltip>
                   </div>
                   <Pencil className="w-3 h-3 text-[#CBD5E1] opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
@@ -4727,16 +4710,7 @@ function ConfigPageContent({
                   <div className="flex items-center gap-1.5">
                     <Receipt className="w-3.5 h-3.5 text-[#94A3B8]" />
                     <span className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Pay To</span>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <button type="button" className="inline-flex" tabIndex={-1} onClick={(e) => e.stopPropagation()}>
-                          <Info className="w-3 h-3 text-[#CBD5E1] hover:text-[#94A3B8] transition-colors" />
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent side="top" sideOffset={6} className="max-w-[240px]">
-                        The party receiving payment for this transaction.
-                      </TooltipContent>
-                    </Tooltip>
+                    <InfoTooltip>The party receiving payment for this transaction.</InfoTooltip>
                   </div>
                   <Pencil className="w-3 h-3 text-[#CBD5E1] opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
@@ -4768,16 +4742,8 @@ function ConfigPageContent({
                       checked={allowAltFunding}
                       onCheckedChange={(val) => { setAllowAltFunding(val); if (!val) setFundedBy("pl-7"); }}
                     />
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <button type="button" className="inline-flex" tabIndex={-1}>
-                          <Info className="w-3 h-3 text-muted-foreground/30 hover:text-muted-foreground/60 transition-colors" />
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent side="top" sideOffset={6}>
-                        Enable to override the default funding source for this partner.
-                      </TooltipContent>
-                    </Tooltip>
+                    <span className={`text-[11px] ${allowAltFunding ? "text-muted-foreground" : "text-muted-foreground/50"}`} style={{ fontWeight: 500 }}>Allow Alternative Funding Source</span>
+                    <InfoTooltip>Enable to override the default funding source for this partner.</InfoTooltip>
                   </div>
                 </div>
                 <div className={allowAltFunding ? "" : "opacity-40"}>
