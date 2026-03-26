@@ -284,12 +284,8 @@ export function ColumnSelector({
 
       (e.target as HTMLElement).setPointerCapture(e.pointerId);
 
-      // Find the label for drag preview
-      const col = columnsRef.current.find((c) => c.key === key);
-      setDraggingLabel(col?.label ?? key);
       setDraggingKey(key);
       setLiveOrder(columnOrder);
-      setPreviewPos({ x: e.clientX, y: e.clientY });
       pointerYRef.current = e.clientY;
 
       // Start auto-scroll loop
