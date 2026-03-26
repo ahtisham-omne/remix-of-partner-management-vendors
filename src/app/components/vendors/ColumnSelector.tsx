@@ -96,7 +96,6 @@ export function ColumnSelector({
   const [searchQuery, setSearchQuery] = useState("");
   const [draggingKey, setDraggingKey] = useState<string | null>(null);
   const [liveOrder, setLiveOrder] = useState<string[] | null>(null);
-  const [previewPos, setPreviewPos] = useState<{ x: number; y: number } | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const rowRefs = useRef<Map<string, HTMLDivElement>>(new Map());
   const liveOrderRef = useRef<string[] | null>(null);
