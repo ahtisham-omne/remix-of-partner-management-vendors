@@ -4896,13 +4896,15 @@ function PaymentMethodsTab({ cfg, PAYMENT_TYPE_ICONS }: { cfg?: VendorConfigData
         count={hasPaymentMethods ? cfg!.paymentMethods!.length : undefined}
       >
         {hasPaymentMethods ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 3xl:grid-cols-3 min-[2560px]:grid-cols-4 gap-3">
+          <div className="@container/pmgrid w-full">
+          <div className="grid grid-cols-1 @[400px]/pmgrid:grid-cols-2 @[750px]/pmgrid:grid-cols-3 gap-3">
             {asEntries.map((entry) => (
               <PaymentMethodCardView
                 key={entry.id}
                 entry={entry}
               />
             ))}
+          </div>
           </div>
         ) : (
           <EmptyState icon={CreditCard} title="No payment methods configured" description="Payment methods will appear here once added during partner creation or editing." />
