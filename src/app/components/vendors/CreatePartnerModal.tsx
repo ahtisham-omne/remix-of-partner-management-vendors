@@ -4729,19 +4729,20 @@ function ConfigPageContent({
                 )}
               </div>
 
-              {/* 4. Funded By */}
+              {/* 4. Funded By – matches reference image */}
               <div className={`${allowAltFunding ? fieldCardBase : disabledCardBase} p-3 h-[88px] flex flex-col justify-between`} onClick={allowAltFunding ? () => setFundedByDialogOpen(true) : undefined}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
                     <Landmark className={`w-3.5 h-3.5 ${allowAltFunding ? "text-[#94A3B8]" : "text-[#CBD5E1]"}`} />
                     <span className={`text-[11px] ${allowAltFunding ? "text-[#64748B]" : "text-[#94A3B8]"}`} style={{ fontWeight: 500 }}>Funded By</span>
-                    <InfoTooltip>Enable to override the default funding source for this partner.</InfoTooltip>
                   </div>
-                  <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
+                  <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
                     <Switch
                       checked={allowAltFunding}
                       onCheckedChange={(val) => { setAllowAltFunding(val); if (!val) setFundedBy("pl-7"); }}
                     />
+                    <span className={`text-[11px] ${allowAltFunding ? "text-[#64748B]" : "text-[#94A3B8]"}`} style={{ fontWeight: 500 }}>Allow Alternative Funding Source</span>
+                    <InfoTooltip>Enable to override the default funding source for this partner.</InfoTooltip>
                   </div>
                 </div>
                 <div className={allowAltFunding ? "" : "opacity-30"}>
