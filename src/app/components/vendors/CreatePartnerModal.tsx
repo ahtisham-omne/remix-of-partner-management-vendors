@@ -3953,6 +3953,7 @@ function ConfigPageContent({
   const [payToDialogSearch, setPayToDialogSearch] = useState("");
   const [fundedByDialogOpen, setFundedByDialogOpen] = useState(false);
   const [fundedByDialogSearch, setFundedByDialogSearch] = useState("");
+  const [dialogExpandedPartners, setDialogExpandedPartners] = useState<Set<string>>(new Set());
 
   // Payment Methods state
   const [paymentEntries, setPaymentEntries] = useState<PaymentMethodEntry[]>([]);
@@ -4258,37 +4259,51 @@ function ConfigPageContent({
       );
     };
 
+    // ── Helper: render partner logo with image or fallback initials ──
+    const PartnerLogo = ({ item, size = 36, className: cls = "" }: { item: PartnerLocationItem; size?: number; className?: string }) => {
+      const [imgErr, setImgErr] = useState(false);
+      if (item.logoUrl && !imgErr) {
+        return (
+          <div className={`rounded-lg border border-[#E8ECF1] bg-white flex items-center justify-center shrink-0 overflow-hidden ${cls}`} style={{ width: size, height: size }}>
+            <img src={item.logoUrl} alt={item.name} className="w-full h-full object-contain p-1" onError={() => setImgErr(true)} />
+          </div>
+        );
+      }
+      return (
+        <div className={`rounded-lg flex items-center justify-center text-white shrink-0 ${cls}`} style={{ width: size, height: size, backgroundColor: item.logoColor, fontWeight: 700, fontSize: size * 0.3 }}>
+          {item.logoText}
+        </div>
+      );
+    };
+
     // ── Helper: group items as partners with nested locations ──
     const buildGroupedItems = (items: typeof PARTNER_LOCATION_ITEMS, searchQuery: string) => {
       const partners = items.filter(i => i.type === "partner");
       const locations = items.filter(i => i.type === "location");
       const q = searchQuery.toLowerCase().trim();
-
-      // Group locations under matching partners by logoText+logoColor
       const grouped = partners.map(p => {
         const pLocations = locations.filter(l => l.logoText === p.logoText && l.logoColor === p.logoColor);
         const partnerMatches = !q || p.name.toLowerCase().includes(q) || (p.location && p.location.toLowerCase().includes(q));
         const matchingLocations = !q ? pLocations : pLocations.filter(l => l.name.toLowerCase().includes(q) || (l.location && l.location.toLowerCase().includes(q)));
         const hasMatch = partnerMatches || matchingLocations.length > 0;
-        return {
-          partner: p,
-          locations: pLocations,
-          matchingLocations,
-          partnerMatches: partnerMatches as boolean,
-          hasMatch,
-          expanded: !!q && hasMatch,
-        };
+        return { partner: p, locations: pLocations, matchingLocations, partnerMatches: partnerMatches as boolean, hasMatch, expanded: !!q && hasMatch };
       });
-
-      // Orphan locations (no matching partner)
       const groupedLocationIds = new Set(grouped.flatMap(g => g.locations.map(l => l.id)));
       const orphanLocations = locations.filter(l => !groupedLocationIds.has(l.id));
       const matchingOrphans = !q ? orphanLocations : orphanLocations.filter(l => l.name.toLowerCase().includes(q) || (l.location && l.location.toLowerCase().includes(q)));
-
       return { grouped: grouped.filter(g => !q || g.hasMatch), orphanLocations: !q ? orphanLocations : matchingOrphans };
     };
 
-    // ── Shared partner selection dialog ──
+    // ── Accordion expand state for dialog ──
+    const togglePartnerExpand = (partnerId: string) => {
+      setDialogExpandedPartners(prev => {
+        const next = new Set(prev);
+        if (next.has(partnerId)) next.delete(partnerId); else next.add(partnerId);
+        return next;
+      });
+    };
+
+    // ── Shared partner selection dialog (accordion style) ──
     const renderPartnerSelectionDialog = (
       dialogOpen: boolean,
       setDialogOpen: (open: boolean) => void,
@@ -4300,9 +4315,10 @@ function ConfigPageContent({
       config: { icon: React.ReactNode; iconBg: string; iconColor: string; title: string; description: string }
     ) => {
       const { grouped, orphanLocations } = buildGroupedItems(items, dialogSearch);
+      const hasSearch = dialogSearch.trim().length > 0;
 
       return (
-        <Dialog open={dialogOpen} onOpenChange={(open) => { setDialogOpen(open); if (!open) setDialogSearch(""); }}>
+        <Dialog open={dialogOpen} onOpenChange={(open) => { setDialogOpen(open); if (!open) { setDialogSearch(""); setDialogExpandedPartners(new Set()); } }}>
           <DialogContent
             className="!max-w-[520px] p-0 gap-0 rounded-2xl border-0 overflow-hidden"
             style={{ boxShadow: "0 24px 48px -12px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.05)" }}
@@ -4310,35 +4326,23 @@ function ConfigPageContent({
           >
             <DialogTitle className="sr-only">{config.title}</DialogTitle>
             <DialogDescription className="sr-only">{config.description}</DialogDescription>
-            {/* Header */}
             <div className="px-5 pt-4 pb-3 border-b border-[#F1F5F9]">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: config.iconBg }}>
-                    {config.icon}
-                  </div>
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: config.iconBg }}>{config.icon}</div>
                   <div>
                     <h3 className="text-sm text-[#0F172A]" style={{ fontWeight: 600 }}>{config.title}</h3>
                     <p className="text-[11px] text-[#64748B]">{config.description}</p>
                   </div>
                 </div>
-                <button onClick={() => { setDialogOpen(false); setDialogSearch(""); }} className="w-7 h-7 rounded-lg flex items-center justify-center text-[#94A3B8] hover:text-[#64748B] hover:bg-[#F1F5F9] transition-all">
-                  <X className="w-4 h-4" />
-                </button>
+                <button onClick={() => { setDialogOpen(false); setDialogSearch(""); setDialogExpandedPartners(new Set()); }} className="w-7 h-7 rounded-lg flex items-center justify-center text-[#94A3B8] hover:text-[#64748B] hover:bg-[#F1F5F9] transition-all"><X className="w-4 h-4" /></button>
               </div>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
-                <input
-                  value={dialogSearch}
-                  onChange={(e) => setDialogSearch(e.target.value)}
-                  placeholder="Search partners & locations..."
-                  className="w-full h-9 pl-9 pr-3 rounded-lg border border-[#E2E8F0] bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-none focus:border-[#0A77FF] focus:ring-2 focus:ring-[#0A77FF]/10"
-                  autoFocus
-                />
+                <input value={dialogSearch} onChange={(e) => setDialogSearch(e.target.value)} placeholder="Search partners & locations..." className="w-full h-9 pl-9 pr-3 rounded-lg border border-[#E2E8F0] bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-none focus:border-[#0A77FF] focus:ring-2 focus:ring-[#0A77FF]/10" autoFocus />
               </div>
             </div>
-            {/* List */}
-            <div className="max-h-[400px] overflow-y-auto">
+            <div className="max-h-[420px] overflow-y-auto">
               {grouped.length === 0 && orphanLocations.length === 0 ? (
                 <div className="py-10 text-center">
                   <Search className="w-8 h-8 text-[#CBD5E1] mx-auto mb-2" />
@@ -4347,67 +4351,40 @@ function ConfigPageContent({
                 </div>
               ) : (
                 <div className="py-1">
-                  {grouped.map(({ partner, locations, matchingLocations, expanded }) => {
-                    const showLocations = expanded || (!dialogSearch.trim());
-                    const locsToShow = dialogSearch.trim() ? matchingLocations : locations;
+                  {grouped.map(({ partner, locations: allLocs, matchingLocations }) => {
+                    const locsToShow = hasSearch ? matchingLocations : allLocs;
                     const isPartnerSelected = selectedId === partner.id;
-
+                    const isExpanded = hasSearch ? true : dialogExpandedPartners.has(partner.id);
+                    const hasLocs = locsToShow.length > 0;
                     return (
-                      <div key={partner.id}>
-                        {/* Partner row */}
-                        <button
-                          onClick={() => { onSelect(partner.id); setDialogOpen(false); setDialogSearch(""); }}
-                          className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-[#F8FAFC] ${isPartnerSelected ? "bg-[#EDF4FF]/60" : ""}`}
-                        >
-                          <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-[11px] shrink-0" style={{ backgroundColor: partner.logoColor, fontWeight: 700 }}>
-                            {partner.logoText}
-                          </div>
-                          <div className="flex flex-col min-w-0 flex-1">
-                            <span className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>
-                              {highlightMatch(partner.name, dialogSearch)}
-                            </span>
-                            {partner.location && (
-                              <span className="flex items-center gap-1 text-[11px] text-[#64748B] truncate mt-0.5">
-                                <MapPin className="w-3 h-3 shrink-0" />
-                                {highlightMatch(partner.location, dialogSearch)}
-                              </span>
-                            )}
-                          </div>
+                      <div key={partner.id} className="border-b border-[#F8FAFC] last:border-b-0">
+                        <div className={`flex items-center gap-3 px-4 py-2.5 transition-colors hover:bg-[#F8FAFC] ${isPartnerSelected ? "bg-[#EDF4FF]/60" : ""}`}>
+                          {hasLocs ? (
+                            <button onClick={(e) => { e.stopPropagation(); togglePartnerExpand(partner.id); }} className="w-5 h-5 flex items-center justify-center rounded text-[#94A3B8] hover:text-[#64748B] hover:bg-[#F1F5F9] transition-all shrink-0">
+                              {isExpanded ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+                            </button>
+                          ) : <div className="w-5 h-5 shrink-0" />}
+                          <PartnerLogo item={partner} size={32} />
+                          <button onClick={() => { onSelect(partner.id); setDialogOpen(false); setDialogSearch(""); setDialogExpandedPartners(new Set()); }} className="flex flex-col min-w-0 flex-1 text-left">
+                            <span className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{highlightMatch(partner.name, dialogSearch)}</span>
+                          </button>
                           <div className="flex items-center gap-2 shrink-0">
-                            {partner.isDefault && (
-                              <span className="text-[9px] text-[#0A77FF] bg-[#EDF4FF] border border-[#0A77FF]/20 px-1.5 py-0.5 rounded" style={{ fontWeight: 600 }}>Default</span>
-                            )}
-                            {locsToShow.length > 0 && (
-                              <span className="text-[10px] text-[#94A3B8] bg-[#F8FAFC] border border-[#E8ECF1] px-1.5 py-0.5 rounded" style={{ fontWeight: 500 }}>
-                                {locsToShow.length} loc{locsToShow.length !== 1 ? "s" : ""}
-                              </span>
-                            )}
+                            {partner.isDefault && <span className="text-[9px] text-[#0A77FF] bg-[#EDF4FF] border border-[#0A77FF]/20 px-1.5 py-0.5 rounded" style={{ fontWeight: 600 }}>Default</span>}
+                            {hasLocs && <span className="text-[10px] text-[#94A3B8] bg-[#F8FAFC] border border-[#E8ECF1] px-1.5 py-0.5 rounded" style={{ fontWeight: 500 }}>{locsToShow.length} loc{locsToShow.length !== 1 ? "s" : ""}</span>}
                             {isPartnerSelected && <Check className="w-4 h-4 text-[#0A77FF]" />}
                           </div>
-                        </button>
-                        {/* Nested locations */}
-                        {showLocations && locsToShow.length > 0 && (
-                          <div className="ml-6 border-l border-[#E8ECF1]">
+                        </div>
+                        {isExpanded && hasLocs && (
+                          <div className="ml-9 border-l border-[#E8ECF1] bg-[#FAFBFC]/50">
                             {locsToShow.map((loc) => {
                               const isLocSelected = selectedId === loc.id;
                               return (
-                                <button
-                                  key={loc.id}
-                                  onClick={() => { onSelect(loc.id); setDialogOpen(false); setDialogSearch(""); }}
-                                  className={`w-full flex items-center gap-3 pl-4 pr-4 py-2 text-left transition-colors hover:bg-[#F8FAFC] ${isLocSelected ? "bg-[#EDF4FF]/60" : ""}`}
-                                >
+                                <button key={loc.id} onClick={() => { onSelect(loc.id); setDialogOpen(false); setDialogSearch(""); setDialogExpandedPartners(new Set()); }} className={`w-full flex items-center gap-3 pl-4 pr-4 py-2 text-left transition-colors hover:bg-[#F1F5F9] ${isLocSelected ? "bg-[#EDF4FF]/60" : ""}`}>
                                   <MapPin className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" />
                                   <div className="flex flex-col min-w-0 flex-1">
-                                    <span className="text-[12px] text-[#334155] truncate" style={{ fontWeight: 500 }}>
-                                      {highlightMatch(loc.name, dialogSearch)}
-                                    </span>
-                                    {loc.location && (
-                                      <span className="text-[10px] text-[#94A3B8] truncate">
-                                        {highlightMatch(loc.location, dialogSearch)}
-                                      </span>
-                                    )}
+                                    <span className="text-[12px] text-[#334155] truncate" style={{ fontWeight: 500 }}>{highlightMatch(loc.name, dialogSearch)}</span>
+                                    {loc.location && <span className="text-[10px] text-[#94A3B8] truncate">{highlightMatch(loc.location, dialogSearch)}</span>}
                                   </div>
-                                  <span className="text-[9px] text-[#22C55E] bg-[#ECFDF5] border border-[#22C55E]/20 px-1.5 py-0.5 rounded shrink-0" style={{ fontWeight: 600 }}>Location</span>
                                   {isLocSelected && <Check className="w-4 h-4 text-[#0A77FF] shrink-0" />}
                                 </button>
                               );
@@ -4417,32 +4394,19 @@ function ConfigPageContent({
                       </div>
                     );
                   })}
-                  {/* Orphan locations */}
                   {orphanLocations.length > 0 && (
                     <>
                       {grouped.length > 0 && <div className="border-t border-[#F1F5F9] my-1" />}
                       {orphanLocations.map((loc) => {
                         const isLocSelected = selectedId === loc.id;
                         return (
-                          <button
-                            key={loc.id}
-                            onClick={() => { onSelect(loc.id); setDialogOpen(false); setDialogSearch(""); }}
-                            className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-[#F8FAFC] ${isLocSelected ? "bg-[#EDF4FF]/60" : ""}`}
-                          >
-                            <div className="w-8 h-8 rounded-lg bg-[#F1F5F9] flex items-center justify-center shrink-0">
-                              <MapPin className="w-4 h-4 text-[#64748B]" />
-                            </div>
+                          <button key={loc.id} onClick={() => { onSelect(loc.id); setDialogOpen(false); setDialogSearch(""); setDialogExpandedPartners(new Set()); }} className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-[#F8FAFC] ${isLocSelected ? "bg-[#EDF4FF]/60" : ""}`}>
+                            <div className="w-5 h-5 shrink-0" />
+                            <PartnerLogo item={loc} size={32} />
                             <div className="flex flex-col min-w-0 flex-1">
-                              <span className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 500 }}>
-                                {highlightMatch(loc.name, dialogSearch)}
-                              </span>
-                              {loc.location && (
-                                <span className="text-[10px] text-[#94A3B8] truncate">
-                                  {highlightMatch(loc.location, dialogSearch)}
-                                </span>
-                              )}
+                              <span className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 500 }}>{highlightMatch(loc.name, dialogSearch)}</span>
+                              {loc.location && <span className="text-[10px] text-[#94A3B8] truncate">{highlightMatch(loc.location, dialogSearch)}</span>}
                             </div>
-                            <span className="text-[9px] text-[#22C55E] bg-[#ECFDF5] border border-[#22C55E]/20 px-1.5 py-0.5 rounded shrink-0" style={{ fontWeight: 600 }}>Location</span>
                             {isLocSelected && <Check className="w-4 h-4 text-[#0A77FF] shrink-0" />}
                           </button>
                         );
@@ -4452,16 +4416,13 @@ function ConfigPageContent({
                 </div>
               )}
             </div>
-            {/* Footer */}
             {selectedId && (
               <div className="px-4 py-3 border-t border-[#F1F5F9] bg-[#FAFBFC] flex items-center justify-between">
                 <div className="flex items-center gap-2.5 min-w-0">
                   <div className="w-1.5 h-1.5 rounded-full bg-[#22C55E] shrink-0" />
-                  <span className="text-xs text-[#334155] truncate" style={{ fontWeight: 500 }}>
-                    Selected: <span style={{ fontWeight: 600 }}>{items.find(i => i.id === selectedId)?.name || ""}</span>
-                  </span>
+                  <span className="text-xs text-[#334155] truncate" style={{ fontWeight: 500 }}>Selected: <span style={{ fontWeight: 600 }}>{items.find(i => i.id === selectedId)?.name || ""}</span></span>
                 </div>
-                <button onClick={() => { setDialogOpen(false); setDialogSearch(""); }} className="px-3 py-1.5 rounded-lg bg-[#0A77FF] text-white text-xs hover:bg-[#0966DB] transition-colors" style={{ fontWeight: 600 }}>Done</button>
+                <button onClick={() => { setDialogOpen(false); setDialogSearch(""); setDialogExpandedPartners(new Set()); }} className="px-3 py-1.5 rounded-lg bg-[#0A77FF] text-white text-xs hover:bg-[#0966DB] transition-colors" style={{ fontWeight: 600 }}>Done</button>
               </div>
             )}
           </DialogContent>
@@ -4641,8 +4602,8 @@ function ConfigPageContent({
               {/* 1. Currency */}
               <Popover onOpenChange={(open) => { if (!open) setCurrencyPopoverSearch(""); }}>
                 <PopoverTrigger asChild>
-                  <div className={fieldCardBase + " p-3"}>
-                    <div className="flex items-center justify-between mb-2.5">
+                  <div className={fieldCardBase + " p-3 h-[88px] flex flex-col justify-between"}>
+                    <div className="flex items-center justify-between">
                       <div className="flex items-center gap-1.5">
                         <DollarSign className="w-3.5 h-3.5 text-[#94A3B8]" />
                         <span className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Currency</span>
@@ -4714,10 +4675,10 @@ function ConfigPageContent({
 
               {/* 2. Ship To */}
               <div
-                className={fieldCardBase + " p-3"}
+                className={fieldCardBase + " p-3 h-[88px] flex flex-col justify-between"}
                 onClick={() => setShipToDialogOpen(true)}
               >
-                <div className="flex items-center justify-between mb-2.5">
+                <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
                     <Truck className="w-3.5 h-3.5 text-[#94A3B8]" />
                     <span className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Ship To</span>
@@ -4736,9 +4697,7 @@ function ConfigPageContent({
                 </div>
                 {stObj ? (
                   <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-lg flex items-center justify-center text-white text-[11px] shrink-0" style={{ backgroundColor: stObj.logoColor, fontWeight: 700 }}>
-                      {stObj.logoText}
-                    </div>
+                    <PartnerLogo item={stObj} size={36} />
                     <div className="min-w-0">
                       <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{stObj.name}</p>
                       {stObj.location && (
@@ -4759,12 +4718,12 @@ function ConfigPageContent({
                 )}
               </div>
 
-              {/* 3. Pay To */}
+              {/* 3. Pay To – entity name only, no address */}
               <div
-                className={fieldCardBase + " p-3"}
+                className={fieldCardBase + " p-3 h-[88px] flex flex-col justify-between"}
                 onClick={() => setPayToDialogOpen(true)}
               >
-                <div className="flex items-center justify-between mb-2.5">
+                <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
                     <Receipt className="w-3.5 h-3.5 text-[#94A3B8]" />
                     <span className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Pay To</span>
@@ -4783,13 +4742,8 @@ function ConfigPageContent({
                 </div>
                 {ptObj ? (
                   <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-lg flex items-center justify-center text-white text-[11px] shrink-0" style={{ backgroundColor: ptObj.logoColor, fontWeight: 700 }}>
-                      {ptObj.logoText}
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{ptObj.name}</p>
-                      <p className="text-[11px] text-[#64748B] truncate">Payment recipient</p>
-                    </div>
+                    <PartnerLogo item={ptObj} size={36} />
+                    <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{ptObj.name}</p>
                   </div>
                 ) : (
                   <div className="flex items-center gap-2.5">
@@ -4801,76 +4755,37 @@ function ConfigPageContent({
                 )}
               </div>
 
-              {/* 4. Funded By – with disabled state + toggle */}
-              {!allowAltFunding ? (
-                <div className={disabledCardBase + " p-3"}>
-                  <div className="flex items-center justify-between mb-2.5">
-                    <div className="flex items-center gap-1.5">
-                      <Landmark className="w-3.5 h-3.5 text-[#CBD5E1]" />
-                      <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Funded By</span>
-                      {fbObj?.isDefault && (
-                        <span className="text-[9px] text-[#94A3B8] bg-[#F1F5F9] border border-[#E2E8F0] px-1.5 py-0.5 rounded" style={{ fontWeight: 600 }}>Default</span>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
-                      <span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Override</span>
-                      <Switch
-                        checked={allowAltFunding}
-                        onCheckedChange={setAllowAltFunding}
-                      />
-                    </div>
+              {/* 4. Funded By – consistent height, toggle with label matching reference */}
+              <div className={`col-span-2 ${allowAltFunding ? fieldCardBase : disabledCardBase} p-3 h-[88px] flex flex-col justify-between`} onClick={allowAltFunding ? () => setFundedByDialogOpen(true) : undefined}>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <Landmark className={`w-3.5 h-3.5 ${allowAltFunding ? "text-[#94A3B8]" : "text-[#CBD5E1]"}`} />
+                    <span className={`text-[11px] ${allowAltFunding ? "text-[#64748B]" : "text-[#94A3B8]"}`} style={{ fontWeight: 500 }}>Funded By</span>
+                    {allowAltFunding && <span className="text-[9px] text-[#F59E0B] bg-[#FFFBEB] border border-[#F59E0B]/20 px-1.5 py-0.5 rounded" style={{ fontWeight: 600 }}>Overridden</span>}
                   </div>
-                  <div className="flex items-center gap-2.5 opacity-50">
-                    {fbObj ? (
-                      <>
-                        <div className="w-9 h-9 rounded-lg flex items-center justify-center text-white text-[11px] shrink-0" style={{ backgroundColor: fbObj.logoColor, fontWeight: 700 }}>
-                          {fbObj.logoText}
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-[13px] text-[#64748B] truncate" style={{ fontWeight: 600 }}>{fbObj.name}</p>
-                          <p className="text-[11px] text-[#94A3B8] truncate">Funding source</p>
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <div className="w-9 h-9 rounded-lg bg-[#F1F5F9] border border-dashed border-[#E2E8F0] flex items-center justify-center shrink-0">
-                          <Landmark className="w-4 h-4 text-[#CBD5E1]" />
-                        </div>
-                        <p className="text-[12px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Funding source locked</p>
-                      </>
-                    )}
+                  <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                    <Switch
+                      checked={allowAltFunding}
+                      onCheckedChange={(val) => { setAllowAltFunding(val); if (!val) setFundedBy("pl-7"); }}
+                    />
+                    <span className="text-[12px] text-[#64748B]" style={{ fontWeight: 500 }}>Allow Alternative Funding Source</span>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button type="button" className="inline-flex" tabIndex={-1}>
+                          <Info className="w-3 h-3 text-[#CBD5E1] hover:text-[#94A3B8] transition-colors" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="top" sideOffset={6} className="bg-[#1E293B] text-white text-[12px] leading-[1.5] rounded-lg max-w-[240px] px-3 py-2.5 shadow-lg z-[300]">
+                        Enable to override the default funding source for this partner.
+                      </TooltipContent>
+                    </Tooltip>
                   </div>
                 </div>
-              ) : (
-                <div
-                  className={fieldCardBase + " p-3"}
-                  onClick={() => setFundedByDialogOpen(true)}
-                >
-                  <div className="flex items-center justify-between mb-2.5">
-                    <div className="flex items-center gap-1.5">
-                      <Landmark className="w-3.5 h-3.5 text-[#94A3B8]" />
-                      <span className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Funded By</span>
-                      <span className="text-[9px] text-[#F59E0B] bg-[#FFFBEB] border border-[#F59E0B]/20 px-1.5 py-0.5 rounded" style={{ fontWeight: 600 }}>Overridden</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div onClick={(e) => e.stopPropagation()}>
-                        <Switch
-                          checked={allowAltFunding}
-                          onCheckedChange={(val) => { setAllowAltFunding(val); if (!val) setFundedBy("pl-7"); }}
-                        />
-                      </div>
-                      <Pencil className="w-3 h-3 text-[#CBD5E1] opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </div>
-                  </div>
+                <div className={allowAltFunding ? "" : "opacity-50"}>
                   {fbObj ? (
                     <div className="flex items-center gap-2.5">
-                      <div className="w-9 h-9 rounded-lg flex items-center justify-center text-white text-[11px] shrink-0" style={{ backgroundColor: fbObj.logoColor, fontWeight: 700 }}>
-                        {fbObj.logoText}
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{fbObj.name}</p>
-                        <p className="text-[11px] text-[#64748B] truncate">Funding source</p>
-                      </div>
+                      <PartnerLogo item={fbObj} size={36} />
+                      <p className={`text-[13px] truncate ${allowAltFunding ? "text-[#0F172A]" : "text-[#64748B]"}`} style={{ fontWeight: 600 }}>{fbObj.name}</p>
                     </div>
                   ) : (
                     <div className="flex items-center gap-2.5">
@@ -4881,7 +4796,7 @@ function ConfigPageContent({
                     </div>
                   )}
                 </div>
-              )}
+              </div>
 
               {/* ── Ship To Dialog ── */}
               {renderPartnerSelectionDialog(
