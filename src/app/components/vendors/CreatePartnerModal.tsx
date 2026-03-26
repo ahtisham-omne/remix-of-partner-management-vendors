@@ -3944,6 +3944,11 @@ function ConfigPageContent({
   const [payTo, setPayTo] = useState<string | null>("pl-3"); // Toyota International default
   const [fundedBy, setFundedBy] = useState<string | null>("pl-7"); // FR Conversions default
   const [allowAltFunding, setAllowAltFunding] = useState(false);
+  const [shipToDialogOpen, setShipToDialogOpen] = useState(false);
+  const [shipToSearch, setShipToSearch] = useState("");
+  const [shipToFilterTab, setShipToFilterTab] = useState<"all" | "partners" | "locations">("all");
+  const [currencyPopoverSearch, setCurrencyPopoverSearch] = useState("");
+  const [payToPopoverSearch, setPayToPopoverSearch] = useState("");
 
   // Payment Methods state
   const [paymentEntries, setPaymentEntries] = useState<PaymentMethodEntry[]>([]);
