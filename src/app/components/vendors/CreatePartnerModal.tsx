@@ -4394,11 +4394,33 @@ function ConfigPageContent({
         </div>
 
         {/* ── Flat field cards ── */}
-        <div className="space-y-2">
-          {/* Currency */}
-          {(() => {
-            const currObj = CURRENCY_OPTIONS.find((c) => c.id === currency);
-            return (
+        {(() => {
+          const currObj = CURRENCY_OPTIONS.find((c) => c.id === currency);
+          const stObj = PARTNER_LOCATION_ITEMS.find((i) => i.id === shipTo);
+          const ptObj = PARTNER_LOCATION_ITEMS.find((i) => i.id === payTo);
+          const fbObj = FUNDED_BY_ITEMS.find((i) => i.id === fundedBy);
+
+          const currencyFiltered = CURRENCY_OPTIONS.filter((c) =>
+            !currencyPopoverSearch.trim() || c.label.toLowerCase().includes(currencyPopoverSearch.toLowerCase())
+          );
+          const payToFiltered = PARTNER_LOCATION_ITEMS.filter((i) =>
+            !payToPopoverSearch.trim() || i.name.toLowerCase().includes(payToPopoverSearch.toLowerCase())
+          );
+
+          const shipToFiltered = (() => {
+            let list = PARTNER_LOCATION_ITEMS as PartnerLocationItem[];
+            if (shipToFilterTab === "partners") list = list.filter((i) => i.type === "partner");
+            if (shipToFilterTab === "locations") list = list.filter((i) => i.type === "location");
+            if (shipToSearch.trim()) {
+              const q = shipToSearch.toLowerCase();
+              list = list.filter((i) => i.name.toLowerCase().includes(q) || (i.location && i.location.toLowerCase().includes(q)));
+            }
+            return list;
+          })();
+
+          return (
+            <div className="space-y-2">
+              {/* Currency */}
               <div className="group flex items-center gap-3 px-3 py-2.5 rounded-xl border border-[#E8ECF1] bg-white hover:border-[#CBD5E1] hover:shadow-sm transition-all">
                 <div className="w-9 h-9 rounded-lg bg-[#EFF6FF] flex items-center justify-center shrink-0">
                   <DollarSign className="w-4 h-4 text-[#0A77FF]" />
@@ -4421,68 +4443,47 @@ function ConfigPageContent({
                     {currObj ? currObj.label : <span className="text-[#94A3B8] italic" style={{ fontWeight: 400 }}>Not selected</span>}
                   </p>
                 </div>
-                <Popover>
+                <Popover onOpenChange={(open) => { if (!open) setCurrencyPopoverSearch(""); }}>
                   <PopoverTrigger asChild>
                     <button className="shrink-0 px-2.5 py-1.5 rounded-lg text-[11px] text-[#0A77FF] bg-[#EDF4FF] hover:bg-[#DBEAFE] border border-[#0A77FF]/15 transition-colors opacity-0 group-hover:opacity-100" style={{ fontWeight: 600 }}>
                       Change
                     </button>
                   </PopoverTrigger>
-                  <PopoverContent
-                    className="w-[300px] p-0 rounded-xl border border-[#E2E8F0] shadow-lg z-[200]"
-                    align="end"
-                    sideOffset={4}
-                  >
-                    {(() => {
-                      const [cSearch, setCSearch] = React.useState("");
-                      const cFiltered = CURRENCY_OPTIONS.filter((c) =>
-                        !cSearch.trim() || c.label.toLowerCase().includes(cSearch.toLowerCase())
-                      );
-                      return (
-                        <>
-                          <div className="p-3">
-                            <div className="relative">
-                              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
-                              <input
-                                value={cSearch}
-                                onChange={(e) => setCSearch(e.target.value)}
-                                placeholder="Search currency..."
-                                className="w-full h-9 pl-9 pr-3 rounded-lg border border-[#E2E8F0] bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-none focus:border-[#0A77FF] focus:ring-2 focus:ring-[#0A77FF]/10"
-                                autoFocus
-                              />
-                            </div>
-                          </div>
-                          <div className="max-h-[220px] overflow-y-auto border-t border-[#F1F5F9]">
-                            {cFiltered.length === 0 ? (
-                              <div className="py-6 text-center text-xs text-[#94A3B8]">No results found</div>
-                            ) : (
-                              cFiltered.map((c) => (
-                                <button
-                                  key={c.id}
-                                  onClick={() => setCurrency(c.id)}
-                                  className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-[#F8FAFC] ${
-                                    currency === c.id ? "bg-[#EDF4FF]/50" : ""
-                                  }`}
-                                >
-                                  <span className="w-7 text-center text-sm text-[#64748B]" style={{ fontWeight: 600 }}>{c.symbol}</span>
-                                  <span className="text-sm text-[#0F172A] truncate" style={{ fontWeight: 500 }}>{c.label}</span>
-                                  {currency === c.id && <Check className="w-4 h-4 text-[#0A77FF] ml-auto shrink-0" />}
-                                </button>
-                              ))
-                            )}
-                          </div>
-                        </>
-                      );
-                    })()}
+                  <PopoverContent className="w-[300px] p-0 rounded-xl border border-[#E2E8F0] shadow-lg z-[200]" align="end" sideOffset={4}>
+                    <div className="p-3">
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
+                        <input
+                          value={currencyPopoverSearch}
+                          onChange={(e) => setCurrencyPopoverSearch(e.target.value)}
+                          placeholder="Search currency..."
+                          className="w-full h-9 pl-9 pr-3 rounded-lg border border-[#E2E8F0] bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-none focus:border-[#0A77FF] focus:ring-2 focus:ring-[#0A77FF]/10"
+                          autoFocus
+                        />
+                      </div>
+                    </div>
+                    <div className="max-h-[220px] overflow-y-auto border-t border-[#F1F5F9]">
+                      {currencyFiltered.length === 0 ? (
+                        <div className="py-6 text-center text-xs text-[#94A3B8]">No results found</div>
+                      ) : (
+                        currencyFiltered.map((c) => (
+                          <button
+                            key={c.id}
+                            onClick={() => setCurrency(c.id)}
+                            className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-[#F8FAFC] ${currency === c.id ? "bg-[#EDF4FF]/50" : ""}`}
+                          >
+                            <span className="w-7 text-center text-sm text-[#64748B]" style={{ fontWeight: 600 }}>{c.symbol}</span>
+                            <span className="text-sm text-[#0F172A] truncate" style={{ fontWeight: 500 }}>{c.label}</span>
+                            {currency === c.id && <Check className="w-4 h-4 text-[#0A77FF] ml-auto shrink-0" />}
+                          </button>
+                        ))
+                      )}
+                    </div>
                   </PopoverContent>
                 </Popover>
               </div>
-            );
-          })()}
 
-          {/* Ship To */}
-          {(() => {
-            const stObj = PARTNER_LOCATION_ITEMS.find((i) => i.id === shipTo);
-            return (
+              {/* Ship To — Dialog-based picker */}
               <div className="group flex items-center gap-3 px-3 py-2.5 rounded-xl border border-[#E8ECF1] bg-white hover:border-[#CBD5E1] hover:shadow-sm transition-all">
                 <div className="w-9 h-9 rounded-lg bg-[#ECFDF5] flex items-center justify-center shrink-0">
                   {stObj ? (
@@ -4521,34 +4522,102 @@ function ConfigPageContent({
                     <p className="text-[13px] text-[#94A3B8] italic mt-0.5" style={{ fontWeight: 400 }}>Not selected</p>
                   )}
                 </div>
-                <SearchablePartnerDropdown
-                  label="Ship To"
-                  tooltip="The destination where goods or services will be delivered."
-                  placeholder="Select delivery destination"
-                  items={PARTNER_LOCATION_ITEMS}
-                  selectedId={shipTo}
-                  onSelect={setShipTo}
-                  showLocationFilter
-                  useDialog
-                  hideLabel
-                  renderTrigger={(onClick: () => void) => (
-                    <button
-                      onClick={onClick}
-                      className="shrink-0 px-2.5 py-1.5 rounded-lg text-[11px] text-[#22C55E] bg-[#ECFDF5] hover:bg-[#D1FAE5] border border-[#22C55E]/15 transition-colors opacity-0 group-hover:opacity-100"
-                      style={{ fontWeight: 600 }}
-                    >
-                      Change
-                    </button>
-                  )}
-                />
+                <button
+                  onClick={() => setShipToDialogOpen(true)}
+                  className="shrink-0 px-2.5 py-1.5 rounded-lg text-[11px] text-[#22C55E] bg-[#ECFDF5] hover:bg-[#D1FAE5] border border-[#22C55E]/15 transition-colors opacity-0 group-hover:opacity-100"
+                  style={{ fontWeight: 600 }}
+                >
+                  Change
+                </button>
               </div>
-            );
-          })()}
+              {/* Ship To Dialog */}
+              <Dialog open={shipToDialogOpen} onOpenChange={(open) => { setShipToDialogOpen(open); if (!open) { setShipToSearch(""); setShipToFilterTab("all"); } }}>
+                <DialogContent
+                  className="!max-w-[520px] p-0 gap-0 rounded-2xl border-0 overflow-hidden"
+                  style={{ boxShadow: "0 24px 48px -12px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.05)" }}
+                  hideCloseButton
+                >
+                  <DialogTitle className="sr-only">Select Ship To</DialogTitle>
+                  <DialogDescription className="sr-only">Choose a partner or location for Ship To</DialogDescription>
+                  <div className="px-5 pt-4 pb-3 border-b border-[#F1F5F9]">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-lg bg-[#ECFDF5] flex items-center justify-center">
+                          <Truck className="w-4 h-4 text-[#22C55E]" />
+                        </div>
+                        <div>
+                          <h3 className="text-sm text-[#0F172A]" style={{ fontWeight: 600 }}>Select Ship To</h3>
+                          <p className="text-[11px] text-[#64748B]">{shipToFiltered.length} results available</p>
+                        </div>
+                      </div>
+                      <button onClick={() => { setShipToDialogOpen(false); setShipToSearch(""); setShipToFilterTab("all"); }} className="w-7 h-7 rounded-lg flex items-center justify-center text-[#94A3B8] hover:text-[#64748B] hover:bg-[#F1F5F9] transition-all">
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
+                      <input value={shipToSearch} onChange={(e) => setShipToSearch(e.target.value)} placeholder="Search ship to..." className="w-full h-9 pl-9 pr-3 rounded-lg border border-[#E2E8F0] bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-none focus:border-[#0A77FF] focus:ring-2 focus:ring-[#0A77FF]/10" autoFocus />
+                    </div>
+                    <div className="flex items-center gap-1.5 mt-3">
+                      {(["all", "partners", "locations"] as const).map((tab) => {
+                        const count = tab === "all" ? PARTNER_LOCATION_ITEMS.length : PARTNER_LOCATION_ITEMS.filter(i => tab === "partners" ? i.type === "partner" : i.type === "location").length;
+                        return (
+                          <button key={tab} onClick={() => setShipToFilterTab(tab)} className={`px-3 py-1.5 rounded-full text-xs transition-colors ${shipToFilterTab === tab ? "border border-[#0A77FF] text-[#0A77FF] bg-[#EDF4FF]" : "border border-[#E2E8F0] text-[#334155] bg-white hover:bg-[#F8FAFC]"}`} style={{ fontWeight: shipToFilterTab === tab ? 600 : 500 }}>
+                            {tab === "all" ? "All" : tab === "partners" ? "Partners" : "Locations"} ({count})
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  <div className="max-h-[380px] overflow-y-auto">
+                    {shipToFiltered.length === 0 ? (
+                      <div className="py-10 text-center">
+                        <Search className="w-8 h-8 text-[#CBD5E1] mx-auto mb-2" />
+                        <p className="text-sm text-[#64748B]" style={{ fontWeight: 500 }}>No results found</p>
+                        <p className="text-xs text-[#94A3B8] mt-0.5">Try a different search term</p>
+                      </div>
+                    ) : (
+                      shipToFiltered.map((item) => (
+                        <button
+                          key={item.id}
+                          onClick={() => { setShipTo(item.id); setShipToDialogOpen(false); setShipToSearch(""); setShipToFilterTab("all"); }}
+                          className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-[#F8FAFC] ${shipTo === item.id ? "bg-[#EDF4FF]/50" : ""}`}
+                        >
+                          <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-[11px] shrink-0" style={{ backgroundColor: item.logoColor, fontWeight: 700 }}>{item.logoText}</div>
+                          <div className="flex flex-col min-w-0 flex-1">
+                            <span className="text-sm text-[#0F172A] truncate" style={{ fontWeight: 500 }}>{item.name}</span>
+                            {item.location && (
+                              <span className="flex items-center gap-1 text-[11px] text-[#64748B] truncate">
+                                <MapPin className="w-3 h-3 shrink-0" />
+                                {item.location}
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2 shrink-0 ml-auto">
+                            <span className={`text-[9px] px-1.5 py-0.5 rounded-md border ${item.type === "location" ? "text-[#22C55E] bg-[#ECFDF5] border-[#22C55E]/20" : "text-[#8B5CF6] bg-[#F5F3FF] border-[#8B5CF6]/20"}`} style={{ fontWeight: 600 }}>
+                              {item.type === "location" ? "Location" : "Partner"}
+                            </span>
+                            {shipTo === item.id && <Check className="w-4 h-4 text-[#0A77FF] shrink-0" />}
+                          </div>
+                        </button>
+                      ))
+                    )}
+                  </div>
+                  {stObj && (
+                    <div className="px-4 py-3 border-t border-[#F1F5F9] bg-[#FAFBFC] flex items-center justify-between">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#22C55E] shrink-0" />
+                        <span className="text-xs text-[#334155] truncate" style={{ fontWeight: 500 }}>
+                          Selected: <span style={{ fontWeight: 600 }}>{stObj.name}</span>
+                        </span>
+                      </div>
+                      <button onClick={() => { setShipToDialogOpen(false); setShipToSearch(""); setShipToFilterTab("all"); }} className="px-3 py-1.5 rounded-lg bg-[#0A77FF] text-white text-xs hover:bg-[#0966DB] transition-colors" style={{ fontWeight: 600 }}>Done</button>
+                    </div>
+                  )}
+                </DialogContent>
+              </Dialog>
 
-          {/* Pay To */}
-          {(() => {
-            const ptObj = PARTNER_LOCATION_ITEMS.find((i) => i.id === payTo);
-            return (
+              {/* Pay To */}
               <div className="group flex items-center gap-3 px-3 py-2.5 rounded-xl border border-[#E8ECF1] bg-white hover:border-[#CBD5E1] hover:shadow-sm transition-all">
                 <div className="w-9 h-9 rounded-lg bg-[#F5F3FF] flex items-center justify-center shrink-0">
                   {ptObj ? (
@@ -4577,70 +4646,37 @@ function ConfigPageContent({
                     {ptObj ? ptObj.name : <span className="text-[#94A3B8] italic" style={{ fontWeight: 400 }}>Not selected</span>}
                   </p>
                 </div>
-                <Popover>
+                <Popover onOpenChange={(open) => { if (!open) setPayToPopoverSearch(""); }}>
                   <PopoverTrigger asChild>
                     <button className="shrink-0 px-2.5 py-1.5 rounded-lg text-[11px] text-[#8B5CF6] bg-[#F5F3FF] hover:bg-[#EDE9FE] border border-[#8B5CF6]/15 transition-colors opacity-0 group-hover:opacity-100" style={{ fontWeight: 600 }}>
                       Change
                     </button>
                   </PopoverTrigger>
-                  <PopoverContent
-                    className="w-[320px] p-0 rounded-xl border border-[#E2E8F0] shadow-lg z-[200]"
-                    align="end"
-                    sideOffset={4}
-                  >
-                    {(() => {
-                      const [pSearch, setPSearch] = React.useState("");
-                      const pFiltered = PARTNER_LOCATION_ITEMS.filter((i) =>
-                        !pSearch.trim() || i.name.toLowerCase().includes(pSearch.toLowerCase()) || (i.location && i.location.toLowerCase().includes(pSearch.toLowerCase()))
-                      );
-                      return (
-                        <>
-                          <div className="p-3">
-                            <div className="relative">
-                              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
-                              <input
-                                value={pSearch}
-                                onChange={(e) => setPSearch(e.target.value)}
-                                placeholder="Search partner..."
-                                className="w-full h-9 pl-9 pr-3 rounded-lg border border-[#E2E8F0] bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-none focus:border-[#0A77FF] focus:ring-2 focus:ring-[#0A77FF]/10"
-                                autoFocus
-                              />
-                            </div>
-                          </div>
-                          <div className="max-h-[260px] overflow-y-auto border-t border-[#F1F5F9]">
-                            {pFiltered.length === 0 ? (
-                              <div className="py-6 text-center text-xs text-[#94A3B8]">No results found</div>
-                            ) : (
-                              pFiltered.map((item) => (
-                                <button
-                                  key={item.id}
-                                  onClick={() => setPayTo(item.id)}
-                                  className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-[#F8FAFC] ${
-                                    payTo === item.id ? "bg-[#EDF4FF]/50" : ""
-                                  }`}
-                                >
-                                  <div className="w-7 h-7 rounded-lg flex items-center justify-center text-white text-[10px] shrink-0" style={{ backgroundColor: item.logoColor, fontWeight: 700 }}>
-                                    {item.logoText}
-                                  </div>
-                                  <span className="text-sm text-[#0F172A] truncate" style={{ fontWeight: 500 }}>{item.name}</span>
-                                  {payTo === item.id && <Check className="w-4 h-4 text-[#0A77FF] ml-auto shrink-0" />}
-                                </button>
-                              ))
-                            )}
-                          </div>
-                        </>
-                      );
-                    })()}
+                  <PopoverContent className="w-[320px] p-0 rounded-xl border border-[#E2E8F0] shadow-lg z-[200]" align="end" sideOffset={4}>
+                    <div className="p-3">
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
+                        <input value={payToPopoverSearch} onChange={(e) => setPayToPopoverSearch(e.target.value)} placeholder="Search partner..." className="w-full h-9 pl-9 pr-3 rounded-lg border border-[#E2E8F0] bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-none focus:border-[#0A77FF] focus:ring-2 focus:ring-[#0A77FF]/10" autoFocus />
+                      </div>
+                    </div>
+                    <div className="max-h-[260px] overflow-y-auto border-t border-[#F1F5F9]">
+                      {payToFiltered.length === 0 ? (
+                        <div className="py-6 text-center text-xs text-[#94A3B8]">No results found</div>
+                      ) : (
+                        payToFiltered.map((item) => (
+                          <button key={item.id} onClick={() => setPayTo(item.id)} className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-[#F8FAFC] ${payTo === item.id ? "bg-[#EDF4FF]/50" : ""}`}>
+                            <div className="w-7 h-7 rounded-lg flex items-center justify-center text-white text-[10px] shrink-0" style={{ backgroundColor: item.logoColor, fontWeight: 700 }}>{item.logoText}</div>
+                            <span className="text-sm text-[#0F172A] truncate" style={{ fontWeight: 500 }}>{item.name}</span>
+                            {payTo === item.id && <Check className="w-4 h-4 text-[#0A77FF] ml-auto shrink-0" />}
+                          </button>
+                        ))
+                      )}
+                    </div>
                   </PopoverContent>
                 </Popover>
               </div>
-            );
-          })()}
 
-          {/* Funded By */}
-          {(() => {
-            const fbObj = FUNDED_BY_ITEMS.find((i) => i.id === fundedBy);
-            return (
+              {/* Funded By */}
               <div className="group flex items-center gap-3 px-3 py-2.5 rounded-xl border border-[#E8ECF1] bg-white hover:border-[#CBD5E1] hover:shadow-sm transition-all">
                 <div className="w-9 h-9 rounded-lg bg-[#FFFBEB] flex items-center justify-center shrink-0">
                   {fbObj ? (
@@ -4674,62 +4710,36 @@ function ConfigPageContent({
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                   {!allowAltFunding ? (
-                    <button
-                      onClick={() => setAllowAltFunding(true)}
-                      className="px-2.5 py-1.5 rounded-lg text-[11px] text-[#F59E0B] bg-[#FFFBEB] hover:bg-[#FEF3C7] border border-[#F59E0B]/15 transition-colors opacity-0 group-hover:opacity-100"
-                      style={{ fontWeight: 600 }}
-                    >
+                    <button onClick={() => setAllowAltFunding(true)} className="px-2.5 py-1.5 rounded-lg text-[11px] text-[#F59E0B] bg-[#FFFBEB] hover:bg-[#FEF3C7] border border-[#F59E0B]/15 transition-colors opacity-0 group-hover:opacity-100" style={{ fontWeight: 600 }}>
                       Override
                     </button>
                   ) : (
                     <div className="flex items-center gap-1.5">
                       <Popover>
                         <PopoverTrigger asChild>
-                          <button className="px-2.5 py-1.5 rounded-lg text-[11px] text-[#F59E0B] bg-[#FFFBEB] hover:bg-[#FEF3C7] border border-[#F59E0B]/15 transition-colors" style={{ fontWeight: 600 }}>
-                            Change
-                          </button>
+                          <button className="px-2.5 py-1.5 rounded-lg text-[11px] text-[#F59E0B] bg-[#FFFBEB] hover:bg-[#FEF3C7] border border-[#F59E0B]/15 transition-colors" style={{ fontWeight: 600 }}>Change</button>
                         </PopoverTrigger>
-                        <PopoverContent
-                          className="w-[300px] p-0 rounded-xl border border-[#E2E8F0] shadow-lg z-[200]"
-                          align="end"
-                          sideOffset={4}
-                        >
+                        <PopoverContent className="w-[300px] p-0 rounded-xl border border-[#E2E8F0] shadow-lg z-[200]" align="end" sideOffset={4}>
                           <div className="max-h-[280px] overflow-y-auto py-1">
                             {FUNDED_BY_ITEMS.map((item) => (
-                              <button
-                                key={item.id}
-                                onClick={() => setFundedBy(item.id)}
-                                className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-[#F8FAFC] ${
-                                  fundedBy === item.id ? "bg-[#EDF4FF]/50" : ""
-                                }`}
-                              >
-                                <div className="w-7 h-7 rounded-full flex items-center justify-center text-white text-[10px] shrink-0" style={{ backgroundColor: item.logoColor, fontWeight: 700 }}>
-                                  {item.logoText}
-                                </div>
+                              <button key={item.id} onClick={() => setFundedBy(item.id)} className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-[#F8FAFC] ${fundedBy === item.id ? "bg-[#EDF4FF]/50" : ""}`}>
+                                <div className="w-7 h-7 rounded-full flex items-center justify-center text-white text-[10px] shrink-0" style={{ backgroundColor: item.logoColor, fontWeight: 700 }}>{item.logoText}</div>
                                 <span className="text-sm text-[#0F172A] truncate" style={{ fontWeight: 500 }}>{item.name}</span>
-                                {item.isDefault && (
-                                  <span className="text-[10px] text-[#0A77FF] bg-[#EDF4FF] border border-[#0A77FF]/20 px-1.5 py-0.5 rounded shrink-0 ml-auto" style={{ fontWeight: 600 }}>Default</span>
-                                )}
+                                {item.isDefault && <span className="text-[10px] text-[#0A77FF] bg-[#EDF4FF] border border-[#0A77FF]/20 px-1.5 py-0.5 rounded shrink-0 ml-auto" style={{ fontWeight: 600 }}>Default</span>}
                                 {fundedBy === item.id && !item.isDefault && <Check className="w-4 h-4 text-[#0A77FF] ml-auto shrink-0" />}
                               </button>
                             ))}
                           </div>
                         </PopoverContent>
                       </Popover>
-                      <button
-                        onClick={() => { setAllowAltFunding(false); setFundedBy("pl-7"); }}
-                        className="px-2 py-1.5 rounded-lg text-[11px] text-[#64748B] hover:text-[#334155] hover:bg-[#F1F5F9] transition-colors"
-                        style={{ fontWeight: 500 }}
-                      >
-                        Reset
-                      </button>
+                      <button onClick={() => { setAllowAltFunding(false); setFundedBy("pl-7"); }} className="px-2 py-1.5 rounded-lg text-[11px] text-[#64748B] hover:text-[#334155] hover:bg-[#F1F5F9] transition-colors" style={{ fontWeight: 500 }}>Reset</button>
                     </div>
                   )}
                 </div>
               </div>
-            );
-          })()}
-        </div>
+            </div>
+          );
+        })()}
       </div>
     );
   }
