@@ -4608,16 +4608,7 @@ function ConfigPageContent({
                       <div className="flex items-center gap-1.5">
                         <DollarSign className="w-3.5 h-3.5 text-[#94A3B8]" />
                         <span className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Currency</span>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <button type="button" className="inline-flex" tabIndex={-1} onClick={(e) => e.stopPropagation()}>
-                              <Info className="w-3 h-3 text-[#CBD5E1] hover:text-[#94A3B8] transition-colors" />
-                            </button>
-                          </TooltipTrigger>
-                          <TooltipContent side="top" sideOffset={6} className="max-w-[240px]">
-                            The currency used for all transactions with this partner.
-                          </TooltipContent>
-                        </Tooltip>
+                        <InfoTooltip>The currency used for all transactions with this partner.</InfoTooltip>
                       </div>
                       <Pencil className="w-3 h-3 text-[#CBD5E1] opacity-0 group-hover:opacity-100 transition-opacity" />
                     </div>
