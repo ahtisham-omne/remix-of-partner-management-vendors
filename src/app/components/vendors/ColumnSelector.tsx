@@ -293,7 +293,6 @@ export function ColumnSelector({
 
       const handleMove = (ev: PointerEvent) => {
         pointerYRef.current = ev.clientY;
-        setPreviewPos({ x: ev.clientX, y: ev.clientY });
         performReorder(ev.clientY);
       };
 
@@ -303,9 +302,7 @@ export function ColumnSelector({
           onColumnOrderChangeRef.current(finalOrder);
         }
         setDraggingKey(null);
-        setDraggingLabel(null);
         setLiveOrder(null);
-        setPreviewPos(null);
         stopAutoScroll();
         window.removeEventListener("pointermove", handleMove);
         window.removeEventListener("pointerup", handleUp);
