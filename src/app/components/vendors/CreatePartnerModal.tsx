@@ -4756,7 +4756,7 @@ function ConfigPageContent({
               </div>
 
               {/* 4. Funded By – consistent height, toggle with label matching reference */}
-              <div className={`${allowAltFunding ? fieldCardBase : disabledCardBase} p-3 h-[88px] flex flex-col justify-between`} onClick={allowAltFunding ? () => setFundedByDialogOpen(true) : undefined}>
+              <div className={`col-span-2 ${allowAltFunding ? fieldCardBase : disabledCardBase} p-3 h-[88px] flex flex-col justify-between`} onClick={allowAltFunding ? () => setFundedByDialogOpen(true) : undefined}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
                     <Landmark className={`w-3.5 h-3.5 ${allowAltFunding ? "text-[#94A3B8]" : "text-[#CBD5E1]"}`} />
