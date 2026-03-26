@@ -4602,8 +4602,8 @@ function ConfigPageContent({
               {/* 1. Currency */}
               <Popover onOpenChange={(open) => { if (!open) setCurrencyPopoverSearch(""); }}>
                 <PopoverTrigger asChild>
-                  <div className={fieldCardBase + " p-3"}>
-                    <div className="flex items-center justify-between mb-2.5">
+                  <div className={fieldCardBase + " p-3 h-[88px] flex flex-col justify-between"}>
+                    <div className="flex items-center justify-between">
                       <div className="flex items-center gap-1.5">
                         <DollarSign className="w-3.5 h-3.5 text-[#94A3B8]" />
                         <span className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Currency</span>
