@@ -1812,7 +1812,8 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                           <span className="text-[10px] text-[#0A77FF] bg-[#EDF4FF] px-1.5 py-0.5 rounded-full" style={{ fontWeight: 600 }}>{custom.length}</span>
                         </div>
                       )}
-                      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3">
+                      <div className="@container/prcustom">
+                      <div className="grid grid-cols-1 @[400px]/prcustom:grid-cols-2 @[750px]/prcustom:grid-cols-3 gap-3">
                         {custom.map((rule) => (
                           <PricingRuleCard key={rule.id} rule={rule} onClick={() => openDetail(rule)} />
                         ))}

@@ -6473,7 +6473,8 @@ function ConfigPageContent({
                       <p className="text-[12px] text-[#94A3B8] mt-1">Try adjusting your search or filter</p>
                     </div>
                   ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 3xl:grid-cols-4 auto-rows-fr gap-4">
+                    <div className="@container/prgrid">
+                    <div className="grid grid-cols-1 @[400px]/prgrid:grid-cols-2 @[750px]/prgrid:grid-cols-3 auto-rows-fr gap-4">
                       {filteredPricingRulePresets.map((rule) => (
                         <PrTemplateCardInner
                           key={rule.id}
