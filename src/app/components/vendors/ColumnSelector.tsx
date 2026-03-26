@@ -95,7 +95,6 @@ export function ColumnSelector({
 }: ColumnSelectorProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [draggingKey, setDraggingKey] = useState<string | null>(null);
-  const [draggingLabel, setDraggingLabel] = useState<string | null>(null);
   const [liveOrder, setLiveOrder] = useState<string[] | null>(null);
   const [previewPos, setPreviewPos] = useState<{ x: number; y: number } | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
