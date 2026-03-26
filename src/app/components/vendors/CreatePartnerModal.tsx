@@ -4295,7 +4295,6 @@ function ConfigPageContent({
     };
 
     // ── Accordion expand state for dialog ──
-    const [dialogExpandedPartners, setDialogExpandedPartners] = useState<Set<string>>(new Set());
     const togglePartnerExpand = (partnerId: string) => {
       setDialogExpandedPartners(prev => {
         const next = new Set(prev);
