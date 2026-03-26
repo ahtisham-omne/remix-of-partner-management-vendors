@@ -5,6 +5,12 @@ import {
   PopoverTrigger,
 } from "../ui/popover";
 import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from "../ui/dialog";
+import {
   Tooltip,
   TooltipTrigger,
   TooltipContent,
@@ -16,6 +22,9 @@ import {
   ChevronUp,
   Info,
   MapPin,
+  X,
+  Building2,
+  Truck,
 } from "lucide-react";
 import {
   type PartnerLocationItem,
@@ -100,6 +109,8 @@ export function SearchablePartnerDropdown({
   showDefaultBadge,
   disabled,
   hideLabel,
+  showLocationFilter,
+  useDialog,
 }: {
   label: string;
   tooltip: string;
@@ -110,6 +121,8 @@ export function SearchablePartnerDropdown({
   showDefaultBadge?: boolean;
   disabled?: boolean;
   hideLabel?: boolean;
+  showLocationFilter?: boolean;
+  useDialog?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -119,15 +132,262 @@ export function SearchablePartnerDropdown({
 
   const filtered = useMemo(() => {
     let list = items;
-    if (filterTab === "partners") list = list.filter((i) => i.type === "partner");
-    if (filterTab === "locations") list = list.filter((i) => i.type === "location");
+    if (showLocationFilter) {
+      if (filterTab === "partners") list = list.filter((i) => i.type === "partner");
+      if (filterTab === "locations") list = list.filter((i) => i.type === "location");
+    }
     if (search.trim()) {
       const q = search.toLowerCase();
-      list = list.filter((i) => i.name.toLowerCase().includes(q));
+      list = list.filter((i) => i.name.toLowerCase().includes(q) || (i.location && i.location.toLowerCase().includes(q)));
     }
     return list;
-  }, [items, filterTab, search]);
+  }, [items, filterTab, search, showLocationFilter]);
 
+  // Group items by type for dialog view
+  const groupedItems = useMemo(() => {
+    if (!useDialog) return { partners: [], locations: [] };
+    const partners = filtered.filter((i) => i.type === "partner");
+    const locations = filtered.filter((i) => i.type === "location");
+    return { partners, locations };
+  }, [filtered, useDialog]);
+
+  const triggerButton = (
+    <button
+      disabled={disabled}
+      onClick={useDialog ? () => !disabled && setOpen(true) : undefined}
+      className={`w-full h-10 px-3 rounded-lg border flex items-center justify-between text-sm transition-colors ${
+        disabled
+          ? "bg-[#F8FAFC] border-[#E2E8F0] cursor-not-allowed"
+          : open
+            ? "bg-white border-[#0A77FF] ring-2 ring-[#0A77FF]/10"
+            : "bg-white border-[#E2E8F0] hover:border-[#CBD5E1]"
+      }`}
+    >
+      {selectedItem ? (
+        <div className="flex items-center gap-2.5 min-w-0 flex-1">
+          <div
+            className="w-7 h-7 rounded-lg flex items-center justify-center text-white text-[10px] shrink-0"
+            style={{ backgroundColor: selectedItem.logoColor, fontWeight: 700 }}
+          >
+            {selectedItem.logoText}
+          </div>
+          <div className="flex flex-col min-w-0 text-left">
+            <span className="text-[#0F172A] truncate text-[13px]" style={{ fontWeight: 500 }}>{selectedItem.name}</span>
+            {selectedItem.location && (
+              <span className="text-[10px] text-[#64748B] truncate flex items-center gap-0.5">
+                <MapPin className="w-2.5 h-2.5 shrink-0" />
+                {selectedItem.location}
+              </span>
+            )}
+          </div>
+          {showDefaultBadge && selectedItem.isDefault && (
+            <span className="text-[10px] text-[#0A77FF] bg-[#EDF4FF] border border-[#0A77FF]/20 px-1.5 py-0.5 rounded shrink-0" style={{ fontWeight: 600 }}>Default</span>
+          )}
+        </div>
+      ) : (
+        <span className="text-[#94A3B8]">{placeholder}</span>
+      )}
+      {open ? (
+        <ChevronUp className="w-4 h-4 text-[#94A3B8] shrink-0" />
+      ) : (
+        <ChevronDown className="w-4 h-4 text-[#94A3B8] shrink-0" />
+      )}
+    </button>
+  );
+
+  const renderItemRow = (item: PartnerLocationItem, compact?: boolean) => (
+    <button
+      key={item.id}
+      onClick={() => {
+        onSelect(item.id);
+        setOpen(false);
+        setSearch("");
+        setFilterTab("all");
+      }}
+      className={`w-full flex items-center gap-3 px-4 ${compact ? "py-2.5" : "py-3"} text-left transition-colors hover:bg-[#F8FAFC] ${
+        selectedId === item.id ? "bg-[#EDF4FF]/50" : ""
+      }`}
+    >
+      <div
+        className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-[11px] shrink-0"
+        style={{ backgroundColor: item.logoColor, fontWeight: 700 }}
+      >
+        {item.logoText}
+      </div>
+      <div className="flex flex-col min-w-0 flex-1">
+        <span className="text-sm text-[#0F172A] truncate" style={{ fontWeight: 500 }}>{item.name}</span>
+        {item.location && (
+          <span className="flex items-center gap-1 text-[11px] text-[#64748B] truncate">
+            <MapPin className="w-3 h-3 shrink-0" />
+            {item.location}
+          </span>
+        )}
+      </div>
+      <div className="flex items-center gap-2 shrink-0 ml-auto">
+        <span className={`text-[9px] px-1.5 py-0.5 rounded-md border ${
+          item.type === "location"
+            ? "text-[#22C55E] bg-[#ECFDF5] border-[#22C55E]/20"
+            : "text-[#8B5CF6] bg-[#F5F3FF] border-[#8B5CF6]/20"
+        }`} style={{ fontWeight: 600 }}>
+          {item.type === "location" ? "Location" : "Partner"}
+        </span>
+        {selectedId === item.id && <Check className="w-4 h-4 text-[#0A77FF] shrink-0" />}
+      </div>
+    </button>
+  );
+
+  const searchBar = (
+    <div className="relative">
+      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
+      <input
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        placeholder={`Search ${label.toLowerCase()}...`}
+        className="w-full h-9 pl-9 pr-3 rounded-lg border border-[#E2E8F0] bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-none focus:border-[#0A77FF] focus:ring-2 focus:ring-[#0A77FF]/10"
+        autoFocus
+      />
+    </div>
+  );
+
+  if (useDialog) {
+    // Dialog-based picker for Ship To (handles large lists)
+    return (
+      <div className={disabled ? "opacity-50 pointer-events-none" : ""}>
+        {!hideLabel && (
+          <div className="flex items-center gap-1.5 mb-1.5">
+            <span className="text-xs text-[#0F172A]" style={{ fontWeight: 600 }}>{label}</span>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button type="button" className="inline-flex" tabIndex={-1}>
+                  <Info className="w-3.5 h-3.5 text-[#94A3B8] cursor-help" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" sideOffset={6} className="bg-[#1E293B] text-white text-[12px] leading-[1.5] rounded-lg max-w-[260px] px-3 py-2.5 shadow-lg z-[300]">
+                {tooltip}
+              </TooltipContent>
+            </Tooltip>
+          </div>
+        )}
+        {triggerButton}
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogContent
+            className="!max-w-[520px] p-0 gap-0 rounded-2xl border-0 overflow-hidden"
+            style={{ boxShadow: "0 24px 48px -12px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.05)" }}
+            hideCloseButton
+          >
+            <DialogTitle className="sr-only">Select {label}</DialogTitle>
+            <DialogDescription className="sr-only">Choose a partner or location for {label}</DialogDescription>
+
+            {/* Header */}
+            <div className="px-5 pt-4 pb-3 border-b border-[#F1F5F9]">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-[#ECFDF5] flex items-center justify-center">
+                    <Truck className="w-4 h-4 text-[#22C55E]" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm text-[#0F172A]" style={{ fontWeight: 600 }}>Select {label}</h3>
+                    <p className="text-[11px] text-[#64748B]">{filtered.length} results available</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => { setOpen(false); setSearch(""); setFilterTab("all"); }}
+                  className="w-7 h-7 rounded-lg flex items-center justify-center text-[#94A3B8] hover:text-[#64748B] hover:bg-[#F1F5F9] transition-all"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Search */}
+              {searchBar}
+
+              {/* Filter tabs */}
+              <div className="flex items-center gap-1.5 mt-3">
+                {(["all", "partners", "locations"] as const).map((tab) => {
+                  const count = tab === "all" ? items.length : items.filter(i => tab === "partners" ? i.type === "partner" : i.type === "location").length;
+                  return (
+                    <button
+                      key={tab}
+                      onClick={() => setFilterTab(tab)}
+                      className={`px-3 py-1.5 rounded-full text-xs transition-colors ${
+                        filterTab === tab
+                          ? "border border-[#0A77FF] text-[#0A77FF] bg-[#EDF4FF]"
+                          : "border border-[#E2E8F0] text-[#334155] bg-white hover:bg-[#F8FAFC]"
+                      }`}
+                      style={{ fontWeight: filterTab === tab ? 600 : 500 }}
+                    >
+                      {tab === "all" ? "All" : tab === "partners" ? "Partners" : "Locations"} ({count})
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Grouped list */}
+            <div className="max-h-[380px] overflow-y-auto">
+              {filtered.length === 0 ? (
+                <div className="py-10 text-center">
+                  <Search className="w-8 h-8 text-[#CBD5E1] mx-auto mb-2" />
+                  <p className="text-sm text-[#64748B]" style={{ fontWeight: 500 }}>No results found</p>
+                  <p className="text-xs text-[#94A3B8] mt-0.5">Try a different search term</p>
+                </div>
+              ) : filterTab === "all" && !search.trim() ? (
+                <>
+                  {/* Locations group */}
+                  {groupedItems.locations.length > 0 && (
+                    <div>
+                      <div className="px-4 py-2 bg-[#FAFBFC] border-b border-[#F1F5F9] flex items-center gap-2">
+                        <MapPin className="w-3.5 h-3.5 text-[#22C55E]" />
+                        <span className="text-[11px] text-[#64748B] uppercase tracking-wide" style={{ fontWeight: 600 }}>
+                          Partner Locations ({groupedItems.locations.length})
+                        </span>
+                      </div>
+                      {groupedItems.locations.map((item) => renderItemRow(item, true))}
+                    </div>
+                  )}
+                  {/* Partners group */}
+                  {groupedItems.partners.length > 0 && (
+                    <div>
+                      <div className="px-4 py-2 bg-[#FAFBFC] border-b border-[#F1F5F9] flex items-center gap-2">
+                        <Building2 className="w-3.5 h-3.5 text-[#8B5CF6]" />
+                        <span className="text-[11px] text-[#64748B] uppercase tracking-wide" style={{ fontWeight: 600 }}>
+                          Partners ({groupedItems.partners.length})
+                        </span>
+                      </div>
+                      {groupedItems.partners.map((item) => renderItemRow(item, true))}
+                    </div>
+                  )}
+                </>
+              ) : (
+                filtered.map((item) => renderItemRow(item, true))
+              )}
+            </div>
+
+            {/* Selected footer */}
+            {selectedItem && (
+              <div className="px-4 py-3 border-t border-[#F1F5F9] bg-[#FAFBFC] flex items-center justify-between">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="w-1.5 h-1.5 rounded-full bg-[#22C55E] shrink-0" />
+                  <span className="text-xs text-[#334155] truncate" style={{ fontWeight: 500 }}>
+                    Selected: <span style={{ fontWeight: 600 }}>{selectedItem.name}</span>
+                  </span>
+                </div>
+                <button
+                  onClick={() => { setOpen(false); setSearch(""); setFilterTab("all"); }}
+                  className="px-3 py-1.5 rounded-lg bg-[#0A77FF] text-white text-xs hover:bg-[#0966DB] transition-colors"
+                  style={{ fontWeight: 600 }}
+                >
+                  Done
+                </button>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
+      </div>
+    );
+  }
+
+  // Default: Popover dropdown (for Pay To, etc.)
   return (
     <div className={disabled ? "opacity-50 pointer-events-none" : ""}>
       {!hideLabel && (
@@ -147,76 +407,36 @@ export function SearchablePartnerDropdown({
       )}
       <Popover open={disabled ? false : open} onOpenChange={disabled ? undefined : setOpen}>
         <PopoverTrigger asChild>
-          <button
-            disabled={disabled}
-            className={`w-full h-10 px-3 rounded-lg border flex items-center justify-between text-sm transition-colors ${
-              disabled
-                ? "bg-[#F8FAFC] border-[#E2E8F0] cursor-not-allowed"
-                : open
-                  ? "bg-white border-[#0A77FF] ring-2 ring-[#0A77FF]/10"
-                  : "bg-white border-[#E2E8F0] hover:border-[#CBD5E1]"
-            }`}
-          >
-            {selectedItem ? (
-              <div className="flex items-center gap-2.5 min-w-0">
-                <div
-                  className="w-7 h-7 rounded-lg flex items-center justify-center text-white text-[10px] shrink-0"
-                  style={{ backgroundColor: selectedItem.logoColor, fontWeight: 700 }}
-                >
-                  {selectedItem.logoText}
-                </div>
-                <span className="text-[#0F172A] truncate" style={{ fontWeight: 500 }}>{selectedItem.name}</span>
-                {selectedItem.location && (
-                  <span className="text-[11px] text-[#64748B] truncate hidden sm:inline">{selectedItem.location}</span>
-                )}
-                {showDefaultBadge && selectedItem.isDefault && (
-                  <span className="text-[10px] text-[#0A77FF] bg-[#EDF4FF] border border-[#0A77FF]/20 px-1.5 py-0.5 rounded shrink-0" style={{ fontWeight: 600 }}>Default</span>
-                )}
-              </div>
-            ) : (
-              <span className="text-[#94A3B8]">{placeholder}</span>
-            )}
-            {open ? (
-              <ChevronUp className="w-4 h-4 text-[#94A3B8] shrink-0" />
-            ) : (
-              <ChevronDown className="w-4 h-4 text-[#94A3B8] shrink-0" />
-            )}
-          </button>
+          {triggerButton}
         </PopoverTrigger>
         <PopoverContent
           className="w-[var(--radix-popover-trigger-width)] p-0 rounded-xl border border-[#E2E8F0] shadow-lg z-[200]"
           align="start"
           sideOffset={4}
         >
-          {/* Filter tabs */}
-          <div className="px-3 pt-3 pb-2 flex items-center gap-1.5">
-            {(["all", "partners", "locations"] as const).map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setFilterTab(tab)}
-                className={`px-3 py-1.5 rounded-full text-xs transition-colors ${
-                  filterTab === tab
-                    ? "border border-[#0A77FF] text-[#0A77FF] bg-white"
-                    : "border border-[#E2E8F0] text-[#334155] bg-white hover:bg-[#F8FAFC]"
-                }`}
-                style={{ fontWeight: filterTab === tab ? 600 : 500 }}
-              >
-                {tab === "all" ? "All" : tab === "partners" ? "Partners" : "Partner Locations"}
-              </button>
-            ))}
-          </div>
+          {/* Filter tabs - only when showLocationFilter */}
+          {showLocationFilter && (
+            <div className="px-3 pt-3 pb-2 flex items-center gap-1.5">
+              {(["all", "partners", "locations"] as const).map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setFilterTab(tab)}
+                  className={`px-3 py-1.5 rounded-full text-xs transition-colors ${
+                    filterTab === tab
+                      ? "border border-[#0A77FF] text-[#0A77FF] bg-white"
+                      : "border border-[#E2E8F0] text-[#334155] bg-white hover:bg-[#F8FAFC]"
+                  }`}
+                  style={{ fontWeight: filterTab === tab ? 600 : 500 }}
+                >
+                  {tab === "all" ? "All" : tab === "partners" ? "Partners" : "Locations"}
+                </button>
+              ))}
+            </div>
+          )}
 
           {/* Search */}
-          <div className="px-3 pb-2">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
-              <input
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search delivery location..."
-                className="w-full h-9 pl-9 pr-3 rounded-lg border border-[#E2E8F0] bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-none focus:border-[#0A77FF] focus:ring-2 focus:ring-[#0A77FF]/10"
-              />
-            </div>
+          <div className={`px-3 ${showLocationFilter ? "pb-2" : "py-3"}`}>
+            {searchBar}
           </div>
 
           {/* List */}
@@ -224,36 +444,7 @@ export function SearchablePartnerDropdown({
             {filtered.length === 0 ? (
               <div className="py-6 text-center text-xs text-[#94A3B8]">No results found</div>
             ) : (
-              filtered.map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => {
-                    onSelect(item.id);
-                    setOpen(false);
-                    setSearch("");
-                  }}
-                  className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-[#F8FAFC] ${
-                    selectedId === item.id ? "bg-[#EDF4FF]/50" : ""
-                  }`}
-                >
-                  <div
-                    className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-[11px] shrink-0"
-                    style={{ backgroundColor: item.logoColor, fontWeight: 700 }}
-                  >
-                    {item.logoText}
-                  </div>
-                  <div className="flex flex-col min-w-0 flex-1">
-                    <span className="text-sm text-[#0F172A] truncate" style={{ fontWeight: 500 }}>{item.name}</span>
-                    {item.location && (
-                      <span className="flex items-center gap-1 text-[11px] text-[#64748B] truncate">
-                        <MapPin className="w-3 h-3 shrink-0" />
-                        {item.location}
-                      </span>
-                    )}
-                  </div>
-                  {selectedId === item.id && <Check className="w-4 h-4 text-[#0A77FF] ml-auto shrink-0" />}
-                </button>
-              ))
+              filtered.map((item) => renderItemRow(item))
             )}
           </div>
         </PopoverContent>
@@ -261,7 +452,6 @@ export function SearchablePartnerDropdown({
     </div>
   );
 }
-
 // ── Currency dropdown ──
 export function CurrencyDropdown({
   selectedId,
