@@ -3949,6 +3949,10 @@ function ConfigPageContent({
   const [shipToFilterTab, setShipToFilterTab] = useState<"all" | "partners" | "locations">("all");
   const [currencyPopoverSearch, setCurrencyPopoverSearch] = useState("");
   const [payToPopoverSearch, setPayToPopoverSearch] = useState("");
+  const [payToDialogOpen, setPayToDialogOpen] = useState(false);
+  const [payToDialogSearch, setPayToDialogSearch] = useState("");
+  const [fundedByDialogOpen, setFundedByDialogOpen] = useState(false);
+  const [fundedByDialogSearch, setFundedByDialogSearch] = useState("");
 
   // Payment Methods state
   const [paymentEntries, setPaymentEntries] = useState<PaymentMethodEntry[]>([]);
@@ -4240,6 +4244,231 @@ function ConfigPageContent({
       },
     ];
 
+    // ── Helper: highlight search matches in text ──
+    const highlightMatch = (text: string, query: string) => {
+      if (!query.trim()) return text;
+      const idx = text.toLowerCase().indexOf(query.toLowerCase());
+      if (idx === -1) return text;
+      return (
+        <span>
+          {text.slice(0, idx)}
+          <span className="bg-[#FEF08A] text-[#0F172A] rounded-sm px-0.5" style={{ fontWeight: 600 }}>{text.slice(idx, idx + query.length)}</span>
+          {text.slice(idx + query.length)}
+        </span>
+      );
+    };
+
+    // ── Helper: group items as partners with nested locations ──
+    const buildGroupedItems = (items: typeof PARTNER_LOCATION_ITEMS, searchQuery: string) => {
+      const partners = items.filter(i => i.type === "partner");
+      const locations = items.filter(i => i.type === "location");
+      const q = searchQuery.toLowerCase().trim();
+
+      // Group locations under matching partners by logoText+logoColor
+      const grouped = partners.map(p => {
+        const pLocations = locations.filter(l => l.logoText === p.logoText && l.logoColor === p.logoColor);
+        const partnerMatches = !q || p.name.toLowerCase().includes(q) || (p.location && p.location.toLowerCase().includes(q));
+        const matchingLocations = !q ? pLocations : pLocations.filter(l => l.name.toLowerCase().includes(q) || (l.location && l.location.toLowerCase().includes(q)));
+        const hasMatch = partnerMatches || matchingLocations.length > 0;
+        return {
+          partner: p,
+          locations: pLocations,
+          matchingLocations,
+          partnerMatches: partnerMatches as boolean,
+          hasMatch,
+          expanded: !!q && hasMatch,
+        };
+      });
+
+      // Orphan locations (no matching partner)
+      const groupedLocationIds = new Set(grouped.flatMap(g => g.locations.map(l => l.id)));
+      const orphanLocations = locations.filter(l => !groupedLocationIds.has(l.id));
+      const matchingOrphans = !q ? orphanLocations : orphanLocations.filter(l => l.name.toLowerCase().includes(q) || (l.location && l.location.toLowerCase().includes(q)));
+
+      return { grouped: grouped.filter(g => !q || g.hasMatch), orphanLocations: !q ? orphanLocations : matchingOrphans };
+    };
+
+    // ── Shared partner selection dialog ──
+    const renderPartnerSelectionDialog = (
+      dialogOpen: boolean,
+      setDialogOpen: (open: boolean) => void,
+      dialogSearch: string,
+      setDialogSearch: (s: string) => void,
+      items: typeof PARTNER_LOCATION_ITEMS,
+      selectedId: string | null,
+      onSelect: (id: string) => void,
+      config: { icon: React.ReactNode; iconBg: string; iconColor: string; title: string; description: string }
+    ) => {
+      const { grouped, orphanLocations } = buildGroupedItems(items, dialogSearch);
+
+      return (
+        <Dialog open={dialogOpen} onOpenChange={(open) => { setDialogOpen(open); if (!open) setDialogSearch(""); }}>
+          <DialogContent
+            className="!max-w-[520px] p-0 gap-0 rounded-2xl border-0 overflow-hidden"
+            style={{ boxShadow: "0 24px 48px -12px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.05)" }}
+            hideCloseButton
+          >
+            <DialogTitle className="sr-only">{config.title}</DialogTitle>
+            <DialogDescription className="sr-only">{config.description}</DialogDescription>
+            {/* Header */}
+            <div className="px-5 pt-4 pb-3 border-b border-[#F1F5F9]">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: config.iconBg }}>
+                    {config.icon}
+                  </div>
+                  <div>
+                    <h3 className="text-sm text-[#0F172A]" style={{ fontWeight: 600 }}>{config.title}</h3>
+                    <p className="text-[11px] text-[#64748B]">{config.description}</p>
+                  </div>
+                </div>
+                <button onClick={() => { setDialogOpen(false); setDialogSearch(""); }} className="w-7 h-7 rounded-lg flex items-center justify-center text-[#94A3B8] hover:text-[#64748B] hover:bg-[#F1F5F9] transition-all">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
+                <input
+                  value={dialogSearch}
+                  onChange={(e) => setDialogSearch(e.target.value)}
+                  placeholder="Search partners & locations..."
+                  className="w-full h-9 pl-9 pr-3 rounded-lg border border-[#E2E8F0] bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-none focus:border-[#0A77FF] focus:ring-2 focus:ring-[#0A77FF]/10"
+                  autoFocus
+                />
+              </div>
+            </div>
+            {/* List */}
+            <div className="max-h-[400px] overflow-y-auto">
+              {grouped.length === 0 && orphanLocations.length === 0 ? (
+                <div className="py-10 text-center">
+                  <Search className="w-8 h-8 text-[#CBD5E1] mx-auto mb-2" />
+                  <p className="text-sm text-[#64748B]" style={{ fontWeight: 500 }}>No results found</p>
+                  <p className="text-xs text-[#94A3B8] mt-0.5">Try a different search term</p>
+                </div>
+              ) : (
+                <div className="py-1">
+                  {grouped.map(({ partner, locations, matchingLocations, expanded }) => {
+                    const showLocations = expanded || (!dialogSearch.trim());
+                    const locsToShow = dialogSearch.trim() ? matchingLocations : locations;
+                    const isPartnerSelected = selectedId === partner.id;
+
+                    return (
+                      <div key={partner.id}>
+                        {/* Partner row */}
+                        <button
+                          onClick={() => { onSelect(partner.id); setDialogOpen(false); setDialogSearch(""); }}
+                          className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-[#F8FAFC] ${isPartnerSelected ? "bg-[#EDF4FF]/60" : ""}`}
+                        >
+                          <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-[11px] shrink-0" style={{ backgroundColor: partner.logoColor, fontWeight: 700 }}>
+                            {partner.logoText}
+                          </div>
+                          <div className="flex flex-col min-w-0 flex-1">
+                            <span className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>
+                              {highlightMatch(partner.name, dialogSearch)}
+                            </span>
+                            {partner.location && (
+                              <span className="flex items-center gap-1 text-[11px] text-[#64748B] truncate mt-0.5">
+                                <MapPin className="w-3 h-3 shrink-0" />
+                                {highlightMatch(partner.location, dialogSearch)}
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2 shrink-0">
+                            {partner.isDefault && (
+                              <span className="text-[9px] text-[#0A77FF] bg-[#EDF4FF] border border-[#0A77FF]/20 px-1.5 py-0.5 rounded" style={{ fontWeight: 600 }}>Default</span>
+                            )}
+                            {locsToShow.length > 0 && (
+                              <span className="text-[10px] text-[#94A3B8] bg-[#F8FAFC] border border-[#E8ECF1] px-1.5 py-0.5 rounded" style={{ fontWeight: 500 }}>
+                                {locsToShow.length} loc{locsToShow.length !== 1 ? "s" : ""}
+                              </span>
+                            )}
+                            {isPartnerSelected && <Check className="w-4 h-4 text-[#0A77FF]" />}
+                          </div>
+                        </button>
+                        {/* Nested locations */}
+                        {showLocations && locsToShow.length > 0 && (
+                          <div className="ml-6 border-l border-[#E8ECF1]">
+                            {locsToShow.map((loc) => {
+                              const isLocSelected = selectedId === loc.id;
+                              return (
+                                <button
+                                  key={loc.id}
+                                  onClick={() => { onSelect(loc.id); setDialogOpen(false); setDialogSearch(""); }}
+                                  className={`w-full flex items-center gap-3 pl-4 pr-4 py-2 text-left transition-colors hover:bg-[#F8FAFC] ${isLocSelected ? "bg-[#EDF4FF]/60" : ""}`}
+                                >
+                                  <MapPin className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" />
+                                  <div className="flex flex-col min-w-0 flex-1">
+                                    <span className="text-[12px] text-[#334155] truncate" style={{ fontWeight: 500 }}>
+                                      {highlightMatch(loc.name, dialogSearch)}
+                                    </span>
+                                    {loc.location && (
+                                      <span className="text-[10px] text-[#94A3B8] truncate">
+                                        {highlightMatch(loc.location, dialogSearch)}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <span className="text-[9px] text-[#22C55E] bg-[#ECFDF5] border border-[#22C55E]/20 px-1.5 py-0.5 rounded shrink-0" style={{ fontWeight: 600 }}>Location</span>
+                                  {isLocSelected && <Check className="w-4 h-4 text-[#0A77FF] shrink-0" />}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                  {/* Orphan locations */}
+                  {orphanLocations.length > 0 && (
+                    <>
+                      {grouped.length > 0 && <div className="border-t border-[#F1F5F9] my-1" />}
+                      {orphanLocations.map((loc) => {
+                        const isLocSelected = selectedId === loc.id;
+                        return (
+                          <button
+                            key={loc.id}
+                            onClick={() => { onSelect(loc.id); setDialogOpen(false); setDialogSearch(""); }}
+                            className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-[#F8FAFC] ${isLocSelected ? "bg-[#EDF4FF]/60" : ""}`}
+                          >
+                            <div className="w-8 h-8 rounded-lg bg-[#F1F5F9] flex items-center justify-center shrink-0">
+                              <MapPin className="w-4 h-4 text-[#64748B]" />
+                            </div>
+                            <div className="flex flex-col min-w-0 flex-1">
+                              <span className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 500 }}>
+                                {highlightMatch(loc.name, dialogSearch)}
+                              </span>
+                              {loc.location && (
+                                <span className="text-[10px] text-[#94A3B8] truncate">
+                                  {highlightMatch(loc.location, dialogSearch)}
+                                </span>
+                              )}
+                            </div>
+                            <span className="text-[9px] text-[#22C55E] bg-[#ECFDF5] border border-[#22C55E]/20 px-1.5 py-0.5 rounded shrink-0" style={{ fontWeight: 600 }}>Location</span>
+                            {isLocSelected && <Check className="w-4 h-4 text-[#0A77FF] shrink-0" />}
+                          </button>
+                        );
+                      })}
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+            {/* Footer */}
+            {selectedId && (
+              <div className="px-4 py-3 border-t border-[#F1F5F9] bg-[#FAFBFC] flex items-center justify-between">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="w-1.5 h-1.5 rounded-full bg-[#22C55E] shrink-0" />
+                  <span className="text-xs text-[#334155] truncate" style={{ fontWeight: 500 }}>
+                    Selected: <span style={{ fontWeight: 600 }}>{items.find(i => i.id === selectedId)?.name || ""}</span>
+                  </span>
+                </div>
+                <button onClick={() => { setDialogOpen(false); setDialogSearch(""); }} className="px-3 py-1.5 rounded-lg bg-[#0A77FF] text-white text-xs hover:bg-[#0966DB] transition-colors" style={{ fontWeight: 600 }}>Done</button>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
+      );
+    };
+
     return (
       <div className="space-y-5">
         {/* ── Heading ── */}
@@ -4393,7 +4622,7 @@ function ConfigPageContent({
           })}
         </div>
 
-        {/* ── Configuration Fields ── */}
+        {/* ── Configuration Cards – 2×2 equal grid ── */}
         {(() => {
           const currObj = CURRENCY_OPTIONS.find((c) => c.id === currency);
           const stObj = PARTNER_LOCATION_ITEMS.find((i) => i.id === shipTo);
@@ -4403,26 +4632,13 @@ function ConfigPageContent({
           const currencyFiltered = CURRENCY_OPTIONS.filter((c) =>
             !currencyPopoverSearch.trim() || c.label.toLowerCase().includes(currencyPopoverSearch.toLowerCase())
           );
-          const payToFiltered = PARTNER_LOCATION_ITEMS.filter((i) =>
-            !payToPopoverSearch.trim() || i.name.toLowerCase().includes(payToPopoverSearch.toLowerCase())
-          );
-
-          const shipToFiltered = (() => {
-            let list = PARTNER_LOCATION_ITEMS as PartnerLocationItem[];
-            if (shipToFilterTab === "partners") list = list.filter((i) => i.type === "partner");
-            if (shipToFilterTab === "locations") list = list.filter((i) => i.type === "location");
-            if (shipToSearch.trim()) {
-              const q = shipToSearch.toLowerCase();
-              list = list.filter((i) => i.name.toLowerCase().includes(q) || (i.location && i.location.toLowerCase().includes(q)));
-            }
-            return list;
-          })();
 
           const fieldCardBase = "group relative rounded-xl border border-[#E8ECF1] bg-white hover:border-[#CBD5E1] hover:shadow-[0_2px_8px_-2px_rgba(0,0,0,0.06)] transition-all duration-200 cursor-pointer";
+          const disabledCardBase = "relative rounded-xl border border-dashed border-[#E2E8F0] bg-[#FAFBFC] transition-all duration-200";
 
           return (
             <div className="grid grid-cols-2 gap-2.5">
-              {/* Currency */}
+              {/* 1. Currency */}
               <Popover onOpenChange={(open) => { if (!open) setCurrencyPopoverSearch(""); }}>
                 <PopoverTrigger asChild>
                   <div className={fieldCardBase + " p-3"}>
@@ -4496,73 +4712,9 @@ function ConfigPageContent({
                 </PopoverContent>
               </Popover>
 
-              {/* Pay To */}
-              <Popover onOpenChange={(open) => { if (!open) setPayToPopoverSearch(""); }}>
-                <PopoverTrigger asChild>
-                  <div className={fieldCardBase + " p-3"}>
-                    <div className="flex items-center justify-between mb-2.5">
-                      <div className="flex items-center gap-1.5">
-                        <Receipt className="w-3.5 h-3.5 text-[#94A3B8]" />
-                        <span className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Pay To</span>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <button type="button" className="inline-flex" tabIndex={-1} onClick={(e) => e.stopPropagation()}>
-                              <Info className="w-3 h-3 text-[#CBD5E1] hover:text-[#94A3B8] transition-colors" />
-                            </button>
-                          </TooltipTrigger>
-                          <TooltipContent side="top" sideOffset={6} className="bg-[#1E293B] text-white text-[12px] leading-[1.5] rounded-lg max-w-[240px] px-3 py-2.5 shadow-lg z-[300]">
-                            The party receiving payment for this transaction.
-                          </TooltipContent>
-                        </Tooltip>
-                      </div>
-                      <Pencil className="w-3 h-3 text-[#CBD5E1] opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </div>
-                    {ptObj ? (
-                      <div className="flex items-center gap-2.5">
-                        <div className="w-9 h-9 rounded-lg flex items-center justify-center text-white text-[11px] shrink-0" style={{ backgroundColor: ptObj.logoColor, fontWeight: 700 }}>
-                          {ptObj.logoText}
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{ptObj.name}</p>
-                          <p className="text-[11px] text-[#64748B] truncate">Payment recipient</p>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-2.5">
-                        <div className="w-9 h-9 rounded-lg bg-[#F8FAFC] border border-dashed border-[#CBD5E1] flex items-center justify-center shrink-0">
-                          <Receipt className="w-4 h-4 text-[#CBD5E1]" />
-                        </div>
-                        <p className="text-[12px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Select recipient</p>
-                      </div>
-                    )}
-                  </div>
-                </PopoverTrigger>
-                <PopoverContent className="w-[320px] p-0 rounded-xl border border-[#E2E8F0] shadow-lg z-[200]" align="end" sideOffset={4}>
-                  <div className="p-3">
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
-                      <input value={payToPopoverSearch} onChange={(e) => setPayToPopoverSearch(e.target.value)} placeholder="Search partner..." className="w-full h-9 pl-9 pr-3 rounded-lg border border-[#E2E8F0] bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-none focus:border-[#0A77FF] focus:ring-2 focus:ring-[#0A77FF]/10" autoFocus />
-                    </div>
-                  </div>
-                  <div className="max-h-[260px] overflow-y-auto border-t border-[#F1F5F9]">
-                    {payToFiltered.length === 0 ? (
-                      <div className="py-6 text-center text-xs text-[#94A3B8]">No results found</div>
-                    ) : (
-                      payToFiltered.map((item) => (
-                        <button key={item.id} onClick={() => setPayTo(item.id)} className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-[#F8FAFC] ${payTo === item.id ? "bg-[#EDF4FF]/50" : ""}`}>
-                          <div className="w-7 h-7 rounded-lg flex items-center justify-center text-white text-[10px] shrink-0" style={{ backgroundColor: item.logoColor, fontWeight: 700 }}>{item.logoText}</div>
-                          <span className="text-sm text-[#0F172A] truncate" style={{ fontWeight: 500 }}>{item.name}</span>
-                          {payTo === item.id && <Check className="w-4 h-4 text-[#0A77FF] ml-auto shrink-0" />}
-                        </button>
-                      ))
-                    )}
-                  </div>
-                </PopoverContent>
-              </Popover>
-
-              {/* Ship To — spans full width */}
+              {/* 2. Ship To */}
               <div
-                className={fieldCardBase + " p-3 col-span-2"}
+                className={fieldCardBase + " p-3"}
                 onClick={() => setShipToDialogOpen(true)}
               >
                 <div className="flex items-center justify-between mb-2.5">
@@ -4583,11 +4735,11 @@ function ConfigPageContent({
                   <Pencil className="w-3 h-3 text-[#CBD5E1] opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
                 {stObj ? (
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2.5">
                     <div className="w-9 h-9 rounded-lg flex items-center justify-center text-white text-[11px] shrink-0" style={{ backgroundColor: stObj.logoColor, fontWeight: 700 }}>
                       {stObj.logoText}
                     </div>
-                    <div className="min-w-0 flex-1">
+                    <div className="min-w-0">
                       <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{stObj.name}</p>
                       {stObj.location && (
                         <p className="text-[11px] text-[#64748B] truncate flex items-center gap-1 mt-0.5">
@@ -4596,129 +4748,119 @@ function ConfigPageContent({
                         </p>
                       )}
                     </div>
-                    <span className={`text-[9px] px-1.5 py-0.5 rounded-md border shrink-0 ${stObj.type === "location" ? "text-[#22C55E] bg-[#ECFDF5] border-[#22C55E]/20" : "text-[#8B5CF6] bg-[#F5F3FF] border-[#8B5CF6]/20"}`} style={{ fontWeight: 600 }}>
-                      {stObj.type === "location" ? "Location" : "Partner"}
-                    </span>
                   </div>
                 ) : (
                   <div className="flex items-center gap-2.5">
                     <div className="w-9 h-9 rounded-lg bg-[#F8FAFC] border border-dashed border-[#CBD5E1] flex items-center justify-center shrink-0">
                       <Truck className="w-4 h-4 text-[#CBD5E1]" />
                     </div>
-                    <p className="text-[12px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Select delivery destination</p>
+                    <p className="text-[12px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Select destination</p>
                   </div>
                 )}
               </div>
 
-              {/* Ship To Dialog */}
-              <Dialog open={shipToDialogOpen} onOpenChange={(open) => { setShipToDialogOpen(open); if (!open) { setShipToSearch(""); setShipToFilterTab("all"); } }}>
-                <DialogContent
-                  className="!max-w-[520px] p-0 gap-0 rounded-2xl border-0 overflow-hidden"
-                  style={{ boxShadow: "0 24px 48px -12px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.05)" }}
-                  hideCloseButton
-                >
-                  <DialogTitle className="sr-only">Select Ship To</DialogTitle>
-                  <DialogDescription className="sr-only">Choose a partner or location for Ship To</DialogDescription>
-                  <div className="px-5 pt-4 pb-3 border-b border-[#F1F5F9]">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-lg bg-[#ECFDF5] flex items-center justify-center">
-                          <Truck className="w-4 h-4 text-[#22C55E]" />
-                        </div>
-                        <div>
-                          <h3 className="text-sm text-[#0F172A]" style={{ fontWeight: 600 }}>Select Ship To</h3>
-                          <p className="text-[11px] text-[#64748B]">{shipToFiltered.length} results available</p>
-                        </div>
-                      </div>
-                      <button onClick={() => { setShipToDialogOpen(false); setShipToSearch(""); setShipToFilterTab("all"); }} className="w-7 h-7 rounded-lg flex items-center justify-center text-[#94A3B8] hover:text-[#64748B] hover:bg-[#F1F5F9] transition-all">
-                        <X className="w-4 h-4" />
-                      </button>
+              {/* 3. Pay To */}
+              <div
+                className={fieldCardBase + " p-3"}
+                onClick={() => setPayToDialogOpen(true)}
+              >
+                <div className="flex items-center justify-between mb-2.5">
+                  <div className="flex items-center gap-1.5">
+                    <Receipt className="w-3.5 h-3.5 text-[#94A3B8]" />
+                    <span className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Pay To</span>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button type="button" className="inline-flex" tabIndex={-1} onClick={(e) => e.stopPropagation()}>
+                          <Info className="w-3 h-3 text-[#CBD5E1] hover:text-[#94A3B8] transition-colors" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="top" sideOffset={6} className="bg-[#1E293B] text-white text-[12px] leading-[1.5] rounded-lg max-w-[240px] px-3 py-2.5 shadow-lg z-[300]">
+                        The party receiving payment for this transaction.
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                  <Pencil className="w-3 h-3 text-[#CBD5E1] opacity-0 group-hover:opacity-100 transition-opacity" />
+                </div>
+                {ptObj ? (
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-9 h-9 rounded-lg flex items-center justify-center text-white text-[11px] shrink-0" style={{ backgroundColor: ptObj.logoColor, fontWeight: 700 }}>
+                      {ptObj.logoText}
                     </div>
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
-                      <input value={shipToSearch} onChange={(e) => setShipToSearch(e.target.value)} placeholder="Search partners & locations..." className="w-full h-9 pl-9 pr-3 rounded-lg border border-[#E2E8F0] bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-none focus:border-[#0A77FF] focus:ring-2 focus:ring-[#0A77FF]/10" autoFocus />
-                    </div>
-                    <div className="flex items-center gap-1.5 mt-3">
-                      {(["all", "partners", "locations"] as const).map((tab) => {
-                        const count = tab === "all" ? PARTNER_LOCATION_ITEMS.length : PARTNER_LOCATION_ITEMS.filter(i => tab === "partners" ? i.type === "partner" : i.type === "location").length;
-                        return (
-                          <button key={tab} onClick={() => setShipToFilterTab(tab)} className={`px-3 py-1.5 rounded-full text-xs transition-colors ${shipToFilterTab === tab ? "border border-[#0A77FF] text-[#0A77FF] bg-[#EDF4FF]" : "border border-[#E2E8F0] text-[#334155] bg-white hover:bg-[#F8FAFC]"}`} style={{ fontWeight: shipToFilterTab === tab ? 600 : 500 }}>
-                            {tab === "all" ? "All" : tab === "partners" ? "Partners" : "Locations"} ({count})
-                          </button>
-                        );
-                      })}
+                    <div className="min-w-0">
+                      <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{ptObj.name}</p>
+                      <p className="text-[11px] text-[#64748B] truncate">Payment recipient</p>
                     </div>
                   </div>
-                  <div className="max-h-[380px] overflow-y-auto">
-                    {shipToFiltered.length === 0 ? (
-                      <div className="py-10 text-center">
-                        <Search className="w-8 h-8 text-[#CBD5E1] mx-auto mb-2" />
-                        <p className="text-sm text-[#64748B]" style={{ fontWeight: 500 }}>No results found</p>
-                        <p className="text-xs text-[#94A3B8] mt-0.5">Try a different search term</p>
-                      </div>
+                ) : (
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-9 h-9 rounded-lg bg-[#F8FAFC] border border-dashed border-[#CBD5E1] flex items-center justify-center shrink-0">
+                      <Receipt className="w-4 h-4 text-[#CBD5E1]" />
+                    </div>
+                    <p className="text-[12px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Select recipient</p>
+                  </div>
+                )}
+              </div>
+
+              {/* 4. Funded By – with disabled state + toggle */}
+              {!allowAltFunding ? (
+                <div className={disabledCardBase + " p-3"}>
+                  <div className="flex items-center justify-between mb-2.5">
+                    <div className="flex items-center gap-1.5">
+                      <Landmark className="w-3.5 h-3.5 text-[#CBD5E1]" />
+                      <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Funded By</span>
+                      {fbObj?.isDefault && (
+                        <span className="text-[9px] text-[#94A3B8] bg-[#F1F5F9] border border-[#E2E8F0] px-1.5 py-0.5 rounded" style={{ fontWeight: 600 }}>Default</span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                      <span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Override</span>
+                      <Switch
+                        checked={allowAltFunding}
+                        onCheckedChange={setAllowAltFunding}
+                      />
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2.5 opacity-50">
+                    {fbObj ? (
+                      <>
+                        <div className="w-9 h-9 rounded-lg flex items-center justify-center text-white text-[11px] shrink-0" style={{ backgroundColor: fbObj.logoColor, fontWeight: 700 }}>
+                          {fbObj.logoText}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-[13px] text-[#64748B] truncate" style={{ fontWeight: 600 }}>{fbObj.name}</p>
+                          <p className="text-[11px] text-[#94A3B8] truncate">Funding source</p>
+                        </div>
+                      </>
                     ) : (
-                      shipToFiltered.map((item) => (
-                        <button
-                          key={item.id}
-                          onClick={() => { setShipTo(item.id); setShipToDialogOpen(false); setShipToSearch(""); setShipToFilterTab("all"); }}
-                          className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-[#F8FAFC] ${shipTo === item.id ? "bg-[#EDF4FF]/50" : ""}`}
-                        >
-                          <div className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-[11px] shrink-0" style={{ backgroundColor: item.logoColor, fontWeight: 700 }}>{item.logoText}</div>
-                          <div className="flex flex-col min-w-0 flex-1">
-                            <span className="text-sm text-[#0F172A] truncate" style={{ fontWeight: 500 }}>{item.name}</span>
-                            {item.location && (
-                              <span className="flex items-center gap-1 text-[11px] text-[#64748B] truncate">
-                                <MapPin className="w-3 h-3 shrink-0" />
-                                {item.location}
-                              </span>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-2 shrink-0 ml-auto">
-                            <span className={`text-[9px] px-1.5 py-0.5 rounded-md border ${item.type === "location" ? "text-[#22C55E] bg-[#ECFDF5] border-[#22C55E]/20" : "text-[#8B5CF6] bg-[#F5F3FF] border-[#8B5CF6]/20"}`} style={{ fontWeight: 600 }}>
-                              {item.type === "location" ? "Location" : "Partner"}
-                            </span>
-                            {shipTo === item.id && <Check className="w-4 h-4 text-[#0A77FF] shrink-0" />}
-                          </div>
-                        </button>
-                      ))
+                      <>
+                        <div className="w-9 h-9 rounded-lg bg-[#F1F5F9] border border-dashed border-[#E2E8F0] flex items-center justify-center shrink-0">
+                          <Landmark className="w-4 h-4 text-[#CBD5E1]" />
+                        </div>
+                        <p className="text-[12px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Funding source locked</p>
+                      </>
                     )}
                   </div>
-                  {stObj && (
-                    <div className="px-4 py-3 border-t border-[#F1F5F9] bg-[#FAFBFC] flex items-center justify-between">
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <div className="w-1.5 h-1.5 rounded-full bg-[#22C55E] shrink-0" />
-                        <span className="text-xs text-[#334155] truncate" style={{ fontWeight: 500 }}>
-                          Selected: <span style={{ fontWeight: 600 }}>{stObj.name}</span>
-                        </span>
-                      </div>
-                      <button onClick={() => { setShipToDialogOpen(false); setShipToSearch(""); setShipToFilterTab("all"); }} className="px-3 py-1.5 rounded-lg bg-[#0A77FF] text-white text-xs hover:bg-[#0966DB] transition-colors" style={{ fontWeight: 600 }}>Done</button>
-                    </div>
-                  )}
-                </DialogContent>
-              </Dialog>
-
-              {/* Funded By */}
-              {!allowAltFunding ? (
-                <div className={fieldCardBase + " p-3 col-span-2"} onClick={() => setAllowAltFunding(true)}>
+                </div>
+              ) : (
+                <div
+                  className={fieldCardBase + " p-3"}
+                  onClick={() => setFundedByDialogOpen(true)}
+                >
                   <div className="flex items-center justify-between mb-2.5">
                     <div className="flex items-center gap-1.5">
                       <Landmark className="w-3.5 h-3.5 text-[#94A3B8]" />
                       <span className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Funded By</span>
-                      {fbObj?.isDefault && (
-                        <span className="text-[9px] text-[#0A77FF] bg-[#EDF4FF] border border-[#0A77FF]/20 px-1.5 py-0.5 rounded" style={{ fontWeight: 600 }}>Default</span>
-                      )}
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <button type="button" className="inline-flex" tabIndex={-1} onClick={(e) => e.stopPropagation()}>
-                            <Info className="w-3 h-3 text-[#CBD5E1] hover:text-[#94A3B8] transition-colors" />
-                          </button>
-                        </TooltipTrigger>
-                        <TooltipContent side="top" sideOffset={6} className="bg-[#1E293B] text-white text-[12px] leading-[1.5] rounded-lg max-w-[240px] px-3 py-2.5 shadow-lg z-[300]">
-                          The entity covering costs for this transaction.
-                        </TooltipContent>
-                      </Tooltip>
+                      <span className="text-[9px] text-[#F59E0B] bg-[#FFFBEB] border border-[#F59E0B]/20 px-1.5 py-0.5 rounded" style={{ fontWeight: 600 }}>Overridden</span>
                     </div>
-                    <span className="text-[11px] text-[#F59E0B] opacity-0 group-hover:opacity-100 transition-opacity" style={{ fontWeight: 600 }}>Override</span>
+                    <div className="flex items-center gap-2">
+                      <div onClick={(e) => e.stopPropagation()}>
+                        <Switch
+                          checked={allowAltFunding}
+                          onCheckedChange={(val) => { setAllowAltFunding(val); if (!val) setFundedBy("pl-7"); }}
+                        />
+                      </div>
+                      <Pencil className="w-3 h-3 text-[#CBD5E1] opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </div>
                   </div>
                   {fbObj ? (
                     <div className="flex items-center gap-2.5">
@@ -4739,70 +4881,30 @@ function ConfigPageContent({
                     </div>
                   )}
                 </div>
-              ) : (
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <div className={fieldCardBase + " p-3 col-span-2"}>
-                      <div className="flex items-center justify-between mb-2.5">
-                        <div className="flex items-center gap-1.5">
-                          <Landmark className="w-3.5 h-3.5 text-[#94A3B8]" />
-                          <span className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Funded By</span>
-                          <span className="text-[9px] text-[#F59E0B] bg-[#FFFBEB] border border-[#F59E0B]/20 px-1.5 py-0.5 rounded" style={{ fontWeight: 600 }}>Overridden</span>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <button type="button" className="inline-flex" tabIndex={-1} onClick={(e) => e.stopPropagation()}>
-                                <Info className="w-3 h-3 text-[#CBD5E1] hover:text-[#94A3B8] transition-colors" />
-                              </button>
-                            </TooltipTrigger>
-                            <TooltipContent side="top" sideOffset={6} className="bg-[#1E293B] text-white text-[12px] leading-[1.5] rounded-lg max-w-[240px] px-3 py-2.5 shadow-lg z-[300]">
-                              The entity covering costs for this transaction.
-                            </TooltipContent>
-                          </Tooltip>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={(e) => { e.stopPropagation(); setAllowAltFunding(false); setFundedBy("pl-7"); }}
-                            className="text-[11px] text-[#64748B] hover:text-[#334155] transition-colors opacity-0 group-hover:opacity-100"
-                            style={{ fontWeight: 500 }}
-                          >
-                            Reset
-                          </button>
-                          <Pencil className="w-3 h-3 text-[#CBD5E1] opacity-0 group-hover:opacity-100 transition-opacity" />
-                        </div>
-                      </div>
-                      {fbObj ? (
-                        <div className="flex items-center gap-2.5">
-                          <div className="w-9 h-9 rounded-lg flex items-center justify-center text-white text-[11px] shrink-0" style={{ backgroundColor: fbObj.logoColor, fontWeight: 700 }}>
-                            {fbObj.logoText}
-                          </div>
-                          <div className="min-w-0">
-                            <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{fbObj.name}</p>
-                            <p className="text-[11px] text-[#64748B] truncate">Funding source</p>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="flex items-center gap-2.5">
-                          <div className="w-9 h-9 rounded-lg bg-[#F8FAFC] border border-dashed border-[#CBD5E1] flex items-center justify-center shrink-0">
-                            <Landmark className="w-4 h-4 text-[#CBD5E1]" />
-                          </div>
-                          <p className="text-[12px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Select funding source</p>
-                        </div>
-                      )}
-                    </div>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-[300px] p-0 rounded-xl border border-[#E2E8F0] shadow-lg z-[200]" align="end" sideOffset={4}>
-                    <div className="max-h-[280px] overflow-y-auto py-1">
-                      {FUNDED_BY_ITEMS.map((item) => (
-                        <button key={item.id} onClick={() => setFundedBy(item.id)} className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-[#F8FAFC] ${fundedBy === item.id ? "bg-[#EDF4FF]/50" : ""}`}>
-                          <div className="w-7 h-7 rounded-full flex items-center justify-center text-white text-[10px] shrink-0" style={{ backgroundColor: item.logoColor, fontWeight: 700 }}>{item.logoText}</div>
-                          <span className="text-sm text-[#0F172A] truncate" style={{ fontWeight: 500 }}>{item.name}</span>
-                          {item.isDefault && <span className="text-[10px] text-[#0A77FF] bg-[#EDF4FF] border border-[#0A77FF]/20 px-1.5 py-0.5 rounded shrink-0 ml-auto" style={{ fontWeight: 600 }}>Default</span>}
-                          {fundedBy === item.id && !item.isDefault && <Check className="w-4 h-4 text-[#0A77FF] ml-auto shrink-0" />}
-                        </button>
-                      ))}
-                    </div>
-                  </PopoverContent>
-                </Popover>
+              )}
+
+              {/* ── Ship To Dialog ── */}
+              {renderPartnerSelectionDialog(
+                shipToDialogOpen, setShipToDialogOpen,
+                shipToSearch, setShipToSearch,
+                PARTNER_LOCATION_ITEMS, shipTo, (id) => setShipTo(id),
+                { icon: <Truck className="w-4 h-4 text-[#22C55E]" />, iconBg: "#ECFDF5", iconColor: "#22C55E", title: "Select Ship To", description: "Choose delivery destination" }
+              )}
+
+              {/* ── Pay To Dialog ── */}
+              {renderPartnerSelectionDialog(
+                payToDialogOpen, setPayToDialogOpen,
+                payToDialogSearch, setPayToDialogSearch,
+                PARTNER_LOCATION_ITEMS, payTo, (id) => setPayTo(id),
+                { icon: <Receipt className="w-4 h-4 text-[#8B5CF6]" />, iconBg: "#F5F3FF", iconColor: "#8B5CF6", title: "Select Pay To", description: "Choose payment recipient" }
+              )}
+
+              {/* ── Funded By Dialog ── */}
+              {renderPartnerSelectionDialog(
+                fundedByDialogOpen, setFundedByDialogOpen,
+                fundedByDialogSearch, setFundedByDialogSearch,
+                FUNDED_BY_ITEMS, fundedBy, (id) => setFundedBy(id),
+                { icon: <Landmark className="w-4 h-4 text-[#F59E0B]" />, iconBg: "#FFFBEB", iconColor: "#F59E0B", title: "Select Funded By", description: "Choose funding source" }
               )}
             </div>
           );
