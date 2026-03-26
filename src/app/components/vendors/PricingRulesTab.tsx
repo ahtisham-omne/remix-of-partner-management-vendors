@@ -1819,6 +1819,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                           <PricingRuleCard key={rule.id} rule={rule} onClick={() => openDetail(rule)} />
                         ))}
                       </div>
+                      </div>
                     </div>
                   )}
                 </>

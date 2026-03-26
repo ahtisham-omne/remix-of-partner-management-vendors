@@ -5038,6 +5038,7 @@ function PricingRulesTab({ cfg }: { cfg?: VendorConfigData }) {
               </div>
             ))}
           </div>
+          </div>
         ) : (
           <EmptyState icon={Tag} title="No pricing rules applied" description="Pricing rules can be configured during partner creation or editing." />
         )}
