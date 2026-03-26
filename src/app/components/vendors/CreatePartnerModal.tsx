@@ -3940,7 +3940,7 @@ function ConfigPageContent({
   }, [selectedPricingRuleIds, allPricingRulePresets]);
 
   // Billing & Shipping state
-  const [currency, setCurrency] = useState("");
+  const [currency, setCurrency] = useState("usd");
   const [shipTo, setShipTo] = useState<string | null>("pl-1"); // FR Conversions, Westminster default
   const [payTo, setPayTo] = useState<string | null>("pl-3"); // Toyota International default
   const [fundedBy, setFundedBy] = useState<string | null>("pl-7"); // FR Conversions default
