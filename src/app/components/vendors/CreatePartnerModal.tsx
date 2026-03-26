@@ -3949,6 +3949,10 @@ function ConfigPageContent({
   const [shipToFilterTab, setShipToFilterTab] = useState<"all" | "partners" | "locations">("all");
   const [currencyPopoverSearch, setCurrencyPopoverSearch] = useState("");
   const [payToPopoverSearch, setPayToPopoverSearch] = useState("");
+  const [payToDialogOpen, setPayToDialogOpen] = useState(false);
+  const [payToDialogSearch, setPayToDialogSearch] = useState("");
+  const [fundedByDialogOpen, setFundedByDialogOpen] = useState(false);
+  const [fundedByDialogSearch, setFundedByDialogSearch] = useState("");
 
   // Payment Methods state
   const [paymentEntries, setPaymentEntries] = useState<PaymentMethodEntry[]>([]);
