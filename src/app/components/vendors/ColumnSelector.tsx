@@ -1,6 +1,5 @@
 import { useState, useRef, useMemo, useCallback } from "react";
 import React from "react";
-import React from "react";
 import {
   Search,
   GripVertical,
