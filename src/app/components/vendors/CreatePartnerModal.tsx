@@ -4424,6 +4424,8 @@ function ConfigPageContent({
                 items={PARTNER_LOCATION_ITEMS}
                 selectedId={shipTo}
                 onSelect={setShipTo}
+                showLocationFilter
+                useDialog
               />
 
               {/* Funded By — stacked layout with toggle below */}
