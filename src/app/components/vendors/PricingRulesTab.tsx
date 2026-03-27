@@ -1669,6 +1669,36 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
             <SlidersHorizontal className="w-3.5 h-3.5 text-muted-foreground" />
             <span className="text-sm" style={{ fontWeight: 500 }}>Filters</span>
           </button>
+
+          {/* Category toggle — inline with search */}
+          <div className="inline-flex items-center rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-0.5 shrink-0">
+            {([
+              { key: "discount" as CategoryView, label: "Discounts", icon: TrendingDown, color: "#047857", bg: "#ECFDF5" },
+              { key: "premium" as CategoryView, label: "Premiums", icon: TrendingUp, color: "#6D28D9", bg: "#F5F3FF" },
+            ]).map((cat) => {
+              const active = categoryView === cat.key;
+              const count = categoryCounts[cat.key];
+              return (
+                <button
+                  key={cat.key}
+                  onClick={() => { setCategoryView(cat.key); setQuickFilter("all"); setCurrentPage(1); }}
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-[11px] transition-all cursor-pointer ${
+                    active ? "bg-white shadow-sm" : "hover:bg-white/60"
+                  }`}
+                  style={{ fontWeight: active ? 600 : 500, color: active ? cat.color : "#64748B" }}
+                >
+                  <cat.icon className="w-3 h-3" />
+                  {cat.label}
+                  <span
+                    className="text-[9px] rounded-full px-1 py-px min-w-[16px] text-center"
+                    style={{ fontWeight: 600, color: active ? cat.color : "#94A3B8", backgroundColor: active ? cat.bg : "#F1F5F9" }}
+                  >
+                    {count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         <div className="flex items-center gap-1.5 shrink-0">
@@ -1701,49 +1731,8 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
         </div>
       </div>
 
-      {/* Row 2: Category toggle (Discount / Premium) + Quick Filter Pills */}
-      <div className="flex items-center gap-3 overflow-x-auto px-4 pb-3 shrink-0">
-        {/* Category View Toggle */}
-        <div className="inline-flex items-center rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-0.5 shrink-0">
-          {([
-            { key: "discount" as CategoryView, label: "Discounts", icon: TrendingDown, color: "#047857", bg: "#ECFDF5", border: "#D1FAE5" },
-            { key: "premium" as CategoryView, label: "Premiums", icon: TrendingUp, color: "#6D28D9", bg: "#F5F3FF", border: "#EDE9FE" },
-          ]).map((cat) => {
-            const active = categoryView === cat.key;
-            const count = categoryCounts[cat.key];
-            return (
-              <button
-                key={cat.key}
-                onClick={() => { setCategoryView(cat.key); setQuickFilter("all"); setCurrentPage(1); }}
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs transition-all cursor-pointer ${
-                  active ? "bg-white shadow-sm" : "hover:bg-white/60"
-                }`}
-                style={{
-                  fontWeight: active ? 600 : 500,
-                  color: active ? cat.color : "#64748B",
-                }}
-              >
-                <cat.icon className="w-3 h-3" />
-                {cat.label}
-                <span
-                  className="text-[10px] rounded-full px-1.5 py-px min-w-[18px] text-center"
-                  style={{
-                    fontWeight: 600,
-                    color: active ? cat.color : "#94A3B8",
-                    backgroundColor: active ? cat.bg : "#F1F5F9",
-                  }}
-                >
-                  {count}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Vertical divider */}
-        <div className="w-px h-5 bg-[#E2E8F0] shrink-0" />
-
-        {/* Quick Sort/Filter Pills */}
+      {/* Row 2: Quick Filter Pills */}
+      <div className="flex items-center overflow-x-auto px-4 pb-3 shrink-0">
         <FilterPills
           options={QUICK_FILTER_DEFS.map((f) => ({
             key: f.key,
@@ -2486,13 +2475,13 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
 
             {/* Search row */}
             <div className="flex items-center gap-3 mb-3">
-              <div className="relative flex-1 max-w-[300px]">
+              <div className="relative shrink-0">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8]" />
                 <Input
                   value={explorePresetsSearch}
                   onChange={(e) => setExplorePresetsSearch(e.target.value)}
                   placeholder="Search pricing rules..."
-                  className="pl-9 h-9 rounded-lg border-[#E2E8F0] bg-[#FAFBFC] text-[13px]"
+                  className="pl-9 h-9 rounded-lg border-[#E2E8F0] bg-[#FAFBFC] text-[13px] w-[220px]"
                 />
                 {explorePresetsSearch && (
                   <button onClick={() => setExplorePresetsSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#94A3B8] hover:text-[#475569] cursor-pointer">
@@ -2500,6 +2489,37 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                   </button>
                 )}
               </div>
+
+              {/* Category toggle — inline with search */}
+              <div className="inline-flex items-center rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-0.5 shrink-0">
+                {([
+                  { key: "discount" as const, label: "Discounts", color: "#047857", bg: "#ECFDF5", icon: TrendingDown },
+                  { key: "premium" as const, label: "Premiums", color: "#6D28D9", bg: "#F5F3FF", icon: TrendingUp },
+                ]).map((cat) => {
+                  const active = exploreCategoryTab === cat.key;
+                  const count = exploreCards.filter((c) => c.category === cat.key).length;
+                  return (
+                    <button
+                      key={cat.key}
+                      onClick={() => setExploreCategoryTab(cat.key)}
+                      className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-[11px] transition-all cursor-pointer ${
+                        active ? "bg-white shadow-sm" : "hover:bg-white/60"
+                      }`}
+                      style={{ fontWeight: active ? 600 : 500, color: active ? cat.color : "#64748B" }}
+                    >
+                      <cat.icon className="w-3 h-3" />
+                      {cat.label}
+                      <span
+                        className="text-[9px] rounded-full px-1 py-px min-w-[16px] text-center"
+                        style={{ fontWeight: 600, color: active ? cat.color : "#94A3B8", backgroundColor: active ? cat.bg : "#F1F5F9" }}
+                      >
+                        {count}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+
               <div className="flex items-center gap-2 ml-auto shrink-0">
                 <span className="inline-flex items-center justify-center min-w-7 h-7 px-1.5 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] text-[12px] text-[#64748B] tabular-nums" style={{ fontWeight: 600 }}>
                   {exploreCards.length}
@@ -2529,39 +2549,8 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
               </div>
             </div>
 
-            {/* Type Toggle + Status Filter Pills */}
-            <div className="flex items-center gap-3 overflow-x-auto pb-3">
-              {/* Type Toggle (mutually exclusive tabs) */}
-              <div className="inline-flex items-center rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-0.5 shrink-0">
-                {([
-                  { key: "discount" as const, label: "Discounts", color: "#047857", bg: "#ECFDF5", icon: TrendingDown },
-                  { key: "premium" as const, label: "Premiums", color: "#6D28D9", bg: "#F5F3FF", icon: TrendingUp },
-                ]).map((cat) => {
-                  const active = exploreCategoryTab === cat.key;
-                  const count = exploreCards.filter((c) => c.category === cat.key).length;
-                  return (
-                    <button
-                      key={cat.key}
-                      onClick={() => setExploreCategoryTab(cat.key)}
-                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs transition-all cursor-pointer ${
-                        active ? "bg-white shadow-sm" : "hover:bg-white/60"
-                      }`}
-                      style={{ fontWeight: active ? 600 : 500, color: active ? cat.color : "#64748B" }}
-                    >
-                      <cat.icon className="w-3 h-3" />
-                      {cat.label}
-                      <span
-                        className="text-[10px] rounded-full px-1.5 py-px min-w-[18px] text-center"
-                        style={{ fontWeight: 600, color: active ? cat.color : "#94A3B8", backgroundColor: active ? cat.bg : "#F1F5F9" }}
-                      >
-                        {count}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-
-              <div className="w-px h-5 bg-[#E2E8F0] shrink-0" />
+            {/* Status Filter Pills */}
+            <div className="flex items-center overflow-x-auto pb-3">
 
               {/* Status pills (parallel with type tabs) */}
               <FilterPills

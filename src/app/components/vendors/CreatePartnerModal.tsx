@@ -3444,7 +3444,7 @@ function ConfigPageContent({
   // Local interactive state for pill/radio selections
   const [billingType, setBillingType] = useState("domestic");
   const [shippingPref, setShippingPref] = useState("same_as_billing");
-  const [enforcement, setEnforcement] = useState("hard_block");
+  const [enforcement, setEnforcement] = useState("none");
   const [thresholdAlertRecipients, setThresholdAlertRecipients] = useState<Set<string>>(new Set());
   const [softWarningRecipients, setSoftWarningRecipients] = useState<Set<string>>(new Set());
   const [hardBlockRecipients, setHardBlockRecipients] = useState<Set<string>>(new Set());
@@ -3625,7 +3625,7 @@ function ConfigPageContent({
     if (ptStatusFilter === "preset") terms = terms.filter((t) => !t.id.startsWith("pt-custom-"));
     else if (ptStatusFilter === "custom") terms = terms.filter((t) => t.id.startsWith("pt-custom-"));
     else if (ptStatusFilter === "created_by_me") terms = terms.filter((t) => t.id.startsWith("pt-custom-"));
-    else if (ptStatusFilter === "vendors_applied") terms = terms.filter((t) => t.vendorsApplied >= 4);
+    else if (ptStatusFilter === "in_use") terms = terms.filter((t) => t.vendorsApplied >= 1);
     if (ptSearch.trim()) {
       const q = ptSearch.toLowerCase();
       terms = terms.filter((t) => t.name.toLowerCase().includes(q) || t.description.toLowerCase().includes(q));
@@ -5347,143 +5347,144 @@ function ConfigPageContent({
           </div>
 
           <div className="grid grid-cols-3 gap-3">
-            {/* ── Hard Block Card ── */}
+            {/* ── No Enforcement Card ── */}
             <button
-              onClick={() => setEnforcement("hard_block")}
-              className={`text-left rounded-xl border transition-all flex flex-col overflow-hidden bg-card ${
-                enforcement === "hard_block"
-                  ? "border-destructive/40 shadow-sm"
-                  : "border-border hover:border-destructive/25 shadow-sm hover:shadow-md"
+              onClick={() => setEnforcement("none")}
+              className={`text-left rounded-xl border transition-all flex flex-col overflow-hidden bg-white ${
+                enforcement === "none"
+                  ? "border-[#0A77FF]/30 shadow-sm"
+                  : "border-[#E2E8F0] hover:border-[#0A77FF]/20 shadow-sm hover:shadow-md"
               }`}
             >
               <div className="p-3.5 flex-1">
                 <div className="flex items-center justify-between mb-2">
                   <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                    enforcement === "hard_block" ? "bg-destructive/10" : "bg-muted/60"
+                    enforcement === "none" ? "bg-[#EDF4FF]" : "bg-[#F1F5F9]"
                   }`}>
-                    <Lock className={`w-4 h-4 ${enforcement === "hard_block" ? "text-destructive" : "text-muted-foreground"}`} />
+                    <Info className={`w-4 h-4 ${enforcement === "none" ? "text-[#0A77FF]" : "text-[#94A3B8]"}`} />
                   </div>
-                  <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                    enforcement === "hard_block" ? "border-destructive/60" : "border-muted-foreground/40"
-                  }`}>
-                    {enforcement === "hard_block" && <div className="w-2 h-2 rounded-full bg-destructive" />}
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[8px] px-1.5 py-[1px] rounded-full bg-[#EDF4FF] text-[#0A77FF] border border-[#0A77FF]/15" style={{ fontWeight: 600 }}>Recommended</span>
+                    <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                      enforcement === "none" ? "border-[#0A77FF]/60" : "border-[#CBD5E1]"
+                    }`}>
+                      {enforcement === "none" && <div className="w-2 h-2 rounded-full bg-[#0A77FF]" />}
+                    </div>
                   </div>
                 </div>
-                <p className="text-xs text-foreground" style={{ fontWeight: 600 }}>Hard Block</p>
-                <p className="text-[10px] text-muted-foreground mt-0.5 leading-relaxed">Prevents order placement when credit limit is exceeded</p>
+                <p className="text-xs text-[#0F172A]" style={{ fontWeight: 600 }}>No Enforcement</p>
+                <p className="text-[10px] text-[#64748B] mt-0.5 leading-relaxed">Passive "Over Limit" label only — no blocking</p>
               </div>
             </button>
 
             {/* ── Soft Warning Card ── */}
             <button
               onClick={() => setEnforcement("soft_warning")}
-              className={`text-left rounded-xl border transition-all flex flex-col overflow-hidden bg-card ${
+              className={`text-left rounded-xl border transition-all flex flex-col overflow-hidden bg-white ${
                 enforcement === "soft_warning"
-                  ? "border-yellow-400/50 shadow-sm"
-                  : "border-border hover:border-yellow-400/30 shadow-sm hover:shadow-md"
+                  ? "border-[#EAB308]/30 shadow-sm"
+                  : "border-[#E2E8F0] hover:border-[#EAB308]/20 shadow-sm hover:shadow-md"
               }`}
             >
               <div className="p-3.5 flex-1">
                 <div className="flex items-center justify-between mb-2">
                   <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                    enforcement === "soft_warning" ? "bg-yellow-50" : "bg-muted/60"
+                    enforcement === "soft_warning" ? "bg-[#FEFCE8]" : "bg-[#F1F5F9]"
                   }`}>
-                    <AlertTriangle className={`w-4 h-4 ${enforcement === "soft_warning" ? "text-yellow-600" : "text-muted-foreground"}`} />
+                    <AlertTriangle className={`w-4 h-4 ${enforcement === "soft_warning" ? "text-[#CA8A04]" : "text-[#94A3B8]"}`} />
                   </div>
                   <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                    enforcement === "soft_warning" ? "border-yellow-400/60" : "border-muted-foreground/40"
+                    enforcement === "soft_warning" ? "border-[#EAB308]/60" : "border-[#CBD5E1]"
                   }`}>
-                    {enforcement === "soft_warning" && <div className="w-2 h-2 rounded-full bg-yellow-400" />}
+                    {enforcement === "soft_warning" && <div className="w-2 h-2 rounded-full bg-[#EAB308]" />}
                   </div>
                 </div>
-                <p className="text-xs text-foreground" style={{ fontWeight: 600 }}>Soft Warning</p>
-                <p className="text-[10px] text-muted-foreground mt-0.5 leading-relaxed">Shows confirmation modal before proceeding with the order</p>
+                <p className="text-xs text-[#0F172A]" style={{ fontWeight: 600 }}>Soft Warning</p>
+                <p className="text-[10px] text-[#64748B] mt-0.5 leading-relaxed">Shows confirmation modal before proceeding with the order</p>
               </div>
             </button>
 
-            {/* ── No Enforcement Card ── */}
+            {/* ── Hard Block Card ── */}
             <button
-              onClick={() => setEnforcement("none")}
-              className={`text-left rounded-xl border transition-all flex flex-col overflow-hidden bg-card ${
-                enforcement === "none"
-                  ? "border-primary/30 shadow-sm"
-                  : "border-border hover:border-primary/20 shadow-sm hover:shadow-md"
+              onClick={() => setEnforcement("hard_block")}
+              className={`text-left rounded-xl border transition-all flex flex-col overflow-hidden bg-white ${
+                enforcement === "hard_block"
+                  ? "border-[#EF4444]/40 shadow-sm"
+                  : "border-[#E2E8F0] hover:border-[#EF4444]/20 shadow-sm hover:shadow-md"
               }`}
             >
               <div className="p-3.5 flex-1">
                 <div className="flex items-center justify-between mb-2">
                   <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                    enforcement === "none" ? "bg-accent" : "bg-muted/60"
+                    enforcement === "hard_block" ? "bg-[#FEF2F2]" : "bg-[#F1F5F9]"
                   }`}>
-                    <Info className={`w-4 h-4 ${enforcement === "none" ? "text-primary" : "text-muted-foreground"}`} />
+                    <Lock className={`w-4 h-4 ${enforcement === "hard_block" ? "text-[#EF4444]" : "text-[#94A3B8]"}`} />
                   </div>
                   <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                    enforcement === "none" ? "border-primary/60" : "border-muted-foreground/40"
+                    enforcement === "hard_block" ? "border-[#EF4444]/60" : "border-[#CBD5E1]"
                   }`}>
-                    {enforcement === "none" && <div className="w-2 h-2 rounded-full bg-primary" />}
+                    {enforcement === "hard_block" && <div className="w-2 h-2 rounded-full bg-[#EF4444]" />}
                   </div>
                 </div>
-                <p className="text-xs text-foreground" style={{ fontWeight: 600 }}>No Enforcement</p>
-                <p className="text-[10px] text-muted-foreground mt-0.5 leading-relaxed">Passive "Over Limit" label only — no blocking</p>
+                <p className="text-xs text-[#0F172A]" style={{ fontWeight: 600 }}>Hard Block</p>
+                <p className="text-[10px] text-[#64748B] mt-0.5 leading-relaxed">Prevents order placement when credit limit is exceeded</p>
               </div>
             </button>
           </div>
 
           {/* ── Contextual settings for selected enforcement ── */}
           {enforcement === "hard_block" && (
-            <div className="mt-3 rounded-xl border border-destructive/20 bg-card shadow-sm p-4 space-y-3">
+            <div className="mt-3 rounded-xl border border-[#EF4444]/15 bg-white shadow-sm p-4 space-y-3">
               <div className="flex items-center gap-2">
-                <Lock className="w-3.5 h-3.5 text-destructive" />
-                <span className="text-xs text-foreground" style={{ fontWeight: 600 }}>Hard Block Settings</span>
+                <Lock className="w-3.5 h-3.5 text-[#EF4444]" />
+                <span className="text-xs text-[#0F172A]" style={{ fontWeight: 600 }}>Hard Block Settings</span>
               </div>
               <SearchableUserPicker
                 selectedIds={hardBlockRecipients}
                 onSelectionChange={setHardBlockRecipients}
-                accentColor="hsl(var(--destructive))"
-                accentBg="hsl(var(--destructive) / 0.05)"
-                accentBorder="hsl(var(--destructive) / 0.2)"
-                accentText="hsl(var(--destructive))"
+                accentColor="#EF4444"
+                accentBg="#FEF2F2"
+                accentBorder="#FECACA"
+                accentText="#991B1B"
                 label="Notify when credit limit is exceeded"
-                placeholder="Search users…"
               />
             </div>
           )}
 
           {enforcement === "soft_warning" && (
-            <div className="mt-3 rounded-xl border border-yellow-400/20 bg-card shadow-sm p-4 space-y-3">
+            <div className="mt-3 rounded-xl border border-[#EAB308]/15 bg-white shadow-sm p-4 space-y-3">
               <div className="flex items-center gap-2">
-                <AlertTriangle className="w-3.5 h-3.5 text-yellow-600" />
-                <span className="text-xs text-foreground" style={{ fontWeight: 600 }}>Soft Warning Settings</span>
+                <AlertTriangle className="w-3.5 h-3.5 text-[#CA8A04]" />
+                <span className="text-xs text-[#0F172A]" style={{ fontWeight: 600 }}>Soft Warning Settings</span>
               </div>
               {/* Warning Threshold */}
               <div>
-                <Label className="text-xs text-foreground" style={{ fontWeight: 600 }}>Warning threshold</Label>
+                <Label className="text-xs text-[#0F172A]" style={{ fontWeight: 600 }}>Warning threshold</Label>
                 <div className="relative mt-1.5">
-                  <div className="absolute left-0 top-0 bottom-0 w-10 rounded-l-lg bg-muted/60 border-r border-border flex items-center justify-center">
-                    <span className="text-xs text-muted-foreground font-medium">%</span>
+                  <div className="absolute left-0 top-0 bottom-0 w-10 rounded-l-lg bg-[#F8FAFC] border-r border-[#E2E8F0] flex items-center justify-center">
+                    <span className="text-xs text-[#94A3B8] font-medium">%</span>
                   </div>
-                  <Input placeholder="80" className="pl-12 rounded-lg border-border h-9 bg-card text-sm placeholder:text-muted-foreground/50" />
+                  <Input placeholder="80" className="pl-12 rounded-lg border-[#E2E8F0] h-9 bg-white text-sm placeholder:text-[#94A3B8]" />
                 </div>
-                <p className="text-[10px] text-muted-foreground mt-1">Alert triggers at this % of credit limit</p>
+                <p className="text-[10px] text-[#94A3B8] mt-1">Alert triggers at this % of credit limit</p>
               </div>
               <SearchableUserPicker
                 selectedIds={softWarningRecipients}
                 onSelectionChange={setSoftWarningRecipients}
-                accentColor="hsl(45 100% 40%)"
-                accentBg="hsl(45 100% 50% / 0.05)"
-                accentBorder="hsl(45 100% 50% / 0.2)"
-                accentText="hsl(45 100% 35%)"
+                accentColor="#CA8A04"
+                accentBg="#FEFCE8"
+                accentBorder="#FDE68A"
+                accentText="#854D0E"
                 label="Notify when warning threshold is reached"
-                placeholder="Search users…"
               />
             </div>
           )}
 
           {enforcement === "none" && (
-            <div className="mt-3 rounded-xl border border-primary/15 bg-card shadow-sm p-3.5">
+            <div className="mt-3 rounded-xl border border-[#0A77FF]/15 bg-white shadow-sm p-3.5">
               <div className="flex items-center gap-2.5">
-                <Info className="w-3.5 h-3.5 text-primary" />
-                <p className="text-xs text-muted-foreground">No enforcement applied. A passive "Over Limit" label will appear on orders exceeding the credit limit.</p>
+                <Info className="w-3.5 h-3.5 text-[#0A77FF]" />
+                <p className="text-xs text-[#64748B]">No enforcement applied. A passive "Over Limit" label will appear on orders exceeding the credit limit.</p>
               </div>
             </div>
           )}
@@ -6006,14 +6007,14 @@ function ConfigPageContent({
             <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
               <div className="flex-1 min-w-0 flex flex-col overflow-hidden bg-white">
                 <div className="shrink-0 bg-white border-b border-[#EEF2F6] px-5 pt-4 pb-3 space-y-3">
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="relative">
+                  <div className="flex items-center gap-3">
+                    <div className="relative shrink-0">
                       <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
                       <Input
                         value={ptSearch}
                         onChange={(e) => setPtSearch(e.target.value)}
                         placeholder="Search payment terms..."
-                        className="pl-9 pr-8 rounded-lg border-[#D0D7E1] h-9 bg-white text-[13px] w-[280px] placeholder:text-[#94A3B8] shadow-[0_1px_2px_rgba(0,0,0,0.05)] focus:border-[#0A77FF] focus:shadow-[0_0_0_3px_rgba(10,119,255,0.08)]"
+                        className="pl-9 pr-8 rounded-lg border-[#D0D7E1] h-9 bg-white text-[13px] w-[220px] placeholder:text-[#94A3B8] shadow-[0_1px_2px_rgba(0,0,0,0.05)] focus:border-[#0A77FF] focus:shadow-[0_0_0_3px_rgba(10,119,255,0.08)]"
                       />
                       {ptSearch && (
                         <button onClick={() => setPtSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#94A3B8] hover:text-[#0F172A] transition-colors">
@@ -6021,7 +6022,40 @@ function ConfigPageContent({
                         </button>
                       )}
                     </div>
-                    <div className="flex items-center gap-2">
+
+                    {/* Type toggle — inline with search */}
+                    <div className="inline-flex items-center rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-0.5 shrink-0">
+                      {([
+                        { key: "net", label: "NET", color: "#0A77FF", bg: "#EFF6FF", icon: Receipt },
+                        { key: "prepayment", label: "Pre", color: "#7C3AED", bg: "#F5F3FF", icon: Clock },
+                        { key: "split", label: "Split", color: "#D97706", bg: "#FFFBEB", icon: Copy },
+                      ] as const).map((cat) => {
+                        const active = ptTypeFilters === cat.key;
+                        const count = PAYMENT_TERM_PRESETS.filter((t) => t.category === cat.key).length;
+                        return (
+                          <button
+                            key={cat.key}
+                            onClick={() => setPtTypeFilters(cat.key)}
+                            className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-[11px] transition-all cursor-pointer ${
+                              active ? "bg-white shadow-sm" : "hover:bg-white/60"
+                            }`}
+                            style={{ fontWeight: active ? 600 : 500, color: active ? cat.color : "#64748B" }}
+                          >
+                            <cat.icon className="w-3 h-3" />
+                            {cat.label}
+                            <span
+                              className="text-[9px] rounded-full px-1 py-px min-w-[16px] text-center"
+                              style={{ fontWeight: 600, color: active ? cat.color : "#94A3B8", backgroundColor: active ? cat.bg : "#F1F5F9" }}
+                            >
+                              {count}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    <div className="flex-1" />
+                    <div className="flex items-center gap-2 shrink-0">
                       <span className="inline-flex items-center justify-center min-w-[22px] h-[20px] px-1.5 rounded-md bg-primary/[0.04] text-[11px] text-[#64748B]" style={{ fontWeight: 600 }}>
                         {filteredPaymentTermPresets.length}
                       </span>
@@ -6083,42 +6117,8 @@ function ConfigPageContent({
                     </div>
                   </div>
 
-                  {/* Row 2: Type toggle (NET / Pre / Split) + Quick Filter Pills */}
-                  <div className="flex items-center gap-3 overflow-x-auto">
-                    {/* Type Toggle */}
-                    <div className="inline-flex items-center rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-0.5 shrink-0">
-                      {([
-                        { key: "net", label: "NET", color: "#0A77FF", bg: "#EFF6FF", icon: Receipt },
-                        { key: "prepayment", label: "Prepayment", color: "#7C3AED", bg: "#F5F3FF", icon: Clock },
-                        { key: "split", label: "Split", color: "#D97706", bg: "#FFFBEB", icon: Copy },
-                      ] as const).map((cat) => {
-                        const active = ptTypeFilters === cat.key;
-                        const count = PAYMENT_TERM_PRESETS.filter((t) => t.category === cat.key).length;
-                        return (
-                          <button
-                            key={cat.key}
-                            onClick={() => setPtTypeFilters(cat.key)}
-                            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs transition-all cursor-pointer ${
-                              active ? "bg-white shadow-sm" : "hover:bg-white/60"
-                            }`}
-                            style={{ fontWeight: active ? 600 : 500, color: active ? cat.color : "#64748B" }}
-                          >
-                            <cat.icon className="w-3 h-3" />
-                            {cat.label}
-                            <span
-                              className="text-[10px] rounded-full px-1.5 py-px min-w-[18px] text-center"
-                              style={{ fontWeight: 600, color: active ? cat.color : "#94A3B8", backgroundColor: active ? cat.bg : "#F1F5F9" }}
-                            >
-                              {count}
-                            </span>
-                          </button>
-                        );
-                      })}
-                    </div>
-
-                    <div className="w-px h-5 bg-[#E2E8F0] shrink-0" />
-
-                    {/* Quick Filter Pills */}
+                  {/* Filter Pills */}
+                  <div className="flex items-center overflow-x-auto">
                     <FilterPills
                       options={(() => {
                         const base = ptTypeFilters
@@ -6132,7 +6132,7 @@ function ConfigPageContent({
                           { key: "preset", label: "Preset", count: presetCount, showCount: true },
                           { key: "custom", label: "Custom", count: customCount, showCount: true },
                           { key: "created_by_me", label: "Created by Me", count: createdByMeCount, showCount: true },
-                          { key: "vendors_applied", label: "Vendors Applied", count: base.filter((t) => t.vendorsApplied >= 4).length, showCount: true },
+                          { key: "in_use", label: "In Use", count: base.filter((t) => t.vendorsApplied >= 1).length, showCount: true },
                         ];
                       })()}
                       activeKey={ptStatusFilter}
@@ -6410,15 +6410,15 @@ function ConfigPageContent({
               <div className="flex-1 min-w-0 flex flex-col overflow-hidden bg-white">
                 {/* Sticky toolbar */}
                 <div className="shrink-0 bg-white border-b border-[#EEF2F6] px-5 pt-4 pb-3 space-y-3">
-                  {/* Search + sort row */}
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="relative">
+                  {/* Search + type toggle + sort row */}
+                  <div className="flex items-center gap-3">
+                    <div className="relative shrink-0">
                       <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
                       <Input
                         value={prSearch}
                         onChange={(e) => setPrSearch(e.target.value)}
                         placeholder="Search pricing rules..."
-                        className="pl-9 pr-8 rounded-lg border-[#D0D7E1] h-9 bg-white text-[13px] w-[280px] placeholder:text-[#94A3B8] shadow-[0_1px_2px_rgba(0,0,0,0.05)] focus:border-[#0A77FF] focus:shadow-[0_0_0_3px_rgba(10,119,255,0.08)]"
+                        className="pl-9 pr-8 rounded-lg border-[#D0D7E1] h-9 bg-white text-[13px] w-[220px] placeholder:text-[#94A3B8] shadow-[0_1px_2px_rgba(0,0,0,0.05)] focus:border-[#0A77FF] focus:shadow-[0_0_0_3px_rgba(10,119,255,0.08)]"
                       />
                       {prSearch && (
                         <button onClick={() => setPrSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#94A3B8] hover:text-[#0F172A] transition-colors">
@@ -6426,7 +6426,39 @@ function ConfigPageContent({
                         </button>
                       )}
                     </div>
-                    <div className="flex items-center gap-2">
+
+                    {/* Type toggle — inline with search */}
+                    <div className="inline-flex items-center rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-0.5 shrink-0">
+                      {([
+                        { key: "discount", label: "Discounts", color: "#047857", bg: "#ECFDF5", icon: TrendingDown },
+                        { key: "premium", label: "Premiums", color: "#7C3AED", bg: "#F5F3FF", icon: TrendingUp },
+                      ] as const).map((cat) => {
+                        const active = prTypeFilters === cat.key;
+                        const count = allPricingRulePresets.filter((r) => r.category === cat.key).length;
+                        return (
+                          <button
+                            key={cat.key}
+                            onClick={() => setPrTypeFilters(cat.key)}
+                            className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-[11px] transition-all cursor-pointer ${
+                              active ? "bg-white shadow-sm" : "hover:bg-white/60"
+                            }`}
+                            style={{ fontWeight: active ? 600 : 500, color: active ? cat.color : "#64748B" }}
+                          >
+                            <cat.icon className="w-3 h-3" />
+                            {cat.label}
+                            <span
+                              className="text-[9px] rounded-full px-1 py-px min-w-[16px] text-center"
+                              style={{ fontWeight: 600, color: active ? cat.color : "#94A3B8", backgroundColor: active ? cat.bg : "#F1F5F9" }}
+                            >
+                              {count}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    <div className="flex-1" />
+                    <div className="flex items-center gap-2 shrink-0">
                       <span className="inline-flex items-center justify-center min-w-[22px] h-[20px] px-1.5 rounded-md bg-primary/[0.04] text-[11px] text-[#64748B]" style={{ fontWeight: 600 }}>
                         {filteredPricingRulePresets.length}
                       </span>
@@ -6488,41 +6520,8 @@ function ConfigPageContent({
                     </div>
                   </div>
 
-                  {/* ── Filter tabs — matching payment terms pattern ── */}
-                  <div className="flex items-center gap-3 overflow-x-auto">
-                    {/* Type Toggle */}
-                    <div className="inline-flex items-center rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-0.5 shrink-0">
-                      {([
-                        { key: "discount", label: "Discounts", color: "#047857", bg: "#ECFDF5", icon: TrendingDown },
-                        { key: "premium", label: "Premiums", color: "#7C3AED", bg: "#F5F3FF", icon: TrendingUp },
-                      ] as const).map((cat) => {
-                        const active = prTypeFilters === cat.key;
-                        const count = allPricingRulePresets.filter((r) => r.category === cat.key).length;
-                        return (
-                          <button
-                            key={cat.key}
-                            onClick={() => setPrTypeFilters(cat.key)}
-                            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs transition-all cursor-pointer ${
-                              active ? "bg-white shadow-sm" : "hover:bg-white/60"
-                            }`}
-                            style={{ fontWeight: active ? 600 : 500, color: active ? cat.color : "#64748B" }}
-                          >
-                            <cat.icon className="w-3 h-3" />
-                            {cat.label}
-                            <span
-                              className="text-[10px] rounded-full px-1.5 py-px min-w-[18px] text-center"
-                              style={{ fontWeight: 600, color: active ? cat.color : "#94A3B8", backgroundColor: active ? cat.bg : "#F1F5F9" }}
-                            >
-                              {count}
-                            </span>
-                          </button>
-                        );
-                      })}
-                    </div>
-
-                    <div className="w-px h-5 bg-[#E2E8F0] shrink-0" />
-
-                    {/* Quick Filter Pills */}
+                  {/* Filter Pills */}
+                  <div className="flex items-center overflow-x-auto">
                     <FilterPills
                       options={(() => {
                         const base = prTypeFilters

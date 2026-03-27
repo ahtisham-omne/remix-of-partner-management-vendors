@@ -1398,7 +1398,7 @@ export function VendorsListPage() {
                               {partnerTypes.map((type) => (
                                 <span
                                   key={type}
-                                  className="inline-flex items-center px-2 py-0.5 rounded text-[10px] border"
+                                  className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] border"
                                   style={{
                                     fontWeight: 500,
                                     backgroundColor: type === "vendor" ? "#EFF6FF" : "#F5F3FF",
@@ -1629,7 +1629,7 @@ export function VendorsListPage() {
                                   <TableCell key={colKey}>
                                     <div className={`flex items-center ${isRelaxed ? "gap-2" : "gap-1.5"}`}>
                                       {partnerTypes.map((type) => (
-                                        <span key={type} className={`inline-flex items-center ${isRelaxed ? "px-2.5 py-1 text-xs" : "px-2 py-0.5 text-xs"} rounded border`} style={{ fontWeight: 500, backgroundColor: type === "vendor" ? "#EFF6FF" : "#F5F3FF", color: type === "vendor" ? "#1E40AF" : "#5B21B6", borderColor: type === "vendor" ? "#BFDBFE" : "#DDD6FE" }}>
+                                        <span key={type} className={`inline-flex items-center ${isRelaxed ? "px-2.5 py-1 text-xs" : "px-2 py-0.5 text-xs"} rounded-md border`} style={{ fontWeight: 500, backgroundColor: type === "vendor" ? "#EFF6FF" : "#F5F3FF", color: type === "vendor" ? "#1E40AF" : "#5B21B6", borderColor: type === "vendor" ? "#BFDBFE" : "#DDD6FE" }}>
                                           {type === "vendor" ? "Vendor" : "Customer"}
                                         </span>
                                       ))}
@@ -1643,8 +1643,7 @@ export function VendorsListPage() {
                                   <TableCell key={colKey}>
                                     {vst.length > 0 ? (
                                       <div className={`flex items-center ${isRelaxed ? "gap-1.5" : "gap-1"}`}>
-                                        <span className={`inline-flex items-center gap-1 ${isRelaxed ? "px-2.5 py-[3px] text-xs" : "px-2 py-[2px] text-[11px]"} rounded-full border`} style={{ fontWeight: 500, backgroundColor: "#EFF6FF", color: "#1E40AF", borderColor: "#BFDBFE" }}>
-                                          <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: "#3B82F6" }} />
+                                        <span className={`inline-flex items-center ${isRelaxed ? "px-2.5 py-[3px] text-xs" : "px-2 py-[2px] text-[11px]"} rounded-md border`} style={{ fontWeight: 500, backgroundColor: "#EFF6FF", color: "#1E40AF", borderColor: "#BFDBFE" }}>
                                           {vst[0]}
                                         </span>
                                         {vstExtra > 0 && (
@@ -1671,8 +1670,7 @@ export function VendorsListPage() {
                                   <TableCell key={colKey}>
                                     {cst.length > 0 ? (
                                       <div className={`flex items-center ${isRelaxed ? "gap-1.5" : "gap-1"}`}>
-                                        <span className={`inline-flex items-center gap-1 ${isRelaxed ? "px-2.5 py-[3px] text-xs" : "px-2 py-[2px] text-[11px]"} rounded-full border`} style={{ fontWeight: 500, backgroundColor: "#F5F3FF", color: "#5B21B6", borderColor: "#DDD6FE" }}>
-                                          <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: "#8B5CF6" }} />
+                                        <span className={`inline-flex items-center ${isRelaxed ? "px-2.5 py-[3px] text-xs" : "px-2 py-[2px] text-[11px]"} rounded-md border`} style={{ fontWeight: 500, backgroundColor: "#F5F3FF", color: "#5B21B6", borderColor: "#DDD6FE" }}>
                                           {cst[0]}
                                         </span>
                                         {cstExtra > 0 && (

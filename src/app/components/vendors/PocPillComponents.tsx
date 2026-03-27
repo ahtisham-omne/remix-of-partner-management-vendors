@@ -93,10 +93,9 @@ export function PocQuickViewCard({ contact }: { contact: ContactPerson }) {
         )}
         <div className="flex items-center gap-3 pt-2 border-t border-[#F1F5F9]">
           <span
-            className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px]"
+            className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px]"
             style={{ backgroundColor: dc.bg, color: dc.text, fontWeight: 600 }}
           >
-            <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: dc.dot }} />
             {contact.department}
           </span>
         </div>
@@ -137,7 +136,6 @@ export function PocChipWithPopover({ contact }: { contact: ContactPerson }) {
           {initials}
         </span>
         {contact.name.split(" ")[0]}
-        <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: dc.dot }} />
       </PopoverTrigger>
       <PopoverContent
         side="bottom"

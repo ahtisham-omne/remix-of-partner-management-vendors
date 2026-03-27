@@ -378,16 +378,23 @@ function PaymentFormFields({
   );
 }
 
+// ── Mask sensitive value: •••• 1234 ──
+function maskValue(value: string): string {
+  const clean = value.replace(/\s/g, "");
+  if (clean.length <= 4) return clean;
+  return `•••• ${clean.slice(-4)}`;
+}
+
 // ── Inline Data Row ──
 function DataRow({ icon: Icon, label, value, sensitive = false }: { icon: React.ElementType; label: string; value?: string; sensitive?: boolean }) {
   const [revealed, setRevealed] = useState(false);
   if (!value) return null;
-  const masked = sensitive && !revealed ? value.replace(/.(?=.{4})/g, "•") : value;
+  const displayed = sensitive && !revealed ? maskValue(value) : value;
   return (
     <div className="flex items-center gap-2 min-w-0">
       <Icon className="w-3 h-3 text-muted-foreground shrink-0" />
       <span className="text-[10px] text-muted-foreground shrink-0" style={{ fontWeight: 500 }}>{label}</span>
-      <span className="text-[10px] text-foreground truncate flex-1 text-right tabular-nums" style={{ fontWeight: 500, letterSpacing: sensitive ? "0.5px" : undefined }}>{masked}</span>
+      <span className="text-[10px] text-foreground truncate flex-1 text-right tabular-nums" style={{ fontWeight: 500, letterSpacing: sensitive ? "0.5px" : undefined }}>{displayed}</span>
       {sensitive && (
         <button
           onClick={(ev) => { ev.stopPropagation(); setRevealed(!revealed); }}
@@ -464,7 +471,12 @@ export function PaymentMethodCard({
 
   return (
     <div
-      className="bg-card border border-border rounded-xl group transition-all duration-200 flex flex-col relative hover:border-primary/30 hover:shadow-[0_4px_16px_-4px_rgba(10,119,255,0.10)]"
+      onClick={onEdit}
+      className={`bg-white rounded-xl group transition-all duration-200 flex flex-col relative cursor-pointer ${
+        pe.isPrimary
+          ? "border-[1.5px] border-[#0A77FF]/40 shadow-[0_2px_12px_-4px_rgba(10,119,255,0.12)] hover:shadow-[0_4px_20px_-4px_rgba(10,119,255,0.18)]"
+          : "border border-[#E2E8F0] hover:border-[#CBD5E1] hover:shadow-[0_4px_16px_-4px_rgba(0,0,0,0.06)]"
+      }`}
     >
       <div className="p-3 flex-1 flex flex-col gap-2">
         {/* Header: icon + name + actions */}
@@ -474,25 +486,24 @@ export function PaymentMethodCard({
               <PeIcon className="w-3.5 h-3.5" style={{ color }} />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-xs text-foreground truncate leading-tight" style={{ fontWeight: 600 }}>{getEntrySummary(pe)}</p>
+              <p className="text-xs text-[#0F172A] truncate leading-tight" style={{ fontWeight: 600 }}>{getEntrySummary(pe)}</p>
               <div className="flex items-center gap-1.5 mt-0.5">
                 <span className="text-[9px] px-1.5 py-[1px] rounded-full" style={{ fontWeight: 600, color, backgroundColor: bg }}>
                   {typeLabel(pe.type)}
                 </span>
-                {pe.isPrimary && (
-                  <span className="text-[8px] px-1 py-[1px] rounded bg-primary/10 text-primary border border-primary/15" style={{ fontWeight: 700 }}>
-                    PRIMARY
-                  </span>
-                )}
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-0 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
-            {!pe.isPrimary && (
+          <div className="flex items-center gap-1 shrink-0" onClick={(e) => e.stopPropagation()}>
+            {pe.isPrimary ? (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#0A77FF] text-white text-[10px]" style={{ fontWeight: 600 }}>
+                <Star className="w-2.5 h-2.5 fill-white" /> Primary
+              </span>
+            ) : (
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <button onClick={onSetPrimary} className="p-1 rounded-md hover:bg-accent transition-colors cursor-pointer">
-                    <Star className="w-3 h-3 text-muted-foreground hover:text-primary" />
+                  <button onClick={onSetPrimary} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md border border-[#E2E8F0] bg-white text-[10px] text-[#94A3B8] hover:text-[#0A77FF] hover:border-[#0A77FF]/30 hover:bg-[#EDF4FF] transition-all cursor-pointer opacity-0 group-hover:opacity-100" style={{ fontWeight: 600 }}>
+                    <Star className="w-2.5 h-2.5" /> Primary
                   </button>
                 </TooltipTrigger>
                 <TooltipContent className="z-[300]"><p className="text-xs">Set as primary</p></TooltipContent>
@@ -500,16 +511,8 @@ export function PaymentMethodCard({
             )}
             <Tooltip>
               <TooltipTrigger asChild>
-                <button onClick={onEdit} className="p-1 rounded-md hover:bg-accent transition-colors cursor-pointer">
-                  <Pencil className="w-3 h-3 text-muted-foreground hover:text-primary" />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent className="z-[300]"><p className="text-xs">Edit</p></TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button onClick={onDelete} className="p-1 rounded-md hover:bg-destructive/5 transition-colors cursor-pointer">
-                  <Trash2 className="w-3 h-3 text-muted-foreground hover:text-destructive" />
+                <button onClick={onDelete} className="p-1 rounded-md hover:bg-[#FEF2F2] transition-colors cursor-pointer opacity-0 group-hover:opacity-100">
+                  <Trash2 className="w-3 h-3 text-[#94A3B8] hover:text-[#EF4444]" />
                 </button>
               </TooltipTrigger>
               <TooltipContent className="z-[300]"><p className="text-xs">Delete</p></TooltipContent>
@@ -519,7 +522,7 @@ export function PaymentMethodCard({
 
         {/* Data rows */}
         {dataRows.length > 0 && (
-          <div className="flex flex-col gap-[5px] py-1.5 px-2 rounded-lg bg-muted/40 border border-border/50">
+          <div className="flex flex-col gap-[5px] py-1.5 px-2 rounded-lg bg-[#FAFBFC] border border-[#F1F5F9]">
             {dataRows.map((row, i) => (
               <DataRow key={i} icon={row.icon} label={row.label} value={row.value} sensitive={row.sensitive} />
             ))}
@@ -528,17 +531,17 @@ export function PaymentMethodCard({
 
         {/* Discount/charges strip */}
         {pe.applyDiscount && (
-          <div className="flex items-center justify-between px-2 py-1 rounded-md bg-accent/50 border border-border/50">
+          <div className="flex items-center justify-between px-2 py-1 rounded-md bg-[#FAFBFC] border border-[#F1F5F9]">
             <div className="flex items-center gap-1">
-              <Percent className="w-2.5 h-2.5 text-primary" />
-              <span className="text-[10px] text-muted-foreground" style={{ fontWeight: 500 }}>Discount</span>
+              <Percent className="w-2.5 h-2.5 text-[#0A77FF]" />
+              <span className="text-[10px] text-[#64748B]" style={{ fontWeight: 500 }}>Discount</span>
             </div>
-            <span className="text-[10px] text-foreground tabular-nums" style={{ fontWeight: 600 }}>{(pe.discountMode ?? "percent") === "fixed" ? "$" : ""}{pe.discountPercent || "0"}{(pe.discountMode ?? "percent") === "percent" ? "%" : ""}</span>
+            <span className="text-[10px] text-[#0F172A] tabular-nums" style={{ fontWeight: 600 }}>{(pe.discountMode ?? "percent") === "fixed" ? "$" : ""}{pe.discountPercent || "0"}{(pe.discountMode ?? "percent") === "percent" ? "%" : ""}</span>
             {pe.additionalCharges && (
               <>
-                <span className="text-[10px] text-muted-foreground mx-1">|</span>
-                <span className="text-[10px] text-muted-foreground" style={{ fontWeight: 500 }}>Charges</span>
-                <span className="text-[10px] text-foreground tabular-nums ml-1" style={{ fontWeight: 600 }}>{(pe.additionalChargesMode ?? "percent") === "fixed" ? "$" : ""}{pe.additionalCharges}{(pe.additionalChargesMode ?? "percent") === "percent" ? "%" : ""}</span>
+                <span className="text-[10px] text-[#CBD5E1] mx-1">|</span>
+                <span className="text-[10px] text-[#64748B]" style={{ fontWeight: 500 }}>Charges</span>
+                <span className="text-[10px] text-[#0F172A] tabular-nums ml-1" style={{ fontWeight: 600 }}>{(pe.additionalChargesMode ?? "percent") === "fixed" ? "$" : ""}{pe.additionalCharges}{(pe.additionalChargesMode ?? "percent") === "percent" ? "%" : ""}</span>
               </>
             )}
           </div>
@@ -546,8 +549,8 @@ export function PaymentMethodCard({
       </div>
 
       {/* Footer */}
-      <div className="flex items-center justify-between px-3 py-1.5 border-t border-border/50 bg-muted/20 rounded-b-xl">
-        <span className="text-[9px] text-muted-foreground" style={{ fontWeight: 500 }}>{typeCategory(pe.type)}</span>
+      <div className="flex items-center justify-between px-3 py-1.5 border-t border-[#F1F5F9] bg-[#FAFBFC] rounded-b-xl">
+        <span className="text-[9px] text-[#94A3B8]" style={{ fontWeight: 500 }}>{typeCategory(pe.type)}</span>
         <span
           className="px-1.5 py-[1px] rounded-full text-[9px] border"
           style={{ fontWeight: 500, color: "#059669", backgroundColor: "#F0FDF4", borderColor: "#BBF7D0" }}

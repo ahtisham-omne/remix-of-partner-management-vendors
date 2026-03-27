@@ -39,19 +39,16 @@ interface VendorStatusBadgeProps {
 export function VendorStatusBadge({ status }: VendorStatusBadgeProps) {
   const s = statusStyles[status];
   return (
-    <Badge
-      variant="outline"
+    <span
+      className="inline-flex items-center justify-center rounded-full border px-2.5 py-0.5 text-xs whitespace-nowrap shrink-0"
       style={{
+        fontWeight: 500,
         backgroundColor: s.bg,
         color: s.text,
         borderColor: s.border,
       }}
     >
-      <span
-        className="inline-block w-1.5 h-1.5 rounded-full mr-1.5"
-        style={{ backgroundColor: s.dot }}
-      />
       {STATUS_LABELS[status]}
-    </Badge>
+    </span>
   );
 }

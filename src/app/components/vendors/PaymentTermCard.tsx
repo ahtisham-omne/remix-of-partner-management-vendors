@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Receipt,
   Building2,
@@ -48,6 +48,78 @@ function highlightMatch(text: string, query?: string) {
       {text.slice(0, idx)}
       <mark className="bg-[#FEF9C3] text-inherit rounded-sm px-0">{text.slice(idx, idx + query.length)}</mark>
       {text.slice(idx + query.length)}
+    </>
+  );
+}
+
+// Parse splits from description
+function parseSplits(desc: string): { pct: string; label: string }[] {
+  const matches = desc.match(/(\d+)%/g);
+  if (!matches || matches.length < 2) return [];
+  return matches.map((s, i) => {
+    const pct = s.replace("%", "");
+    const parts = desc.split(s);
+    const afterText = parts[1]?.split(/[,.]/).shift()?.trim().replace(/^(is )?due (at |on )?/, "").replace(/^at /, "").trim() || "";
+    return { pct, label: afterText || `Event ${i + 1}` };
+  });
+}
+
+// Interactive split tier display — matches pricing rules T1/T2/T3 pattern
+function SplitTierDisplay({ term }: { term: PaymentTermPreset }) {
+  const splits = parseSplits(term.description);
+  const isMulti = splits.length > 1;
+  const [activeIdx, setActiveIdx] = useState(0);
+  const shown = splits[isMulti ? activeIdx : 0];
+
+  if (splits.length === 0) return null;
+
+  return (
+    <>
+      {/* Hero value */}
+      <div className="flex items-baseline gap-2 shrink-0">
+        <span className="text-[22px] text-[#0F172A] tabular-nums leading-none tracking-tight" style={{ fontWeight: 600 }}>
+          {splits.length}
+        </span>
+        <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>
+          {splits.length === 1 ? "split" : "splits"}
+        </span>
+      </div>
+
+      {/* Split selector + detail row — matches pricing rules tier selector */}
+      <div className="mt-auto pt-2 shrink-0" onClick={(e) => e.stopPropagation()}>
+        {/* Split selector strip */}
+        <div className={`h-[24px] mb-1.5 ${isMulti ? "flex items-center gap-[3px]" : ""}`}>
+          {isMulti && splits.map((s, i) => {
+            const isActive = activeIdx === i;
+            return (
+              <button
+                key={i}
+                onClick={(e) => { e.stopPropagation(); setActiveIdx(i); }}
+                className={`h-[22px] rounded-md text-[10px] tabular-nums transition-all duration-200 cursor-pointer flex items-center justify-center px-2 ${
+                  isActive
+                    ? "bg-[#F1F5F9] text-[#334155] ring-1 ring-[#CBD5E1]"
+                    : "bg-transparent text-[#C0C9D4] hover:bg-[#F8FAFC] hover:text-[#94A3B8]"
+                }`}
+                style={{ fontWeight: isActive ? 600 : 500 }}
+              >
+                S{i + 1}
+                {isActive && (
+                  <span className="ml-1 text-[9px] text-[#94A3B8]" style={{ fontWeight: 400 }}>
+                    {s.pct}%
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+        {/* Split detail row */}
+        {shown && (
+          <div className="flex items-center justify-between px-3 py-[6px] rounded-lg border border-[#E8ECF1] bg-[#FAFBFC] text-[11px] tabular-nums min-w-0">
+            <span className="text-[#64748B] capitalize truncate" style={{ fontWeight: 400 }}>{shown.label}</span>
+            <span className="shrink-0 ml-2 text-[#0F172A]" style={{ fontWeight: 600 }}>{shown.pct}%</span>
+          </div>
+        )}
+      </div>
     </>
   );
 }
@@ -160,20 +232,24 @@ export function PaymentTermCard({
           <p className="text-[11px] text-[#64748B] line-clamp-2 leading-relaxed" style={{ fontWeight: 400 }}>{highlightMatch(term.description, searchText)}</p>
         </div>
 
-        {/* Row 4: Hero value + vendor count inline */}
-        <div className="flex items-baseline justify-between shrink-0">
-          <div className="flex items-baseline gap-2">
-            <span className="text-[22px] text-[#0F172A] tabular-nums leading-none tracking-tight" style={{ fontWeight: 600 }}>
-              {ptDays}
+        {/* Row 4: Hero value + split tier selector */}
+        {term.category === "split" ? (
+          <SplitTierDisplay term={term} />
+        ) : (
+          <div className="flex items-baseline justify-between shrink-0">
+            <div className="flex items-baseline gap-2">
+              <span className="text-[22px] text-[#0F172A] tabular-nums leading-none tracking-tight" style={{ fontWeight: 600 }}>
+                {ptDays}
+              </span>
+              <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>days</span>
+            </div>
+            <span className="inline-flex items-center gap-1 text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>
+              <Building2 className="w-3 h-3" /> {term.vendorsApplied} in use
             </span>
-            <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>days</span>
           </div>
-          <span className="inline-flex items-center gap-1 text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>
-            <Building2 className="w-3 h-3" /> {term.vendorsApplied} vendors applied
-          </span>
-        </div>
+        )}
 
-        {/* Row 5: Discount info strip */}
+        {/* Discount info strip */}
         {(term.applyDiscount || term.discountPercent) && (
           <div className="pt-1.5 shrink-0">
             <div className="flex items-center px-2.5 py-[5px] rounded-lg border border-[#E8ECF1] bg-[#FAFBFC] text-[11px] tabular-nums">

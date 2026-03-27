@@ -35,12 +35,10 @@ import {
 
 /* ─── Tab config ─── */
 const PT_DETAIL_TABS = [
-  { id: "items", label: "Items", icon: Package },
-  { id: "vendors", label: "Vendors", icon: Building2 },
+  { id: "vendors", label: "Partners", icon: Building2 },
   { id: "notes", label: "Notes", icon: FileText },
   { id: "files", label: "Files", icon: Paperclip },
-  { id: "audit", label: "Audit", icon: Shield },
-  { id: "activity", label: "Activity", icon: Clock },
+  { id: "activity", label: "Activity Log", icon: Clock },
 ];
 
 /* ─── Mock items matching partner listing table ─── */
@@ -73,7 +71,7 @@ interface PaymentTermDetailModalProps {
 }
 
 function PaymentTermDetailModal({ term, open, onClose, mode = "create", onDisable, onApply, onDuplicate }: PaymentTermDetailModalProps) {
-  const [tab, setTab] = useState("items");
+  const [tab, setTab] = useState("vendors");
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [itemFilter, setItemFilter] = useState("all");
   const { vendors } = useVendors();
@@ -170,7 +168,7 @@ function PaymentTermDetailModal({ term, open, onClose, mode = "create", onDisabl
             <div className="flex items-center border-b border-[#E2E8F0] shrink-0 px-1 bg-white">
               {PT_DETAIL_TABS.map((t) => {
                 const active = tab === t.id;
-                const count = t.id === "items" ? itemCount : t.id === "vendors" ? vendorCount : 0;
+                const count = t.id === "vendors" ? vendorCount : 0;
                 const TabIcon = t.icon;
                 return (
                   <button
@@ -192,96 +190,7 @@ function PaymentTermDetailModal({ term, open, onClose, mode = "create", onDisabl
               })}
             </div>
 
-            {/* Items Tab */}
-            {tab === "items" && (
-              <div className="flex-1 flex flex-col overflow-hidden">
-                <div className="px-4 py-3 shrink-0 bg-white border-b border-[#E2E8F0]">
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-2 flex-1 min-w-0">
-                      <div className="relative flex-1 max-w-[240px]">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8] pointer-events-none" />
-                        <input type="text" placeholder="Search items..." className="w-full pl-9 pr-3 h-8 text-xs bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg focus:outline-none focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 transition-colors placeholder:text-[#94A3B8]" />
-                      </div>
-                      <button className="h-8 px-3 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#334155] hover:bg-[#F8FAFC] cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 500 }}>
-                        <SlidersHorizontal className="w-3.5 h-3.5" /> Filters
-                      </button>
-                    </div>
-                    <button className="h-8 px-3 rounded-lg bg-[#0A77FF] text-white text-xs hover:bg-[#0A77FF]/90 cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 500 }}>
-                      + Add Item
-                    </button>
-                  </div>
-                </div>
-
-                <div className="flex-1 overflow-auto">
-                  <table className="w-full text-xs">
-                    <thead className="sticky top-0 z-10">
-                      <tr className="bg-[#F8FAFC]">
-                        <th className="text-left pl-4 pr-2 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Item</th>
-                        <th className="text-left pl-4 pr-2 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Description</th>
-                        <th className="text-left pl-4 pr-2 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Status</th>
-                        <th className="text-left pl-4 pr-2 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Control Type</th>
-                        <th className="text-left pl-4 pr-2 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Primary Cat.</th>
-                        <th className="text-left pl-4 pr-4 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Additional Cat.</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredItems.map((item) => {
-                        const statusColor = item.status === "In Stock"
-                          ? { bg: "#F0FDF4", text: "#16A34A", border: "#BBF7D0", dot: "#16A34A" }
-                          : item.status === "Low Stock"
-                            ? { bg: "#FFFBEB", text: "#D97706", border: "#FDE68A", dot: "#D97706" }
-                            : { bg: "#FEF2F2", text: "#DC2626", border: "#FECACA", dot: "#DC2626" };
-                        return (
-                          <tr key={item.id} className="bg-white hover:bg-[#F8FAFC] transition-colors border-b border-[#F1F5F9]">
-                            <td className="pl-4 pr-2 py-3">
-                              <div className="flex items-center gap-3">
-                                <div className="w-9 h-9 rounded-lg bg-[#F1F5F9] flex items-center justify-center text-base shrink-0 border border-[#E2E8F0]">
-                                  {item.img}
-                                </div>
-                                <span className="font-mono text-[12px] text-[#0F172A] whitespace-nowrap" style={{ fontWeight: 600 }}>{item.code}</span>
-                              </div>
-                            </td>
-                            <td className="pl-4 pr-2 py-3 max-w-[220px]">
-                              <p className="text-[12px] text-[#0F172A] truncate" style={{ fontWeight: 500 }}>{item.desc}</p>
-                              <p className="text-[10px] text-[#94A3B8] mt-0.5 truncate">
-                                {item.vendor} <span className="mx-1">·</span> {item.partNo}
-                              </p>
-                            </td>
-                            <td className="pl-4 pr-2 py-3 whitespace-nowrap">
-                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px]" style={{ fontWeight: 600, backgroundColor: statusColor.bg, color: statusColor.text, border: `1px solid ${statusColor.border}` }}>
-                                <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: statusColor.dot }} />
-                                {item.status}
-                              </span>
-                            </td>
-                            <td className="pl-4 pr-2 py-3 text-[12px] text-[#334155] whitespace-nowrap" style={{ fontWeight: 500 }}>{item.controlType}</td>
-                            <td className="pl-4 pr-2 py-3 text-[12px] text-[#334155] whitespace-nowrap" style={{ fontWeight: 500 }}>{item.primaryCat}</td>
-                            <td className="pl-4 pr-4 py-3 whitespace-nowrap">
-                              <div className="flex items-center gap-1.5">
-                                {item.additionalCat.map((cat) => (
-                                  <span key={cat} className="text-[10px] px-2 py-0.5 rounded-md bg-[#F1F5F9] text-[#475569] border border-[#E2E8F0]" style={{ fontWeight: 500 }}>{cat}</span>
-                                ))}
-                              </div>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-
-                <div className="flex items-center justify-between px-4 py-2.5 border-t border-[#E2E8F0] shrink-0 bg-white">
-                  <span className="text-[11px] text-[#64748B]">Showing <span className="text-[#0F172A]" style={{ fontWeight: 600 }}>{filteredItems.length}</span> of <span className="text-[#0F172A]" style={{ fontWeight: 600 }}>{itemCount}</span> items</span>
-                  <div className="flex items-center gap-2 text-[11px] text-[#64748B]">
-                    <span>Records per page</span>
-                    <select className="h-6 px-1.5 rounded border border-[#E2E8F0] bg-white text-[11px] text-[#334155] cursor-pointer outline-none">
-                      <option>20</option><option>50</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Vendors Tab */}
+            {/* Partners Tab */}
             {tab === "vendors" && (
               <div className="flex-1 flex flex-col overflow-hidden">
                 <div className="px-4 py-3 shrink-0 bg-white border-b border-[#E2E8F0]">
@@ -301,10 +210,8 @@ function PaymentTermDetailModal({ term, open, onClose, mode = "create", onDisabl
                       <tr className="bg-[#F8FAFC]">
                         <th className="text-left pl-4 pr-2 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Partner</th>
                         <th className="text-left pl-4 pr-2 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Description</th>
-                        <th className="text-left pl-4 pr-2 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Status</th>
-                        <th className="text-left pl-4 pr-2 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Type</th>
-                        <th className="text-left pl-4 pr-2 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Category</th>
-                        <th className="text-left pl-4 pr-4 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Country</th>
+                        <th className="text-left pl-4 pr-2 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Address</th>
+                        <th className="text-left pl-4 pr-4 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Status</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -312,10 +219,10 @@ function PaymentTermDetailModal({ term, open, onClose, mode = "create", onDisabl
                         const vTint = getAvatarTint(v.companyName);
                         const vInit = v.companyName.split(" ").map(w => w[0]).slice(0, 2).join("");
                         const statusColor = v.status === "active"
-                          ? { bg: "#F0FDF4", text: "#16A34A", border: "#BBF7D0", dot: "#16A34A" }
+                          ? { bg: "#ECFDF5", text: "#065F46", border: "#A7F3D0" }
                           : v.status === "inactive"
-                            ? { bg: "#FFFBEB", text: "#D97706", border: "#FDE68A", dot: "#D97706" }
-                            : { bg: "#FEF2F2", text: "#DC2626", border: "#FECACA", dot: "#DC2626" };
+                            ? { bg: "#FFFBEB", text: "#92400E", border: "#FDE68A" }
+                            : { bg: "#F1F5F9", text: "#334155", border: "#CBD5E1" };
                         return (
                           <tr key={v.id} className="bg-white hover:bg-[#F8FAFC] transition-colors border-b border-[#F1F5F9]">
                             <td className="pl-4 pr-2 py-3">
@@ -329,28 +236,16 @@ function PaymentTermDetailModal({ term, open, onClose, mode = "create", onDisabl
                                 </div>
                               </div>
                             </td>
-                            <td className="pl-4 pr-2 py-3 max-w-[180px]">
+                            <td className="pl-4 pr-2 py-3 max-w-[200px]">
                               <p className="text-[12px] text-[#334155] truncate" style={{ fontWeight: 500 }}>{v.description || v.services}</p>
-                              <p className="text-[10px] text-[#94A3B8] mt-0.5">{v.country}</p>
                             </td>
-                            <td className="pl-4 pr-2 py-3 whitespace-nowrap">
-                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px]" style={{ fontWeight: 600, backgroundColor: statusColor.bg, color: statusColor.text, border: `1px solid ${statusColor.border}` }}>
-                                <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: statusColor.dot }} />
+                            <td className="pl-4 pr-2 py-3 max-w-[180px]">
+                              <p className="text-[12px] text-[#334155] truncate" style={{ fontWeight: 500 }}>{v.address || `${v.city || ""}, ${v.country}`}</p>
+                            </td>
+                            <td className="pl-4 pr-4 py-3 whitespace-nowrap">
+                              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] border" style={{ fontWeight: 500, backgroundColor: statusColor.bg, color: statusColor.text, borderColor: statusColor.border }}>
                                 {v.status.charAt(0).toUpperCase() + v.status.slice(1)}
                               </span>
-                            </td>
-                            <td className="pl-4 pr-2 py-3 whitespace-nowrap">
-                              <div className="flex items-center gap-1">
-                                {v.partnerTypes.map((t) => (
-                                  <span key={t} className={`text-[10px] px-2 py-0.5 rounded-md border ${t === "vendor" ? "bg-[#F0FDF4] border-[#BBF7D0] text-[#166534]" : "bg-[#EFF6FF] border-[#BFDBFE] text-[#1E40AF]"}`} style={{ fontWeight: 500 }}>
-                                    {t === "vendor" ? "Vendor" : "Customer"}
-                                  </span>
-                                ))}
-                              </div>
-                            </td>
-                            <td className="pl-4 pr-2 py-3 text-[12px] text-[#334155] whitespace-nowrap" style={{ fontWeight: 500 }}>{CATEGORY_LABELS[v.category]}</td>
-                            <td className="pl-4 pr-4 py-3 whitespace-nowrap">
-                              <span className="text-[12px] text-[#334155]" style={{ fontWeight: 500 }}>{v.countryFlag} {v.country}</span>
                             </td>
                           </tr>
                         );
@@ -371,7 +266,7 @@ function PaymentTermDetailModal({ term, open, onClose, mode = "create", onDisabl
             )}
 
             {/* Placeholder tabs */}
-            {tab !== "items" && tab !== "vendors" && (
+            {tab !== "vendors" && (
               <div className="flex-1 flex items-center justify-center">
                 <div className="text-center">
                   <div className="w-12 h-12 rounded-xl bg-[#F1F5F9] flex items-center justify-center mx-auto mb-3">
