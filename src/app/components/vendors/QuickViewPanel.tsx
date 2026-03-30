@@ -227,7 +227,21 @@ function LocationQuickView({ locationName, vendorName }: { locationName: string;
       <div className="px-5 pb-4">
         <div className="text-[11px] uppercase tracking-wider text-muted-foreground/60 mb-1" style={{ fontWeight: 600 }}>Details</div>
         <div className="divide-y divide-border/30">
-          <InfoRow icon={MapPin} label="Address" value={`${d.street}, ${d.city}`} />
+          <div className="flex items-start gap-2.5 py-2">
+            <div className="w-7 h-7 rounded-md bg-muted/50 flex items-center justify-center shrink-0 mt-0.5">
+              <MapPin className="w-3.5 h-3.5 text-muted-foreground" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="text-[10px] uppercase tracking-wider text-muted-foreground/60" style={{ fontWeight: 500 }}>Address</div>
+              <a
+                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${d.street}, ${d.city}`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[13px] text-foreground hover:text-[#0A77FF] hover:underline transition-colors block"
+                style={{ fontWeight: 500 }}
+              >{d.street}, {d.city}</a>
+            </div>
+          </div>
           <InfoRow icon={Warehouse} label="Facility Type" value={d.type} />
           <InfoRow icon={Clock} label="Operating Hours" value={d.operatingHours} />
           <InfoRow icon={User} label="On-Site Contacts" value={`${d.contactCount} people`} />

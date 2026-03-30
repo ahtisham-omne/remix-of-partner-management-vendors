@@ -155,7 +155,7 @@ export function SearchablePartnerDropdown({
     <button
       disabled={disabled}
       onClick={useDialog ? () => !disabled && setOpen(true) : undefined}
-      className={`w-full h-10 px-3 rounded-lg border flex items-center justify-between text-sm transition-colors ${
+      className={`w-full min-h-[40px] px-3 py-2 rounded-lg border flex items-center justify-between text-sm transition-colors ${
         disabled
           ? "bg-[#F8FAFC] border-[#E2E8F0] cursor-not-allowed"
           : open
@@ -164,19 +164,19 @@ export function SearchablePartnerDropdown({
       }`}
     >
       {selectedItem ? (
-        <div className="flex items-center gap-2.5 min-w-0 flex-1">
+        <div className="flex items-start gap-2.5 min-w-0 flex-1">
           <div
-            className="w-7 h-7 rounded-lg flex items-center justify-center text-white text-[10px] shrink-0"
+            className="w-7 h-7 rounded-lg flex items-center justify-center text-white text-[10px] shrink-0 mt-0.5"
             style={{ backgroundColor: selectedItem.logoColor, fontWeight: 700 }}
           >
             {selectedItem.logoText}
           </div>
           <div className="flex flex-col min-w-0 text-left">
-            <span className="text-[#0F172A] truncate text-[13px]" style={{ fontWeight: 500 }}>{selectedItem.name}</span>
+            <span className="text-[#0F172A] text-[13px]" style={{ fontWeight: 500 }}>{selectedItem.name}</span>
             {selectedItem.location && (
-              <span className="text-[10px] text-[#64748B] truncate flex items-center gap-0.5">
-                <MapPin className="w-2.5 h-2.5 shrink-0" />
-                {selectedItem.location}
+              <span className="text-[10px] text-[#64748B] flex items-start gap-0.5 leading-relaxed">
+                <MapPin className="w-2.5 h-2.5 shrink-0 mt-0.5" />
+                <span className="break-words">{selectedItem.location}</span>
               </span>
             )}
           </div>
@@ -215,11 +215,14 @@ export function SearchablePartnerDropdown({
         {item.logoText}
       </div>
       <div className="flex flex-col min-w-0 flex-1">
-        <span className="text-sm text-[#0F172A] truncate" style={{ fontWeight: 500 }}>{item.name}</span>
+        <span className="text-sm text-[#0F172A]" style={{ fontWeight: 500 }}>{item.name}</span>
         {item.location && (
-          <span className="flex items-center gap-1 text-[11px] text-[#64748B] truncate">
-            <MapPin className="w-3 h-3 shrink-0" />
-            {item.location}
+          <span
+            className="flex items-start gap-1 text-[10px] text-[#64748B] hover:text-[#0A77FF] hover:underline leading-relaxed mt-0.5 transition-colors cursor-pointer"
+            onClick={(e) => { e.stopPropagation(); window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.location!)}`, "_blank"); }}
+          >
+            <MapPin className="w-3 h-3 shrink-0 mt-0.5" />
+            <span className="break-words">{item.location}</span>
           </span>
         )}
       </div>
@@ -262,7 +265,7 @@ export function SearchablePartnerDropdown({
                   <Info className="w-3.5 h-3.5 text-[#94A3B8] cursor-help" />
                 </button>
               </TooltipTrigger>
-              <TooltipContent side="bottom" sideOffset={6} className="bg-[#1E293B] text-white text-[12px] leading-[1.5] rounded-lg max-w-[260px] px-3 py-2.5 shadow-lg z-[300]">
+              <TooltipContent side="bottom" sideOffset={6} className="max-w-[260px] text-[12px] leading-[1.5] z-[300]">
                 {tooltip}
               </TooltipContent>
             </Tooltip>
@@ -399,7 +402,7 @@ export function SearchablePartnerDropdown({
                 <Info className="w-3.5 h-3.5 text-[#94A3B8] cursor-help" />
               </button>
             </TooltipTrigger>
-            <TooltipContent side="bottom" sideOffset={6} className="bg-[#1E293B] text-white text-[12px] leading-[1.5] rounded-lg max-w-[260px] px-3 py-2.5 shadow-lg z-[300]">
+            <TooltipContent side="bottom" sideOffset={6} className="max-w-[260px] text-[12px] leading-[1.5] z-[300]">
               {tooltip}
             </TooltipContent>
           </Tooltip>
@@ -483,7 +486,7 @@ export function CurrencyDropdown({
                 <Info className="w-3.5 h-3.5 text-[#94A3B8] cursor-help" />
               </button>
             </TooltipTrigger>
-            <TooltipContent side="bottom" sideOffset={6} className="bg-[#1E293B] text-white text-[12px] leading-[1.5] rounded-lg max-w-[260px] px-3 py-2.5 shadow-lg z-[300]">
+            <TooltipContent side="bottom" sideOffset={6} className="max-w-[260px] text-[12px] leading-[1.5] z-[300]">
               The currency used for all transactions with this partner. Ensure it matches your billing and funding requirements.
             </TooltipContent>
           </Tooltip>
@@ -497,7 +500,10 @@ export function CurrencyDropdown({
             }`}
           >
             {selected ? (
-              <span className="text-[#0F172A] truncate" style={{ fontWeight: 500 }}>{selected.label}</span>
+              <span className="flex items-center gap-2 text-[#0F172A] truncate" style={{ fontWeight: 500 }}>
+                <span className="text-base shrink-0">{(selected as any).flag || ""}</span>
+                {selected.label}
+              </span>
             ) : (
               <span className="text-[#94A3B8]">Select a currency</span>
             )}
@@ -509,11 +515,12 @@ export function CurrencyDropdown({
           </button>
         </PopoverTrigger>
         <PopoverContent
-          className="w-[var(--radix-popover-trigger-width)] p-0 rounded-xl border border-[#E2E8F0] shadow-lg z-[200]"
+          className="w-[var(--radix-popover-trigger-width)] p-0 rounded-xl border border-[#E2E8F0] shadow-lg z-[250]"
           align="start"
           sideOffset={4}
+          style={{ maxHeight: "min(380px, var(--radix-popover-content-available-height))" }}
         >
-          <div className="p-3">
+          <div className="p-3 shrink-0">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
               <input
@@ -521,10 +528,11 @@ export function CurrencyDropdown({
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search currency..."
                 className="w-full h-9 pl-9 pr-3 rounded-lg border border-[#E2E8F0] bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-none focus:border-[#0A77FF] focus:ring-2 focus:ring-[#0A77FF]/10"
+                autoFocus
               />
             </div>
           </div>
-          <div className="max-h-[220px] overflow-y-auto border-t border-[#F1F5F9]">
+          <div className="border-t border-[#F1F5F9]" style={{ maxHeight: 300, overflowY: "auto" }}>
             {filtered.length === 0 ? (
               <div className="py-6 text-center text-xs text-[#94A3B8]">No results found</div>
             ) : (
@@ -540,7 +548,8 @@ export function CurrencyDropdown({
                     selectedId === c.id ? "bg-[#EDF4FF]/50" : ""
                   }`}
                 >
-                  <span className="w-7 text-center text-sm text-[#64748B]" style={{ fontWeight: 600 }}>{c.symbol}</span>
+                  <span className="text-base shrink-0">{(c as any).flag || ""}</span>
+                  <span className="w-7 text-center text-[12px] text-[#64748B] shrink-0" style={{ fontWeight: 600 }}>{c.symbol}</span>
                   <span className="text-sm text-[#0F172A] truncate" style={{ fontWeight: 500 }}>{c.label}</span>
                   {selectedId === c.id && <Check className="w-4 h-4 text-[#0A77FF] ml-auto shrink-0" />}
                 </button>
@@ -579,7 +588,7 @@ export function FundedByDropdown({
                 <Info className="w-3.5 h-3.5 text-[#94A3B8] cursor-help" />
               </button>
             </TooltipTrigger>
-            <TooltipContent side="bottom" sideOffset={6} className="bg-[#1E293B] text-white text-[12px] leading-[1.5] rounded-lg max-w-[260px] px-3 py-2.5 shadow-lg z-[300]">
+            <TooltipContent side="bottom" sideOffset={6} className="max-w-[260px] text-[12px] leading-[1.5] z-[300]">
               The organization or entity covering the costs of this transaction. This is usually the buyer or their funding partner.
             </TooltipContent>
           </Tooltip>

@@ -2,12 +2,13 @@ import React, { useState } from "react";
 import {
   Plus, X, CreditCard, ChevronLeft, Check, Pencil, Trash2, Star,
   ArrowUpDown, ExternalLink, ChevronDown, MoreHorizontal, Eye, EyeOff,
-  Building2, Hash, Phone, MapPin, FileText, Percent, AlertCircle, Wallet, User,
+  Building2, Hash, Phone, MapPin, FileText, Percent, AlertCircle, Wallet, User, Search,
 } from "lucide-react";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../ui/select";
+import { Popover, PopoverTrigger, PopoverContent } from "../ui/popover";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "../ui/dialog";
 import { Tooltip, TooltipTrigger, TooltipContent } from "../ui/tooltip";
 import { FilterPills, type FilterPillOption } from "./FilterPills";
@@ -19,14 +20,116 @@ import {
 } from "./partnerConstants";
 import { createEmptyPaymentEntry } from "./config-helpers";
 
-const inputCls = "mt-1.5 rounded-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#CBD5E1] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20";
+const inputCls = "mt-1.5 rounded-lg border-[#E2E8F0] !h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#CBD5E1] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20";
 
-// ── Auto-format helpers ──
-function formatRoutingNumber(v: string): string {
-  return v.replace(/\D/g, "").slice(0, 9);
+// ── Country banking format definitions ──
+interface CountryBankFormat {
+  code: string;
+  flag: string;
+  phoneCode: string;
+  phoneDigits: number;
+  phoneFormat: (d: string) => string;
+  phonePlaceholder: string;
+  accountMaxDigits: number;
+  accountFormat: (d: string) => string;
+  accountPlaceholder: string;
+  routingLabel: string;
+  routingMaxDigits: number;
+  routingFormat: (d: string) => string;
+  routingPlaceholder: string;
+  hasRouting: boolean;
+  swiftLabel: string;
 }
-function formatAccountNumber(v: string): string {
-  return v.replace(/\D/g, "").slice(0, 17);
+
+const COUNTRY_BANK_FORMATS: Record<string, CountryBankFormat> = {
+  USA: {
+    code: "US", flag: "🇺🇸", phoneCode: "+1", phoneDigits: 10,
+    phoneFormat: (d) => { if (d.length > 6) return `(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}`; if (d.length > 3) return `(${d.slice(0,3)}) ${d.slice(3)}`; return d; },
+    phonePlaceholder: "(555) 123-4567",
+    accountMaxDigits: 17, accountFormat: (d) => d.replace(/(\d{4})(?=\d)/g, "$1 "), accountPlaceholder: "0000 0000 0000 0",
+    routingLabel: "Routing Number (ABA)", routingMaxDigits: 9, routingFormat: (d) => d, routingPlaceholder: "021000021", hasRouting: true, swiftLabel: "SWIFT / BIC Code",
+  },
+  UK: {
+    code: "GB", flag: "🇬🇧", phoneCode: "+44", phoneDigits: 10,
+    phoneFormat: (d) => { if (d.length > 4) return `${d.slice(0,4)} ${d.slice(4)}`; return d; },
+    phonePlaceholder: "7911 123456",
+    accountMaxDigits: 8, accountFormat: (d) => d.replace(/(\d{4})(?=\d)/g, "$1 "), accountPlaceholder: "0000 0000",
+    routingLabel: "Sort Code", routingMaxDigits: 6, routingFormat: (d) => { if (d.length > 4) return `${d.slice(0,2)}-${d.slice(2,4)}-${d.slice(4)}`; if (d.length > 2) return `${d.slice(0,2)}-${d.slice(2)}`; return d; }, routingPlaceholder: "20-00-00", hasRouting: true, swiftLabel: "SWIFT / BIC Code",
+  },
+  Germany: {
+    code: "DE", flag: "🇩🇪", phoneCode: "+49", phoneDigits: 11,
+    phoneFormat: (d) => { if (d.length > 4) return `${d.slice(0,3)} ${d.slice(3)}`; return d; },
+    phonePlaceholder: "151 12345678",
+    accountMaxDigits: 22, accountFormat: (d) => d.replace(/(\d{4})(?=\d)/g, "$1 "), accountPlaceholder: "DE89 3704 0044 0532 0130 00",
+    routingLabel: "BLZ (Bank Code)", routingMaxDigits: 8, routingFormat: (d) => d.replace(/(\d{4})(?=\d)/g, "$1 "), routingPlaceholder: "3704 0044", hasRouting: true, swiftLabel: "SWIFT / BIC Code",
+  },
+  Japan: {
+    code: "JP", flag: "🇯🇵", phoneCode: "+81", phoneDigits: 10,
+    phoneFormat: (d) => { if (d.length > 6) return `${d.slice(0,2)}-${d.slice(2,6)}-${d.slice(6)}`; if (d.length > 2) return `${d.slice(0,2)}-${d.slice(2)}`; return d; },
+    phonePlaceholder: "90-1234-5678",
+    accountMaxDigits: 7, accountFormat: (d) => d, accountPlaceholder: "1234567",
+    routingLabel: "Bank & Branch Code", routingMaxDigits: 7, routingFormat: (d) => { if (d.length > 3) return `${d.slice(0,3)}-${d.slice(3)}`; return d; }, routingPlaceholder: "001-0123", hasRouting: true, swiftLabel: "SWIFT Code",
+  },
+  India: {
+    code: "IN", flag: "🇮🇳", phoneCode: "+91", phoneDigits: 10,
+    phoneFormat: (d) => { if (d.length > 5) return `${d.slice(0,5)} ${d.slice(5)}`; return d; },
+    phonePlaceholder: "98765 43210",
+    accountMaxDigits: 18, accountFormat: (d) => d.replace(/(\d{4})(?=\d)/g, "$1 "), accountPlaceholder: "0000 0000 0000 0000 00",
+    routingLabel: "IFSC Code", routingMaxDigits: 11, routingFormat: (d) => d.toUpperCase(), routingPlaceholder: "SBIN0001234", hasRouting: true, swiftLabel: "SWIFT Code",
+  },
+  China: {
+    code: "CN", flag: "🇨🇳", phoneCode: "+86", phoneDigits: 11,
+    phoneFormat: (d) => { if (d.length > 7) return `${d.slice(0,3)} ${d.slice(3,7)} ${d.slice(7)}`; if (d.length > 3) return `${d.slice(0,3)} ${d.slice(3)}`; return d; },
+    phonePlaceholder: "138 0013 8000",
+    accountMaxDigits: 19, accountFormat: (d) => d.replace(/(\d{4})(?=\d)/g, "$1 "), accountPlaceholder: "6222 0000 0000 0000 000",
+    routingLabel: "CNAPS Code", routingMaxDigits: 12, routingFormat: (d) => d, routingPlaceholder: "102100099996", hasRouting: true, swiftLabel: "SWIFT Code",
+  },
+  UAE: {
+    code: "AE", flag: "🇦🇪", phoneCode: "+971", phoneDigits: 9,
+    phoneFormat: (d) => { if (d.length > 2) return `${d.slice(0,2)} ${d.slice(2)}`; return d; },
+    phonePlaceholder: "50 123 4567",
+    accountMaxDigits: 23, accountFormat: (d) => d.replace(/(\d{4})(?=\d)/g, "$1 "), accountPlaceholder: "AE07 0331 2345 6789 0123 456",
+    routingLabel: "Bank Code", routingMaxDigits: 4, routingFormat: (d) => d, routingPlaceholder: "0331", hasRouting: true, swiftLabel: "SWIFT Code",
+  },
+  "South Korea": {
+    code: "KR", flag: "🇰🇷", phoneCode: "+82", phoneDigits: 10,
+    phoneFormat: (d) => { if (d.length > 6) return `${d.slice(0,2)}-${d.slice(2,6)}-${d.slice(6)}`; if (d.length > 2) return `${d.slice(0,2)}-${d.slice(2)}`; return d; },
+    phonePlaceholder: "10-1234-5678",
+    accountMaxDigits: 14, accountFormat: (d) => d.replace(/(\d{4})(?=\d)/g, "$1-"), accountPlaceholder: "1234-5678-9012-34",
+    routingLabel: "Bank Code", routingMaxDigits: 3, routingFormat: (d) => d, routingPlaceholder: "004", hasRouting: true, swiftLabel: "SWIFT Code",
+  },
+  Australia: {
+    code: "AU", flag: "🇦🇺", phoneCode: "+61", phoneDigits: 9,
+    phoneFormat: (d) => { if (d.length > 5) return `${d.slice(0,1)} ${d.slice(1,5)} ${d.slice(5)}`; if (d.length > 1) return `${d.slice(0,1)} ${d.slice(1)}`; return d; },
+    phonePlaceholder: "4 1234 5678",
+    accountMaxDigits: 9, accountFormat: (d) => d, accountPlaceholder: "123456789",
+    routingLabel: "BSB Number", routingMaxDigits: 6, routingFormat: (d) => { if (d.length > 3) return `${d.slice(0,3)}-${d.slice(3)}`; return d; }, routingPlaceholder: "062-000", hasRouting: true, swiftLabel: "SWIFT Code",
+  },
+  Canada: {
+    code: "CA", flag: "🇨🇦", phoneCode: "+1", phoneDigits: 10,
+    phoneFormat: (d) => { if (d.length > 6) return `(${d.slice(0,3)}) ${d.slice(3,6)}-${d.slice(6)}`; if (d.length > 3) return `(${d.slice(0,3)}) ${d.slice(3)}`; return d; },
+    phonePlaceholder: "(416) 123-4567",
+    accountMaxDigits: 12, accountFormat: (d) => d.replace(/(\d{4})(?=\d)/g, "$1 "), accountPlaceholder: "0000 0000 0000",
+    routingLabel: "Transit + Institution", routingMaxDigits: 8, routingFormat: (d) => { if (d.length > 5) return `${d.slice(0,5)}-${d.slice(5)}`; return d; }, routingPlaceholder: "00002-004", hasRouting: true, swiftLabel: "SWIFT Code",
+  },
+};
+
+export const DEFAULT_FORMAT: CountryBankFormat = COUNTRY_BANK_FORMATS["USA"];
+
+// Map partner group country to format
+export function getCountryFormat(country?: string): CountryBankFormat {
+  if (!country) return DEFAULT_FORMAT;
+  return COUNTRY_BANK_FORMATS[country] || DEFAULT_FORMAT;
+}
+
+// ── Auto-format helpers (country-aware) ──
+function formatRoutingNumber(v: string, fmt: CountryBankFormat = DEFAULT_FORMAT): string {
+  const clean = fmt.routingPlaceholder.match(/[A-Z]/) ? v.replace(/[^a-zA-Z0-9]/g, "").slice(0, fmt.routingMaxDigits) : v.replace(/\D/g, "").slice(0, fmt.routingMaxDigits);
+  return fmt.routingFormat(clean);
+}
+function formatAccountNumber(v: string, fmt: CountryBankFormat = DEFAULT_FORMAT): string {
+  const digits = v.replace(/\D/g, "").slice(0, fmt.accountMaxDigits);
+  return fmt.accountFormat(digits);
 }
 function formatCardNumber(v: string): string {
   const digits = v.replace(/\D/g, "").slice(0, 16);
@@ -40,11 +143,9 @@ function formatExpiry(v: string): string {
 function formatCVV(v: string): string {
   return v.replace(/\D/g, "").slice(0, 4);
 }
-function formatPhone(v: string): string {
-  const digits = v.replace(/\D/g, "").slice(0, 10);
-  if (digits.length > 6) return `${digits.slice(0, 3)} ${digits.slice(3, 6)} ${digits.slice(6)}`;
-  if (digits.length > 3) return `${digits.slice(0, 3)} ${digits.slice(3)}`;
-  return digits;
+function formatPhone(v: string, fmt: CountryBankFormat = DEFAULT_FORMAT): string {
+  const digits = v.replace(/\D/g, "").slice(0, fmt.phoneDigits);
+  return fmt.phoneFormat(digits);
 }
 
 const catColor: Record<string, string> = {
@@ -95,14 +196,107 @@ function getEntrySubtext(e: PaymentMethodEntry): string {
   return typeCategory(e.type);
 }
 
+// ── Phone country list for selector ──
+const PHONE_COUNTRIES = Object.entries(COUNTRY_BANK_FORMATS).map(([country, f]) => ({
+  country,
+  code: f.code,
+  flag: f.flag,
+  phoneCode: f.phoneCode,
+}));
+
+// ── Phone field with country selector ──
+export function PhoneFieldWithCountry({ e, updateEntry, defaultFormat }: {
+  e: PaymentMethodEntry;
+  updateEntry: (id: string, updates: Partial<PaymentMethodEntry>) => void;
+  defaultFormat: CountryBankFormat;
+}) {
+  const [phoneCountryOpen, setPhoneCountryOpen] = useState(false);
+  const [phoneSearch, setPhoneSearch] = useState("");
+  // Determine active format from stored countryCode
+  const activeFormat = Object.values(COUNTRY_BANK_FORMATS).find(f => f.phoneCode === e.countryCode) || defaultFormat;
+
+  const filtered = phoneSearch.trim()
+    ? PHONE_COUNTRIES.filter(c => c.country.toLowerCase().includes(phoneSearch.toLowerCase()) || c.phoneCode.includes(phoneSearch))
+    : PHONE_COUNTRIES;
+
+  return (
+    <div>
+      <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Phone Number</Label>
+      <div className="flex gap-0 mt-1.5">
+        <Popover open={phoneCountryOpen} onOpenChange={setPhoneCountryOpen}>
+          <PopoverTrigger asChild>
+            <button
+              type="button"
+              className={`flex items-center gap-1.5 px-3 h-10 border border-r-0 rounded-l-lg bg-white text-sm text-[#0F172A] shrink-0 cursor-pointer hover:bg-[#F8FAFC] transition-colors ${
+                phoneCountryOpen ? "border-[#0A77FF] bg-[#F8FAFC]" : "border-[#E2E8F0]"
+              }`}
+            >
+              <span className="text-base">{activeFormat.flag}</span>
+              <span style={{ fontWeight: 500 }}>{activeFormat.phoneCode}</span>
+              <ChevronDown className={`w-3 h-3 text-[#94A3B8] transition-transform ${phoneCountryOpen ? "rotate-180" : ""}`} />
+            </button>
+          </PopoverTrigger>
+          <PopoverContent className="w-[240px] p-0 rounded-xl border border-[#E2E8F0] shadow-lg z-[300]" align="start" sideOffset={4}>
+            <div className="p-2">
+              <div className="relative">
+                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8]" />
+                <input
+                  value={phoneSearch}
+                  onChange={(ev) => setPhoneSearch(ev.target.value)}
+                  placeholder="Search country..."
+                  className="w-full h-8 pl-8 pr-3 rounded-md border border-[#E2E8F0] bg-white text-[12px] text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-none focus:border-[#0A77FF]"
+                  autoFocus
+                />
+              </div>
+            </div>
+            <div className="border-t border-[#F1F5F9]" style={{ maxHeight: 200, overflowY: "auto" }}>
+              {filtered.map((c) => {
+                const isActive = activeFormat.phoneCode === c.phoneCode;
+                return (
+                  <button
+                    key={c.country}
+                    type="button"
+                    onClick={() => {
+                      const newFmt = COUNTRY_BANK_FORMATS[c.country];
+                      updateEntry(e.id, { countryCode: c.phoneCode, phone: formatPhone(e.phone.replace(/\D/g, ""), newFmt) });
+                      setPhoneCountryOpen(false);
+                      setPhoneSearch("");
+                    }}
+                    className={`w-full flex items-center gap-2.5 px-3 py-2 text-left transition-colors hover:bg-[#F8FAFC] ${isActive ? "bg-[#EDF4FF]/50" : ""}`}
+                  >
+                    <span className="text-base shrink-0">{c.flag}</span>
+                    <span className="text-[12px] text-[#0F172A] flex-1" style={{ fontWeight: 500 }}>{c.country}</span>
+                    <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>{c.phoneCode}</span>
+                    {isActive && <Check className="w-3.5 h-3.5 text-[#0A77FF] shrink-0" />}
+                  </button>
+                );
+              })}
+            </div>
+          </PopoverContent>
+        </Popover>
+        <Input
+          value={e.phone}
+          onChange={(ev) => updateEntry(e.id, { phone: formatPhone(ev.target.value, activeFormat), countryCode: activeFormat.phoneCode })}
+          placeholder={activeFormat.phonePlaceholder}
+          inputMode="numeric"
+          className="rounded-l-none rounded-r-lg border-[#E2E8F0] !h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#CBD5E1] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
+        />
+      </div>
+    </div>
+  );
+}
+
 // ── Form Fields Renderer ──
 function PaymentFormFields({
   e,
   updateEntry,
+  countryFormat,
 }: {
   e: PaymentMethodEntry;
   updateEntry: (id: string, updates: Partial<PaymentMethodEntry>) => void;
+  countryFormat?: CountryBankFormat;
 }) {
+  const fmt = countryFormat || DEFAULT_FORMAT;
   return (
     <>
       {/* Nickname */}
@@ -124,11 +318,11 @@ function PaymentFormFields({
           </div>
           <div>
             <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Account Number <span className="text-[#EF4444]">*</span></Label>
-            <Input value={e.accountNumber} onChange={(ev) => updateEntry(e.id, { accountNumber: formatAccountNumber(ev.target.value) })} placeholder="Enter account number" className={inputCls} inputMode="numeric" />
+            <Input value={e.accountNumber} onChange={(ev) => updateEntry(e.id, { accountNumber: formatAccountNumber(ev.target.value, fmt) })} placeholder={fmt.accountPlaceholder} className={inputCls} inputMode="numeric" />
           </div>
           <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Routing Number <span className="text-[#EF4444]">*</span></Label>
-            <Input value={e.routingNumber} onChange={(ev) => updateEntry(e.id, { routingNumber: formatRoutingNumber(ev.target.value) })} placeholder="e.g. 021000021" className={inputCls} inputMode="numeric" />
+            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>{fmt.routingLabel} <span className="text-[#EF4444]">*</span></Label>
+            <Input value={e.routingNumber} onChange={(ev) => updateEntry(e.id, { routingNumber: formatRoutingNumber(ev.target.value, fmt) })} placeholder={fmt.routingPlaceholder} className={inputCls} inputMode={fmt.routingPlaceholder.match(/[A-Z]/) ? "text" : "numeric"} />
           </div>
           <div>
             <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Account Type</Label>
@@ -161,15 +355,15 @@ function PaymentFormFields({
           </div>
           <div>
             <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Account Number <span className="text-[#EF4444]">*</span></Label>
-            <Input value={e.accountNumber} onChange={(ev) => updateEntry(e.id, { accountNumber: formatAccountNumber(ev.target.value) })} placeholder="Enter account number" className={inputCls} inputMode="numeric" />
+            <Input value={e.accountNumber} onChange={(ev) => updateEntry(e.id, { accountNumber: formatAccountNumber(ev.target.value, fmt) })} placeholder={fmt.accountPlaceholder} className={inputCls} inputMode="numeric" />
           </div>
           <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Routing Number <span className="text-[#EF4444]">*</span></Label>
-            <Input value={e.routingNumber} onChange={(ev) => updateEntry(e.id, { routingNumber: formatRoutingNumber(ev.target.value) })} placeholder="e.g. 021000021" className={inputCls} inputMode="numeric" />
+            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>{fmt.routingLabel} <span className="text-[#EF4444]">*</span></Label>
+            <Input value={e.routingNumber} onChange={(ev) => updateEntry(e.id, { routingNumber: formatRoutingNumber(ev.target.value, fmt) })} placeholder={fmt.routingPlaceholder} className={inputCls} inputMode={fmt.routingPlaceholder.match(/[A-Z]/) ? "text" : "numeric"} />
           </div>
           <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>SWIFT Code <span className="text-[10px] text-[#94A3B8] font-normal">(optional — international wire only)</span></Label>
-            <Input value={e.swiftCode} onChange={(ev) => updateEntry(e.id, { swiftCode: ev.target.value })} placeholder="Enter SWIFT code for international transfers" className={inputCls} />
+            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>{fmt.swiftLabel} <span className="text-[10px] text-[#94A3B8] font-normal">(optional — international wire only)</span></Label>
+            <Input value={e.swiftCode} onChange={(ev) => updateEntry(e.id, { swiftCode: ev.target.value.toUpperCase() })} placeholder="e.g. CHASUS33" className={inputCls} />
           </div>
         </>
       )}
@@ -269,17 +463,7 @@ function PaymentFormFields({
 
       {/* Phone — for ACH, Wire, Digital Wallet, Cash */}
       {(e.type === "ach" || e.type === "wire" || e.type === "digital_wallet" || e.type === "cash") && (
-        <div>
-          <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Phone Number</Label>
-          <div className="flex gap-0 mt-1.5">
-            <div className="flex items-center gap-1.5 px-3 h-10 border border-r-0 border-[#E2E8F0] rounded-l-lg bg-white text-sm text-[#0F172A] shrink-0">
-              <span className="text-base">🇺🇸</span>
-              <span style={{ fontWeight: 500 }}>{e.countryCode}</span>
-              <ChevronDown className="w-3 h-3 text-[#94A3B8]" />
-            </div>
-            <Input value={e.phone} onChange={(ev) => updateEntry(e.id, { phone: formatPhone(ev.target.value) })} placeholder="xxx xxx xxxx" inputMode="numeric" className="rounded-l-none rounded-r-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#CBD5E1] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
-          </div>
-        </div>
+        <PhoneFieldWithCountry e={e} updateEntry={updateEntry} defaultFormat={fmt} />
       )}
 
       {/* Special Instructions — skip for "other" since it has description */}
@@ -334,7 +518,7 @@ function PaymentFormFields({
               {(e.discountMode ?? "percent") === "fixed" && (
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#94A3B8]">$</span>
               )}
-              <Input value={e.discountPercent} onChange={(ev) => updateEntry(e.id, { discountPercent: ev.target.value })} placeholder={`e.g. ${(e.discountMode ?? "percent") === "percent" ? "5" : "25.00"}`} className={`rounded-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#CBD5E1] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 ${(e.discountMode ?? "percent") === "fixed" ? "pl-7 pr-3" : "pr-8"}`} />
+              <Input value={e.discountPercent} onChange={(ev) => updateEntry(e.id, { discountPercent: ev.target.value })} placeholder={`e.g. ${(e.discountMode ?? "percent") === "percent" ? "5" : "25.00"}`} className={`rounded-lg border-[#E2E8F0] !h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#CBD5E1] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 ${(e.discountMode ?? "percent") === "fixed" ? "pl-7 pr-3" : "pr-8"}`} />
               {(e.discountMode ?? "percent") === "percent" && (
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-[#94A3B8]">%</span>
               )}
@@ -366,7 +550,7 @@ function PaymentFormFields({
               {(e.additionalChargesMode ?? "percent") === "fixed" && (
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#94A3B8]">$</span>
               )}
-              <Input value={e.additionalCharges} onChange={(ev) => updateEntry(e.id, { additionalCharges: ev.target.value })} placeholder={`e.g. ${(e.additionalChargesMode ?? "percent") === "percent" ? "2" : "50.00"}`} className={`rounded-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#CBD5E1] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 ${(e.additionalChargesMode ?? "percent") === "fixed" ? "pl-7 pr-3" : "pr-8"}`} />
+              <Input value={e.additionalCharges} onChange={(ev) => updateEntry(e.id, { additionalCharges: ev.target.value })} placeholder={`e.g. ${(e.additionalChargesMode ?? "percent") === "percent" ? "2" : "50.00"}`} className={`rounded-lg border-[#E2E8F0] !h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#CBD5E1] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 ${(e.additionalChargesMode ?? "percent") === "fixed" ? "pl-7 pr-3" : "pr-8"}`} />
               {(e.additionalChargesMode ?? "percent") === "percent" && (
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-[#94A3B8]">%</span>
               )}
@@ -571,6 +755,7 @@ export function PaymentMethodsSection({
   updatePaymentEntry,
   savePaymentEntry,
   removePaymentEntry,
+  country,
 }: {
   configType: "vendor" | "customer";
   paymentEntries: PaymentMethodEntry[];
@@ -579,7 +764,9 @@ export function PaymentMethodsSection({
   updatePaymentEntry: (id: string, updates: Partial<PaymentMethodEntry>) => void;
   savePaymentEntry: (id: string) => void;
   removePaymentEntry: (id: string) => void;
+  country?: string;
 }) {
+  const countryFormat = getCountryFormat(country);
   const [pmModalOpen, setPmModalOpen] = useState(false);
   const [pmModalStep, setPmModalStep] = useState<"select" | "form">("select");
   const [pmModalTypeFilter, setPmModalTypeFilter] = useState<PaymentTypeCategory | "All">("All");
@@ -818,7 +1005,7 @@ export function PaymentMethodsSection({
                 </div>
               ) : modalEntry ? (
                 <div className="space-y-3">
-                  <PaymentFormFields e={modalEntry} updateEntry={updatePaymentEntry} />
+                  <PaymentFormFields e={modalEntry} updateEntry={updatePaymentEntry} countryFormat={countryFormat} />
                 </div>
               ) : null}
             </div>

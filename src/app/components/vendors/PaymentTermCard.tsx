@@ -188,7 +188,7 @@ export function PaymentTermCard({
                 ? "border-[#E2E8F0] bg-white text-[#64748B]"
                 : "bg-[#F1F5F9] border-[#E2E8F0] text-[#94A3B8]"
             }`} style={{ fontWeight: 600 }}>
-              {isCustom ? "Custom" : <><Lock className="w-2.5 h-2.5" /> PRESET</>}
+              {isCustom ? "Custom" : <><Lock className="w-2.5 h-2.5" /> TEMPLATE</>}
             </span>
           )}
           {/* Hover actions for editable selected card */}

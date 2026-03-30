@@ -283,7 +283,7 @@ export function SearchableUserPicker({
                             <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}><HighlightText text={role.name} query={search} /></p>
                             {role.description && (
                               <Tooltip><TooltipTrigger asChild><span><Info className="w-3 h-3 text-[#CBD5E1] shrink-0" /></span></TooltipTrigger>
-                                <TooltipContent side="bottom" className="bg-[#1E293B] text-white text-[11px] rounded-lg max-w-[220px] px-3 py-2 z-[350]">{role.description}</TooltipContent>
+                                <TooltipContent side="bottom" className="max-w-[220px] text-[11px] z-[350]">{role.description}</TooltipContent>
                               </Tooltip>
                             )}
                           </div>

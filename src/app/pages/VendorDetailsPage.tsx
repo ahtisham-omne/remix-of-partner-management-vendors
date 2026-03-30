@@ -796,6 +796,7 @@ export function VendorDetailsPage() {
                       icon={MapPin}
                       label="Address"
                       value={`${vendor.billingAddress.street}, ${vendor.billingAddress.city}${vendor.billingAddress.state ? `, ${vendor.billingAddress.state}` : ""} ${vendor.billingAddress.zipCode}, ${vendor.billingAddress.country}`}
+                      isAddress
                     />
                   )}
                 </div>
@@ -1119,7 +1120,7 @@ function SidebarCard({ title, children }: { title: string; children: React.React
   );
 }
 
-function SidebarRow({ icon: Icon, label, value, isLink }: { icon: React.ElementType; label: string; value: string; isLink?: boolean }) {
+function SidebarRow({ icon: Icon, label, value, isLink, isAddress }: { icon: React.ElementType; label: string; value: string; isLink?: boolean; isAddress?: boolean }) {
   return (
     <div className="flex items-start gap-2.5">
       <Icon className="w-3.5 h-3.5 text-[#94A3B8] mt-0.5 shrink-0" />
@@ -1131,6 +1132,16 @@ function SidebarRow({ icon: Icon, label, value, isLink }: { icon: React.ElementT
             target="_blank"
             rel="noopener noreferrer"
             className="text-[12px] text-[#0A77FF] hover:underline break-all"
+            style={{ fontWeight: 500 }}
+          >
+            {value}
+          </a>
+        ) : isAddress ? (
+          <a
+            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(value)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[12px] text-[#334155] hover:text-[#0A77FF] hover:underline break-words transition-colors"
             style={{ fontWeight: 500 }}
           >
             {value}

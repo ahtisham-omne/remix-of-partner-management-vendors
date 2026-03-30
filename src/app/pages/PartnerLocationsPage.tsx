@@ -88,10 +88,16 @@ export function PartnerLocationsPage() {
                   {location.partner}
                 </p>
                 <div className="space-y-2">
-                  <div className="flex items-start gap-2 text-muted-foreground" style={{ fontSize: "12px" }}>
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location.address)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-start gap-2 text-muted-foreground hover:text-[#0A77FF] hover:underline transition-colors"
+                    style={{ fontSize: "12px" }}
+                  >
                     <MapPin className="w-3.5 h-3.5 shrink-0 mt-0.5" />
                     <span>{location.address}</span>
-                  </div>
+                  </a>
                   <div className="flex items-center gap-2 text-muted-foreground" style={{ fontSize: "12px" }}>
                     <Phone className="w-3.5 h-3.5 shrink-0" />
                     <span>{location.phone}</span>

@@ -657,7 +657,7 @@ function PricingRuleCard({ rule, onClick }: { rule: PricingRule; onClick: () => 
               <Tooltip>
                 <TooltipTrigger asChild>
                   <span className="inline-flex items-center gap-1 px-1.5 py-[3px] rounded-md bg-[#F1F5F9] border border-[#E2E8F0] text-[9px] text-[#94A3B8]" style={{ fontWeight: 600 }}>
-                    <Lock className="w-2.5 h-2.5" /> PRESET
+                    <Lock className="w-2.5 h-2.5" /> TEMPLATE
                   </span>
                 </TooltipTrigger>
                 <TooltipContent side="top" sideOffset={6} className="z-[300] !bg-white !text-[#334155] !border !border-[#E2E8F0] !shadow-sm rounded-lg text-[11px] px-2.5 py-1.5 max-w-[220px]" style={{ fontWeight: 500 }}>
@@ -809,21 +809,47 @@ function PricingRuleCard({ rule, onClick }: { rule: PricingRule; onClick: () => 
 const DETAIL_TABS_VISIBLE = [
   { id: "items", label: "Items", icon: Package },
   { id: "categories", label: "Categories", icon: Layers },
-  { id: "partner", label: "Partner", icon: Users },
+  { id: "partner", label: "Partners", icon: Users },
+  { id: "notes", label: "Notes", icon: FileText },
   { id: "attachments", label: "Attachments", icon: Paperclip },
-  { id: "audit", label: "Audit log", icon: History },
-  { id: "activity", label: "Recent Activity", icon: Activity },
+  { id: "activity", label: "Recent Activity", icon: Clock },
 ] as const;
 
-const DETAIL_TABS_OVERFLOW = [
-  { id: "notes", label: "Notes" },
-  { id: "history", label: "History" },
-  { id: "compliance", label: "Compliance" },
-  { id: "analytics", label: "Analytics" },
-  { id: "approvals", label: "Approvals" },
-  { id: "exceptions", label: "Exceptions" },
-  { id: "reports", label: "Reports" },
-] as const;
+const DETAIL_TABS_OVERFLOW = [] as const;
+
+const PR_DUMMY_ITEMS = [
+  { id: "i1", code: "FAST-HEX-001", name: "Zinc-Plated Steel Hex Head Screw", vendor: "BoltMaster Inc.", status: "Active", img: "🔩" },
+  { id: "i2", code: "FAST-NUT-004", name: "Stainless Steel Hex Nut M10", vendor: "MetalWorks Ltd.", status: "Active", img: "🔧" },
+  { id: "i3", code: "BRK-PAD-012", name: "Ceramic Brake Pad Set — Front", vendor: "AutoParts Co.", status: "Active", img: "🛞" },
+  { id: "i4", code: "ENG-FLT-007", name: "Oil Filter — Premium Grade", vendor: "FilterPro Inc.", status: "Inactive", img: "⚙️" },
+];
+
+const PR_DUMMY_CATEGORIES = [
+  { id: "c1", name: "Fasteners", count: 245, color: "#0A77FF" },
+  { id: "c2", name: "Brake Components", count: 89, color: "#7C3AED" },
+  { id: "c3", name: "Engine Parts", count: 167, color: "#059669" },
+  { id: "c4", name: "Electrical", count: 112, color: "#D97706" },
+];
+
+const PR_DUMMY_NOTES = [
+  { id: "n1", author: "Sarah Johnson", initials: "SJ", color: "#0A77FF", date: "Mar 28, 2026", text: "Pricing rule approved for Q2. Applies to all fastener categories." },
+  { id: "n2", author: "David Kim", initials: "DK", color: "#D97706", date: "Mar 22, 2026", text: "Increased discount from 10% to 15% for orders over 500 units per vendor request." },
+  { id: "n3", author: "Emily Chen", initials: "EC", color: "#059669", date: "Mar 18, 2026", text: "Added quantity limit tiers based on supplier feedback." },
+];
+
+const PR_DUMMY_ATTACHMENTS = [
+  { id: "a1", name: "Pricing_Agreement_Q2_2026.pdf", size: "312 KB", type: "PDF", date: "Mar 28, 2026", icon: "📄" },
+  { id: "a2", name: "Volume_Discount_Schedule.xlsx", size: "156 KB", type: "XLSX", date: "Mar 20, 2026", icon: "📊" },
+  { id: "a3", name: "Supplier_Rate_Card.pdf", size: "98 KB", type: "PDF", date: "Mar 12, 2026", icon: "📄" },
+];
+
+const PR_DUMMY_ACTIVITY = [
+  { id: "act1", action: "Pricing rule applied", target: "BoltMaster Inc.", user: "Sarah Johnson", date: "Mar 28, 2026 · 3:15 PM", type: "apply" },
+  { id: "act2", action: "Discount tier updated", target: "Tier 2: 10% → 15%", user: "David Kim", date: "Mar 22, 2026 · 10:45 AM", type: "edit" },
+  { id: "act3", action: "Item added", target: "FAST-NUT-004 — Hex Nut M10", user: "Emily Chen", date: "Mar 18, 2026 · 2:30 PM", type: "create" },
+  { id: "act4", action: "Pricing rule created", target: "", user: "Sarah Johnson", date: "Mar 15, 2026 · 9:00 AM", type: "create" },
+  { id: "act5", action: "Category added", target: "Brake Components", user: "David Kim", date: "Mar 14, 2026 · 4:20 PM", type: "create" },
+];
 
 const PARTNER_TYPE_COLORS: Record<string, { bg: string; text: string; border: string }> = {
   "Vendor": { bg: "#EFF6FF", text: "#0A77FF", border: "#BFDBFE" },
@@ -882,9 +908,9 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
     { id: "items", label: "Items", icon: Package, count: rule.itemCount },
     { id: "categories", label: "Categories", icon: Layers, count: rule.categoryCount },
     { id: "partner", label: "Partners", icon: Users, count: rule.partnerCount },
-    { id: "notes", label: "Notes", icon: FileText, count: 0 },
-    { id: "files", label: "Files", icon: Paperclip, count: 0 },
-    { id: "activity", label: "Activity", icon: Activity, count: 0 },
+    { id: "notes", label: "Notes", icon: FileText, count: PR_DUMMY_NOTES.length },
+    { id: "attachments", label: "Attachments", icon: Paperclip, count: PR_DUMMY_ATTACHMENTS.length },
+    { id: "activity", label: "Recent Activity", icon: Clock, count: 0 },
   ];
 
   const creatorInitials = rule.createdBy.split(" ").map((n) => n[0]).join("");
@@ -1240,14 +1266,57 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
             )}
 
             {/* Placeholder tabs */}
-            {tab !== "items" && tab !== "categories" && tab !== "partner" && (
-              <div className="flex-1 flex items-center justify-center">
-                <div className="text-center">
-                  <div className="w-12 h-12 rounded-xl bg-[#F1F5F9] flex items-center justify-center mx-auto mb-3">
-                    {(() => { const T = PR_DETAIL_TABS.find((x) => x.id === tab); return T ? <T.icon className="w-5 h-5 text-[#94A3B8]" /> : null; })()}
+            {/* Notes Tab */}
+            {tab === "notes" && (
+              <div className="flex-1 overflow-auto p-4 space-y-3">
+                {PR_DUMMY_NOTES.map((note) => (
+                  <div key={note.id} className="rounded-lg border border-[#F1F5F9] bg-white p-3.5">
+                    <div className="flex items-center gap-2.5 mb-2">
+                      <div className="w-7 h-7 rounded-full flex items-center justify-center text-[9px] text-white shrink-0" style={{ fontWeight: 700, backgroundColor: note.color }}>{note.initials}</div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[12px] text-[#0F172A]" style={{ fontWeight: 600 }}>{note.author}</p>
+                        <p className="text-[10px] text-[#94A3B8]">{note.date}</p>
+                      </div>
+                    </div>
+                    <p className="text-[12px] text-[#334155] leading-relaxed">{note.text}</p>
                   </div>
-                  <p className="text-sm text-[#0F172A]" style={{ fontWeight: 600 }}>{PR_DETAIL_TABS.find((x) => x.id === tab)?.label || tab}</p>
-                  <p className="text-[11px] text-[#94A3B8] mt-1">Coming soon</p>
+                ))}
+              </div>
+            )}
+
+            {/* Attachments Tab */}
+            {tab === "attachments" && (
+              <div className="flex-1 overflow-auto p-4 space-y-2">
+                {PR_DUMMY_ATTACHMENTS.map((file) => (
+                  <div key={file.id} className="flex items-center gap-3 rounded-lg border border-[#F1F5F9] bg-white px-3.5 py-3 hover:bg-[#F8FAFC] transition-colors cursor-pointer">
+                    <div className="w-9 h-9 rounded-lg bg-[#F1F5F9] border border-[#E2E8F0] flex items-center justify-center text-base shrink-0">{file.icon}</div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[12px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{file.name}</p>
+                      <p className="text-[10px] text-[#94A3B8] mt-0.5">{file.size} · {file.type} · {file.date}</p>
+                    </div>
+                    <ExternalLink className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" />
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Recent Activity Tab */}
+            {tab === "activity" && (
+              <div className="flex-1 overflow-auto p-4">
+                <div className="relative pl-5">
+                  <div className="absolute left-[7px] top-2 bottom-2 w-px bg-[#E2E8F0]" />
+                  <div className="space-y-4">
+                    {PR_DUMMY_ACTIVITY.map((act) => (
+                      <div key={act.id} className="relative">
+                        <div className={`absolute -left-5 top-1 w-3.5 h-3.5 rounded-full border-2 border-white ${act.type === "create" ? "bg-[#22C55E]" : act.type === "edit" ? "bg-[#0A77FF]" : "bg-[#F59E0B]"}`} />
+                        <div>
+                          <p className="text-[12px] text-[#0F172A]" style={{ fontWeight: 600 }}>{act.action}</p>
+                          {act.target && <p className="text-[11px] text-[#64748B] mt-0.5">{act.target}</p>}
+                          <p className="text-[10px] text-[#94A3B8] mt-1">{act.user} · {act.date}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             )}
@@ -1290,7 +1359,7 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
                       </span>
                       {isPreset && (
                         <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-md border border-[#E2E8F0] bg-[#F1F5F9] text-[#64748B]" style={{ fontWeight: 600 }}>
-                          <Lock className="w-2.5 h-2.5" /> PRESET
+                          <Lock className="w-2.5 h-2.5" /> TEMPLATE
                         </span>
                       )}
                     </div>
@@ -1453,7 +1522,7 @@ type QuickFilter = "all" | "preset" | "custom" | "active" | "inactive";
 
 const QUICK_FILTER_DEFS: { key: QuickFilter; label: string; showCount: boolean }[] = [
   { key: "all", label: "All", showCount: true },
-  { key: "preset", label: "Preset", showCount: true },
+  { key: "preset", label: "Template", showCount: true },
   { key: "custom", label: "Custom", showCount: true },
   { key: "active", label: "Active", showCount: true },
   { key: "inactive", label: "Inactive", showCount: true },
@@ -1721,7 +1790,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
           <div className="w-px h-5 bg-border/60 mx-0.5 hidden sm:block" />
 
           <button type="button" onClick={() => { setExplorePresetsOpen(true); setExplorePresetsSidebar("all"); setExploreCategoryTab("discount"); setExplorePresetsSearch(""); }} className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg border border-[#E2E8F0] bg-white text-[#334155] hover:bg-[#F8FAFC] text-sm transition-colors cursor-pointer" style={{ fontWeight: 600 }}>
-            <BookOpen className="w-3.5 h-3.5" />
+            <FileText className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Templates</span>
           </button>
           <button type="button" onClick={() => { resetCreateForm(); setCreateModalOpen(true); }} className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-sm shadow-sm transition-colors cursor-pointer" style={{ fontWeight: 600 }}>
@@ -2091,14 +2160,16 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                         </div>
                         <div>
                           <label className="text-[12px] text-[#0F172A] mb-1.5 block" style={{ fontWeight: 600 }}>Description</label>
-                          <Textarea
-                            value={createDescription}
-                            onChange={(e) => setCreateDescription(e.target.value.slice(0, 150))}
-                            placeholder="Type here..."
-                            className="rounded-lg border-[#E2E8F0] bg-white min-h-[38px] resize-none text-[13px]"
-                            rows={2}
-                          />
-                          <p className="text-right text-[10px] text-[#94A3B8] mt-0.5">{createDescription.length}/150</p>
+                          <div className="relative">
+                            <Textarea
+                              value={createDescription}
+                              onChange={(e) => { if (e.target.value.length <= 5000) setCreateDescription(e.target.value); }}
+                              placeholder="Brief summary of pricing rule purpose or context."
+                              className="rounded-lg border-[#E2E8F0] bg-white min-h-[64px] resize-none text-sm placeholder:text-[#94A3B8] pb-5"
+                              rows={2}
+                            />
+                            <p className="absolute bottom-1.5 right-2.5 text-[11px] text-[#94A3B8] pointer-events-none">{createDescription.length}/5,000</p>
+                          </div>
                         </div>
                       </div>
 
@@ -2292,7 +2363,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                     </button>
                   </div>
 
-                  {/* Items & Categories card */}
+                  {/* Items, Categories, Partners & Attachments card */}
                   <div className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden">
                     <div className="flex items-center gap-0 border-b border-[#E2E8F0] px-4">
                       {([
@@ -2558,10 +2629,10 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                   const base = exploreCards.filter((c) => c.category === exploreCategoryTab);
                   return [
                     { key: "all", label: "All", count: base.length, showCount: true },
-                    { key: "preset", label: "Preset", count: base.filter((c) => c.isPreset).length, showCount: true },
+                    { key: "preset", label: "Template", count: base.filter((c) => c.isPreset).length, showCount: true },
                     { key: "custom", label: "Custom", count: base.filter((c) => !c.isPreset).length, showCount: true },
                     { key: "created_by_me", label: "Created by Me", count: base.filter((c) => !c.isPreset && c.createdBy === "Ahtisham Ahmad").length, showCount: true },
-                    { key: "vendors_applied", label: "Vendors Applied", count: base.filter((c) => c.partnerCount >= 3).length, showCount: true },
+                    { key: "vendors_applied", label: "In Use", count: base.filter((c) => c.partnerCount >= 3).length, showCount: true },
                   ];
                 })()}
                 activeKey={explorePresetsSidebar}
@@ -2661,7 +2732,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                             <div className="flex items-center gap-1.5 shrink-0">
                               {card.isPreset ? (
                                 <span className="inline-flex items-center gap-1 px-1.5 py-[3px] rounded-md bg-[#F1F5F9] border border-[#E2E8F0] text-[9px] text-[#94A3B8]" style={{ fontWeight: 600 }}>
-                                  <Lock className="w-2.5 h-2.5" /> PRESET
+                                  <Lock className="w-2.5 h-2.5" /> TEMPLATE
                                 </span>
                               ) : (
                                 <span className="px-1.5 py-[2px] rounded-md text-[10px] border border-[#E2E8F0] bg-white text-[#64748B]" style={{ fontWeight: 500 }}>Custom</span>

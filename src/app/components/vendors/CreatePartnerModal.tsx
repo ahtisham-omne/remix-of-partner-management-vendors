@@ -129,7 +129,7 @@ import { FilterPills } from "./FilterPills";
 import { PaymentTermDetailModal } from "./PaymentTermDetailModal";
 import { PricingRuleDetailModal, presetToPricingRule, type PricingRule } from "./PricingRulesTab";
 import { PaymentTermCard } from "./PaymentTermCard";
-import { PaymentMethodsSection } from "./PaymentMethodsSection";
+import { PaymentMethodsSection, PhoneFieldWithCountry, DEFAULT_FORMAT } from "./PaymentMethodsSection";
 import {
   PillOption,
   RadioOption,
@@ -171,6 +171,7 @@ import {
   CREATE_PT_DISCOUNT_PERIODS,
   PRICING_RULE_PRESETS,
   CONTACT_DICTIONARY,
+  COUNTRY_CURRENCY_MAP,
   type ContactPerson,
 } from "./partnerConstants";
 import { SelectPocDictionaryModal, CreatePocModal } from "./PocModals";
@@ -831,7 +832,7 @@ export function CreatePartnerModal({ open, onOpenChange, onPartnerCreated, initi
                           </Button>
                         </span>
                       </TooltipTrigger>
-                      <TooltipContent side="top" sideOffset={6} className="max-w-[220px] text-center bg-[#1E293B] text-white border-[#1E293B]">
+                      <TooltipContent side="top" sideOffset={6} className="max-w-[220px] text-center">
                         {selectedGroups.length === 0
                           ? "Select at least one partner group and mark it as primary to continue"
                           : "Mark a partner group as primary to continue"}
@@ -1596,7 +1597,7 @@ function PrTemplateCardInner({
               ? "border-[#E2E8F0] bg-white text-[#64748B]"
               : "bg-[#F1F5F9] border-[#E2E8F0] text-[#94A3B8]"
           }`} style={{ fontWeight: 600 }}>
-            {isCustom ? "Custom" : <><Lock className="w-2.5 h-2.5" /> PRESET</>}
+            {isCustom ? "Custom" : <><Lock className="w-2.5 h-2.5" /> TEMPLATE</>}
           </span>
         </div>
 
@@ -1621,7 +1622,7 @@ function PrTemplateCardInner({
             </span>
           </div>
           <span className="inline-flex items-center gap-1 text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>
-            <Building2 className="w-3 h-3" /> {rule.vendorsApplied} vendors applied
+            <Building2 className="w-3 h-3" /> {rule.vendorsApplied} in use
           </span>
         </div>
 
@@ -2549,7 +2550,7 @@ function Step2PartnerForm({
                   placeholder="e.g. Acme Supply Co."
                   value={partnerName}
                   onChange={(e) => onPartnerNameChange(e.target.value)}
-                  className="mt-1 rounded-lg border-[#E2E8F0] bg-white h-9 sm:h-10 text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
+                  className="mt-1 rounded-lg border-[#E2E8F0] bg-white !h-10 text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
                 />
                 {errors.partnerName && (
                   <p className="text-[#EF4444] text-xs mt-1">{errors.partnerName}</p>
@@ -2560,7 +2561,7 @@ function Step2PartnerForm({
               <div>
                 <Label className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>Status</Label>
                 <Select value={status} onValueChange={(val: string) => setStatus(val as "Active" | "Inactive")}>
-                  <SelectTrigger className="mt-1 h-9 sm:h-10 rounded-lg border-[#E2E8F0] bg-white text-sm hover:border-[#CBD5E1] transition-colors focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 [&>svg]:text-[#94A3B8]">
+                  <SelectTrigger className="mt-1 !h-10 rounded-lg border-[#E2E8F0] bg-white text-sm hover:border-[#CBD5E1] transition-colors focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 [&>svg]:text-[#94A3B8]">
                     <SelectValue>
                       <div className="flex items-center gap-2">
                         <div className="w-2 h-2 rounded-full" style={{ backgroundColor: statusConfig[status].color }} />
@@ -2595,7 +2596,7 @@ function Step2PartnerForm({
                     <PopoverTrigger asChild>
                       <button
                         type="button"
-                        className="flex items-center gap-1.5 pl-2.5 pr-1.5 h-9 sm:h-10 rounded-l-lg border border-r-0 border-[#E2E8F0] bg-white text-sm shrink-0 cursor-pointer hover:border-[#CBD5E1] transition-colors focus:outline-none focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
+                        className="flex items-center gap-1.5 pl-2.5 pr-1.5 !h-10 rounded-l-lg border border-r-0 border-[#E2E8F0] bg-white text-sm shrink-0 cursor-pointer hover:border-[#CBD5E1] transition-colors focus:outline-none focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
                       >
                         <span className="text-base leading-none">{selectedCountry.flag}</span>
                         <span className="text-xs text-[#334155]" style={{ fontWeight: 600 }}>{phoneCountryCode}</span>
@@ -2650,7 +2651,7 @@ function Step2PartnerForm({
                     placeholder="(555) 123-4567"
                     value={partnerPhone}
                     onChange={(e) => onPartnerPhoneChange(e.target.value)}
-                    className="rounded-l-none rounded-r-lg border-[#E2E8F0] bg-white h-9 sm:h-10 text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
+                    className="rounded-l-none rounded-r-lg border-[#E2E8F0] bg-white !h-10 text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
                   />
                 </div>
               </div>
@@ -2665,7 +2666,7 @@ function Step2PartnerForm({
                   placeholder="https://example.com"
                   value={website}
                   onChange={(e) => onWebsiteChange(e.target.value)}
-                  className="mt-1 rounded-lg border-[#E2E8F0] bg-white h-9 sm:h-10 text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
+                  className="mt-1 rounded-lg border-[#E2E8F0] bg-white !h-10 text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
                 />
               </div>
 
@@ -2688,7 +2689,7 @@ function Step2PartnerForm({
                       setAddressFocused(true);
                       if (addressSelected) setAddressSelected(false);
                     }}
-                    className={`pl-9 pr-8 rounded-lg border-[#E2E8F0] bg-white h-9 sm:h-10 text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 ${
+                    className={`pl-9 pr-8 rounded-lg border-[#E2E8F0] bg-white !h-10 text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 ${
                       addressFocused && addressSuggestions.length > 0 ? "rounded-b-none border-b-transparent" : ""
                     }`}
                   />
@@ -2752,7 +2753,7 @@ function Step2PartnerForm({
                   onChange={(e) => setDescription(e.target.value)}
                   className="mt-1 w-full h-[64px] sm:h-[72px] rounded-lg border border-[#E2E8F0] bg-white px-3 py-2 pb-5 text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 focus:outline-none resize-none transition-colors"
                 />
-                <p className="absolute bottom-1.5 right-2.5 text-[11px] text-[#94A3B8] pointer-events-none">{description.length}/500</p>
+                <p className="absolute bottom-1.5 right-2.5 text-[11px] text-[#94A3B8] pointer-events-none">{description.length}/5,000</p>
               </div>
             </div>
           </div>
@@ -3482,7 +3483,8 @@ function ConfigPageContent({
   const [createPtApplyDiscount, setCreatePtApplyDiscount] = useState(false);
   const [createPtDiscountPercent, setCreatePtDiscountPercent] = useState("");
   const [createPtDiscountMode, setCreatePtDiscountMode] = useState<"percent" | "fixed">("percent");
-  const [createPtDiscountPeriod, setCreatePtDiscountPeriod] = useState("30");
+  const [createPtDiscountPeriod, setCreatePtDiscountPeriod] = useState("10");
+  const [createPtCustomDiscountPeriod, setCreatePtCustomDiscountPeriod] = useState("");
   const [createPtStep, setCreatePtStep] = useState<1 | 2>(1);
   // Split payment events
   const [createPtSplitEvents, setCreatePtSplitEvents] = useState<Array<{ event: string; percent: string }>>([
@@ -3529,7 +3531,8 @@ function ConfigPageContent({
     setCreatePtApplyDiscount(false);
     setCreatePtDiscountPercent("");
     setCreatePtDiscountMode("percent");
-    setCreatePtDiscountPeriod("30");
+    setCreatePtDiscountPeriod("10");
+    setCreatePtCustomDiscountPeriod("");
     setCreatePtStep(1);
     setCreatePtSplitEvents([
       { event: "order_confirmation", percent: "50" },
@@ -3580,7 +3583,8 @@ function ConfigPageContent({
         autoDescription = `Split payment term triggered on ${triggerLabel.toLowerCase()}.`;
       }
       if (createPtApplyDiscount && createPtDiscountPercent) {
-        const discPeriodLabel = CREATE_PT_DURATIONS.find((d) => d.id === createPtDiscountPeriod)?.label || `${createPtDiscountPeriod} days`;
+        const resolvedPeriod = createPtDiscountPeriod === "custom" ? createPtCustomDiscountPeriod : createPtDiscountPeriod;
+        const discPeriodLabel = `${resolvedPeriod} days`;
         const discValue = createPtDiscountMode === "fixed" ? `$${createPtDiscountPercent}` : `${createPtDiscountPercent}%`;
         autoDescription += ` ${discValue} discount if paid within ${discPeriodLabel}.`;
       }
@@ -3599,7 +3603,7 @@ function ConfigPageContent({
       applyDiscount: createPtApplyDiscount,
       discountPercent: createPtApplyDiscount ? createPtDiscountPercent : undefined,
       discountMode: createPtApplyDiscount ? createPtDiscountMode : undefined,
-      discountPeriod: createPtApplyDiscount ? createPtDiscountPeriod : undefined,
+      discountPeriod: createPtApplyDiscount ? (createPtDiscountPeriod === "custom" ? createPtCustomDiscountPeriod : createPtDiscountPeriod) : undefined,
     };
     setSelectedPaymentTermId(newPreset.id);
     // We store a reference to show the selected card
@@ -3944,7 +3948,20 @@ function ConfigPageContent({
   }, [selectedPricingRuleIds, allPricingRulePresets]);
 
   // Billing & Shipping state
-  const [currency, setCurrency] = useState("usd");
+  const [currency, setCurrency] = useState(() => {
+    if (selectedGroup?.country) {
+      return COUNTRY_CURRENCY_MAP[selectedGroup.country] || "usd";
+    }
+    return "usd";
+  });
+
+  // Auto-set currency when selected partner group changes
+  React.useEffect(() => {
+    if (selectedGroup?.country) {
+      const mapped = COUNTRY_CURRENCY_MAP[selectedGroup.country];
+      if (mapped) setCurrency(mapped);
+    }
+  }, [selectedGroup?.id]); // eslint-disable-line react-hooks/exhaustive-deps
   const [shipTo, setShipTo] = useState<string | null>("pl-1"); // FR Conversions, Westminster default
   const [payTo, setPayTo] = useState<string | null>("pl-3"); // Toyota International default
   const [fundedBy, setFundedBy] = useState<string | null>("pl-7"); // FR Conversions default
@@ -4222,15 +4239,6 @@ function ConfigPageContent({
         dataKey: "currency" as const,
       },
       {
-        icon: <Truck className="w-5 h-5" />,
-        label: "Ship To",
-        sublabel: shipToObj ? shipToObj.name.split(",")[0] : null,
-        active: !!shipToObj,
-        color: "#22C55E",
-        bgActive: "#ECFDF5",
-        dataKey: "shipTo" as const,
-      },
-      {
         icon: <Receipt className="w-5 h-5" />,
         label: "Pay To",
         sublabel: payToObj ? payToObj.name.split(",")[0] : null,
@@ -4238,6 +4246,15 @@ function ConfigPageContent({
         color: "#8B5CF6",
         bgActive: "#F5F3FF",
         dataKey: "payTo" as const,
+      },
+      {
+        icon: <Truck className="w-5 h-5" />,
+        label: "Ship To",
+        sublabel: shipToObj ? shipToObj.name.split(",")[0] : null,
+        active: !!shipToObj,
+        color: "#22C55E",
+        bgActive: "#ECFDF5",
+        dataKey: "shipTo" as const,
       },
       {
         icon: <Landmark className="w-5 h-5" />,
@@ -4388,7 +4405,7 @@ function ConfigPageContent({
                                   <MapPin className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" />
                                   <div className="flex flex-col min-w-0 flex-1">
                                     <span className="text-[12px] text-[#334155] truncate" style={{ fontWeight: 500 }}>{highlightMatch(loc.name, dialogSearch)}</span>
-                                    {loc.location && <span className="text-[10px] text-[#94A3B8] truncate">{highlightMatch(loc.location, dialogSearch)}</span>}
+                                    {loc.location && <span className="text-[10px] text-[#94A3B8] hover:text-[#0A77FF] hover:underline transition-colors cursor-pointer" onClick={(e) => { e.stopPropagation(); window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(loc.location!)}`, "_blank"); }}>{highlightMatch(loc.location, dialogSearch)}</span>}
                                   </div>
                                   {isLocSelected && <Check className="w-4 h-4 text-[#0A77FF] shrink-0" />}
                                 </button>
@@ -4410,7 +4427,7 @@ function ConfigPageContent({
                             <PartnerLogo item={loc} size={32} />
                             <div className="flex flex-col min-w-0 flex-1">
                               <span className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 500 }}>{highlightMatch(loc.name, dialogSearch)}</span>
-                              {loc.location && <span className="text-[10px] text-[#94A3B8] truncate">{highlightMatch(loc.location, dialogSearch)}</span>}
+                              {loc.location && <span className="text-[10px] text-[#94A3B8] hover:text-[#0A77FF] hover:underline transition-colors cursor-pointer" onClick={(e) => { e.stopPropagation(); window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(loc.location!)}`, "_blank"); }}>{highlightMatch(loc.location, dialogSearch)}</span>}
                             </div>
                             {isLocSelected && <Check className="w-4 h-4 text-[#0A77FF] shrink-0" />}
                           </button>
@@ -4495,24 +4512,30 @@ function ConfigPageContent({
                 const typeLabel = partnerObj.type === "location" ? "Location" : "Partner";
                 const roleLabel = node.dataKey === "shipTo" ? "Delivery Address" : node.dataKey === "payTo" ? "Payment Recipient" : "Funding Source";
                 return (
-                  <div className="w-[220px] bg-white rounded-xl border border-[#E8ECF1] shadow-lg p-3">
-                    <div className="flex items-center gap-2.5 mb-2.5">
+                  <div className="w-[260px] bg-white rounded-xl border border-[#E8ECF1] shadow-lg p-3">
+                    <div className="flex items-start gap-2.5 mb-2.5">
                       <div
                         className="w-9 h-9 rounded-lg flex items-center justify-center text-white text-[13px] shrink-0"
                         style={{ fontWeight: 700, backgroundColor: partnerObj.logoColor }}
                       >
                         {partnerObj.logoText}
                       </div>
-                      <div className="min-w-0">
-                        <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{partnerObj.name}</p>
-                        <div className="flex items-center gap-1 mt-0.5">
-                          <MapPin className="w-3 h-3 text-[#94A3B8] shrink-0" />
-                          <span className="text-[11px] text-[#64748B] truncate">{partnerObj.location || typeLabel}</span>
-                        </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>{partnerObj.name}</p>
+                        {partnerObj.location && (
+                          <a
+                            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(partnerObj.location)}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-start gap-1 mt-1 text-[10px] text-[#64748B] hover:text-[#0A77FF] hover:underline leading-relaxed transition-colors"
+                          >
+                            <MapPin className="w-3 h-3 shrink-0 mt-0.5 text-[#94A3B8]" />
+                            <span className="break-words">{partnerObj.location}</span>
+                          </a>
+                        )}
                       </div>
                     </div>
                     <div className="flex items-center gap-1.5 px-2 py-1 rounded-md" style={{ backgroundColor: node.bgActive }}>
-                      <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: node.color }} />
                       <span className="text-[10px]" style={{ fontWeight: 500, color: node.color }}>{roleLabel}</span>
                     </div>
                     {partnerObj.isDefault && (
@@ -4607,7 +4630,7 @@ function ConfigPageContent({
               {/* 1. Currency */}
               <Popover onOpenChange={(open) => { if (!open) setCurrencyPopoverSearch(""); }}>
                 <PopoverTrigger asChild>
-                  <div className={fieldCardBase + " p-3 h-[88px] flex flex-col justify-between"}>
+                  <div className={fieldCardBase + " p-3 flex flex-col gap-2.5"}>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-1.5">
                         <DollarSign className="w-3.5 h-3.5 text-[#94A3B8]" />
@@ -4636,8 +4659,8 @@ function ConfigPageContent({
                     )}
                   </div>
                 </PopoverTrigger>
-                <PopoverContent className="w-[300px] p-0 rounded-xl border border-[#E2E8F0] shadow-lg z-[200]" align="start" sideOffset={4}>
-                  <div className="p-3">
+                <PopoverContent className="w-[300px] p-0 rounded-xl border border-[#E2E8F0] shadow-lg z-[250]" align="start" sideOffset={4}>
+                  <div className="p-3 shrink-0">
                     <div className="relative">
                       <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
                       <input
@@ -4649,7 +4672,7 @@ function ConfigPageContent({
                       />
                     </div>
                   </div>
-                  <div className="max-h-[220px] overflow-y-auto border-t border-[#F1F5F9]">
+                  <div className="border-t border-[#F1F5F9]" style={{ maxHeight: 280, overflowY: "auto" }}>
                     {currencyFiltered.length === 0 ? (
                       <div className="py-6 text-center text-xs text-[#94A3B8]">No results found</div>
                     ) : (
@@ -4659,7 +4682,8 @@ function ConfigPageContent({
                           onClick={() => setCurrency(c.id)}
                           className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-[#F8FAFC] ${currency === c.id ? "bg-[#EDF4FF]/50" : ""}`}
                         >
-                          <span className="w-7 text-center text-sm text-[#64748B]" style={{ fontWeight: 600 }}>{c.symbol}</span>
+                          <span className="text-base shrink-0">{(c as any).flag || ""}</span>
+                          <span className="w-7 text-center text-[12px] text-[#64748B] shrink-0" style={{ fontWeight: 600 }}>{c.symbol}</span>
                           <span className="text-sm text-[#0F172A] truncate" style={{ fontWeight: 500 }}>{c.label}</span>
                           {currency === c.id && <Check className="w-4 h-4 text-[#0A77FF] ml-auto shrink-0" />}
                         </button>
@@ -4669,45 +4693,9 @@ function ConfigPageContent({
                 </PopoverContent>
               </Popover>
 
-              {/* 2. Ship To */}
+              {/* 2. Pay To */}
               <div
-                className={fieldCardBase + " p-3 h-[88px] flex flex-col justify-between"}
-                onClick={() => setShipToDialogOpen(true)}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1.5">
-                    <Truck className="w-3.5 h-3.5 text-[#94A3B8]" />
-                    <span className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Ship To</span>
-                    <InfoTooltip>The destination where goods or services will be delivered.</InfoTooltip>
-                  </div>
-                  <Pencil className="w-3 h-3 text-[#CBD5E1] opacity-0 group-hover:opacity-100 transition-opacity" />
-                </div>
-                {stObj ? (
-                  <div className="flex items-center gap-2.5">
-                    <PartnerLogo item={stObj} size={36} />
-                    <div className="min-w-0">
-                      <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{stObj.name}</p>
-                      {stObj.location && (
-                        <p className="text-[11px] text-[#64748B] truncate flex items-center gap-1 mt-0.5">
-                          <MapPin className="w-3 h-3 shrink-0 text-[#94A3B8]" />
-                          {stObj.location}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-lg bg-[#F8FAFC] border border-dashed border-[#CBD5E1] flex items-center justify-center shrink-0">
-                      <Truck className="w-4 h-4 text-[#CBD5E1]" />
-                    </div>
-                    <p className="text-[12px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Select destination</p>
-                  </div>
-                )}
-              </div>
-
-              {/* 3. Pay To – entity name only, no address */}
-              <div
-                className={fieldCardBase + " p-3 h-[88px] flex flex-col justify-between"}
+                className={fieldCardBase + " p-3 flex flex-col gap-2.5"}
                 onClick={() => setPayToDialogOpen(true)}
               >
                 <div className="flex items-center justify-between">
@@ -4733,23 +4721,60 @@ function ConfigPageContent({
                 )}
               </div>
 
-              {/* 4. Funded By – matches reference image */}
-              <div className={`${allowAltFunding ? fieldCardBase : disabledCardBase} p-3 h-[88px] flex flex-col justify-between`} onClick={allowAltFunding ? () => setFundedByDialogOpen(true) : undefined}>
+              {/* 3. Ship To */}
+              <div
+                className={fieldCardBase + " p-3 flex flex-col gap-2"}
+                onClick={() => setShipToDialogOpen(true)}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5">
+                    <Truck className="w-3.5 h-3.5 text-[#94A3B8]" />
+                    <span className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Ship To</span>
+                    <InfoTooltip>The destination where goods or services will be delivered.</InfoTooltip>
+                  </div>
+                  <Pencil className="w-3 h-3 text-[#CBD5E1] opacity-0 group-hover:opacity-100 transition-opacity" />
+                </div>
+                {stObj ? (
+                  <div className="flex items-start gap-2.5">
+                    <PartnerLogo item={stObj} size={36} />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>{stObj.name}</p>
+                      {stObj.location && (
+                        <a
+                          href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(stObj.location)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="text-[11px] text-[#64748B] hover:text-[#0A77FF] hover:underline flex items-start gap-1 mt-1 leading-snug transition-colors"
+                        >
+                          <MapPin className="w-3 h-3 shrink-0 text-[#94A3B8] mt-[2px]" />
+                          <span className="break-words">{stObj.location}</span>
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-9 h-9 rounded-lg bg-[#F8FAFC] border border-dashed border-[#CBD5E1] flex items-center justify-center shrink-0">
+                      <Truck className="w-4 h-4 text-[#CBD5E1]" />
+                    </div>
+                    <p className="text-[12px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Select destination</p>
+                  </div>
+                )}
+              </div>
+
+              {/* 4. Funded By */}
+              <div className={`${allowAltFunding ? fieldCardBase : disabledCardBase} p-3 flex flex-col`} onClick={allowAltFunding ? () => setFundedByDialogOpen(true) : undefined}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
                     <Landmark className={`w-3.5 h-3.5 ${allowAltFunding ? "text-[#94A3B8]" : "text-[#CBD5E1]"}`} />
                     <span className={`text-[11px] ${allowAltFunding ? "text-[#64748B]" : "text-[#94A3B8]"}`} style={{ fontWeight: 500 }}>Funded By</span>
-                  </div>
-                  <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
-                    <Switch
-                      checked={allowAltFunding}
-                      onCheckedChange={(val) => { setAllowAltFunding(val); if (!val) setFundedBy("pl-7"); }}
-                    />
-                    <span className={`text-[11px] ${allowAltFunding ? "text-[#64748B]" : "text-[#94A3B8]"}`} style={{ fontWeight: 500 }}>Allow Alternative Funding Source</span>
                     <InfoTooltip>Enable to override the default funding source for this partner.</InfoTooltip>
                   </div>
+                  <Pencil className={`w-3 h-3 text-[#CBD5E1] opacity-0 ${allowAltFunding ? "group-hover:opacity-100" : ""} transition-opacity`} />
                 </div>
-                <div className={allowAltFunding ? "" : "opacity-30"}>
+                {/* Selection */}
+                <div className={`mt-2 ${allowAltFunding ? "" : "opacity-30"}`}>
                   {fbObj ? (
                     <div className="flex items-center gap-2.5">
                       <PartnerLogo item={fbObj} size={36} />
@@ -4763,6 +4788,14 @@ function ConfigPageContent({
                       <p className="text-[12px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Select funding source</p>
                     </div>
                   )}
+                </div>
+                {/* Toggle at bottom */}
+                <div className="flex items-center gap-2 mt-auto pt-2.5 mt-2.5 border-t border-[#F1F5F9]" onClick={(e) => e.stopPropagation()}>
+                  <Switch
+                    checked={allowAltFunding}
+                    onCheckedChange={(val) => { setAllowAltFunding(val); if (!val) setFundedBy("pl-7"); }}
+                  />
+                  <span className={`text-[11px] ${allowAltFunding ? "text-[#64748B]" : "text-[#94A3B8]"}`} style={{ fontWeight: 500 }}>Allow Alternative Funding Source</span>
                 </div>
               </div>
 
@@ -4806,6 +4839,7 @@ function ConfigPageContent({
         updatePaymentEntry={updatePaymentEntry}
         savePaymentEntry={savePaymentEntry}
         removePaymentEntry={removePaymentEntry}
+        country={selectedGroup?.country}
       />
     );
   }
@@ -4825,42 +4859,34 @@ function ConfigPageContent({
           <>
             <div>
               <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Bank Name *</Label>
-              <Input value={e.bankName} onChange={(ev) => updatePaymentEntry(e.id, { bankName: ev.target.value })} placeholder="e.g. Chase Bank" className="mt-1.5 rounded-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+              <Input value={e.bankName} onChange={(ev) => updatePaymentEntry(e.id, { bankName: ev.target.value })} placeholder="e.g. Chase Bank" className="mt-1.5 rounded-lg border-[#E2E8F0] !h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
             </div>
             <div>
               <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Account Title *</Label>
-              <Input value={e.accountTitle} onChange={(ev) => updatePaymentEntry(e.id, { accountTitle: ev.target.value })} placeholder="Enter account holder name" className="mt-1.5 rounded-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+              <Input value={e.accountTitle} onChange={(ev) => updatePaymentEntry(e.id, { accountTitle: ev.target.value })} placeholder="Enter account holder name" className="mt-1.5 rounded-lg border-[#E2E8F0] !h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
             </div>
             <div>
               <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>{e.type === "wire" ? "Account Number/IBAN *" : "Account Number *"}</Label>
-              <Input value={e.accountNumber} onChange={(ev) => updatePaymentEntry(e.id, { accountNumber: ev.target.value })} placeholder={e.type === "wire" ? "Enter account number/IBAN" : "••••••••1234"} className="mt-1.5 rounded-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+              <Input value={e.accountNumber} onChange={(ev) => updatePaymentEntry(e.id, { accountNumber: ev.target.value })} placeholder={e.type === "wire" ? "Enter account number/IBAN" : "••••••••1234"} className="mt-1.5 rounded-lg border-[#E2E8F0] !h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
             </div>
             {e.type === "ach" && (
               <div>
                 <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Routing Number *</Label>
-                <Input value={e.routingNumber} onChange={(ev) => updatePaymentEntry(e.id, { routingNumber: ev.target.value })} placeholder="e.g. 021000021" className="mt-1.5 rounded-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+                <Input value={e.routingNumber} onChange={(ev) => updatePaymentEntry(e.id, { routingNumber: ev.target.value })} placeholder="e.g. 021000021" className="mt-1.5 rounded-lg border-[#E2E8F0] !h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
               </div>
             )}
             {e.type === "wire" && (
               <div>
                 <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Swift Code *</Label>
-                <Input value={e.swiftCode} onChange={(ev) => updatePaymentEntry(e.id, { swiftCode: ev.target.value })} placeholder="Enter swift code" className="mt-1.5 rounded-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+                <Input value={e.swiftCode} onChange={(ev) => updatePaymentEntry(e.id, { swiftCode: ev.target.value })} placeholder="Enter swift code" className="mt-1.5 rounded-lg border-[#E2E8F0] !h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
               </div>
             )}
             <div>
-              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Phone Number for SMS Updates</Label>
-              <div className="flex gap-0 mt-1.5">
-                <div className="flex items-center gap-1.5 px-3 h-10 border border-r-0 border-[#E2E8F0] rounded-l-lg bg-white text-sm text-[#0F172A] shrink-0">
-                  <span className="text-base">🇺🇸</span>
-                  <span style={{ fontWeight: 500 }}>{e.countryCode}</span>
-                  <ChevronDown className="w-3 h-3 text-[#94A3B8]" />
-                </div>
-                <Input value={e.phone} onChange={(ev) => updatePaymentEntry(e.id, { phone: ev.target.value })} placeholder="xxx xxx xxxx" className="rounded-l-none rounded-r-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
-              </div>
+              <PhoneFieldWithCountry e={e} updateEntry={(id, updates) => updatePaymentEntry(id, updates)} defaultFormat={DEFAULT_FORMAT} />
             </div>
             <div>
               <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Special Instructions</Label>
-              <Input value={e.specialInstructions} onChange={(ev) => updatePaymentEntry(e.id, { specialInstructions: ev.target.value })} placeholder="Enter any special instructions or notes..." className="mt-1.5 rounded-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+              <Input value={e.specialInstructions} onChange={(ev) => updatePaymentEntry(e.id, { specialInstructions: ev.target.value })} placeholder="Enter any special instructions or notes..." className="mt-1.5 rounded-lg border-[#E2E8F0] !h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
             </div>
           </>
         )}
@@ -4870,19 +4896,19 @@ function ConfigPageContent({
           <>
             <div>
               <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Payee Name *</Label>
-              <Input value={e.payeeName} onChange={(ev) => updatePaymentEntry(e.id, { payeeName: ev.target.value })} placeholder="Enter payee name" className="mt-1.5 rounded-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+              <Input value={e.payeeName} onChange={(ev) => updatePaymentEntry(e.id, { payeeName: ev.target.value })} placeholder="Enter payee name" className="mt-1.5 rounded-lg border-[#E2E8F0] !h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
             </div>
             <div>
               <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Check Mailing Address *</Label>
-              <Input value={e.mailingAddress} onChange={(ev) => updatePaymentEntry(e.id, { mailingAddress: ev.target.value })} placeholder="Enter mailing address" className="mt-1.5 rounded-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+              <Input value={e.mailingAddress} onChange={(ev) => updatePaymentEntry(e.id, { mailingAddress: ev.target.value })} placeholder="Enter mailing address" className="mt-1.5 rounded-lg border-[#E2E8F0] !h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
             </div>
             <div>
               <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Bank Name</Label>
-              <Input value={e.bankName} onChange={(ev) => updatePaymentEntry(e.id, { bankName: ev.target.value })} placeholder="e.g. Chase Bank" className="mt-1.5 rounded-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+              <Input value={e.bankName} onChange={(ev) => updatePaymentEntry(e.id, { bankName: ev.target.value })} placeholder="e.g. Chase Bank" className="mt-1.5 rounded-lg border-[#E2E8F0] !h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
             </div>
             <div>
               <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Account Number *</Label>
-              <Input value={e.accountNumber} onChange={(ev) => updatePaymentEntry(e.id, { accountNumber: ev.target.value })} placeholder="••••••••1234" className="mt-1.5 rounded-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+              <Input value={e.accountNumber} onChange={(ev) => updatePaymentEntry(e.id, { accountNumber: ev.target.value })} placeholder="••••••••1234" className="mt-1.5 rounded-lg border-[#E2E8F0] !h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
             </div>
           </>
         )}
@@ -4892,15 +4918,15 @@ function ConfigPageContent({
           <>
             <div>
               <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Cardholder Name *</Label>
-              <Input value={e.cardholderName} onChange={(ev) => updatePaymentEntry(e.id, { cardholderName: ev.target.value })} placeholder="Enter cardholder name" className="mt-1.5 rounded-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+              <Input value={e.cardholderName} onChange={(ev) => updatePaymentEntry(e.id, { cardholderName: ev.target.value })} placeholder="Enter cardholder name" className="mt-1.5 rounded-lg border-[#E2E8F0] !h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
             </div>
             <div>
               <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Card Number *</Label>
-              <Input value={e.cardNumber} onChange={(ev) => updatePaymentEntry(e.id, { cardNumber: ev.target.value })} placeholder="Enter card number" className="mt-1.5 rounded-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+              <Input value={e.cardNumber} onChange={(ev) => updatePaymentEntry(e.id, { cardNumber: ev.target.value })} placeholder="Enter card number" className="mt-1.5 rounded-lg border-[#E2E8F0] !h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
             </div>
             <div>
               <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Expiry Date *</Label>
-              <Input value={e.expiryDate} onChange={(ev) => updatePaymentEntry(e.id, { expiryDate: ev.target.value })} placeholder="MM/YY" className="mt-1.5 rounded-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+              <Input value={e.expiryDate} onChange={(ev) => updatePaymentEntry(e.id, { expiryDate: ev.target.value })} placeholder="MM/YY" className="mt-1.5 rounded-lg border-[#E2E8F0] !h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
             </div>
             <div>
               <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>CVV *</Label>
@@ -4908,7 +4934,7 @@ function ConfigPageContent({
             </div>
             <div>
               <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Billing Address</Label>
-              <Input value={e.billingAddress} onChange={(ev) => updatePaymentEntry(e.id, { billingAddress: ev.target.value })} placeholder="Enter billing address" className="mt-1.5 rounded-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+              <Input value={e.billingAddress} onChange={(ev) => updatePaymentEntry(e.id, { billingAddress: ev.target.value })} placeholder="Enter billing address" className="mt-1.5 rounded-lg border-[#E2E8F0] !h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
             </div>
           </>
         )}
@@ -4918,22 +4944,14 @@ function ConfigPageContent({
           <>
             <div>
               <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Wallet Provider *</Label>
-              <Input value={e.walletProvider} onChange={(ev) => updatePaymentEntry(e.id, { walletProvider: ev.target.value })} placeholder="e.g. PayPal, Venmo, Stripe" className="mt-1.5 rounded-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+              <Input value={e.walletProvider} onChange={(ev) => updatePaymentEntry(e.id, { walletProvider: ev.target.value })} placeholder="e.g. PayPal, Venmo, Stripe" className="mt-1.5 rounded-lg border-[#E2E8F0] !h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
             </div>
             <div>
               <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Wallet ID/Email *</Label>
-              <Input value={e.walletId} onChange={(ev) => updatePaymentEntry(e.id, { walletId: ev.target.value })} placeholder="Enter wallet ID or email" className="mt-1.5 rounded-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+              <Input value={e.walletId} onChange={(ev) => updatePaymentEntry(e.id, { walletId: ev.target.value })} placeholder="Enter wallet ID or email" className="mt-1.5 rounded-lg border-[#E2E8F0] !h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
             </div>
             <div>
-              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Phone Number</Label>
-              <div className="flex gap-0 mt-1.5">
-                <div className="flex items-center gap-1.5 px-3 h-10 border border-r-0 border-[#E2E8F0] rounded-l-lg bg-white text-sm text-[#0F172A] shrink-0">
-                  <span className="text-base">🇺🇸</span>
-                  <span style={{ fontWeight: 500 }}>{e.countryCode}</span>
-                  <ChevronDown className="w-3 h-3 text-[#94A3B8]" />
-                </div>
-                <Input value={e.phone} onChange={(ev) => updatePaymentEntry(e.id, { phone: ev.target.value })} placeholder="xxx xxx xxxx" className="rounded-l-none rounded-r-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
-              </div>
+              <PhoneFieldWithCountry e={e} updateEntry={(id, updates) => updatePaymentEntry(id, updates)} defaultFormat={DEFAULT_FORMAT} />
             </div>
           </>
         )}
@@ -4943,22 +4961,14 @@ function ConfigPageContent({
           <>
             <div>
               <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Recipient Name *</Label>
-              <Input value={e.recipientName} onChange={(ev) => updatePaymentEntry(e.id, { recipientName: ev.target.value })} placeholder="Enter recipient name" className="mt-1.5 rounded-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+              <Input value={e.recipientName} onChange={(ev) => updatePaymentEntry(e.id, { recipientName: ev.target.value })} placeholder="Enter recipient name" className="mt-1.5 rounded-lg border-[#E2E8F0] !h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
             </div>
             <div>
               <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Collection Point *</Label>
-              <Input value={e.collectionPoint} onChange={(ev) => updatePaymentEntry(e.id, { collectionPoint: ev.target.value })} placeholder="Enter collection point or location" className="mt-1.5 rounded-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+              <Input value={e.collectionPoint} onChange={(ev) => updatePaymentEntry(e.id, { collectionPoint: ev.target.value })} placeholder="Enter collection point or location" className="mt-1.5 rounded-lg border-[#E2E8F0] !h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
             </div>
             <div>
-              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Phone Number</Label>
-              <div className="flex gap-0 mt-1.5">
-                <div className="flex items-center gap-1.5 px-3 h-10 border border-r-0 border-[#E2E8F0] rounded-l-lg bg-white text-sm text-[#0F172A] shrink-0">
-                  <span className="text-base">🇺🇸</span>
-                  <span style={{ fontWeight: 500 }}>{e.countryCode}</span>
-                  <ChevronDown className="w-3 h-3 text-[#94A3B8]" />
-                </div>
-                <Input value={e.phone} onChange={(ev) => updatePaymentEntry(e.id, { phone: ev.target.value })} placeholder="xxx xxx xxxx" className="rounded-l-none rounded-r-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
-              </div>
+              <PhoneFieldWithCountry e={e} updateEntry={(id, updates) => updatePaymentEntry(id, updates)} defaultFormat={DEFAULT_FORMAT} />
             </div>
           </>
         )}
@@ -4967,7 +4977,7 @@ function ConfigPageContent({
         {(e.type === "card" || e.type === "digital_wallet" || e.type === "cash") && (
           <div>
             <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Special Instructions</Label>
-            <Input value={e.specialInstructions} onChange={(ev) => updatePaymentEntry(e.id, { specialInstructions: ev.target.value })} placeholder="Enter any special instructions or notes..." className="mt-1.5 rounded-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+            <Input value={e.specialInstructions} onChange={(ev) => updatePaymentEntry(e.id, { specialInstructions: ev.target.value })} placeholder="Enter any special instructions or notes..." className="mt-1.5 rounded-lg border-[#E2E8F0] !h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
           </div>
         )}
 
@@ -5332,7 +5342,7 @@ function ConfigPageContent({
                 <div className="absolute left-0 top-0 bottom-0 w-10 rounded-l-lg bg-muted/60 border-r border-border flex items-center justify-center">
                   <span className="text-xs text-muted-foreground font-medium">{currencySymbol}</span>
                 </div>
-                <Input placeholder="50,000.00" className="pl-12 rounded-lg border-border h-9 bg-card text-sm placeholder:text-muted-foreground/50" />
+                <Input placeholder="50,000.00" className="pl-12 rounded-lg border-[#E2E8F0] !h-10 bg-white text-sm placeholder:text-[#94A3B8]" />
               </div>
               <p className="text-[10px] text-muted-foreground mt-1">Leave empty for unlimited credit</p>
             </div>
@@ -5464,7 +5474,7 @@ function ConfigPageContent({
                   <div className="absolute left-0 top-0 bottom-0 w-10 rounded-l-lg bg-[#F8FAFC] border-r border-[#E2E8F0] flex items-center justify-center">
                     <span className="text-xs text-[#94A3B8] font-medium">%</span>
                   </div>
-                  <Input placeholder="80" className="pl-12 rounded-lg border-[#E2E8F0] h-9 bg-white text-sm placeholder:text-[#94A3B8]" />
+                  <Input placeholder="80" className="pl-12 rounded-lg border-[#E2E8F0] !h-10 bg-white text-sm placeholder:text-[#94A3B8]" />
                 </div>
                 <p className="text-[10px] text-[#94A3B8] mt-1">Alert triggers at this % of credit limit</p>
               </div>
@@ -5534,7 +5544,7 @@ function ConfigPageContent({
                 className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-[#DBEAFE] bg-[#EFF6FF] text-xs text-[#0A77FF] hover:bg-[#DBEAFE] transition-colors"
                 style={{ fontWeight: 500 }}
               >
-                <Copy className="w-3.5 h-3.5" /> Templates
+                <FileText className="w-3.5 h-3.5" /> Templates
               </button>
             </div>
           </div>
@@ -5627,7 +5637,7 @@ function ConfigPageContent({
                           return (
                             <div
                               key={t.id}
-                              onClick={() => setCreatePtType(t.id as "net" | "prepayment" | "split")}
+                              onClick={() => { setCreatePtType(t.id as "net" | "prepayment" | "split"); if (t.id === "prepayment" && createPtTrigger === "delivery") setCreatePtTrigger("order_confirmation"); }}
                               className={`group relative rounded-xl overflow-hidden border transition-all duration-200 cursor-pointer ${
                                 isActive
                                   ? `${activeBorderClass} bg-white shadow-[0_1px_4px_rgba(0,0,0,0.06)]`
@@ -5660,7 +5670,11 @@ function ConfigPageContent({
                       {createPtType !== "split" && (
                         <div className="flex items-center gap-2 mt-3">
                           <span className="text-[12px] text-[#64748B] mr-1" style={{ fontWeight: 500 }}>Trigger:</span>
-                          {CREATE_PT_TRIGGERS.map((t) => {
+                          {CREATE_PT_TRIGGERS.filter((t) => {
+                            // Delivery is post-payment by definition — hide it for prepayment
+                            if (createPtType === "prepayment" && t.id === "delivery") return false;
+                            return true;
+                          }).map((t) => {
                             const isActive = createPtTrigger === t.id;
                             const accentColor = createPtType === "net" ? "#0A77FF" : "#7C3AED";
                             return (
@@ -5708,60 +5722,80 @@ function ConfigPageContent({
                               value={createPtName}
                               onChange={(e) => setCreatePtName(e.target.value)}
                               placeholder={`e.g. ${createPtType === "net" ? "Net 30 Standard" : createPtType === "prepayment" ? "50% Upfront" : "3-Part Split"}`}
-                              className="mt-1 rounded-lg border-[#E2E8F0] bg-white h-9 sm:h-10 text-sm text-[#0F172A] placeholder:text-[#94A3B8]"
+                              className="mt-1 rounded-lg border-[#E2E8F0] bg-white !h-10 text-sm text-[#0F172A] placeholder:text-[#94A3B8]"
                             />
                           </div>
-                          {/* NET: Duration next to name */}
+                          {/* NET: Duration — smart field (dropdown or input) */}
                           {createPtType === "net" ? (
                             <div>
                               <Label className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>NET Duration (Days)</Label>
-                              <Select value={createPtDuration} onValueChange={(v) => { setCreatePtDuration(v); if (v !== "custom") setCreatePtCustomDuration(""); }}>
-                                <SelectTrigger className="mt-1 h-9 sm:h-10 rounded-lg border-[#E2E8F0] bg-white text-sm w-full">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent className="z-[250] rounded-lg">
-                                  {CREATE_PT_DURATIONS.map((d) => (
-                                    <SelectItem key={d.id} value={d.id} className="py-2.5 px-3 text-sm">{d.label}</SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                              {createPtDuration === "custom" && (
-                                <Input
-                                  type="number"
-                                  min="1"
-                                  value={createPtCustomDuration}
-                                  onChange={(e) => setCreatePtCustomDuration(e.target.value)}
-                                  placeholder="Enter custom days"
-                                  className="mt-1.5 h-9 sm:h-10 rounded-lg border-[#E2E8F0] bg-white text-sm w-full"
-                                />
+                              {createPtDuration === "custom" ? (
+                                <div className="flex mt-1">
+                                  <Input
+                                    value={createPtCustomDuration}
+                                    onChange={(e) => setCreatePtCustomDuration(e.target.value.replace(/\D/g, ""))}
+                                    placeholder="e.g. 45"
+                                    className="rounded-r-none border-r-0 border-[#E2E8F0] bg-white !h-10 text-sm text-[#0F172A] placeholder:text-[#94A3B8] flex-1 min-w-0"
+                                    inputMode="numeric"
+                                    autoFocus
+                                  />
+                                  <Popover>
+                                    <PopoverTrigger asChild>
+                                      <button type="button" className="h-10 px-2.5 rounded-r-lg border border-[#E2E8F0] bg-[#F8FAFC] flex items-center gap-1 shrink-0 hover:bg-[#F1F5F9] transition-colors cursor-pointer">
+                                        <span className="text-[12px] text-[#64748B]" style={{ fontWeight: 500 }}>days</span>
+                                        <ChevronDown className="w-3 h-3 text-[#94A3B8]" />
+                                      </button>
+                                    </PopoverTrigger>
+                                    <PopoverContent align="end" sideOffset={4} className="w-[160px] p-1 rounded-lg z-[250]">
+                                      {CREATE_PT_DURATIONS.map((d) => (
+                                        <button key={d.id} type="button" onClick={() => { setCreatePtDuration(d.id); if (d.id !== "custom") setCreatePtCustomDuration(""); }} className="w-full text-left px-3 py-2 text-sm rounded-md hover:bg-[#F8FAFC] transition-colors" style={{ fontWeight: 500 }}>{d.label}</button>
+                                      ))}
+                                    </PopoverContent>
+                                  </Popover>
+                                </div>
+                              ) : (
+                                <Select value={createPtDuration} onValueChange={(v) => { setCreatePtDuration(v); if (v !== "custom") setCreatePtCustomDuration(""); }}>
+                                  <SelectTrigger className="mt-1 !h-10 rounded-lg border-[#E2E8F0] bg-white text-sm w-full">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent className="z-[250] rounded-lg">
+                                    {CREATE_PT_DURATIONS.map((d) => (
+                                      <SelectItem key={d.id} value={d.id} className="py-2 px-3 text-sm">{d.label}</SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
                               )}
                             </div>
                           ) : (
                             /* Prepayment/Split: Description next to name */
                             <div>
                               <Label className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>Description</Label>
-                              <Textarea
-                                value={createPtDescription}
-                                onChange={(e) => { if (e.target.value.length <= 150) setCreatePtDescription(e.target.value); }}
-                                placeholder="Brief summary of payment term purpose or context."
-                                className="mt-1 rounded-lg border-[#E2E8F0] bg-white min-h-[38px] resize-none text-sm placeholder:text-[#94A3B8]"
-                                rows={2}
-                              />
-                              <p className="text-right text-[10px] text-[#94A3B8] mt-0.5">{createPtDescription.length}/150</p>
+                              <div className="relative mt-1">
+                                <Textarea
+                                  value={createPtDescription}
+                                  onChange={(e) => { if (e.target.value.length <= 5000) setCreatePtDescription(e.target.value); }}
+                                  placeholder="Brief summary of payment term purpose or context."
+                                  className="rounded-lg border-[#E2E8F0] bg-white min-h-[38px] resize-none text-sm placeholder:text-[#94A3B8] pb-5"
+                                  rows={2}
+                                />
+                                <p className="absolute bottom-1.5 right-2.5 text-[11px] text-[#94A3B8] pointer-events-none">{createPtDescription.length}/5,000</p>
+                              </div>
                             </div>
                           )}
                           {/* NET: Description full width below */}
                           {createPtType === "net" && (
                             <div className="col-span-2">
                               <Label className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>Description</Label>
-                              <Textarea
-                                value={createPtDescription}
-                                onChange={(e) => { if (e.target.value.length <= 150) setCreatePtDescription(e.target.value); }}
-                                placeholder="Brief summary of payment term purpose or context."
-                                className="mt-1 rounded-lg border-[#E2E8F0] bg-white min-h-[64px] resize-none text-sm placeholder:text-[#94A3B8]"
-                                rows={2}
-                              />
-                              <p className="text-right text-[10px] text-[#94A3B8] mt-0.5">{createPtDescription.length}/150</p>
+                              <div className="relative mt-1">
+                                <Textarea
+                                  value={createPtDescription}
+                                  onChange={(e) => { if (e.target.value.length <= 5000) setCreatePtDescription(e.target.value); }}
+                                  placeholder="Brief summary of payment term purpose or context."
+                                  className="rounded-lg border-[#E2E8F0] bg-white min-h-[64px] resize-none text-sm placeholder:text-[#94A3B8] pb-5"
+                                  rows={2}
+                                />
+                                <p className="absolute bottom-1.5 right-2.5 text-[11px] text-[#94A3B8] pointer-events-none">{createPtDescription.length}/5,000</p>
+                              </div>
                             </div>
                           )}
                         </div>
@@ -5812,7 +5846,7 @@ function ConfigPageContent({
                                         setCreatePtSplitEvents(updated);
                                       }}
                                       placeholder="Enter percentage (e.g., 50%)"
-                                      className="h-9 sm:h-10 rounded-lg border-[#E2E8F0] bg-white pr-8 text-sm"
+                                      className="!h-10 rounded-lg border-[#E2E8F0] bg-white pr-8 text-sm"
                                     />
                                     <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-[#94A3B8]">%</span>
                                   </div>
@@ -5827,7 +5861,7 @@ function ConfigPageContent({
                                       setCreatePtSplitEvents(updated);
                                     }}
                                   >
-                                    <SelectTrigger className="mt-1 h-9 sm:h-10 rounded-lg border-[#E2E8F0] bg-white text-sm">
+                                    <SelectTrigger className="mt-1 !h-10 rounded-lg border-[#E2E8F0] bg-white text-sm">
                                       <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent className="z-[250] rounded-lg">
@@ -5879,13 +5913,10 @@ function ConfigPageContent({
                         </div>
 
                         {createPtApplyDiscount && (
-                          <div className="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-[#F1F5F9]">
+                          <div className="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-[#F1F5F9] items-end">
                             <div>
-                              <div className="flex items-center justify-between mb-1.5">
-                                <div className="flex items-center gap-1">
-                                  <label className="text-[12px] text-[#0F172A]" style={{ fontWeight: 500 }}>Discount</label>
-                                  <Tooltip><TooltipTrigger asChild><span><Info className="w-3 h-3 text-[#CBD5E1]" /></span></TooltipTrigger><TooltipContent className="z-[300]"><p className="text-xs">Discount applied for early payment.</p></TooltipContent></Tooltip>
-                                </div>
+                              <div className="flex items-center justify-between">
+                                <Label className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>Discount</Label>
                                 <div className="inline-flex items-center h-[22px] rounded-full bg-[#F1F5F9] p-0.5">
                                   <button
                                     type="button"
@@ -5905,38 +5936,71 @@ function ConfigPageContent({
                                   </button>
                                 </div>
                               </div>
-                              <div className="relative">
+                              <div className="relative mt-1">
                                 {createPtDiscountMode === "fixed" && (
-                                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[13px] text-[#94A3B8]">$</span>
+                                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#94A3B8]">$</span>
                                 )}
                                 <Input
                                   value={createPtDiscountPercent}
                                   onChange={(e) => setCreatePtDiscountPercent(e.target.value)}
                                   placeholder={createPtDiscountMode === "percent" ? "e.g. 5" : "e.g. 25.00"}
-                                  className={`rounded-lg border-[#E2E8F0] bg-white text-[13px] ${createPtDiscountMode === "fixed" ? "pl-7 pr-3" : "pr-8"}`}
+                                  className={`rounded-lg border-[#E2E8F0] bg-white !h-10 text-sm placeholder:text-[#94A3B8] ${createPtDiscountMode === "fixed" ? "pl-7 pr-3" : "pr-8"}`}
                                 />
                                 {createPtDiscountMode === "percent" && (
-                                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[13px] text-[#94A3B8]">%</span>
+                                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-[#94A3B8]">%</span>
                                 )}
                               </div>
                             </div>
                             <div>
-                              <div className="flex items-center gap-1 mb-1.5">
-                                <label className="text-[12px] text-[#0F172A]" style={{ fontWeight: 500 }}>Eligible Payment Period</label>
-                                <Tooltip><TooltipTrigger asChild><span><Info className="w-3 h-3 text-[#CBD5E1]" /></span></TooltipTrigger><TooltipContent className="z-[300]"><p className="text-xs">Time window within which the discount applies.</p></TooltipContent></Tooltip>
+                              <div className="flex items-center gap-1">
+                                <Label className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>Eligible Payment Period</Label>
+                                <Tooltip>
+                                  <TooltipTrigger asChild><span><Info className="w-3 h-3 text-[#CBD5E1] cursor-help" /></span></TooltipTrigger>
+                                  <TooltipContent side="bottom" sideOffset={6} className="max-w-[260px] text-[11px] leading-[1.6] z-[300]">
+                                    <p className="text-[#64748B]">If paid within this window, the discount will be applied to the invoice total.</p>
+                                    <div className="mt-2 px-2.5 py-2 rounded-lg bg-[#F8FAFC] border border-[#F1F5F9]">
+                                      <p className="text-[10px] text-[#94A3B8] tracking-wide" style={{ fontWeight: 600 }}>EXAMPLE</p>
+                                      <p className="text-[11px] text-[#334155] mt-1"><span className="text-[#0A77FF]" style={{ fontWeight: 600 }}>2/10 Net 30</span> — 2% off if paid in 10 days, otherwise full payment in 30 days.</p>
+                                    </div>
+                                  </TooltipContent>
+                                </Tooltip>
                               </div>
-                              <Select value={createPtDiscountPeriod} onValueChange={setCreatePtDiscountPeriod}>
-                                <SelectTrigger className="h-9 rounded-lg border-[#E2E8F0] bg-white text-[13px]">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent className="z-[250] rounded-lg">
-                                  {CREATE_PT_DISCOUNT_PERIODS.map((d) => (
-                                    <SelectItem key={d.id} value={d.id} className="py-2.5 px-3">
-                                      <span className="text-sm">{d.label}</span>
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
+                              {createPtDiscountPeriod === "custom" ? (
+                                <div className="flex mt-1">
+                                  <Input
+                                    value={createPtCustomDiscountPeriod}
+                                    onChange={(e) => setCreatePtCustomDiscountPeriod(e.target.value.replace(/\D/g, ""))}
+                                    placeholder="e.g. 15"
+                                    className="rounded-r-none border-r-0 border-[#E2E8F0] bg-white !h-10 text-sm text-[#0F172A] placeholder:text-[#94A3B8] flex-1 min-w-0"
+                                    inputMode="numeric"
+                                    autoFocus
+                                  />
+                                  <Popover>
+                                    <PopoverTrigger asChild>
+                                      <button type="button" className="h-10 px-2.5 rounded-r-lg border border-[#E2E8F0] bg-[#F8FAFC] flex items-center gap-1 shrink-0 hover:bg-[#F1F5F9] transition-colors cursor-pointer">
+                                        <span className="text-[12px] text-[#64748B]" style={{ fontWeight: 500 }}>days</span>
+                                        <ChevronDown className="w-3 h-3 text-[#94A3B8]" />
+                                      </button>
+                                    </PopoverTrigger>
+                                    <PopoverContent align="end" sideOffset={4} className="w-[160px] p-1 rounded-lg z-[250]">
+                                      {CREATE_PT_DISCOUNT_PERIODS.map((d) => (
+                                        <button key={d.id} type="button" onClick={() => { setCreatePtDiscountPeriod(d.id); if (d.id !== "custom") setCreatePtCustomDiscountPeriod(""); }} className="w-full text-left px-3 py-2 text-sm rounded-md hover:bg-[#F8FAFC] transition-colors" style={{ fontWeight: 500 }}>{d.label}</button>
+                                      ))}
+                                    </PopoverContent>
+                                  </Popover>
+                                </div>
+                              ) : (
+                                <Select value={createPtDiscountPeriod} onValueChange={(v) => { setCreatePtDiscountPeriod(v); if (v !== "custom") setCreatePtCustomDiscountPeriod(""); }}>
+                                  <SelectTrigger className="mt-1 !h-10 rounded-lg border-[#E2E8F0] bg-white text-sm w-full">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent className="z-[250] rounded-lg">
+                                    {CREATE_PT_DISCOUNT_PERIODS.map((d) => (
+                                      <SelectItem key={d.id} value={d.id} className="py-2 px-3 text-sm">{d.label}</SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              )}
                             </div>
                           </div>
                         )}
@@ -6063,7 +6127,7 @@ function ConfigPageContent({
                       <PopoverTrigger asChild>
                         <button className={`inline-flex items-center gap-1 text-[12px] transition-colors px-2 py-1 rounded-md border ${ptSortOpen ? "text-[#0A77FF] bg-[#EFF6FF] border-[#DBEAFE]" : "text-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC] border-transparent hover:border-[#E2E8F0]"}`} style={{ fontWeight: 500 }}>
                           <ArrowUpDown className="w-3 h-3" />
-                          {ptSortBy === "name" ? "Name" : ptSortBy === "vendorsApplied" ? "Vendors" : ptSortBy === "duration" ? "Duration" : "Type"}
+                          {ptSortBy === "name" ? "Name" : ptSortBy === "vendorsApplied" ? "In Use" : ptSortBy === "duration" ? "Duration" : "Type"}
                           {ptSortDir === "asc" ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />}
                         </button>
                       </PopoverTrigger>
@@ -6071,7 +6135,7 @@ function ConfigPageContent({
                         <div className="space-y-0.5">
                           {([
                             { key: "name", label: "Name", icon: <ArrowUpDown className="w-3.5 h-3.5" /> },
-                            { key: "vendorsApplied", label: "Vendors Applied", icon: <Building2 className="w-3.5 h-3.5" /> },
+                            { key: "vendorsApplied", label: "In Use", icon: <Building2 className="w-3.5 h-3.5" /> },
                             { key: "duration", label: "Duration", icon: <Clock className="w-3.5 h-3.5" /> },
                             { key: "category", label: "Type", icon: <Tag className="w-3.5 h-3.5" /> },
                           ] as const).map((opt) => {
@@ -6129,7 +6193,7 @@ function ConfigPageContent({
                         const createdByMeCount = base.filter((t) => t.id.startsWith("pt-custom-")).length;
                         return [
                           { key: "all", label: "All", count: base.length, showCount: true },
-                          { key: "preset", label: "Preset", count: presetCount, showCount: true },
+                          { key: "preset", label: "Template", count: presetCount, showCount: true },
                           { key: "custom", label: "Custom", count: customCount, showCount: true },
                           { key: "created_by_me", label: "Created by Me", count: createdByMeCount, showCount: true },
                           { key: "in_use", label: "In Use", count: base.filter((t) => t.vendorsApplied >= 1).length, showCount: true },
@@ -6466,7 +6530,7 @@ function ConfigPageContent({
                       <PopoverTrigger asChild>
                         <button className={`inline-flex items-center gap-1 text-[12px] transition-colors px-2 py-1 rounded-md border ${prSortOpen ? "text-[#0A77FF] bg-[#EFF6FF] border-[#DBEAFE]" : "text-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC] border-transparent hover:border-[#E2E8F0]"}`} style={{ fontWeight: 500 }}>
                           <ArrowUpDown className="w-3 h-3" />
-                          {prSortBy === "name" ? "Name" : prSortBy === "vendorsApplied" ? "Vendors" : prSortBy === "category" ? "Type" : "Basis"}
+                          {prSortBy === "name" ? "Name" : prSortBy === "vendorsApplied" ? "In Use" : prSortBy === "category" ? "Type" : "Basis"}
                           {prSortDir === "asc" ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />}
                         </button>
                       </PopoverTrigger>
@@ -6474,7 +6538,7 @@ function ConfigPageContent({
                         <div className="space-y-0.5">
                           {([
                             { key: "name", label: "Name", icon: <ArrowUpDown className="w-3.5 h-3.5" /> },
-                            { key: "vendorsApplied", label: "Vendors Applied", icon: <Building2 className="w-3.5 h-3.5" /> },
+                            { key: "vendorsApplied", label: "In Use", icon: <Building2 className="w-3.5 h-3.5" /> },
                             { key: "category", label: "Type", icon: <Tag className="w-3.5 h-3.5" /> },
                             { key: "basis", label: "Basis", icon: <ChartColumn className="w-3.5 h-3.5" /> },
                           ] as const).map((opt) => {
@@ -6532,10 +6596,10 @@ function ConfigPageContent({
                         const createdByMeCount = base.filter((r) => r.id.startsWith("pr-custom-")).length;
                         return [
                           { key: "all", label: "All", count: base.length, showCount: true },
-                          { key: "preset", label: "Preset", count: presetCount, showCount: true },
+                          { key: "preset", label: "Template", count: presetCount, showCount: true },
                           { key: "custom", label: "Custom", count: customCount, showCount: true },
                           { key: "created_by_me", label: "Created by Me", count: createdByMeCount, showCount: true },
-                          { key: "vendors_applied", label: "Vendors Applied", count: base.filter((r) => r.vendorsApplied >= 3).length, showCount: true },
+                          { key: "vendors_applied", label: "In Use", count: base.filter((r) => r.vendorsApplied >= 3).length, showCount: true },
                         ];
                       })()}
                       activeKey={prStatusFilter}
@@ -6815,8 +6879,10 @@ function ConfigPageContent({
                         </div>
                         <div>
                           <label className="text-[12px] text-[#0F172A] mb-1.5 block" style={{ fontWeight: 600 }}>Description</label>
-                          <Textarea value={createPrDescription} onChange={(e) => setCreatePrDescription(e.target.value.slice(0, 150))} placeholder="Type here..." className="rounded-lg border-[#E2E8F0] bg-white min-h-[38px] resize-none text-[13px] text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" rows={2} />
-                          <p className="text-right text-[10px] text-[#94A3B8] mt-0.5">{createPrDescription.length}/150</p>
+                          <div className="relative">
+                            <Textarea value={createPrDescription} onChange={(e) => { if (e.target.value.length <= 5000) setCreatePrDescription(e.target.value); }} placeholder="Brief summary of pricing rule purpose or context." className="rounded-lg border-[#E2E8F0] bg-white min-h-[64px] resize-none text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 pb-5" rows={2} />
+                            <p className="absolute bottom-1.5 right-2.5 text-[11px] text-[#94A3B8] pointer-events-none">{createPrDescription.length}/5,000</p>
+                          </div>
                         </div>
                       </div>
                       {/* Date range toggle + fields */}
@@ -6976,7 +7042,7 @@ function ConfigPageContent({
                     <button onClick={() => setCreatePrStep(1)} className="text-[11px] text-[#0A77FF] hover:text-[#0862D0] transition-colors cursor-pointer shrink-0" style={{ fontWeight: 600 }}>{createPrMode === "view" ? "View Setup" : "Edit Setup"}</button>
                   </div>
 
-                  {/* Items & Categories card */}
+                  {/* Items, Categories & Attachments card */}
                   <div className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden">
                     <div className="flex items-center gap-0 border-b border-[#E2E8F0] px-4">
                       {([
@@ -7542,7 +7608,7 @@ function ConfigPageContent({
                             value={entry.name}
                             onChange={(e) => updateCarrierService(entry.id, { name: e.target.value })}
                             placeholder="e.g. Economical Shipping"
-                            className="mt-1 rounded-lg border-[#E2E8F0] bg-white h-9 sm:h-10 text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
+                            className="mt-1 rounded-lg border-[#E2E8F0] bg-white !h-10 text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
                           />
                         </div>
                         <div>
@@ -7551,7 +7617,7 @@ function ConfigPageContent({
                             value={entry.description}
                             onChange={(e) => updateCarrierService(entry.id, { description: e.target.value })}
                             placeholder="Brief description of this method"
-                            className="mt-1 rounded-lg border-[#E2E8F0] bg-white h-9 sm:h-10 text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
+                            className="mt-1 rounded-lg border-[#E2E8F0] bg-white !h-10 text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
                           />
                         </div>
                       </div>
@@ -7681,7 +7747,7 @@ function ConfigPageContent({
                             <Label className="text-[11px] text-[#0F172A]" style={{ fontWeight: 600 }}>Shipping Carrier</Label>
                             <button
                               onClick={() => setCarrierDropdownOpen((prev) => ({ ...prev, [entry.id]: !prev[entry.id] }))}
-                              className="mt-1 w-full flex items-center justify-between h-9 sm:h-10 px-3 rounded-lg border border-[#E2E8F0] bg-white text-sm hover:border-[#CBD5E1] transition-colors focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
+                              className="mt-1 w-full flex items-center justify-between !h-10 px-3 rounded-lg border border-[#E2E8F0] bg-white text-sm hover:border-[#CBD5E1] transition-colors focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
                             >
                               {selectedCarrier ? (
                                 <div className="flex items-center gap-2">
@@ -7797,7 +7863,7 @@ function ConfigPageContent({
                                 if (!entry.carrier) { toast.info("Please select a carrier first"); return; }
                                 setMethodDropdownOpen((prev) => ({ ...prev, [entry.id]: !prev[entry.id] }));
                               }}
-                              className="mt-1 w-full flex items-center justify-between h-9 sm:h-10 px-3 rounded-lg border border-[#E2E8F0] bg-white text-sm hover:border-[#CBD5E1] transition-colors"
+                              className="mt-1 w-full flex items-center justify-between !h-10 px-3 rounded-lg border border-[#E2E8F0] bg-white text-sm hover:border-[#CBD5E1] transition-colors"
                             >
                               {selectedMethodIds.length > 0 ? (
                                 <span className="text-[#0F172A] text-sm truncate">{selectedMethodIds.length} method{selectedMethodIds.length !== 1 ? "s" : ""} selected</span>
@@ -8032,7 +8098,7 @@ function ConfigPageContent({
                           value={sm.name}
                           onChange={(e) => setCreateSmMethods((prev) => prev.map((m) => m.id === sm.id ? { ...m, name: e.target.value } : m))}
                           placeholder="Enter shipping method name"
-                          className="mt-1 rounded-lg border-[#E2E8F0] bg-white h-9 sm:h-10 text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-primary focus:ring-1 focus:ring-primary/20"
+                          className="mt-1 rounded-lg border-[#E2E8F0] bg-white !h-10 text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-primary focus:ring-1 focus:ring-primary/20"
                         />
                       </div>
                       <div>
@@ -8041,7 +8107,7 @@ function ConfigPageContent({
                           value={sm.description}
                           onChange={(e) => setCreateSmMethods((prev) => prev.map((m) => m.id === sm.id ? { ...m, description: e.target.value } : m))}
                           placeholder="Enter description"
-                          className="mt-1 rounded-lg border-[#E2E8F0] bg-white h-9 sm:h-10 text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-primary focus:ring-1 focus:ring-primary/20"
+                          className="mt-1 rounded-lg border-[#E2E8F0] bg-white !h-10 text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-primary focus:ring-1 focus:ring-primary/20"
                         />
                       </div>
                     </div>
@@ -8057,7 +8123,7 @@ function ConfigPageContent({
                               setCreateSmMethods((prev) => prev.map((m) => m.id === sm.id ? { ...m, minDuration: val } : m));
                             }}
                             placeholder="Enter minimum delivery period"
-                            className="rounded-lg border-[#E2E8F0] bg-white h-9 sm:h-10 text-sm text-foreground pr-12 placeholder:text-muted-foreground/60 focus:border-primary focus:ring-1 focus:ring-primary/20"
+                            className="rounded-lg border-[#E2E8F0] bg-white !h-10 text-sm text-foreground pr-12 placeholder:text-muted-foreground/60 focus:border-primary focus:ring-1 focus:ring-primary/20"
                           />
                           <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground" style={{ fontWeight: 500 }}>days</span>
                         </div>
@@ -8075,7 +8141,7 @@ function ConfigPageContent({
                                 setCreateSmMethods((prev) => prev.map((m) => m.id === sm.id ? { ...m, maxDuration: val } : m));
                               }}
                               placeholder="Enter maximum delivery period"
-                              className="rounded-lg border-[#E2E8F0] bg-white h-9 sm:h-10 text-sm text-foreground pr-12 placeholder:text-muted-foreground/60 focus:border-primary focus:ring-1 focus:ring-primary/20"
+                              className="rounded-lg border-[#E2E8F0] bg-white !h-10 text-sm text-foreground pr-12 placeholder:text-muted-foreground/60 focus:border-primary focus:ring-1 focus:ring-primary/20"
                             />
                             <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground" style={{ fontWeight: 500 }}>days</span>
                           </div>

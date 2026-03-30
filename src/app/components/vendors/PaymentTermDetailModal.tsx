@@ -25,6 +25,7 @@ import {
   Receipt,
   Lock,
   Ban,
+  ExternalLink,
 } from "lucide-react";
 import { toast } from "sonner";
 import { getAvatarTint } from "../../utils/avatarTints";
@@ -37,8 +38,28 @@ import {
 const PT_DETAIL_TABS = [
   { id: "vendors", label: "Partners", icon: Building2 },
   { id: "notes", label: "Notes", icon: FileText },
-  { id: "files", label: "Files", icon: Paperclip },
-  { id: "activity", label: "Activity Log", icon: Clock },
+  { id: "attachments", label: "Attachments", icon: Paperclip },
+  { id: "activity", label: "Recent Activity", icon: Clock },
+];
+
+const PT_DUMMY_NOTES = [
+  { id: "n1", author: "Sarah Johnson", initials: "SJ", color: "#0A77FF", date: "Mar 28, 2026", text: "Reviewed this payment term with the finance team. Approved for all Tier 1 vendors." },
+  { id: "n2", author: "Michael Torres", initials: "MT", color: "#7C3AED", date: "Mar 25, 2026", text: "Vendor requested extension to Net 45 — declined. Keeping standard terms." },
+  { id: "n3", author: "Emily Chen", initials: "EC", color: "#059669", date: "Mar 20, 2026", text: "Added early payment discount clause per Q2 policy update." },
+];
+
+const PT_DUMMY_ATTACHMENTS = [
+  { id: "a1", name: "Payment_Terms_Agreement_v2.pdf", size: "245 KB", type: "PDF", date: "Mar 28, 2026", icon: "📄" },
+  { id: "a2", name: "Vendor_Credit_Assessment.xlsx", size: "128 KB", type: "XLSX", date: "Mar 22, 2026", icon: "📊" },
+  { id: "a3", name: "Discount_Policy_2026.pdf", size: "89 KB", type: "PDF", date: "Mar 15, 2026", icon: "📄" },
+];
+
+const PT_DUMMY_ACTIVITY = [
+  { id: "act1", action: "Payment term applied", target: "BoltMaster Inc.", user: "Sarah Johnson", date: "Mar 28, 2026 · 2:45 PM", type: "apply" },
+  { id: "act2", action: "Early discount updated", target: "2% → 3% within 10 days", user: "Michael Torres", date: "Mar 25, 2026 · 11:30 AM", type: "edit" },
+  { id: "act3", action: "Payment term created", target: "", user: "Emily Chen", date: "Mar 20, 2026 · 9:15 AM", type: "create" },
+  { id: "act4", action: "Payment term applied", target: "Toyota International", user: "David Kim", date: "Mar 18, 2026 · 4:00 PM", type: "apply" },
+  { id: "act5", action: "Duration changed", target: "30 days → 45 days", user: "Sarah Johnson", date: "Mar 15, 2026 · 10:20 AM", type: "edit" },
 ];
 
 /* ─── Mock items matching partner listing table ─── */
@@ -168,7 +189,7 @@ function PaymentTermDetailModal({ term, open, onClose, mode = "create", onDisabl
             <div className="flex items-center border-b border-[#E2E8F0] shrink-0 px-1 bg-white">
               {PT_DETAIL_TABS.map((t) => {
                 const active = tab === t.id;
-                const count = t.id === "vendors" ? vendorCount : 0;
+                const count = t.id === "vendors" ? vendorCount : t.id === "notes" ? PT_DUMMY_NOTES.length : t.id === "attachments" ? PT_DUMMY_ATTACHMENTS.length : 0;
                 const TabIcon = t.icon;
                 return (
                   <button
@@ -239,8 +260,16 @@ function PaymentTermDetailModal({ term, open, onClose, mode = "create", onDisabl
                             <td className="pl-4 pr-2 py-3 max-w-[200px]">
                               <p className="text-[12px] text-[#334155] truncate" style={{ fontWeight: 500 }}>{v.description || v.services}</p>
                             </td>
-                            <td className="pl-4 pr-2 py-3 max-w-[180px]">
-                              <p className="text-[12px] text-[#334155] truncate" style={{ fontWeight: 500 }}>{v.address || `${v.city || ""}, ${v.country}`}</p>
+                            <td className="pl-4 pr-2 py-3 max-w-[200px]">
+                              {(() => { const addr = v.address || `${v.city || ""}, ${v.country}`; return (
+                                <a
+                                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(addr)}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-[12px] text-[#334155] hover:text-[#0A77FF] hover:underline transition-colors truncate block"
+                                  style={{ fontWeight: 500 }}
+                                >{addr}</a>
+                              ); })()}
                             </td>
                             <td className="pl-4 pr-4 py-3 whitespace-nowrap">
                               <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] border" style={{ fontWeight: 500, backgroundColor: statusColor.bg, color: statusColor.text, borderColor: statusColor.border }}>
@@ -265,15 +294,57 @@ function PaymentTermDetailModal({ term, open, onClose, mode = "create", onDisabl
               </div>
             )}
 
-            {/* Placeholder tabs */}
-            {tab !== "vendors" && (
-              <div className="flex-1 flex items-center justify-center">
-                <div className="text-center">
-                  <div className="w-12 h-12 rounded-xl bg-[#F1F5F9] flex items-center justify-center mx-auto mb-3">
-                    {(() => { const T = PT_DETAIL_TABS.find((x) => x.id === tab); return T ? <T.icon className="w-5 h-5 text-[#94A3B8]" /> : null; })()}
+            {/* Notes Tab */}
+            {tab === "notes" && (
+              <div className="flex-1 overflow-auto p-4 space-y-3">
+                {PT_DUMMY_NOTES.map((note) => (
+                  <div key={note.id} className="rounded-lg border border-[#F1F5F9] bg-white p-3.5">
+                    <div className="flex items-center gap-2.5 mb-2">
+                      <div className="w-7 h-7 rounded-full flex items-center justify-center text-[9px] text-white shrink-0" style={{ fontWeight: 700, backgroundColor: note.color }}>{note.initials}</div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[12px] text-[#0F172A]" style={{ fontWeight: 600 }}>{note.author}</p>
+                        <p className="text-[10px] text-[#94A3B8]">{note.date}</p>
+                      </div>
+                    </div>
+                    <p className="text-[12px] text-[#334155] leading-relaxed">{note.text}</p>
                   </div>
-                  <p className="text-sm text-[#0F172A]" style={{ fontWeight: 600 }}>{PT_DETAIL_TABS.find((x) => x.id === tab)?.label || tab}</p>
-                  <p className="text-[11px] text-[#94A3B8] mt-1">Coming soon</p>
+                ))}
+              </div>
+            )}
+
+            {/* Attachments Tab */}
+            {tab === "attachments" && (
+              <div className="flex-1 overflow-auto p-4 space-y-2">
+                {PT_DUMMY_ATTACHMENTS.map((file) => (
+                  <div key={file.id} className="flex items-center gap-3 rounded-lg border border-[#F1F5F9] bg-white px-3.5 py-3 hover:bg-[#F8FAFC] transition-colors cursor-pointer">
+                    <div className="w-9 h-9 rounded-lg bg-[#F1F5F9] border border-[#E2E8F0] flex items-center justify-center text-base shrink-0">{file.icon}</div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[12px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{file.name}</p>
+                      <p className="text-[10px] text-[#94A3B8] mt-0.5">{file.size} · {file.type} · {file.date}</p>
+                    </div>
+                    <ExternalLink className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" />
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Recent Activity Tab */}
+            {tab === "activity" && (
+              <div className="flex-1 overflow-auto p-4">
+                <div className="relative pl-5">
+                  <div className="absolute left-[7px] top-2 bottom-2 w-px bg-[#E2E8F0]" />
+                  <div className="space-y-4">
+                    {PT_DUMMY_ACTIVITY.map((act) => (
+                      <div key={act.id} className="relative">
+                        <div className={`absolute -left-5 top-1 w-3.5 h-3.5 rounded-full border-2 border-white ${act.type === "create" ? "bg-[#22C55E]" : act.type === "edit" ? "bg-[#0A77FF]" : "bg-[#F59E0B]"}`} />
+                        <div>
+                          <p className="text-[12px] text-[#0F172A]" style={{ fontWeight: 600 }}>{act.action}</p>
+                          {act.target && <p className="text-[11px] text-[#64748B] mt-0.5">{act.target}</p>}
+                          <p className="text-[10px] text-[#94A3B8] mt-1">{act.user} · {act.date}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             )}
@@ -313,7 +384,7 @@ function PaymentTermDetailModal({ term, open, onClose, mode = "create", onDisabl
                         {term.typeBadge}
                       </span>
                       <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-md border border-[#E2E8F0] bg-[#F1F5F9] text-[#64748B]" style={{ fontWeight: 600 }}>
-                        <Lock className="w-2.5 h-2.5" /> PRESET
+                        <Lock className="w-2.5 h-2.5" /> TEMPLATE
                       </span>
                     </div>
                   </div>

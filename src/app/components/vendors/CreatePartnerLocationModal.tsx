@@ -649,7 +649,7 @@ export function CreatePartnerLocationModal({
                             setLocationName(e.target.value);
                             if (errors.locationName) setErrors((p) => ({ ...p, locationName: "" }));
                           }}
-                          className="mt-1 rounded-lg border-[#E2E8F0] bg-white h-9 sm:h-10 text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
+                          className="mt-1 rounded-lg border-[#E2E8F0] bg-white !h-10 text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
                         />
                         {errors.locationName && (
                           <p className="text-[#EF4444] text-xs mt-1">{errors.locationName}</p>
@@ -660,7 +660,7 @@ export function CreatePartnerLocationModal({
                       <div>
                         <Label className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>Status</Label>
                         <Select value={status} onValueChange={(val: string) => setStatus(val as "Active" | "Inactive")}>
-                          <SelectTrigger className="mt-1 h-9 sm:h-10 rounded-lg border-[#E2E8F0] bg-white text-sm hover:border-[#CBD5E1] transition-colors focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 [&>svg]:text-[#94A3B8]">
+                          <SelectTrigger className="mt-1 !h-10 rounded-lg border-[#E2E8F0] bg-white text-sm hover:border-[#CBD5E1] transition-colors focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 [&>svg]:text-[#94A3B8]">
                             <SelectValue>
                               <div className="flex items-center gap-2">
                                 <div className="w-2 h-2 rounded-full" style={{ backgroundColor: statusConfig[status].color }} />
@@ -695,7 +695,7 @@ export function CreatePartnerLocationModal({
                             <PopoverTrigger asChild>
                               <button
                                 type="button"
-                                className="flex items-center gap-1.5 pl-2.5 pr-1.5 h-9 sm:h-10 rounded-l-lg border border-r-0 border-[#E2E8F0] bg-white text-sm shrink-0 cursor-pointer hover:border-[#CBD5E1] transition-colors focus:outline-none focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
+                                className="flex items-center gap-1.5 pl-2.5 pr-1.5 !h-10 rounded-l-lg border border-r-0 border-[#E2E8F0] bg-white text-sm shrink-0 cursor-pointer hover:border-[#CBD5E1] transition-colors focus:outline-none focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
                               >
                                 <span className="text-base leading-none">{selectedPhoneCountry.flag}</span>
                                 <span className="text-xs text-[#334155]" style={{ fontWeight: 600 }}>
@@ -760,7 +760,7 @@ export function CreatePartnerLocationModal({
                             placeholder="(555) 123-4567"
                             value={phone}
                             onChange={(e) => setPhone(e.target.value)}
-                            className="rounded-l-none rounded-r-lg border-[#E2E8F0] bg-white h-9 sm:h-10 text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
+                            className="rounded-l-none rounded-r-lg border-[#E2E8F0] bg-white !h-10 text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
                           />
                         </div>
                       </div>
@@ -776,7 +776,7 @@ export function CreatePartnerLocationModal({
                           placeholder="support@toyota.com"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
-                          className="mt-1 rounded-lg border-[#E2E8F0] bg-white h-9 sm:h-10 text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
+                          className="mt-1 rounded-lg border-[#E2E8F0] bg-white !h-10 text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
                         />
                       </div>
 
@@ -799,7 +799,7 @@ export function CreatePartnerLocationModal({
                               setAddressFocused(true);
                               if (addressSelected) setAddressSelected(false);
                             }}
-                            className={`pl-9 pr-8 rounded-lg border-[#E2E8F0] bg-white h-9 sm:h-10 text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 ${
+                            className={`pl-9 pr-8 rounded-lg border-[#E2E8F0] bg-white !h-10 text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 ${
                               addressFocused && addressSuggestions.length > 0 ? "rounded-b-none border-b-transparent" : ""
                             }`}
                           />
