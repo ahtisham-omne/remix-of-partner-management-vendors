@@ -101,6 +101,12 @@ import {
   ArchiveRestore,
   AlertTriangle,
   Info,
+  Phone,
+  StickyNote,
+  Upload,
+  Link2,
+  ExternalLink,
+  Printer,
 } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
@@ -2051,80 +2057,81 @@ export function VendorsListPage() {
                                     onClick={(e) => e.stopPropagation()}
                                   >
                                     {vendor.status === "archived" ? (
-                                      /* Archived vendors can only be unarchived */
-                                      <DropdownMenuItem
-                                        onClick={() => handleUnarchive(vendor.id)}
-                                      >
+                                      <DropdownMenuItem onClick={() => handleUnarchive(vendor.id)}>
                                         <ArchiveRestore className="w-4 h-4 mr-2" />
                                         Unarchive
                                       </DropdownMenuItem>
                                     ) : (
                                       <>
-                                        <DropdownMenuItem
-                                          onClick={() => toast.info("Create New Location – coming soon")}
-                                        >
+                                        {/* Create & communicate */}
+                                        <DropdownMenuItem onClick={() => toast.info("Create New Location – coming soon")}>
                                           <MapPinPlus className="w-4 h-4 mr-2" />
                                           Create New Location
                                         </DropdownMenuItem>
-                                        <DropdownMenuItem
-                                          onClick={() => toast.info("Send Email – coming soon")}
-                                        >
+                                        <DropdownMenuItem onClick={() => toast.info("Send Email – coming soon")}>
                                           <Mail className="w-4 h-4 mr-2" />
                                           Send Email
                                         </DropdownMenuItem>
-                                        <DropdownMenuItem
-                                          onClick={() => toast.info("Create Purchase Order – coming soon")}
-                                        >
+                                        <DropdownMenuItem onClick={() => toast.info("Create Purchase Order – coming soon")}>
                                           <ClipboardList className="w-4 h-4 mr-2" />
                                           Create Purchase Order
                                         </DropdownMenuItem>
-                                        <DropdownMenuItem
-                                          onClick={() => toast.info("Create Sales Order – coming soon")}
-                                        >
+                                        <DropdownMenuItem onClick={() => toast.info("Create Sales Order – coming soon")}>
                                           <FileText className="w-4 h-4 mr-2" />
                                           Create Sales Order
                                         </DropdownMenuItem>
-                                        <DropdownMenuItem
-                                          onClick={() => toast.info("Create Quote – coming soon")}
-                                        >
+                                        <DropdownMenuItem onClick={() => toast.info("Create Quote – coming soon")}>
                                           <FileUp className="w-4 h-4 mr-2" />
                                           Create Quote
                                         </DropdownMenuItem>
-                                        <DropdownMenuItem
-                                          onClick={() => toast.info("Add Invoice – coming soon")}
-                                        >
+                                        <DropdownMenuItem onClick={() => toast.info("Add Invoice – coming soon")}>
                                           <Receipt className="w-4 h-4 mr-2" />
                                           Add Invoice
                                         </DropdownMenuItem>
                                         <DropdownMenuSeparator />
+                                        {/* Documents & Notes */}
+                                        <DropdownMenuItem onClick={() => toast.info("Add Note – coming soon")}>
+                                          <StickyNote className="w-4 h-4 mr-2" />
+                                          Add Note
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem onClick={() => toast.info("Upload – coming soon")}>
+                                          <Upload className="w-4 h-4 mr-2" />
+                                          Upload
+                                        </DropdownMenuItem>
+                                        <DropdownMenuSeparator />
+                                      </>
+                                    )}
+                                    {/* Utilities — always visible */}
+                                    <DropdownMenuItem onClick={() => { navigator.clipboard.writeText(`${window.location.origin}/vendors/${vendor.id}`); toast.success("Link copied"); }}>
+                                      <Link2 className="w-4 h-4 mr-2" />
+                                      Copy Link
+                                    </DropdownMenuItem>
+                                    {vendor.website && (
+                                      <DropdownMenuItem onClick={() => window.open(vendor.website.startsWith("http") ? vendor.website : `https://${vendor.website}`, "_blank")}>
+                                        <ExternalLink className="w-4 h-4 mr-2" />
+                                        Visit Website
+                                      </DropdownMenuItem>
+                                    )}
+                                    <DropdownMenuItem onClick={() => toast.info("Print – coming soon")}>
+                                      <Printer className="w-4 h-4 mr-2" />
+                                      Print Partner Details
+                                    </DropdownMenuItem>
+                                    {vendor.status !== "archived" && (
+                                      <>
+                                        <DropdownMenuSeparator />
+                                        {/* Status & Lifecycle */}
                                         {vendor.status === "inactive" ? (
-                                          <DropdownMenuItem
-                                            onClick={() => {
-                                              setSelectedVendorId(vendor.id);
-                                              setMarkActiveDialogOpen(true);
-                                            }}
-                                          >
+                                          <DropdownMenuItem onClick={() => { setSelectedVendorId(vendor.id); setMarkActiveDialogOpen(true); }}>
                                             <CircleCheck className="w-4 h-4 mr-2" />
                                             Mark as Active
                                           </DropdownMenuItem>
                                         ) : (
-                                          <DropdownMenuItem
-                                            onClick={() => {
-                                              setSelectedVendorId(vendor.id);
-                                              setMarkInactiveDialogOpen(true);
-                                            }}
-                                          >
+                                          <DropdownMenuItem onClick={() => { setSelectedVendorId(vendor.id); setMarkInactiveDialogOpen(true); }}>
                                             <CircleSlash className="w-4 h-4 mr-2" />
                                             Mark as Inactive
                                           </DropdownMenuItem>
                                         )}
-                                        <DropdownMenuItem
-                                          variant="destructive"
-                                          onClick={() => {
-                                            setSelectedVendorId(vendor.id);
-                                            setArchiveDialogOpen(true);
-                                          }}
-                                        >
+                                        <DropdownMenuItem variant="destructive" onClick={() => { setSelectedVendorId(vendor.id); setArchiveDialogOpen(true); }}>
                                           <Archive className="w-4 h-4 mr-2" />
                                           Archive
                                         </DropdownMenuItem>

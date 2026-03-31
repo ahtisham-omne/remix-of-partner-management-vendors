@@ -142,6 +142,11 @@ import {
   ChevronUp,
   AlertTriangle,
   Settings2,
+  CircleCheck,
+  CircleSlash,
+  MapPinPlus,
+  FileUp,
+  ArchiveRestore,
 } from "lucide-react";
 import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { toast } from "sonner";
@@ -233,14 +238,16 @@ export function VendorDetailsPage() {
   // sentinel scrolls out of view (i.e. user scrolled past the full header area).
   const sentinelRef = useRef<HTMLDivElement>(null);
   const descRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [descNeedsTruncation, setDescNeedsTruncation] = useState(false);
 
   useEffect(() => {
     const el = sentinelRef.current;
-    if (!el) return;
+    const root = scrollContainerRef.current;
+    if (!el || !root) return;
     const io = new IntersectionObserver(
       ([entry]) => setIsScrolled(!entry.isIntersecting),
-      { threshold: 0, rootMargin: "-44px 0px 0px 0px" } // offset by nav bar height
+      { root, threshold: 0, rootMargin: "-44px 0px 0px 0px" }
     );
     io.observe(el);
     return () => io.disconnect();
@@ -331,9 +338,9 @@ export function VendorDetailsPage() {
 
   // Status config
   const statusConfig: Record<string, { color: string; bg: string; border: string; label: string }> = {
-    active: { color: "#059669", bg: "#ECFDF5", border: "#A7F3D0", label: "Active" },
-    inactive: { color: "#DC2626", bg: "#FEF2F2", border: "#FECACA", label: "Inactive" },
-    archived: { color: "#64748B", bg: "#F1F5F9", border: "#CBD5E1", label: "Archived" },
+    active: { color: "#065F46", bg: "#ECFDF5", border: "#A7F3D0", label: "Active" },
+    inactive: { color: "#92400E", bg: "#FFFBEB", border: "#FDE68A", label: "Inactive" },
+    archived: { color: "#334155", bg: "#F1F5F9", border: "#CBD5E1", label: "Archived" },
   };
   const currentStatus = statusConfig[vendor.status] || statusConfig.active;
 
@@ -368,80 +375,84 @@ export function VendorDetailsPage() {
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="z-[200] w-56">
-        {/* Communication */}
-        <DropdownMenuItem onClick={() => toast.info("Email feature coming soon")}>
-          <Mail className="w-3.5 h-3.5 mr-2 text-[#64748B]" />
-          Send Email
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => toast.info("Phone feature coming soon")}>
-          <Phone className="w-3.5 h-3.5 mr-2 text-[#64748B]" />
-          Call Partner
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        {/* Transactions */}
-        <DropdownMenuItem onClick={() => toast.info("Purchase Order creation coming soon")}>
-          <ClipboardList className="w-3.5 h-3.5 mr-2 text-[#64748B]" />
-          Create Purchase Order
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => toast.info("Sales Order creation coming soon")}>
-          <ShoppingCart className="w-3.5 h-3.5 mr-2 text-[#64748B]" />
-          Create Sales Order
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => toast.info("Invoice creation coming soon")}>
-          <Receipt className="w-3.5 h-3.5 mr-2 text-[#64748B]" />
-          Create Invoice
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        {/* Documents & Notes */}
-        <DropdownMenuItem onClick={() => toast.info("Note creation coming soon")}>
-          <StickyNote className="w-3.5 h-3.5 mr-2 text-[#64748B]" />
-          Add Note
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => toast.info("Upload feature coming soon")}>
-          <Upload className="w-3.5 h-3.5 mr-2 text-[#64748B]" />
-          Upload Document / Attachment
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
+        {vendor.status !== "archived" && (
+          <>
+            {/* Create & communicate */}
+            <DropdownMenuItem onClick={() => toast.info("Create New Location – coming soon")}>
+              <MapPinPlus className="w-4 h-4 mr-2 text-[#64748B]" />
+              Create New Location
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => toast.info("Email feature coming soon")}>
+              <Mail className="w-4 h-4 mr-2 text-[#64748B]" />
+              Send Email
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => toast.info("Purchase Order creation coming soon")}>
+              <ClipboardList className="w-4 h-4 mr-2 text-[#64748B]" />
+              Create Purchase Order
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => toast.info("Sales Order creation coming soon")}>
+              <FileText className="w-4 h-4 mr-2 text-[#64748B]" />
+              Create Sales Order
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => toast.info("Quote creation coming soon")}>
+              <FileUp className="w-4 h-4 mr-2 text-[#64748B]" />
+              Create Quote
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => toast.info("Invoice creation coming soon")}>
+              <Receipt className="w-4 h-4 mr-2 text-[#64748B]" />
+              Add Invoice
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            {/* Documents & Notes */}
+            <DropdownMenuItem onClick={() => toast.info("Note creation coming soon")}>
+              <StickyNote className="w-4 h-4 mr-2 text-[#64748B]" />
+              Add Note
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => toast.info("Upload feature coming soon")}>
+              <Upload className="w-4 h-4 mr-2 text-[#64748B]" />
+              Upload
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+          </>
+        )}
         {/* Utilities */}
         <DropdownMenuItem onClick={() => { navigator.clipboard.writeText(window.location.href); toast.success("Link copied to clipboard"); }}>
-          <Link2 className="w-3.5 h-3.5 mr-2 text-[#64748B]" />
+          <Link2 className="w-4 h-4 mr-2 text-[#64748B]" />
           Copy Link
         </DropdownMenuItem>
         {vendor.website && (
           <DropdownMenuItem onClick={() => window.open(vendor.website.startsWith("http") ? vendor.website : `https://${vendor.website}`, "_blank")}>
-            <ExternalLink className="w-3.5 h-3.5 mr-2 text-[#64748B]" />
+            <ExternalLink className="w-4 h-4 mr-2 text-[#64748B]" />
             Visit Website
           </DropdownMenuItem>
         )}
         <DropdownMenuItem onClick={() => toast.info("Print feature coming soon")}>
-          <Printer className="w-3.5 h-3.5 mr-2 text-[#64748B]" />
+          <Printer className="w-4 h-4 mr-2 text-[#64748B]" />
           Print Partner Details
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        {/* Change Status */}
-        <DropdownMenuItem
-          onClick={() => {
-            // Cycle to next available status
-            const currentIdx = ALL_STATUSES.indexOf(vendor.status as typeof ALL_STATUSES[number]);
-            const nextStatus = ALL_STATUSES[(currentIdx + 1) % ALL_STATUSES.length];
-            setStatusChangeTarget(nextStatus);
-            setStatusConfirmOpen(true);
-          }}
-        >
-          <ToggleRight className="w-3.5 h-3.5 mr-2 text-[#64748B]" />
-          Change Status
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        {/* Archive — always red */}
+        {/* Status & Lifecycle */}
+        {vendor.status === "active" && (
+          <DropdownMenuItem onClick={() => { setStatusChangeTarget("inactive"); setStatusConfirmOpen(true); }}>
+            <CircleSlash className="w-4 h-4 mr-2" />
+            Mark as Inactive
+          </DropdownMenuItem>
+        )}
+        {vendor.status === "inactive" && (
+          <DropdownMenuItem onClick={() => { setStatusChangeTarget("active"); setStatusConfirmOpen(true); }}>
+            <CircleCheck className="w-4 h-4 mr-2" />
+            Mark as Active
+          </DropdownMenuItem>
+        )}
         {vendor.status === "archived" ? (
           <DropdownMenuItem onClick={handleRestore}>
-            <RotateCcw className="w-3.5 h-3.5 mr-2 text-[#64748B]" />
-            Restore Partner
+            <ArchiveRestore className="w-4 h-4 mr-2" />
+            Unarchive
           </DropdownMenuItem>
         ) : (
           <DropdownMenuItem onClick={() => setArchiveDialogOpen(true)} className="text-[#DC2626] focus:text-[#DC2626]">
-            <Archive className="w-3.5 h-3.5 mr-2" />
-            Archive Partner
+            <Archive className="w-4 h-4 mr-2 text-[#DC2626]" />
+            Archive
           </DropdownMenuItem>
         )}
       </DropdownMenuContent>
@@ -460,6 +471,9 @@ export function VendorDetailsPage() {
     </button>
   );
 
+  // Only active/inactive in the status dropdown (archive is a separate action)
+  const DROPDOWN_STATUSES = ["active", "inactive"] as const;
+
   // ── Status pill with dropdown ──
   const StatusPill = ({ compact = false }: { compact?: boolean }) => (
     <Popover open={statusDropdownOpen} onOpenChange={setStatusDropdownOpen}>
@@ -472,9 +486,9 @@ export function VendorDetailsPage() {
           <ChevronDown className={compact ? "w-2.5 h-2.5" : "w-3 h-3"} />
         </button>
       </PopoverTrigger>
-      <PopoverContent side="bottom" align="start" sideOffset={6} className="w-[160px] p-1.5 z-[300]" onOpenAutoFocus={(e) => e.preventDefault()}>
-        <div className="space-y-0.5">
-          {ALL_STATUSES.map((s) => {
+      <PopoverContent side="bottom" align="start" sideOffset={6} className="w-[170px] p-1.5 z-[300]" onOpenAutoFocus={(e) => e.preventDefault()}>
+        <div className="space-y-1">
+          {DROPDOWN_STATUSES.map((s) => {
             const sc = statusConfig[s];
             const isCurrent = s === vendor.status;
             return (
@@ -487,11 +501,14 @@ export function VendorDetailsPage() {
                     setStatusDropdownOpen(false);
                   }
                 }}
-                className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-[12px] transition-colors cursor-pointer ${isCurrent ? "bg-[#F1F5F9]" : "hover:bg-[#F8FAFC]"}`}
-                style={{ fontWeight: isCurrent ? 600 : 400 }}
+                className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg transition-colors cursor-pointer ${isCurrent ? "bg-[#F8FAFC]" : "hover:bg-[#F8FAFC]"}`}
               >
-                <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: sc.color }} />
-                <span style={{ color: "#334155" }}>{sc.label}</span>
+                <span
+                  className="inline-flex items-center rounded-full border px-2 py-0.5 text-[10px]"
+                  style={{ fontWeight: 500, backgroundColor: sc.bg, color: sc.color, borderColor: sc.border }}
+                >
+                  {sc.label}
+                </span>
                 {isCurrent && <Check className="w-3.5 h-3.5 ml-auto text-[#0A77FF]" />}
               </button>
             );
@@ -507,7 +524,7 @@ export function VendorDetailsPage() {
   const allSubTypes = [...vendorSubTypeLabels, ...customerSubTypeLabels];
 
   return (
-    <div className="flex-1 flex flex-col overflow-y-auto bg-[#F8FAFC]">
+    <div ref={scrollContainerRef} className="flex-1 flex flex-col overflow-y-auto bg-[#F8FAFC]">
       {/* ══════════════════════════════════════════════
           TOP NAV BAR
          ══════════════════════════════════════════════ */}
@@ -557,288 +574,257 @@ export function VendorDetailsPage() {
       <div ref={sentinelRef} className="shrink-0 h-px" />
 
       {/* ══════════════════════════════════════════════
-          FULL HEADER — scrolls naturally, NOT sticky
+          SINGLE STICKY HEADER — morphs between full & compact
          ══════════════════════════════════════════════ */}
-      <div className="shrink-0 pt-3 relative">
-        <div className={`mx-auto px-4 lg:px-6 xl:px-8 transition-all duration-300 ${isFullscreen ? "max-w-full" : "max-w-[1440px] 2xl:max-w-[1600px]"}`}>
-          <div className="bg-white border border-[#E2E8F0] rounded-xl shadow-sm overflow-hidden">
-            {/* Main header row */}
-            <div className="flex items-start justify-between gap-4 px-4 lg:px-5 py-3">
-              {/* Left: Back + Avatar + Info */}
-              <div className="flex items-start gap-3 min-w-0">
-                {/* Back button */}
-                <button
-                  onClick={() => navigate("/vendors")}
-                  className="rounded-xl border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] flex items-center justify-center shrink-0 w-11 h-11 cursor-pointer shadow-[0_1px_3px_0_rgba(0,0,0,0.04),0_1px_2px_-1px_rgba(0,0,0,0.03)] mt-0.5"
-                >
-                  <ChevronLeft className="w-5 h-5 text-[#94A3B8]" />
-                </button>
-
-                {/* Avatar */}
-                {vendor.profileImage ? (
-                  <img
-                    src={vendor.profileImage}
-                    alt={vendor.displayName}
-                    className="rounded-xl w-11 h-11 object-cover shrink-0 border border-[#E2E8F0] shadow-[0_1px_3px_0_rgba(0,0,0,0.04),0_1px_2px_-1px_rgba(0,0,0,0.03)] mt-0.5"
-                  />
-                ) : (
-                  <div
-                    className="rounded-xl w-11 h-11 flex items-center justify-center shrink-0 text-white text-[14px] border border-white shadow-[0_1px_3px_0_rgba(0,0,0,0.06),0_0_0_2px_rgba(10,119,255,0.10)] mt-0.5"
-                    style={{ backgroundColor: toAAAColor(vendor.createdByContact?.bgColor || "#0A77FF"), fontWeight: 700 }}
+      <div className="shrink-0 sticky top-[44px] z-20 bg-[#F8FAFC]">
+        <div style={{ paddingTop: isScrolled ? "8px" : "12px", paddingBottom: "4px", transition: "padding-top 250ms ease" }}>
+          <div className={`mx-auto px-4 lg:px-6 xl:px-8 transition-all duration-300 ${isFullscreen ? "max-w-full" : "max-w-[1440px] 2xl:max-w-[1600px]"}`}>
+            <div className={`bg-white border border-[#E2E8F0] rounded-xl overflow-hidden transition-shadow duration-250 ${isScrolled ? "shadow-[0_1px_3px_0_rgba(0,0,0,0.04),0_4px_12px_-4px_rgba(0,0,0,0.05)]" : "shadow-sm"}`}>
+              {/* Main header row — morphs between full and compact */}
+              <div
+                className="flex items-center justify-between gap-4 px-4 lg:px-5 transition-all duration-250 ease-in-out"
+                style={{ padding: isScrolled ? "6px 16px" : "12px 16px" }}
+              >
+                {/* Left: Back + Avatar + Info */}
+                <div className="flex items-center gap-2.5 min-w-0">
+                  {/* Back button */}
+                  <button
+                    onClick={() => navigate("/vendors")}
+                    className="rounded-xl border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] flex items-center justify-center shrink-0 cursor-pointer shadow-[0_1px_3px_0_rgba(0,0,0,0.04),0_1px_2px_-1px_rgba(0,0,0,0.03)] transition-all duration-250"
+                    style={{ width: isScrolled ? 32 : 44, height: isScrolled ? 32 : 44 }}
                   >
-                    {initials}
-                  </div>
-                )}
+                    <ChevronLeft className="text-[#94A3B8] transition-all duration-250" style={{ width: isScrolled ? 16 : 20, height: isScrolled ? 16 : 20 }} />
+                  </button>
 
-                {/* Name + Badges + Description */}
-                <div className="min-w-0 flex-1">
-                  {/* Line 1: Name + Status + Type + Sub-types + Group */}
-                  <div className="flex items-center flex-wrap gap-2">
-                    <h1 className="text-[16px] text-[#0F172A] truncate" style={{ fontWeight: 700, lineHeight: "22px" }}>
-                      {vendor.displayName}
-                    </h1>
-
-                    {/* Status badge — clickable dropdown */}
-                    <StatusPill />
-
-                    {/* Partner Type badges */}
-                    {(vendor.partnerTypes || []).map((type) => (
-                      <span
-                        key={type}
-                        className={`inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[11px] ${
-                          type === "vendor"
-                            ? "border-[#BFDBFE] bg-[#DBEAFE] text-[#2563EB]"
-                            : "border-[#C4B5FD] bg-[#EDE9FE] text-[#7C3AED]"
-                        }`}
-                        style={{ fontWeight: 600 }}
-                      >
-                        {type === "vendor" ? <Truck className="w-3 h-3" /> : <ShoppingCart className="w-3 h-3" />}
-                        {type === "vendor" ? "Vendor" : "Customer"}
-                      </span>
-                    ))}
-
-                    {/* Partner Sub-Type pills */}
-                    {allSubTypes.length > 0 && allSubTypes.map((st) => (
-                      <span
-                        key={st}
-                        className="inline-flex items-center gap-1 rounded-md border border-[#E2E8F0] bg-[#F8FAFC] text-[#475569] px-2 py-0.5 text-[11px]"
-                        style={{ fontWeight: 500 }}
-                      >
-                        <Settings2 className="w-3 h-3 text-[#94A3B8]" />
-                        {st}
-                      </span>
-                    ))}
-
-                    {/* Partner Groups — primary + overflow */}
-                    {vendor.partnerGroup && (() => {
-                      const primaryGroup = PARTNER_GROUPS.find((g) => g.id === vendor.partnerGroup);
-                      const extraGroups = PARTNER_GROUPS.filter((g) => g.id !== vendor.partnerGroup && g.country === vendor.country).slice(0, 2);
-                      if (!primaryGroup) return (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] border border-[#E2E8F0] bg-[#F1F5F9] text-[#475569]" style={{ fontWeight: 500 }}>
-                          <Building2 className="w-3 h-3 text-[#94A3B8]" />
-                          {vendor.partnerGroup}
-                        </span>
-                      );
-                      return (
-                        <>
-                          <PartnerGroupHoverPill group={primaryGroup} />
-                          {extraGroups.length > 0 && (
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <span className="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] border border-[#E2E8F0] bg-[#F1F5F9] text-[#0A77FF] cursor-default" style={{ fontWeight: 600 }}>
-                                  +{extraGroups.length}
-                                </span>
-                              </TooltipTrigger>
-                              <TooltipContent side="bottom" sideOffset={6} className="max-w-[240px] z-[300]">
-                                <div className="space-y-1.5">
-                                  {extraGroups.map((g) => (
-                                    <div key={g.id} className="flex items-center gap-2">
-                                      <span className="text-[11px]">{g.countryFlag}</span>
-                                      <div>
-                                        <p className="text-[11px] text-[#0F172A]" style={{ fontWeight: 600 }}>{g.name}</p>
-                                        <p className="text-[10px] text-[#94A3B8]">{g.memberCount} members</p>
-                                      </div>
-                                    </div>
-                                  ))}
-                                </div>
-                              </TooltipContent>
-                            </Tooltip>
-                          )}
-                        </>
-                      );
-                    })()}
-                  </div>
-
-                  {/* ── Description with smooth expand/collapse — inline "more" at end of first line ── */}
-                  <div className="mt-1.5 max-w-3xl relative">
+                  {/* Avatar */}
+                  {vendor.profileImage ? (
+                    <img
+                      src={vendor.profileImage}
+                      alt={vendor.displayName}
+                      className="rounded-xl object-cover shrink-0 border border-[#E2E8F0] shadow-[0_1px_3px_0_rgba(0,0,0,0.04),0_1px_2px_-1px_rgba(0,0,0,0.03)] transition-all duration-250"
+                      style={{ width: isScrolled ? 32 : 44, height: isScrolled ? 32 : 44 }}
+                    />
+                  ) : (
                     <div
-                      ref={descRef}
-                      className="overflow-hidden transition-[max-height] duration-300 ease-in-out"
-                      style={{ maxHeight: descExpanded ? "500px" : "20px" }}
+                      className="rounded-xl flex items-center justify-center shrink-0 text-white border border-white shadow-[0_1px_3px_0_rgba(0,0,0,0.06),0_0_0_2px_rgba(10,119,255,0.10)] transition-all duration-250"
+                      style={{
+                        width: isScrolled ? 32 : 44,
+                        height: isScrolled ? 32 : 44,
+                        fontSize: isScrolled ? 10 : 14,
+                        backgroundColor: toAAAColor(vendor.createdByContact?.bgColor || "#0A77FF"),
+                        fontWeight: 700,
+                      }}
                     >
-                      <p className="text-[12px] text-[#64748B] leading-[1.6]">
-                        {descriptionText}
-                        {descExpanded && descNeedsTruncation && (
-                          <>
-                            {" "}
-                            <button
-                              type="button"
-                              onClick={(e) => { e.stopPropagation(); setDescExpanded(false); }}
-                              className="inline-flex items-center gap-0.5 text-[11px] text-[#0A77FF] hover:text-[#0862D0] cursor-pointer align-baseline"
-                              style={{ fontWeight: 500 }}
-                            >
-                              Show less <ChevronUp className="w-3 h-3 inline" />
-                            </button>
-                          </>
-                        )}
-                      </p>
+                      {initials}
                     </div>
-                    {/* "... more" toggle — shown only when collapsed and truncation needed */}
-                    {!descExpanded && descNeedsTruncation && (
-                      <button
-                        type="button"
-                        onClick={(e) => { e.stopPropagation(); setDescExpanded(true); }}
-                        className="absolute right-0 bottom-0 bg-gradient-to-l from-white via-white to-transparent pl-6 pr-0 inline-flex items-center gap-0.5 text-[11px] text-[#0A77FF] hover:text-[#0862D0] cursor-pointer"
-                        style={{ fontWeight: 500, lineHeight: "20px" }}
+                  )}
+
+                  {/* Name + Badges + Description */}
+                  <div className="min-w-0 flex-1">
+                    {/* Line 1: Name + Status + Type + (expanded-only: Sub-types + Group) */}
+                    <div className="flex items-center flex-wrap gap-1.5 transition-all duration-250" style={{ gap: isScrolled ? 6 : 8 }}>
+                      <h1
+                        className="text-[#0F172A] truncate transition-all duration-250"
+                        style={{ fontSize: isScrolled ? 13 : 16, fontWeight: isScrolled ? 600 : 700, lineHeight: isScrolled ? "18px" : "22px" }}
                       >
-                        ... more <ChevronDown className="w-3 h-3" />
-                      </button>
-                    )}
+                        {vendor.displayName}
+                      </h1>
+
+                      {/* Status badge — clickable dropdown */}
+                      <StatusPill compact={isScrolled} />
+
+                      {/* Partner Type badges — with sub-types on hover */}
+                      {(vendor.partnerTypes || []).map((type) => {
+                        const subs = type === "vendor" ? vendorSubTypeLabels : customerSubTypeLabels;
+                        const badge = (
+                          <span
+                            className={`inline-flex items-center gap-1 rounded-md border transition-all duration-250 ${
+                              type === "vendor"
+                                ? "border-[#BFDBFE] bg-[#DBEAFE] text-[#2563EB]"
+                                : "border-[#C4B5FD] bg-[#EDE9FE] text-[#7C3AED]"
+                            }`}
+                            style={{ padding: isScrolled ? "1px 6px" : "2px 8px", fontSize: isScrolled ? 10 : 11, fontWeight: 600, cursor: subs.length > 0 ? "default" : undefined }}
+                          >
+                            {type === "vendor" ? (
+                              <Truck className="transition-all duration-250" style={{ width: isScrolled ? 10 : 12, height: isScrolled ? 10 : 12 }} />
+                            ) : (
+                              <ShoppingCart className="transition-all duration-250" style={{ width: isScrolled ? 10 : 12, height: isScrolled ? 10 : 12 }} />
+                            )}
+                            {type === "vendor" ? "Vendor" : "Customer"}
+                            {subs.length > 0 && (
+                              <span style={{ fontSize: isScrolled ? 9 : 10, opacity: 0.7, fontWeight: 500 }}>· {subs.length}</span>
+                            )}
+                          </span>
+                        );
+                        if (subs.length === 0) return <React.Fragment key={type}>{badge}</React.Fragment>;
+                        return (
+                          <Tooltip key={type}>
+                            <TooltipTrigger asChild>{badge}</TooltipTrigger>
+                            <TooltipContent side="bottom" sideOffset={6} className="z-[300] max-w-[260px]">
+                              <div className="space-y-1">
+                                <p className="text-[10px] text-[#94A3B8] mb-1.5" style={{ fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                                  {type === "vendor" ? "Vendor" : "Customer"} Profiles
+                                </p>
+                                {subs.map((st) => (
+                                  <div key={st} className="flex items-center gap-2 py-0.5">
+                                    <Settings2 className="w-3 h-3 text-[#94A3B8] shrink-0" />
+                                    <span className="text-[11px] text-[#334155]" style={{ fontWeight: 500 }}>{st}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </TooltipContent>
+                          </Tooltip>
+                        );
+                      })}
+
+                      {/* Partner Groups — hidden when compact */}
+                      {!isScrolled && vendor.partnerGroup && (() => {
+                        const primaryGroup = PARTNER_GROUPS.find((g) => g.id === vendor.partnerGroup);
+                        const extraGroups = PARTNER_GROUPS.filter((g) => g.id !== vendor.partnerGroup && g.country === vendor.country).slice(0, 2);
+                        if (!primaryGroup) return (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] border border-[#E2E8F0] bg-[#F1F5F9] text-[#475569]" style={{ fontWeight: 500 }}>
+                            <Building2 className="w-3 h-3 text-[#94A3B8]" />
+                            {vendor.partnerGroup}
+                          </span>
+                        );
+                        return (
+                          <>
+                            <PartnerGroupHoverPill group={primaryGroup} />
+                            {extraGroups.length > 0 && (
+                              <PartnerGroupOverflowPill groups={extraGroups} />
+                            )}
+                          </>
+                        );
+                      })()}
+                    </div>
+
+                    {/* ── Description — hidden when compact ── */}
+                    <div
+                      className="overflow-hidden transition-all duration-250 ease-in-out max-w-3xl relative"
+                      style={{
+                        maxHeight: isScrolled ? 0 : descExpanded ? 500 : 20,
+                        opacity: isScrolled ? 0 : 1,
+                        marginTop: isScrolled ? 0 : 6,
+                      }}
+                    >
+                      <div ref={descRef} className="overflow-hidden" style={{ maxHeight: descExpanded ? 500 : 20 }}>
+                        <p className="text-[12px] text-[#64748B] leading-[1.6]">
+                          {descriptionText}
+                          {descExpanded && descNeedsTruncation && (
+                            <>
+                              {" "}
+                              <button
+                                type="button"
+                                onClick={(e) => { e.stopPropagation(); setDescExpanded(false); }}
+                                className="inline-flex items-center gap-0.5 text-[11px] text-[#0A77FF] hover:text-[#0862D0] cursor-pointer align-baseline"
+                                style={{ fontWeight: 500 }}
+                              >
+                                Show less <ChevronUp className="w-3 h-3 inline" />
+                              </button>
+                            </>
+                          )}
+                        </p>
+                      </div>
+                      {!descExpanded && descNeedsTruncation && (
+                        <button
+                          type="button"
+                          onClick={(e) => { e.stopPropagation(); setDescExpanded(true); }}
+                          className="absolute right-0 bottom-0 bg-gradient-to-l from-white via-white to-transparent pl-6 pr-0 inline-flex items-center gap-0.5 text-[11px] text-[#0A77FF] hover:text-[#0862D0] cursor-pointer"
+                          style={{ fontWeight: 500, lineHeight: "20px" }}
+                        >
+                          ... more <ChevronDown className="w-3 h-3" />
+                        </button>
+                      )}
+                    </div>
                   </div>
+                </div>
+
+                {/* Right: Fullscreen + Actions + Edit CTA */}
+                <div className="flex items-center shrink-0 transition-all duration-250" style={{ gap: isScrolled ? 6 : 8 }}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        onClick={() => setIsFullscreen(!isFullscreen)}
+                        className="rounded-lg border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] flex items-center justify-center cursor-pointer shadow-sm transition-all duration-250"
+                        style={{ width: isScrolled ? 32 : 36, height: isScrolled ? 32 : 36 }}
+                      >
+                        {isFullscreen ? (
+                          <Minimize2 className="text-[#64748B] transition-all duration-250" style={{ width: isScrolled ? 14 : 16, height: isScrolled ? 14 : 16 }} />
+                        ) : (
+                          <Maximize2 className="text-[#64748B] transition-all duration-250" style={{ width: isScrolled ? 14 : 16, height: isScrolled ? 14 : 16 }} />
+                        )}
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent className="z-[300]">{isFullscreen ? "Exit Full Screen" : "Full Screen"}</TooltipContent>
+                  </Tooltip>
+                  <ActionsDropdown compact={isScrolled} />
+                  <EditCta compact={isScrolled} />
                 </div>
               </div>
 
-              {/* Right: Fullscreen + Actions + Edit CTA */}
-              <div className="flex items-center gap-2 shrink-0 pt-0.5">
-                <Tooltip>
-                  <TooltipTrigger asChild>
+              {/* Tab bar — always visible at the bottom of the card */}
+              <div className="flex items-center gap-0 overflow-x-auto scrollbar-hide border-t border-[#F1F5F9] px-4 lg:px-5">
+                {TABS.map((tab) => {
+                  const isActive = activeTab === tab.id;
+                  return (
                     <button
-                      onClick={() => setIsFullscreen(!isFullscreen)}
-                      className="rounded-lg border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] w-9 h-9 flex items-center justify-center cursor-pointer shadow-sm"
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`flex items-center px-3.5 border-b-2 transition-all duration-200 whitespace-nowrap cursor-pointer ${
+                        isActive
+                          ? "border-[#0A77FF] text-[#0A77FF]"
+                          : "border-transparent text-[#64748B] hover:text-[#334155] hover:border-[#CBD5E1]"
+                      }`}
+                      style={{
+                        padding: isScrolled ? "8px 14px" : "10px 14px",
+                        fontSize: isScrolled ? 12 : 13,
+                        fontWeight: isActive ? 600 : 400,
+                        transition: "padding 250ms ease, font-size 250ms ease",
+                      }}
                     >
-                      {isFullscreen ? <Minimize2 className="w-4 h-4 text-[#64748B]" /> : <Maximize2 className="w-4 h-4 text-[#64748B]" />}
+                      {tab.label}
                     </button>
-                  </TooltipTrigger>
-                  <TooltipContent className="z-[300]">{isFullscreen ? "Exit Full Screen" : "Full Screen"}</TooltipContent>
-                </Tooltip>
-                <ActionsDropdown />
-                <EditCta />
+                  );
+                })}
               </div>
-            </div>
-
-            {/* Tab bar — inside the header card, at the bottom */}
-            <div className="flex items-center gap-0 overflow-x-auto scrollbar-hide border-t border-[#F1F5F9] px-4 lg:px-5">
-              {TABS.map((tab) => {
-                const isActive = activeTab === tab.id;
-                return (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center px-3.5 py-2.5 border-b-2 transition-all duration-200 whitespace-nowrap cursor-pointer text-[13px] ${
-                      isActive
-                        ? "border-[#0A77FF] text-[#0A77FF]"
-                        : "border-transparent text-[#64748B] hover:text-[#334155] hover:border-[#CBD5E1]"
-                    }`}
-                    style={{ fontWeight: isActive ? 600 : 400 }}
-                  >
-                    {tab.label}
-                  </button>
-                );
-              })}
             </div>
           </div>
         </div>
+        {/* Bottom gradient fade — soft edge below sticky header */}
+        <div
+          className="pointer-events-none transition-opacity duration-300"
+          style={{
+            height: 8,
+            background: "linear-gradient(to bottom, rgba(248,250,252,0.8) 0%, rgba(248,250,252,0.4) 40%, rgba(248,250,252,0) 100%)",
+            opacity: isScrolled ? 1 : 0,
+          }}
+        />
       </div>
 
-      {/* ══════════════════════════════════════════════
-          STICKY COMPACT HEADER — slides in on scroll
-         ══════════════════════════════════════════════ */}
-      <div
-        className="shrink-0 sticky top-[44px] z-20 overflow-hidden transition-all duration-300 ease-in-out"
-        style={{
-          maxHeight: isScrolled ? "100px" : "0px",
-          opacity: isScrolled ? 1 : 0,
+      {/* ── Scroll to top FAB ── */}
+      <button
+        onClick={() => {
+          const el = scrollContainerRef.current;
+          if (el) el.scrollTo({ top: 0, behavior: "smooth" });
         }}
+        className="fixed bottom-6 right-6 z-40 rounded-full bg-white border border-[#E2E8F0] shadow-[0_2px_12px_-3px_rgba(0,0,0,0.12),0_4px_16px_-4px_rgba(0,0,0,0.08)] flex items-center justify-center cursor-pointer hover:bg-[#F8FAFC] hover:border-[#CBD5E1] hover:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.15)] active:scale-95 transition-all duration-300"
+        style={{
+          width: 40,
+          height: 40,
+          opacity: isScrolled ? 1 : 0,
+          transform: isScrolled ? "translateY(0) scale(1)" : "translateY(16px) scale(0.9)",
+          pointerEvents: isScrolled ? "auto" : "none",
+        }}
+        aria-label="Scroll to top"
       >
-        <div className="bg-white border-b border-[#E2E8F0] shadow-[0_1px_3px_0_rgba(0,0,0,0.04),0_4px_12px_-4px_rgba(0,0,0,0.05)]">
-          <div className={`mx-auto px-4 lg:px-6 xl:px-8 transition-all duration-300 ${isFullscreen ? "max-w-full" : "max-w-[1440px] 2xl:max-w-[1600px]"}`}>
-            {/* Compact header row */}
-            <div className="flex items-center justify-between h-11">
-              <div className="flex items-center gap-2.5 min-w-0">
-                {/* Small avatar */}
-                {vendor.profileImage ? (
-                  <img
-                    src={vendor.profileImage}
-                    alt={vendor.displayName}
-                    className="rounded-lg w-7 h-7 object-cover shrink-0 border border-[#E2E8F0]"
-                  />
-                ) : (
-                  <div
-                    className="rounded-lg w-7 h-7 flex items-center justify-center shrink-0 text-white text-[10px] border border-white shadow-[0_0_0_1px_rgba(10,119,255,0.10)]"
-                    style={{ backgroundColor: toAAAColor(vendor.createdByContact?.bgColor || "#0A77FF"), fontWeight: 700 }}
-                  >
-                    {initials}
-                  </div>
-                )}
-
-                <h2 className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>
-                  {vendor.displayName}
-                </h2>
-
-                <StatusPill compact />
-
-                {/* Type badges — compact */}
-                {(vendor.partnerTypes || []).map((type) => (
-                  <span
-                    key={type}
-                    className={`inline-flex items-center gap-1 rounded-md border px-1.5 py-px text-[10px] ${
-                      type === "vendor"
-                        ? "border-[#BFDBFE] bg-[#DBEAFE] text-[#2563EB]"
-                        : "border-[#C4B5FD] bg-[#EDE9FE] text-[#7C3AED]"
-                    }`}
-                    style={{ fontWeight: 600 }}
-                  >
-                    {type === "vendor" ? <Truck className="w-2.5 h-2.5" /> : <ShoppingCart className="w-2.5 h-2.5" />}
-                    {type === "vendor" ? "Vendor" : "Customer"}
-                  </span>
-                ))}
-              </div>
-
-              <div className="flex items-center gap-1.5 shrink-0">
-                <ActionsDropdown compact />
-                <EditCta compact />
-              </div>
-            </div>
-
-            {/* Compact tab bar */}
-            <div className="flex items-center gap-0 overflow-x-auto scrollbar-hide border-t border-[#F1F5F9]">
-              {TABS.map((tab) => {
-                const isActive = activeTab === tab.id;
-                return (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center px-3.5 py-2 border-b-2 transition-all duration-200 whitespace-nowrap cursor-pointer text-[12px] ${
-                      isActive
-                        ? "border-[#0A77FF] text-[#0A77FF]"
-                        : "border-transparent text-[#64748B] hover:text-[#334155] hover:border-[#CBD5E1]"
-                    }`}
-                    style={{ fontWeight: isActive ? 600 : 400 }}
-                  >
-                    {tab.label}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      </div>
+        <ChevronUp className="w-5 h-5 text-[#64748B]" />
+      </button>
 
       {/* ══════════════════════════════════════════════
           BODY: centered container on large screens
          ══════════════════════════════════════════════ */}
       <div className="flex-1">
-        <div className={`mx-auto px-4 lg:px-6 xl:px-8 py-5 space-y-5 transition-all duration-300 ${isFullscreen ? "max-w-full" : "max-w-[1440px] 2xl:max-w-[1600px]"}`}>
+        <div className={`mx-auto px-4 lg:px-6 xl:px-8 pt-3 pb-5 space-y-4 transition-all duration-300 ${isFullscreen ? "max-w-full" : "max-w-[1440px] 2xl:max-w-[1600px]"}`}>
           {/* Full-width KPI strip — only on Dashboard tab */}
           {activeTab === "dashboard" && (
             <div className="space-y-3">
@@ -1179,68 +1165,80 @@ export function VendorDetailsPage() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Status change confirmation */}
-      <AlertDialog open={statusConfirmOpen} onOpenChange={setStatusConfirmOpen}>
+      {/* Status change confirmation — matches listing page modals */}
+      {/* Mark as Active */}
+      <AlertDialog open={statusConfirmOpen && statusChangeTarget === "active"} onOpenChange={(o) => { if (!o) { setStatusConfirmOpen(false); setStatusChangeTarget(null); } }}>
         <AlertDialogContent
           className="sm:max-w-[400px] p-0 gap-0 overflow-hidden rounded-2xl border-0 shadow-[0_24px_80px_-12px_rgba(0,0,0,0.25)]"
           style={{ zIndex: 220 }}
           onInteractOutside={() => { setStatusConfirmOpen(false); setStatusChangeTarget(null); }}
         >
-          {(() => {
-            const targetSc = statusChangeTarget ? statusConfig[statusChangeTarget] : null;
-            const isArchiving = statusChangeTarget === "archived";
-            const gradientColor = isArchiving ? "#EF4444" : "#0A77FF";
-            const gradientBg = isArchiving
-              ? "linear-gradient(180deg, #FEF2F2 0%, rgba(254,242,242,0.3) 70%, transparent 100%)"
-              : "linear-gradient(180deg, #EFF6FF 0%, rgba(239,246,255,0.3) 70%, transparent 100%)";
-            const iconBg = isArchiving ? "#FEE2E2" : "#DBEAFE";
-            const btnBg = isArchiving ? "#DC2626" : "#0A77FF";
-            return (
-              <>
-                <div className="relative flex flex-col items-center pt-10 pb-6" style={{ background: gradientBg }}>
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[180px] h-[80px] rounded-full blur-[50px] opacity-25" style={{ backgroundColor: gradientColor }} />
-                  <div className="relative w-16 h-16 rounded-2xl flex items-center justify-center" style={{ backgroundColor: iconBg }}>
-                    <ToggleRight className="w-8 h-8" style={{ color: isArchiving ? "#DC2626" : "#0A77FF" }} />
-                  </div>
-                  <span
-                    className="mt-4 px-3 py-1 rounded-full text-[11px]"
-                    style={{ fontWeight: 600, backgroundColor: isArchiving ? "#FEF2F2" : "#EFF6FF", color: isArchiving ? "#991B1B" : "#1D4ED8", textTransform: "uppercase" as const, letterSpacing: "0.05em" }}
-                  >
-                    Status Change
-                  </span>
-                </div>
-                <div className="flex flex-col items-center text-center px-8 pb-8">
-                  <AlertDialogHeader className="p-0 gap-0 text-center">
-                    <AlertDialogTitle className="text-[18px] tracking-[-0.02em]" style={{ fontWeight: 600, color: "#0F172A" }}>
-                      Change status to {targetSc?.label}?
-                    </AlertDialogTitle>
-                  </AlertDialogHeader>
-                  <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "#475569", lineHeight: "1.65" }}>
-                    <span style={{ fontWeight: 600, color: "#1E293B" }}>{vendor.displayName}</span>{" "}
-                    will be updated from <span style={{ fontWeight: 600 }}>{currentStatus.label}</span> to{" "}
-                    <span style={{ fontWeight: 600, color: targetSc?.color }}>{targetSc?.label}</span>.
-                    {isArchiving && " The partner will be removed from active workflows."}
-                  </AlertDialogDescription>
-                  <div className="w-full mt-7 flex flex-col gap-2.5">
-                    <button
-                      onClick={() => statusChangeTarget && handleStatusChange(statusChangeTarget)}
-                      className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors hover:opacity-90"
-                      style={{ fontWeight: 600, backgroundColor: btnBg, color: "#fff" }}
-                    >
-                      Change to {targetSc?.label}
-                    </button>
-                    <button
-                      onClick={() => { setStatusConfirmOpen(false); setStatusChangeTarget(null); }}
-                      className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors"
-                      style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#334155" }}
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              </>
-            );
-          })()}
+          <div className="relative flex flex-col items-center pt-10 pb-6" style={{ background: "linear-gradient(180deg, #F0FDF4 0%, rgba(240,253,244,0.3) 70%, transparent 100%)" }}>
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[180px] h-[80px] rounded-full blur-[50px] opacity-30" style={{ backgroundColor: "#22C55E" }} />
+            <div className="relative w-16 h-16 rounded-2xl flex items-center justify-center" style={{ backgroundColor: "#DCFCE7" }}>
+              <CircleCheck className="w-8 h-8" style={{ color: "#16A34A" }} />
+            </div>
+            <span className="mt-4 px-3 py-1 rounded-full text-[11px]" style={{ fontWeight: 600, backgroundColor: "#F0FDF4", color: "#14532D", textTransform: "uppercase" as const, letterSpacing: "0.05em" }}>
+              Activation
+            </span>
+          </div>
+          <div className="flex flex-col items-center text-center px-8 pb-8">
+            <AlertDialogHeader className="p-0 gap-0 text-center">
+              <AlertDialogTitle className="text-[18px] tracking-[-0.02em]" style={{ fontWeight: 600, color: "#0F172A" }}>
+                Activate this partner?
+              </AlertDialogTitle>
+            </AlertDialogHeader>
+            <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "#475569", lineHeight: "1.65" }}>
+              <span style={{ fontWeight: 600, color: "#1E293B" }}>{vendor.displayName}</span>{" "}
+              will be restored to active status and become available for new transactions, orders, and search results.
+            </AlertDialogDescription>
+            <div className="w-full mt-7 flex flex-col gap-2.5">
+              <button onClick={() => handleStatusChange("active")} className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors hover:opacity-90" style={{ fontWeight: 600, backgroundColor: "#16A34A", color: "#fff" }}>
+                Activate Partner
+              </button>
+              <button onClick={() => { setStatusConfirmOpen(false); setStatusChangeTarget(null); }} className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors" style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#334155" }}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Mark as Inactive */}
+      <AlertDialog open={statusConfirmOpen && statusChangeTarget === "inactive"} onOpenChange={(o) => { if (!o) { setStatusConfirmOpen(false); setStatusChangeTarget(null); } }}>
+        <AlertDialogContent
+          className="sm:max-w-[400px] p-0 gap-0 overflow-hidden rounded-2xl border-0 shadow-[0_24px_80px_-12px_rgba(0,0,0,0.25)]"
+          style={{ zIndex: 220 }}
+          onInteractOutside={() => { setStatusConfirmOpen(false); setStatusChangeTarget(null); }}
+        >
+          <div className="relative flex flex-col items-center pt-10 pb-6" style={{ background: "linear-gradient(180deg, #FEFCE8 0%, rgba(254,252,232,0.3) 70%, transparent 100%)" }}>
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[180px] h-[80px] rounded-full blur-[50px] opacity-25" style={{ backgroundColor: "#EAB308" }} />
+            <div className="relative w-16 h-16 rounded-2xl flex items-center justify-center" style={{ backgroundColor: "#FEF3C7" }}>
+              <AlertTriangle className="w-8 h-8" style={{ color: "#D97706" }} />
+            </div>
+            <span className="mt-4 px-3 py-1 rounded-full text-[11px]" style={{ fontWeight: 600, backgroundColor: "#FEF9C3", color: "#92400E", textTransform: "uppercase" as const, letterSpacing: "0.05em" }}>
+              Warning
+            </span>
+          </div>
+          <div className="flex flex-col items-center text-center px-8 pb-8">
+            <AlertDialogHeader className="p-0 gap-0 text-center">
+              <AlertDialogTitle className="text-[18px] tracking-[-0.02em]" style={{ fontWeight: 600, color: "#0F172A" }}>
+                Deactivate this partner?
+              </AlertDialogTitle>
+            </AlertDialogHeader>
+            <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "#475569", lineHeight: "1.65" }}>
+              <span style={{ fontWeight: 600, color: "#1E293B" }}>{vendor.displayName}</span>{" "}
+              will be hidden from active lists and no new transactions can be created. You can reactivate anytime.
+            </AlertDialogDescription>
+            <div className="w-full mt-7 flex flex-col gap-2.5">
+              <button onClick={() => handleStatusChange("inactive")} className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors hover:opacity-90" style={{ fontWeight: 600, backgroundColor: "#F97316", color: "#FFFFFF" }}>
+                Deactivate Partner
+              </button>
+              <button onClick={() => { setStatusConfirmOpen(false); setStatusChangeTarget(null); }} className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors" style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#334155" }}>
+                Cancel
+              </button>
+            </div>
+          </div>
         </AlertDialogContent>
       </AlertDialog>
 
@@ -1347,6 +1345,108 @@ function PartnerGroupHoverPill({ group }: { group: { id: string; name: string; d
 // ══════════════════════════════════════════════
 // SIDEBAR HELPER COMPONENTS
 // ══════════════════════════════════════════════
+
+// ══════════════════════════════════════════════
+// PARTNER GROUP OVERFLOW "+X more" WITH HOVER CARDS
+// ══════════════════════════════════════════════
+
+function PartnerGroupOverflowPill({ groups }: { groups: { id: string; name: string; description: string; country: string; countryFlag: string; memberCount: number }[] }) {
+  const [listOpen, setListOpen] = useState(false);
+  const [hoveredGroup, setHoveredGroup] = useState<string | null>(null);
+  const listLeaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleListEnter = useCallback(() => {
+    if (listLeaveTimer.current) { clearTimeout(listLeaveTimer.current); listLeaveTimer.current = null; }
+    setListOpen(true);
+  }, []);
+
+  const handleListLeave = useCallback(() => {
+    listLeaveTimer.current = setTimeout(() => { setListOpen(false); setHoveredGroup(null); }, 200);
+  }, []);
+
+  return (
+    <Popover open={listOpen} onOpenChange={(o) => { if (!o) { setListOpen(false); setHoveredGroup(null); } }}>
+      <PopoverTrigger
+        onMouseEnter={handleListEnter}
+        onMouseLeave={handleListLeave}
+        className="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] border border-[#E2E8F0] bg-[#F1F5F9] text-[#0A77FF] cursor-default transition-colors hover:bg-[#E2E8F0]"
+        style={{ fontWeight: 600 }}
+      >
+        +{groups.length}
+      </PopoverTrigger>
+      <PopoverContent
+        side="bottom"
+        align="start"
+        sideOffset={6}
+        className="p-0 w-auto border-0 shadow-none bg-transparent z-[200]"
+        onMouseEnter={handleListEnter}
+        onMouseLeave={handleListLeave}
+        onOpenAutoFocus={(e) => e.preventDefault()}
+      >
+        <div className="flex gap-2">
+          {/* List dropdown */}
+          <div className="w-[220px] rounded-xl overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-[#E2E8F0]/60 bg-white">
+            <div className="px-3 py-2 border-b border-[#F1F5F9]">
+              <p className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em" }}>Secondary Groups</p>
+            </div>
+            <div className="py-1">
+              {groups.map((g) => (
+                <button
+                  key={g.id}
+                  onMouseEnter={() => setHoveredGroup(g.id)}
+                  className={`w-full flex items-center gap-2.5 px-3 py-2 text-left transition-colors cursor-default ${hoveredGroup === g.id ? "bg-[#F8FAFC]" : "hover:bg-[#F8FAFC]"}`}
+                >
+                  <span className="text-sm shrink-0">{g.countryFlag}</span>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[12px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{g.name}</p>
+                    <p className="text-[10px] text-[#94A3B8]">{g.memberCount} members · {g.country}</p>
+                  </div>
+                  <ChevronRight className="w-3 h-3 text-[#CBD5E1] shrink-0" />
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Hover card — shows for the hovered group */}
+          {hoveredGroup && (() => {
+            const g = groups.find((grp) => grp.id === hoveredGroup);
+            if (!g) return null;
+            return (
+              <div className="w-[280px] rounded-xl overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-[#E2E8F0]/60 self-start">
+                <div className="bg-gradient-to-br from-[#1E293B] to-[#334155] px-3.5 py-3 relative overflow-hidden">
+                  <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-white/[0.04]" />
+                  <div className="flex items-center justify-between relative">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="text-base shrink-0">{g.countryFlag}</span>
+                      <span className="text-white text-[13px] truncate" style={{ fontWeight: 600 }}>{g.name}</span>
+                    </div>
+                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] bg-white/10 text-[#94A3B8] shrink-0" style={{ fontWeight: 600 }}>
+                      Secondary
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-[#94A3B8] mt-1.5 relative">{g.country} Region</p>
+                </div>
+                <div className="bg-white px-3.5 py-3 space-y-3">
+                  <p className="text-[12px] text-[#475569] leading-relaxed line-clamp-3">{g.description}</p>
+                  <div className="flex items-center gap-4 pt-2 border-t border-[#F1F5F9]">
+                    <div className="flex items-center gap-1.5 text-[11px] text-[#64748B]">
+                      <Users className="w-3 h-3 text-[#94A3B8]" />
+                      <span style={{ fontWeight: 500 }}>{g.memberCount} partners</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-[11px] text-[#64748B]">
+                      <Globe className="w-3 h-3 text-[#94A3B8]" />
+                      <span style={{ fontWeight: 500 }}>{g.country}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+}
 
 function SidebarCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -1752,6 +1852,8 @@ function DashboardCustomizePanel({ open, onOpenChange, activeKpis, onToggleKpi, 
   formatDate: (d: string) => string;
 }) {
   const [searchQuery, setSearchQuery] = useState("");
+  const [panelTab, setPanelTab] = useState<"kpis" | "widgets">("kpis");
+  const [widgetSize, setWidgetSize] = useState<"sm" | "md" | "lg">("md");
   const [mounted, setMounted] = useState(false);
   const [visible, setVisible] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -1880,74 +1982,160 @@ function DashboardCustomizePanel({ open, onOpenChange, activeKpis, onToggleKpi, 
               className="w-full h-10 pl-10 pr-3 rounded-lg border border-border bg-white text-sm text-foreground placeholder:text-muted-foreground/50 outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-colors"
             />
           </div>
+
+          {/* Tab switcher: KPIs / Widgets */}
+          <div className="flex items-center gap-1 mt-3 p-0.5 rounded-lg bg-[#F1F5F9]">
+            {(["kpis", "widgets"] as const).map((t) => (
+              <button
+                key={t}
+                onClick={() => setPanelTab(t)}
+                className={`flex-1 text-[12px] py-1.5 rounded-md transition-all duration-150 cursor-pointer ${
+                  panelTab === t
+                    ? "bg-white text-[#0F172A] shadow-sm"
+                    : "text-[#64748B] hover:text-[#334155]"
+                }`}
+                style={{ fontWeight: panelTab === t ? 600 : 500 }}
+              >
+                {t === "kpis" ? "KPIs" : "Widgets"}
+              </button>
+            ))}
+          </div>
+
+          {/* Size selector — only for widgets tab */}
+          {panelTab === "widgets" && (
+            <div className="flex items-center gap-2 mt-3">
+              <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Size:</span>
+              <div className="flex items-center gap-1">
+                {([
+                  { key: "sm" as const, label: "S", w: "60px", h: "24px" },
+                  { key: "md" as const, label: "M", w: "80px", h: "32px" },
+                  { key: "lg" as const, label: "L", w: "100px", h: "40px" },
+                ] as const).map((sz) => (
+                  <button
+                    key={sz.key}
+                    onClick={() => setWidgetSize(sz.key)}
+                    className={`flex items-center justify-center rounded-md border text-[11px] transition-all duration-150 cursor-pointer ${
+                      widgetSize === sz.key
+                        ? "border-[#0A77FF]/30 bg-[#EBF3FF] text-[#0A77FF]"
+                        : "border-[#E2E8F0] bg-white text-[#64748B] hover:border-[#CBD5E1]"
+                    }`}
+                    style={{ width: 32, height: 28, fontWeight: widgetSize === sz.key ? 600 : 500 }}
+                  >
+                    {sz.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Scrollable content */}
         <div className="flex-1 overflow-y-auto px-4 pb-4 scrollbar-hide">
-          {categories.length === 0 && (
-            <div className="flex flex-col items-center py-12 text-muted-foreground">
-              <Search className="w-5 h-5 mb-2 opacity-40" />
-              <p className="text-xs text-muted-foreground/60">No metrics found</p>
+          {panelTab === "kpis" ? (
+            <>
+              {categories.length === 0 && (
+                <div className="flex flex-col items-center py-12 text-muted-foreground">
+                  <Search className="w-5 h-5 mb-2 opacity-40" />
+                  <p className="text-xs text-muted-foreground/60">No metrics found</p>
+                </div>
+              )}
+              {categories.map((cat) => (
+                <div key={cat.name} className="mt-5 first:mt-4">
+                  <div className="flex items-center gap-1.5 mb-2">
+                    {cat.name === "Financial" ? <DollarSign className="w-4 h-4 text-muted-foreground" /> : <Globe className="w-4 h-4 text-muted-foreground" />}
+                    <span className="text-[12px] text-muted-foreground/70 uppercase tracking-wide" style={{ fontWeight: 600 }}>{cat.name}</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    {cat.kpis.map((kpi) => {
+                      const isActive = activeKpis.includes(kpi.key);
+                      const computed = computeDashKpiValue(kpi.key, vendor, formatCurrency, formatDate);
+                      return (
+                        <button
+                          key={kpi.key}
+                          onClick={() => onToggleKpi(kpi.key)}
+                          className={`relative text-left rounded-lg border px-3 py-2.5 transition-all duration-150 cursor-pointer group ${
+                            isActive
+                              ? "border-[#0A77FF]/25 bg-[#0A77FF]/[0.04] shadow-[0_0_0_1px_rgba(10,119,255,0.08)]"
+                              : "border-border/60 bg-white hover:border-border hover:bg-muted/20 hover:shadow-sm"
+                          }`}
+                        >
+                          <div className="flex items-center justify-between gap-1">
+                            <span className={`text-[11.5px] truncate transition-colors ${isActive ? "text-[#0A77FF]" : "text-muted-foreground/70"}`} style={{ fontWeight: 500 }} title={kpi.label}>{kpi.label}</span>
+                            <div className="shrink-0">
+                              {isActive ? <Check className="w-3.5 h-3.5" style={{ color: "#0A77FF" }} /> : <Plus className="w-3.5 h-3.5 text-muted-foreground/25 group-hover:text-muted-foreground/50 transition-colors" />}
+                            </div>
+                          </div>
+                          <p className={`text-[15px] mt-1 transition-colors ${isActive ? "text-foreground" : "text-foreground/80"}`} style={{ fontWeight: 550 }}>{computed.value}</p>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </>
+          ) : (
+            /* ── Widgets tab — chart/widget previews ── */
+            <div className="mt-4 space-y-3">
+              {[
+                { key: "spend_trend", label: "Spend Trend", desc: "Monthly spend over time", icon: "TrendingUp", preview: "area" },
+                { key: "order_activity", label: "Order Activity", desc: "Orders placed per month", icon: "BarChart3", preview: "bar" },
+                { key: "spend_by_category", label: "Spend by Category", desc: "Breakdown by category", icon: "PieChart", preview: "pie" },
+                { key: "credit_health", label: "Credit Health", desc: "Utilization gauge", icon: "CreditCard", preview: "gauge" },
+                { key: "about_partner", label: "About Partner", desc: "Key partner details", icon: "Building2", preview: "info" },
+                { key: "primary_contact", label: "Primary Contact", desc: "Main contact person", icon: "User", preview: "contact" },
+              ].map((w) => {
+                const sizeLabel = widgetSize === "sm" ? "Small" : widgetSize === "md" ? "Medium" : "Large";
+                return (
+                  <div
+                    key={w.key}
+                    className="rounded-lg border border-[#E2E8F0] bg-white hover:border-[#CBD5E1] hover:shadow-sm transition-all duration-150 cursor-pointer overflow-hidden"
+                  >
+                    {/* Preview thumbnail */}
+                    <div className="bg-[#F8FAFC] border-b border-[#F1F5F9] flex items-center justify-center" style={{ height: widgetSize === "sm" ? 48 : widgetSize === "md" ? 64 : 80 }}>
+                      {w.preview === "area" && (
+                        <svg viewBox="0 0 120 40" className="w-[80%] h-[70%]" fill="none">
+                          <path d="M0 35 Q20 28 40 25 T80 15 T120 8 V40 H0Z" fill="#0A77FF" fillOpacity="0.08" />
+                          <path d="M0 35 Q20 28 40 25 T80 15 T120 8" stroke="#0A77FF" strokeWidth="1.5" fill="none" />
+                        </svg>
+                      )}
+                      {w.preview === "bar" && (
+                        <svg viewBox="0 0 120 40" className="w-[80%] h-[70%]" fill="none">
+                          {[10, 22, 30, 18, 35, 28, 32].map((h, i) => (
+                            <rect key={i} x={i * 17 + 2} y={40 - h} width="12" height={h} rx="2" fill="#0A77FF" fillOpacity={0.15 + i * 0.08} />
+                          ))}
+                        </svg>
+                      )}
+                      {w.preview === "pie" && (
+                        <svg viewBox="0 0 40 40" className="w-[50%] h-[70%]">
+                          <circle cx="20" cy="20" r="16" fill="none" stroke="#E2E8F0" strokeWidth="6" />
+                          <circle cx="20" cy="20" r="16" fill="none" stroke="#0A77FF" strokeWidth="6" strokeDasharray="40 100" strokeDashoffset="0" />
+                          <circle cx="20" cy="20" r="16" fill="none" stroke="#3B82F6" strokeWidth="6" strokeDasharray="30 100" strokeDashoffset="-40" />
+                          <circle cx="20" cy="20" r="16" fill="none" stroke="#93C5FD" strokeWidth="6" strokeDasharray="20 100" strokeDashoffset="-70" />
+                        </svg>
+                      )}
+                      {(w.preview === "gauge" || w.preview === "info" || w.preview === "contact") && (
+                        <div className="flex items-center gap-1.5">
+                          <div className="w-5 h-5 rounded bg-[#E2E8F0]" />
+                          <div className="space-y-1">
+                            <div className="w-16 h-1.5 rounded bg-[#E2E8F0]" />
+                            <div className="w-10 h-1.5 rounded bg-[#F1F5F9]" />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    {/* Card info */}
+                    <div className="px-3 py-2.5 flex items-center justify-between">
+                      <div className="min-w-0">
+                        <p className="text-[12px] text-[#0F172A]" style={{ fontWeight: 600 }}>{w.label}</p>
+                        <p className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 400 }}>{w.desc}</p>
+                      </div>
+                      <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#F1F5F9] text-[#64748B] border border-[#E2E8F0] shrink-0" style={{ fontWeight: 600 }}>{sizeLabel}</span>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           )}
-          {categories.map((cat) => (
-            <div key={cat.name} className="mt-5 first:mt-4">
-              {/* Category Header */}
-              <div className="flex items-center gap-1.5 mb-2">
-                {cat.name === "Financial" ? <DollarSign className="w-4 h-4 text-muted-foreground" /> : <Globe className="w-4 h-4 text-muted-foreground" />}
-                <span
-                  className="text-[12px] text-muted-foreground/70 uppercase tracking-wide"
-                  style={{ fontWeight: 600 }}
-                >
-                  {cat.name}
-                </span>
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                {cat.kpis.map((kpi) => {
-                  const isActive = activeKpis.includes(kpi.key);
-                  const computed = computeDashKpiValue(kpi.key, vendor, formatCurrency, formatDate);
-                  return (
-                    <button
-                      key={kpi.key}
-                      onClick={() => onToggleKpi(kpi.key)}
-                      className={`relative text-left rounded-lg border px-3 py-2.5 transition-all duration-150 cursor-pointer group ${
-                        isActive
-                          ? "border-[#0A77FF]/25 bg-[#0A77FF]/[0.04] shadow-[0_0_0_1px_rgba(10,119,255,0.08)]"
-                          : "border-border/60 bg-white hover:border-border hover:bg-muted/20 hover:shadow-sm"
-                      }`}
-                    >
-                      <div className="flex items-center justify-between gap-1">
-                        <span
-                          className={`text-[11.5px] truncate transition-colors ${
-                            isActive ? "text-[#0A77FF]" : "text-muted-foreground/70"
-                          }`}
-                          style={{ fontWeight: 500 }}
-                          title={kpi.label}
-                        >
-                          {kpi.label}
-                        </span>
-                        <div className="shrink-0">
-                          {isActive ? (
-                            <Check className="w-3.5 h-3.5" style={{ color: "#0A77FF" }} />
-                          ) : (
-                            <Plus className="w-3.5 h-3.5 text-muted-foreground/25 group-hover:text-muted-foreground/50 transition-colors" />
-                          )}
-                        </div>
-                      </div>
-                      <p
-                        className={`text-[15px] mt-1 transition-colors ${
-                          isActive ? "text-foreground" : "text-foreground/80"
-                        }`}
-                        style={{ fontWeight: 550 }}
-                      >
-                        {computed.value}
-                      </p>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
         </div>
       </div>
     </>
@@ -2166,7 +2354,7 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate }: {
       </div>
 
       {/* ═══ RIGHT COLUMN — Information Cards ═══ */}
-      <div className="space-y-3.5 min-w-0 overflow-hidden">
+      <div className="space-y-3.5 min-w-0 overflow-hidden xl:sticky xl:bottom-5 xl:top-[160px] xl:self-end">
 
         {/* Partner Information */}
         <DashInfoCard title="Partner Information" icon={Building2}>
@@ -2252,9 +2440,9 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate }: {
           </div>
         </DashInfoCard>
 
-        {/* Financial Overview */}
-        <DashInfoCard title="Financial Overview" icon={Wallet} tooltip="Key financial configuration for this partner including transaction currency, payment routing, and performance rating.">
-          <div className="grid grid-cols-2 gap-x-4 gap-y-2.5">
+        {/* Financial Overview & Cash Flow — merged */}
+        <DashInfoCard title="Financial Summary" icon={Wallet} tooltip="Financial overview including currency, cash flow, and outstanding obligations for this partner.">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 mb-3">
             <div className="min-w-0">
               <DashInfoLabel>Currency</DashInfoLabel>
               <p className="text-[12.5px] text-[#0F172A]" style={{ fontWeight: 600 }}>USD ($)</p>
@@ -2282,40 +2470,36 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate }: {
               </p>
             </div>
           </div>
-        </DashInfoCard>
-
-        {/* Cash Flow */}
-        <DashInfoCard title="Cash Flow" icon={Banknote} tooltip="Net cash movement for this partner. Inflows include payments received, outflows include disbursements and refunds. Outstanding shows unpaid obligations.">
-          <div className="space-y-3">
-            <div>
-              <DashInfoLabel tooltip="Total payments received from or on behalf of this partner, including early payment discounts captured.">Total Cash In Flow</DashInfoLabel>
-              <p className="text-[16px] text-[#059669]" style={{ fontWeight: 700 }}>{formatCurrency(totalCashIn)}</p>
-            </div>
-            <div>
-              <DashInfoLabel tooltip="Total disbursements made to this partner, including PO payments, freight charges, and adjustments.">Total Cash Out Flow</DashInfoLabel>
-              <p className="text-[16px] text-[#DC2626]" style={{ fontWeight: 700 }}>{formatCurrency(totalCashOut)}</p>
-            </div>
-            <div className="pt-2.5 border-t border-[#F1F5F9]">
-              <div className="flex items-center gap-1 mb-px">
-                <p className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Outstanding Payables</p>
-                <DetailRichTooltip data={{
-                  title: "OUTSTANDING PAYABLES",
-                  description: "Total unpaid obligations to this partner. Includes approved invoices awaiting payment, overdue amounts past their due date, and scheduled future payments.",
-                  breakdown: [
-                    { label: "Pending Invoices", value: formatCurrency(Math.round(vendor.outstandingBalance * 0.55)) },
-                    { label: "Overdue Payments", value: formatCurrency(Math.round(vendor.outstandingBalance * 0.30)) },
-                    { label: "Scheduled Payments", value: formatCurrency(Math.round(vendor.outstandingBalance * 0.15)) },
-                    { label: "Total Outstanding", value: formatCurrency(vendor.outstandingBalance), isResult: true },
-                  ],
-                  formula: "Outstanding = Pending + Overdue + Scheduled",
-                }}>
-                  <span className="inline-flex shrink-0"><Info className="w-2.5 h-2.5 text-[#D1D5DB] hover:text-[#94A3B8] transition-colors cursor-help" /></span>
-                </DetailRichTooltip>
+          <div className="border-t border-[#F1F5F9] pt-3 space-y-2.5">
+            <div className="grid grid-cols-2 gap-x-4">
+              <div className="min-w-0">
+                <DashInfoLabel tooltip="Total payments received from or on behalf of this partner.">Cash Inflow</DashInfoLabel>
+                <p className="text-[15px] text-[#059669]" style={{ fontWeight: 700 }}>{formatCurrency(totalCashIn)}</p>
               </div>
-              <div className="flex items-baseline gap-2">
-                <p className="text-[16px] text-[#0F172A]" style={{ fontWeight: 700 }}>{formatCurrency(vendor.outstandingBalance)}</p>
-                <button className="text-[11px] text-[#0A77FF] hover:underline cursor-pointer" style={{ fontWeight: 500 }}>Invoice Details</button>
+              <div className="min-w-0">
+                <DashInfoLabel tooltip="Total disbursements made to this partner.">Cash Outflow</DashInfoLabel>
+                <p className="text-[15px] text-[#DC2626]" style={{ fontWeight: 700 }}>{formatCurrency(totalCashOut)}</p>
               </div>
+            </div>
+            <div className="flex items-center gap-1 mb-px">
+              <p className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Outstanding Payables</p>
+              <DetailRichTooltip data={{
+                title: "OUTSTANDING PAYABLES",
+                description: "Total unpaid obligations to this partner.",
+                breakdown: [
+                  { label: "Pending Invoices", value: formatCurrency(Math.round(vendor.outstandingBalance * 0.55)) },
+                  { label: "Overdue Payments", value: formatCurrency(Math.round(vendor.outstandingBalance * 0.30)) },
+                  { label: "Scheduled Payments", value: formatCurrency(Math.round(vendor.outstandingBalance * 0.15)) },
+                  { label: "Total Outstanding", value: formatCurrency(vendor.outstandingBalance), isResult: true },
+                ],
+                formula: "Outstanding = Pending + Overdue + Scheduled",
+              }}>
+                <span className="inline-flex shrink-0"><Info className="w-2.5 h-2.5 text-[#D1D5DB] hover:text-[#94A3B8] transition-colors cursor-help" /></span>
+              </DetailRichTooltip>
+            </div>
+            <div className="flex items-baseline gap-2">
+              <p className="text-[15px] text-[#0F172A]" style={{ fontWeight: 700 }}>{formatCurrency(vendor.outstandingBalance)}</p>
+              <button className="text-[11px] text-[#0A77FF] hover:underline cursor-pointer" style={{ fontWeight: 500 }}>Invoice Details</button>
             </div>
           </div>
         </DashInfoCard>
