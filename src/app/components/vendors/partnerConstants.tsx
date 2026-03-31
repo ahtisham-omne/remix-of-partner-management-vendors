@@ -780,13 +780,13 @@ export type PaymentMethodType = "ach" | "wire" | "card" | "digital_wallet" | "ch
 export type PaymentTypeCategory = "Bank" | "Card" | "Digital" | "Traditional" | "Other";
 
 export const PAYMENT_TYPE_CARDS: { id: PaymentMethodType; label: string; description: string; icon: React.ElementType; category: PaymentTypeCategory }[] = [
-  { id: "ach", label: "ACH / Direct Deposit", description: "Electronic bank transfer via ACH network", icon: CircleDollarSign, category: "Bank" },
-  { id: "wire", label: "Wire Transfer", description: "Domestic or international bank wire transfer", icon: Landmark, category: "Bank" },
-  { id: "card", label: "Credit / Debit Card", description: "Visa, Mastercard, Amex and other card networks", icon: CreditCard, category: "Card" },
-  { id: "digital_wallet", label: "Digital Wallet", description: "PayPal, Venmo, Stripe, Apple Pay, Google Pay", icon: Wallet, category: "Digital" },
-  { id: "check", label: "Check (Paper)", description: "Physical paper check payment via mail", icon: Receipt, category: "Traditional" },
-  { id: "cash", label: "Cash", description: "Physical cash payment at collection point", icon: Banknote, category: "Traditional" },
-  { id: "other", label: "Other (Record Only)", description: "Custom payment method for record-keeping", icon: FileText, category: "Other" },
+  { id: "ach", label: "ACH / Direct Deposit", description: "Electronic bank transfer through the ACH network. Common for US-based vendors.", icon: CircleDollarSign, category: "Bank" },
+  { id: "wire", label: "Wire Transfer", description: "Direct bank-to-bank transfer. Suitable for domestic or international payments where ACH is not available.", icon: Landmark, category: "Bank" },
+  { id: "card", label: "Credit / Debit Card", description: "Card payment via Visa, Mastercard, Amex, or other card networks.", icon: CreditCard, category: "Card" },
+  { id: "digital_wallet", label: "Digital Wallet", description: "Payment through platforms such as PayPal, Venmo, Stripe, Apple Pay, or Google Pay.", icon: Wallet, category: "Digital" },
+  { id: "check", label: "Check (Paper)", description: "Physical paper check sent by mail. Used when electronic payment is not accepted.", icon: Receipt, category: "Traditional" },
+  { id: "cash", label: "Cash", description: "Physical cash payment collected at a designated collection point.", icon: Banknote, category: "Traditional" },
+  { id: "other", label: "Other (Record Only)", description: "A custom payment method for record-keeping only. No transaction is processed through the system.", icon: FileText, category: "Other" },
 ];
 
 // ── Payment Terms Presets ──

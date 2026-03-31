@@ -40,7 +40,7 @@ export function InfoTooltip({
             side={side}
             sideOffset={sideOffset}
             className={cn(
-              "z-[300] max-w-[240px] rounded-xl bg-white text-[#334155] border border-[#E2E8F0] px-3 py-2 text-[12px] leading-[1.5] shadow-[0_4px_20px_-4px_rgba(0,0,0,0.1),0_0_0_1px_rgba(0,0,0,0.03)] animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+              "z-[300] max-w-[240px] rounded-xl bg-white/95 backdrop-blur-md text-[#334155] border border-[#E2E8F0]/80 px-3.5 py-2.5 text-[11px] leading-relaxed shadow-[0_8px_32px_-8px_rgba(0,0,0,0.12),0_4px_12px_-4px_rgba(0,0,0,0.05)] animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
               className,
             )}
           >

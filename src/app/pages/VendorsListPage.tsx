@@ -3,6 +3,14 @@ import { createPortal } from "react-dom";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useVendors } from "../context/VendorContext";
 import { VendorStatusBadge } from "../components/vendors/VendorStatusBadge";
+import fedexLogo from "@/assets/carriers/fedex.png";
+import dhlLogo from "@/assets/carriers/dhl.png";
+import upsLogo from "@/assets/carriers/ups.png";
+import tcsLogo from "@/assets/carriers/tcs.png";
+import sfLogo from "@/assets/carriers/sf.png";
+import uspsLogo from "@/assets/carriers/usps.png";
+import aramexLogo from "@/assets/carriers/aramex.png";
+import maerskLogo from "@/assets/carriers/maersk.png";
 import { ColumnSelector, ColumnSelectorTrigger, type ColumnConfig } from "../components/vendors/ColumnSelector";
 import {
   KpiInsightsPanel,
@@ -92,11 +100,13 @@ import {
   CircleSlash,
   ArchiveRestore,
   AlertTriangle,
+  Info,
 } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { Checkbox } from "../components/ui/checkbox";
 import { OverflowTooltip } from "../components/vendors/OverflowTooltip";
+import { Tooltip, TooltipTrigger, TooltipContent } from "../components/ui/tooltip";
 import { QuickViewPanel, type QuickViewData } from "../components/vendors/QuickViewPanel";
 import {
   FiltersModal,
@@ -114,6 +124,7 @@ const DND_LIST_KPI = "LIST_KPI_CARD";
 // Module refresh v7
 type QuickFilter = "all" | "customers" | "vendors" | "active" | "inactive" | "archived";
 type DensityOption = "condensed" | "comfort" | "card";
+type CardSize = "large" | "medium" | "small";
 
 const DENSITY_CONFIG: {
   key: DensityOption;
@@ -184,6 +195,7 @@ export function VendorsListPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [quickFilter, setQuickFilter] = useState<QuickFilter>("all");
   const [density, setDensity] = useState<DensityOption>("condensed");
+  const [cardSize, setCardSize] = useState<CardSize>("medium");
   const [archiveDialogOpen, setArchiveDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [markActiveDialogOpen, setMarkActiveDialogOpen] = useState(false);
@@ -950,16 +962,100 @@ export function VendorsListPage() {
     }
   };
 
-  const getPartnerIcon = (name: string): { emoji: string; bg: string } => {
-    const icons: Record<string, string> = {
-      Toyota: "\u{1F697}", UPS: "\u{1F4E6}", "General Motors": "\u{1F3ED}", Tesla: "\u26A1",
-      FedEx: "\u2708\uFE0F", BMW: "\u{1F535}", Ford: "\u{1F3CE}\uFE0F", Honda: "\u{1F534}",
+  // Sample avatar photos for people (POC, Created By)
+  const getPersonAvatar = (name: string): string | undefined => {
+    const avatars: Record<string, string> = {
+      "Sarah": "https://randomuser.me/api/portraits/women/44.jpg",
+      "Michael": "https://randomuser.me/api/portraits/men/32.jpg",
+      "Emily": "https://randomuser.me/api/portraits/women/65.jpg",
+      "David": "https://randomuser.me/api/portraits/men/75.jpg",
+      "Rachel": "https://randomuser.me/api/portraits/women/28.jpg",
+      "James": "https://randomuser.me/api/portraits/men/46.jpg",
+      "Lisa": "https://randomuser.me/api/portraits/women/17.jpg",
+      "Robert": "https://randomuser.me/api/portraits/men/22.jpg",
+      "Amanda": "https://randomuser.me/api/portraits/women/56.jpg",
+      "Kevin": "https://randomuser.me/api/portraits/men/64.jpg",
+      "Maria": "https://randomuser.me/api/portraits/women/33.jpg",
+      "Chris": "https://randomuser.me/api/portraits/men/85.jpg",
+      "Jessica": "https://randomuser.me/api/portraits/women/91.jpg",
+      "Andrew": "https://randomuser.me/api/portraits/men/41.jpg",
+      "Nicole": "https://randomuser.me/api/portraits/women/72.jpg",
+      "Thomas": "https://randomuser.me/api/portraits/men/55.jpg",
+      "Stephanie": "https://randomuser.me/api/portraits/women/15.jpg",
+      "Daniel": "https://randomuser.me/api/portraits/men/18.jpg",
+      "Karen": "https://randomuser.me/api/portraits/women/48.jpg",
+      "Brian": "https://randomuser.me/api/portraits/men/67.jpg",
+      "Ahtisham": "https://randomuser.me/api/portraits/men/36.jpg",
+      "Abdullah": "https://randomuser.me/api/portraits/men/29.jpg",
+    };
+    const firstName = name.split(" ")[0];
+    return avatars[firstName];
+  };
+
+  const getPartnerIcon = (name: string, website?: string): { bg: string; logoUrl?: string; initials: string } => {
+    const logos: Record<string, string> = {
+      Toyota: "https://logo.clearbit.com/toyota.com",
+      Tesla: "https://logo.clearbit.com/tesla.com",
+      Ford: "https://logo.clearbit.com/ford.com",
+      BMW: "https://logo.clearbit.com/bmw.com",
+      Honda: "https://logo.clearbit.com/honda.com",
+      "General Motors": "https://logo.clearbit.com/gm.com",
+      FedEx: "https://logo.clearbit.com/fedex.com",
+      UPS: "https://logo.clearbit.com/ups.com",
+      Nissan: "https://logo.clearbit.com/nissan-global.com",
+      Hyundai: "https://logo.clearbit.com/hyundai.com",
+      Volvo: "https://logo.clearbit.com/volvocars.com",
+      Rivian: "https://logo.clearbit.com/rivian.com",
+      Mercedes: "https://logo.clearbit.com/mercedes-benz.com",
+      Volkswagen: "https://logo.clearbit.com/volkswagen.com",
+      Audi: "https://logo.clearbit.com/audi.com",
+      Porsche: "https://logo.clearbit.com/porsche.com",
+      Subaru: "https://logo.clearbit.com/subaru.com",
+      Mazda: "https://logo.clearbit.com/mazda.com",
+      Kia: "https://logo.clearbit.com/kia.com",
+      Chrysler: "https://logo.clearbit.com/stellantis.com",
+      Lexus: "https://logo.clearbit.com/lexus.com",
+      Acura: "https://logo.clearbit.com/acura.com",
+      Jeep: "https://logo.clearbit.com/jeep.com",
+      Dodge: "https://logo.clearbit.com/dodge.com",
+      Lucid: "https://logo.clearbit.com/lucidmotors.com",
+      Ferrari: "https://logo.clearbit.com/ferrari.com",
+      Lamborghini: "https://logo.clearbit.com/lamborghini.com",
+      Maserati: "https://logo.clearbit.com/maserati.com",
+      Bentley: "https://logo.clearbit.com/bentleymotors.com",
+      McLaren: "https://logo.clearbit.com/mclaren.com",
+      BYD: "https://logo.clearbit.com/byd.com",
+      Suzuki: "https://logo.clearbit.com/suzuki.com",
+      Mitsubishi: "https://logo.clearbit.com/mitsubishi-motors.com",
+      Infiniti: "https://logo.clearbit.com/infinitiusa.com",
+      Lincoln: "https://logo.clearbit.com/lincoln.com",
+      Cadillac: "https://logo.clearbit.com/cadillac.com",
+      Buick: "https://logo.clearbit.com/buick.com",
+      MINI: "https://logo.clearbit.com/mini.com",
+      Peugeot: "https://logo.clearbit.com/peugeot.com",
+      Tata: "https://logo.clearbit.com/tatamotors.com",
+      Geely: "https://logo.clearbit.com/geely.com",
+      Jaguar: "https://logo.clearbit.com/jaguarlandrover.com",
+      "Aston Martin": "https://logo.clearbit.com/astonmartin.com",
+      "Rolls-Royce": "https://logo.clearbit.com/rolls-roycemotorcars.com",
+      Polestar: "https://logo.clearbit.com/polestar.com",
+      Genesis: "https://logo.clearbit.com/genesis.com",
+      RAM: "https://logo.clearbit.com/ramtrucks.com",
     };
     const tint = getAvatarTint(name);
-    for (const key of Object.keys(icons)) {
-      if (name.includes(key)) return { emoji: icons[key], bg: tint.bg };
+    const initials = name.split(/[\s&]+/).filter(Boolean).map(w => w[0]).slice(0, 2).join("").toUpperCase();
+    let logoUrl: string | undefined;
+    for (const key of Object.keys(logos)) {
+      if (name.includes(key)) { logoUrl = logos[key]; break; }
     }
-    return { emoji: "\u2014", bg: tint.bg };
+    // Fallback: use vendor website for Clearbit logo if no name match
+    if (!logoUrl && website) {
+      const domain = website.replace(/^https?:\/\//, "").replace(/^www\./, "").split("/")[0];
+      if (domain && domain.includes(".")) {
+        logoUrl = `https://logo.clearbit.com/${domain}`;
+      }
+    }
+    return { bg: tint.bg, logoUrl, initials };
   };
 
   const getPageNumbers = () => {
@@ -1099,6 +1195,31 @@ export function VendorsListPage() {
               <div className="grid gap-2.5" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(210px, 1fr))" }}>
                 {activeKpiDefs.map((kpi, idx) => {
                   const value = computeKpiValue(kpi.key, vendors);
+                  // Populate rich tooltip breakdowns with live data (only for complex KPIs)
+                  const tooltipData = KPI_TOOLTIP_DATA[kpi.key];
+                  if (tooltipData) {
+                    const totalCredit = vendors.reduce((s, v) => s + (v.creditLimit || 0), 0);
+                    const totalUtil = vendors.reduce((s, v) => s + (v.creditUtilization || 0), 0);
+                    const totalOutstanding = vendors.reduce((s, v) => s + (v.outstandingBalance || 0), 0);
+                    const fmt = (n: number) => n >= 1_000_000 ? `$${(n/1_000_000).toFixed(1)}M` : n >= 1_000 ? `$${(n/1_000).toFixed(0)}K` : `$${n.toFixed(0)}`;
+                    if (kpi.key === "total_credit_utilization") {
+                      tooltipData.breakdown = [
+                        { label: "Total Credit Limit", value: fmt(totalCredit) },
+                        { label: "Currently Utilized", value: fmt(totalUtil) },
+                        { label: "Available Credit", value: fmt(totalCredit - totalUtil), isResult: true },
+                      ];
+                    } else if (kpi.key === "total_outstanding") {
+                      const pending = Math.round(totalOutstanding * 0.55);
+                      const overdue = Math.round(totalOutstanding * 0.30);
+                      const scheduled = totalOutstanding - pending - overdue;
+                      tooltipData.breakdown = [
+                        { label: "Pending Invoices", value: fmt(pending) },
+                        { label: "Overdue Payments", value: fmt(overdue) },
+                        { label: "Scheduled Payments", value: fmt(scheduled) },
+                        { label: "Total Outstanding", value: fmt(totalOutstanding), isResult: true },
+                      ];
+                    }
+                  }
                   return (
                     <DraggableListKpiCard
                       key={kpi.key}
@@ -1107,6 +1228,7 @@ export function VendorsListPage() {
                       label={kpi.label}
                       value={value}
                       iconName={kpi.iconName}
+                      tooltip={kpi.tooltip}
                       moveCard={moveKpi}
                       onRemove={() => handleToggleKpi(kpi.key)}
                     />
@@ -1256,6 +1378,31 @@ export function VendorsListPage() {
                           {density === opt.key && <Check className="w-4 h-4 shrink-0" style={{ color: '#0A77FF' }} />}
                         </DropdownMenuItem>
                       ))}
+                      {/* Card size options — only when card view is active */}
+                      {density === "card" && (
+                        <>
+                          <div className="mx-2 my-1.5 border-t border-[#F1F5F9]" />
+                          <div className="px-3 py-1.5">
+                            <p className="text-[10px] text-[#94A3B8] uppercase tracking-wide mb-2" style={{ fontWeight: 600 }}>Card Size</p>
+                            <div className="flex items-center gap-1.5">
+                              {(["large", "medium", "small"] as const).map((size) => (
+                                <button
+                                  key={size}
+                                  onClick={() => setCardSize(size)}
+                                  className={`flex-1 py-1.5 rounded-md text-[11px] text-center transition-all cursor-pointer ${
+                                    cardSize === size
+                                      ? "bg-[#0A77FF] text-white shadow-sm"
+                                      : "bg-[#F1F5F9] text-[#64748B] hover:bg-[#E2E8F0]"
+                                  }`}
+                                  style={{ fontWeight: cardSize === size ? 600 : 500 }}
+                                >
+                                  {size === "large" ? "Large" : size === "medium" ? "Medium" : "Small"}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        </>
+                      )}
                     </DropdownMenuContent>
                   </DropdownMenu>
                   <ColumnSelectorTrigger
@@ -1349,24 +1496,25 @@ export function VendorsListPage() {
                       )}
                     </div>
                   ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                    <div className={`grid gap-4 ${
+                      cardSize === "large" ? "grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2" :
+                      cardSize === "small" ? "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5" :
+                      "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+                    }`}>
                       {paginatedVendors.map((vendor) => {
-                        const icon = getPartnerIcon(vendor.companyName);
+                        const icon = getPartnerIcon(vendor.companyName, vendor.website);
                         const partnerTypes = vendor.partnerTypes || [];
                         return (
                           <div
                             key={vendor.id}
-                            className={`bg-card border border-border rounded-xl p-4 cursor-pointer hover:shadow-md hover:border-primary/20 transition-all ${newlyCreatedId === vendor.id ? "animate-row-flash" : ""}`}
+                            className={`bg-card border border-border rounded-xl cursor-pointer hover:shadow-md hover:border-primary/20 transition-all ${newlyCreatedId === vendor.id ? "animate-row-flash" : ""} ${
+                              cardSize === "large" ? "p-5" : cardSize === "small" ? "p-3" : "p-4"
+                            }`}
                             onClick={() => navigate(`/vendors/${vendor.id}`)}
                           >
                             <div className="flex items-start justify-between mb-3">
                               <div className="flex items-center gap-3 min-w-0">
-                                <div
-                                  className="w-9 h-9 rounded-md flex items-center justify-center text-sm shrink-0"
-                                  style={{ backgroundColor: icon.bg }}
-                                >
-                                  {icon.emoji}
-                                </div>
+                                <LogoAvatar logoUrl={icon.logoUrl} initials={icon.initials} bg={icon.bg} size={cardSize === "large" ? "lg" : cardSize === "small" ? "sm" : "md"} />
                                 <div className="min-w-0">
                                   <p className="text-sm truncate" style={{ fontWeight: 500 }}>
                                     {highlightText(vendor.displayName)}
@@ -1411,23 +1559,21 @@ export function VendorsListPage() {
                               ))}
                               {vendor.vendorSubTypes && vendor.vendorSubTypes.length > 0 && (
                                 <>
-                                  <span className="inline-flex items-center gap-0.5 px-1.5 py-px rounded-full text-[9px] border" style={{ fontWeight: 500, backgroundColor: "#EFF6FF", color: "#1E40AF", borderColor: "#BFDBFE" }}>
-                                    <span className="w-1 h-1 rounded-full" style={{ backgroundColor: "#3B82F6" }} />
+                                  <span className="inline-flex items-center px-1.5 py-px rounded-full text-[9px] border" style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#475569", borderColor: "#E2E8F0" }}>
                                     {vendor.vendorSubTypes[0]}
                                   </span>
                                   {vendor.vendorSubTypes.length > 1 && (
-                                    <span className="inline-flex items-center px-1 py-px rounded-full text-[9px] border" style={{ fontWeight: 600, backgroundColor: "#EFF6FF", color: "#2563EB", borderColor: "#BFDBFE" }}>+{vendor.vendorSubTypes.length - 1}</span>
+                                    <span className="inline-flex items-center px-1 py-px rounded-full text-[9px] border" style={{ fontWeight: 600, backgroundColor: "#F1F5F9", color: "#475569", borderColor: "#E2E8F0" }}>+{vendor.vendorSubTypes.length - 1}</span>
                                   )}
                                 </>
                               )}
                               {vendor.customerSubTypes && vendor.customerSubTypes.length > 0 && (
                                 <>
-                                  <span className="inline-flex items-center gap-0.5 px-1.5 py-px rounded-full text-[9px] border" style={{ fontWeight: 500, backgroundColor: "#F5F3FF", color: "#5B21B6", borderColor: "#DDD6FE" }}>
-                                    <span className="w-1 h-1 rounded-full" style={{ backgroundColor: "#8B5CF6" }} />
+                                  <span className="inline-flex items-center px-1.5 py-px rounded-full text-[9px] border" style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#475569", borderColor: "#E2E8F0" }}>
                                     {vendor.customerSubTypes[0]}
                                   </span>
                                   {vendor.customerSubTypes.length > 1 && (
-                                    <span className="inline-flex items-center px-1 py-px rounded-full text-[9px] border" style={{ fontWeight: 600, backgroundColor: "#F5F3FF", color: "#7C3AED", borderColor: "#DDD6FE" }}>+{vendor.customerSubTypes.length - 1}</span>
+                                    <span className="inline-flex items-center px-1 py-px rounded-full text-[9px] border" style={{ fontWeight: 600, backgroundColor: "#F1F5F9", color: "#475569", borderColor: "#E2E8F0" }}>+{vendor.customerSubTypes.length - 1}</span>
                                   )}
                                 </>
                               )}
@@ -1595,7 +1741,7 @@ export function VendorsListPage() {
                         </TableRow>
                       ) : (
                         paginatedVendors.map((vendor) => {
-                          const icon = getPartnerIcon(vendor.companyName);
+                          const icon = getPartnerIcon(vendor.companyName, vendor.website);
                           const itemCodes = vendor.itemCodes || [];
                           const partnerLocations = vendor.partnerLocations || [];
                           const globalPointOfContacts = vendor.globalPointOfContacts || [];
@@ -1612,9 +1758,7 @@ export function VendorsListPage() {
                                 return (
                                   <TableCell key={colKey}>
                                     <div className={`flex items-center ${isRelaxed ? "gap-3" : "gap-2.5"}`}>
-                                      <div className={`${isRelaxed ? "w-9 h-9 text-sm" : "w-7 h-7 text-xs"} rounded-md flex items-center justify-center shrink-0`} style={{ backgroundColor: icon.bg }}>
-                                        {icon.emoji}
-                                      </div>
+                                      <LogoAvatar logoUrl={icon.logoUrl} initials={icon.initials} bg={icon.bg} size={isRelaxed ? "lg" : "md"} />
                                       <div className="min-w-0">
                                         <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate block max-w-[170px]`} style={{ fontWeight: 500 }}>{highlightText(vendor.displayName)}</span>
                                         {isRelaxed && vendor.emailAddress && (
@@ -1643,7 +1787,7 @@ export function VendorsListPage() {
                                   <TableCell key={colKey}>
                                     {vst.length > 0 ? (
                                       <div className={`flex items-center ${isRelaxed ? "gap-1.5" : "gap-1"}`}>
-                                        <span className={`inline-flex items-center ${isRelaxed ? "px-2.5 py-[3px] text-xs" : "px-2 py-[2px] text-[11px]"} rounded-md border`} style={{ fontWeight: 500, backgroundColor: "#EFF6FF", color: "#1E40AF", borderColor: "#BFDBFE" }}>
+                                        <span className={`inline-flex items-center ${isRelaxed ? "px-2.5 py-1 text-xs" : "px-2 py-0.5 text-xs"} rounded-md border`} style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#475569", borderColor: "#E2E8F0" }}>
                                           {vst[0]}
                                         </span>
                                         {vstExtra > 0 && (
@@ -1655,7 +1799,7 @@ export function VendorsListPage() {
                                               subtitle: "VENDOR SUB-TYPE",
                                             }))}
                                           >
-                                            <span className="inline-flex items-center px-1.5 py-[2px] rounded-full text-[11px] border cursor-default" style={{ fontWeight: 600, backgroundColor: "#EFF6FF", color: "#2563EB", borderColor: "#BFDBFE" }}>+{vstExtra}</span>
+                                            <span className="inline-flex items-center px-1.5 py-0.5 rounded-md text-xs border cursor-default" style={{ fontWeight: 600, backgroundColor: "#F1F5F9", color: "#475569", borderColor: "#E2E8F0" }}>+{vstExtra}</span>
                                           </OverflowTooltip>
                                         )}
                                       </div>
@@ -1670,7 +1814,7 @@ export function VendorsListPage() {
                                   <TableCell key={colKey}>
                                     {cst.length > 0 ? (
                                       <div className={`flex items-center ${isRelaxed ? "gap-1.5" : "gap-1"}`}>
-                                        <span className={`inline-flex items-center ${isRelaxed ? "px-2.5 py-[3px] text-xs" : "px-2 py-[2px] text-[11px]"} rounded-md border`} style={{ fontWeight: 500, backgroundColor: "#F5F3FF", color: "#5B21B6", borderColor: "#DDD6FE" }}>
+                                        <span className={`inline-flex items-center ${isRelaxed ? "px-2.5 py-1 text-xs" : "px-2 py-0.5 text-xs"} rounded-md border`} style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#475569", borderColor: "#E2E8F0" }}>
                                           {cst[0]}
                                         </span>
                                         {cstExtra > 0 && (
@@ -1682,7 +1826,7 @@ export function VendorsListPage() {
                                               subtitle: "CUSTOMER SUB-TYPE",
                                             }))}
                                           >
-                                            <span className="inline-flex items-center px-1.5 py-[2px] rounded-full text-[11px] border cursor-default" style={{ fontWeight: 600, backgroundColor: "#F5F3FF", color: "#7C3AED", borderColor: "#DDD6FE" }}>+{cstExtra}</span>
+                                            <span className="inline-flex items-center px-1.5 py-0.5 rounded-md text-xs border cursor-default" style={{ fontWeight: 600, backgroundColor: "#F1F5F9", color: "#475569", borderColor: "#E2E8F0" }}>+{cstExtra}</span>
                                           </OverflowTooltip>
                                         )}
                                       </div>
@@ -1738,10 +1882,9 @@ export function VendorsListPage() {
                                     <div className={`flex items-center ${isRelaxed ? "gap-2.5" : "gap-2"}`}>
                                       {globalPointOfContacts.length > 0 ? (
                                         <>
-                                          {(() => { const t = getAvatarTint(globalPointOfContacts[0]?.name || ""); return (
-                                          <div className={`${isRelaxed ? "w-8 h-8 text-[11px]" : "w-6 h-6 text-[10px]"} rounded-md flex items-center justify-center shrink-0`} style={{ backgroundColor: t.bg, color: t.fg, fontWeight: 600 }}>
-                                            {globalPointOfContacts[0]?.initials}
-                                          </div>); })()}
+                                          {(() => { const photoUrl = getPersonAvatar(globalPointOfContacts[0]?.name || ""); const t = getAvatarTint(globalPointOfContacts[0]?.name || ""); return (
+                                          <LogoAvatar logoUrl={photoUrl} initials={globalPointOfContacts[0]?.initials || "?"} bg={t.bg} size={isRelaxed ? "lg" : "md"} type="person" />
+                                          ); })()}
                                           <div className="min-w-0">
                                             <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate block max-w-[90px]`}>{highlightText(globalPointOfContacts[0]?.name)}</span>
                                             {isRelaxed && (globalPointOfContacts[0] as any)?.role && (
@@ -1819,10 +1962,9 @@ export function VendorsListPage() {
                                     <div className={`flex items-center ${isRelaxed ? "gap-2.5" : "gap-2"}`}>
                                       {vendor.createdByContact ? (
                                         <>
-                                          {(() => { const t = getAvatarTint(vendor.createdByContact.name || ""); return (
-                                          <div className={`${isRelaxed ? "w-8 h-8 text-[11px]" : "w-6 h-6 text-[10px]"} rounded-md flex items-center justify-center shrink-0`} style={{ backgroundColor: t.bg, color: t.fg, fontWeight: 600 }}>
-                                            {vendor.createdByContact.initials}
-                                          </div>); })()}
+                                          {(() => { const photoUrl = getPersonAvatar(vendor.createdByContact.name || ""); const t = getAvatarTint(vendor.createdByContact.name || ""); return (
+                                          <LogoAvatar logoUrl={photoUrl} initials={vendor.createdByContact.initials || "?"} bg={t.bg} size={isRelaxed ? "lg" : "md"} type="person" />
+                                          ); })()}
                                           <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate max-w-[120px]`}>{highlightText(vendor.createdByContact.name)}</span>
                                         </>
                                       ) : (<span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} text-muted-foreground`}>{"\u2013"}</span>)}
@@ -2379,6 +2521,111 @@ export function VendorsListPage() {
   );
 }
 
+// ── Rich KPI Tooltip Data ──
+interface KpiTooltipData {
+  title: string;
+  description: string;
+  breakdown: { label: string; value: string; isResult?: boolean }[];
+  formula: string;
+}
+
+// Only complex/calculated KPIs get the rich tooltip — simple counts use plain tooltips
+const KPI_TOOLTIP_DATA: Record<string, KpiTooltipData> = {
+  total_credit_utilization: {
+    title: "CREDIT UTILIZATION",
+    description: "Sum of all credit currently being used across the partner portfolio. High utilization relative to the total limit indicates elevated financial risk.",
+    breakdown: [
+      { label: "Total Credit Limit", value: "—" },
+      { label: "Currently Utilized", value: "—" },
+      { label: "Available Credit", value: "—", isResult: true },
+    ],
+    formula: "Available = Total Limit – Currently Utilized",
+  },
+  total_outstanding: {
+    title: "OUTSTANDING BALANCE",
+    description: "Total unpaid amount across all partners. Includes pending invoices, overdue payments, and scheduled disbursements.",
+    breakdown: [
+      { label: "Pending Invoices", value: "—" },
+      { label: "Overdue Payments", value: "—" },
+      { label: "Scheduled Payments", value: "—" },
+      { label: "Total Outstanding", value: "—", isResult: true },
+    ],
+    formula: "Outstanding = Pending + Overdue + Scheduled",
+  },
+  avg_net_profit: {
+    title: "AVERAGE NET MARGIN",
+    description: "Average net profit margin calculated across all partner transactions. Factors in revenue, cost of goods, and operational expenses.",
+    breakdown: [
+      { label: "Gross Revenue", value: "—" },
+      { label: "Cost of Goods", value: "—" },
+      { label: "Operational Costs", value: "—" },
+      { label: "Net Margin", value: "—", isResult: true },
+    ],
+    formula: "Margin = (Revenue – COGS – Costs) ÷ Revenue × 100",
+  },
+};
+
+function KpiRichTooltip({ data, children }: { data?: KpiTooltipData; children: React.ReactNode }) {
+  if (!data) return <>{children}</>;
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>{children}</TooltipTrigger>
+      <TooltipContent side="bottom" sideOffset={8} className="p-0 w-[320px] max-w-[90vw] z-[400] !bg-white !border-[#E2E8F0] !shadow-[0_12px_40px_-8px_rgba(0,0,0,0.15),0_0_0_1px_rgba(0,0,0,0.04)]">
+        <div className="p-4">
+          {/* Header */}
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-5 h-5 rounded-md bg-[#EDF4FF] flex items-center justify-center shrink-0">
+              <Info className="w-3 h-3 text-[#0A77FF]" />
+            </div>
+            <span className="text-[11px] text-[#0F172A] tracking-wide" style={{ fontWeight: 700 }}>{data.title}</span>
+          </div>
+          {/* Description */}
+          <p className="text-[11px] text-[#64748B] leading-[1.6] mb-3">{data.description}</p>
+          {/* Divider */}
+          <div className="border-t border-[#F1F5F9] mb-3" />
+          {/* Breakdown */}
+          <div className="space-y-1.5">
+            {data.breakdown.map((row, i) => (
+              <div
+                key={i}
+                className={`flex items-center justify-between px-2.5 py-1.5 rounded-md text-[11px] ${
+                  row.isResult ? "bg-[#F0FDF4] border border-[#D1FAE5]" : ""
+                }`}
+              >
+                <span className={row.isResult ? "text-[#0F172A]" : "text-[#64748B]"} style={{ fontWeight: row.isResult ? 600 : 400 }}>{row.label}</span>
+                <span className={row.isResult ? "text-[#16A34A]" : "text-[#0F172A]"} style={{ fontWeight: row.isResult ? 700 : 500 }}>{row.value}</span>
+              </div>
+            ))}
+          </div>
+          {/* Divider */}
+          <div className="border-t border-[#F1F5F9] my-3" />
+          {/* Formula */}
+          <div className="px-3 py-2 rounded-lg bg-[#F0F6FF] border border-[#DBEAFE]">
+            <code className="text-[10px] text-[#1D4ED8]" style={{ fontWeight: 500, fontFamily: "ui-monospace, monospace" }}>{data.formula}</code>
+          </div>
+        </div>
+      </TooltipContent>
+    </Tooltip>
+  );
+}
+
+function LogoAvatar({ logoUrl, initials, bg, size = "md", type = "logo" }: { logoUrl?: string; initials: string; bg: string; size?: "sm" | "md" | "lg"; type?: "logo" | "person" }) {
+  const [imgFailed, setImgFailed] = useState(false);
+  const sizeClass = size === "lg" ? "w-9 h-9" : size === "sm" ? "w-7 h-7" : "w-8 h-8";
+  const textSize = size === "lg" ? "text-[11px]" : size === "sm" ? "text-[9px]" : "text-[10px]";
+  const showImg = logoUrl && !imgFailed;
+  const isPerson = type === "person";
+  return (
+    <div className={`${sizeClass} rounded-lg flex items-center justify-center shrink-0 overflow-hidden border border-[#E8ECF1]`} style={{ backgroundColor: showImg ? (isPerson ? "transparent" : "#FFFFFF") : bg }}>
+      {showImg ? (
+        <img src={logoUrl} alt="" className={`w-full h-full ${isPerson ? "object-cover" : "object-contain p-1.5"}`} onError={() => setImgFailed(true)} />
+      ) : (
+        <span className={`${textSize} text-[#334155]`} style={{ fontWeight: 700 }}>{initials}</span>
+      )}
+    </div>
+  );
+}
+
 function CarrierIcon({ carrier }: { carrier: string }) {
   const getInitials = (name: string): string => {
     if (!name) return "\u2013";
@@ -2394,27 +2641,41 @@ function CarrierIcon({ carrier }: { carrier: string }) {
     if (name.includes("Australia")) return "AP";
     return name.substring(0, 2).toUpperCase();
   };
+  const carrierLogos: Record<string, string> = {
+    FedEx: fedexLogo,
+    DHL: dhlLogo,
+    UPS: upsLogo,
+    TCS: tcsLogo,
+    SF: sfLogo,
+    USPS: uspsLogo,
+    Aramex: aramexLogo,
+    Maersk: maerskLogo,
+  };
+  let carrierLogo: string | undefined;
+  for (const key of Object.keys(carrierLogos)) {
+    if (carrier.includes(key)) { carrierLogo = carrierLogos[key]; break; }
+  }
 
   const tint = getAvatarTint(carrier || "");
   return (
     <div
-      className="w-5 h-5 rounded-md flex items-center justify-center shrink-0"
+      className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 overflow-hidden border border-[#E8ECF1]"
       style={{
-        backgroundColor: tint.bg,
-        color: tint.fg,
-        fontSize: "7px",
+        backgroundColor: carrierLogo ? "#FFFFFF" : "#F1F5F9",
+        color: "#475569",
+        fontSize: "9px",
         fontWeight: 700,
         letterSpacing: "-0.02em",
       }}
     >
-      {getInitials(carrier)}
+      {carrierLogo ? <img src={carrierLogo} alt="" className="w-full h-full object-contain p-1" /> : getInitials(carrier)}
     </div>
   );
 }
 
 /* ── Draggable KPI Card for partner listing page ── */
-function DraggableListKpiCard({ index, kpiKey, label, value, iconName, moveCard, onRemove }: {
-  index: number; kpiKey: string; label: string; value: string; iconName?: string;
+function DraggableListKpiCard({ index, kpiKey, label, value, iconName, tooltip, moveCard, onRemove }: {
+  index: number; kpiKey: string; label: string; value: string; iconName?: string; tooltip?: string;
   moveCard: (from: number, to: number) => void; onRemove?: () => void;
 }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -2478,9 +2739,31 @@ function DraggableListKpiCard({ index, kpiKey, label, value, iconName, moveCard,
         <div className="absolute top-1.5 right-1.5 opacity-0 group-hover:opacity-100 transition-all duration-150 flex items-center bg-[#F1F5F9] rounded-md p-1 z-10 pointer-events-none">
           <GripVertical className="w-3.5 h-3.5 text-[#64748B]" />
         </div>
-        {/* Label row: label + icon */}
+        {/* Label row: label + info + icon */}
         <div className="flex items-center justify-between gap-1 mb-1">
-          <p className="text-[10.5px] text-[#64748B] whitespace-nowrap" style={{ fontWeight: 500 }}>{label}</p>
+          <div className="flex items-center gap-1 min-w-0">
+            <p className="text-[10.5px] text-[#64748B] whitespace-nowrap" style={{ fontWeight: 500 }}>{label}</p>
+            {(KPI_TOOLTIP_DATA[kpiKey] || tooltip) && (
+              KPI_TOOLTIP_DATA[kpiKey] ? (
+                <KpiRichTooltip data={KPI_TOOLTIP_DATA[kpiKey]}>
+                  <button type="button" className="inline-flex shrink-0" tabIndex={-1} onClick={(e) => e.stopPropagation()}>
+                    <Info className="w-3 h-3 text-[#CBD5E1] hover:text-[#94A3B8] transition-colors cursor-help" />
+                  </button>
+                </KpiRichTooltip>
+              ) : (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button type="button" className="inline-flex shrink-0" tabIndex={-1} onClick={(e) => e.stopPropagation()}>
+                      <Info className="w-3 h-3 text-[#CBD5E1] hover:text-[#94A3B8] transition-colors cursor-help" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom" sideOffset={6} className="max-w-[220px] text-[11px] z-[300]">
+                    {tooltip}
+                  </TooltipContent>
+                </Tooltip>
+              )
+            )}
+          </div>
           {iconName && <KpiIcon name={iconName} className="w-3.5 h-3.5 shrink-0" style={{ color: "#94A3B8" }} />}
         </div>
         {/* Value */}

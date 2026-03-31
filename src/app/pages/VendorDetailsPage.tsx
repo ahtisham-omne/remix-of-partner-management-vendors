@@ -13,9 +13,10 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "../components/ui/popover";
-import { PARTNER_GROUPS, CONTACT_DICTIONARY } from "../components/vendors/partnerConstants";
+import { PARTNER_GROUPS, CONTACT_DICTIONARY, VENDOR_SUB_TYPES, CUSTOMER_SUB_TYPES } from "../components/vendors/partnerConstants";
 import type { ContactPerson as PartnerContact } from "../components/vendors/partnerConstants";
 import { CreatePartnerLocationModal } from "../components/vendors/CreatePartnerLocationModal";
+import { CreatePartnerModal } from "../components/vendors/CreatePartnerModal";
 import { PartnerItemsTab } from "../components/vendors/PartnerItemsTab";
 import { PricingRulesTabNew } from "../components/vendors/PricingRulesTab";
 import { PaymentMethodCard as PaymentMethodCardBase } from "../components/vendors/PaymentMethodsSection";
@@ -32,8 +33,6 @@ import {
 } from "../components/ui/dropdown-menu";
 import {
   AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogHeader,
@@ -140,6 +139,9 @@ import {
   UserPlus,
   ToggleLeft,
   ToggleRight,
+  ChevronUp,
+  AlertTriangle,
+  Settings2,
 } from "lucide-react";
 import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { toast } from "sonner";
@@ -186,11 +188,16 @@ type TabId = (typeof TABS)[number]["id"];
 export function VendorDetailsPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { getVendor, archiveVendor, restoreVendor, deleteVendor } = useVendors();
+  const { getVendor, archiveVendor, restoreVendor, updateVendor } = useVendors();
   const [archiveDialogOpen, setArchiveDialogOpen] = useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<TabId>("dashboard");
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [descExpanded, setDescExpanded] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [statusDropdownOpen, setStatusDropdownOpen] = useState(false);
+  const [statusChangeTarget, setStatusChangeTarget] = useState<string | null>(null);
+  const [statusConfirmOpen, setStatusConfirmOpen] = useState(false);
 
   // Dashboard KPI state (lifted for full-width rendering)
   const [dashActiveKpis, setDashActiveKpis] = useState<string[]>(DEFAULT_DASH_KPIS);
@@ -222,11 +229,21 @@ export function VendorDetailsPage() {
     [dashActiveKpis]
   );
 
+  // IntersectionObserver sentinel – the compact header kicks in once this
+  // sentinel scrolls out of view (i.e. user scrolled past the full header area).
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  const descRef = useRef<HTMLDivElement>(null);
+  const [descNeedsTruncation, setDescNeedsTruncation] = useState(false);
+
   useEffect(() => {
-    const onScroll = () => setIsScrolled(window.scrollY > 10);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
-    return () => window.removeEventListener("scroll", onScroll);
+    const el = sentinelRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => setIsScrolled(!entry.isIntersecting),
+      { threshold: 0, rootMargin: "-44px 0px 0px 0px" } // offset by nav bar height
+    );
+    io.observe(el);
+    return () => io.disconnect();
   }, []);
 
   const vendor = getVendor(id!);
@@ -260,11 +277,11 @@ export function VendorDetailsPage() {
     toast.success("Partner restored to active");
   };
 
-  const handleDelete = () => {
-    deleteVendor(vendor.id);
-    toast.success("Partner deleted successfully");
-    setDeleteDialogOpen(false);
-    navigate("/vendors");
+  const handleStatusChange = (newStatus: string) => {
+    updateVendor(vendor.id, { status: newStatus as "active" | "inactive" | "archived" });
+    toast.success(`Partner status changed to ${newStatus.charAt(0).toUpperCase() + newStatus.slice(1)}`);
+    setStatusConfirmOpen(false);
+    setStatusChangeTarget(null);
   };
 
   const formatCurrency = (val: number) =>
@@ -323,11 +340,177 @@ export function VendorDetailsPage() {
   // Contact count
   const contactCount = (vendor.globalPointOfContacts?.length || 0) + (cfg?.pointsOfContact?.length || 0);
 
+  // Build the description text once for reuse
+  const descriptionText = vendor.description || cfg?.description || `${CATEGORY_LABELS[vendor.category]} partner specializing in ${vendor.services || vendor.vendorType || "industrial solutions"}. Established operations across ${vendor.country || "multiple regions"} with a focus on quality assurance, timely delivery, and competitive pricing. This partner has been onboarded through the standard vendor qualification process and maintains active compliance certifications for all applicable regulatory requirements.`;
+
+  // Detect if description needs truncation (exceeds 1 line at ~20px collapsed max-height)
+  useEffect(() => {
+    const check = () => {
+      const el = descRef.current;
+      if (!el) return;
+      setDescNeedsTruncation(el.scrollHeight > 22);
+    };
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, [descriptionText]);
+
+  // All statuses a user can switch to
+  const ALL_STATUSES = ["active", "inactive", "archived"] as const;
+
+  // ── Actions dropdown (shared between full + compact headers) ──
+  const ActionsDropdown = ({ compact = false }: { compact?: boolean }) => (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button className={`rounded-lg border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] text-[#334155] inline-flex items-center gap-1.5 transition-all duration-200 cursor-pointer shadow-sm ${compact ? "h-8 px-3 text-[12px]" : "h-9 px-3.5 text-[13px]"}`} style={{ fontWeight: 500 }}>
+          Actions
+          <ChevronDown className="w-3.5 h-3.5 text-[#94A3B8]" />
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="z-[200] w-56">
+        {/* Communication */}
+        <DropdownMenuItem onClick={() => toast.info("Email feature coming soon")}>
+          <Mail className="w-3.5 h-3.5 mr-2 text-[#64748B]" />
+          Send Email
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => toast.info("Phone feature coming soon")}>
+          <Phone className="w-3.5 h-3.5 mr-2 text-[#64748B]" />
+          Call Partner
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        {/* Transactions */}
+        <DropdownMenuItem onClick={() => toast.info("Purchase Order creation coming soon")}>
+          <ClipboardList className="w-3.5 h-3.5 mr-2 text-[#64748B]" />
+          Create Purchase Order
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => toast.info("Sales Order creation coming soon")}>
+          <ShoppingCart className="w-3.5 h-3.5 mr-2 text-[#64748B]" />
+          Create Sales Order
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => toast.info("Invoice creation coming soon")}>
+          <Receipt className="w-3.5 h-3.5 mr-2 text-[#64748B]" />
+          Create Invoice
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        {/* Documents & Notes */}
+        <DropdownMenuItem onClick={() => toast.info("Note creation coming soon")}>
+          <StickyNote className="w-3.5 h-3.5 mr-2 text-[#64748B]" />
+          Add Note
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => toast.info("Upload feature coming soon")}>
+          <Upload className="w-3.5 h-3.5 mr-2 text-[#64748B]" />
+          Upload Document / Attachment
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        {/* Utilities */}
+        <DropdownMenuItem onClick={() => { navigator.clipboard.writeText(window.location.href); toast.success("Link copied to clipboard"); }}>
+          <Link2 className="w-3.5 h-3.5 mr-2 text-[#64748B]" />
+          Copy Link
+        </DropdownMenuItem>
+        {vendor.website && (
+          <DropdownMenuItem onClick={() => window.open(vendor.website.startsWith("http") ? vendor.website : `https://${vendor.website}`, "_blank")}>
+            <ExternalLink className="w-3.5 h-3.5 mr-2 text-[#64748B]" />
+            Visit Website
+          </DropdownMenuItem>
+        )}
+        <DropdownMenuItem onClick={() => toast.info("Print feature coming soon")}>
+          <Printer className="w-3.5 h-3.5 mr-2 text-[#64748B]" />
+          Print Partner Details
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        {/* Change Status */}
+        <DropdownMenuItem
+          onClick={() => {
+            // Cycle to next available status
+            const currentIdx = ALL_STATUSES.indexOf(vendor.status as typeof ALL_STATUSES[number]);
+            const nextStatus = ALL_STATUSES[(currentIdx + 1) % ALL_STATUSES.length];
+            setStatusChangeTarget(nextStatus);
+            setStatusConfirmOpen(true);
+          }}
+        >
+          <ToggleRight className="w-3.5 h-3.5 mr-2 text-[#64748B]" />
+          Change Status
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        {/* Archive — always red */}
+        {vendor.status === "archived" ? (
+          <DropdownMenuItem onClick={handleRestore}>
+            <RotateCcw className="w-3.5 h-3.5 mr-2 text-[#64748B]" />
+            Restore Partner
+          </DropdownMenuItem>
+        ) : (
+          <DropdownMenuItem onClick={() => setArchiveDialogOpen(true)} className="text-[#DC2626] focus:text-[#DC2626]">
+            <Archive className="w-3.5 h-3.5 mr-2" />
+            Archive Partner
+          </DropdownMenuItem>
+        )}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+
+  // ── Edit CTA (shared) — opens edit modal ──
+  const EditCta = ({ compact = false }: { compact?: boolean }) => (
+    <button
+      onClick={() => setEditModalOpen(true)}
+      className={`rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white inline-flex items-center gap-1.5 transition-all duration-200 cursor-pointer shadow-sm ${compact ? "h-8 px-3.5 text-[12px]" : "h-9 px-4 text-[13px]"}`}
+      style={{ fontWeight: 600 }}
+    >
+      <Pencil className={compact ? "w-3 h-3" : "w-3.5 h-3.5"} />
+      Edit Partner
+    </button>
+  );
+
+  // ── Status pill with dropdown ──
+  const StatusPill = ({ compact = false }: { compact?: boolean }) => (
+    <Popover open={statusDropdownOpen} onOpenChange={setStatusDropdownOpen}>
+      <PopoverTrigger asChild>
+        <button
+          className={`inline-flex items-center rounded-full border cursor-pointer transition-all duration-150 hover:ring-2 hover:ring-offset-1 hover:ring-[#E2E8F0] ${compact ? "px-1.5 py-px text-[10px] gap-0.5" : "px-2 py-0.5 text-[11px] gap-1"}`}
+          style={{ fontWeight: 500, backgroundColor: currentStatus.bg, color: currentStatus.color, borderColor: currentStatus.border }}
+        >
+          {currentStatus.label}
+          <ChevronDown className={compact ? "w-2.5 h-2.5" : "w-3 h-3"} />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent side="bottom" align="start" sideOffset={6} className="w-[160px] p-1.5 z-[300]" onOpenAutoFocus={(e) => e.preventDefault()}>
+        <div className="space-y-0.5">
+          {ALL_STATUSES.map((s) => {
+            const sc = statusConfig[s];
+            const isCurrent = s === vendor.status;
+            return (
+              <button
+                key={s}
+                onClick={() => {
+                  if (!isCurrent) {
+                    setStatusChangeTarget(s);
+                    setStatusConfirmOpen(true);
+                    setStatusDropdownOpen(false);
+                  }
+                }}
+                className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-[12px] transition-colors cursor-pointer ${isCurrent ? "bg-[#F1F5F9]" : "hover:bg-[#F8FAFC]"}`}
+                style={{ fontWeight: isCurrent ? 600 : 400 }}
+              >
+                <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: sc.color }} />
+                <span style={{ color: "#334155" }}>{sc.label}</span>
+                {isCurrent && <Check className="w-3.5 h-3.5 ml-auto text-[#0A77FF]" />}
+              </button>
+            );
+          })}
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
+
+  // Build sub-type pills for display
+  const vendorSubTypeLabels = vendor.vendorSubTypes || [];
+  const customerSubTypeLabels = vendor.customerSubTypes || [];
+  const allSubTypes = [...vendorSubTypeLabels, ...customerSubTypeLabels];
+
   return (
     <div className="flex-1 flex flex-col overflow-y-auto bg-[#F8FAFC]">
-      {/* ═══════════════���══════════════════════════════
+      {/* ══════════════════════════════════════════════
           TOP NAV BAR
-         ══���══════════════════════════════════���════════ */}
+         ══════════════════════════════════════════════ */}
       <div className="bg-white border-b border-[#E2E8F0] shrink-0 sticky top-0 z-30">
         <div className="flex items-center justify-between px-4 lg:px-6 h-11">
           <div className="flex items-center gap-2 text-[13px] text-[#64748B]">
@@ -370,277 +553,292 @@ export function VendorDetailsPage() {
         </div>
       </div>
 
-      {/* ══════════════════════════════════════���═══════
-          HEADER CARD — sticky below nav
+      {/* IntersectionObserver sentinel — sits right below nav bar */}
+      <div ref={sentinelRef} className="shrink-0 h-px" />
+
+      {/* ══════════════════════════════════════════════
+          FULL HEADER — scrolls naturally, NOT sticky
          ══════════════════════════════════════════════ */}
-      <div className="shrink-0 sticky top-[44px] z-20 relative" style={{ paddingTop: isScrolled ? '8px' : '12px', transition: 'padding-top 200ms ease' }}>
-            {/* Absolute gradient background layer — morphs on scroll */}
-            <div
-              style={{
-                position: "absolute",
-                inset: "-48px 0 -6px 0",
-                background: "linear-gradient(180deg, #F8FAFC 0%, #F8FAFC calc(100% - 6px), transparent 100%)",
-                pointerEvents: "none",
-                zIndex: -1,
-              }}
-            />
-        <div className="max-w-[1440px] 2xl:max-w-[1600px] mx-auto px-4 lg:px-6 xl:px-8">
-        <div className={`bg-white border border-[#E2E8F0] transition-all duration-200 ${isScrolled ? "rounded-lg shadow-[0_1px_2px_0_rgba(0,0,0,0.03),0_4px_12px_-2px_rgba(0,0,0,0.06)]" : "rounded-xl shadow-sm"}`}>
-          {/* Main header row */}
-          <div className={`flex items-center justify-between gap-4 px-4 lg:px-5 transition-all duration-200 ${isScrolled ? "py-1.5" : "py-3"}`}>
-            {/* Left: Back + Avatar + Info */}
-            <div className={`flex items-center min-w-0 transition-all duration-200 ${isScrolled ? "gap-2.5" : "gap-3"}`}>
-              {/* Back button — rounded rectangle */}
-              <button
-                onClick={() => navigate("/vendors")}
-                className={`rounded-xl border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] flex items-center justify-center shrink-0 transition-all duration-200 cursor-pointer shadow-[0_1px_3px_0_rgba(0,0,0,0.04),0_1px_2px_-1px_rgba(0,0,0,0.03)] ${isScrolled ? "w-8 h-8" : "w-11 h-11"}`}
-              >
-                <ChevronLeft className={`text-[#94A3B8] transition-all duration-200 ${isScrolled ? "w-4 h-4" : "w-5 h-5"}`} />
-              </button>
-
-              {/* Avatar — rounded rectangle thumbnail */}
-              {vendor.profileImage ? (
-                <img
-                  src={vendor.profileImage}
-                  alt={vendor.displayName}
-                  className={`rounded-xl object-cover shrink-0 border border-[#E2E8F0] shadow-[0_1px_3px_0_rgba(0,0,0,0.04),0_1px_2px_-1px_rgba(0,0,0,0.03)] transition-all duration-200 ${isScrolled ? "w-8 h-8" : "w-11 h-11"}`}
-                />
-              ) : (
-                <div
-                  className={`rounded-xl flex items-center justify-center shrink-0 text-white border border-white shadow-[0_1px_3px_0_rgba(0,0,0,0.06),0_0_0_2px_rgba(10,119,255,0.10)] transition-all duration-200 ${isScrolled ? "w-8 h-8 text-[10px]" : "w-11 h-11 text-[14px]"}`}
-                  style={{ backgroundColor: toAAAColor(vendor.createdByContact?.bgColor || "#0A77FF"), fontWeight: 700 }}
+      <div className="shrink-0 pt-3 relative">
+        <div className={`mx-auto px-4 lg:px-6 xl:px-8 transition-all duration-300 ${isFullscreen ? "max-w-full" : "max-w-[1440px] 2xl:max-w-[1600px]"}`}>
+          <div className="bg-white border border-[#E2E8F0] rounded-xl shadow-sm overflow-hidden">
+            {/* Main header row */}
+            <div className="flex items-start justify-between gap-4 px-4 lg:px-5 py-3">
+              {/* Left: Back + Avatar + Info */}
+              <div className="flex items-start gap-3 min-w-0">
+                {/* Back button */}
+                <button
+                  onClick={() => navigate("/vendors")}
+                  className="rounded-xl border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] flex items-center justify-center shrink-0 w-11 h-11 cursor-pointer shadow-[0_1px_3px_0_rgba(0,0,0,0.04),0_1px_2px_-1px_rgba(0,0,0,0.03)] mt-0.5"
                 >
-                  {initials}
-                </div>
-              )}
+                  <ChevronLeft className="w-5 h-5 text-[#94A3B8]" />
+                </button>
 
-              {/* Name + Badges + Description */}
-              <div className="min-w-0">
-                {/* Line 1: Name + inline badges */}
-                <div className={`flex items-center flex-wrap transition-all duration-200 ${isScrolled ? "gap-1.5" : "gap-2"}`}>
-                  <h1
-                    className="text-[#0F172A] truncate"
-                    style={{ fontSize: isScrolled ? "13px" : "16px", fontWeight: isScrolled ? 600 : 700, lineHeight: isScrolled ? "18px" : "22px", transition: "font-size 200ms, line-height 200ms, font-weight 200ms" }}
+                {/* Avatar */}
+                {vendor.profileImage ? (
+                  <img
+                    src={vendor.profileImage}
+                    alt={vendor.displayName}
+                    className="rounded-xl w-11 h-11 object-cover shrink-0 border border-[#E2E8F0] shadow-[0_1px_3px_0_rgba(0,0,0,0.04),0_1px_2px_-1px_rgba(0,0,0,0.03)] mt-0.5"
+                  />
+                ) : (
+                  <div
+                    className="rounded-xl w-11 h-11 flex items-center justify-center shrink-0 text-white text-[14px] border border-white shadow-[0_1px_3px_0_rgba(0,0,0,0.06),0_0_0_2px_rgba(10,119,255,0.10)] mt-0.5"
+                    style={{ backgroundColor: toAAAColor(vendor.createdByContact?.bgColor || "#0A77FF"), fontWeight: 700 }}
                   >
-                    {vendor.displayName}
-                  </h1>
-
-                  {/* Status badge */}
-                  <span
-                    className={`inline-flex items-center gap-1 rounded-md border transition-all duration-200 ${isScrolled ? "px-1.5 py-px text-[10px]" : "px-2 py-0.5 text-[11px]"}`}
-                    style={{
-                      fontWeight: 600,
-                      backgroundColor: currentStatus.bg,
-                      color: currentStatus.color,
-                      borderColor: currentStatus.border,
-                    }}
-                  >
-                    <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: currentStatus.color }} />
-                    {currentStatus.label}
-                  </span>
-
-                  {/* Partner Type badges (Vendor / Customer) */}
-                  {(vendor.partnerTypes || []).map((type) => (
-                    <span
-                      key={type}
-                      className={`inline-flex items-center gap-1 rounded-md border transition-all duration-200 ${isScrolled ? "px-1.5 py-px text-[10px]" : "px-2 py-0.5 text-[11px]"} ${
-                        type === "vendor"
-                          ? "border-[#BFDBFE] bg-[#DBEAFE] text-[#2563EB]"
-                          : "border-[#C4B5FD] bg-[#EDE9FE] text-[#7C3AED]"
-                      }`}
-                      style={{ fontWeight: 600 }}
-                    >
-                      {type === "vendor" ? (
-                        <Truck className={`transition-all duration-200 ${isScrolled ? "w-2.5 h-2.5" : "w-3 h-3"}`} />
-                      ) : (
-                        <ShoppingCart className={`transition-all duration-200 ${isScrolled ? "w-2.5 h-2.5" : "w-3 h-3"}`} />
-                      )}
-                      {type === "vendor" ? "Vendor" : "Customer"}
-                    </span>
-                  ))}
-
-                  {/* Primary Partner Group — hoverable with quick view popover */}
-                  {!isScrolled && vendor.partnerGroup && (() => {
-                    const group = PARTNER_GROUPS.find((g) => g.id === vendor.partnerGroup);
-                    if (!group) return (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] border border-[#E2E8F0] bg-[#F1F5F9] text-[#475569]" style={{ fontWeight: 500 }}>
-                        <Building2 className="w-3 h-3 text-[#94A3B8]" />
-                        {vendor.partnerGroup}
-                      </span>
-                    );
-                    return (
-                      <PartnerGroupHoverPill group={group} />
-                    );
-                  })()}
-                </div>
-
-                {/* Line 2: Code + Description — hidden when scrolled */}
-                {!isScrolled && (
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <span className="text-[11px] text-[#94A3B8] shrink-0" style={{ fontWeight: 500 }}>
-                      {vendor.code}
-                    </span>
-                    <span className="text-[#CBD5E1]">·</span>
-                    <p className="text-[12px] text-[#64748B] line-clamp-1 max-w-3xl" style={{ lineHeight: "16px" }}>
-                      {vendor.description || cfg?.description || `${CATEGORY_LABELS[vendor.category]} partner — ${vendor.services || vendor.vendorType || vendor.country}`}
-                    </p>
+                    {initials}
                   </div>
                 )}
+
+                {/* Name + Badges + Description */}
+                <div className="min-w-0 flex-1">
+                  {/* Line 1: Name + Status + Type + Sub-types + Group */}
+                  <div className="flex items-center flex-wrap gap-2">
+                    <h1 className="text-[16px] text-[#0F172A] truncate" style={{ fontWeight: 700, lineHeight: "22px" }}>
+                      {vendor.displayName}
+                    </h1>
+
+                    {/* Status badge — clickable dropdown */}
+                    <StatusPill />
+
+                    {/* Partner Type badges */}
+                    {(vendor.partnerTypes || []).map((type) => (
+                      <span
+                        key={type}
+                        className={`inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[11px] ${
+                          type === "vendor"
+                            ? "border-[#BFDBFE] bg-[#DBEAFE] text-[#2563EB]"
+                            : "border-[#C4B5FD] bg-[#EDE9FE] text-[#7C3AED]"
+                        }`}
+                        style={{ fontWeight: 600 }}
+                      >
+                        {type === "vendor" ? <Truck className="w-3 h-3" /> : <ShoppingCart className="w-3 h-3" />}
+                        {type === "vendor" ? "Vendor" : "Customer"}
+                      </span>
+                    ))}
+
+                    {/* Partner Sub-Type pills */}
+                    {allSubTypes.length > 0 && allSubTypes.map((st) => (
+                      <span
+                        key={st}
+                        className="inline-flex items-center gap-1 rounded-md border border-[#E2E8F0] bg-[#F8FAFC] text-[#475569] px-2 py-0.5 text-[11px]"
+                        style={{ fontWeight: 500 }}
+                      >
+                        <Settings2 className="w-3 h-3 text-[#94A3B8]" />
+                        {st}
+                      </span>
+                    ))}
+
+                    {/* Partner Groups — primary + overflow */}
+                    {vendor.partnerGroup && (() => {
+                      const primaryGroup = PARTNER_GROUPS.find((g) => g.id === vendor.partnerGroup);
+                      const extraGroups = PARTNER_GROUPS.filter((g) => g.id !== vendor.partnerGroup && g.country === vendor.country).slice(0, 2);
+                      if (!primaryGroup) return (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] border border-[#E2E8F0] bg-[#F1F5F9] text-[#475569]" style={{ fontWeight: 500 }}>
+                          <Building2 className="w-3 h-3 text-[#94A3B8]" />
+                          {vendor.partnerGroup}
+                        </span>
+                      );
+                      return (
+                        <>
+                          <PartnerGroupHoverPill group={primaryGroup} />
+                          {extraGroups.length > 0 && (
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <span className="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] border border-[#E2E8F0] bg-[#F1F5F9] text-[#0A77FF] cursor-default" style={{ fontWeight: 600 }}>
+                                  +{extraGroups.length}
+                                </span>
+                              </TooltipTrigger>
+                              <TooltipContent side="bottom" sideOffset={6} className="max-w-[240px] z-[300]">
+                                <div className="space-y-1.5">
+                                  {extraGroups.map((g) => (
+                                    <div key={g.id} className="flex items-center gap-2">
+                                      <span className="text-[11px]">{g.countryFlag}</span>
+                                      <div>
+                                        <p className="text-[11px] text-[#0F172A]" style={{ fontWeight: 600 }}>{g.name}</p>
+                                        <p className="text-[10px] text-[#94A3B8]">{g.memberCount} members</p>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              </TooltipContent>
+                            </Tooltip>
+                          )}
+                        </>
+                      );
+                    })()}
+                  </div>
+
+                  {/* ── Description with smooth expand/collapse — inline "more" at end of first line ── */}
+                  <div className="mt-1.5 max-w-3xl relative">
+                    <div
+                      ref={descRef}
+                      className="overflow-hidden transition-[max-height] duration-300 ease-in-out"
+                      style={{ maxHeight: descExpanded ? "500px" : "20px" }}
+                    >
+                      <p className="text-[12px] text-[#64748B] leading-[1.6]">
+                        {descriptionText}
+                        {descExpanded && descNeedsTruncation && (
+                          <>
+                            {" "}
+                            <button
+                              type="button"
+                              onClick={(e) => { e.stopPropagation(); setDescExpanded(false); }}
+                              className="inline-flex items-center gap-0.5 text-[11px] text-[#0A77FF] hover:text-[#0862D0] cursor-pointer align-baseline"
+                              style={{ fontWeight: 500 }}
+                            >
+                              Show less <ChevronUp className="w-3 h-3 inline" />
+                            </button>
+                          </>
+                        )}
+                      </p>
+                    </div>
+                    {/* "... more" toggle — shown only when collapsed and truncation needed */}
+                    {!descExpanded && descNeedsTruncation && (
+                      <button
+                        type="button"
+                        onClick={(e) => { e.stopPropagation(); setDescExpanded(true); }}
+                        className="absolute right-0 bottom-0 bg-gradient-to-l from-white via-white to-transparent pl-6 pr-0 inline-flex items-center gap-0.5 text-[11px] text-[#0A77FF] hover:text-[#0862D0] cursor-pointer"
+                        style={{ fontWeight: 500, lineHeight: "20px" }}
+                      >
+                        ... more <ChevronDown className="w-3 h-3" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Right: Fullscreen + Actions + Edit CTA */}
+              <div className="flex items-center gap-2 shrink-0 pt-0.5">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      onClick={() => setIsFullscreen(!isFullscreen)}
+                      className="rounded-lg border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] w-9 h-9 flex items-center justify-center cursor-pointer shadow-sm"
+                    >
+                      {isFullscreen ? <Minimize2 className="w-4 h-4 text-[#64748B]" /> : <Maximize2 className="w-4 h-4 text-[#64748B]" />}
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent className="z-[300]">{isFullscreen ? "Exit Full Screen" : "Full Screen"}</TooltipContent>
+                </Tooltip>
+                <ActionsDropdown />
+                <EditCta />
               </div>
             </div>
 
-            {/* Right: Action + Edit CTA */}
-            <div className={`flex items-center shrink-0 transition-all duration-200 ${isScrolled ? "gap-1.5" : "gap-2"}`}>
-              {/* Action dropdown */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button className={`rounded-lg border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] text-[#334155] inline-flex items-center gap-1.5 transition-all duration-200 cursor-pointer shadow-sm ${isScrolled ? "h-8 px-3 text-[12px]" : "h-9 px-3.5 text-[13px]"}`} style={{ fontWeight: 500 }}>
-                    Action
-                    <ChevronDown className="w-3.5 h-3.5 text-[#94A3B8]" />
+            {/* Tab bar — inside the header card, at the bottom */}
+            <div className="flex items-center gap-0 overflow-x-auto scrollbar-hide border-t border-[#F1F5F9] px-4 lg:px-5">
+              {TABS.map((tab) => {
+                const isActive = activeTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`flex items-center px-3.5 py-2.5 border-b-2 transition-all duration-200 whitespace-nowrap cursor-pointer text-[13px] ${
+                      isActive
+                        ? "border-[#0A77FF] text-[#0A77FF]"
+                        : "border-transparent text-[#64748B] hover:text-[#334155] hover:border-[#CBD5E1]"
+                    }`}
+                    style={{ fontWeight: isActive ? 600 : 400 }}
+                  >
+                    {tab.label}
                   </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="z-[200] w-56">
-                  {/* Communication */}
-                  <DropdownMenuItem onClick={() => toast.info("Email feature coming soon")}>
-                    <Mail className="w-3.5 h-3.5 mr-2 text-[#64748B]" />
-                    Send Email
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => toast.info("Phone feature coming soon")}>
-                    <Phone className="w-3.5 h-3.5 mr-2 text-[#64748B]" />
-                    Call Partner
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  {/* Transactions */}
-                  <DropdownMenuItem onClick={() => toast.info("Purchase Order creation coming soon")}>
-                    <ClipboardList className="w-3.5 h-3.5 mr-2 text-[#64748B]" />
-                    Create Purchase Order
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => toast.info("Sales Order creation coming soon")}>
-                    <ShoppingCart className="w-3.5 h-3.5 mr-2 text-[#64748B]" />
-                    Create Sales Order
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => toast.info("Invoice creation coming soon")}>
-                    <Receipt className="w-3.5 h-3.5 mr-2 text-[#64748B]" />
-                    Create Invoice
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  {/* Documents & Notes */}
-                  <DropdownMenuItem onClick={() => toast.info("Note creation coming soon")}>
-                    <StickyNote className="w-3.5 h-3.5 mr-2 text-[#64748B]" />
-                    Add Note
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => toast.info("Upload feature coming soon")}>
-                    <Upload className="w-3.5 h-3.5 mr-2 text-[#64748B]" />
-                    Upload Document
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => toast.info("Attachment feature coming soon")}>
-                    <Paperclip className="w-3.5 h-3.5 mr-2 text-[#64748B]" />
-                    Attach File
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  {/* Utilities */}
-                  <DropdownMenuItem onClick={() => { navigator.clipboard.writeText(vendor.code); toast.success("Partner code copied"); }}>
-                    <Copy className="w-3.5 h-3.5 mr-2 text-[#64748B]" />
-                    Copy Partner Code
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => { navigator.clipboard.writeText(window.location.href); toast.success("Link copied to clipboard"); }}>
-                    <Link2 className="w-3.5 h-3.5 mr-2 text-[#64748B]" />
-                    Copy Link
-                  </DropdownMenuItem>
-                  {vendor.website && (
-                    <DropdownMenuItem onClick={() => window.open(vendor.website.startsWith("http") ? vendor.website : `https://${vendor.website}`, "_blank")}>
-                      <ExternalLink className="w-3.5 h-3.5 mr-2 text-[#64748B]" />
-                      Visit Website
-                    </DropdownMenuItem>
-                  )}
-                  <DropdownMenuItem onClick={() => toast.info("Print feature coming soon")}>
-                    <Printer className="w-3.5 h-3.5 mr-2 text-[#64748B]" />
-                    Print Partner Details
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  {/* Lifecycle */}
-                  {vendor.status !== "archived" && (
-                    <DropdownMenuItem onClick={() => setArchiveDialogOpen(true)}>
-                      <Archive className="w-3.5 h-3.5 mr-2 text-[#64748B]" />
-                      Archive Partner
-                    </DropdownMenuItem>
-                  )}
-                  {vendor.status === "archived" && (
-                    <DropdownMenuItem onClick={handleRestore}>
-                      <RotateCcw className="w-3.5 h-3.5 mr-2 text-[#64748B]" />
-                      Restore Partner
-                    </DropdownMenuItem>
-                  )}
-                  <DropdownMenuItem onClick={() => setDeleteDialogOpen(true)} className="text-[#DC2626] focus:text-[#DC2626]">
-                    <Trash2 className="w-3.5 h-3.5 mr-2" />
-                    Delete Partner
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              {/* Expand icon */}
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button className={`rounded-lg border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] flex items-center justify-center transition-all duration-200 cursor-pointer shadow-sm ${isScrolled ? "w-8 h-8" : "w-9 h-9"}`}>
-                    <Maximize2 className={`text-[#64748B] transition-all duration-200 ${isScrolled ? "w-3.5 h-3.5" : "w-4 h-4"}`} />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent className="z-[300]">Full Screen</TooltipContent>
-              </Tooltip>
-
-              {/* Primary CTA */}
-              {vendor.status === "archived" ? (
-                <button
-                  onClick={handleRestore}
-                  className={`rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white inline-flex items-center gap-1.5 transition-all duration-200 cursor-pointer shadow-sm ${isScrolled ? "h-8 px-3.5 text-[12px]" : "h-9 px-4 text-[13px]"}`}
-                  style={{ fontWeight: 600 }}
-                >
-                  <RotateCcw className={`transition-all duration-200 ${isScrolled ? "w-3 h-3" : "w-3.5 h-3.5"}`} />
-                  Restore Partner
-                </button>
-              ) : (
-                <button
-                  onClick={() => navigate(`/vendors/${vendor.id}/edit`)}
-                  className={`rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white inline-flex items-center gap-1.5 transition-all duration-200 cursor-pointer shadow-sm ${isScrolled ? "h-8 px-3.5 text-[12px]" : "h-9 px-4 text-[13px]"}`}
-                  style={{ fontWeight: 600 }}
-                >
-                  <Pencil className={`transition-all duration-200 ${isScrolled ? "w-3 h-3" : "w-3.5 h-3.5"}`} />
-                  Edit Partner
-                </button>
-              )}
+                );
+              })}
             </div>
           </div>
+        </div>
+      </div>
 
-          {/* Tab bar */}
-          <div className="flex items-center gap-0 overflow-x-auto scrollbar-hide border-t border-[#F1F5F9] px-4 lg:px-5">
-            {TABS.map((tab) => {
-              const isActive = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center px-3.5 border-b-2 transition-all duration-200 whitespace-nowrap cursor-pointer ${isScrolled ? "py-1.5 text-[12px]" : "py-2.5 text-[13px]"} ${
-                    isActive
-                      ? "border-[#0A77FF] text-[#0A77FF]"
-                      : "border-transparent text-[#64748B] hover:text-[#334155] hover:border-[#CBD5E1]"
-                  }`}
-                  style={{ fontWeight: isActive ? 600 : 400 }}
-                >
-                  {tab.label}
-                </button>
-              );
-            })}
+      {/* ══════════════════════════════════════════════
+          STICKY COMPACT HEADER — slides in on scroll
+         ══════════════════════════════════════════════ */}
+      <div
+        className="shrink-0 sticky top-[44px] z-20 overflow-hidden transition-all duration-300 ease-in-out"
+        style={{
+          maxHeight: isScrolled ? "100px" : "0px",
+          opacity: isScrolled ? 1 : 0,
+        }}
+      >
+        <div className="bg-white border-b border-[#E2E8F0] shadow-[0_1px_3px_0_rgba(0,0,0,0.04),0_4px_12px_-4px_rgba(0,0,0,0.05)]">
+          <div className={`mx-auto px-4 lg:px-6 xl:px-8 transition-all duration-300 ${isFullscreen ? "max-w-full" : "max-w-[1440px] 2xl:max-w-[1600px]"}`}>
+            {/* Compact header row */}
+            <div className="flex items-center justify-between h-11">
+              <div className="flex items-center gap-2.5 min-w-0">
+                {/* Small avatar */}
+                {vendor.profileImage ? (
+                  <img
+                    src={vendor.profileImage}
+                    alt={vendor.displayName}
+                    className="rounded-lg w-7 h-7 object-cover shrink-0 border border-[#E2E8F0]"
+                  />
+                ) : (
+                  <div
+                    className="rounded-lg w-7 h-7 flex items-center justify-center shrink-0 text-white text-[10px] border border-white shadow-[0_0_0_1px_rgba(10,119,255,0.10)]"
+                    style={{ backgroundColor: toAAAColor(vendor.createdByContact?.bgColor || "#0A77FF"), fontWeight: 700 }}
+                  >
+                    {initials}
+                  </div>
+                )}
+
+                <h2 className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>
+                  {vendor.displayName}
+                </h2>
+
+                <StatusPill compact />
+
+                {/* Type badges — compact */}
+                {(vendor.partnerTypes || []).map((type) => (
+                  <span
+                    key={type}
+                    className={`inline-flex items-center gap-1 rounded-md border px-1.5 py-px text-[10px] ${
+                      type === "vendor"
+                        ? "border-[#BFDBFE] bg-[#DBEAFE] text-[#2563EB]"
+                        : "border-[#C4B5FD] bg-[#EDE9FE] text-[#7C3AED]"
+                    }`}
+                    style={{ fontWeight: 600 }}
+                  >
+                    {type === "vendor" ? <Truck className="w-2.5 h-2.5" /> : <ShoppingCart className="w-2.5 h-2.5" />}
+                    {type === "vendor" ? "Vendor" : "Customer"}
+                  </span>
+                ))}
+              </div>
+
+              <div className="flex items-center gap-1.5 shrink-0">
+                <ActionsDropdown compact />
+                <EditCta compact />
+              </div>
+            </div>
+
+            {/* Compact tab bar */}
+            <div className="flex items-center gap-0 overflow-x-auto scrollbar-hide border-t border-[#F1F5F9]">
+              {TABS.map((tab) => {
+                const isActive = activeTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`flex items-center px-3.5 py-2 border-b-2 transition-all duration-200 whitespace-nowrap cursor-pointer text-[12px] ${
+                      isActive
+                        ? "border-[#0A77FF] text-[#0A77FF]"
+                        : "border-transparent text-[#64748B] hover:text-[#334155] hover:border-[#CBD5E1]"
+                    }`}
+                    style={{ fontWeight: isActive ? 600 : 400 }}
+                  >
+                    {tab.label}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
-        </div>
-
       </div>
 
       {/* ══════════════════════════════════════════════
           BODY: centered container on large screens
          ══════════════════════════════════════════════ */}
       <div className="flex-1">
-        <div className="max-w-[1440px] 2xl:max-w-[1600px] mx-auto px-4 lg:px-6 xl:px-8 py-5 space-y-5">
+        <div className={`mx-auto px-4 lg:px-6 xl:px-8 py-5 space-y-5 transition-all duration-300 ${isFullscreen ? "max-w-full" : "max-w-[1440px] 2xl:max-w-[1600px]"}`}>
           {/* Full-width KPI strip — only on Dashboard tab */}
           {activeTab === "dashboard" && (
             <div className="space-y-3">
@@ -680,6 +878,7 @@ export function VendorDetailsPage() {
                           value={computed.value}
                           subtitle={kpi.subtitle}
                           iconName={kpi.iconName}
+                          tooltip={kpi.tooltip}
                           change={computed.change}
                           changeColor={computed.changeColor}
                           moveCard={moveKpi}
@@ -930,21 +1129,24 @@ export function VendorDetailsPage() {
       )}
 
       {/* ── Dialogs ── */}
+
+      {/* Archive confirmation — matches creation form discard pattern */}
       <AlertDialog open={archiveDialogOpen} onOpenChange={setArchiveDialogOpen}>
         <AlertDialogContent
           className="sm:max-w-[400px] p-0 gap-0 overflow-hidden rounded-2xl border-0 shadow-[0_24px_80px_-12px_rgba(0,0,0,0.25)]"
+          style={{ zIndex: 220 }}
           onInteractOutside={() => setArchiveDialogOpen(false)}
         >
           <div className="relative flex flex-col items-center pt-10 pb-6" style={{ background: "linear-gradient(180deg, #FEF2F2 0%, rgba(254,242,242,0.3) 70%, transparent 100%)" }}>
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[180px] h-[80px] rounded-full blur-[50px] opacity-25" style={{ backgroundColor: "#EF4444" }} />
             <div className="relative w-16 h-16 rounded-2xl flex items-center justify-center" style={{ backgroundColor: "#FEE2E2" }}>
-              <Archive className="w-8 h-8" style={{ color: "#DC2626" }} />
+              <AlertTriangle className="w-8 h-8" style={{ color: "#DC2626" }} />
             </div>
             <span
               className="mt-4 px-3 py-1 rounded-full text-[11px]"
               style={{ fontWeight: 600, backgroundColor: "#FEF2F2", color: "#991B1B", textTransform: "uppercase" as const, letterSpacing: "0.05em" }}
             >
-              Caution
+              Archive
             </span>
           </div>
           <div className="flex flex-col items-center text-center px-8 pb-8">
@@ -955,72 +1157,104 @@ export function VendorDetailsPage() {
             </AlertDialogHeader>
             <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "#475569", lineHeight: "1.65" }}>
               <span style={{ fontWeight: 600, color: "#1E293B" }}>{vendor.displayName}</span>{" "}
-              will be removed from active workflows. Historical records are preserved and you can unarchive later.
+              will be removed from active workflows. Historical records are preserved and you can restore later.
             </AlertDialogDescription>
             <div className="w-full mt-7 flex flex-col gap-2.5">
-              <AlertDialogAction
+              <button
                 onClick={handleArchive}
                 className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors hover:opacity-90"
                 style={{ fontWeight: 600, backgroundColor: "#DC2626", color: "#fff" }}
               >
                 Archive Partner
-              </AlertDialogAction>
-              <AlertDialogCancel
+              </button>
+              <button
+                onClick={() => setArchiveDialogOpen(false)}
                 className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors"
                 style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#334155" }}
               >
                 Cancel
-              </AlertDialogCancel>
+              </button>
             </div>
           </div>
         </AlertDialogContent>
       </AlertDialog>
 
-      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+      {/* Status change confirmation */}
+      <AlertDialog open={statusConfirmOpen} onOpenChange={setStatusConfirmOpen}>
         <AlertDialogContent
           className="sm:max-w-[400px] p-0 gap-0 overflow-hidden rounded-2xl border-0 shadow-[0_24px_80px_-12px_rgba(0,0,0,0.25)]"
-          onInteractOutside={() => setDeleteDialogOpen(false)}
+          style={{ zIndex: 220 }}
+          onInteractOutside={() => { setStatusConfirmOpen(false); setStatusChangeTarget(null); }}
         >
-          <div className="relative flex flex-col items-center pt-10 pb-6" style={{ background: "linear-gradient(180deg, #FEF2F2 0%, rgba(254,242,242,0.3) 70%, transparent 100%)" }}>
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[180px] h-[80px] rounded-full blur-[50px] opacity-25" style={{ backgroundColor: "#DC2626" }} />
-            <div className="relative w-16 h-16 rounded-2xl flex items-center justify-center" style={{ backgroundColor: "#FEE2E2" }}>
-              <Trash2 className="w-8 h-8" style={{ color: "#DC2626" }} />
-            </div>
-            <span
-              className="mt-4 px-3 py-1 rounded-full text-[11px]"
-              style={{ fontWeight: 600, backgroundColor: "#FEF2F2", color: "#991B1B", textTransform: "uppercase" as const, letterSpacing: "0.05em" }}
-            >
-              Danger
-            </span>
-          </div>
-          <div className="flex flex-col items-center text-center px-8 pb-8">
-            <AlertDialogHeader className="p-0 gap-0 text-center">
-              <AlertDialogTitle className="text-[18px] tracking-[-0.02em]" style={{ fontWeight: 600, color: "#0F172A" }}>
-                Delete permanently?
-              </AlertDialogTitle>
-            </AlertDialogHeader>
-            <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "#475569", lineHeight: "1.65" }}>
-              <span style={{ fontWeight: 600, color: "#1E293B" }}>{vendor.displayName}</span>{" "}
-              and all associated data will be permanently erased. This action cannot be undone.
-            </AlertDialogDescription>
-            <div className="w-full mt-7 flex flex-col gap-2.5">
-              <AlertDialogAction
-                onClick={handleDelete}
-                className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors hover:opacity-90"
-                style={{ fontWeight: 600, backgroundColor: "#DC2626", color: "#fff" }}
-              >
-                Delete Forever
-              </AlertDialogAction>
-              <AlertDialogCancel
-                className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors"
-                style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#334155" }}
-              >
-                Cancel
-              </AlertDialogCancel>
-            </div>
-          </div>
+          {(() => {
+            const targetSc = statusChangeTarget ? statusConfig[statusChangeTarget] : null;
+            const isArchiving = statusChangeTarget === "archived";
+            const gradientColor = isArchiving ? "#EF4444" : "#0A77FF";
+            const gradientBg = isArchiving
+              ? "linear-gradient(180deg, #FEF2F2 0%, rgba(254,242,242,0.3) 70%, transparent 100%)"
+              : "linear-gradient(180deg, #EFF6FF 0%, rgba(239,246,255,0.3) 70%, transparent 100%)";
+            const iconBg = isArchiving ? "#FEE2E2" : "#DBEAFE";
+            const btnBg = isArchiving ? "#DC2626" : "#0A77FF";
+            return (
+              <>
+                <div className="relative flex flex-col items-center pt-10 pb-6" style={{ background: gradientBg }}>
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[180px] h-[80px] rounded-full blur-[50px] opacity-25" style={{ backgroundColor: gradientColor }} />
+                  <div className="relative w-16 h-16 rounded-2xl flex items-center justify-center" style={{ backgroundColor: iconBg }}>
+                    <ToggleRight className="w-8 h-8" style={{ color: isArchiving ? "#DC2626" : "#0A77FF" }} />
+                  </div>
+                  <span
+                    className="mt-4 px-3 py-1 rounded-full text-[11px]"
+                    style={{ fontWeight: 600, backgroundColor: isArchiving ? "#FEF2F2" : "#EFF6FF", color: isArchiving ? "#991B1B" : "#1D4ED8", textTransform: "uppercase" as const, letterSpacing: "0.05em" }}
+                  >
+                    Status Change
+                  </span>
+                </div>
+                <div className="flex flex-col items-center text-center px-8 pb-8">
+                  <AlertDialogHeader className="p-0 gap-0 text-center">
+                    <AlertDialogTitle className="text-[18px] tracking-[-0.02em]" style={{ fontWeight: 600, color: "#0F172A" }}>
+                      Change status to {targetSc?.label}?
+                    </AlertDialogTitle>
+                  </AlertDialogHeader>
+                  <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "#475569", lineHeight: "1.65" }}>
+                    <span style={{ fontWeight: 600, color: "#1E293B" }}>{vendor.displayName}</span>{" "}
+                    will be updated from <span style={{ fontWeight: 600 }}>{currentStatus.label}</span> to{" "}
+                    <span style={{ fontWeight: 600, color: targetSc?.color }}>{targetSc?.label}</span>.
+                    {isArchiving && " The partner will be removed from active workflows."}
+                  </AlertDialogDescription>
+                  <div className="w-full mt-7 flex flex-col gap-2.5">
+                    <button
+                      onClick={() => statusChangeTarget && handleStatusChange(statusChangeTarget)}
+                      className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors hover:opacity-90"
+                      style={{ fontWeight: 600, backgroundColor: btnBg, color: "#fff" }}
+                    >
+                      Change to {targetSc?.label}
+                    </button>
+                    <button
+                      onClick={() => { setStatusConfirmOpen(false); setStatusChangeTarget(null); }}
+                      className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors"
+                      style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#334155" }}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              </>
+            );
+          })()}
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Edit Partner modal — reuses CreatePartnerModal in edit mode */}
+      <CreatePartnerModal
+        open={editModalOpen}
+        onOpenChange={setEditModalOpen}
+        editMode
+        editVendor={vendor}
+        onPartnerCreated={() => {
+          setEditModalOpen(false);
+          toast.success("Partner updated successfully");
+        }}
+      />
     </div>
   );
 }
@@ -1426,6 +1660,7 @@ interface DashKpiDef {
   category: string;
   iconName: string;
   subtitle: string;
+  tooltip?: string;
 }
 
 const DASH_KPI_DEFS: DashKpiDef[] = [
@@ -1433,18 +1668,18 @@ const DASH_KPI_DEFS: DashKpiDef[] = [
   { key: "total_orders", label: "Total Orders", category: "Financial", iconName: "ShoppingCart", subtitle: "All purchase orders" },
   { key: "total_spent", label: "Total Spent", category: "Financial", iconName: "TrendingUp", subtitle: "Cumulative spend" },
   { key: "outstanding", label: "Outstanding", category: "Financial", iconName: "Package", subtitle: "Balance due" },
-  { key: "avg_order_value", label: "Avg. Order Value", category: "Financial", iconName: "DollarSign", subtitle: "Per order average" },
-  { key: "days_payable", label: "Days Payable", category: "Financial", iconName: "Calendar", subtitle: "Payment cycle length" },
-  { key: "net_margin", label: "Net Margin", category: "Financial", iconName: "Percent", subtitle: "Profit margin %" },
+  { key: "avg_order_value", label: "Avg. Order Value", category: "Financial", iconName: "DollarSign", subtitle: "Per order average", tooltip: "Total spend divided by number of orders. Tracks purchasing efficiency and helps identify cost trends per transaction." },
+  { key: "days_payable", label: "Days Payable", category: "Financial", iconName: "Calendar", subtitle: "Payment cycle length", tooltip: "Average number of days between invoice receipt and payment. Lower values indicate faster payment cycles and stronger vendor relationships." },
+  { key: "net_margin", label: "Net Margin", category: "Financial", iconName: "Percent", subtitle: "Profit margin %", tooltip: "Net profit as a percentage of total revenue from this partner. Accounts for all costs including goods, logistics, and overhead." },
   { key: "credit_limit", label: "Credit Limit", category: "Financial", iconName: "CreditCard", subtitle: "Total credit line" },
   // Operational
   { key: "last_order_date", label: "Last Order Date", category: "Operational", iconName: "Calendar", subtitle: "Most recent order" },
   { key: "payment_status", label: "Payment Status", category: "Operational", iconName: "CheckCircle2", subtitle: "Current payment state" },
-  { key: "credit_utilization", label: "Credit Utilization", category: "Operational", iconName: "Shield", subtitle: "Used vs limit" },
-  { key: "on_time_rate", label: "On-Time Delivery", category: "Operational", iconName: "Truck", subtitle: "Delivery performance" },
-  { key: "rating", label: "Vendor Rating", category: "Operational", iconName: "Star", subtitle: "Performance score" },
+  { key: "credit_utilization", label: "Credit Utilization", category: "Operational", iconName: "Shield", subtitle: "Used vs limit", tooltip: "Percentage of credit limit currently in use. Above 80% is flagged as high risk. Monitored in real-time against the enforcement policy." },
+  { key: "on_time_rate", label: "On-Time Delivery", category: "Operational", iconName: "Truck", subtitle: "Delivery performance", tooltip: "Percentage of orders delivered on or before the promised date. Calculated over the last 12 months of completed orders." },
+  { key: "rating", label: "Vendor Rating", category: "Operational", iconName: "Star", subtitle: "Performance score", tooltip: "Composite score based on delivery reliability, product quality, responsiveness, and compliance. Updated quarterly." },
   { key: "total_locations", label: "Total Locations", category: "Operational", iconName: "MapPin", subtitle: "Partner locations" },
-  { key: "return_rate", label: "Return Rate", category: "Operational", iconName: "RotateCcw", subtitle: "Returns percentage" },
+  { key: "return_rate", label: "Return Rate", category: "Operational", iconName: "RotateCcw", subtitle: "Returns percentage", tooltip: "Percentage of delivered items returned due to defects, damage, or mismatch. Lower is better — industry benchmark is under 3%." },
 ];
 
 const DEFAULT_DASH_KPIS = [
@@ -2018,7 +2253,7 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate }: {
         </DashInfoCard>
 
         {/* Financial Overview */}
-        <DashInfoCard title="Financial Overview" icon={Wallet}>
+        <DashInfoCard title="Financial Overview" icon={Wallet} tooltip="Key financial configuration for this partner including transaction currency, payment routing, and performance rating.">
           <div className="grid grid-cols-2 gap-x-4 gap-y-2.5">
             <div className="min-w-0">
               <DashInfoLabel>Currency</DashInfoLabel>
@@ -2050,18 +2285,33 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate }: {
         </DashInfoCard>
 
         {/* Cash Flow */}
-        <DashInfoCard title="Cash Flow" icon={Banknote}>
+        <DashInfoCard title="Cash Flow" icon={Banknote} tooltip="Net cash movement for this partner. Inflows include payments received, outflows include disbursements and refunds. Outstanding shows unpaid obligations.">
           <div className="space-y-3">
             <div>
-              <DashInfoLabel>Total Cash In Flow</DashInfoLabel>
+              <DashInfoLabel tooltip="Total payments received from or on behalf of this partner, including early payment discounts captured.">Total Cash In Flow</DashInfoLabel>
               <p className="text-[16px] text-[#059669]" style={{ fontWeight: 700 }}>{formatCurrency(totalCashIn)}</p>
             </div>
             <div>
-              <DashInfoLabel>Total Cash Out Flow</DashInfoLabel>
+              <DashInfoLabel tooltip="Total disbursements made to this partner, including PO payments, freight charges, and adjustments.">Total Cash Out Flow</DashInfoLabel>
               <p className="text-[16px] text-[#DC2626]" style={{ fontWeight: 700 }}>{formatCurrency(totalCashOut)}</p>
             </div>
             <div className="pt-2.5 border-t border-[#F1F5F9]">
-              <DashInfoLabel>Outstanding Payables</DashInfoLabel>
+              <div className="flex items-center gap-1 mb-px">
+                <p className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Outstanding Payables</p>
+                <DetailRichTooltip data={{
+                  title: "OUTSTANDING PAYABLES",
+                  description: "Total unpaid obligations to this partner. Includes approved invoices awaiting payment, overdue amounts past their due date, and scheduled future payments.",
+                  breakdown: [
+                    { label: "Pending Invoices", value: formatCurrency(Math.round(vendor.outstandingBalance * 0.55)) },
+                    { label: "Overdue Payments", value: formatCurrency(Math.round(vendor.outstandingBalance * 0.30)) },
+                    { label: "Scheduled Payments", value: formatCurrency(Math.round(vendor.outstandingBalance * 0.15)) },
+                    { label: "Total Outstanding", value: formatCurrency(vendor.outstandingBalance), isResult: true },
+                  ],
+                  formula: "Outstanding = Pending + Overdue + Scheduled",
+                }}>
+                  <span className="inline-flex shrink-0"><Info className="w-2.5 h-2.5 text-[#D1D5DB] hover:text-[#94A3B8] transition-colors cursor-help" /></span>
+                </DetailRichTooltip>
+              </div>
               <div className="flex items-baseline gap-2">
                 <p className="text-[16px] text-[#0F172A]" style={{ fontWeight: 700 }}>{formatCurrency(vendor.outstandingBalance)}</p>
                 <button className="text-[11px] text-[#0A77FF] hover:underline cursor-pointer" style={{ fontWeight: 500 }}>Invoice Details</button>
@@ -2071,14 +2321,28 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate }: {
         </DashInfoCard>
 
         {/* Credit Limits & Utilization */}
-        <DashInfoCard title="Credit Limits" icon={CreditCard}>
+        <DashInfoCard title="Credit Limits" icon={CreditCard} tooltip="Credit exposure summary. Shows approved limit vs current utilization.">
           <div className="grid grid-cols-2 gap-x-4 mb-3">
             <div className="min-w-0">
-              <DashInfoLabel>Credit Limit</DashInfoLabel>
+              <div className="flex items-center gap-1 mb-px">
+                <p className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Credit Limit</p>
+                <DetailRichTooltip data={{
+                  title: "CREDIT UTILIZATION",
+                  description: "How much of the approved credit line is currently in use. Utilization above 80% is flagged as high risk and may trigger enforcement actions.",
+                  breakdown: [
+                    { label: "Approved Limit", value: formatCurrency(vendor.creditLimit) },
+                    { label: "Currently Used", value: formatCurrency(vendor.creditUtilization) },
+                    { label: "Available", value: formatCurrency(vendor.creditLimit - vendor.creditUtilization), isResult: true },
+                  ],
+                  formula: "Available = Credit Limit – Current Utilization",
+                }}>
+                  <span className="inline-flex shrink-0"><Info className="w-2.5 h-2.5 text-[#D1D5DB] hover:text-[#94A3B8] transition-colors cursor-help" /></span>
+                </DetailRichTooltip>
+              </div>
               <p className="text-[16px] text-[#0F172A] truncate" style={{ fontWeight: 700 }}>{formatCurrency(vendor.creditLimit)}</p>
             </div>
             <div className="min-w-0">
-              <DashInfoLabel>Utilization</DashInfoLabel>
+              <DashInfoLabel tooltip="Amount of credit currently in use. Calculated as sum of open orders and pending invoices against the credit limit.">Utilization</DashInfoLabel>
               <p className="text-[16px] text-[#0F172A] truncate" style={{ fontWeight: 700 }}>{formatCurrency(vendor.creditUtilization)}</p>
             </div>
           </div>
@@ -2095,7 +2359,7 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate }: {
         </DashInfoCard>
 
         {/* Payment Terms */}
-        <DashInfoCard title="Payment Terms" icon={Receipt}>
+        <DashInfoCard title="Payment Terms" icon={Receipt} tooltip="Active payment terms applied to this partner. Determines when payment is due, early payment discounts, and enforcement rules.">
           {(() => {
             const termPreset: PaymentTermPreset = paymentTermCfg
               ? (PAYMENT_TERM_PRESETS.find((p) => p.name === paymentTermCfg.name) || {
@@ -2132,7 +2396,7 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate }: {
         </DashInfoCard>
 
         {/* Carrier & Shipping */}
-        <DashInfoCard title="Carrier & Shipping" icon={Truck} defaultOpen={false}>
+        <DashInfoCard title="Carrier & Shipping" icon={Truck} tooltip="Preferred shipping carriers and methods configured for this partner. Affects default carrier selection on new purchase orders." defaultOpen={false}>
           <div className="space-y-2.5">
             <div className="rounded-lg border border-[#E2E8F0] p-3">
               <p className="text-[10px] text-[#94A3B8] mb-1.5" style={{ fontWeight: 500 }}>Default Carrier (Vendor)</p>
@@ -2226,8 +2490,48 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate }: {
 }
 
 /* ── Collapsible info card for dashboard right column ── */
-function DashInfoCard({ title, icon: Icon, count, children, defaultOpen = true }: {
-  title: string; icon?: React.ElementType; count?: number; children: React.ReactNode; defaultOpen?: boolean;
+// ── Rich KPI Tooltip for Details Page ──
+interface DetailTooltipData {
+  title: string;
+  description: string;
+  breakdown: { label: string; value: string; isResult?: boolean }[];
+  formula: string;
+}
+
+function DetailRichTooltip({ data, children }: { data: DetailTooltipData; children: React.ReactNode }) {
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>{children}</TooltipTrigger>
+      <TooltipContent side="bottom" sideOffset={8} className="p-0 w-[300px] max-w-[90vw] z-[400] !bg-white !border-[#E2E8F0] !shadow-[0_12px_40px_-8px_rgba(0,0,0,0.15),0_0_0_1px_rgba(0,0,0,0.04)]">
+        <div className="p-3.5">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-5 h-5 rounded-md bg-[#EDF4FF] flex items-center justify-center shrink-0">
+              <Info className="w-3 h-3 text-[#0A77FF]" />
+            </div>
+            <span className="text-[11px] text-[#0F172A] tracking-wide" style={{ fontWeight: 700 }}>{data.title}</span>
+          </div>
+          <p className="text-[11px] text-[#64748B] leading-[1.6] mb-3">{data.description}</p>
+          <div className="border-t border-[#F1F5F9] mb-2.5" />
+          <div className="space-y-1">
+            {data.breakdown.map((row, i) => (
+              <div key={i} className={`flex items-center justify-between px-2.5 py-1.5 rounded-md text-[11px] ${row.isResult ? "bg-[#F0FDF4] border border-[#D1FAE5]" : ""}`}>
+                <span className={row.isResult ? "text-[#0F172A]" : "text-[#64748B]"} style={{ fontWeight: row.isResult ? 600 : 400 }}>{row.label}</span>
+                <span className={row.isResult ? "text-[#16A34A]" : "text-[#0F172A]"} style={{ fontWeight: row.isResult ? 700 : 500 }}>{row.value}</span>
+              </div>
+            ))}
+          </div>
+          <div className="border-t border-[#F1F5F9] my-2.5" />
+          <div className="px-2.5 py-1.5 rounded-lg bg-[#F0F6FF] border border-[#DBEAFE]">
+            <code className="text-[10px] text-[#1D4ED8]" style={{ fontWeight: 500, fontFamily: "ui-monospace, monospace" }}>{data.formula}</code>
+          </div>
+        </div>
+      </TooltipContent>
+    </Tooltip>
+  );
+}
+
+function DashInfoCard({ title, icon: Icon, count, tooltip: cardTooltip, children, defaultOpen = true }: {
+  title: string; icon?: React.ElementType; count?: number; tooltip?: string; children: React.ReactNode; defaultOpen?: boolean;
 }) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -2253,6 +2557,18 @@ function DashInfoCard({ title, icon: Icon, count, children, defaultOpen = true }
           </div>
         )}
         <span className="text-[12px] text-[#0F172A] text-left" style={{ fontWeight: 600 }}>{title}</span>
+        {cardTooltip && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span className="inline-flex shrink-0" onClick={(e) => e.stopPropagation()}>
+                <Info className="w-3 h-3 text-[#CBD5E1] hover:text-[#94A3B8] transition-colors cursor-help" />
+              </span>
+            </TooltipTrigger>
+            <TooltipContent side="bottom" sideOffset={6} className="max-w-[260px] z-[300]">
+              {cardTooltip}
+            </TooltipContent>
+          </Tooltip>
+        )}
         {count != null && (
           <span className="text-[10px] text-[#0A77FF] px-1.5 py-0.5 rounded-md bg-[#EDF4FF]" style={{ fontWeight: 600 }}>{count}</span>
         )}
@@ -2275,12 +2591,26 @@ function DashInfoCard({ title, icon: Icon, count, children, defaultOpen = true }
 }
 
 /* ── Small label for dashboard info fields ── */
-function DashInfoLabel({ children }: { children: React.ReactNode }) {
-  return <p className="text-[10px] text-[#94A3B8] mb-px" style={{ fontWeight: 500 }}>{children}</p>;
+function DashInfoLabel({ children, tooltip: labelTooltip }: { children: React.ReactNode; tooltip?: string }) {
+  return (
+    <div className="flex items-center gap-1 mb-px">
+      <p className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>{children}</p>
+      {labelTooltip && (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span className="inline-flex shrink-0"><Info className="w-2.5 h-2.5 text-[#D1D5DB] hover:text-[#94A3B8] transition-colors cursor-help" /></span>
+          </TooltipTrigger>
+          <TooltipContent side="right" sideOffset={4} className="max-w-[240px] z-[300]">
+            {labelTooltip}
+          </TooltipContent>
+        </Tooltip>
+      )}
+    </div>
+  );
 }
 
-function DraggableKpiCard({ index, kpiKey, label, value, subtitle, iconName, change, changeColor, moveCard, onRemove }: {
-  index: number; kpiKey: string; label: string; value: string; subtitle?: string; iconName?: string;
+function DraggableKpiCard({ index, kpiKey, label, value, subtitle, iconName, tooltip, change, changeColor, moveCard, onRemove }: {
+  index: number; kpiKey: string; label: string; value: string; subtitle?: string; iconName?: string; tooltip?: string;
   change?: string; changeColor?: string; moveCard: (from: number, to: number) => void; onRemove?: () => void;
 }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -2344,9 +2674,23 @@ function DraggableKpiCard({ index, kpiKey, label, value, subtitle, iconName, cha
         <div className="absolute top-1.5 right-1.5 opacity-0 group-hover:opacity-100 transition-all duration-150 flex items-center bg-[#F1F5F9] rounded-md p-1 z-10 pointer-events-none">
           <GripVertical className="w-3.5 h-3.5 text-[#64748B]" />
         </div>
-        {/* Label row: label + icon */}
+        {/* Label row: label + info + icon */}
         <div className="flex items-center justify-between gap-1 mb-1">
-          <p className="text-[10.5px] text-[#64748B] whitespace-nowrap" style={{ fontWeight: 500 }}>{label}</p>
+          <div className="flex items-center gap-1 min-w-0">
+            <p className="text-[10.5px] text-[#64748B] whitespace-nowrap" style={{ fontWeight: 500 }}>{label}</p>
+            {tooltip && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button type="button" className="inline-flex shrink-0" tabIndex={-1} onClick={(e) => e.stopPropagation()}>
+                    <Info className="w-3 h-3 text-[#CBD5E1] hover:text-[#94A3B8] transition-colors cursor-help" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" sideOffset={6} className="max-w-[240px] text-[11px] z-[300]">
+                  {tooltip}
+                </TooltipContent>
+              </Tooltip>
+            )}
+          </div>
           {iconName && <DashKpiIcon name={iconName} className="w-3.5 h-3.5 shrink-0" style={{ color: "#94A3B8" }} />}
         </div>
         {/* Value row with optional change indicator */}

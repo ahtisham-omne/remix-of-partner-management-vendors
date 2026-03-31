@@ -185,15 +185,20 @@ interface CreatePartnerModalProps {
   onPartnerCreated?: (data: Record<string, unknown>) => void;
   /** Auto-navigate to a specific vendor profile on open (e.g. "carrier") */
   initialProfile?: string;
+  /** When true, the modal opens in "Edit Partner" mode with pre-populated data */
+  editMode?: boolean;
+  /** The vendor object to pre-populate when in edit mode */
+  editVendor?: Record<string, unknown> | null;
 }
 
-export function CreatePartnerModal({ open, onOpenChange, onPartnerCreated, initialProfile }: CreatePartnerModalProps) {
+export function CreatePartnerModal({ open, onOpenChange, onPartnerCreated, initialProfile, editMode = false, editVendor }: CreatePartnerModalProps) {
   // Steps: 1 = Partner Group Selection, 2 = Partner Form, 3 = Configuration Sub-page
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [configType, setConfigType] = useState<"vendor" | "customer">("vendor");
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [showCancelConfirmation, setShowCancelConfirmation] = useState(false);
   const [initialProfileHandled, setInitialProfileHandled] = useState(false);
+  const [editModeInitialized, setEditModeInitialized] = useState(false);
 
   // Auto-navigate to the specified profile (e.g. carrier) when modal opens
   useEffect(() => {
@@ -209,8 +214,58 @@ export function CreatePartnerModal({ open, onOpenChange, onPartnerCreated, initi
     }
     if (!open) {
       setInitialProfileHandled(false);
+      setEditModeInitialized(false);
     }
   }, [open, initialProfile, initialProfileHandled]);
+
+  // Edit mode: pre-populate fields from vendor data
+  useEffect(() => {
+    if (open && editMode && editVendor && !editModeInitialized) {
+      setEditModeInitialized(true);
+      const v = editVendor as Record<string, unknown>;
+
+      // Pre-populate step 1: partner groups
+      const groupId = v.partnerGroup as string;
+      if (groupId) {
+        const grp = PARTNER_GROUPS.find((g) => g.id === groupId);
+        if (grp) {
+          setSelectedGroups([grp]);
+          setPrimaryGroupId(grp.id);
+        }
+      }
+
+      // Pre-populate step 2: partner info
+      setPartnerName((v.displayName as string) || (v.companyName as string) || "");
+      setWebsite((v.website as string) || "");
+      setAddress((v.billingAddress as Record<string, string>)?.street || "");
+      setProfileImage((v.profileImage as string) || null);
+
+      // Partner types
+      const types = (v.partnerTypes as string[]) || [];
+      setSelectedPartnerTypes(new Set(types));
+
+      // Sub-types — use labels from vendor data
+      const vSubs = (v.vendorSubTypes as string[]) || [];
+      const cSubs = (v.customerSubTypes as string[]) || [];
+      // Map labels back to IDs for the sub-type selection
+      const vSubIds = new Set<string>();
+      vSubs.forEach((label) => {
+        const found = VENDOR_SUB_TYPES.find((s) => s.label === label || s.id === label);
+        if (found) vSubIds.add(found.id);
+      });
+      const cSubIds = new Set<string>();
+      cSubs.forEach((label) => {
+        const found = CUSTOMER_SUB_TYPES.find((s) => s.label === label || s.id === label);
+        if (found) cSubIds.add(found.id);
+      });
+      setSelectedVendorSubTypes(vSubIds);
+      setSelectedCustomerSubTypes(cSubIds);
+      if (vSubIds.size > 0) setActiveSubTypeTab(Array.from(vSubIds)[0]);
+
+      // Skip to step 2 (partner info form)
+      setStep(2);
+    }
+  }, [open, editMode, editVendor, editModeInitialized]);
 
   // Step 1 state
   const [groupSearch, setGroupSearch] = useState("");
@@ -476,7 +531,7 @@ export function CreatePartnerModal({ open, onOpenChange, onPartnerCreated, initi
         hideCloseButton
         style={{ boxShadow: "0 24px 48px -12px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.05)" }}
       >
-        <DialogTitle className="sr-only">Create New Partner</DialogTitle>
+        <DialogTitle className="sr-only">{editMode ? "Edit Partner" : "Create New Partner"}</DialogTitle>
         <DialogDescription className="sr-only">Configure the details and settings for the new partner.</DialogDescription>
         {step === 3 ? (
           /* ───────── Configuration Sub-page ───────── */
@@ -698,9 +753,9 @@ export function CreatePartnerModal({ open, onOpenChange, onPartnerCreated, initi
               {/* Title row */}
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <h2 className="text-[15px] sm:text-[17px] text-[#0F172A]" style={{ fontWeight: 700 }}>Create New Partner</h2>
+                  <h2 className="text-[15px] sm:text-[17px] text-[#0F172A]" style={{ fontWeight: 700 }}>{editMode ? "Edit Partner" : "Create New Partner"}</h2>
                   <p className="text-[11px] sm:text-xs text-[#64748B] mt-0.5" style={{ fontWeight: 400 }}>
-                    Configure the details and settings for the new partner.
+                    {editMode ? "Update the details and settings for this partner." : "Configure the details and settings for the new partner."}
                   </p>
                 </div>
                 <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
@@ -859,9 +914,9 @@ export function CreatePartnerModal({ open, onOpenChange, onPartnerCreated, initi
                     Cancel
                   </Button>
                   <Button onClick={handleSave} className="gap-1.5 rounded-lg px-3 sm:px-5 text-xs sm:text-[13px] h-8 sm:h-9 shadow-sm">
-                    <Plus className="w-3.5 h-3.5" />
-                    <span className="hidden sm:inline">Create Partner</span>
-                    <span className="sm:hidden">Create</span>
+                    {editMode ? <Check className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
+                    <span className="hidden sm:inline">{editMode ? "Save Changes" : "Create Partner"}</span>
+                    <span className="sm:hidden">{editMode ? "Save" : "Create"}</span>
                   </Button>
                 </>
               )}
@@ -895,11 +950,11 @@ export function CreatePartnerModal({ open, onOpenChange, onPartnerCreated, initi
         <div className="flex flex-col items-center text-center px-8 pb-8">
           <AlertDialogHeader className="p-0 gap-0 text-center">
             <AlertDialogTitle className="text-[18px] tracking-[-0.02em]" style={{ fontWeight: 600, color: "#0F172A" }}>
-              Discard partner creation?
+              {editMode ? "Discard changes?" : "Discard partner creation?"}
             </AlertDialogTitle>
           </AlertDialogHeader>
           <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "#475569", lineHeight: "1.65" }}>
-            All the information you've entered will be lost. This action cannot be undone.
+            {editMode ? "All unsaved changes will be lost. This action cannot be undone." : "All the information you've entered will be lost. This action cannot be undone."}
           </AlertDialogDescription>
           <div className="w-full mt-7 flex flex-col gap-2.5">
             <button
@@ -4458,7 +4513,7 @@ function ConfigPageContent({
         <div>
           <h4 className="text-sm text-[#0F172A]" style={{ fontWeight: 700 }}>Billing & Shipping</h4>
           <p className="text-xs text-[#64748B] mt-0.5 leading-relaxed">
-            Configure default transaction currency, delivery destination, payment recipient, and funding source for this partner.
+            Configure the currency, delivery destination, payment recipient, and funding source for all transactions with this vendor.
           </p>
         </div>
 
@@ -4635,7 +4690,7 @@ function ConfigPageContent({
                       <div className="flex items-center gap-1.5">
                         <DollarSign className="w-3.5 h-3.5 text-[#94A3B8]" />
                         <span className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Currency</span>
-                        <InfoTooltip>The currency used for all transactions with this partner.</InfoTooltip>
+                        <InfoTooltip>The currency used for all transactions with this vendor, including purchase orders, invoices, and payments.</InfoTooltip>
                       </div>
                       <Pencil className="w-3 h-3 text-[#CBD5E1] opacity-0 group-hover:opacity-100 transition-opacity" />
                     </div>
@@ -4702,7 +4757,7 @@ function ConfigPageContent({
                   <div className="flex items-center gap-1.5">
                     <Receipt className="w-3.5 h-3.5 text-[#94A3B8]" />
                     <span className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Pay To</span>
-                    <InfoTooltip>The party receiving payment for this transaction.</InfoTooltip>
+                    <InfoTooltip>The entity that receives payment for this vendor's transactions. Defaults to this vendor. Change this if payments go to a different party, such as a parent company or billing agent.</InfoTooltip>
                   </div>
                   <Pencil className="w-3 h-3 text-[#CBD5E1] opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
@@ -4730,7 +4785,7 @@ function ConfigPageContent({
                   <div className="flex items-center gap-1.5">
                     <Truck className="w-3.5 h-3.5 text-[#94A3B8]" />
                     <span className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Ship To</span>
-                    <InfoTooltip>The destination where goods or services will be delivered.</InfoTooltip>
+                    <InfoTooltip>The default delivery destination for goods ordered from this vendor. Defaults to your company. Change this if items are regularly shipped to a different location.</InfoTooltip>
                   </div>
                   <Pencil className="w-3 h-3 text-[#CBD5E1] opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
@@ -4769,7 +4824,7 @@ function ConfigPageContent({
                   <div className="flex items-center gap-1.5">
                     <Landmark className={`w-3.5 h-3.5 ${allowAltFunding ? "text-[#94A3B8]" : "text-[#CBD5E1]"}`} />
                     <span className={`text-[11px] ${allowAltFunding ? "text-[#64748B]" : "text-[#94A3B8]"}`} style={{ fontWeight: 500 }}>Funded By</span>
-                    <InfoTooltip>Enable to override the default funding source for this partner.</InfoTooltip>
+                    <InfoTooltip>The entity that funds purchases from this vendor. Defaults to your company. Change this only if another entity — such as a parent company or partner — is responsible for financing these transactions.</InfoTooltip>
                   </div>
                   <Pencil className={`w-3 h-3 text-[#CBD5E1] opacity-0 ${allowAltFunding ? "group-hover:opacity-100" : ""} transition-opacity`} />
                 </div>
@@ -5076,7 +5131,7 @@ function ConfigPageContent({
         <div className="mb-1">
           <h4 className="text-sm text-[#0F172A]" style={{ fontWeight: 700 }}>Payment Methods</h4>
           <p className="text-xs text-[#64748B] mt-0.5 leading-relaxed">
-            Specify payment methods such as ACH, Wire Transfer, or Credit Card, and input the relevant details required for each type. These settings can be applied at Partner level or customized for specific locations.{" "}
+            Add one or more payment methods for this vendor — such as bank transfer, credit card, or digital wallet. These will be available when processing payments.{" "}
             <span className="text-[#0A77FF] inline-flex items-center gap-0.5 cursor-pointer hover:underline" style={{ fontWeight: 500 }}>
               Learn More <ExternalLink className="w-3 h-3" />
             </span>
@@ -5323,7 +5378,7 @@ function ConfigPageContent({
         <div>
           <h4 className="text-sm text-foreground" style={{ fontWeight: 700 }}>Credit Limit</h4>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Optionally set a credit limit and enforcement behaviour for this {configType}.
+            Set the maximum outstanding balance allowed with this vendor and choose how the system responds when that limit is reached.
           </p>
         </div>
 
@@ -5383,7 +5438,7 @@ function ConfigPageContent({
                   </div>
                 </div>
                 <p className="text-xs text-[#0F172A]" style={{ fontWeight: 600 }}>No Enforcement</p>
-                <p className="text-[10px] text-[#64748B] mt-0.5 leading-relaxed">Passive "Over Limit" label only — no blocking</p>
+                <p className="text-[10px] text-[#64748B] mt-0.5 leading-relaxed">No action when exceeded. A passive "Over Limit" label appears on the order as an indicator only.</p>
               </div>
             </button>
 
@@ -5410,7 +5465,7 @@ function ConfigPageContent({
                   </div>
                 </div>
                 <p className="text-xs text-[#0F172A]" style={{ fontWeight: 600 }}>Soft Warning</p>
-                <p className="text-[10px] text-[#64748B] mt-0.5 leading-relaxed">Shows confirmation modal before proceeding with the order</p>
+                <p className="text-[10px] text-[#64748B] mt-0.5 leading-relaxed">A confirmation prompt is shown before the order can proceed. The user must acknowledge to continue.</p>
               </div>
             </button>
 
@@ -5437,7 +5492,7 @@ function ConfigPageContent({
                   </div>
                 </div>
                 <p className="text-xs text-[#0F172A]" style={{ fontWeight: 600 }}>Hard Block</p>
-                <p className="text-[10px] text-[#64748B] mt-0.5 leading-relaxed">Prevents order placement when credit limit is exceeded</p>
+                <p className="text-[10px] text-[#64748B] mt-0.5 leading-relaxed">Orders cannot be placed when the limit is exceeded. Blocked until the balance is resolved.</p>
               </div>
             </button>
           </div>
@@ -5494,7 +5549,7 @@ function ConfigPageContent({
             <div className="mt-3 rounded-xl border border-[#0A77FF]/15 bg-white shadow-sm p-3.5">
               <div className="flex items-center gap-2.5">
                 <Info className="w-3.5 h-3.5 text-[#0A77FF]" />
-                <p className="text-xs text-[#64748B]">No enforcement applied. A passive "Over Limit" label will appear on orders exceeding the credit limit.</p>
+                <p className="text-xs text-[#64748B]">No action is taken when the credit limit is exceeded. An "Over Limit" label appears on the order as a passive indicator only.</p>
               </div>
             </div>
           )}
@@ -5515,7 +5570,7 @@ function ConfigPageContent({
         <div className="mb-1">
           <h4 className="text-sm text-[#0F172A]" style={{ fontWeight: 700 }}>Payment Terms</h4>
           <p className="text-xs text-[#64748B] mt-0.5 leading-relaxed">
-            Set payment terms for this partner to apply as the default for all associated purchase orders, ensuring consistent payment processing.{" "}
+            Set the default payment terms for this vendor. These will apply automatically to all associated purchase orders.{" "}
             <span className="text-[#0A77FF] inline-flex items-center gap-0.5 cursor-pointer hover:underline" style={{ fontWeight: 500 }}>
               Learn More <ExternalLink className="w-3 h-3" />
             </span>
@@ -5585,7 +5640,7 @@ function ConfigPageContent({
                     </span>
                   </div>
                   <p className="text-[11px] sm:text-xs text-[#64748B] mt-0.5" style={{ fontWeight: 400 }}>
-                    Configure the type, trigger, and duration for the new term.
+                    Select the structure of the payment arrangement with this vendor.
                   </p>
                 </div>
                 <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
@@ -6290,7 +6345,7 @@ function ConfigPageContent({
         <div className="mb-1">
           <h4 className="text-sm text-[#0F172A]" style={{ fontWeight: 700 }}>Vendor Pricing Rules</h4>
           <p className="text-xs text-[#64748B] mt-0.5 leading-relaxed">
-            Set a pricing rule to this partner to automatically apply tier-based discounts and pricing in purchase and sales orders.{" "}
+            Attach a pricing rule to this vendor to automatically apply tier-based discounts or premiums on purchase and sales orders.{" "}
             <span className="text-[#0A77FF] inline-flex items-center gap-0.5 cursor-pointer hover:underline" style={{ fontWeight: 500 }}>
               Learn More <ExternalLink className="w-3 h-3" />
             </span>
@@ -7506,7 +7561,7 @@ function ConfigPageContent({
         <div>
           <h4 className="text-sm text-foreground" style={{ fontWeight: 700 }}>Shipping Methods</h4>
           <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
-            Set up carrier-grade shipping services and vendor-specific delivery methods to ensure accurate lead times and tracking for all shipments involving this partner.{" "}
+            Set up the shipping services and delivery methods used with this vendor. These ensure accurate lead times and tracking on all related shipments.{" "}
             <span className="text-primary inline-flex items-center gap-0.5 cursor-pointer hover:underline" style={{ fontWeight: 500 }}>
               Learn More <ExternalLink className="w-3 h-3" />
             </span>
@@ -7558,7 +7613,7 @@ function ConfigPageContent({
                   <Truck className="w-5 h-5 text-muted-foreground" />
                 </div>
                 <p className="text-sm text-foreground" style={{ fontWeight: 600 }}>No carrier services yet</p>
-                <p className="text-xs text-muted-foreground mt-1 max-w-[280px]">Create custom shipping methods with name, description, and delivery duration range.</p>
+                <p className="text-xs text-muted-foreground mt-1 max-w-[280px]">Add a carrier service to define the shipping methods available from this vendor.</p>
                 <button
                   onClick={addCarrierService}
                   className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-xs transition-colors hover:bg-primary/90"
@@ -7688,7 +7743,7 @@ function ConfigPageContent({
                   <Ship className="w-5 h-5 text-muted-foreground" />
                 </div>
                 <p className="text-sm text-foreground" style={{ fontWeight: 600 }}>No vendor preferences yet</p>
-                <p className="text-xs text-muted-foreground mt-1 max-w-[280px]">Map vendor-specific carrier and shipping method preferences.</p>
+                <p className="text-xs text-muted-foreground mt-1 max-w-[280px]">Add a vendor preference to specify which carrier and shipping method this vendor uses by default.</p>
                 <button
                   onClick={addVendorShippingPref}
                   className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-xs transition-colors hover:bg-primary/90"

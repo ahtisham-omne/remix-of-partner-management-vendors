@@ -35,6 +35,7 @@ export interface KpiDefinition {
   iconBg: string;
   iconColor: string;
   subtitle: string;
+  tooltip?: string;
 }
 
 /* ─── All available KPI definitions ─── */
@@ -76,6 +77,7 @@ export const ALL_KPI_DEFINITIONS: KpiDefinition[] = [
     iconBg: "#EDF4FF",
     iconColor: "#0A77FF",
     subtitle: "Total credit exposure",
+    tooltip: "The combined credit limit across all active partners. Represents total credit exposure your organization has extended.",
   },
   {
     key: "avg_credit_limit",
@@ -85,6 +87,7 @@ export const ALL_KPI_DEFINITIONS: KpiDefinition[] = [
     iconBg: "#F5F3FF",
     iconColor: "#7C3AED",
     subtitle: "Average per partner",
+    tooltip: "Total credit limit divided by number of partners. Helps benchmark individual credit allocations against the portfolio average.",
   },
   {
     key: "total_credit_utilization",
@@ -94,6 +97,7 @@ export const ALL_KPI_DEFINITIONS: KpiDefinition[] = [
     iconBg: "#FFF7ED",
     iconColor: "#EA580C",
     subtitle: "Total utilization amount",
+    tooltip: "Sum of all credit currently being used across partners. A high utilization relative to the total limit may indicate elevated risk.",
   },
   {
     key: "total_outstanding",
@@ -103,6 +107,7 @@ export const ALL_KPI_DEFINITIONS: KpiDefinition[] = [
     iconBg: "#FEF2F2",
     iconColor: "#DC2626",
     subtitle: "Total outstanding",
+    tooltip: "Total unpaid balance across all partners. Includes invoices pending payment, overdue amounts, and scheduled disbursements.",
   },
   {
     key: "total_spent",
@@ -121,6 +126,7 @@ export const ALL_KPI_DEFINITIONS: KpiDefinition[] = [
     iconBg: "#ECFDF5",
     iconColor: "#059669",
     subtitle: "Average profit margin",
+    tooltip: "Average net profit margin calculated across all partner transactions. Factors in revenue, cost of goods, and operational expenses per partner.",
   },
   // Status
   {
@@ -168,6 +174,7 @@ export const ALL_KPI_DEFINITIONS: KpiDefinition[] = [
     iconBg: "#FFFBEB",
     iconColor: "#D97706",
     subtitle: "Average partner rating",
+    tooltip: "Weighted average of all partner performance ratings. Based on delivery reliability, quality, communication, and compliance scores.",
   },
 ];
 
