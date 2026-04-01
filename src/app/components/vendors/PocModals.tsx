@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useRef } from "react";
 import { PocDataTable } from "./PocDataTable";
 import {
   Dialog,
@@ -426,6 +426,7 @@ export function CreatePocModal({
   saveAndCreateAnother, onSaveAndCreateAnotherChange, onSave,
 }: CreatePocModalProps) {
   // Internal state for new fields
+  const profileInputRef = useRef<HTMLInputElement>(null);
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [company, setCompany] = useState(contextName || "");
   const [notes, setNotes] = useState("");
@@ -509,17 +510,42 @@ export function CreatePocModal({
             <div className="px-2.5 sm:px-3 pt-2 sm:pt-2.5 pb-1.5 sm:pb-2">
               {/* Photo on left, fields in 2-col grid on right */}
               <div className="grid grid-cols-1 sm:grid-cols-[auto_1fr] gap-3 sm:gap-4">
-                {/* Left — Profile Picture */}
-                <div className="hidden sm:flex flex-col items-center w-[100px]">
-                  <div className={`relative w-full aspect-square rounded-xl cursor-pointer group transition-all ${profileImage ? "ring-2 ring-[#E2E8F0] hover:ring-[#0A77FF]/30" : "border-2 border-dashed border-[#CBD5E1] hover:border-[#0A77FF]/50 bg-[#F8FAFC] hover:bg-[#EDF4FF]/50"}`}>
+                {/* Left — Profile Picture (full height) */}
+                <div className="hidden sm:flex flex-col w-[110px]">
+                  <input ref={profileInputRef} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) { const reader = new FileReader(); reader.onload = (ev) => setProfileImage(ev.target?.result as string); reader.readAsDataURL(f); } e.target.value = ""; }} />
+                  <div
+                    onClick={() => profileInputRef.current?.click()}
+                    className={`relative w-full h-full min-h-[120px] rounded-xl cursor-pointer group transition-all ${profileImage ? "ring-2 ring-[#E2E8F0] hover:ring-[#0A77FF]/30" : "border-2 border-dashed border-[#CBD5E1] hover:border-[#0A77FF]/50 bg-[#F8FAFC] hover:bg-[#EDF4FF]/50"}`}
+                  >
                     {profileImage ? (
-                      <><img src={profileImage} alt="" className="w-full h-full rounded-xl object-cover" /><div className="absolute inset-0 rounded-xl bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center"><Camera className="w-5 h-5 text-white opacity-0 group-hover:opacity-100 transition-opacity" /></div></>
+                      <>
+                        <img src={profileImage} alt="" className="w-full h-full rounded-xl object-cover" />
+                        <div className="absolute inset-0 rounded-xl bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center">
+                          <Camera className="w-5 h-5 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </div>
+                      </>
                     ) : initials ? (
-                      <div className="w-full h-full flex flex-col items-center justify-center"><span className="text-[22px]" style={{ fontWeight: 700, color: deptAvatarColor.text }}>{initials}</span></div>
+                      <div className="w-full h-full flex flex-col items-center justify-center gap-1">
+                        <span className="text-[28px]" style={{ fontWeight: 700, color: deptAvatarColor.text }}>{initials}</span>
+                        <span className="text-[9px] text-[#94A3B8] group-hover:text-[#0A77FF] transition-colors" style={{ fontWeight: 500 }}>Change photo</span>
+                      </div>
                     ) : (
-                      <div className="w-full h-full flex flex-col items-center justify-center gap-1"><div className="w-8 h-8 rounded-lg bg-[#F1F5F9] group-hover:bg-[#EDF4FF] flex items-center justify-center transition-colors"><Camera className="w-4 h-4 text-[#94A3B8] group-hover:text-[#0A77FF] transition-colors" /></div><span className="text-[10px] text-[#94A3B8] group-hover:text-[#0A77FF] transition-colors" style={{ fontWeight: 500 }}>Upload</span></div>
+                      <div className="w-full h-full flex flex-col items-center justify-center gap-1.5">
+                        <div className="w-10 h-10 rounded-lg bg-[#F1F5F9] group-hover:bg-[#EDF4FF] flex items-center justify-center transition-colors">
+                          <Camera className="w-5 h-5 text-[#94A3B8] group-hover:text-[#0A77FF] transition-colors" />
+                        </div>
+                        <span className="text-[10px] text-[#94A3B8] group-hover:text-[#0A77FF] transition-colors" style={{ fontWeight: 500 }}>Upload photo</span>
+                        <span className="text-[9px] text-[#CBD5E1]">Max 5 MB</span>
+                      </div>
                     )}
                   </div>
+                  {profileImage && (
+                    <div className="flex items-center justify-center gap-2 mt-1.5">
+                      <button type="button" onClick={() => profileInputRef.current?.click()} className="text-[10px] text-[#0A77FF] hover:text-[#0862D0] cursor-pointer" style={{ fontWeight: 500 }}>Change</button>
+                      <span className="text-[#E2E8F0] text-[10px]">·</span>
+                      <button type="button" onClick={(e) => { e.stopPropagation(); setProfileImage(null); }} className="text-[10px] text-[#EF4444] hover:text-[#DC2626] cursor-pointer" style={{ fontWeight: 500 }}>Remove</button>
+                    </div>
+                  )}
                 </div>
                 {/* Right — fields in 2-col grid */}
                 <div className="grid grid-cols-1 min-[480px]:grid-cols-2 gap-x-3 sm:gap-x-4 gap-y-2.5 sm:gap-y-3">
