@@ -202,10 +202,10 @@ export function PocDataTable({
                 {selectable && <TableHead className="w-[40px] min-w-[40px] !pl-4 !pr-0"><Checkbox checked={allSel ? true : someSel ? "indeterminate" : false} onCheckedChange={() => onSelectAll?.(allIds)} /></TableHead>}
                 <TableHead className="min-w-[200px]">Name</TableHead>
                 <TableHead className="w-[120px]">Department</TableHead>
-                <TableHead className="w-[80px]">Status</TableHead>
                 <TableHead className="w-[200px]">Email</TableHead>
                 <TableHead className="w-[130px]">Phone</TableHead>
                 <TableHead className="w-[130px]">Secondary</TableHead>
+                <TableHead className="w-[80px]">Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -224,10 +224,10 @@ export function PocDataTable({
                       </div>
                     </TableCell>
                     <TableCell><span className={`${isComfort ? "text-[13px]" : "text-sm"} text-[#475569]`}>{c.department === "Supply Chain Management" ? "SCM" : c.department}</span></TableCell>
-                    <TableCell><span className="inline-flex items-center text-[11px] px-2 py-0.5 rounded-full border" style={{ fontWeight: 500, backgroundColor: "#ECFDF5", color: "#065F46", borderColor: "#A7F3D0" }}>Active</span></TableCell>
                     <TableCell><span className={`${isComfort ? "text-[13px]" : "text-sm"} text-muted-foreground truncate block max-w-[180px]`}><Hl text={c.email} q={searchQuery} /></span></TableCell>
                     <TableCell><span className={`${isComfort ? "text-[13px]" : "text-sm"} text-muted-foreground`}>{c.phone}</span>{isComfort && c.phoneExt && <span className="text-xs text-muted-foreground/50 ml-1">ext. {c.phoneExt}</span>}</TableCell>
                     <TableCell><span className={`${isComfort ? "text-[13px]" : "text-sm"} text-muted-foreground`}>{c.secondaryPhone || "—"}</span></TableCell>
+                    <TableCell><span className="inline-flex items-center text-[11px] px-2 py-0.5 rounded-full border" style={{ fontWeight: 500, backgroundColor: "#ECFDF5", color: "#065F46", borderColor: "#A7F3D0" }}>Active</span></TableCell>
                   </TableRow>
                 );
               })}
