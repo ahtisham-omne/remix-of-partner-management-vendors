@@ -203,11 +203,12 @@ export function PocDataTable({
                           </div>
                         )}
                       </div>
-                      {/* Department pill */}
-                      <div className="mt-2.5 mb-3">
+                      {/* Department pill + Status */}
+                      <div className="flex items-center gap-1.5 mt-2.5 mb-3">
                         <span className="inline-flex items-center gap-1 px-2 py-[2px] rounded text-[10px]" style={{ fontWeight: 500, backgroundColor: dc.bg, color: dc.text }}>
                           {c.department === "Supply Chain Management" ? "Supply Chain" : c.department}
                         </span>
+                        <span className="inline-flex items-center text-[10px] px-2 py-[2px] rounded-full border" style={{ fontWeight: 500, backgroundColor: "#ECFDF5", color: "#065F46", borderColor: "#A7F3D0" }}>Active</span>
                       </div>
                       {/* Contact details with icons */}
                       <div className="space-y-1.5 pt-2.5 border-t border-[#F1F5F9]">
