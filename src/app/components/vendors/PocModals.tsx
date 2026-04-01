@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
+import { PocDataTable } from "./PocDataTable";
 import {
   Dialog,
   DialogContent,
@@ -303,6 +304,15 @@ export function SelectPocDictionaryModal({
 }: SelectPocDictionaryModalProps) {
   const [isFullScreen, setIsFullScreen] = useState(false);
 
+  const handleSelectAll = useCallback((ids: string[]) => {
+    const allSelected = ids.every((id) => pocTempSelected.has(id));
+    if (allSelected) {
+      ids.forEach((id) => onTogglePocTemp(id));
+    } else {
+      ids.filter((id) => !pocTempSelected.has(id)).forEach((id) => onTogglePocTemp(id));
+    }
+  }, [pocTempSelected, onTogglePocTemp]);
+
   const modalBaseClass =
     "!fixed !inset-0 !translate-x-0 !translate-y-0 !m-auto !w-full !h-full transition-[max-width,max-height,border-radius] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]";
   const modalSizeClass = isFullScreen
@@ -321,17 +331,17 @@ export function SelectPocDictionaryModal({
         <DialogDescription className="sr-only">Choose contacts from the contact directory to associate with {contextLabel}.</DialogDescription>
 
         {/* Header */}
-        <div className="px-3 sm:px-5 pt-3 sm:pt-4 pb-3 shrink-0 border-b border-[#EEF2F6] bg-white rounded-t-none sm:rounded-t-2xl">
-          <div className="flex items-start justify-between gap-3 mb-3">
+        <div className="px-5 pt-4 pb-3 shrink-0 border-b border-[#E2E8F0] bg-white rounded-t-none sm:rounded-t-2xl">
+          <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
               <h2 className="text-[15px] sm:text-[17px] text-[#0F172A]" style={{ fontWeight: 700 }}>
                 Select Point of Contact
               </h2>
-              <p className="text-[11px] sm:text-xs text-[#64748B] mt-0.5" style={{ fontWeight: 400 }}>
+              <p className="text-[12px] text-[#64748B] mt-0.5" style={{ fontWeight: 400 }}>
                 Choose from your saved contacts or create a new one to assign to {contextLabel}.
               </p>
             </div>
-            <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
+            <div className="flex items-center gap-1.5 shrink-0">
               <button
                 onClick={() => setIsFullScreen(!isFullScreen)}
                 className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#475569] hover:bg-[#F8FAFC] hover:border-[#CBD5E1] transition-all cursor-pointer"
@@ -340,215 +350,44 @@ export function SelectPocDictionaryModal({
                 {isFullScreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
                 {isFullScreen ? "Exit full" : "Full view"}
               </button>
-              <button
-                onClick={() => onOpenChange(false)}
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-[#94A3B8] hover:text-[#64748B] hover:bg-[#F1F5F9] transition-all cursor-pointer"
-              >
+              <button onClick={() => onOpenChange(false)} className="w-8 h-8 rounded-lg flex items-center justify-center text-[#94A3B8] hover:text-[#64748B] hover:bg-[#F1F5F9] transition-all cursor-pointer">
                 <X className="w-4.5 h-4.5" />
               </button>
             </div>
           </div>
-
-          {/* Search + Create CTA */}
-          <div className="flex items-center justify-between gap-3 mb-3">
-            <div className="relative w-[220px]">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
-              <Input
-                value={pocSearch}
-                onChange={(e) => onPocSearchChange(e.target.value)}
-                placeholder="Search point of contact"
-                className="pl-9 h-9 rounded-lg border-[#E2E8F0] bg-white text-sm"
-              />
-            </div>
-            <button
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#0A77FF] text-white text-[13px] hover:bg-[#0960D9] transition-colors shadow-sm shrink-0 cursor-pointer"
-              style={{ fontWeight: 600 }}
-              onClick={onOpenCreatePoc}
-            >
-              <Plus className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Create New Contact</span>
-              <span className="sm:hidden">New</span>
-            </button>
-          </div>
-
-          {/* Category filter tabs */}
-          <div className="flex items-center gap-1.5 flex-wrap">
-            {([
-              { key: "all" as const, label: "All", count: contactDictionary.length },
-              { key: "Sales" as const, label: "Sales", count: pocDepartmentCounts["Sales"] || 0 },
-              { key: "Supply Chain Management" as const, label: "Supply Chain", count: pocDepartmentCounts["Supply Chain Management"] || 0 },
-              { key: "Finance" as const, label: "Finance", count: pocDepartmentCounts["Finance"] || 0 },
-            ]).map((tab) => {
-              const isActive = pocCategoryFilter === tab.key;
-              return (
-                <button
-                  key={tab.key}
-                  onClick={() => onPocCategoryFilterChange(tab.key)}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-all border cursor-pointer ${
-                    isActive
-                      ? "bg-[#0A77FF]/8 border-[#0A77FF]/20 text-[#0A77FF]"
-                      : "bg-white border-[#E2E8F0] text-[#64748B] hover:bg-[#F8FAFC] hover:border-[#CBD5E1]"
-                  }`}
-                  style={{ fontWeight: isActive ? 600 : 500 }}
-                >
-                  {tab.label}
-                  <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${isActive ? "bg-[#0A77FF]/12 text-[#0A77FF]" : "bg-[#F1F5F9] text-[#94A3B8]"}`} style={{ fontWeight: 600 }}>
-                    {tab.count}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
         </div>
 
-        {/* Card Grid */}
-        <div className="flex-1 overflow-y-auto px-3 sm:px-5 py-4 bg-[#FAFBFC]">
-          {pocPagedContacts.length === 0 ? (
-            <div className="py-16 flex flex-col items-center justify-center text-center">
-              <div className="w-14 h-14 rounded-2xl bg-[#F1F5F9] flex items-center justify-center mb-4">
-                <Search className="w-6 h-6 text-[#94A3B8]" />
-              </div>
-              <p className="text-sm text-[#64748B]" style={{ fontWeight: 600 }}>No contacts found</p>
-              <p className="text-xs text-[#94A3B8] mt-1.5 max-w-[260px]">Try adjusting your search or filter, or create a new contact.</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-              {pocPagedContacts.map((contact) => {
-                const isSelected = pocTempSelected.has(contact.id);
-                const dc = DEPT_COLORS[contact.department] || DEPT_COLORS["Sales"];
-                const at = getAvatarTint(contact.avatarColor);
-                return (
-                  <button
-                    key={contact.id}
-                    onClick={() => onTogglePocTemp(contact.id)}
-                    className={`group/poc relative text-left rounded-xl border transition-all duration-200 cursor-pointer ${
-                      isSelected
-                        ? "border-[#0A77FF] bg-[#FAFCFF] shadow-[0_0_0_1px_#0A77FF]"
-                        : "border-[#E8ECF1] bg-white hover:border-[#BFDBFE] hover:shadow-[0_4px_16px_-4px_rgba(10,119,255,0.12)]"
-                    }`}
-                  >
-                    <div className="p-3.5">
-                      {/* Row 1: Avatar + Name + Checkbox */}
-                      <div className="flex items-start gap-3">
-                        <div
-                          className="w-10 h-10 rounded-full flex items-center justify-center text-[11px] shrink-0"
-                          style={{ backgroundColor: at.bg, color: at.text, fontWeight: 700 }}
-                        >
-                          {getInitials(contact.name)}
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{highlightMatch(contact.name, pocSearch)}</p>
-                          <p className="text-[11px] text-[#64748B] truncate mt-0.5">{highlightMatch(contact.company, pocSearch)}</p>
-                        </div>
-                        <div className={`w-[18px] h-[18px] rounded-[5px] border-[1.5px] flex items-center justify-center shrink-0 mt-0.5 transition-all duration-150 ${
-                          isSelected ? "bg-[#0A77FF] border-[#0A77FF]" : "border-[#CBD5E1] bg-white group-hover/poc:border-[#94A3B8]"
-                        }`}>
-                          {isSelected && <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />}
-                        </div>
-                      </div>
-
-                      {/* Department badge */}
-                      <div className="mt-2.5 mb-3">
-                        <span
-                          className="inline-flex items-center gap-1 px-2 py-[2px] rounded text-[10px]"
-                          style={{ fontWeight: 500, backgroundColor: dc.bg, color: dc.text }}
-                        >
-                          {contact.department === "Supply Chain Management" ? "Supply Chain" : contact.department}
-                        </span>
-                      </div>
-
-                      {/* Contact details — clean list */}
-                      <div className="space-y-1.5 pt-2.5 border-t border-[#F1F5F9]">
-                        <div className="flex items-center gap-2 text-[11px] text-[#475569]">
-                          <Phone className="w-3 h-3 text-[#94A3B8] shrink-0" />
-                          <span className="truncate">{contact.phone}</span>
-                        </div>
-                        {contact.secondaryPhone && (
-                          <div className="flex items-center gap-2 text-[11px] text-[#475569]">
-                            <PhoneCall className="w-3 h-3 text-[#94A3B8] shrink-0" />
-                            <span className="truncate">{contact.secondaryPhone}</span>
-                          </div>
-                        )}
-                        <div className="flex items-center gap-2 text-[11px] text-[#475569]">
-                          <Mail className="w-3 h-3 text-[#94A3B8] shrink-0" />
-                          <span className="truncate">{contact.email}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          )}
-        </div>
-
-        {/* Pagination */}
-        <div className="px-3 sm:px-5 py-2.5 border-t border-[#F1F5F9] flex items-center justify-between shrink-0 bg-white">
-          <div className="flex items-center gap-2 text-xs text-[#64748B]">
-            <span>Records per page</span>
-            <span className="px-2 py-1 rounded border border-[#E2E8F0] text-xs text-[#0F172A]" style={{ fontWeight: 500 }}>{POC_PER_PAGE}</span>
-          </div>
-          <div className="flex items-center gap-0.5">
-            <button onClick={() => onPocPageChange(1)} disabled={pocPage === 1} className="w-7 h-7 rounded-md flex items-center justify-center hover:bg-[#F1F5F9] disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
-              <ChevronsLeft className="w-3.5 h-3.5 text-[#64748B]" />
-            </button>
-            <button onClick={() => onPocPageChange(Math.max(1, pocPage - 1))} disabled={pocPage === 1} className="w-7 h-7 rounded-md flex items-center justify-center hover:bg-[#F1F5F9] disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
-              <ChevronLeft className="w-3.5 h-3.5 text-[#64748B]" />
-            </button>
-            {Array.from({ length: Math.min(pocTotalPages, 5) }, (_, i) => {
-              let pageNum: number;
-              if (pocTotalPages <= 5) pageNum = i + 1;
-              else if (pocPage <= 3) pageNum = i + 1;
-              else if (pocPage >= pocTotalPages - 2) pageNum = pocTotalPages - 4 + i;
-              else pageNum = pocPage - 2 + i;
-              return (
-                <button
-                  key={pageNum}
-                  onClick={() => onPocPageChange(pageNum)}
-                  className={`w-7 h-7 rounded-md flex items-center justify-center text-xs transition-colors ${
-                    pocPage === pageNum ? "bg-[#0A77FF] text-white" : "text-[#64748B] hover:bg-[#F1F5F9]"
-                  }`}
-                  style={{ fontWeight: pocPage === pageNum ? 600 : 400 }}
-                >
-                  {pageNum}
-                </button>
-              );
-            })}
-            <button onClick={() => onPocPageChange(Math.min(pocTotalPages, pocPage + 1))} disabled={pocPage === pocTotalPages} className="w-7 h-7 rounded-md flex items-center justify-center hover:bg-[#F1F5F9] disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
-              <ChevronRight className="w-3.5 h-3.5 text-[#64748B]" />
-            </button>
-            <button onClick={() => onPocPageChange(pocTotalPages)} disabled={pocPage === pocTotalPages} className="w-7 h-7 rounded-md flex items-center justify-center hover:bg-[#F1F5F9] disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
-              <ChevronsRight className="w-3.5 h-3.5 text-[#64748B]" />
-            </button>
-          </div>
-        </div>
+        {/* PocDataTable — reusable table component */}
+        <PocDataTable
+          contacts={pocPagedContacts}
+          selectedIds={pocTempSelected}
+          onToggleSelect={onTogglePocTemp}
+          onSelectAll={handleSelectAll}
+          searchQuery={pocSearch}
+          onSearchChange={onPocSearchChange}
+          categoryFilter={pocCategoryFilter}
+          onCategoryFilterChange={onPocCategoryFilterChange}
+          page={pocPage}
+          totalPages={pocTotalPages}
+          onPageChange={onPocPageChange}
+          totalCount={contactDictionary.length}
+          perPage={POC_PER_PAGE}
+          onCreateNew={onOpenCreatePoc}
+          selectable
+        />
 
         {/* Footer */}
-        <div className="px-3 sm:px-5 py-3 border-t border-[#EEF2F6] bg-white rounded-b-none sm:rounded-b-2xl flex items-center justify-between shrink-0">
+        <div className="px-5 py-3 border-t border-[#E2E8F0] bg-white rounded-b-none sm:rounded-b-2xl flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#0A77FF]/8 border border-[#0A77FF]/12">
               <Users className="w-3 h-3 text-[#0A77FF]" />
               <span className="text-[11px] text-[#0A77FF]" style={{ fontWeight: 700 }}>{pocTempSelected.size}</span>
             </div>
-            <span className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>
-              selected
-            </span>
+            <span className="text-[13px] text-[#64748B]" style={{ fontWeight: 500 }}>selected</span>
           </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => onOpenChange(false)}
-              className="px-4 py-2 rounded-lg border border-[#E2E8F0] bg-white text-[13px] text-[#334155] hover:bg-[#F8FAFC] transition-colors cursor-pointer"
-              style={{ fontWeight: 500 }}
-            >
-              Cancel
-            </button>
-            <button
-              onClick={onConfirm}
-              className="px-4 py-2 rounded-lg bg-[#0A77FF] text-[13px] text-white hover:bg-[#0960D9] transition-colors shadow-sm cursor-pointer"
-              style={{ fontWeight: 600 }}
-            >
-              Confirm Selection
-            </button>
+          <div className="flex items-center gap-2.5">
+            <button onClick={() => onOpenChange(false)} className="px-4 py-2 rounded-lg border border-[#E2E8F0] bg-white text-[13px] text-[#334155] hover:bg-[#F8FAFC] transition-colors cursor-pointer" style={{ fontWeight: 500 }}>Cancel</button>
+            <button onClick={onConfirm} className="px-5 py-2 rounded-lg bg-[#0A77FF] text-[13px] text-white hover:bg-[#0960D9] transition-colors shadow-sm cursor-pointer" style={{ fontWeight: 600 }}>Confirm Selection</button>
           </div>
         </div>
       </DialogContent>
