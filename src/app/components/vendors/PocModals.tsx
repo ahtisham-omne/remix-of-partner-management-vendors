@@ -567,7 +567,7 @@ export function CreatePocModal({
                     </Select>
                     <input value={row.number} onChange={(e) => handlePhoneChange(idx, "number", e.target.value)} placeholder="Phone number" className="flex-1 h-full px-2.5 text-sm text-[#0F172A] outline-none bg-transparent placeholder:text-[#B8C4D0]" />
                   </div>
-                  <Input value={row.ext} onChange={(e) => handlePhoneChange(idx, "ext", e.target.value)} placeholder="Ext." className={`w-[70px] shrink-0 ${inputCls}`} />
+                  {(row.type === "Office" || row.type === "Landline") && <Input value={row.ext} onChange={(e) => handlePhoneChange(idx, "ext", e.target.value)} placeholder="Ext." className={`w-[70px] shrink-0 ${inputCls}`} />}
                   {phoneRows.length > 1 && <button onClick={() => removePhoneRow(row.id)} className="w-8 h-8 rounded-lg flex items-center justify-center text-[#CBD5E1] hover:text-[#EF4444] hover:bg-[#FEF2F2] transition-colors cursor-pointer shrink-0"><Trash2 className="w-3.5 h-3.5" /></button>}
                 </div>
               ))}
