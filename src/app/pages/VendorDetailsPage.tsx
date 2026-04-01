@@ -1670,9 +1670,9 @@ function ContentCard({ title, icon: Icon, count, children, action, currentSize, 
   return (
     <div
       style={{ opacity: isDragging ? 0.4 : 1 }}
-      className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)] transition-all duration-200 hover:shadow-[0_2px_8px_-2px_rgba(0,0,0,0.06)]"
+      className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)] transition-all duration-200 hover:shadow-[0_2px_8px_-2px_rgba(0,0,0,0.06)] h-full flex flex-col"
     >
-      <div className="px-4 py-2.5 border-b border-[#F1F5F9] flex items-center justify-between">
+      <div className="px-4 py-2.5 border-b border-[#F1F5F9] flex items-center justify-between shrink-0">
         <div className="flex items-center gap-2">
           {dragRef && (
             <div ref={dragRef} className="cursor-grab active:cursor-grabbing p-0.5 -ml-1 rounded hover:bg-[#F1F5F9] transition-colors">
@@ -1725,7 +1725,7 @@ function ContentCard({ title, icon: Icon, count, children, action, currentSize, 
           {action}
         </div>
       </div>
-      <div className="p-4">{children}</div>
+      <div className="p-4 flex-1 flex flex-col justify-between">{children}</div>
     </div>
   );
 }
@@ -1760,7 +1760,7 @@ function DraggableWidgetCard({ widgetKey, index, moveWidget, children }: {
     <div
       ref={ref}
       style={{ opacity: isDragging ? 0.35 : 1 }}
-      className={`transition-all duration-150 rounded-xl ${isOver && !isDragging ? "ring-2 ring-[#0A77FF]/20 ring-offset-2" : ""}`}
+      className={`transition-all duration-150 rounded-xl h-full ${isOver && !isDragging ? "ring-2 ring-[#0A77FF]/20 ring-offset-2" : ""}`}
     >
       {children((node) => { drag(node); }, isDragging)}
     </div>
@@ -2873,7 +2873,7 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
               output.push(halfBuf[0].node);
             } else {
               output.push(
-                <div key={`grid-${halfBuf[0].key}`} className="grid grid-cols-1 lg:grid-cols-2 gap-3 items-start">
+                <div key={`grid-${halfBuf[0].key}`} className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                   {halfBuf.map((h) => h.node)}
                 </div>
               );
