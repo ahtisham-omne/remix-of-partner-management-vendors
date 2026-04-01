@@ -495,7 +495,7 @@ export function CreatePocModal({
         <div className="flex-1 overflow-y-auto px-3 sm:px-4 pt-3 pb-4 bg-[#FAFBFC] scrollbar-hide space-y-3">
 
           {/* ── Contact Details — boxed card matching Partner Details ── */}
-          <div className="rounded-lg border border-[#E2E8F0] bg-white overflow-visible shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
+          <div className="rounded-lg border border-[#E2E8F0] bg-white overflow-hidden shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
             <div className="px-3 sm:px-4 py-2 sm:py-2.5 border-b border-[#EEF2F6] flex items-center gap-2 bg-[#FAFBFC]">
               <div className="w-6 h-6 rounded-md bg-[#0A77FF]/8 flex items-center justify-center shrink-0"><Users className="w-3.5 h-3.5 text-[#0A77FF]" /></div>
               <span className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Contact Details</span>
@@ -551,7 +551,7 @@ export function CreatePocModal({
           </div>
 
           {/* ── Phone Numbers — boxed card ── */}
-          <div className="rounded-lg border border-[#E2E8F0] bg-white overflow-visible shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
+          <div className="rounded-lg border border-[#E2E8F0] bg-white overflow-hidden shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
             <div className="px-3 sm:px-4 py-2 sm:py-2.5 border-b border-[#EEF2F6] flex items-center justify-between bg-[#FAFBFC]">
               <div className="flex items-center gap-2">
                 <div className="w-6 h-6 rounded-md bg-[#ECFDF5] flex items-center justify-center shrink-0"><Phone className="w-3.5 h-3.5 text-[#059669]" /></div>
@@ -581,7 +581,7 @@ export function CreatePocModal({
           </div>
 
           {/* ── Email Addresses — boxed card ── */}
-          <div className="rounded-lg border border-[#E2E8F0] bg-white overflow-visible shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
+          <div className="rounded-lg border border-[#E2E8F0] bg-white overflow-hidden shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
             <div className="px-3 sm:px-4 py-2 sm:py-2.5 border-b border-[#EEF2F6] flex items-center justify-between bg-[#FAFBFC]">
               <div className="flex items-center gap-2">
                 <div className="w-6 h-6 rounded-md bg-[#EFF6FF] flex items-center justify-center shrink-0"><Mail className="w-3.5 h-3.5 text-[#0A77FF]" /></div>

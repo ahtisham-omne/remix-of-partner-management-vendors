@@ -2445,7 +2445,7 @@ function Step2PartnerForm({
       )}
 
       {/* ── Partner Details — boxed card ── */}
-      <div className="rounded-lg border border-[#E2E8F0] bg-white overflow-visible shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
+      <div className="rounded-lg border border-[#E2E8F0] bg-white overflow-hidden shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
         <div className="px-3 sm:px-4 py-2 sm:py-2.5 border-b border-[#EEF2F6] flex items-center gap-2 bg-[#FAFBFC]">
           <div className="w-6 h-6 rounded-md bg-[#0A77FF]/8 flex items-center justify-center shrink-0">
             <Info className="w-3.5 h-3.5 text-[#0A77FF]" />
