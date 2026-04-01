@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { Search, X, Plus, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Users, AlignJustify, List as ListIcon, LayoutGrid, ChevronDown, Check, SlidersHorizontal } from "lucide-react";
 import { Input } from "../ui/input";
+import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "../ui/table";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import type { ContactPerson } from "./partnerConstants";
 
 // ── Highlight ──
@@ -24,44 +24,41 @@ const TINTS: Record<string, { bg: string; text: string }> = {
 function tint(c: string) { return TINTS[c] || { bg: "#F0F4FF", text: c || "#64748B" }; }
 function ini(n: string) { return n.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2); }
 
-// ── Filter Dropdown (multi-select) ──
-function FilterDrop({ label, selected, options, onToggle, onClear }: {
-  label: string; selected: Set<string>; options: string[]; onToggle: (v: string) => void; onClear: () => void;
+// ── Filter Dropdown ──
+function FilterDrop({ label, selected, options, onToggle, onClear, searchable }: {
+  label: string; selected: Set<string>; options: string[]; onToggle: (v: string) => void; onClear: () => void; searchable?: boolean;
 }) {
   const [open, setOpen] = useState(false);
+  const [q, setQ] = useState("");
   const count = selected.size;
+  const filtered = searchable && q ? options.filter((o) => o.toLowerCase().includes(q.toLowerCase())) : options;
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={(o) => { setOpen(o); if (!o) setQ(""); }}>
       <PopoverTrigger asChild>
-        <button type="button" className={`inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border text-xs transition-colors cursor-pointer ${
-          count > 0 ? "border-primary/30 bg-[#EDF4FF] text-[#0A77FF]" : "border-border bg-white text-foreground hover:bg-muted/50 hover:border-muted-foreground/30"
-        }`} style={{ fontWeight: count > 0 ? 600 : 500 }}>
+        <button type="button" className={`inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border text-xs transition-colors cursor-pointer ${count > 0 ? "border-primary/30 bg-[#EDF4FF] text-[#0A77FF]" : "border-border bg-white text-foreground hover:bg-muted/50"}`} style={{ fontWeight: count > 0 ? 600 : 500 }}>
           <SlidersHorizontal className={`w-3 h-3 ${count > 0 ? "text-[#0A77FF]" : "text-muted-foreground"}`} />
-          {label}
-          {count > 0 && <span className="text-[10px] min-w-[18px] h-[18px] rounded-full bg-[#0A77FF] text-white flex items-center justify-center px-1" style={{ fontWeight: 600 }}>{count}</span>}
+          {label}{count > 0 && <span className="text-[10px] min-w-[18px] h-[18px] rounded-full bg-[#0A77FF] text-white flex items-center justify-center px-1" style={{ fontWeight: 600 }}>{count}</span>}
           <ChevronDown className="w-3 h-3 text-muted-foreground" />
         </button>
       </PopoverTrigger>
-      <PopoverContent side="bottom" align="start" sideOffset={4} className="w-[200px] p-0 z-[350] rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-[#E2E8F0]/80" onOpenAutoFocus={(e) => e.preventDefault()}>
-        <div className="max-h-[240px] overflow-y-auto py-1">
-          {options.map((opt) => {
-            const isSel = selected.has(opt);
-            return (
-              <button key={opt} type="button" onClick={() => onToggle(opt)}
-                className={`w-full flex items-center gap-2.5 px-3 py-2 text-left text-[12px] transition-colors ${isSel ? "bg-[#EDF4FF]/50" : "hover:bg-[#F8FAFC]"}`}>
-                <div className="w-[16px] h-[16px] rounded-[4px] border-[1.5px] flex items-center justify-center shrink-0" style={{ borderColor: isSel ? "#0A77FF" : "#CBD5E1", backgroundColor: isSel ? "#0A77FF" : "transparent" }}>
-                  {isSel && <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
-                </div>
-                <span className={`flex-1 ${isSel ? "text-[#0A77FF]" : "text-[#334155]"}`} style={{ fontWeight: isSel ? 600 : 400 }}>{opt}</span>
-              </button>
-            );
-          })}
-        </div>
-        {count > 0 && (
-          <div className="px-2 py-1.5 border-t border-[#F1F5F9]">
-            <button type="button" onClick={() => { onClear(); setOpen(false); }} className="text-[11px] text-[#94A3B8] hover:text-[#EF4444] cursor-pointer" style={{ fontWeight: 500 }}>Clear</button>
+      <PopoverContent side="bottom" align="start" sideOffset={4} className="w-[220px] p-0 z-[350] rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-[#E2E8F0]/80" onOpenAutoFocus={(e) => e.preventDefault()}>
+        {searchable && (
+          <div className="p-2 border-b border-[#F1F5F9]">
+            <div className="relative"><Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8]" />
+              <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={`Search...`} className="w-full h-8 pl-8 pr-3 rounded-md border border-[#E2E8F0] bg-[#F8FAFC] text-[12px] focus:outline-none focus:border-[#0A77FF]" autoFocus />
+            </div>
           </div>
         )}
+        <div className="max-h-[240px] overflow-y-auto py-1">
+          {filtered.map((opt) => {
+            const isSel = selected.has(opt);
+            return (<button key={opt} type="button" onClick={() => onToggle(opt)} className={`w-full flex items-center gap-2.5 px-3 py-2 text-left text-[12px] transition-colors ${isSel ? "bg-[#EDF4FF]/50" : "hover:bg-[#F8FAFC]"}`}>
+              <div className="w-4 h-4 rounded border-[1.5px] flex items-center justify-center shrink-0" style={{ borderColor: isSel ? "#0A77FF" : "#CBD5E1", backgroundColor: isSel ? "#0A77FF" : "transparent" }}>{isSel && <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}</div>
+              <span className={isSel ? "text-[#0A77FF] font-semibold" : "text-[#334155]"}>{opt === "Supply Chain Management" ? "Supply Chain" : opt}</span>
+            </button>);
+          })}
+        </div>
+        {count > 0 && <div className="px-2 py-1.5 border-t border-[#F1F5F9]"><button type="button" onClick={() => { onClear(); setOpen(false); }} className="text-[11px] text-[#94A3B8] hover:text-[#EF4444] cursor-pointer" style={{ fontWeight: 500 }}>Clear</button></div>}
       </PopoverContent>
     </Popover>
   );
@@ -69,7 +66,6 @@ function FilterDrop({ label, selected, options, onToggle, onClear }: {
 
 type Density = "condensed" | "comfort" | "card";
 
-// ── Props ──
 export interface PocDataTableProps {
   contacts: ContactPerson[];
   selectedIds?: Set<string>;
@@ -99,44 +95,43 @@ export function PocDataTable({
   const [deptFilter, setDeptFilter] = useState<Set<string>>(new Set());
   const isComfort = density === "comfort";
   const isCard = density === "card";
-
   const toggleSet = (s: Set<string>, v: string) => { const n = new Set(s); n.has(v) ? n.delete(v) : n.add(v); return n; };
-  const hasActiveFilters = deptFilter.size > 0;
 
   const allIds = contacts.map((c) => c.id);
   const allSel = selectable && selectedIds ? allIds.length > 0 && allIds.every((id) => selectedIds.has(id)) : false;
   const someSel = selectable && selectedIds ? !allSel && allIds.some((id) => selectedIds.has(id)) : false;
 
-  const PER_PAGE_OPTIONS = [10, 20, 50, 100];
+  // Page numbers with ellipsis
+  const getPageNumbers = (): (number | "...")[] => {
+    const pages: (number | "...")[] = [];
+    if (totalPages <= 7) { for (let i = 1; i <= totalPages; i++) pages.push(i); }
+    else {
+      pages.push(1);
+      if (page > 3) pages.push("...");
+      for (let i = Math.max(2, page - 1); i <= Math.min(totalPages - 1, page + 1); i++) pages.push(i);
+      if (page < totalPages - 2) pages.push("...");
+      pages.push(totalPages);
+    }
+    return pages;
+  };
 
   return (
-    <div className="flex flex-col flex-1 min-h-0 bg-card">
-      {/* ── Row 1: Search + Filters + Count + Density + Create ── */}
+    <div className="flex flex-col flex-1 min-h-0 bg-white">
+      {/* ── Row 1: Search + Count + Density + Create ── */}
       <div className="flex items-center justify-between gap-3 px-4 pt-3.5 pb-2 shrink-0">
         <div className="flex items-center gap-2.5 flex-1 min-w-0">
           <div className="relative flex-1 max-w-xs">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70 pointer-events-none" />
-            <Input
-              placeholder="Search by name, email, or phone..."
-              value={searchQuery}
-              onChange={(e) => onSearchChange(e.target.value)}
-              className="pl-9 pr-8 h-9 text-sm bg-white border-border/80 shadow-sm placeholder:text-muted-foreground/50 focus-visible:border-primary focus-visible:ring-primary/20"
-            />
-            {searchQuery && (
-              <button onClick={() => onSearchChange("")} className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded-full hover:bg-muted/60 text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
-                <X className="w-3.5 h-3.5" />
-              </button>
-            )}
+            <Input placeholder="Search by name, email, or phone..." value={searchQuery} onChange={(e) => onSearchChange(e.target.value)}
+              className="pl-9 pr-8 h-9 text-sm bg-white border-border/80 shadow-sm placeholder:text-muted-foreground/50 focus-visible:border-primary focus-visible:ring-primary/20" />
+            {searchQuery && <button onClick={() => onSearchChange("")} className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded-full hover:bg-muted/60 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"><X className="w-3.5 h-3.5" /></button>}
           </div>
         </div>
-
         <div className="flex items-center gap-1.5 shrink-0">
           <span className="text-sm tabular-nums mr-1 hidden sm:inline" style={{ fontWeight: 500 }}>
-            <span className="text-foreground">{totalCount}</span>
-            <span className="text-muted-foreground/70"> contacts</span>
+            <span className="text-foreground">{totalCount}</span><span className="text-muted-foreground/70"> contacts</span>
           </span>
           <div className="w-px h-5 bg-border/60 mx-0.5 hidden sm:block" />
-          {/* Density */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button className="inline-flex items-center justify-center h-9 gap-2 px-3 rounded-lg border border-border bg-white shadow-sm hover:bg-muted/40 transition-colors cursor-pointer">
@@ -146,154 +141,93 @@ export function PocDataTable({
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-[200px] p-1.5">
-              {([
-                { key: "condensed" as Density, label: "Condensed", desc: "Compact view", Icon: AlignJustify },
-                { key: "comfort" as Density, label: "Comfort", desc: "Spacious view", Icon: ListIcon },
-                { key: "card" as Density, label: "Card View", desc: "Grid layout", Icon: LayoutGrid },
-              ]).map((opt) => (
+              {([{ key: "condensed" as Density, label: "Condensed", desc: "Compact view", Icon: AlignJustify }, { key: "comfort" as Density, label: "Comfort", desc: "Spacious view", Icon: ListIcon }, { key: "card" as Density, label: "Card View", desc: "Grid layout", Icon: LayoutGrid }]).map((opt) => (
                 <DropdownMenuItem key={opt.key} onClick={() => setDensity(opt.key)} className={`flex items-center gap-2.5 px-2.5 py-2 rounded-lg ${density === opt.key ? "bg-muted/50" : ""}`}>
-                  <opt.Icon className="w-4 h-4 text-muted-foreground shrink-0" />
-                  <div className="min-w-0"><p className="text-sm" style={{ fontWeight: 500 }}>{opt.label}</p><p className="text-[10px] text-muted-foreground/60">{opt.desc}</p></div>
+                  <opt.Icon className="w-4 h-4 text-muted-foreground shrink-0" /><div className="min-w-0"><p className="text-sm" style={{ fontWeight: 500 }}>{opt.label}</p><p className="text-[10px] text-muted-foreground/60">{opt.desc}</p></div>
                   {density === opt.key && <Check className="w-3.5 h-3.5 ml-auto text-primary shrink-0" />}
                 </DropdownMenuItem>
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
-          {onCreateNew && (
-            <>
-              <div className="w-px h-5 bg-border/60 mx-0.5 hidden sm:block" />
-              <button onClick={onCreateNew} className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-sm shadow-sm transition-colors cursor-pointer" style={{ fontWeight: 600 }}>
-                <Plus className="w-3.5 h-3.5" /><span className="hidden sm:inline">Create New</span>
-              </button>
-            </>
-          )}
+          {onCreateNew && (<><div className="w-px h-5 bg-border/60 mx-0.5 hidden sm:block" /><button onClick={onCreateNew} className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-sm shadow-sm transition-colors cursor-pointer" style={{ fontWeight: 600 }}><Plus className="w-3.5 h-3.5" /><span className="hidden sm:inline">Create New</span></button></>)}
         </div>
       </div>
 
-      {/* ── Row 2: Filter pills + dropdown filters ── */}
+      {/* ── Row 2: Status pills + Department dropdown ── */}
       <div className="flex items-center gap-1.5 overflow-x-auto px-4 pb-2.5 shrink-0 scrollbar-hide">
-        {/* Quick filter pills */}
-        {([
-          { key: "all", label: "All", count: totalCount },
-          { key: "Sales", label: "Sales" },
-          { key: "Supply Chain Management", label: "Supply Chain" },
-          { key: "Finance", label: "Finance" },
-        ]).map((f) => {
+        {([{ key: "all", label: "All", count: totalCount }, { key: "active", label: "Active" }, { key: "inactive", label: "Inactive" }]).map((f) => {
           const isActive = categoryFilter === f.key;
-          return (
-            <button key={f.key} onClick={() => onCategoryFilterChange(f.key)}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                isActive ? "border-primary bg-[#EDF4FF] hover:bg-[#D6E8FF] active:bg-[#ADD1FF]" : "border-border text-muted-foreground hover:bg-muted/60 hover:text-foreground hover:border-muted-foreground/30 active:bg-muted"
-              }`}
-              style={{ fontWeight: isActive ? 500 : 400, color: isActive ? "#0A77FF" : undefined }}
-            >
-              {f.label}
-              {"count" in f && f.count != null && (
-                <span className={`text-[10px] rounded-full px-1.5 py-px min-w-[18px] text-center ${isActive ? "bg-primary/10" : "bg-muted"}`}
-                  style={{ fontWeight: 600, color: isActive ? "#0A77FF" : "#475569" }}>{f.count}</span>
-              )}
-            </button>
-          );
+          return (<button key={f.key} onClick={() => onCategoryFilterChange(f.key)}
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs transition-colors whitespace-nowrap shrink-0 cursor-pointer ${isActive ? "border-primary bg-[#EDF4FF] hover:bg-[#D6E8FF]" : "border-border text-muted-foreground hover:bg-muted/60 hover:text-foreground hover:border-muted-foreground/30"}`}
+            style={{ fontWeight: isActive ? 500 : 400, color: isActive ? "#0A77FF" : undefined }}>
+            {f.label}{"count" in f && f.count != null && <span className={`text-[10px] rounded-full px-1.5 py-px min-w-[18px] text-center ${isActive ? "bg-primary/10" : "bg-muted"}`} style={{ fontWeight: 600, color: isActive ? "#0A77FF" : "#475569" }}>{f.count}</span>}
+          </button>);
         })}
         <span className="w-px h-5 bg-border/60 shrink-0" />
-        {/* Department multi-select dropdown */}
-        <FilterDrop label="Department" selected={deptFilter} options={["Sales", "Supply Chain Management", "Finance"]} onToggle={(v) => setDeptFilter(toggleSet(deptFilter, v))} onClear={() => setDeptFilter(new Set())} />
-        {hasActiveFilters && (
-          <button type="button" onClick={() => setDeptFilter(new Set())}
-            className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs text-[#94A3B8] hover:text-[#EF4444] hover:bg-[#FEF2F2] cursor-pointer transition-colors" style={{ fontWeight: 500 }}>
-            <X className="w-3 h-3" />Clear
-          </button>
-        )}
+        <FilterDrop label="Department" selected={deptFilter} options={["Sales", "Supply Chain Management", "Finance"]} onToggle={(v) => setDeptFilter(toggleSet(deptFilter, v))} onClear={() => setDeptFilter(new Set())} searchable />
+        {deptFilter.size > 0 && <button type="button" onClick={() => setDeptFilter(new Set())} className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs text-[#94A3B8] hover:text-[#EF4444] hover:bg-[#FEF2F2] cursor-pointer transition-colors" style={{ fontWeight: 500 }}><X className="w-3 h-3" />Clear</button>}
       </div>
 
-      {/* ── Table / Card View ── */}
+      {/* ── Table / Card ── */}
       {isCard ? (
-        /* Card grid view */
         <div className="flex-1 min-h-0 overflow-y-auto scrollbar-hide px-4 py-3 border-t border-border">
-          {contacts.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16"><Users className="w-8 h-8 text-[#E2E8F0] mb-2" /><p className="text-sm text-muted-foreground" style={{ fontWeight: 500 }}>No contacts found</p></div>
-          ) : (
+          {contacts.length === 0 ? <div className="flex flex-col items-center justify-center py-16"><Users className="w-8 h-8 text-[#E2E8F0] mb-2" /><p className="text-sm text-muted-foreground" style={{ fontWeight: 500 }}>No contacts found</p></div> : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {contacts.map((c) => {
-                const isSel = selectable && selectedIds ? selectedIds.has(c.id) : false;
+                const isSel = selectable && selectedIds?.has(c.id);
                 const t = tint(c.avatarColor);
-                return (
-                  <button key={c.id} type="button" onClick={() => selectable && onToggleSelect?.(c.id)}
-                    className={`text-left rounded-xl border transition-all duration-150 ${selectable ? "cursor-pointer" : ""} ${
-                      isSel ? "border-[#0A77FF] bg-[#FAFCFF] shadow-[0_0_0_1px_#0A77FF]" : "border-[#E8ECF1] bg-white hover:border-[#BFDBFE] hover:shadow-sm"
-                    }`}>
-                    <div className="p-3.5">
-                      <div className="flex items-start gap-3">
-                        <div className="w-10 h-10 rounded-lg flex items-center justify-center text-[11px] shrink-0 border border-[#E8ECF1]" style={{ backgroundColor: t.bg, color: t.text, fontWeight: 700 }}>{ini(c.name)}</div>
-                        <div className="min-w-0 flex-1">
-                          <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}><Hl text={c.name} q={searchQuery} /></p>
-                          <p className="text-[11px] text-[#64748B] truncate mt-0.5">{c.company}</p>
-                        </div>
-                        {selectable && (
-                          <div className={`w-[18px] h-[18px] rounded-[5px] border-[1.5px] flex items-center justify-center shrink-0 mt-0.5 ${isSel ? "bg-[#0A77FF] border-[#0A77FF]" : "border-[#CBD5E1]"}`}>
-                            {isSel && <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
-                          </div>
-                        )}
-                      </div>
-                      <p className="text-[11px] text-[#64748B] mt-2">{c.department === "Supply Chain Management" ? "Supply Chain" : c.department}</p>
-                      <div className="space-y-1 mt-2 pt-2 border-t border-[#F1F5F9]">
-                        <p className="text-[11px] text-[#475569] truncate">{c.email}</p>
-                        <p className="text-[11px] text-[#475569]">{c.phone}{c.phoneExt ? ` ext. ${c.phoneExt}` : ""}</p>
-                      </div>
+                return (<div key={c.id} onClick={() => selectable && onToggleSelect?.(c.id)} className={`text-left rounded-xl border transition-all ${selectable ? "cursor-pointer" : ""} ${isSel ? "border-[#0A77FF] bg-[#FAFCFF] shadow-[0_0_0_1px_#0A77FF]" : "border-[#E8ECF1] bg-white hover:border-[#BFDBFE] hover:shadow-sm"}`}>
+                  <div className="p-3.5">
+                    <div className="flex items-start gap-3">
+                      <div className="w-10 h-10 rounded-lg flex items-center justify-center text-[11px] shrink-0 border border-[#E8ECF1]" style={{ backgroundColor: t.bg, color: t.text, fontWeight: 700 }}>{ini(c.name)}</div>
+                      <div className="min-w-0 flex-1"><p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}><Hl text={c.name} q={searchQuery} /></p><p className="text-[11px] text-[#64748B] truncate mt-0.5">{c.company}</p></div>
+                      {selectable && <div className={`w-[18px] h-[18px] rounded-[5px] border-[1.5px] flex items-center justify-center shrink-0 mt-0.5 ${isSel ? "bg-[#0A77FF] border-[#0A77FF]" : "border-[#CBD5E1]"}`}>{isSel && <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}</div>}
                     </div>
-                  </button>
-                );
+                    <p className="text-[11px] text-[#64748B] mt-2">{c.department === "Supply Chain Management" ? "Supply Chain" : c.department}</p>
+                    <div className="space-y-1 mt-2 pt-2 border-t border-[#F1F5F9]">
+                      <p className="text-[11px] text-[#475569] truncate">{c.email}</p>
+                      <p className="text-[11px] text-[#475569]">{c.phone}{c.phoneExt ? ` ext. ${c.phoneExt}` : ""}</p>
+                    </div>
+                  </div>
+                </div>);
               })}
             </div>
           )}
         </div>
       ) : (
-        /* Table view */
         <div className="flex-1 min-h-0 overflow-auto scrollbar-hide border-t border-border">
-          <Table style={{ tableLayout: "auto" }}>
+          <Table>
             <TableHeader className="sticky top-0 z-10 bg-white">
               <TableRow className={`bg-muted/30 hover:bg-muted/30 ${isComfort ? "[&>th]:h-10" : "[&>th]:h-8"}`}>
-                {selectable && (
-                  <TableHead className="w-[40px] min-w-[40px] !pl-4 !pr-0">
-                    <Checkbox checked={allSel ? true : someSel ? "indeterminate" : false} onCheckedChange={() => onSelectAll?.(allIds)} />
-                  </TableHead>
-                )}
+                {selectable && <TableHead className="w-[40px] min-w-[40px] !pl-4 !pr-0"><Checkbox checked={allSel ? true : someSel ? "indeterminate" : false} onCheckedChange={() => onSelectAll?.(allIds)} /></TableHead>}
                 <TableHead className="min-w-[200px]">Name</TableHead>
-                <TableHead className="w-[130px]">Department</TableHead>
+                <TableHead className="w-[120px]">Department</TableHead>
+                <TableHead className="w-[80px]">Status</TableHead>
                 <TableHead className="w-[200px]">Email</TableHead>
-                <TableHead className="w-[140px]">Phone</TableHead>
-                <TableHead className="w-[140px]">Secondary</TableHead>
+                <TableHead className="w-[130px]">Phone</TableHead>
+                <TableHead className="w-[130px]">Secondary</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {contacts.length === 0 ? (
-                <TableRow><TableCell colSpan={selectable ? 6 : 5} className="h-32 text-center"><div className="flex flex-col items-center py-8"><Users className="w-8 h-8 text-[#E2E8F0] mb-2" /><p className="text-sm text-muted-foreground" style={{ fontWeight: 500 }}>No contacts found</p></div></TableCell></TableRow>
+                <TableRow><TableCell colSpan={selectable ? 7 : 6} className="h-32 text-center"><div className="flex flex-col items-center py-8"><Users className="w-8 h-8 text-[#E2E8F0] mb-2" /><p className="text-sm text-muted-foreground" style={{ fontWeight: 500 }}>No contacts found</p></div></TableCell></TableRow>
               ) : contacts.map((c) => {
-                const isSel = selectable && selectedIds ? selectedIds.has(c.id) : false;
+                const isSel = selectable && selectedIds?.has(c.id);
                 const t = tint(c.avatarColor);
                 return (
-                  <TableRow key={c.id} onClick={() => selectable && onToggleSelect?.(c.id)}
-                    className={`${selectable ? "cursor-pointer" : ""} ${isSel ? "bg-primary/[0.03]" : ""} ${isComfort ? "[&>td]:py-3 [&>td]:pl-4 [&>td]:pr-2" : "[&>td]:py-1 [&>td]:pl-4 [&>td]:pr-2"}`}>
-                    {selectable && (
-                      <TableCell className="w-[40px] !pl-4 !pr-0"><Checkbox checked={isSel} onCheckedChange={() => onToggleSelect?.(c.id)} onClick={(e) => e.stopPropagation()} /></TableCell>
-                    )}
+                  <TableRow key={c.id} onClick={() => selectable && onToggleSelect?.(c.id)} className={`${selectable ? "cursor-pointer" : ""} ${isSel ? "bg-primary/[0.03]" : ""} ${isComfort ? "[&>td]:py-3 [&>td]:pl-4 [&>td]:pr-2" : "[&>td]:py-1 [&>td]:pl-4 [&>td]:pr-2"}`}>
+                    {selectable && <TableCell className="w-[40px] !pl-4 !pr-0"><Checkbox checked={!!isSel} onCheckedChange={() => onToggleSelect?.(c.id)} onClick={(e) => e.stopPropagation()} /></TableCell>}
                     <TableCell>
                       <div className={`flex items-center ${isComfort ? "gap-3" : "gap-2.5"}`}>
                         <div className={`${isComfort ? "w-9 h-9" : "w-8 h-8"} rounded-lg flex items-center justify-center shrink-0 border border-[#E8ECF1]`} style={{ backgroundColor: t.bg, color: t.text, fontSize: isComfort ? 12 : 11, fontWeight: 700 }}>{ini(c.name)}</div>
-                        <div className="min-w-0">
-                          <span className={`${isComfort ? "text-[13.5px]" : "text-sm"} truncate block`} style={{ fontWeight: 500 }}><Hl text={c.name} q={searchQuery} /></span>
-                          {isComfort && <span className="text-xs text-muted-foreground/60 truncate block">{c.company}</span>}
-                        </div>
+                        <div className="min-w-0"><span className={`${isComfort ? "text-[13.5px]" : "text-sm"} truncate block`} style={{ fontWeight: 500 }}><Hl text={c.name} q={searchQuery} /></span>{isComfort && <span className="text-xs text-muted-foreground/60 truncate block">{c.company}</span>}</div>
                       </div>
                     </TableCell>
-                    <TableCell><span className={`${isComfort ? "text-[13.5px]" : "text-sm"} text-[#475569]`}>{c.department === "Supply Chain Management" ? "Supply Chain" : c.department}</span></TableCell>
-                    <TableCell><span className={`${isComfort ? "text-[13.5px]" : "text-sm"} text-muted-foreground truncate block max-w-[180px]`}><Hl text={c.email} q={searchQuery} /></span></TableCell>
-                    <TableCell>
-                      <div><span className={`${isComfort ? "text-[13.5px]" : "text-sm"} text-muted-foreground`}>{c.phone}</span>{isComfort && c.phoneExt && <span className="text-xs text-muted-foreground/50 ml-1">ext. {c.phoneExt}</span>}</div>
-                    </TableCell>
-                    <TableCell>
-                      <div><span className={`${isComfort ? "text-[13.5px]" : "text-sm"} text-muted-foreground`}>{c.secondaryPhone || "—"}</span>{isComfort && c.secondaryPhoneExt && <span className="text-xs text-muted-foreground/50 ml-1">ext. {c.secondaryPhoneExt}</span>}</div>
-                    </TableCell>
+                    <TableCell><span className={`${isComfort ? "text-[13px]" : "text-sm"} text-[#475569]`}>{c.department === "Supply Chain Management" ? "SCM" : c.department}</span></TableCell>
+                    <TableCell><span className="inline-flex items-center text-[11px] px-2 py-0.5 rounded-full border" style={{ fontWeight: 500, backgroundColor: "#ECFDF5", color: "#065F46", borderColor: "#A7F3D0" }}>Active</span></TableCell>
+                    <TableCell><span className={`${isComfort ? "text-[13px]" : "text-sm"} text-muted-foreground truncate block max-w-[180px]`}><Hl text={c.email} q={searchQuery} /></span></TableCell>
+                    <TableCell><span className={`${isComfort ? "text-[13px]" : "text-sm"} text-muted-foreground`}>{c.phone}</span>{isComfort && c.phoneExt && <span className="text-xs text-muted-foreground/50 ml-1">ext. {c.phoneExt}</span>}</TableCell>
+                    <TableCell><span className={`${isComfort ? "text-[13px]" : "text-sm"} text-muted-foreground`}>{c.secondaryPhone || "—"}</span></TableCell>
                   </TableRow>
                 );
               })}
@@ -302,50 +236,38 @@ export function PocDataTable({
         </div>
       )}
 
-      {/* ── Pagination — centered, matches listing page ── */}
-      <div className="flex items-center justify-between px-4 py-2.5 border-t border-border shrink-0">
-        {/* Records per page */}
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <span style={{ fontWeight: 500 }}>Records per page</span>
-          {onPerPageChange ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="px-2 py-1 rounded border border-border text-xs text-foreground cursor-pointer hover:bg-muted/50" style={{ fontWeight: 500 }}>{perPage}<ChevronDown className="w-3 h-3 inline ml-1 text-muted-foreground" /></button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-[80px]">
-                {PER_PAGE_OPTIONS.map((n) => (
-                  <DropdownMenuItem key={n} onClick={() => onPerPageChange(n)} className={perPage === n ? "bg-muted/50" : ""}>{n}{perPage === n && <Check className="w-3 h-3 ml-auto text-primary" />}</DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <span className="px-2 py-1 rounded border border-border text-xs text-foreground" style={{ fontWeight: 500 }}>{perPage}</span>
-          )}
+      {/* ── Pagination — matches listing page exactly ── */}
+      {totalCount > 0 && (
+        <div className="flex flex-col sm:flex-row items-center justify-center px-4 py-3 border-t border-border gap-3 shrink-0">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <span>Records per page</span>
+            {onPerPageChange ? (
+              <Select value={String(perPage)} onValueChange={(v) => onPerPageChange(Number(v))}>
+                <SelectTrigger className="w-[70px] h-8"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="10">10</SelectItem>
+                  <SelectItem value="20">20</SelectItem>
+                  <SelectItem value="50">50</SelectItem>
+                  <SelectItem value="100">100</SelectItem>
+                </SelectContent>
+              </Select>
+            ) : (
+              <span className="px-2 py-1 rounded border border-border text-xs text-foreground" style={{ fontWeight: 500 }}>{perPage}</span>
+            )}
+          </div>
+          <div className="flex items-center gap-1">
+            <Button variant="ghost" size="sm" className="h-8 w-8 p-0" disabled={page <= 1} onClick={() => onPageChange(1)}><ChevronsLeft className="w-4 h-4" /></Button>
+            <Button variant="ghost" size="sm" className="h-8 gap-1 text-sm text-muted-foreground" disabled={page <= 1} onClick={() => onPageChange(page - 1)}><ChevronLeft className="w-3.5 h-3.5" />Prev</Button>
+            {getPageNumbers().map((p, idx) => p === "..." ? (
+              <span key={`dots-${idx}`} className="px-1 text-sm text-muted-foreground">...</span>
+            ) : (
+              <Button key={p} variant={page === p ? "default" : "ghost"} size="sm" className={`h-8 w-8 p-0 text-sm ${page === p ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`} onClick={() => onPageChange(p as number)}>{p}</Button>
+            ))}
+            <Button variant="ghost" size="sm" className="h-8 gap-1 text-sm text-muted-foreground" disabled={page >= totalPages} onClick={() => onPageChange(page + 1)}>Next<ChevronRight className="w-3.5 h-3.5" /></Button>
+            <Button variant="ghost" size="sm" className="h-8 w-8 p-0" disabled={page >= totalPages} onClick={() => onPageChange(totalPages)}><ChevronsRight className="w-4 h-4" /></Button>
+          </div>
         </div>
-
-        {/* Page numbers — centered */}
-        <div className="flex items-center gap-0.5">
-          <button onClick={() => onPageChange(1)} disabled={page <= 1} className="w-8 h-8 rounded-md flex items-center justify-center hover:bg-muted/60 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"><ChevronsLeft className="w-3.5 h-3.5 text-muted-foreground" /></button>
-          <button onClick={() => onPageChange(page - 1)} disabled={page <= 1} className="w-8 h-8 rounded-md flex items-center justify-center hover:bg-muted/60 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"><ChevronLeft className="w-3.5 h-3.5 text-muted-foreground" /></button>
-          {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-            const start = Math.max(1, Math.min(page - 2, totalPages - 4));
-            const p = start + i;
-            if (p > totalPages) return null;
-            return (
-              <button key={p} onClick={() => onPageChange(p)}
-                className={`w-8 h-8 rounded-md text-xs transition-colors cursor-pointer ${p === page ? "bg-primary text-white" : "hover:bg-muted/60 text-muted-foreground"}`}
-                style={{ fontWeight: p === page ? 600 : 400 }}>{p}</button>
-            );
-          })}
-          <button onClick={() => onPageChange(page + 1)} disabled={page >= totalPages} className="w-8 h-8 rounded-md flex items-center justify-center hover:bg-muted/60 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"><ChevronRight className="w-3.5 h-3.5 text-muted-foreground" /></button>
-          <button onClick={() => onPageChange(totalPages)} disabled={page >= totalPages} className="w-8 h-8 rounded-md flex items-center justify-center hover:bg-muted/60 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"><ChevronsRight className="w-3.5 h-3.5 text-muted-foreground" /></button>
-        </div>
-
-        {/* Range indicator */}
-        <span className="text-xs text-muted-foreground tabular-nums" style={{ fontWeight: 500 }}>
-          {contacts.length > 0 ? `${(page - 1) * perPage + 1}–${Math.min(page * perPage, totalCount)} of ${totalCount}` : `0 results`}
-        </span>
-      </div>
+      )}
     </div>
   );
 }
