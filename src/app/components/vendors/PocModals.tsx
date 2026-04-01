@@ -511,11 +511,11 @@ export function CreatePocModal({
               {/* Photo on left, fields in 2-col grid on right */}
               <div className="grid grid-cols-1 sm:grid-cols-[auto_1fr] gap-3 sm:gap-4">
                 {/* Left — Profile Picture (full height) */}
-                <div className="hidden sm:flex flex-col w-[110px]">
+                <div className="hidden sm:flex flex-col w-[120px]">
                   <input ref={profileInputRef} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) { const reader = new FileReader(); reader.onload = (ev) => setProfileImage(ev.target?.result as string); reader.readAsDataURL(f); } e.target.value = ""; }} />
                   <div
                     onClick={() => profileInputRef.current?.click()}
-                    className={`relative w-full h-full min-h-[120px] rounded-xl cursor-pointer group transition-all ${profileImage ? "ring-2 ring-[#E2E8F0] hover:ring-[#0A77FF]/30" : "border-2 border-dashed border-[#CBD5E1] hover:border-[#0A77FF]/50 bg-[#F8FAFC] hover:bg-[#EDF4FF]/50"}`}
+                    className={`relative w-full aspect-square rounded-xl cursor-pointer group transition-all ${profileImage ? "ring-2 ring-[#E2E8F0] hover:ring-[#0A77FF]/30" : "border-2 border-dashed border-[#CBD5E1] hover:border-[#0A77FF]/50 bg-[#F8FAFC] hover:bg-[#EDF4FF]/50"}`}
                   >
                     {profileImage ? (
                       <>
@@ -632,7 +632,7 @@ export function CreatePocModal({
                 <div className="w-6 h-6 rounded-md bg-[#ECFDF5] flex items-center justify-center shrink-0"><Phone className="w-3.5 h-3.5 text-[#059669]" /></div>
                 <span className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Phone Numbers</span>
               </div>
-              <button type="button" onClick={addPhoneRow} className="inline-flex items-center gap-1 text-[11px] text-[#0A77FF] hover:text-[#0862D0] cursor-pointer" style={{ fontWeight: 600 }}><Plus className="w-3 h-3" />Add</button>
+              <button type="button" onClick={addPhoneRow} className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] text-[#0A77FF] hover:bg-[#EDF4FF] border border-transparent hover:border-[#0A77FF]/15 transition-all cursor-pointer" style={{ fontWeight: 600 }}><Plus className="w-3 h-3" />Add another number</button>
             </div>
             <div className="px-3 sm:px-4 py-2.5 space-y-2">
               {phoneRows.map((row, idx) => (
@@ -662,7 +662,7 @@ export function CreatePocModal({
                 <div className="w-6 h-6 rounded-md bg-[#EFF6FF] flex items-center justify-center shrink-0"><Mail className="w-3.5 h-3.5 text-[#0A77FF]" /></div>
                 <span className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Email Addresses</span>
               </div>
-              <button type="button" onClick={addEmailRow} className="inline-flex items-center gap-1 text-[11px] text-[#0A77FF] hover:text-[#0862D0] cursor-pointer" style={{ fontWeight: 600 }}><Plus className="w-3 h-3" />Add</button>
+              <button type="button" onClick={addEmailRow} className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] text-[#0A77FF] hover:bg-[#EDF4FF] border border-transparent hover:border-[#0A77FF]/15 transition-all cursor-pointer" style={{ fontWeight: 600 }}><Plus className="w-3 h-3" />Add another email</button>
             </div>
             <div className="px-3 sm:px-4 py-2.5 space-y-2">
               {emailRows.map((row, idx) => (
@@ -685,7 +685,7 @@ export function CreatePocModal({
                 <div className="w-6 h-6 rounded-md bg-[#F5F3FF] flex items-center justify-center shrink-0"><Globe className="w-3.5 h-3.5 text-[#7C3AED]" /></div>
                 <span className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Social Profiles</span>
               </div>
-              <button type="button" onClick={addSocialRow} className="inline-flex items-center gap-1 text-[11px] text-[#0A77FF] hover:text-[#0862D0] cursor-pointer" style={{ fontWeight: 600 }}><Plus className="w-3 h-3" />Add</button>
+              <button type="button" onClick={addSocialRow} className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] text-[#0A77FF] hover:bg-[#EDF4FF] border border-transparent hover:border-[#0A77FF]/15 transition-all cursor-pointer" style={{ fontWeight: 600 }}><Plus className="w-3 h-3" />Add social profile</button>
             </div>
             <div className="px-3 sm:px-4 py-2.5 space-y-2">
               {socialRows.map((row, idx) => (
