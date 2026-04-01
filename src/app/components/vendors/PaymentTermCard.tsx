@@ -185,8 +185,8 @@ export function PaymentTermCard({
           {showPresetBadge && (
             <span className={`inline-flex items-center gap-1 px-1.5 py-[3px] rounded-md border text-[9px] shrink-0 ${
               isCustom
-                ? "border-[#E2E8F0] bg-white text-[#64748B]"
-                : "bg-[#F1F5F9] border-[#E2E8F0] text-[#94A3B8]"
+                ? "border-[#CBD5E1] bg-white text-[#475569]"
+                : "bg-[#F1F5F9] border-[#CBD5E1] text-[#64748B]"
             }`} style={{ fontWeight: 600 }}>
               {isCustom ? "Custom" : <><Lock className="w-2.5 h-2.5" /> TEMPLATE</>}
             </span>

@@ -656,7 +656,7 @@ function PricingRuleCard({ rule, onClick }: { rule: PricingRule; onClick: () => 
             {isPreset ? (
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <span className="inline-flex items-center gap-1 px-1.5 py-[3px] rounded-md bg-[#F1F5F9] border border-[#E2E8F0] text-[9px] text-[#94A3B8]" style={{ fontWeight: 600 }}>
+                  <span className="inline-flex items-center gap-1 px-1.5 py-[3px] rounded-md bg-[#F1F5F9] border border-[#CBD5E1] text-[9px] text-[#64748B]" style={{ fontWeight: 600 }}>
                     <Lock className="w-2.5 h-2.5" /> TEMPLATE
                   </span>
                 </TooltipTrigger>
@@ -1358,7 +1358,7 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
                         {rule.basis === "volume" ? "Volume" : "Value"}-Based
                       </span>
                       {isPreset && (
-                        <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-md border border-[#E2E8F0] bg-[#F1F5F9] text-[#64748B]" style={{ fontWeight: 600 }}>
+                        <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-md border border-[#CBD5E1] bg-[#F1F5F9] text-[#64748B]" style={{ fontWeight: 600 }}>
                           <Lock className="w-2.5 h-2.5" /> TEMPLATE
                         </span>
                       )}
@@ -1740,7 +1740,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
           </button>
 
           {/* Category toggle — inline with search */}
-          <div className="inline-flex items-center rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-0.5 shrink-0">
+          <div className="inline-flex items-center rounded-lg border border-[#CBD5E1] bg-[#E2E8F0] p-0.5 shrink-0">
             {([
               { key: "discount" as CategoryView, label: "Discounts", icon: TrendingDown, color: "#047857", bg: "#ECFDF5" },
               { key: "premium" as CategoryView, label: "Premiums", icon: TrendingUp, color: "#6D28D9", bg: "#F5F3FF" },
@@ -1752,7 +1752,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                   key={cat.key}
                   onClick={() => { setCategoryView(cat.key); setQuickFilter("all"); setCurrentPage(1); }}
                   className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-[11px] transition-all cursor-pointer ${
-                    active ? "bg-white shadow-sm" : "hover:bg-white/60"
+                    active ? "bg-white shadow-sm" : "bg-transparent hover:bg-white/70"
                   }`}
                   style={{ fontWeight: active ? 600 : 500, color: active ? cat.color : "#64748B" }}
                 >
@@ -1760,7 +1760,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                   {cat.label}
                   <span
                     className="text-[9px] rounded-full px-1 py-px min-w-[16px] text-center"
-                    style={{ fontWeight: 600, color: active ? cat.color : "#94A3B8", backgroundColor: active ? cat.bg : "#F1F5F9" }}
+                    style={{ fontWeight: 600, color: active ? cat.color : "#64748B", backgroundColor: active ? cat.bg : "#CBD5E1" }}
                   >
                     {count}
                   </span>
@@ -2562,7 +2562,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
               </div>
 
               {/* Category toggle — inline with search */}
-              <div className="inline-flex items-center rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-0.5 shrink-0">
+              <div className="inline-flex items-center rounded-lg border border-[#CBD5E1] bg-[#E2E8F0] p-0.5 shrink-0">
                 {([
                   { key: "discount" as const, label: "Discounts", color: "#047857", bg: "#ECFDF5", icon: TrendingDown },
                   { key: "premium" as const, label: "Premiums", color: "#6D28D9", bg: "#F5F3FF", icon: TrendingUp },
@@ -2574,7 +2574,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                       key={cat.key}
                       onClick={() => setExploreCategoryTab(cat.key)}
                       className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-[11px] transition-all cursor-pointer ${
-                        active ? "bg-white shadow-sm" : "hover:bg-white/60"
+                        active ? "bg-white shadow-sm" : "bg-transparent hover:bg-white/70"
                       }`}
                       style={{ fontWeight: active ? 600 : 500, color: active ? cat.color : "#64748B" }}
                     >
@@ -2582,7 +2582,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                       {cat.label}
                       <span
                         className="text-[9px] rounded-full px-1 py-px min-w-[16px] text-center"
-                        style={{ fontWeight: 600, color: active ? cat.color : "#94A3B8", backgroundColor: active ? cat.bg : "#F1F5F9" }}
+                        style={{ fontWeight: 600, color: active ? cat.color : "#64748B", backgroundColor: active ? cat.bg : "#CBD5E1" }}
                       >
                         {count}
                       </span>
@@ -2731,7 +2731,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                             </span>
                             <div className="flex items-center gap-1.5 shrink-0">
                               {card.isPreset ? (
-                                <span className="inline-flex items-center gap-1 px-1.5 py-[3px] rounded-md bg-[#F1F5F9] border border-[#E2E8F0] text-[9px] text-[#94A3B8]" style={{ fontWeight: 600 }}>
+                                <span className="inline-flex items-center gap-1 px-1.5 py-[3px] rounded-md bg-[#F1F5F9] border border-[#CBD5E1] text-[9px] text-[#64748B]" style={{ fontWeight: 600 }}>
                                   <Lock className="w-2.5 h-2.5" /> TEMPLATE
                                 </span>
                               ) : (
