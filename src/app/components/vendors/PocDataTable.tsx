@@ -101,6 +101,7 @@ export function PocDataTable({
   const isCard = density === "card";
 
   const toggleSet = (s: Set<string>, v: string) => { const n = new Set(s); n.has(v) ? n.delete(v) : n.add(v); return n; };
+  const hasActiveFilters = deptFilter.size > 0;
 
   const allIds = contacts.map((c) => c.id);
   const allSel = selectable && selectedIds ? allIds.length > 0 && allIds.every((id) => selectedIds.has(id)) : false;
@@ -109,7 +110,7 @@ export function PocDataTable({
   const PER_PAGE_OPTIONS = [10, 20, 50, 100];
 
   return (
-    <div className="flex flex-col flex-1 min-h-0">
+    <div className="flex flex-col flex-1 min-h-0 bg-card">
       {/* ── Row 1: Search + Filters + Count + Density + Create ── */}
       <div className="flex items-center justify-between gap-3 px-4 pt-3.5 pb-2 shrink-0">
         <div className="flex items-center gap-2.5 flex-1 min-w-0">
@@ -127,8 +128,6 @@ export function PocDataTable({
               </button>
             )}
           </div>
-          {/* Filter dropdowns */}
-          <FilterDrop label="Department" selected={deptFilter} options={["Sales", "Supply Chain Management", "Finance"]} onToggle={(v) => setDeptFilter(toggleSet(deptFilter, v))} onClear={() => setDeptFilter(new Set())} />
         </div>
 
         <div className="flex items-center gap-1.5 shrink-0">
@@ -171,8 +170,9 @@ export function PocDataTable({
         </div>
       </div>
 
-      {/* ── Row 2: Filter pills ── */}
+      {/* ── Row 2: Filter pills + dropdown filters ── */}
       <div className="flex items-center gap-1.5 overflow-x-auto px-4 pb-2.5 shrink-0 scrollbar-hide">
+        {/* Quick filter pills */}
         {([
           { key: "all", label: "All", count: totalCount },
           { key: "Sales", label: "Sales" },
@@ -195,12 +195,21 @@ export function PocDataTable({
             </button>
           );
         })}
+        <span className="w-px h-5 bg-border/60 shrink-0" />
+        {/* Department multi-select dropdown */}
+        <FilterDrop label="Department" selected={deptFilter} options={["Sales", "Supply Chain Management", "Finance"]} onToggle={(v) => setDeptFilter(toggleSet(deptFilter, v))} onClear={() => setDeptFilter(new Set())} />
+        {hasActiveFilters && (
+          <button type="button" onClick={() => setDeptFilter(new Set())}
+            className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs text-[#94A3B8] hover:text-[#EF4444] hover:bg-[#FEF2F2] cursor-pointer transition-colors" style={{ fontWeight: 500 }}>
+            <X className="w-3 h-3" />Clear
+          </button>
+        )}
       </div>
 
       {/* ── Table / Card View ── */}
       {isCard ? (
         /* Card grid view */
-        <div className="flex-1 min-h-0 overflow-y-auto scrollbar-hide px-4 py-3 bg-[#FAFBFC] border-t border-border">
+        <div className="flex-1 min-h-0 overflow-y-auto scrollbar-hide px-4 py-3 border-t border-border">
           {contacts.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16"><Users className="w-8 h-8 text-[#E2E8F0] mb-2" /><p className="text-sm text-muted-foreground" style={{ fontWeight: 500 }}>No contacts found</p></div>
           ) : (
@@ -241,8 +250,8 @@ export function PocDataTable({
       ) : (
         /* Table view */
         <div className="flex-1 min-h-0 overflow-auto scrollbar-hide border-t border-border">
-          <Table>
-            <TableHeader className="sticky top-0 z-10 bg-card">
+          <Table style={{ tableLayout: "auto" }}>
+            <TableHeader className="sticky top-0 z-10 bg-white">
               <TableRow className={`bg-muted/30 hover:bg-muted/30 ${isComfort ? "[&>th]:h-10" : "[&>th]:h-8"}`}>
                 {selectable && (
                   <TableHead className="w-[40px] min-w-[40px] !pl-4 !pr-0">
