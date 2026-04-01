@@ -1670,7 +1670,7 @@ function ContentCard({ title, icon: Icon, count, children, action, currentSize, 
   return (
     <div
       style={{ opacity: isDragging ? 0.4 : 1 }}
-      className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)] transition-all duration-200 hover:shadow-[0_2px_8px_-2px_rgba(0,0,0,0.06)] h-full"
+      className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)] transition-all duration-200 hover:shadow-[0_2px_8px_-2px_rgba(0,0,0,0.06)]"
     >
       <div className="px-4 py-2.5 border-b border-[#F1F5F9] flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -1741,27 +1741,23 @@ function DraggableWidgetCard({ widgetKey, index, moveWidget, children }: {
     item: () => ({ key: widgetKey, index }),
     collect: (monitor) => ({ isDragging: monitor.isDragging() }),
   });
-  const [, drop] = useDrop({
+  const [{ isOver }, drop] = useDrop({
     accept: WIDGET_DND_TYPE,
-    hover(item: { key: string; index: number }, monitor) {
-      if (!ref.current) return;
-      const dragIdx = item.index;
-      const hoverIdx = index;
-      if (dragIdx === hoverIdx) return;
-      const rect = ref.current.getBoundingClientRect();
-      const midY = (rect.bottom - rect.top) / 2;
-      const clientOffset = monitor.getClientOffset();
-      if (!clientOffset) return;
-      const hoverY = clientOffset.y - rect.top;
-      if (dragIdx < hoverIdx && hoverY < midY) return;
-      if (dragIdx > hoverIdx && hoverY > midY) return;
-      moveWidget(dragIdx, hoverIdx);
-      item.index = hoverIdx;
+    drop(item: { key: string; index: number }) {
+      if (item.index !== index) {
+        moveWidget(item.index, index);
+        item.index = index;
+      }
     },
+    collect: (monitor) => ({ isOver: monitor.isOver() }),
   });
   drop(ref);
   return (
-    <div ref={ref}>
+    <div
+      ref={ref}
+      style={{ opacity: isDragging ? 0.35 : 1 }}
+      className={`transition-all duration-150 rounded-xl ${isOver && !isDragging ? "ring-2 ring-[#0A77FF]/20 ring-offset-2" : ""}`}
+    >
       {children((node) => { drag(node); }, isDragging)}
     </div>
   );
@@ -2422,18 +2418,22 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
       <DndProvider backend={HTML5Backend}>
       <div className="space-y-3 min-w-0">
         {(() => {
-          // Widget definitions with size-aware span: "full" = full-width, "half" = side by side
-          // Size overrides: sm → always half, lg → always full, md → uses default
-          const getSpan = (defaultSpan: "full" | "half", sz: "sm" | "md" | "lg") =>
-            sz === "lg" ? "full" : sz === "sm" ? "half" : defaultSpan;
+          // Fixed layout spans — never changes with size. Size only affects content inside the card.
+          const WIDGET_SPANS: Record<string, "full" | "half"> = {
+            spend_trend: "full", order_activity: "full",
+            spend_by_category: "half", credit_health: "half",
+            delivery_perf: "half", invoice_aging: "half",
+            primary_contact: "half", return_rate: "half",
+            top_items: "half", recent_orders: "half",
+            payment_history: "half", compliance_docs: "half",
+            notes: "full",
+          };
 
-          // Build widget nodes with their spans
           type WidgetNode = { key: string; idx: number; span: "full" | "half"; node: React.ReactNode };
           const nodes: WidgetNode[] = [];
 
-          // Standardized chart height tiers
-          const CHART_H = { sm: 120, md: 200, lg: 280 } as const;
-          const CHART_H_HALF = { sm: 120, md: 180, lg: 240 } as const;
+          // Chart heights: consistent per size tier
+          const CH: Record<string, number> = { sm: 140, md: 200, lg: 260 };
 
           activeWidgets.forEach((wKey, wIdx) => {
             const sz = widgetSizes[wKey] || "md";
@@ -2444,13 +2444,13 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
             let title = "";
             let tip = "";
             let cardAction: React.ReactNode = undefined;
-            let defaultSpan: "full" | "half" = "half";
+            
 
             if (wKey === "spend_trend") {
-            icon = TrendingUp; title = "Spend Trend"; tip = "Monthly spend trend over the current year."; defaultSpan = "full";
+            icon = TrendingUp; title = "Spend Trend"; tip = "Monthly spend trend over the current year.";
             cardAction = <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>This Year</span>;
             content = (
-              <div style={{ height: CHART_H[sz] }} className="-ml-2">
+              <div style={{ height: CH[sz] }} className="-ml-2">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={SPEND_TREND_DATA} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
                     <defs><linearGradient id="spendGradientUniq" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#0A77FF" stopOpacity={0.15} /><stop offset="100%" stopColor="#0A77FF" stopOpacity={0.01} /></linearGradient></defs>
@@ -2464,10 +2464,10 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
               </div>
             );
           } else if (wKey === "order_activity") {
-            icon = BarChart3; title = "Order Activity"; tip = "Weekly order and return volume."; defaultSpan = "full";
+            icon = BarChart3; title = "Order Activity"; tip = "Weekly order and return volume.";
             cardAction = (<div className="flex items-center gap-3"><div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-[#0A77FF]" /><span className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Orders</span></div><div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-[#F59E0B]" /><span className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Returns</span></div></div>);
             content = (
-              <div style={{ height: CHART_H[sz] }} className="-ml-2">
+              <div style={{ height: CH[sz] }} className="-ml-2">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={ORDER_ACTIVITY_DATA} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
@@ -2491,7 +2491,7 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
                     </Pie>
                   </RePieChart>
                   <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <span className={`text-[#0F172A] ${sz === "sm" ? "text-[10px]" : "text-[13px]"}`} style={{ fontWeight: 700 }}>{formatCurrency(vendor.totalSpent)}</span>
+                    <span className="text-[11px] text-[#0F172A]" style={{ fontWeight: 700 }}>{sz === "sm" ? `$${Math.round(vendor.totalSpent / 1000)}K` : formatCurrency(vendor.totalSpent)}</span>
                   </div>
                 </div>
                 {sz !== "sm" && (
@@ -2528,7 +2528,7 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
             icon = TrendingUp; title = "Delivery Performance"; tip = "On-time delivery rate trend over time.";
             content = (
               <>
-                <div style={{ height: CHART_H_HALF[sz] }} className="-ml-2">
+                <div style={{ height: CH[sz] }} className="-ml-2">
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={[{ month: "Oct", rate: 91 }, { month: "Nov", rate: 88 }, { month: "Dec", rate: 93 }, { month: "Jan", rate: 95 }, { month: "Feb", rate: 92 }, { month: "Mar", rate: 94 }]} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
                       <defs><linearGradient id="delivGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#059669" stopOpacity={0.15} /><stop offset="100%" stopColor="#059669" stopOpacity={0.01} /></linearGradient></defs>
@@ -2553,7 +2553,7 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
             icon = Receipt; title = "Invoice Aging"; tip = "Overdue invoices grouped by aging bucket.";
             content = (
               <>
-                <div style={{ height: CHART_H_HALF[sz] }} className="-ml-2">
+                <div style={{ height: CH[sz] }} className="-ml-2">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={[
                       { range: "0-30d", amount: Math.round(vendor.outstandingBalance * 0.4) },
@@ -2593,7 +2593,7 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
                   </div>
                 </div>
                 {sz !== "sm" && (
-                  <div style={{ height: sz === "sm" ? 0 : CHART_H_HALF[sz] - 80 }} className="-ml-2 border-t border-[#F1F5F9] pt-2">
+                  <div style={{ height: sz === "lg" ? 160 : 100 }} className="-ml-2 border-t border-[#F1F5F9] pt-2">
                     <p className="text-[10px] text-[#94A3B8] mb-1 ml-2" style={{ fontWeight: 500 }}>Response Time (hours)</p>
                     <ResponsiveContainer width="100%" height="80%">
                       <LineChart data={[{ week: "W1", hours: 4.2 }, { week: "W2", hours: 3.8 }, { week: "W3", hours: 2.5 }, { week: "W4", hours: 3.1 }, { week: "W5", hours: 1.8 }, { week: "W6", hours: 2.2 }]} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
@@ -2611,7 +2611,7 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
             icon = BarChart3; title = "Return Rate"; tip = "Return and defect rate trends over recent months.";
             content = (
               <>
-                <div style={{ height: CHART_H_HALF[sz] }} className="-ml-2">
+                <div style={{ height: CH[sz] }} className="-ml-2">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={[
                       { month: "Oct", rate: 3.2, defect: 1.8 }, { month: "Nov", rate: 2.8, defect: 1.5 }, { month: "Dec", rate: 2.1, defect: 1.2 },
@@ -2632,7 +2632,7 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
           } else if (wKey === "top_items") {
             icon = Package; title = "Top Items by Spend"; tip = "Highest spend items from this partner.";
             content = (
-              <div style={{ height: CHART_H_HALF[sz] }} className="-ml-2">
+              <div style={{ height: CH[sz] }} className="-ml-2">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart layout="vertical" data={[
                     { name: "Steel Alloy A", spend: Math.round(vendor.totalSpent * 0.18) },
@@ -2656,7 +2656,7 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
             icon = ClipboardList; title = "Recent Orders"; tip = "Latest purchase orders and their delivery status.";
             content = (
               <>
-                <div style={{ height: CHART_H_HALF[sz] }} className="-ml-2 mb-2">
+                <div style={{ height: CH[sz] }} className="-ml-2 mb-2">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={[
                       { po: "28180", amount: Math.round(vendor.totalSpent * 0.04) }, { po: "28255", amount: Math.round(vendor.totalSpent * 0.07) },
@@ -2679,7 +2679,7 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
             icon = Banknote; title = "Payment History"; tip = "Monthly payment and pending amounts trend.";
             content = (
               <>
-                <div style={{ height: CHART_H_HALF[sz] }} className="-ml-2">
+                <div style={{ height: CH[sz] }} className="-ml-2">
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={[
                       { month: "Oct", paid: Math.round(vendor.totalSpent * 0.03), pending: Math.round(vendor.totalSpent * 0.01) },
@@ -2767,7 +2767,7 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
 
           if (!content) return;
 
-            const span = getSpan(defaultSpan, sz);
+            const span = WIDGET_SPANS[wKey] || "half";
             nodes.push({
               key: wKey,
               idx: wIdx,
@@ -2794,7 +2794,7 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
               output.push(halfBuf[0].node);
             } else {
               output.push(
-                <div key={`grid-${halfBuf[0].key}`} className="grid grid-cols-1 lg:grid-cols-2 gap-3 items-stretch">
+                <div key={`grid-${halfBuf[0].key}`} className="grid grid-cols-1 lg:grid-cols-2 gap-3 items-start">
                   {halfBuf.map((h) => h.node)}
                 </div>
               );
