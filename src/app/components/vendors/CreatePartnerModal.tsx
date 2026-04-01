@@ -8568,190 +8568,32 @@ function ConfigPageContent({
         </Dialog>
 
         {/* ── Create New Point of Contact Modal ── */}
-        <Dialog open={showCreatePocModal} onOpenChange={setShowCreatePocModal}>
-          <DialogContent
-            className="w-full max-w-none rounded-none sm:rounded-2xl sm:max-w-[640px] max-h-[100dvh] h-auto flex flex-col p-0 gap-0 sm:max-h-fit"
-            style={{ zIndex: 210 }}
-            hideCloseButton
-          >
-            <DialogTitle className="sr-only">Create New Point of Contact</DialogTitle>
-            <DialogDescription className="sr-only">Create a new contact for this partner</DialogDescription>
-
-            {/* Header */}
-            <div className="px-6 pt-6 pb-5 shrink-0 border-b border-[#E2E8F0] bg-[#F8FAFC] rounded-t-none sm:rounded-t-2xl">
-              <div className="flex items-start justify-between">
-                <div className="min-w-0 pr-4">
-                  <h3 className="text-base sm:text-[17px] text-[#0F172A]" style={{ fontWeight: 700 }}>
-                    Create New Point of Contact {partnerName ? <span className="text-[#64748B]">"{partnerName}"</span> : ""}
-                  </h3>
-                  <p className="text-xs text-[#64748B] mt-1" style={{ fontWeight: 400 }}>
-                    Create a new contact for this partner to assist with your Purchase Orders/Sales Orders and inquiries on locations.
-                  </p>
-                </div>
-                <button
-                  onClick={() => setShowCreatePocModal(false)}
-                  className="w-8 h-8 rounded-lg hover:bg-[#E2E8F0] flex items-center justify-center transition-colors shrink-0 mt-0.5"
-                >
-                  <X className="w-4 h-4 text-[#64748B]" />
-                </button>
-              </div>
-            </div>
-
-            {/* Form body */}
-            <div className="flex-1 overflow-y-auto px-6 py-5 space-y-6">
-              {/* Personnel info */}
-              <div>
-                <h4 className="text-[13px] text-[#0F172A] mb-3" style={{ fontWeight: 600 }}>Personnel info</h4>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-[13px] text-[#0F172A] mb-1.5" style={{ fontWeight: 600 }}>Name</label>
-                    <Input
-                      value={newPocName}
-                      onChange={(e) => setNewPocName(e.target.value)}
-                      placeholder="Full name"
-                      className="h-10 rounded-lg border-[#E2E8F0] bg-white text-sm"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[13px] text-[#0F172A] mb-1.5" style={{ fontWeight: 600 }}>Department</label>
-                    <Select value={newPocDepartment} onValueChange={(v) => setNewPocDepartment(v as "Sales" | "Supply Chain Management" | "Finance")}>
-                      <SelectTrigger className="h-10 rounded-lg border-[#E2E8F0] bg-white text-sm">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent style={{ zIndex: 250 }}>
-                        <SelectItem value="Sales">Sales</SelectItem>
-                        <SelectItem value="Supply Chain Management">Supply Chain Management</SelectItem>
-                        <SelectItem value="Finance">Finance</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <label className="block text-[13px] text-[#0F172A] mb-1.5" style={{ fontWeight: 600 }}>Role</label>
-                    <Input
-                      value={newPocRole}
-                      onChange={(e) => setNewPocRole(e.target.value)}
-                      placeholder="e.g. Sales Manager"
-                      className="h-10 rounded-lg border-[#E2E8F0] bg-white text-sm"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Contact details */}
-              <div>
-                <h4 className="text-[13px] text-[#0F172A] mb-3" style={{ fontWeight: 600 }}>Contact details</h4>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-[13px] text-[#0F172A] mb-1.5" style={{ fontWeight: 600 }}>Landline phone number</label>
-                    <div className="flex items-center gap-0 rounded-lg border border-[#E2E8F0] bg-white overflow-hidden h-10">
-                      <Select value={newPocLandlineCode} onValueChange={setNewPocLandlineCode}>
-                        <SelectTrigger className="h-full border-0 border-r border-[#E2E8F0] rounded-none bg-[#FAFBFC] px-2.5 text-xs w-[80px] shrink-0 shadow-none focus:ring-0">
-                          <span className="flex items-center gap-1.5">
-                            <span className="text-[13px]">🇺🇸</span>
-                            <SelectValue />
-                          </span>
-                        </SelectTrigger>
-                        <SelectContent style={{ zIndex: 250 }}>
-                          <SelectItem value="+1">+1</SelectItem>
-                          <SelectItem value="+44">+44</SelectItem>
-                          <SelectItem value="+91">+91</SelectItem>
-                          <SelectItem value="+49">+49</SelectItem>
-                          <SelectItem value="+33">+33</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <input
-                        value={newPocLandline}
-                        onChange={(e) => setNewPocLandline(e.target.value)}
-                        placeholder="678 627 2788"
-                        className="flex-1 h-full px-3 text-sm text-[#0F172A] outline-none bg-transparent placeholder:text-[#94A3B8]"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-[13px] text-[#0F172A] mb-1.5" style={{ fontWeight: 600 }}>Ext</label>
-                    <Input
-                      value={newPocExt}
-                      onChange={(e) => setNewPocExt(e.target.value)}
-                      placeholder="8979"
-                      className="h-10 rounded-lg border-[#E2E8F0] bg-white text-sm"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[13px] text-[#0F172A] mb-1.5" style={{ fontWeight: 600 }}>Mobile number</label>
-                    <div className="flex items-center gap-0 rounded-lg border border-[#E2E8F0] bg-white overflow-hidden h-10">
-                      <Select value={newPocMobileCode} onValueChange={setNewPocMobileCode}>
-                        <SelectTrigger className="h-full border-0 border-r border-[#E2E8F0] rounded-none bg-[#FAFBFC] px-2.5 text-xs w-[80px] shrink-0 shadow-none focus:ring-0">
-                          <span className="flex items-center gap-1.5">
-                            <span className="text-[13px]">🇺🇸</span>
-                            <SelectValue />
-                          </span>
-                        </SelectTrigger>
-                        <SelectContent style={{ zIndex: 250 }}>
-                          <SelectItem value="+1">+1</SelectItem>
-                          <SelectItem value="+44">+44</SelectItem>
-                          <SelectItem value="+91">+91</SelectItem>
-                          <SelectItem value="+49">+49</SelectItem>
-                          <SelectItem value="+33">+33</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <input
-                        value={newPocMobile}
-                        onChange={(e) => setNewPocMobile(e.target.value)}
-                        placeholder="678 627 2788"
-                        className="flex-1 h-full px-3 text-sm text-[#0F172A] outline-none bg-transparent placeholder:text-[#94A3B8]"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-[13px] text-[#0F172A] mb-1.5" style={{ fontWeight: 600 }}>Email</label>
-                    <Input
-                      value={newPocEmail}
-                      onChange={(e) => setNewPocEmail(e.target.value)}
-                      placeholder="alec@company.com"
-                      className="h-10 rounded-lg border-[#E2E8F0] bg-white text-sm"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Footer */}
-            <div className="px-6 py-4 border-t border-[#E2E8F0] bg-[#FAFBFC] rounded-b-none sm:rounded-b-2xl flex items-center justify-between shrink-0">
-              <label className="flex items-center gap-2 cursor-pointer select-none">
-                <div
-                  onClick={() => setSaveAndCreateAnother(!saveAndCreateAnother)}
-                  className={`w-[18px] h-[18px] rounded border flex items-center justify-center transition-colors cursor-pointer ${
-                    saveAndCreateAnother ? "bg-[#0A77FF] border-[#0A77FF]" : "border-[#D1D5DB] bg-white"
-                  }`}
-                >
-                  {saveAndCreateAnother && <Check className="w-3 h-3 text-white" />}
-                </div>
-                <span className="text-[13px] text-[#334155]" style={{ fontWeight: 500 }}>Save and create another</span>
-              </label>
-              <div className="flex items-center gap-2.5">
-                <button
-                  onClick={() => setShowCreatePocModal(false)}
-                  className="px-5 py-2.5 rounded-lg border border-[#E2E8F0] bg-white text-sm text-[#334155] hover:bg-[#F8FAFC] transition-colors"
-                  style={{ fontWeight: 500 }}
-                >
-                  Discard
-                </button>
-                <button
-                  onClick={handleSaveNewPoc}
-                  disabled={!newPocName.trim()}
-                  className={`px-5 py-2.5 rounded-lg text-sm text-white transition-colors ${
-                    newPocName.trim()
-                      ? "bg-[#0A77FF] hover:bg-[#0960D9]"
-                      : "bg-[#0A77FF]/50 cursor-not-allowed"
-                  }`}
-                  style={{ fontWeight: 600 }}
-                >
-                  Save
-                </button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
+        <CreatePocModal
+          open={showCreatePocModal}
+          onOpenChange={setShowCreatePocModal}
+          contextName={partnerName}
+          newPocName={newPocName}
+          onNewPocNameChange={setNewPocName}
+          newPocDepartment={newPocDepartment}
+          onNewPocDepartmentChange={setNewPocDepartment}
+          newPocRole={newPocRole}
+          onNewPocRoleChange={setNewPocRole}
+          newPocLandline={newPocLandline}
+          onNewPocLandlineChange={setNewPocLandline}
+          newPocLandlineCode={newPocLandlineCode}
+          onNewPocLandlineCodeChange={setNewPocLandlineCode}
+          newPocExt={newPocExt}
+          onNewPocExtChange={setNewPocExt}
+          newPocMobile={newPocMobile}
+          onNewPocMobileChange={setNewPocMobile}
+          newPocMobileCode={newPocMobileCode}
+          onNewPocMobileCodeChange={setNewPocMobileCode}
+          newPocEmail={newPocEmail}
+          onNewPocEmailChange={setNewPocEmail}
+          saveAndCreateAnother={saveAndCreateAnother}
+          onSaveAndCreateAnotherChange={setSaveAndCreateAnother}
+          onSave={handleSaveNewPoc}
+        />
       </div>
     );
   }
