@@ -91,6 +91,8 @@ import {
   GripVertical,
   ChartColumn,
   MapPinPlus,
+  MapPin,
+  Package,
   Mail,
   ClipboardList,
   FileText,
@@ -124,6 +126,7 @@ import { CreatePartnerModal } from "../components/vendors/CreatePartnerModal";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import type { PartnerType } from "../data/vendors";
+import { CATEGORY_LABELS } from "../data/vendors";
 
 const DND_LIST_KPI = "LIST_KPI_CARD";
 
@@ -154,7 +157,7 @@ const QUICK_FILTER_OPTIONS: { key: QuickFilter; label: string; showCount: boolea
 
 /* ─── Column configuration for the data table ─── */
 const COLUMN_DEFS: (ColumnConfig & { minWidth: string; sortable?: boolean; align?: "left" | "right" })[] = [
-  { key: "partner_name", label: "Partner Name", minWidth: "220px", sortable: true },
+  { key: "partner_name", label: "Partners", minWidth: "220px", sortable: true },
   { key: "partner_type", label: "Partner Type", minWidth: "160px", sortable: true },
   { key: "vendor_sub_types", label: "Vendor Sub-Types", minWidth: "200px" },
   { key: "customer_sub_types", label: "Customer Sub-Types", minWidth: "200px" },
@@ -1777,12 +1780,17 @@ export function VendorsListPage() {
                               case "partner_type":
                                 return (
                                   <TableCell key={colKey}>
-                                    <div className={`flex items-center ${isRelaxed ? "gap-2" : "gap-1.5"}`}>
-                                      {partnerTypes.map((type) => (
-                                        <span key={type} className={`inline-flex items-center ${isRelaxed ? "px-2.5 py-1 text-xs" : "px-2 py-0.5 text-xs"} rounded-md border`} style={{ fontWeight: 500, backgroundColor: type === "vendor" ? "#EFF6FF" : "#F5F3FF", color: type === "vendor" ? "#1E40AF" : "#5B21B6", borderColor: type === "vendor" ? "#BFDBFE" : "#DDD6FE" }}>
-                                          {type === "vendor" ? "Vendor" : "Customer"}
-                                        </span>
-                                      ))}
+                                    <div>
+                                      <div className={`flex items-center ${isRelaxed ? "gap-2" : "gap-1.5"}`}>
+                                        {partnerTypes.map((type) => (
+                                          <span key={type} className={`inline-flex items-center ${isRelaxed ? "px-2.5 py-1 text-xs" : "px-2 py-0.5 text-xs"} rounded-md border`} style={{ fontWeight: 500, backgroundColor: type === "vendor" ? "#EFF6FF" : "#F5F3FF", color: type === "vendor" ? "#1E40AF" : "#5B21B6", borderColor: type === "vendor" ? "#BFDBFE" : "#DDD6FE" }}>
+                                            {type === "vendor" ? "Vendor" : "Customer"}
+                                          </span>
+                                        ))}
+                                      </div>
+                                      {isRelaxed && (vendor.vendorSubTypes?.length || vendor.customerSubTypes?.length) ? (
+                                        <span className="text-[10px] text-muted-foreground/50 truncate block mt-0.5 max-w-[140px]">{[...(vendor.vendorSubTypes || []), ...(vendor.customerSubTypes || [])].slice(0, 2).join(", ")}</span>
+                                      ) : null}
                                     </div>
                                   </TableCell>
                                 );
@@ -1843,8 +1851,16 @@ export function VendorsListPage() {
                               case "num_items":
                                 return (
                                   <TableCell key={colKey}>
-                                    <div className={`flex items-center ${isRelaxed ? "gap-2" : "gap-1.5"}`}>
-                                      <span className={isRelaxed ? "text-[13.5px]" : "text-sm"}>{itemCodes[0] || "\u2013"}</span>
+                                    <div className={`flex items-center ${isRelaxed ? "gap-2.5" : "gap-1.5"}`}>
+                                      {isRelaxed && (
+                                        <div className="w-7 h-7 rounded-md bg-[#F1F5F9] flex items-center justify-center shrink-0">
+                                          <Package className="w-3.5 h-3.5 text-[#64748B]" />
+                                        </div>
+                                      )}
+                                      <div className="min-w-0">
+                                        <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate block`} style={{ fontWeight: 500 }}>{itemCodes[0] || "\u2013"}</span>
+                                        {isRelaxed && <span className="text-[10px] text-muted-foreground/50 block">{itemCodes.length} item{itemCodes.length !== 1 ? "s" : ""} total</span>}
+                                      </div>
                                       {extraItems > 0 && (
                                         <OverflowTooltip
                                           category="Items"
@@ -1864,8 +1880,16 @@ export function VendorsListPage() {
                               case "partner_locations":
                                 return (
                                   <TableCell key={colKey}>
-                                    <div className={`flex items-center ${isRelaxed ? "gap-2" : "gap-1.5"}`}>
-                                      <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate max-w-[110px]`}>{highlightText(partnerLocations[0] || "\u2013")}</span>
+                                    <div className={`flex items-center ${isRelaxed ? "gap-2.5" : "gap-1.5"}`}>
+                                      {isRelaxed && (
+                                        <div className="w-7 h-7 rounded-md bg-[#F0FDF4] flex items-center justify-center shrink-0">
+                                          <MapPin className="w-3.5 h-3.5 text-[#059669]" />
+                                        </div>
+                                      )}
+                                      <div className="min-w-0">
+                                        <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate block max-w-[110px]`} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{highlightText(partnerLocations[0] || "\u2013")}</span>
+                                        {isRelaxed && <span className="text-[10px] text-muted-foreground/50 block">{partnerLocations.length} location{partnerLocations.length !== 1 ? "s" : ""}</span>}
+                                      </div>
                                       {extraLocations > 0 && (
                                         <OverflowTooltip
                                           category="Locations"
@@ -1930,13 +1954,23 @@ export function VendorsListPage() {
                               case "credit_utilization":
                                 return (<TableCell key={colKey} className="text-right tabular-nums"><span className={isRelaxed ? "text-[13.5px]" : "text-sm"}>{formatCurrency(vendor.creditUtilization)}</span></TableCell>);
                               case "services":
-                                return (<TableCell key={colKey}><span className={isRelaxed ? "text-[13.5px]" : "text-sm"}>{vendor.services}</span></TableCell>);
+                                return (
+                                  <TableCell key={colKey}>
+                                    <div>
+                                      <span className={isRelaxed ? "text-[13.5px]" : "text-sm"} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{vendor.services}</span>
+                                      {isRelaxed && <span className="text-[10px] text-muted-foreground/50 block">{CATEGORY_LABELS[vendor.category]}</span>}
+                                    </div>
+                                  </TableCell>
+                                );
                               case "carrier_vendor":
                                 return (
                                   <TableCell key={colKey}>
                                     <div className={`flex items-center ${isRelaxed ? "gap-2.5" : "gap-2"}`}>
                                       <CarrierIcon carrier={vendor.defaultCarrierVendor} />
-                                      <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate max-w-[160px]`}>{vendor.defaultCarrierVendor}</span>
+                                      <div className="min-w-0">
+                                        <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate block max-w-[160px]`} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{vendor.defaultCarrierVendor}</span>
+                                        {isRelaxed && <span className="text-[10px] text-muted-foreground/50 block">Vendor Carrier</span>}
+                                      </div>
                                     </div>
                                   </TableCell>
                                 );
@@ -1945,7 +1979,10 @@ export function VendorsListPage() {
                                   <TableCell key={colKey}>
                                     <div className={`flex items-center ${isRelaxed ? "gap-2.5" : "gap-2"}`}>
                                       <CarrierIcon carrier={vendor.defaultCarrierCustomer} />
-                                      <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate max-w-[160px]`}>{vendor.defaultCarrierCustomer}</span>
+                                      <div className="min-w-0">
+                                        <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate block max-w-[160px]`} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{vendor.defaultCarrierCustomer}</span>
+                                        {isRelaxed && <span className="text-[10px] text-muted-foreground/50 block">Customer Carrier</span>}
+                                      </div>
                                     </div>
                                   </TableCell>
                                 );
@@ -1954,7 +1991,10 @@ export function VendorsListPage() {
                                   <TableCell key={colKey}>
                                     <div className={`flex items-center ${isRelaxed ? "gap-2.5" : "gap-2"}`}>
                                       <span className={isRelaxed ? "text-lg" : "text-base"}>{vendor.countryFlag}</span>
-                                      <span className={isRelaxed ? "text-[13.5px]" : "text-sm"}>{highlightText(vendor.country)}</span>
+                                      <div className="min-w-0">
+                                        <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} block`} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{highlightText(vendor.country)}</span>
+                                        {isRelaxed && vendor.billingAddress?.city && <span className="text-[10px] text-muted-foreground/50 block truncate max-w-[100px]">{vendor.billingAddress.city}{vendor.billingAddress.state ? `, ${vendor.billingAddress.state}` : ""}</span>}
+                                      </div>
                                     </div>
                                   </TableCell>
                                 );
@@ -1971,14 +2011,24 @@ export function VendorsListPage() {
                                           {(() => { const photoUrl = getPersonAvatar(vendor.createdByContact.name || ""); const t = getAvatarTint(vendor.createdByContact.name || ""); return (
                                           <LogoAvatar logoUrl={photoUrl} initials={vendor.createdByContact.initials || "?"} bg={t.bg} size={isRelaxed ? "lg" : "md"} type="person" />
                                           ); })()}
-                                          <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate max-w-[120px]`}>{highlightText(vendor.createdByContact.name)}</span>
+                                          <div className="min-w-0">
+                                            <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate block max-w-[120px]`} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{highlightText(vendor.createdByContact.name)}</span>
+                                            {isRelaxed && <span className="text-[10px] text-muted-foreground/50 block truncate max-w-[120px]">{(vendor.createdByContact as any).role || "Team Member"}</span>}
+                                          </div>
                                         </>
                                       ) : (<span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} text-muted-foreground`}>{"\u2013"}</span>)}
                                     </div>
                                   </TableCell>
                                 );
                               case "created_on":
-                                return (<TableCell key={colKey}><span className={isRelaxed ? "text-[13.5px]" : "text-sm"}>{formatDate(vendor.createdAt)}</span></TableCell>);
+                                return (
+                                  <TableCell key={colKey}>
+                                    <div>
+                                      <span className={isRelaxed ? "text-[13.5px]" : "text-sm"} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{formatDate(vendor.createdAt)}</span>
+                                      {isRelaxed && <span className="text-[10px] text-muted-foreground/50 block">{(() => { const d = Math.floor((Date.now() - new Date(vendor.createdAt).getTime()) / 86400000); return d < 30 ? `${d}d ago` : d < 365 ? `${Math.floor(d / 30)}mo ago` : `${Math.floor(d / 365)}y ago`; })()}</span>}
+                                    </div>
+                                  </TableCell>
+                                );
                               case "status":
                                 return (<TableCell key={colKey}><VendorStatusBadge status={vendor.status} /></TableCell>);
                               default:
