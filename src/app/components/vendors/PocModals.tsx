@@ -380,9 +380,11 @@ const DEPT_AVATAR_COLORS: Record<string, { bg: string; text: string; ring: strin
 // ── Phone/Email row types ──
 type PhoneRow = { id: string; type: string; code: string; number: string; ext: string };
 type EmailRow = { id: string; type: string; address: string };
+type SocialRow = { id: string; type: string; url: string };
 
 const PHONE_TYPES = ["Office", "Mobile", "Landline", "Fax", "Other"];
 const EMAIL_TYPES = ["Work", "Personal", "Secondary", "Other"];
+const SOCIAL_TYPES = ["LinkedIn", "Twitter / X", "Website", "Skype", "WhatsApp", "Other"];
 const DEFAULT_DEPARTMENTS = ["Sales", "Supply Chain Management", "Finance", "Operations", "Engineering", "Human Resources", "Legal", "Marketing", "IT", "Quality Assurance", "Logistics", "Procurement"];
 
 interface CreatePocModalProps {
@@ -423,13 +425,11 @@ export function CreatePocModal({
 }: CreatePocModalProps) {
   // Internal state for new fields
   const [profileImage, setProfileImage] = useState<string | null>(null);
-  const [linkedin, setLinkedin] = useState("");
-  const [twitter, setTwitter] = useState("");
-  const [website, setWebsite] = useState("");
   const [company, setCompany] = useState(contextName || "");
   const [notes, setNotes] = useState("");
   const [phoneRows, setPhoneRows] = useState<PhoneRow[]>([{ id: "ph-1", type: "Office", code: newPocLandlineCode, number: "", ext: "" }]);
   const [emailRows, setEmailRows] = useState<EmailRow[]>([{ id: "em-1", type: "Work", address: "" }]);
+  const [socialRows, setSocialRows] = useState<SocialRow[]>([{ id: "sc-1", type: "LinkedIn", url: "" }]);
   const [deptSearch, setDeptSearch] = useState("");
   const [customDepts, setCustomDepts] = useState<string[]>([]);
 
@@ -458,8 +458,10 @@ export function CreatePocModal({
 
   const addPhoneRow = () => setPhoneRows((p) => [...p, { id: `ph-${Date.now()}`, type: "Mobile", code: "+1", number: "", ext: "" }]);
   const addEmailRow = () => setEmailRows((p) => [...p, { id: `em-${Date.now()}`, type: "Personal", address: "" }]);
+  const addSocialRow = () => setSocialRows((p) => [...p, { id: `sc-${Date.now()}`, type: "Website", url: "" }]);
   const removePhoneRow = (id: string) => setPhoneRows((p) => p.filter((r) => r.id !== id));
   const removeEmailRow = (id: string) => setEmailRows((p) => p.filter((r) => r.id !== id));
+  const removeSocialRow = (id: string) => setSocialRows((p) => p.filter((r) => r.id !== id));
 
   const inputCls = "h-10 rounded-lg border-[#E2E8F0] bg-white text-sm text-[#0F172A] placeholder:text-[#B8C4D0] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/15";
 
@@ -542,30 +544,6 @@ export function CreatePocModal({
             </div>
           </div>
 
-          {/* ── Social Profiles — boxed card ── */}
-          <div className="rounded-lg border border-[#E2E8F0] bg-white overflow-hidden shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
-            <div className="px-3 sm:px-4 py-2 sm:py-2.5 border-b border-[#EEF2F6] flex items-center gap-2 bg-[#FAFBFC]">
-              <div className="w-6 h-6 rounded-md bg-[#F5F3FF] flex items-center justify-center shrink-0"><Globe className="w-3.5 h-3.5 text-[#7C3AED]" /></div>
-              <span className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Social Profiles</span>
-            </div>
-            <div className="px-3 sm:px-4 py-2.5">
-              <div className="grid grid-cols-1 min-[480px]:grid-cols-2 gap-x-3 sm:gap-x-4 gap-y-2.5 sm:gap-y-3">
-                <div>
-                  <label className="text-xs sm:text-[13px] text-[#0F172A] mb-1 flex items-center gap-1" style={{ fontWeight: 500 }}><Linkedin className="w-3 h-3 text-[#0A66C2]" />LinkedIn</label>
-                  <Input value={linkedin} onChange={(e) => setLinkedin(e.target.value)} placeholder="linkedin.com/in/username" className={inputCls} />
-                </div>
-                <div>
-                  <label className="text-xs sm:text-[13px] text-[#0F172A] mb-1 flex items-center gap-1" style={{ fontWeight: 500 }}><Twitter className="w-3 h-3 text-[#1DA1F2]" />Twitter / X</label>
-                  <Input value={twitter} onChange={(e) => setTwitter(e.target.value)} placeholder="@username" className={inputCls} />
-                </div>
-                <div>
-                  <label className="text-xs sm:text-[13px] text-[#0F172A] mb-1 flex items-center gap-1" style={{ fontWeight: 500 }}><Globe className="w-3 h-3 text-[#64748B]" />Website</label>
-                  <Input value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="https://example.com" className={inputCls} />
-                </div>
-              </div>
-            </div>
-          </div>
-
           {/* ── Phone Numbers — boxed card ── */}
           <div className="rounded-lg border border-[#E2E8F0] bg-white overflow-hidden shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
             <div className="px-3 sm:px-4 py-2 sm:py-2.5 border-b border-[#EEF2F6] flex items-center justify-between bg-[#FAFBFC]">
@@ -614,6 +592,31 @@ export function CreatePocModal({
                   </Select>
                   <Input value={row.address} onChange={(e) => handleEmailChange(idx, e.target.value)} placeholder="name@company.com" type="email" className={`flex-1 ${inputCls}`} />
                   {emailRows.length > 1 && <button onClick={() => removeEmailRow(row.id)} className="w-8 h-8 rounded-lg flex items-center justify-center text-[#CBD5E1] hover:text-[#EF4444] hover:bg-[#FEF2F2] transition-colors cursor-pointer shrink-0"><Trash2 className="w-3.5 h-3.5" /></button>}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* ── Social Profiles — dynamic rows like phone/email ── */}
+          <div className="rounded-lg border border-[#E2E8F0] bg-white overflow-hidden shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
+            <div className="px-3 sm:px-4 py-2 sm:py-2.5 border-b border-[#EEF2F6] flex items-center justify-between bg-[#FAFBFC]">
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded-md bg-[#F5F3FF] flex items-center justify-center shrink-0"><Globe className="w-3.5 h-3.5 text-[#7C3AED]" /></div>
+                <span className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Social Profiles</span>
+              </div>
+              <button type="button" onClick={addSocialRow} className="inline-flex items-center gap-1 text-[11px] text-[#0A77FF] hover:text-[#0862D0] cursor-pointer" style={{ fontWeight: 600 }}><Plus className="w-3 h-3" />Add</button>
+            </div>
+            <div className="px-3 sm:px-4 py-2.5 space-y-2">
+              {socialRows.map((row, idx) => (
+                <div key={row.id} className="flex items-center gap-2">
+                  <Select value={row.type} onValueChange={(v) => { setSocialRows((p) => { const n = [...p]; n[idx] = { ...n[idx], type: v }; return n; }); }}>
+                    <SelectTrigger className="!h-10 rounded-lg border-[#E2E8F0] text-xs w-[110px] shrink-0 [&>svg]:text-[#94A3B8]"><SelectValue /></SelectTrigger>
+                    <SelectContent className="z-[350]">{SOCIAL_TYPES.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
+                  </Select>
+                  <Input value={row.url} onChange={(e) => { setSocialRows((p) => { const n = [...p]; n[idx] = { ...n[idx], url: e.target.value }; return n; }); }}
+                    placeholder={row.type === "LinkedIn" ? "linkedin.com/in/username" : row.type === "Twitter / X" ? "@username" : row.type === "WhatsApp" ? "+1 555-123-4567" : "https://example.com"}
+                    className={`flex-1 ${inputCls}`} />
+                  {socialRows.length > 1 && <button onClick={() => removeSocialRow(row.id)} className="w-8 h-8 rounded-lg flex items-center justify-center text-[#CBD5E1] hover:text-[#EF4444] hover:bg-[#FEF2F2] transition-colors cursor-pointer shrink-0"><Trash2 className="w-3.5 h-3.5" /></button>}
                 </div>
               ))}
             </div>
