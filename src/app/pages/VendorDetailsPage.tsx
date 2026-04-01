@@ -2422,8 +2422,9 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
       <DndProvider backend={HTML5Backend}>
       <div className="space-y-3 min-w-0">
         {(() => {
-          // Fixed layout spans — never changes with size. Size only affects content inside the card.
-          const WIDGET_SPANS: Record<string, "full" | "half"> = {
+          // Default spans per widget — overridden by size:
+          // Small → always "half" (2 per row), Medium → default, Large → always "full"
+          const DEFAULT_SPANS: Record<string, "full" | "half"> = {
             spend_trend: "full", order_activity: "full",
             spend_by_category: "half", credit_health: "half",
             delivery_perf: "half", invoice_aging: "half",
@@ -2436,8 +2437,9 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
           type WidgetNode = { key: string; idx: number; span: "full" | "half"; node: React.ReactNode };
           const nodes: WidgetNode[] = [];
 
-          // Chart heights: consistent per size tier
-          const CH: Record<string, number> = { sm: 140, md: 200, lg: 260 };
+          // Standardized chart heights per size — same for EVERY widget
+          // sm: compact 2-per-row cards, md: standard, lg: full-width expanded
+          const CH: Record<string, number> = { sm: 120, md: 200, lg: 280 };
 
           activeWidgets.forEach((wKey, wIdx) => {
             const sz = widgetSizes[wKey] || "md";
@@ -2450,77 +2452,94 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
             let cardAction: React.ReactNode = undefined;
             
 
+            // ── Shared chart rendering helper ──
+            const chartBox = (h: number, chart: React.ReactNode) => (
+              <div style={{ height: h }} className="-ml-2"><ResponsiveContainer width="100%" height="100%">{chart}</ResponsiveContainer></div>
+            );
+            const statRow = (stats: { label: string; value: string; color?: string }[]) => (
+              <div className="flex items-center gap-4 mt-2 pt-2 border-t border-[#F1F5F9]">
+                {stats.map((s, i) => (<div key={i}><p className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>{s.label}</p><p className="text-[13px]" style={{ fontWeight: 700, color: s.color || "#0F172A" }}>{s.value}</p></div>))}
+              </div>
+            );
+            const ttStyle = { borderRadius: 8, border: "1px solid #E2E8F0", boxShadow: "0 4px 12px rgba(0,0,0,0.08)", fontSize: 12 };
+
             if (wKey === "spend_trend") {
             icon = TrendingUp; title = "Spend Trend"; tip = "Tracks total monthly spend with this partner across all purchase orders and invoices. Use this to identify seasonal patterns and budget alignment.";
             cardAction = <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>This Year</span>;
             const totalYTD = SPEND_TREND_DATA.reduce((s, d) => s + d.amount, 0);
             const avgMonthly = Math.round(totalYTD / SPEND_TREND_DATA.length);
             const peakMonth = SPEND_TREND_DATA.reduce((a, b) => a.amount > b.amount ? a : b);
+            const lowMonth = SPEND_TREND_DATA.reduce((a, b) => a.amount < b.amount ? a : b);
             content = (
               <>
-                <div style={{ height: CH[sz] }} className="-ml-2">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={SPEND_TREND_DATA} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
-                      <defs><linearGradient id="spendGradientUniq" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#0A77FF" stopOpacity={0.15} /><stop offset="100%" stopColor="#0A77FF" stopOpacity={0.01} /></linearGradient></defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
-                      <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
-                      <YAxis tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
-                      <ReTooltip contentStyle={{ borderRadius: 8, border: "1px solid #E2E8F0", fontSize: 12 }} formatter={(val: number) => [`$${val.toLocaleString()}`, "Spend"]} />
-                      <Area type="monotone" dataKey="amount" stroke="#0A77FF" strokeWidth={2} fill="url(#spendGradientUniq)" />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </div>
-                {sz !== "sm" && (
-                  <div className="flex items-center gap-4 mt-2 pt-2 border-t border-[#F1F5F9]">
-                    <div><p className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>YTD Total</p><p className="text-[14px] text-[#0F172A]" style={{ fontWeight: 700 }}>{formatCurrency(totalYTD)}</p></div>
-                    <div><p className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Monthly Avg</p><p className="text-[14px] text-[#0F172A]" style={{ fontWeight: 700 }}>{formatCurrency(avgMonthly)}</p></div>
-                    {sz === "lg" && <div><p className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Peak</p><p className="text-[14px] text-[#0A77FF]" style={{ fontWeight: 700 }}>{peakMonth.month} · {formatCurrency(peakMonth.amount)}</p></div>}
-                  </div>
-                )}
+                {chartBox(CH[sz], (
+                  <AreaChart data={SPEND_TREND_DATA} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
+                    <defs><linearGradient id="spendGradientUniq" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#0A77FF" stopOpacity={0.15} /><stop offset="100%" stopColor="#0A77FF" stopOpacity={0.01} /></linearGradient></defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
+                    <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
+                    <ReTooltip contentStyle={ttStyle} formatter={(val: number) => [`$${val.toLocaleString()}`, "Spend"]} />
+                    <Area type="monotone" dataKey="amount" stroke="#0A77FF" strokeWidth={2} fill="url(#spendGradientUniq)" />
+                  </AreaChart>
+                ))}
+                {sz === "md" && statRow([
+                  { label: "YTD Total", value: formatCurrency(totalYTD) },
+                  { label: "Monthly Avg", value: formatCurrency(avgMonthly) },
+                ])}
+                {sz === "lg" && statRow([
+                  { label: "YTD Total", value: formatCurrency(totalYTD) },
+                  { label: "Monthly Avg", value: formatCurrency(avgMonthly) },
+                  { label: "Peak Month", value: `${peakMonth.month} · ${formatCurrency(peakMonth.amount)}`, color: "#0A77FF" },
+                  { label: "Lowest", value: `${lowMonth.month} · ${formatCurrency(lowMonth.amount)}`, color: "#94A3B8" },
+                ])}
               </>
             );
           } else if (wKey === "order_activity") {
             icon = BarChart3; title = "Order Activity"; tip = "Shows daily order volume and return rates for the current week. Helps identify peak ordering days and track return patterns for quality monitoring.";
             cardAction = (<div className="flex items-center gap-3"><div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-[#0A77FF]" /><span className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Orders</span></div><div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-[#F59E0B]" /><span className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Returns</span></div></div>);
-            const totalOrders = ORDER_ACTIVITY_DATA.reduce((s, d) => s + d.orders, 0);
-            const totalReturns = ORDER_ACTIVITY_DATA.reduce((s, d) => s + d.returns, 0);
-            const returnPct = totalOrders > 0 ? ((totalReturns / totalOrders) * 100).toFixed(1) : "0";
+            const totalOrd = ORDER_ACTIVITY_DATA.reduce((s, d) => s + d.orders, 0);
+            const totalRet = ORDER_ACTIVITY_DATA.reduce((s, d) => s + d.returns, 0);
+            const retPct = totalOrd > 0 ? ((totalRet / totalOrd) * 100).toFixed(1) : "0";
             content = (
               <>
-                <div style={{ height: CH[sz] }} className="-ml-2">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={ORDER_ACTIVITY_DATA} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
-                      <XAxis dataKey="day" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
-                      <YAxis tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
-                      <ReTooltip contentStyle={{ borderRadius: 8, border: "1px solid #E2E8F0", fontSize: 12 }} />
-                      <Bar dataKey="orders" fill="#0A77FF" radius={[4, 4, 0, 0]} barSize={sz === "sm" ? 14 : 24} name="Orders" />
-                      <Bar dataKey="returns" fill="#F59E0B" radius={[4, 4, 0, 0]} barSize={sz === "sm" ? 14 : 24} name="Returns" />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-                {sz !== "sm" && (
-                  <div className="flex items-center gap-4 mt-2 pt-2 border-t border-[#F1F5F9]">
-                    <div><p className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>This Week</p><p className="text-[14px] text-[#0F172A]" style={{ fontWeight: 700 }}>{totalOrders} orders</p></div>
-                    <div><p className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Returns</p><p className="text-[14px] text-[#F59E0B]" style={{ fontWeight: 700 }}>{totalReturns} ({returnPct}%)</p></div>
-                    {sz === "lg" && <div><p className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Peak Day</p><p className="text-[14px] text-[#0A77FF]" style={{ fontWeight: 700 }}>Thursday · 8</p></div>}
-                  </div>
-                )}
+                {chartBox(CH[sz], (
+                  <BarChart data={ORDER_ACTIVITY_DATA} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
+                    <XAxis dataKey="day" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
+                    <ReTooltip contentStyle={ttStyle} />
+                    <Bar dataKey="orders" fill="#0A77FF" radius={[4, 4, 0, 0]} barSize={sz === "sm" ? 14 : 24} name="Orders" />
+                    <Bar dataKey="returns" fill="#F59E0B" radius={[4, 4, 0, 0]} barSize={sz === "sm" ? 14 : 24} name="Returns" />
+                  </BarChart>
+                ))}
+                {sz === "md" && statRow([
+                  { label: "This Week", value: `${totalOrd} orders` },
+                  { label: "Returns", value: `${totalRet} (${retPct}%)`, color: "#F59E0B" },
+                ])}
+                {sz === "lg" && statRow([
+                  { label: "This Week", value: `${totalOrd} orders` },
+                  { label: "Returns", value: `${totalRet} (${retPct}%)`, color: "#F59E0B" },
+                  { label: "Peak Day", value: "Thursday · 8", color: "#0A77FF" },
+                  { label: "Avg / Day", value: `${(totalOrd / 7).toFixed(1)}` },
+                ])}
               </>
             );
           } else if (wKey === "spend_by_category") {
             icon = PieChart; title = "Spend by Category"; tip = "Breakdown of total partner spend across procurement categories. Identifies which categories drive the most cost and helps with budget allocation and contract negotiations.";
+            const pieSize = sz === "sm" ? 100 : sz === "lg" ? 160 : 130;
+            const pieInner = sz === "sm" ? 30 : sz === "lg" ? 52 : 40;
+            const pieOuter = sz === "sm" ? 46 : sz === "lg" ? 74 : 60;
             content = (
               <>
                 <div className="flex items-center gap-4">
-                  <div className="shrink-0 relative" style={{ width: 120, height: 120 }}>
-                    <RePieChart width={120} height={120}>
-                      <Pie data={spendCategories} cx="50%" cy="50%" innerRadius={36} outerRadius={56} paddingAngle={2} dataKey="value" stroke="none">
+                  <div className="shrink-0 relative" style={{ width: pieSize, height: pieSize }}>
+                    <RePieChart width={pieSize} height={pieSize}>
+                      <Pie data={spendCategories} cx="50%" cy="50%" innerRadius={pieInner} outerRadius={pieOuter} paddingAngle={2} dataKey="value" stroke="none">
                         {spendCategories.map((_, i) => (<Cell key={`cell-${i}`} fill={PIE_COLORS[i % PIE_COLORS.length]} />))}
                       </Pie>
                     </RePieChart>
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
-                      <span className="text-[12px] text-[#0F172A]" style={{ fontWeight: 700 }}>{formatCurrency(vendor.totalSpent)}</span>
+                      <span className="text-[11px] text-[#0F172A]" style={{ fontWeight: 700 }}>{formatCurrency(vendor.totalSpent)}</span>
                     </div>
                   </div>
                   <div className="flex-1 min-w-0 space-y-1.5">
@@ -2532,13 +2551,8 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
                     ))}
                   </div>
                 </div>
-                {sz !== "sm" && (
-                  <div className="flex items-center gap-4 mt-3 pt-2 border-t border-[#F1F5F9]">
-                    {spendCategories.map((cat, idx) => (
-                      <div key={cat.name}><p className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>{cat.name}</p><p className="text-[13px] text-[#0F172A]" style={{ fontWeight: 700 }}>{formatCurrency(cat.value)}</p></div>
-                    ))}
-                  </div>
-                )}
+                {sz === "md" && statRow(spendCategories.slice(0, 3).map(c => ({ label: c.name, value: formatCurrency(c.value) })))}
+                {sz === "lg" && statRow(spendCategories.map(c => ({ label: c.name, value: formatCurrency(c.value) })))}
               </>
             );
           } else if (wKey === "credit_health") {
@@ -2548,69 +2562,77 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
                 <div className="flex items-center justify-between mb-2"><span className="text-[12px] text-[#475569]" style={{ fontWeight: 500 }}>Credit Utilization</span><span className="text-[13px] text-[#0F172A]" style={{ fontWeight: 700 }}>{creditPct}%</span></div>
                 <div className="w-full h-3 rounded-full bg-[#F1F5F9] overflow-hidden"><div className="h-full rounded-full transition-all" style={{ width: `${Math.min(creditPct, 100)}%`, backgroundColor: creditPct > 80 ? "#DC2626" : creditPct > 50 ? "#D97706" : "#059669" }} /></div>
                 <div className="flex items-center justify-between mt-1.5"><span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>$0</span><span className="text-[10px]" style={{ fontWeight: 500, color: creditStatusColor }}>{creditStatusLabel}</span><span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>{formatCurrency(vendor.creditLimit)}</span></div>
-                {sz !== "sm" && (
-                  <div className="grid grid-cols-3 gap-3 mt-3 pt-2 border-t border-[#F1F5F9]">
-                    <div><p className="text-[10px] text-[#94A3B8] mb-0.5" style={{ fontWeight: 500 }}>Available</p><p className="text-[14px] text-[#0F172A]" style={{ fontWeight: 700 }}>{formatCurrency(Math.max(available, 0))}</p></div>
-                    <div><p className="text-[10px] text-[#94A3B8] mb-0.5" style={{ fontWeight: 500 }}>Used</p><p className="text-[14px] text-[#0F172A]" style={{ fontWeight: 700 }}>{formatCurrency(vendor.creditUtilization)}</p></div>
-                    <div><p className="text-[10px] text-[#94A3B8] mb-0.5" style={{ fontWeight: 500 }}>Limit</p><p className="text-[14px] text-[#0F172A]" style={{ fontWeight: 700 }}>{formatCurrency(vendor.creditLimit)}</p></div>
-                  </div>
-                )}
+                {sz === "md" && statRow([
+                  { label: "Available", value: formatCurrency(Math.max(available, 0)), color: "#059669" },
+                  { label: "Used", value: formatCurrency(vendor.creditUtilization) },
+                  { label: "Limit", value: formatCurrency(vendor.creditLimit) },
+                ])}
+                {sz === "lg" && statRow([
+                  { label: "Available", value: formatCurrency(Math.max(available, 0)), color: "#059669" },
+                  { label: "Used", value: formatCurrency(vendor.creditUtilization) },
+                  { label: "Limit", value: formatCurrency(vendor.creditLimit) },
+                  { label: "Status", value: creditStatusLabel, color: creditStatusColor },
+                ])}
               </>
             );
           } else if (wKey === "delivery_perf") {
             icon = TrendingUp; title = "Delivery Performance"; tip = "Tracks the percentage of orders delivered on or before the promised date. Monitors trends over 6 months to identify supply chain reliability improvements or deterioration.";
             content = (
               <>
-                <div style={{ height: CH[sz] }} className="-ml-2">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={[{ month: "Oct", rate: 91 }, { month: "Nov", rate: 88 }, { month: "Dec", rate: 93 }, { month: "Jan", rate: 95 }, { month: "Feb", rate: 92 }, { month: "Mar", rate: 94 }]} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
-                      <defs><linearGradient id="delivGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#059669" stopOpacity={0.15} /><stop offset="100%" stopColor="#059669" stopOpacity={0.01} /></linearGradient></defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
-                      <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
-                      <YAxis tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} domain={[80, 100]} tickFormatter={(v) => `${v}%`} />
-                      <ReTooltip contentStyle={{ borderRadius: 8, border: "1px solid #E2E8F0", fontSize: 12 }} formatter={(v: number) => [`${v}%`, "On-Time"]} />
-                      <Area type="monotone" dataKey="rate" stroke="#059669" strokeWidth={2} fill="url(#delivGrad)" />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </div>
-                {sz !== "sm" && (
-                  <div className="flex items-center gap-4 mt-2 pt-2 border-t border-[#F1F5F9]">
-                    <div><p className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Current</p><p className="text-[14px] text-[#059669]" style={{ fontWeight: 700 }}>94%</p></div>
-                    <div><p className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Average</p><p className="text-[14px] text-[#0F172A]" style={{ fontWeight: 700 }}>92.2%</p></div>
-                    <div><p className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Late</p><p className="text-[14px] text-[#D97706]" style={{ fontWeight: 700 }}>6%</p></div>
-                  </div>
-                )}
+                {chartBox(CH[sz], (
+                  <AreaChart data={[{ month: "Oct", rate: 91 }, { month: "Nov", rate: 88 }, { month: "Dec", rate: 93 }, { month: "Jan", rate: 95 }, { month: "Feb", rate: 92 }, { month: "Mar", rate: 94 }]} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
+                    <defs><linearGradient id="delivGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#059669" stopOpacity={0.15} /><stop offset="100%" stopColor="#059669" stopOpacity={0.01} /></linearGradient></defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
+                    <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} domain={[80, 100]} tickFormatter={(v) => `${v}%`} />
+                    <ReTooltip contentStyle={ttStyle} formatter={(v: number) => [`${v}%`, "On-Time"]} />
+                    <Area type="monotone" dataKey="rate" stroke="#059669" strokeWidth={2} fill="url(#delivGrad)" />
+                  </AreaChart>
+                ))}
+                {sz === "md" && statRow([
+                  { label: "Current", value: "94%", color: "#059669" },
+                  { label: "Average", value: "92.2%" },
+                  { label: "Late", value: "6%", color: "#D97706" },
+                ])}
+                {sz === "lg" && statRow([
+                  { label: "Current", value: "94%", color: "#059669" },
+                  { label: "6-Mo Avg", value: "92.2%" },
+                  { label: "Late Rate", value: "6%", color: "#D97706" },
+                  { label: "Best Month", value: "Jan · 95%", color: "#059669" },
+                ])}
               </>
             );
           } else if (wKey === "invoice_aging") {
             icon = Receipt; title = "Invoice Aging"; tip = "Groups outstanding invoices by how long they've been overdue: 0-30, 31-60, 61-90, and 90+ days. Higher amounts in older buckets indicate payment collection risk.";
             content = (
               <>
-                <div style={{ height: CH[sz] }} className="-ml-2">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={[
-                      { range: "0-30d", amount: Math.round(vendor.outstandingBalance * 0.4) },
-                      { range: "31-60d", amount: Math.round(vendor.outstandingBalance * 0.25) },
-                      { range: "61-90d", amount: Math.round(vendor.outstandingBalance * 0.2) },
-                      { range: "90d+", amount: Math.round(vendor.outstandingBalance * 0.15) },
-                    ]} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
-                      <XAxis dataKey="range" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
-                      <YAxis tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
-                      <ReTooltip contentStyle={{ borderRadius: 8, border: "1px solid #E2E8F0", fontSize: 12 }} formatter={(v: number) => [`$${v.toLocaleString()}`, "Amount"]} />
-                      <Bar dataKey="amount" radius={[4, 4, 0, 0]} barSize={sz === "sm" ? 20 : 36}>
-                        {[0, 1, 2, 3].map((i) => (<Cell key={i} fill={["#0A77FF", "#3B82F6", "#D97706", "#DC2626"][i]} />))}
-                      </Bar>
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-                {sz !== "sm" && (
-                  <div className="flex items-center gap-4 mt-2 pt-2 border-t border-[#F1F5F9]">
-                    <div><p className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Total Overdue</p><p className="text-[14px] text-[#DC2626]" style={{ fontWeight: 700 }}>{formatCurrency(Math.round(vendor.outstandingBalance * 0.35))}</p></div>
-                    <div><p className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Invoices</p><p className="text-[14px] text-[#0F172A]" style={{ fontWeight: 700 }}>11</p></div>
-                    <div><p className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Avg Days</p><p className="text-[14px] text-[#D97706]" style={{ fontWeight: 700 }}>42</p></div>
-                  </div>
-                )}
+                {chartBox(CH[sz], (
+                  <BarChart data={[
+                    { range: "0-30d", amount: Math.round(vendor.outstandingBalance * 0.4) },
+                    { range: "31-60d", amount: Math.round(vendor.outstandingBalance * 0.25) },
+                    { range: "61-90d", amount: Math.round(vendor.outstandingBalance * 0.2) },
+                    { range: "90d+", amount: Math.round(vendor.outstandingBalance * 0.15) },
+                  ]} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
+                    <XAxis dataKey="range" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
+                    <ReTooltip contentStyle={ttStyle} formatter={(v: number) => [`$${v.toLocaleString()}`, "Amount"]} />
+                    <Bar dataKey="amount" radius={[4, 4, 0, 0]} barSize={sz === "sm" ? 20 : 36}>
+                      {[0, 1, 2, 3].map((i) => (<Cell key={i} fill={["#0A77FF", "#3B82F6", "#D97706", "#DC2626"][i]} />))}
+                    </Bar>
+                  </BarChart>
+                ))}
+                {sz === "md" && statRow([
+                  { label: "Total Overdue", value: formatCurrency(Math.round(vendor.outstandingBalance * 0.35)), color: "#DC2626" },
+                  { label: "Invoices", value: "11" },
+                  { label: "Avg Days", value: "42", color: "#D97706" },
+                ])}
+                {sz === "lg" && statRow([
+                  { label: "Total Overdue", value: formatCurrency(Math.round(vendor.outstandingBalance * 0.35)), color: "#DC2626" },
+                  { label: "Open Invoices", value: "11" },
+                  { label: "Avg Days", value: "42", color: "#D97706" },
+                  { label: "Oldest", value: "98 days", color: "#DC2626" },
+                ])}
               </>
             );
           } else if (wKey === "primary_contact") {
@@ -2622,27 +2644,44 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
                   <div className="min-w-0 flex-1">
                     <p className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>{vendor.primaryContact.name}</p>
                     <p className="text-[11px] text-[#64748B] mt-0.5">{vendor.primaryContact.designation}</p>
-                    {sz !== "sm" && (
-                      <div className="flex items-center gap-3 mt-1">
-                        <div className="flex items-center gap-1.5 text-[11px] text-[#334155]"><Mail className="w-3 h-3 text-[#94A3B8]" />{vendor.primaryContact.email || "—"}</div>
-                        <div className="flex items-center gap-1.5 text-[11px] text-[#334155]"><Phone className="w-3 h-3 text-[#94A3B8]" />{vendor.primaryContact.phone || "—"}</div>
-                      </div>
-                    )}
                   </div>
                 </div>
-                {sz !== "sm" && (
-                  <div style={{ height: CH[sz] }} className="-ml-2 mt-3 border-t border-[#F1F5F9] pt-2">
-                    <p className="text-[10px] text-[#94A3B8] mb-1 ml-2" style={{ fontWeight: 500 }}>Response Time (hours)</p>
-                    <ResponsiveContainer width="100%" height="85%">
-                      <LineChart data={[{ week: "W1", hours: 4.2 }, { week: "W2", hours: 3.8 }, { week: "W3", hours: 2.5 }, { week: "W4", hours: 3.1 }, { week: "W5", hours: 1.8 }, { week: "W6", hours: 2.2 }]} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
-                        <XAxis dataKey="week" tick={{ fontSize: 10, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
-                        <YAxis tick={{ fontSize: 10, fill: "#94A3B8" }} axisLine={false} tickLine={false} domain={[0, 6]} />
-                        <ReTooltip contentStyle={{ borderRadius: 8, border: "1px solid #E2E8F0", fontSize: 11 }} formatter={(v: number) => [`${v}h`, "Avg"]} />
-                        <Line type="monotone" dataKey="hours" stroke="#7C3AED" strokeWidth={2} dot={{ r: 3, fill: "#7C3AED" }} />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  </div>
+                {sz === "md" && (
+                  <>
+                    <div className="flex items-center gap-3 mt-2 pt-2 border-t border-[#F1F5F9]">
+                      <div className="flex items-center gap-1.5 text-[11px] text-[#334155]"><Mail className="w-3 h-3 text-[#94A3B8]" />{vendor.primaryContact.email || "—"}</div>
+                      <div className="flex items-center gap-1.5 text-[11px] text-[#334155]"><Phone className="w-3 h-3 text-[#94A3B8]" />{vendor.primaryContact.phone || "—"}</div>
+                    </div>
+                    <div style={{ height: 100 }} className="-ml-2 mt-2">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <LineChart data={[{ w: "W1", h: 4.2 }, { w: "W2", h: 3.8 }, { w: "W3", h: 2.5 }, { w: "W4", h: 3.1 }, { w: "W5", h: 1.8 }, { w: "W6", h: 2.2 }]} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
+                          <XAxis dataKey="w" tick={{ fontSize: 10, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
+                          <Line type="monotone" dataKey="h" stroke="#7C3AED" strokeWidth={2} dot={{ r: 2, fill: "#7C3AED" }} />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </>
+                )}
+                {sz === "lg" && (
+                  <>
+                    <div className="flex items-center gap-3 mt-2 pt-2 border-t border-[#F1F5F9]">
+                      <div className="flex items-center gap-1.5 text-[11px] text-[#334155]"><Mail className="w-3 h-3 text-[#94A3B8]" />{vendor.primaryContact.email || "—"}</div>
+                      <div className="flex items-center gap-1.5 text-[11px] text-[#334155]"><Phone className="w-3 h-3 text-[#94A3B8]" />{vendor.primaryContact.phone || "—"}</div>
+                    </div>
+                    <div style={{ height: 160 }} className="-ml-2 mt-2">
+                      <p className="text-[10px] text-[#94A3B8] mb-1 ml-2" style={{ fontWeight: 500 }}>Response Time (hours)</p>
+                      <ResponsiveContainer width="100%" height="85%">
+                        <LineChart data={[{ w: "W1", h: 4.2 }, { w: "W2", h: 3.8 }, { w: "W3", h: 2.5 }, { w: "W4", h: 3.1 }, { w: "W5", h: 1.8 }, { w: "W6", h: 2.2 }]} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
+                          <XAxis dataKey="w" tick={{ fontSize: 10, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
+                          <YAxis tick={{ fontSize: 10, fill: "#94A3B8" }} axisLine={false} tickLine={false} domain={[0, 6]} />
+                          <ReTooltip contentStyle={ttStyle} formatter={(v: number) => [`${v}h`, "Avg"]} />
+                          <Line type="monotone" dataKey="h" stroke="#7C3AED" strokeWidth={2} dot={{ r: 3, fill: "#7C3AED" }} />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </div>
+                    {statRow([{ label: "Avg Response", value: "2.9h", color: "#7C3AED" }, { label: "Best", value: "1.8h", color: "#059669" }, { label: "Worst", value: "4.2h", color: "#D97706" }])}
+                  </>
                 )}
               </>
             );
@@ -2650,102 +2689,95 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
             icon = BarChart3; title = "Return Rate"; tip = "Tracks product return percentage and defect rates over the last 6 months. A declining trend indicates improving quality. Rates above 5% may trigger vendor quality reviews.";
             content = (
               <>
-                <div style={{ height: CH[sz] }} className="-ml-2">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={[
-                      { month: "Oct", rate: 3.2, defect: 1.8 }, { month: "Nov", rate: 2.8, defect: 1.5 }, { month: "Dec", rate: 2.1, defect: 1.2 },
-                      { month: "Jan", rate: 2.5, defect: 1.4 }, { month: "Feb", rate: 1.9, defect: 0.9 }, { month: "Mar", rate: 2.1, defect: 1.1 },
-                    ]} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
-                      <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
-                      <YAxis tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} tickFormatter={(v) => `${v}%`} />
-                      <ReTooltip contentStyle={{ borderRadius: 8, border: "1px solid #E2E8F0", fontSize: 12 }} />
-                      <Line type="monotone" dataKey="rate" stroke="#F59E0B" strokeWidth={2} dot={{ r: 3, fill: "#F59E0B" }} name="Return %" />
-                      <Line type="monotone" dataKey="defect" stroke="#DC2626" strokeWidth={2} dot={{ r: 3, fill: "#DC2626" }} name="Defect %" strokeDasharray="5 5" />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-                <div className="flex items-center gap-4 mt-1 pt-2 border-t border-[#F1F5F9]"><div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-[#F59E0B]" /><span className="text-[10px] text-[#64748B]" style={{ fontWeight: 500 }}>Returns 2.1%</span></div><div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-[#DC2626]" /><span className="text-[10px] text-[#64748B]" style={{ fontWeight: 500 }}>Defects 1.1%</span></div></div>
+                {chartBox(CH[sz], (
+                  <LineChart data={[{ month: "Oct", rate: 3.2, defect: 1.8 }, { month: "Nov", rate: 2.8, defect: 1.5 }, { month: "Dec", rate: 2.1, defect: 1.2 }, { month: "Jan", rate: 2.5, defect: 1.4 }, { month: "Feb", rate: 1.9, defect: 0.9 }, { month: "Mar", rate: 2.1, defect: 1.1 }]} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
+                    <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} tickFormatter={(v) => `${v}%`} />
+                    <ReTooltip contentStyle={ttStyle} />
+                    <Line type="monotone" dataKey="rate" stroke="#F59E0B" strokeWidth={2} dot={{ r: 3, fill: "#F59E0B" }} name="Return %" />
+                    <Line type="monotone" dataKey="defect" stroke="#DC2626" strokeWidth={2} dot={{ r: 3, fill: "#DC2626" }} name="Defect %" strokeDasharray="5 5" />
+                  </LineChart>
+                ))}
+                {sz === "md" && statRow([{ label: "Returns", value: "2.1%", color: "#F59E0B" }, { label: "Defects", value: "1.1%", color: "#DC2626" }])}
+                {sz === "lg" && statRow([{ label: "Returns", value: "2.1%", color: "#F59E0B" }, { label: "Defects", value: "1.1%", color: "#DC2626" }, { label: "6-Mo Trend", value: "↓ Improving", color: "#059669" }, { label: "Items Returned", value: "12" }])}
               </>
             );
           } else if (wKey === "top_items") {
             icon = Package; title = "Top Items by Spend"; tip = "Ranks the top 5 most purchased items by total spend amount. Useful for identifying key SKUs for volume discount negotiations and supply chain risk assessment.";
+            const topItemsData = [
+              { name: "Steel Alloy A", spend: Math.round(vendor.totalSpent * 0.18) },
+              { name: "Precision Bearings", spend: Math.round(vendor.totalSpent * 0.14) },
+              { name: "Hydraulic Pump", spend: Math.round(vendor.totalSpent * 0.11) },
+              { name: "Carbon Fiber", spend: Math.round(vendor.totalSpent * 0.09) },
+              { name: "Ind. Lubricant", spend: Math.round(vendor.totalSpent * 0.07) },
+            ];
             content = (
-              <div style={{ height: CH[sz] }} className="-ml-2">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart layout="vertical" data={[
-                    { name: "Steel Alloy A", spend: Math.round(vendor.totalSpent * 0.18) },
-                    { name: "Precision Bearings", spend: Math.round(vendor.totalSpent * 0.14) },
-                    { name: "Hydraulic Pump", spend: Math.round(vendor.totalSpent * 0.11) },
-                    { name: "Carbon Fiber", spend: Math.round(vendor.totalSpent * 0.09) },
-                    { name: "Ind. Lubricant", spend: Math.round(vendor.totalSpent * 0.07) },
-                  ]} margin={{ top: 5, right: 30, left: 5, bottom: 5 }}>
+              <>
+                {chartBox(CH[sz], (
+                  <BarChart layout="vertical" data={topItemsData} margin={{ top: 5, right: 30, left: 5, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" horizontal={false} />
                     <XAxis type="number" tick={{ fontSize: 10, fill: "#94A3B8" }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
                     <YAxis type="category" dataKey="name" tick={{ fontSize: 10, fill: "#64748B" }} axisLine={false} tickLine={false} width={90} />
-                    <ReTooltip contentStyle={{ borderRadius: 8, border: "1px solid #E2E8F0", fontSize: 12 }} formatter={(v: number) => [`$${v.toLocaleString()}`, "Spend"]} />
+                    <ReTooltip contentStyle={ttStyle} formatter={(v: number) => [`$${v.toLocaleString()}`, "Spend"]} />
                     <Bar dataKey="spend" radius={[0, 4, 4, 0]} barSize={sz === "sm" ? 10 : 16}>
-                      {[0, 1, 2, 3, 4].map((i) => (<Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />))}
+                      {topItemsData.map((_, i) => (<Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />))}
                     </Bar>
                   </BarChart>
-                </ResponsiveContainer>
-              </div>
+                ))}
+                {sz === "md" && statRow([{ label: "Top Item", value: "Steel Alloy A" }, { label: "Total (Top 5)", value: formatCurrency(topItemsData.reduce((s, d) => s + d.spend, 0)) }])}
+                {sz === "lg" && statRow([{ label: "Top Item", value: "Steel Alloy A" }, { label: "Top 5 Total", value: formatCurrency(topItemsData.reduce((s, d) => s + d.spend, 0)) }, { label: "% of Spend", value: "59%" }, { label: "Unique SKUs", value: "5" }])}
+              </>
             );
           } else if (wKey === "recent_orders") {
             icon = ClipboardList; title = "Recent Orders"; tip = "Shows the 5 most recent purchase orders with their current fulfillment status and value. Color-coded bars indicate delivery status: green (delivered), blue (in transit), amber (pending).";
             content = (
               <>
-                <div style={{ height: CH[sz] }} className="-ml-2">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={[
-                      { po: "28180", amount: Math.round(vendor.totalSpent * 0.04) }, { po: "28255", amount: Math.round(vendor.totalSpent * 0.07) },
-                      { po: "28312", amount: Math.round(vendor.totalSpent * 0.05) }, { po: "28390", amount: Math.round(vendor.totalSpent * 0.06) },
-                      { po: "28451", amount: Math.round(vendor.totalSpent * 0.08) },
-                    ]} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
-                      <XAxis dataKey="po" tick={{ fontSize: 9, fill: "#94A3B8" }} axisLine={false} tickLine={false} tickFormatter={(v) => `PO-${v}`} />
-                      <YAxis tick={{ fontSize: 10, fill: "#94A3B8" }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
-                      <ReTooltip contentStyle={{ borderRadius: 8, border: "1px solid #E2E8F0", fontSize: 12 }} formatter={(v: number) => [`$${v.toLocaleString()}`, "Amount"]} />
-                      <Bar dataKey="amount" radius={[4, 4, 0, 0]} barSize={sz === "sm" ? 16 : 24}>
-                        {[0, 1, 2, 3, 4].map((i) => (<Cell key={i} fill={[1, 2, 4].includes(i) ? "#059669" : i === 3 ? "#0A77FF" : "#D97706"} />))}
-                      </Bar>
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-                {sz !== "sm" && (
-                  <div className="flex items-center gap-3 mt-2 pt-2 border-t border-[#F1F5F9]">
-                    <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#059669]" /><span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Delivered</span></div>
-                    <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#0A77FF]" /><span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>In Transit</span></div>
-                    <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#D97706]" /><span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Pending</span></div>
-                  </div>
-                )}
+                {chartBox(CH[sz], (
+                  <BarChart data={[
+                    { po: "28180", amount: Math.round(vendor.totalSpent * 0.04) }, { po: "28255", amount: Math.round(vendor.totalSpent * 0.07) },
+                    { po: "28312", amount: Math.round(vendor.totalSpent * 0.05) }, { po: "28390", amount: Math.round(vendor.totalSpent * 0.06) },
+                    { po: "28451", amount: Math.round(vendor.totalSpent * 0.08) },
+                  ]} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
+                    <XAxis dataKey="po" tick={{ fontSize: 9, fill: "#94A3B8" }} axisLine={false} tickLine={false} tickFormatter={(v) => `PO-${v}`} />
+                    <YAxis tick={{ fontSize: 10, fill: "#94A3B8" }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
+                    <ReTooltip contentStyle={ttStyle} formatter={(v: number) => [`$${v.toLocaleString()}`, "Amount"]} />
+                    <Bar dataKey="amount" radius={[4, 4, 0, 0]} barSize={sz === "sm" ? 16 : 24}>
+                      {[0, 1, 2, 3, 4].map((i) => (<Cell key={i} fill={[1, 2, 4].includes(i) ? "#059669" : i === 3 ? "#0A77FF" : "#D97706"} />))}
+                    </Bar>
+                  </BarChart>
+                ))}
+                {sz === "md" && statRow([{ label: "Delivered", value: "3", color: "#059669" }, { label: "In Transit", value: "1", color: "#0A77FF" }, { label: "Pending", value: "1", color: "#D97706" }])}
+                {sz === "lg" && statRow([{ label: "Delivered", value: "3", color: "#059669" }, { label: "In Transit", value: "1", color: "#0A77FF" }, { label: "Pending", value: "1", color: "#D97706" }, { label: "Total Value", value: formatCurrency(Math.round(vendor.totalSpent * 0.3)) }])}
               </>
             );
           } else if (wKey === "payment_history") {
             icon = Banknote; title = "Payment History"; tip = "Displays monthly payment amounts (completed) vs pending payments over the last 6 months. The solid green area shows cleared payments, the dashed amber line shows outstanding amounts.";
+            const paidTotal = Math.round(vendor.totalSpent * 0.32);
+            const pendTotal = Math.round(vendor.totalSpent * 0.06);
             content = (
               <>
-                <div style={{ height: CH[sz] }} className="-ml-2">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={[
-                      { month: "Oct", paid: Math.round(vendor.totalSpent * 0.03), pending: Math.round(vendor.totalSpent * 0.01) },
-                      { month: "Nov", paid: Math.round(vendor.totalSpent * 0.05), pending: Math.round(vendor.totalSpent * 0.008) },
-                      { month: "Dec", paid: Math.round(vendor.totalSpent * 0.04), pending: Math.round(vendor.totalSpent * 0.015) },
-                      { month: "Jan", paid: Math.round(vendor.totalSpent * 0.06), pending: Math.round(vendor.totalSpent * 0.005) },
-                      { month: "Feb", paid: Math.round(vendor.totalSpent * 0.08), pending: Math.round(vendor.totalSpent * 0.012) },
-                      { month: "Mar", paid: Math.round(vendor.totalSpent * 0.06), pending: Math.round(vendor.totalSpent * 0.01) },
-                    ]} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
-                      <defs><linearGradient id="paidGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#059669" stopOpacity={0.12} /><stop offset="100%" stopColor="#059669" stopOpacity={0.01} /></linearGradient></defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
-                      <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
-                      <YAxis tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
-                      <ReTooltip contentStyle={{ borderRadius: 8, border: "1px solid #E2E8F0", fontSize: 12 }} formatter={(v: number) => [`$${v.toLocaleString()}`, ""]} />
-                      <Area type="monotone" dataKey="paid" stroke="#059669" strokeWidth={2} fill="url(#paidGrad)" name="Paid" />
-                      <Area type="monotone" dataKey="pending" stroke="#D97706" strokeWidth={1.5} fill="none" strokeDasharray="4 4" name="Pending" />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </div>
-                <div className="flex items-center gap-3 mt-1 pt-2 border-t border-[#F1F5F9]"><div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-[#059669]" /><span className="text-[10px] text-[#64748B]" style={{ fontWeight: 500 }}>Paid</span></div><div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-[#D97706]" /><span className="text-[10px] text-[#64748B]" style={{ fontWeight: 500 }}>Pending</span></div></div>
+                {chartBox(CH[sz], (
+                  <AreaChart data={[
+                    { month: "Oct", paid: Math.round(vendor.totalSpent * 0.03), pending: Math.round(vendor.totalSpent * 0.01) },
+                    { month: "Nov", paid: Math.round(vendor.totalSpent * 0.05), pending: Math.round(vendor.totalSpent * 0.008) },
+                    { month: "Dec", paid: Math.round(vendor.totalSpent * 0.04), pending: Math.round(vendor.totalSpent * 0.015) },
+                    { month: "Jan", paid: Math.round(vendor.totalSpent * 0.06), pending: Math.round(vendor.totalSpent * 0.005) },
+                    { month: "Feb", paid: Math.round(vendor.totalSpent * 0.08), pending: Math.round(vendor.totalSpent * 0.012) },
+                    { month: "Mar", paid: Math.round(vendor.totalSpent * 0.06), pending: Math.round(vendor.totalSpent * 0.01) },
+                  ]} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
+                    <defs><linearGradient id="paidGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#059669" stopOpacity={0.12} /><stop offset="100%" stopColor="#059669" stopOpacity={0.01} /></linearGradient></defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
+                    <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
+                    <ReTooltip contentStyle={ttStyle} formatter={(v: number) => [`$${v.toLocaleString()}`, ""]} />
+                    <Area type="monotone" dataKey="paid" stroke="#059669" strokeWidth={2} fill="url(#paidGrad)" name="Paid" />
+                    <Area type="monotone" dataKey="pending" stroke="#D97706" strokeWidth={1.5} fill="none" strokeDasharray="4 4" name="Pending" />
+                  </AreaChart>
+                ))}
+                {sz === "md" && statRow([{ label: "Total Paid", value: formatCurrency(paidTotal), color: "#059669" }, { label: "Pending", value: formatCurrency(pendTotal), color: "#D97706" }])}
+                {sz === "lg" && statRow([{ label: "Total Paid", value: formatCurrency(paidTotal), color: "#059669" }, { label: "Pending", value: formatCurrency(pendTotal), color: "#D97706" }, { label: "Transactions", value: "24" }, { label: "Avg Payment", value: formatCurrency(Math.round(paidTotal / 24)) }])}
               </>
             );
           } else if (wKey === "compliance_docs") {
@@ -2813,7 +2845,8 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
 
           if (!content) return;
 
-            const span = WIDGET_SPANS[wKey] || "half";
+            // Small → always half (2-per-row), Large → always full, Medium → use default
+            const span = sz === "sm" ? "half" : sz === "lg" ? "full" : (DEFAULT_SPANS[wKey] || "half");
             nodes.push({
               key: wKey,
               idx: wIdx,
