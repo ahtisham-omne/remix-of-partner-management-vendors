@@ -552,34 +552,45 @@ export function CreatePocModal({
                             <input value={deptSearch} onChange={(e) => setDeptSearch(e.target.value)} placeholder="Search departments..." className="w-full h-8 pl-8 pr-3 rounded-md border border-[#E2E8F0] bg-[#F8FAFC] text-[12px] focus:outline-none focus:border-[#0A77FF]" autoFocus />
                           </div>
                         </div>
-                        {/* Options */}
+                        {/* Options with search highlight */}
                         <div className="max-h-[200px] overflow-y-auto py-1">
-                          {filteredDepts.map((d) => (
-                            <button key={d} type="button" onClick={() => { onNewPocDepartmentChange(d as any); setDeptDropdownOpen(false); setDeptSearch(""); }}
-                              className={`w-full flex items-center gap-2.5 px-3 py-2 text-left text-[12px] transition-colors ${newPocDepartment === d ? "bg-[#EDF4FF]/50 text-[#0A77FF]" : "text-[#334155] hover:bg-[#F8FAFC]"}`}
-                              style={{ fontWeight: newPocDepartment === d ? 600 : 400 }}>
-                              <span className="flex-1">{d}</span>
-                              {newPocDepartment === d && <Check className="w-3.5 h-3.5 text-[#0A77FF] shrink-0" />}
-                            </button>
-                          ))}
-                          {filteredDepts.length === 0 && !canCreateDept && (
+                          {filteredDepts.map((d) => {
+                            // Highlight matching text
+                            let label: React.ReactNode = d;
+                            if (deptSearch.trim()) {
+                              const regex = new RegExp(`(${deptSearch.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "gi");
+                              const parts = d.split(regex);
+                              if (parts.length > 1) {
+                                label = parts.map((p, i) => regex.test(p) ? <mark key={i} className="bg-transparent px-0.5 rounded-sm" style={{ backgroundColor: "#FEFCE8", color: "#854D0E", fontWeight: 500 }}>{p}</mark> : <React.Fragment key={i}>{p}</React.Fragment>);
+                              }
+                            }
+                            return (
+                              <button key={d} type="button" onClick={() => { onNewPocDepartmentChange(d as any); setDeptDropdownOpen(false); setDeptSearch(""); }}
+                                className={`w-full flex items-center gap-2.5 px-3 py-2 text-left text-[12px] transition-colors ${newPocDepartment === d ? "bg-[#EDF4FF]/50 text-[#0A77FF]" : "text-[#334155] hover:bg-[#F8FAFC]"}`}
+                                style={{ fontWeight: newPocDepartment === d ? 600 : 400 }}>
+                                <span className="flex-1">{label}</span>
+                                {newPocDepartment === d && <Check className="w-3.5 h-3.5 text-[#0A77FF] shrink-0" />}
+                              </button>
+                            );
+                          })}
+                          {filteredDepts.length === 0 && (
                             <p className="px-3 py-3 text-[12px] text-[#94A3B8] text-center">No departments found</p>
                           )}
                         </div>
-                        {/* Create new */}
-                        {canCreateDept && (
-                          <div className="border-t border-[#F1F5F9] p-2">
-                            <button type="button" onClick={() => {
+                        {/* Permanent create new CTA */}
+                        <div className="border-t border-[#F1F5F9] p-2">
+                          <button type="button" onClick={() => {
+                            if (deptSearch.trim() && canCreateDept) {
                               const newDept = deptSearch.trim();
                               setCustomDepts((p) => [...p, newDept]);
                               onNewPocDepartmentChange(newDept as any);
                               setDeptSearch("");
-                              setDeptDropdownOpen(false);
-                            }} className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[12px] text-[#0A77FF] hover:bg-[#EDF4FF] transition-colors cursor-pointer" style={{ fontWeight: 600 }}>
-                              <Plus className="w-3.5 h-3.5" />Create "{deptSearch.trim()}"
-                            </button>
-                          </div>
-                        )}
+                            }
+                            setDeptDropdownOpen(false);
+                          }} className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[12px] text-[#0A77FF] hover:bg-[#EDF4FF] transition-colors cursor-pointer" style={{ fontWeight: 600 }}>
+                            <Plus className="w-3.5 h-3.5" />{canCreateDept ? <>Create "{deptSearch.trim()}"</> : "Create new department"}
+                          </button>
+                        </div>
                       </PopoverContent>
                     </Popover>
                   </div>
