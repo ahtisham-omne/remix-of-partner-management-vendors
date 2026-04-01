@@ -1007,6 +1007,20 @@ export function VendorsListPage() {
     return avatars[firstName];
   };
 
+  // Generate realistic contact details from a name (deterministic hash-based)
+  const getContactDetails = (name: string) => {
+    const h = name.split("").reduce((a, c) => a + c.charCodeAt(0), 0);
+    const depts = ["Procurement", "Supply Chain", "Finance", "Operations", "Sales", "Logistics", "Engineering", "Quality Assurance"];
+    const roles = ["Manager", "Director", "Lead", "Specialist", "Coordinator", "Analyst", "Supervisor", "Associate"];
+    const dept = depts[h % depts.length];
+    const role = `${dept} ${roles[(h * 7) % roles.length]}`;
+    const first = name.split(" ")[0]?.toLowerCase() || "user";
+    const last = name.split(" ")[1]?.toLowerCase() || "name";
+    const email = `${first}.${last}@company.com`;
+    const phone = `(${300 + (h % 700)}) ${100 + (h % 900)}-${1000 + (h % 9000)}`;
+    return { role, dept, email, phone };
+  };
+
   const getPartnerIcon = (name: string, website?: string): { bg: string; logoUrl?: string; initials: string } => {
     const logos: Record<string, string> = {
       Toyota: "https://logo.clearbit.com/toyota.com",
@@ -1913,27 +1927,30 @@ export function VendorsListPage() {
                                     <div className={`flex items-center ${isRelaxed ? "gap-2.5" : "gap-2"}`}>
                                       {globalPointOfContacts.length > 0 ? (
                                         <>
-                                          {(() => { const poc = globalPointOfContacts[0]; const photoUrl = getPersonAvatar(poc?.name || ""); const t = getAvatarTint(poc?.name || ""); return (
+                                          {(() => { const poc = globalPointOfContacts[0]; const photoUrl = getPersonAvatar(poc?.name || ""); const t = getAvatarTint(poc?.name || ""); const cd = getContactDetails(poc?.name || ""); return (
                                           <HoverCard>
                                             <HoverCardTrigger asChild onClick={(e: React.MouseEvent) => e.stopPropagation()}>
                                               <div className="cursor-pointer"><LogoAvatar logoUrl={photoUrl} initials={poc?.initials || "?"} bg={t.bg} size={isRelaxed ? "lg" : "md"} type="person" /></div>
                                             </HoverCardTrigger>
-                                            <HoverCardContent side="bottom" align="start" className="w-[260px] p-0 rounded-xl border border-[#E2E8F0]/80 shadow-[0_8px_30px_rgba(0,0,0,0.12)]" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
-                                              <div className="p-3.5">
-                                                <div className="flex items-center gap-3">
-                                                  <div className="w-10 h-10 rounded-lg overflow-hidden border border-[#E8ECF1] shrink-0" style={{ backgroundColor: photoUrl ? "transparent" : t.bg }}>
-                                                    {photoUrl ? <img src={photoUrl} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-[12px] text-[#334155]" style={{ fontWeight: 700 }}>{poc?.initials}</div>}
+                                            <HoverCardContent side="bottom" align="start" className="w-[280px] p-0 rounded-xl border-0 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+                                              {/* Header with gradient */}
+                                              <div className="bg-gradient-to-br from-[#1E293B] to-[#334155] px-4 py-3 relative overflow-hidden">
+                                                <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-white/[0.04]" />
+                                                <div className="flex items-center gap-3 relative">
+                                                  <div className="w-11 h-11 rounded-xl overflow-hidden border-2 border-white/20 shrink-0" style={{ backgroundColor: photoUrl ? "transparent" : poc?.bgColor || t.bg }}>
+                                                    {photoUrl ? <img src={photoUrl} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-[13px] text-white" style={{ fontWeight: 700 }}>{poc?.initials}</div>}
                                                   </div>
                                                   <div className="min-w-0">
-                                                    <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{poc?.name}</p>
-                                                    {(poc as any)?.role && <p className="text-[11px] text-[#64748B] truncate">{(poc as any).role}</p>}
+                                                    <p className="text-[14px] text-white truncate" style={{ fontWeight: 600 }}>{poc?.name}</p>
+                                                    <p className="text-[11px] text-[#94A3B8] truncate">{cd.role}</p>
                                                   </div>
                                                 </div>
-                                                <div className="mt-3 pt-2.5 border-t border-[#F1F5F9] space-y-1.5">
-                                                  {(poc as any)?.email && <div className="flex items-center gap-2 text-[11px] text-[#334155]"><Mail className="w-3 h-3 text-[#94A3B8] shrink-0" /><span className="truncate">{(poc as any).email}</span></div>}
-                                                  {(poc as any)?.phone && <div className="flex items-center gap-2 text-[11px] text-[#334155]"><Phone className="w-3 h-3 text-[#94A3B8] shrink-0" /><span>{(poc as any).phone}</span></div>}
-                                                  {(poc as any)?.department && <div className="flex items-center gap-2 text-[11px] text-[#334155]"><Building2 className="w-3 h-3 text-[#94A3B8] shrink-0" /><span>{(poc as any).department}</span></div>}
-                                                </div>
+                                              </div>
+                                              {/* Body */}
+                                              <div className="bg-white px-4 py-3 space-y-2">
+                                                <div className="flex items-center gap-2.5 text-[12px] text-[#334155]"><Mail className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" /><span className="truncate">{cd.email}</span></div>
+                                                <div className="flex items-center gap-2.5 text-[12px] text-[#334155]"><Phone className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" /><span>{cd.phone}</span></div>
+                                                <div className="flex items-center gap-2.5 text-[12px] text-[#334155]"><Building2 className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" /><span>{cd.dept}</span></div>
                                               </div>
                                             </HoverCardContent>
                                           </HoverCard>
@@ -1993,15 +2010,18 @@ export function VendorsListPage() {
                                         <HoverCardTrigger asChild onClick={(e: React.MouseEvent) => e.stopPropagation()}>
                                           <div className="cursor-pointer"><CarrierIcon carrier={vendor.defaultCarrierVendor} /></div>
                                         </HoverCardTrigger>
-                                        <HoverCardContent side="bottom" align="start" className="w-[220px] p-0 rounded-xl border border-[#E2E8F0]/80 shadow-[0_8px_30px_rgba(0,0,0,0.12)]" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
-                                          <div className="p-3.5">
-                                            <div className="flex items-center gap-3">
-                                              <CarrierIcon carrier={vendor.defaultCarrierVendor} />
-                                              <div className="min-w-0">
-                                                <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{vendor.defaultCarrierVendor}</p>
-                                                <p className="text-[11px] text-[#64748B]">Default Vendor Carrier</p>
-                                              </div>
+                                        <HoverCardContent side="bottom" align="start" className="w-[240px] p-0 rounded-xl border-0 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+                                          <div className="px-3.5 py-3 flex items-center gap-3 border-b border-[#F1F5F9]">
+                                            <CarrierIcon carrier={vendor.defaultCarrierVendor} />
+                                            <div className="min-w-0">
+                                              <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{vendor.defaultCarrierVendor}</p>
+                                              <p className="text-[10px] text-[#94A3B8]">Default Vendor Carrier</p>
                                             </div>
+                                          </div>
+                                          <div className="px-3.5 py-2.5 space-y-1.5 bg-[#FAFBFC]">
+                                            <div className="flex items-center justify-between text-[11px]"><span className="text-[#64748B]">Service Type</span><span className="text-[#0F172A]" style={{ fontWeight: 500 }}>Ground & Express</span></div>
+                                            <div className="flex items-center justify-between text-[11px]"><span className="text-[#64748B]">Avg. Delivery</span><span className="text-[#0F172A]" style={{ fontWeight: 500 }}>3–5 business days</span></div>
+                                            <div className="flex items-center justify-between text-[11px]"><span className="text-[#64748B]">Tracking</span><span className="text-[#059669]" style={{ fontWeight: 500 }}>Available</span></div>
                                           </div>
                                         </HoverCardContent>
                                       </HoverCard>
@@ -2020,15 +2040,18 @@ export function VendorsListPage() {
                                         <HoverCardTrigger asChild onClick={(e: React.MouseEvent) => e.stopPropagation()}>
                                           <div className="cursor-pointer"><CarrierIcon carrier={vendor.defaultCarrierCustomer} /></div>
                                         </HoverCardTrigger>
-                                        <HoverCardContent side="bottom" align="start" className="w-[220px] p-0 rounded-xl border border-[#E2E8F0]/80 shadow-[0_8px_30px_rgba(0,0,0,0.12)]" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
-                                          <div className="p-3.5">
-                                            <div className="flex items-center gap-3">
-                                              <CarrierIcon carrier={vendor.defaultCarrierCustomer} />
-                                              <div className="min-w-0">
-                                                <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{vendor.defaultCarrierCustomer}</p>
-                                                <p className="text-[11px] text-[#64748B]">Default Customer Carrier</p>
-                                              </div>
+                                        <HoverCardContent side="bottom" align="start" className="w-[240px] p-0 rounded-xl border-0 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+                                          <div className="px-3.5 py-3 flex items-center gap-3 border-b border-[#F1F5F9]">
+                                            <CarrierIcon carrier={vendor.defaultCarrierCustomer} />
+                                            <div className="min-w-0">
+                                              <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{vendor.defaultCarrierCustomer}</p>
+                                              <p className="text-[10px] text-[#94A3B8]">Default Customer Carrier</p>
                                             </div>
+                                          </div>
+                                          <div className="px-3.5 py-2.5 space-y-1.5 bg-[#FAFBFC]">
+                                            <div className="flex items-center justify-between text-[11px]"><span className="text-[#64748B]">Service Type</span><span className="text-[#0F172A]" style={{ fontWeight: 500 }}>Standard & Priority</span></div>
+                                            <div className="flex items-center justify-between text-[11px]"><span className="text-[#64748B]">Avg. Delivery</span><span className="text-[#0F172A]" style={{ fontWeight: 500 }}>2–7 business days</span></div>
+                                            <div className="flex items-center justify-between text-[11px]"><span className="text-[#64748B]">Tracking</span><span className="text-[#059669]" style={{ fontWeight: 500 }}>Available</span></div>
                                           </div>
                                         </HoverCardContent>
                                       </HoverCard>
@@ -2061,22 +2084,28 @@ export function VendorsListPage() {
                                     <div className={`flex items-center ${isRelaxed ? "gap-2.5" : "gap-2"}`}>
                                       {vendor.createdByContact ? (
                                         <>
-                                          {(() => { const cb = vendor.createdByContact; const photoUrl = getPersonAvatar(cb.name || ""); const t = getAvatarTint(cb.name || ""); return (
+                                          {(() => { const cb = vendor.createdByContact; const photoUrl = getPersonAvatar(cb.name || ""); const t = getAvatarTint(cb.name || ""); const cd = getContactDetails(cb.name || ""); return (
                                           <HoverCard>
                                             <HoverCardTrigger asChild onClick={(e: React.MouseEvent) => e.stopPropagation()}>
                                               <div className="cursor-pointer"><LogoAvatar logoUrl={photoUrl} initials={cb.initials || "?"} bg={t.bg} size={isRelaxed ? "lg" : "md"} type="person" /></div>
                                             </HoverCardTrigger>
-                                            <HoverCardContent side="bottom" align="start" className="w-[240px] p-0 rounded-xl border border-[#E2E8F0]/80 shadow-[0_8px_30px_rgba(0,0,0,0.12)]" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
-                                              <div className="p-3.5">
-                                                <div className="flex items-center gap-3">
-                                                  <div className="w-10 h-10 rounded-lg overflow-hidden border border-[#E8ECF1] shrink-0" style={{ backgroundColor: photoUrl ? "transparent" : t.bg }}>
-                                                    {photoUrl ? <img src={photoUrl} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-[12px] text-[#334155]" style={{ fontWeight: 700 }}>{cb.initials}</div>}
+                                            <HoverCardContent side="bottom" align="start" className="w-[280px] p-0 rounded-xl border-0 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+                                              <div className="bg-gradient-to-br from-[#1E293B] to-[#334155] px-4 py-3 relative overflow-hidden">
+                                                <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-white/[0.04]" />
+                                                <div className="flex items-center gap-3 relative">
+                                                  <div className="w-11 h-11 rounded-xl overflow-hidden border-2 border-white/20 shrink-0" style={{ backgroundColor: photoUrl ? "transparent" : cb.bgColor || t.bg }}>
+                                                    {photoUrl ? <img src={photoUrl} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-[13px] text-white" style={{ fontWeight: 700 }}>{cb.initials}</div>}
                                                   </div>
                                                   <div className="min-w-0">
-                                                    <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{cb.name}</p>
-                                                    <p className="text-[11px] text-[#64748B]">{(cb as any).role || "Team Member"}</p>
+                                                    <p className="text-[14px] text-white truncate" style={{ fontWeight: 600 }}>{cb.name}</p>
+                                                    <p className="text-[11px] text-[#94A3B8] truncate">{cd.role}</p>
                                                   </div>
                                                 </div>
+                                              </div>
+                                              <div className="bg-white px-4 py-3 space-y-2">
+                                                <div className="flex items-center gap-2.5 text-[12px] text-[#334155]"><Mail className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" /><span className="truncate">{cd.email}</span></div>
+                                                <div className="flex items-center gap-2.5 text-[12px] text-[#334155]"><Building2 className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" /><span>{cd.dept}</span></div>
+                                                <div className="flex items-center gap-2.5 text-[12px] text-[#334155]"><Phone className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" /><span>{cd.phone}</span></div>
                                               </div>
                                             </HoverCardContent>
                                           </HoverCard>
