@@ -462,13 +462,14 @@ export function CreatePocModal({
           </div>
         </div>
 
-        {/* Form body */}
-        <div className="flex-1 overflow-y-auto px-4 sm:px-5 py-4 sm:py-5 bg-white">
+        {/* Form body — matches partner creation form bg */}
+        <div className="flex-1 overflow-y-auto px-5 py-5 bg-[#FAFBFC] scrollbar-hide">
           {/* Personnel Info Section */}
           <div className="mb-5">
-            <p className="text-[13px] text-[#0F172A] mb-3" style={{ fontWeight: 600 }}>Personnel Info</p>
+            <h4 className="text-[13px] sm:text-sm text-foreground" style={{ fontWeight: 600 }}>Personnel Info</h4>
+            <p className="text-[11px] text-[#94A3B8] mt-0.5 mb-3">Name, department, and role of the contact person.</p>
 
-            <div className="rounded-xl border border-border bg-white overflow-hidden">
+            <div className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
               <div className="p-3.5 sm:p-4 space-y-3.5">
                 {/* Name + Department row */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
@@ -543,9 +544,10 @@ export function CreatePocModal({
 
           {/* Contact Details Section */}
           <div>
-            <p className="text-[13px] text-[#0F172A] mb-3" style={{ fontWeight: 600 }}>Contact Details</p>
+            <h4 className="text-[13px] sm:text-sm text-foreground" style={{ fontWeight: 600 }}>Contact Details</h4>
+            <p className="text-[11px] text-[#94A3B8] mt-0.5 mb-3">Phone numbers and email address for reaching this contact.</p>
 
-            <div className="rounded-xl border border-border bg-white overflow-hidden">
+            <div className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
               <div className="p-3.5 sm:p-4 space-y-3.5">
                 {/* Landline + Ext row */}
                 <div className="grid grid-cols-1 sm:grid-cols-[1fr_120px] gap-3.5">
