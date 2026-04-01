@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { Search, X, Users, Shield, Plus, Bell, Info, Mail, ChevronDown } from "lucide-react";
+import { Search, X, Users, Shield, Plus, Bell, Info, Mail } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "../ui/dialog";
 import { Tooltip, TooltipTrigger, TooltipContent } from "../ui/tooltip";
 import { SYSTEM_USERS, SYSTEM_ROLES, type LicenseType, type UserStatus } from "./partnerConstants";
@@ -118,10 +118,6 @@ export function SearchableUserPicker({
   const showUsersInList = listFilter === "all" || listFilter === "users";
   const hasActiveFilters = deptFilter !== "all" || licenseFilter !== "all" || statusFilter !== "all";
 
-  // Shared select style for filter dropdowns
-  const selectCls = "text-[12px] text-[#334155] bg-white border border-[#E2E8F0] rounded-lg px-3 py-1.5 outline-none cursor-pointer appearance-none pr-7 hover:border-[#CBD5E1] transition-colors";
-  const selectBg = { backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat", backgroundPosition: "right 8px center" } as React.CSSProperties;
-
   return (
     <div>
       <div className="flex items-center justify-between mb-2">
@@ -231,56 +227,64 @@ export function SearchableUserPicker({
               {search && <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 rounded-full hover:bg-[#F1F5F9] transition-colors cursor-pointer"><X className="w-3.5 h-3.5 text-[#94A3B8]" /></button>}
             </div>
 
-            {/* Tabs + Filters row */}
-            <div className="flex items-center gap-2 flex-wrap">
-              {/* Tab pills */}
-              {(["roles", "users"] as const).map((t) => (
-                <button key={t} type="button" onClick={() => { setTab(t); setSearch(""); }}
-                  className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-[12px] border transition-all ${tab === t ? "border-[#0A77FF] text-[#0A77FF] bg-[#EDF4FF] shadow-sm" : "border-[#E2E8F0] text-[#64748B] bg-white hover:bg-[#F8FAFC] hover:border-[#CBD5E1]"}`}
-                  style={{ fontWeight: tab === t ? 600 : 500 }}
-                >
-                  {t === "roles" ? <Shield className="w-3.5 h-3.5" /> : <Users className="w-3.5 h-3.5" />}
-                  {t === "roles" ? "Roles" : "Users"}
-                  <span className="text-[10px] px-1.5 py-px rounded-full ml-0.5" style={{ backgroundColor: tab === t ? "rgba(10,119,255,0.12)" : "#F1F5F9", fontWeight: 600 }}>
-                    {t === "roles" ? filteredRoles.length : filteredUsers.length}
-                  </span>
-                </button>
-              ))}
+            {/* Filter pills — matching partner listing page style */}
+            <div className="flex items-center gap-1.5 flex-wrap">
+              {/* Tab pills — rounded-full like listing page */}
+              {(["roles", "users"] as const).map((t) => {
+                const isActive = tab === t;
+                const count = t === "roles" ? filteredRoles.length : filteredUsers.length;
+                return (
+                  <button key={t} type="button" onClick={() => { setTab(t); setSearch(""); }}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                      isActive
+                        ? "border-primary bg-[#EDF4FF] hover:bg-[#D6E8FF]"
+                        : "border-border text-muted-foreground hover:bg-muted/60 hover:text-foreground hover:border-muted-foreground/30"
+                    }`}
+                    style={{ fontWeight: isActive ? 500 : 400, color: isActive ? "#0A77FF" : undefined }}
+                  >
+                    {t === "roles" ? <Shield className="w-3.5 h-3.5" /> : <Users className="w-3.5 h-3.5" />}
+                    {t === "roles" ? "Roles" : "Users"}
+                    <span className={`text-[10px] rounded-full px-1.5 py-px min-w-[18px] text-center ${isActive ? "bg-primary/10" : "bg-muted"}`}
+                      style={{ fontWeight: 600, color: isActive ? "#0A77FF" : "#475569" }}>{count}</span>
+                  </button>
+                );
+              })}
 
               <span className="w-px h-5 bg-[#E2E8F0]" />
 
-              {/* Filter dropdowns — proper sized */}
-              <select value={deptFilter} onChange={(e) => setDeptFilter(e.target.value)} className={selectCls} style={{ fontWeight: 500, ...selectBg }}>
-                <option value="all">All Departments</option>
-                {departments.map((d) => <option key={d} value={d}>{d}</option>)}
-              </select>
-              <select value={licenseFilter} onChange={(e) => setLicenseFilter(e.target.value)} className={selectCls} style={{ fontWeight: 500, ...selectBg }}>
-                <option value="all">All Licenses</option>
-                <option value="Full Access">Full Access</option>
-                <option value="Field User">Field User</option>
-                <option value="Read Only">Read Only</option>
-              </select>
-              <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className={selectCls} style={{ fontWeight: 500, ...selectBg }}>
-                <option value="all">All Status</option>
-                <option value="Active">Active</option>
-                <option value="Disabled">Disabled</option>
-              </select>
+              {/* Department filter pill */}
+              {departments.map((d) => {
+                const isActive = deptFilter === d;
+                return (
+                  <button key={d} type="button" onClick={() => setDeptFilter(isActive ? "all" : d)}
+                    className={`inline-flex items-center px-3 py-1.5 rounded-full border text-xs transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                      isActive
+                        ? "border-primary bg-[#EDF4FF] text-[#0A77FF]"
+                        : "border-border text-muted-foreground hover:bg-muted/60 hover:border-muted-foreground/30"
+                    }`}
+                    style={{ fontWeight: isActive ? 500 : 400 }}
+                  >{d}</button>
+                );
+              })}
+
               {hasActiveFilters && (
                 <button type="button" onClick={() => { setDeptFilter("all"); setLicenseFilter("all"); setStatusFilter("all"); }}
-                  className="text-[12px] text-[#94A3B8] hover:text-[#EF4444] cursor-pointer px-2 py-1 rounded-lg hover:bg-[#FEF2F2] transition-colors" style={{ fontWeight: 500 }}>Clear</button>
+                  className="inline-flex items-center px-2.5 py-1.5 rounded-full text-xs text-[#94A3B8] hover:text-[#EF4444] hover:bg-[#FEF2F2] cursor-pointer transition-colors" style={{ fontWeight: 500 }}>
+                  <X className="w-3 h-3 mr-1" />Clear
+                </button>
               )}
             </div>
           </div>
 
-          {/* Table header */}
-          <div className="flex items-center gap-3 px-5 py-2 bg-[#F8FAFC] border-b border-[#E2E8F0] shrink-0">
+          {/* Table header — matches listing page bg-muted/30 style */}
+          <div className="flex items-center gap-3 px-5 py-2 bg-muted/30 border-b border-border shrink-0">
             <div className="w-[18px]" />
             <div className="w-9" />
-            <span className="flex-1 text-[11px] text-[#64748B] uppercase tracking-wider" style={{ fontWeight: 600 }}>
+            <span className="flex-1 text-muted-foreground text-xs font-normal">
               {tab === "roles" ? "Role" : "User"}
             </span>
-            <span className="w-[90px] text-[11px] text-[#64748B] uppercase tracking-wider text-center" style={{ fontWeight: 600 }}>License</span>
-            <span className="w-[80px] text-[11px] text-[#64748B] uppercase tracking-wider text-center" style={{ fontWeight: 600 }}>Status</span>
+            <span className="w-[90px] text-muted-foreground text-xs font-normal text-center">License</span>
+            <span className="w-[80px] text-muted-foreground text-xs font-normal text-center">Status</span>
           </div>
 
           {/* List */}
@@ -296,7 +300,7 @@ export function SearchableUserPicker({
                     const isDisabledRole = role.status === "Disabled";
                     return (
                       <button key={role.id} type="button" onClick={() => toggle(role.id)}
-                        className={`w-full flex items-center gap-3 px-5 py-3 text-left transition-colors border-b border-[#F8FAFC] ${isSelected ? "bg-[#EDF4FF]/40" : "hover:bg-[#F8FAFC]"} ${isDisabledRole ? "opacity-60" : ""}`}>
+                        className={`w-full flex items-center gap-3 px-5 py-2.5 text-left transition-colors border-b border-border/50 ${isSelected ? "bg-primary/[0.03]" : "hover:bg-muted/50"} ${isDisabledRole ? "opacity-60" : ""}`}>
                         <div className="w-[18px] h-[18px] rounded-[5px] border-[1.5px] flex items-center justify-center shrink-0 transition-all"
                           style={{ borderColor: isSelected ? accentColor : "#CBD5E1", backgroundColor: isSelected ? accentColor : "transparent" }}>
                           {isSelected && <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
@@ -331,7 +335,7 @@ export function SearchableUserPicker({
                     const isDisabledUser = user.status === "Disabled";
                     return (
                       <button key={user.id} type="button" onClick={() => toggle(user.id)}
-                        className={`w-full flex items-center gap-3 px-5 py-3 text-left transition-colors border-b border-[#F8FAFC] ${isSelected ? "bg-[#EDF4FF]/40" : "hover:bg-[#F8FAFC]"} ${isDisabledUser ? "opacity-50" : ""}`}>
+                        className={`w-full flex items-center gap-3 px-5 py-2.5 text-left transition-colors border-b border-border/50 ${isSelected ? "bg-primary/[0.03]" : "hover:bg-muted/50"} ${isDisabledUser ? "opacity-50" : ""}`}>
                         <div className="w-[18px] h-[18px] rounded-[5px] border-[1.5px] flex items-center justify-center shrink-0 transition-all"
                           style={{ borderColor: isSelected ? accentColor : "#CBD5E1", backgroundColor: isSelected ? accentColor : "transparent" }}>
                           {isSelected && <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
