@@ -3532,6 +3532,7 @@ function ConfigPageContent({
   const [createPtName, setCreatePtName] = useState("");
   const [createPtType, setCreatePtType] = useState<"net" | "prepayment" | "split">("net");
   const [createPtTrigger, setCreatePtTrigger] = useState("order_confirmation");
+  const [createPtShipReceive, setCreatePtShipReceive] = useState<"ship" | "receive">("ship");
   const [createPtDuration, setCreatePtDuration] = useState("30");
   const [createPtCustomDuration, setCreatePtCustomDuration] = useState("");
   const [createPtDescription, setCreatePtDescription] = useState("");
@@ -5721,41 +5722,52 @@ function ConfigPageContent({
                         })}
                       </div>
 
-                      {/* Trigger selector pills — NET & Prepayment only */}
-                      {createPtType !== "split" && (
-                        <div className="flex items-center gap-2 mt-3">
-                          <span className="text-[12px] text-[#64748B] mr-1" style={{ fontWeight: 500 }}>Trigger:</span>
-                          {CREATE_PT_TRIGGERS.filter((t) => {
-                            // Delivery is post-payment by definition — hide it for prepayment
-                            if (createPtType === "prepayment" && t.id === "delivery") return false;
-                            return true;
-                          }).map((t) => {
-                            const isActive = createPtTrigger === t.id;
-                            const accentColor = createPtType === "net" ? "#0A77FF" : "#7C3AED";
-                            return (
-                              <Tooltip key={t.id}>
-                                <TooltipTrigger asChild>
-                                  <button
-                                    onClick={() => setCreatePtTrigger(t.id)}
-                                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[12px] transition-all cursor-pointer ${
-                                      isActive ? "" : "border-[#E2E8F0] bg-white text-[#64748B] hover:border-[#CBD5E1] hover:bg-[#F8FAFC]"
-                                    }`}
-                                    style={isActive ? { fontWeight: 600, borderColor: `${accentColor}30`, backgroundColor: `${accentColor}08`, color: accentColor } : { fontWeight: 500 }}
-                                  >
-                                    {t.id === "order_confirmation" && <ShoppingCart className="w-3.5 h-3.5" />}
-                                    {t.id === "production_start" && <Cog className="w-3.5 h-3.5" />}
-                                    {t.id === "production_end" && <Package className="w-3.5 h-3.5" />}
-                                    {t.id === "shipping" && <Ship className="w-3.5 h-3.5" />}
-                                    {t.id === "delivery" && <Truck className="w-3.5 h-3.5" />}
-                                    {t.label}
-                                  </button>
-                                </TooltipTrigger>
-                                <TooltipContent side="bottom" className="max-w-[240px] text-[11px] z-[300]">
-                                  {TRIGGER_TOOLTIPS[t.id] || t.label}
-                                </TooltipContent>
-                              </Tooltip>
-                            );
-                          })}
+                      {/* Trigger selector — Prepayment & Split only (Net terms = always from delivery, no trigger needed) */}
+                      {(createPtType === "prepayment" || createPtType === "split") && (
+                        <div className="mt-3 space-y-2.5">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-[12px] text-[#64748B] mr-1" style={{ fontWeight: 500 }}>Trigger:</span>
+                            {CREATE_PT_TRIGGERS.map((t) => {
+                              const isActive = createPtTrigger === t.id;
+                              const accentColor = "#7C3AED";
+                              return (
+                                <Tooltip key={t.id}>
+                                  <TooltipTrigger asChild>
+                                    <button
+                                      onClick={() => setCreatePtTrigger(t.id)}
+                                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[12px] transition-all cursor-pointer ${
+                                        isActive ? "" : "border-[#E2E8F0] bg-white text-[#64748B] hover:border-[#CBD5E1] hover:bg-[#F8FAFC]"
+                                      }`}
+                                      style={isActive ? { fontWeight: 600, borderColor: `${accentColor}30`, backgroundColor: `${accentColor}08`, color: accentColor } : { fontWeight: 500 }}
+                                    >
+                                      {t.id === "order_confirmation" && <ShoppingCart className="w-3.5 h-3.5" />}
+                                      {t.id === "production_start" && <Cog className="w-3.5 h-3.5" />}
+                                      {t.id === "production_end" && <Package className="w-3.5 h-3.5" />}
+                                      {t.id === "shipping" && <Ship className="w-3.5 h-3.5" />}
+                                      {t.label}
+                                    </button>
+                                  </TooltipTrigger>
+                                  <TooltipContent side="bottom" className="max-w-[240px] text-[11px] z-[300]">
+                                    {TRIGGER_TOOLTIPS[t.id] || t.label}
+                                  </TooltipContent>
+                                </Tooltip>
+                              );
+                            })}
+                          </div>
+                          {/* Ship vs Receive toggle — prepayment nuance */}
+                          <div className="flex items-center gap-2">
+                            <span className="text-[12px] text-[#64748B]" style={{ fontWeight: 500 }}>Based on:</span>
+                            <div className="flex items-center gap-0.5 p-0.5 rounded-lg bg-[#F1F5F9]">
+                              {(["ship", "receive"] as const).map((opt) => (
+                                <button key={opt} type="button" onClick={() => setCreatePtShipReceive(opt)}
+                                  className={`px-3 py-1 rounded-md text-[12px] transition-all cursor-pointer ${createPtShipReceive === opt ? "bg-white text-[#0F172A] shadow-sm" : "text-[#64748B] hover:text-[#334155]"}`}
+                                  style={{ fontWeight: createPtShipReceive === opt ? 600 : 500 }}
+                                >
+                                  {opt === "ship" ? "Date of Shipment" : "Date of Receipt"}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
                         </div>
                       )}
                     </div>
@@ -5784,42 +5796,16 @@ function ConfigPageContent({
                           {createPtType === "net" ? (
                             <div>
                               <Label className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>NET Duration (Days)</Label>
-                              {createPtDuration === "custom" ? (
-                                <div className="flex mt-1">
-                                  <Input
-                                    value={createPtCustomDuration}
-                                    onChange={(e) => setCreatePtCustomDuration(e.target.value.replace(/\D/g, ""))}
-                                    placeholder="e.g. 45"
-                                    className="rounded-r-none border-r-0 border-[#E2E8F0] bg-white !h-10 text-sm text-[#0F172A] placeholder:text-[#94A3B8] flex-1 min-w-0"
-                                    inputMode="numeric"
-                                    autoFocus
-                                  />
-                                  <Popover>
-                                    <PopoverTrigger asChild>
-                                      <button type="button" className="h-10 px-2.5 rounded-r-lg border border-[#E2E8F0] bg-[#F8FAFC] flex items-center gap-1 shrink-0 hover:bg-[#F1F5F9] transition-colors cursor-pointer">
-                                        <span className="text-[12px] text-[#64748B]" style={{ fontWeight: 500 }}>days</span>
-                                        <ChevronDown className="w-3 h-3 text-[#94A3B8]" />
-                                      </button>
-                                    </PopoverTrigger>
-                                    <PopoverContent align="end" sideOffset={4} className="w-[160px] p-1 rounded-lg z-[250]">
-                                      {CREATE_PT_DURATIONS.map((d) => (
-                                        <button key={d.id} type="button" onClick={() => { setCreatePtDuration(d.id); if (d.id !== "custom") setCreatePtCustomDuration(""); }} className="w-full text-left px-3 py-2 text-sm rounded-md hover:bg-[#F8FAFC] transition-colors" style={{ fontWeight: 500 }}>{d.label}</button>
-                                      ))}
-                                    </PopoverContent>
-                                  </Popover>
-                                </div>
-                              ) : (
-                                <Select value={createPtDuration} onValueChange={(v) => { setCreatePtDuration(v); if (v !== "custom") setCreatePtCustomDuration(""); }}>
-                                  <SelectTrigger className="mt-1 !h-10 rounded-lg border-[#E2E8F0] bg-white text-sm w-full">
-                                    <SelectValue />
-                                  </SelectTrigger>
-                                  <SelectContent className="z-[250] rounded-lg">
-                                    {CREATE_PT_DURATIONS.map((d) => (
-                                      <SelectItem key={d.id} value={d.id} className="py-2 px-3 text-sm">{d.label}</SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                              )}
+                              <div className="relative mt-1">
+                                <Input
+                                  value={createPtCustomDuration || createPtDuration}
+                                  onChange={(e) => { const v = e.target.value.replace(/\D/g, ""); setCreatePtCustomDuration(v); setCreatePtDuration(v || "30"); }}
+                                  placeholder="e.g. 30"
+                                  className="!h-10 rounded-lg border-[#E2E8F0] bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] pr-14"
+                                  inputMode="numeric"
+                                />
+                                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] text-[#94A3B8]" style={{ fontWeight: 500 }}>days</span>
+                              </div>
                             </div>
                           ) : (
                             /* Prepayment/Split: Description next to name */
@@ -6020,42 +6006,16 @@ function ConfigPageContent({
                                   </TooltipContent>
                                 </Tooltip>
                               </div>
-                              {createPtDiscountPeriod === "custom" ? (
-                                <div className="flex mt-1">
-                                  <Input
-                                    value={createPtCustomDiscountPeriod}
-                                    onChange={(e) => setCreatePtCustomDiscountPeriod(e.target.value.replace(/\D/g, ""))}
-                                    placeholder="e.g. 15"
-                                    className="rounded-r-none border-r-0 border-[#E2E8F0] bg-white !h-10 text-sm text-[#0F172A] placeholder:text-[#94A3B8] flex-1 min-w-0"
-                                    inputMode="numeric"
-                                    autoFocus
-                                  />
-                                  <Popover>
-                                    <PopoverTrigger asChild>
-                                      <button type="button" className="h-10 px-2.5 rounded-r-lg border border-[#E2E8F0] bg-[#F8FAFC] flex items-center gap-1 shrink-0 hover:bg-[#F1F5F9] transition-colors cursor-pointer">
-                                        <span className="text-[12px] text-[#64748B]" style={{ fontWeight: 500 }}>days</span>
-                                        <ChevronDown className="w-3 h-3 text-[#94A3B8]" />
-                                      </button>
-                                    </PopoverTrigger>
-                                    <PopoverContent align="end" sideOffset={4} className="w-[160px] p-1 rounded-lg z-[250]">
-                                      {CREATE_PT_DISCOUNT_PERIODS.map((d) => (
-                                        <button key={d.id} type="button" onClick={() => { setCreatePtDiscountPeriod(d.id); if (d.id !== "custom") setCreatePtCustomDiscountPeriod(""); }} className="w-full text-left px-3 py-2 text-sm rounded-md hover:bg-[#F8FAFC] transition-colors" style={{ fontWeight: 500 }}>{d.label}</button>
-                                      ))}
-                                    </PopoverContent>
-                                  </Popover>
-                                </div>
-                              ) : (
-                                <Select value={createPtDiscountPeriod} onValueChange={(v) => { setCreatePtDiscountPeriod(v); if (v !== "custom") setCreatePtCustomDiscountPeriod(""); }}>
-                                  <SelectTrigger className="mt-1 !h-10 rounded-lg border-[#E2E8F0] bg-white text-sm w-full">
-                                    <SelectValue />
-                                  </SelectTrigger>
-                                  <SelectContent className="z-[250] rounded-lg">
-                                    {CREATE_PT_DISCOUNT_PERIODS.map((d) => (
-                                      <SelectItem key={d.id} value={d.id} className="py-2 px-3 text-sm">{d.label}</SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                              )}
+                              <div className="relative mt-1">
+                                <Input
+                                  value={createPtCustomDiscountPeriod || createPtDiscountPeriod}
+                                  onChange={(e) => { const v = e.target.value.replace(/\D/g, ""); setCreatePtCustomDiscountPeriod(v); setCreatePtDiscountPeriod(v || "10"); }}
+                                  placeholder="e.g. 10"
+                                  className="!h-10 rounded-lg border-[#E2E8F0] bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] pr-14"
+                                  inputMode="numeric"
+                                />
+                                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] text-[#94A3B8]" style={{ fontWeight: 500 }}>days</span>
+                              </div>
                             </div>
                           </div>
                         )}
