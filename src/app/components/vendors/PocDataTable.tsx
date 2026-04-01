@@ -187,31 +187,31 @@ export function PocDataTable({
                     className={`group/poc relative text-left rounded-xl border transition-all duration-200 ${selectable ? "cursor-pointer" : ""} ${
                       isSel ? "border-[#0A77FF] bg-[#FAFCFF] shadow-[0_0_0_1px_#0A77FF]" : "border-[#E8ECF1] bg-white hover:border-[#BFDBFE] hover:shadow-[0_4px_16px_-4px_rgba(10,119,255,0.12)]"
                     }`}>
-                    <div className="p-3.5">
-                      {/* Avatar + Name + Checkbox */}
-                      <div className="flex items-start gap-3">
+                    <div className="p-4">
+                      {/* Row 1: Avatar + Name/Company + Status + Checkbox */}
+                      <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full flex items-center justify-center text-[11px] shrink-0" style={{ backgroundColor: t.bg, color: t.text, fontWeight: 700 }}>{ini(c.name)}</div>
                         <div className="min-w-0 flex-1">
-                          <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}><Hl text={c.name} q={searchQuery} /></p>
+                          <div className="flex items-center gap-2">
+                            <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}><Hl text={c.name} q={searchQuery} /></p>
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#059669] shrink-0" title="Active" />
+                          </div>
                           <p className="text-[11px] text-[#64748B] truncate mt-0.5"><Hl text={c.company} q={searchQuery} /></p>
                         </div>
                         {selectable && (
-                          <div className={`w-[18px] h-[18px] rounded-[5px] border-[1.5px] flex items-center justify-center shrink-0 mt-0.5 transition-all duration-150 ${
+                          <div className={`w-[18px] h-[18px] rounded-[5px] border-[1.5px] flex items-center justify-center shrink-0 transition-all duration-150 ${
                             isSel ? "bg-[#0A77FF] border-[#0A77FF]" : "border-[#CBD5E1] bg-white group-hover/poc:border-[#94A3B8]"
                           }`}>
                             {isSel && <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
                           </div>
                         )}
                       </div>
-                      {/* Department pill + Status */}
-                      <div className="flex items-center gap-1.5 mt-2.5 mb-3">
-                        <span className="inline-flex items-center gap-1 px-2 py-[2px] rounded text-[10px]" style={{ fontWeight: 500, backgroundColor: dc.bg, color: dc.text }}>
-                          {c.department === "Supply Chain Management" ? "Supply Chain" : c.department}
-                        </span>
-                        <span className="inline-flex items-center text-[10px] px-2 py-[2px] rounded-full border" style={{ fontWeight: 500, backgroundColor: "#ECFDF5", color: "#065F46", borderColor: "#A7F3D0" }}>Active</span>
-                      </div>
-                      {/* Contact details with icons */}
-                      <div className="space-y-1.5 pt-2.5 border-t border-[#F1F5F9]">
+                      {/* Row 2: Contact details */}
+                      <div className="space-y-1.5 mt-3 pt-3 border-t border-[#F1F5F9]">
+                        <div className="flex items-center gap-2 text-[11px] text-[#475569]">
+                          <Mail className="w-3 h-3 text-[#94A3B8] shrink-0" />
+                          <span className="truncate">{c.email}</span>
+                        </div>
                         <div className="flex items-center gap-2 text-[11px] text-[#475569]">
                           <Phone className="w-3 h-3 text-[#94A3B8] shrink-0" />
                           <span className="truncate">{c.phone}{c.phoneExt ? ` ext. ${c.phoneExt}` : ""}</span>
@@ -219,13 +219,16 @@ export function PocDataTable({
                         {c.secondaryPhone && (
                           <div className="flex items-center gap-2 text-[11px] text-[#475569]">
                             <PhoneCall className="w-3 h-3 text-[#94A3B8] shrink-0" />
-                            <span className="truncate">{c.secondaryPhone}{c.secondaryPhoneExt ? ` ext. ${c.secondaryPhoneExt}` : ""}</span>
+                            <span className="truncate">{c.secondaryPhone}</span>
                           </div>
                         )}
-                        <div className="flex items-center gap-2 text-[11px] text-[#475569]">
-                          <Mail className="w-3 h-3 text-[#94A3B8] shrink-0" />
-                          <span className="truncate">{c.email}</span>
-                        </div>
+                      </div>
+                      {/* Row 3: Footer — Department + Status */}
+                      <div className="flex items-center justify-between mt-3 pt-3 border-t border-[#F1F5F9]">
+                        <span className="inline-flex items-center px-2 py-[3px] rounded-md text-[10px]" style={{ fontWeight: 500, backgroundColor: dc.bg, color: dc.text }}>
+                          {c.department === "Supply Chain Management" ? "Supply Chain" : c.department}
+                        </span>
+                        <span className="inline-flex items-center text-[10px] px-2 py-[3px] rounded-full border" style={{ fontWeight: 500, backgroundColor: "#ECFDF5", color: "#065F46", borderColor: "#A7F3D0" }}>Active</span>
                       </div>
                     </div>
                   </button>
