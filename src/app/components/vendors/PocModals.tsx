@@ -433,9 +433,10 @@ export function CreatePocModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="flex flex-col p-0 gap-0 overflow-hidden sm:rounded-2xl border-0 sm:border"
+        className="flex flex-col p-0 gap-0 overflow-hidden sm:rounded-2xl border-0 sm:border z-[215]"
         hideCloseButton
-        style={{ maxWidth: 680, width: "calc(100% - 2rem)", maxHeight: "85vh", borderRadius: 16, boxShadow: "0 24px 80px -12px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.05)", zIndex: 215 }}
+        overlayClassName="z-[212] bg-black/50"
+        style={{ maxWidth: 680, width: "calc(100% - 2rem)", maxHeight: "85vh", borderRadius: 16, boxShadow: "0 24px 80px -12px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.05)" }}
       >
         <DialogTitle className="sr-only">Create New Point of Contact</DialogTitle>
         <DialogDescription className="sr-only">Create a new contact</DialogDescription>
