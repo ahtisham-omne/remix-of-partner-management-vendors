@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from "react";
-import { Search, X, Users, Shield, Plus, Bell, Info, Mail } from "lucide-react";
+import { Search, X, Users, Shield, Plus, Bell, Info, Mail, ChevronDown, SlidersHorizontal, Check } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "../ui/dialog";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Tooltip, TooltipTrigger, TooltipContent } from "../ui/tooltip";
 import { SYSTEM_USERS, SYSTEM_ROLES, type LicenseType, type UserStatus } from "./partnerConstants";
 
@@ -46,6 +47,67 @@ function StatusPill({ status }: { status: UserStatus }) {
     >
       {status}
     </span>
+  );
+}
+
+// ── Searchable Filter Dropdown ──
+function FilterDropdown({ label, value, options, onChange, accentColor }: {
+  label: string; value: string; options: string[]; onChange: (v: string) => void; accentColor: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const [filterSearch, setFilterSearch] = useState("");
+  const isActive = value !== "all";
+  const filtered = options.filter((o) => o === "all" || o.toLowerCase().includes(filterSearch.toLowerCase()));
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button type="button"
+          className={`inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border text-xs transition-colors cursor-pointer ${
+            isActive
+              ? "border-primary/30 bg-[#EDF4FF] text-[#0A77FF]"
+              : "border-border bg-white text-foreground hover:bg-muted/50 hover:border-muted-foreground/30"
+          }`}
+          style={{ fontWeight: isActive ? 600 : 500 }}
+        >
+          <SlidersHorizontal className={`w-3 h-3 ${isActive ? "text-[#0A77FF]" : "text-muted-foreground"}`} />
+          {isActive ? value : label}
+          <ChevronDown className="w-3 h-3 text-muted-foreground" />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent side="bottom" align="start" sideOffset={4} className="w-[200px] p-0 z-[350] rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-[#E2E8F0]/80">
+        {options.length > 5 && (
+          <div className="p-2 border-b border-[#F1F5F9]">
+            <div className="relative">
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8]" />
+              <input
+                value={filterSearch}
+                onChange={(e) => setFilterSearch(e.target.value)}
+                placeholder={`Search ${label.toLowerCase()}...`}
+                className="w-full h-8 pl-8 pr-3 rounded-md border border-[#E2E8F0] bg-[#F8FAFC] text-[12px] text-[#0F172A] placeholder:text-[#94A3B8]/60 focus:outline-none focus:border-[#0A77FF]"
+                autoFocus
+              />
+            </div>
+          </div>
+        )}
+        <div className="max-h-[200px] overflow-y-auto py-1 scrollbar-hide">
+          {filtered.map((opt) => {
+            const isAll = opt === "all";
+            const isSelected = isAll ? value === "all" : value === opt;
+            return (
+              <button key={opt} type="button"
+                onClick={() => { onChange(isAll ? "all" : (value === opt ? "all" : opt)); setOpen(false); setFilterSearch(""); }}
+                className={`w-full flex items-center gap-2.5 px-3 py-2 text-left text-[12px] transition-colors ${isSelected ? "bg-[#EDF4FF]/50" : "hover:bg-[#F8FAFC]"}`}
+                style={{ fontWeight: isSelected ? 600 : 400 }}
+              >
+                <span className={`flex-1 ${isSelected ? "text-[#0A77FF]" : "text-[#334155]"}`}>{isAll ? `All ${label}s` : opt}</span>
+                {isSelected && <Check className="w-3.5 h-3.5 text-[#0A77FF] shrink-0" />}
+              </button>
+            );
+          })}
+        </div>
+      </PopoverContent>
+    </Popover>
   );
 }
 
@@ -227,9 +289,9 @@ export function SearchableUserPicker({
               {search && <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 rounded-full hover:bg-[#F1F5F9] transition-colors cursor-pointer"><X className="w-3.5 h-3.5 text-[#94A3B8]" /></button>}
             </div>
 
-            {/* Filter pills — matching partner listing page style */}
-            <div className="flex items-center gap-1.5 flex-wrap">
-              {/* Tab pills — rounded-full like listing page */}
+            {/* Filter row — tabs + dropdown filters */}
+            <div className="flex items-center gap-2 flex-wrap">
+              {/* Tab pills */}
               {(["roles", "users"] as const).map((t) => {
                 const isActive = tab === t;
                 const count = t === "roles" ? filteredRoles.length : filteredUsers.length;
@@ -252,37 +314,48 @@ export function SearchableUserPicker({
 
               <span className="w-px h-5 bg-[#E2E8F0]" />
 
-              {/* Department filter pill */}
-              {departments.map((d) => {
-                const isActive = deptFilter === d;
-                return (
-                  <button key={d} type="button" onClick={() => setDeptFilter(isActive ? "all" : d)}
-                    className={`inline-flex items-center px-3 py-1.5 rounded-full border text-xs transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                      isActive
-                        ? "border-primary bg-[#EDF4FF] text-[#0A77FF]"
-                        : "border-border text-muted-foreground hover:bg-muted/60 hover:border-muted-foreground/30"
-                    }`}
-                    style={{ fontWeight: isActive ? 500 : 400 }}
-                  >{d}</button>
-                );
-              })}
+              {/* Department dropdown */}
+              <FilterDropdown
+                label="Department"
+                value={deptFilter}
+                options={["all", ...departments]}
+                onChange={setDeptFilter}
+                accentColor={accentColor}
+              />
+
+              {/* License dropdown */}
+              <FilterDropdown
+                label="License"
+                value={licenseFilter}
+                options={["all", "Full Access", "Field User", "Read Only"]}
+                onChange={setLicenseFilter}
+                accentColor={accentColor}
+              />
+
+              {/* Status dropdown */}
+              <FilterDropdown
+                label="Status"
+                value={statusFilter}
+                options={["all", "Active", "Disabled"]}
+                onChange={setStatusFilter}
+                accentColor={accentColor}
+              />
 
               {hasActiveFilters && (
                 <button type="button" onClick={() => { setDeptFilter("all"); setLicenseFilter("all"); setStatusFilter("all"); }}
-                  className="inline-flex items-center px-2.5 py-1.5 rounded-full text-xs text-[#94A3B8] hover:text-[#EF4444] hover:bg-[#FEF2F2] cursor-pointer transition-colors" style={{ fontWeight: 500 }}>
-                  <X className="w-3 h-3 mr-1" />Clear
+                  className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs text-[#94A3B8] hover:text-[#EF4444] hover:bg-[#FEF2F2] cursor-pointer transition-colors border border-transparent hover:border-[#FECACA]" style={{ fontWeight: 500 }}>
+                  <X className="w-3 h-3" />Clear all
                 </button>
               )}
             </div>
           </div>
 
-          {/* Table header — matches listing page bg-muted/30 style */}
+          {/* Table header — matches listing page */}
           <div className="flex items-center gap-3 px-5 py-2 bg-muted/30 border-b border-border shrink-0">
             <div className="w-[18px]" />
             <div className="w-9" />
-            <span className="flex-1 text-muted-foreground text-xs font-normal">
-              {tab === "roles" ? "Role" : "User"}
-            </span>
+            <span className="flex-1 text-muted-foreground text-xs font-normal">{tab === "roles" ? "Role" : "User"}</span>
+            <span className="w-[100px] text-muted-foreground text-xs font-normal">Department</span>
             <span className="w-[90px] text-muted-foreground text-xs font-normal text-center">License</span>
             <span className="w-[80px] text-muted-foreground text-xs font-normal text-center">Status</span>
           </div>
@@ -315,8 +388,9 @@ export function SearchableUserPicker({
                               </Tooltip>
                             )}
                           </div>
-                          <p className="text-[11px] text-[#94A3B8] truncate mt-0.5"><HighlightText text={role.department} query={search} /> · {role.activeUsers}/{role.userCount} active</p>
+                          <p className="text-[11px] text-[#94A3B8] truncate mt-0.5">{role.activeUsers}/{role.userCount} active users</p>
                         </div>
+                        <span className="w-[100px] text-[11px] text-[#64748B] truncate shrink-0"><HighlightText text={role.department} query={search} /></span>
                         <div className="w-[90px] flex justify-center"><LicenseBadge type={role.licenseType} /></div>
                         <div className="w-[80px] flex justify-center"><StatusPill status={role.status} /></div>
                       </button>
@@ -345,12 +419,9 @@ export function SearchableUserPicker({
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}><HighlightText text={user.name} query={search} /></p>
-                          <div className="flex items-center gap-2 mt-0.5">
-                            <p className="text-[11px] text-[#94A3B8] truncate"><HighlightText text={user.role} query={search} /> · <HighlightText text={user.department} query={search} /></p>
-                            <span className="text-[10px] text-[#CBD5E1]">·</span>
-                            <span className="text-[10px] text-[#94A3B8] truncate flex items-center gap-1"><Mail className="w-2.5 h-2.5" />{user.email}</span>
-                          </div>
+                          <p className="text-[11px] text-[#94A3B8] truncate mt-0.5"><HighlightText text={user.role} query={search} /> · {user.email}</p>
                         </div>
+                        <span className="w-[100px] text-[11px] text-[#64748B] truncate shrink-0"><HighlightText text={user.department} query={search} /></span>
                         <div className="w-[90px] flex justify-center"><LicenseBadge type={user.licenseType} /></div>
                         <div className="w-[80px] flex justify-center"><StatusPill status={user.status} /></div>
                       </button>
