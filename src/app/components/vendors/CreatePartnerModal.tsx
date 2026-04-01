@@ -6103,7 +6103,7 @@ function ConfigPageContent({
                     </div>
 
                     {/* Type toggle — inline with search */}
-                    <div className="inline-flex items-center rounded-lg border border-[#CBD5E1] bg-[#E2E8F0] p-0.5 shrink-0">
+                    <div className="inline-flex items-center rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] p-0.5 shrink-0">
                       {([
                         { key: "net", label: "NET", color: "#0A77FF", bg: "#EFF6FF", icon: Receipt },
                         { key: "prepayment", label: "Pre", color: "#7C3AED", bg: "#F5F3FF", icon: Clock },
@@ -6116,15 +6116,15 @@ function ConfigPageContent({
                             key={cat.key}
                             onClick={() => setPtTypeFilters(cat.key)}
                             className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-[11px] transition-all cursor-pointer ${
-                              active ? "bg-white shadow-sm" : "bg-transparent hover:bg-white/70"
+                              active ? "shadow-sm" : "hover:bg-white/60"
                             }`}
-                            style={{ fontWeight: active ? 600 : 500, color: active ? cat.color : "#475569" }}
+                            style={{ fontWeight: active ? 600 : 500, color: active ? cat.color : "#334155", backgroundColor: active ? cat.bg : undefined }}
                           >
                             <cat.icon className="w-3 h-3" />
                             {cat.label}
                             <span
                               className="text-[9px] rounded-full px-1 py-px min-w-[16px] text-center"
-                              style={{ fontWeight: 600, color: active ? cat.color : "#64748B", backgroundColor: active ? cat.bg : "#CBD5E1" }}
+                              style={{ fontWeight: 600, color: active ? cat.color : "#475569", backgroundColor: active ? `${cat.color}15` : "#E2E8F0" }}
                             >
                               {count}
                             </span>
@@ -6507,7 +6507,7 @@ function ConfigPageContent({
                     </div>
 
                     {/* Type toggle — inline with search */}
-                    <div className="inline-flex items-center rounded-lg border border-[#CBD5E1] bg-[#E2E8F0] p-0.5 shrink-0">
+                    <div className="inline-flex items-center rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] p-0.5 shrink-0">
                       {([
                         { key: "discount", label: "Discounts", color: "#047857", bg: "#ECFDF5", icon: TrendingDown },
                         { key: "premium", label: "Premiums", color: "#7C3AED", bg: "#F5F3FF", icon: TrendingUp },
@@ -6519,15 +6519,15 @@ function ConfigPageContent({
                             key={cat.key}
                             onClick={() => setPrTypeFilters(cat.key)}
                             className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-[11px] transition-all cursor-pointer ${
-                              active ? "bg-white shadow-sm" : "bg-transparent hover:bg-white/70"
+                              active ? "shadow-sm" : "hover:bg-white/60"
                             }`}
-                            style={{ fontWeight: active ? 600 : 500, color: active ? cat.color : "#475569" }}
+                            style={{ fontWeight: active ? 600 : 500, color: active ? cat.color : "#334155", backgroundColor: active ? cat.bg : undefined }}
                           >
                             <cat.icon className="w-3 h-3" />
                             {cat.label}
                             <span
                               className="text-[9px] rounded-full px-1 py-px min-w-[16px] text-center"
-                              style={{ fontWeight: 600, color: active ? cat.color : "#64748B", backgroundColor: active ? cat.bg : "#CBD5E1" }}
+                              style={{ fontWeight: 600, color: active ? cat.color : "#475569", backgroundColor: active ? `${cat.color}15` : "#E2E8F0" }}
                             >
                               {count}
                             </span>

@@ -28,8 +28,8 @@ export function FilterPills({ options, activeKey, onSelect }: FilterPillsProps) 
             onClick={() => onSelect(opt.key)}
             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
               isActive
-                ? "border-[#0A77FF] bg-[#EDF4FF] hover:bg-[#D6E8FF] active:bg-[#ADD1FF] shadow-sm"
-                : "border-[#CBD5E1] bg-white text-[#475569] hover:bg-[#F1F5F9] hover:text-[#0F172A] hover:border-[#94A3B8] active:bg-[#E2E8F0]"
+                ? "border-[#0A77FF]/25 bg-[#EDF4FF] hover:bg-[#D6E8FF] active:bg-[#ADD1FF]"
+                : "border-[#E2E8F0] bg-transparent text-[#334155] hover:bg-[#F1F5F9] hover:border-[#CBD5E1] active:bg-[#E2E8F0]"
             }`}
             style={{
               fontWeight: isActive ? 600 : 500,
