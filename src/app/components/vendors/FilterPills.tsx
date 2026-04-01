@@ -28,23 +28,23 @@ export function FilterPills({ options, activeKey, onSelect }: FilterPillsProps) 
             onClick={() => onSelect(opt.key)}
             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
               isActive
-                ? "border-primary bg-[hsl(213,100%,96%)] hover:bg-[hsl(213,100%,92%)] active:bg-[hsl(213,100%,87%)]"
-                : "border-border text-muted-foreground hover:bg-muted/60 hover:text-foreground hover:border-muted-foreground/30 active:bg-muted"
+                ? "border-[#0A77FF] bg-[#EDF4FF] hover:bg-[#D6E8FF] active:bg-[#ADD1FF] shadow-sm"
+                : "border-[#CBD5E1] bg-white text-[#475569] hover:bg-[#F1F5F9] hover:text-[#0F172A] hover:border-[#94A3B8] active:bg-[#E2E8F0]"
             }`}
             style={{
-              fontWeight: isActive ? 500 : 400,
-              color: isActive ? "hsl(var(--primary))" : undefined,
+              fontWeight: isActive ? 600 : 500,
+              color: isActive ? "#0A77FF" : undefined,
             }}
           >
             {opt.label}
             {opt.showCount && opt.count !== undefined && (
               <span
                 className={`text-[10px] rounded-full px-1.5 py-px min-w-[18px] text-center ${
-                  isActive ? "bg-primary/10" : "bg-muted"
+                  isActive ? "bg-[#0A77FF]/12" : "bg-[#E2E8F0]"
                 }`}
                 style={{
                   fontWeight: 600,
-                  color: isActive ? "hsl(var(--primary))" : "hsl(var(--foreground))",
+                  color: isActive ? "#0A77FF" : "#475569",
                 }}
               >
                 {opt.count}
