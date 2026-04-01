@@ -187,30 +187,25 @@ export function PocDataTable({
                     className={`group/poc relative text-left rounded-xl border transition-all duration-200 ${selectable ? "cursor-pointer" : ""} ${
                       isSel ? "border-[#0A77FF] bg-[#FAFCFF] shadow-[0_0_0_1px_#0A77FF]" : "border-[#E8ECF1] bg-white hover:border-[#BFDBFE] hover:shadow-[0_4px_16px_-4px_rgba(10,119,255,0.12)]"
                     }`}>
-                    <div className="flex items-start gap-3 p-3.5">
-                      {/* Avatar */}
-                      <div className="w-10 h-10 rounded-xl flex items-center justify-center text-[11px] shrink-0 mt-0.5" style={{ backgroundColor: t.bg, color: t.text, fontWeight: 700 }}>{ini(c.name)}</div>
-                      {/* Content */}
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="min-w-0">
-                            <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}><Hl text={c.name} q={searchQuery} /></p>
-                            <p className="text-[11px] text-[#94A3B8] truncate">{c.department === "Supply Chain Management" ? "Supply Chain" : c.department} · {c.company}</p>
+                    <div className="p-3.5">
+                      {/* Header: Initials + Name + Status + Checkbox */}
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-xl flex items-center justify-center text-[10px] shrink-0" style={{ backgroundColor: t.bg, color: t.text, fontWeight: 700 }}>{ini(c.name)}</div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}><Hl text={c.name} q={searchQuery} /></p>
+                          <p className="text-[11px] text-[#334155] truncate" style={{ fontWeight: 500 }}>{c.department === "Supply Chain Management" ? "Supply Chain" : c.department} <span className="text-[#CBD5E1]">·</span> <span className="text-[#94A3B8]" style={{ fontWeight: 400 }}>{c.company}</span></p>
+                        </div>
+                        <span className="inline-flex items-center text-[10px] px-2 py-[2px] rounded-full border shrink-0" style={{ fontWeight: 500, backgroundColor: "#ECFDF5", color: "#065F46", borderColor: "#A7F3D0" }}>Active</span>
+                        {selectable && (
+                          <div className={`w-[18px] h-[18px] rounded-[5px] border-[1.5px] flex items-center justify-center shrink-0 transition-all duration-150 ${isSel ? "bg-[#0A77FF] border-[#0A77FF]" : "border-[#CBD5E1] bg-white group-hover/poc:border-[#94A3B8]"}`}>
+                            {isSel && <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
                           </div>
-                          {selectable && (
-                            <div className={`w-[18px] h-[18px] rounded-[5px] border-[1.5px] flex items-center justify-center shrink-0 mt-0.5 transition-all duration-150 ${
-                              isSel ? "bg-[#0A77FF] border-[#0A77FF]" : "border-[#CBD5E1] bg-white group-hover/poc:border-[#94A3B8]"
-                            }`}>
-                              {isSel && <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
-                            </div>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-3 mt-2 text-[11px] text-[#475569]">
-                          <span className="flex items-center gap-1.5 truncate"><Mail className="w-3 h-3 text-[#94A3B8] shrink-0" />{c.email}</span>
-                        </div>
-                        <div className="flex items-center gap-3 mt-1 text-[11px] text-[#475569]">
-                          <span className="flex items-center gap-1.5"><Phone className="w-3 h-3 text-[#94A3B8] shrink-0" />{c.phone}</span>
-                        </div>
+                        )}
+                      </div>
+                      {/* Contact info */}
+                      <div className="mt-2.5 pt-2.5 border-t border-[#F1F5F9] space-y-1">
+                        <div className="flex items-center gap-2 text-[11px] text-[#475569]"><Mail className="w-3 h-3 text-[#94A3B8] shrink-0" /><span className="truncate">{c.email}</span></div>
+                        <div className="flex items-center gap-2 text-[11px] text-[#475569]"><Phone className="w-3 h-3 text-[#94A3B8] shrink-0" /><span>{c.phone}</span></div>
                       </div>
                     </div>
                   </button>
