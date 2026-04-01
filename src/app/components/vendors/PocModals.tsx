@@ -357,24 +357,26 @@ export function SelectPocDictionaryModal({
           </div>
         </div>
 
-        {/* PocDataTable — reusable table component */}
-        <PocDataTable
-          contacts={pocPagedContacts}
-          selectedIds={pocTempSelected}
-          onToggleSelect={onTogglePocTemp}
-          onSelectAll={handleSelectAll}
-          searchQuery={pocSearch}
-          onSearchChange={onPocSearchChange}
-          categoryFilter={pocCategoryFilter}
-          onCategoryFilterChange={onPocCategoryFilterChange}
-          page={pocPage}
-          totalPages={pocTotalPages}
-          onPageChange={onPocPageChange}
-          totalCount={contactDictionary.length}
-          perPage={POC_PER_PAGE}
-          onCreateNew={onOpenCreatePoc}
-          selectable
-        />
+        {/* PocDataTable — matching listing page card wrapper */}
+        <div className="flex-1 min-h-0 overflow-hidden mx-3 sm:mx-4 my-3 border border-border rounded-xl bg-card flex flex-col">
+          <PocDataTable
+            contacts={pocPagedContacts}
+            selectedIds={pocTempSelected}
+            onToggleSelect={onTogglePocTemp}
+            onSelectAll={handleSelectAll}
+            searchQuery={pocSearch}
+            onSearchChange={onPocSearchChange}
+            categoryFilter={pocCategoryFilter}
+            onCategoryFilterChange={onPocCategoryFilterChange}
+            page={pocPage}
+            totalPages={pocTotalPages}
+            onPageChange={onPocPageChange}
+            totalCount={contactDictionary.length}
+            perPage={POC_PER_PAGE}
+            onCreateNew={onOpenCreatePoc}
+            selectable
+          />
+        </div>
 
         {/* Footer */}
         <div className="px-5 py-3 border-t border-[#E2E8F0] bg-white rounded-b-none sm:rounded-b-2xl flex items-center justify-between shrink-0">
