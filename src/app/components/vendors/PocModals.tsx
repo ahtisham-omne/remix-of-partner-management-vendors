@@ -424,82 +424,41 @@ export function CreatePocModal({
   onSaveAndCreateAnotherChange,
   onSave,
 }: CreatePocModalProps) {
-  const [isFullScreen, setIsFullScreen] = useState(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
-
-  const modalBaseClass =
-    "!fixed !inset-0 !translate-x-0 !translate-y-0 !m-auto !w-full !h-full transition-[max-width,max-height,border-radius] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]";
-  const modalSizeClass = isFullScreen
-    ? `${modalBaseClass} !max-w-[calc(100%-1rem)] sm:!max-w-[calc(100%-1.5rem)] lg:!max-w-[calc(100%-2rem)] !max-h-[calc(100%-1rem)] sm:!max-h-[calc(100%-1.5rem)] lg:!max-h-[calc(100%-2rem)] !rounded-2xl`
-    : `${modalBaseClass} !max-w-[100%] sm:!max-w-[680px] !max-h-[100dvh] sm:!max-h-fit !h-auto rounded-none sm:!rounded-2xl`;
 
   const initials = newPocName.trim() ? getInitials(newPocName.trim()) : "";
   const deptAvatarColor = DEPT_AVATAR_COLORS[newPocDepartment] || DEPT_AVATAR_COLORS["Sales"];
   const isValid = newPocName.trim().length > 0;
 
-  // Count filled fields for progress
-  const filledCount = [newPocName, newPocRole, newPocLandline, newPocMobile, newPocEmail].filter((v) => v.trim()).length;
-  const totalFields = 5;
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className={`flex flex-col p-0 gap-0 border-0 sm:border ${modalSizeClass}`}
+        className="flex flex-col p-0 gap-0 overflow-hidden sm:rounded-2xl border-0 sm:border"
         hideCloseButton
-        overlayClassName="z-[205]"
-        style={{ zIndex: 210, boxShadow: "0 24px 48px -12px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.05)" }}
+        style={{ maxWidth: 680, width: "calc(100% - 2rem)", maxHeight: "85vh", borderRadius: 16, boxShadow: "0 24px 80px -12px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.05)", zIndex: 215 }}
       >
         <DialogTitle className="sr-only">Create New Point of Contact</DialogTitle>
         <DialogDescription className="sr-only">Create a new contact</DialogDescription>
 
-        {/* Header */}
-        <div className="px-4 sm:px-5 pt-4 pb-3 shrink-0 bg-white rounded-t-none sm:rounded-t-2xl border-b border-border">
+        {/* Header — matches partner creation form */}
+        <div className="px-5 pt-4 pb-3 shrink-0 bg-white border-b border-border">
           <div className="flex items-start justify-between gap-3">
-            <div className="flex items-center gap-3 min-w-0">
-              {/* Live avatar preview */}
-              <div
-                className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0 transition-all duration-300"
-                style={{
-                  backgroundColor: initials ? deptAvatarColor.bg : "#F1F5F9",
-                  color: initials ? deptAvatarColor.text : "#94A3B8",
-                  boxShadow: initials ? `0 0 0 2px white, 0 0 0 3.5px ${deptAvatarColor.ring}` : "none",
-                  fontWeight: 700,
-                  fontSize: initials.length > 1 ? "13px" : "15px",
-                }}
-              >
+            <div className="flex items-start gap-3 min-w-0">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-all duration-300"
+                style={{ backgroundColor: initials ? deptAvatarColor.bg : "#F1F5F9", color: initials ? deptAvatarColor.text : "#94A3B8", fontWeight: 700, fontSize: 13 }}>
                 {initials || <UserPlus className="w-4.5 h-4.5" />}
               </div>
               <div className="min-w-0">
-                <h2 className="text-[15px] sm:text-[17px] text-[#0F172A]" style={{ fontWeight: 700 }}>
-                  Create New Contact
-                </h2>
-                <p className="text-[11px] sm:text-xs text-[#64748B] mt-0.5 truncate" style={{ fontWeight: 400 }}>
-                  {contextName
-                    ? <>For <span className="text-[#0F172A]" style={{ fontWeight: 500 }}>{contextName}</span> &middot; Purchase Orders &amp; Inquiries</>
-                    : "Assist with Purchase Orders/Sales Orders and inquiries."}
+                <h2 className="text-[15px] sm:text-[17px] text-[#0F172A]" style={{ fontWeight: 700 }}>Create New Contact</h2>
+                <p className="text-[12px] text-[#64748B] mt-0.5" style={{ fontWeight: 400 }}>
+                  {contextName ? <>For <span className="text-[#0F172A]" style={{ fontWeight: 500 }}>{contextName}</span></> : "Add a new point of contact to the directory."}
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
-              <button
-                onClick={() => setIsFullScreen(!isFullScreen)}
-                className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#475569] hover:bg-[#F8FAFC] hover:border-[#CBD5E1] transition-all cursor-pointer"
-                style={{ fontWeight: 500 }}
-              >
-                {isFullScreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
-                {isFullScreen ? "Exit full" : "Full view"}
-              </button>
-              <button
-                onClick={() => onOpenChange(false)}
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-[#94A3B8] hover:text-[#64748B] hover:bg-[#F1F5F9] transition-all cursor-pointer"
-              >
-                <X className="w-4.5 h-4.5" />
-              </button>
-            </div>
+            <button onClick={() => onOpenChange(false)} className="p-1.5 rounded-lg hover:bg-[#F1F5F9] transition-colors cursor-pointer shrink-0">
+              <X className="w-4 h-4 text-[#94A3B8]" />
+            </button>
           </div>
-
-          {/* Subtle progress indicator */}
-          
         </div>
 
         {/* Form body */}
