@@ -1611,7 +1611,7 @@ export function VendorsListPage() {
               ) : (
                 /* Table View */
                 <div className={`min-h-0 overflow-auto flex-1 ${isResizing || draggingColumnKey ? "select-none" : ""}`}>
-                  <Table>
+                  <Table style={{ tableLayout: "fixed", width: `${CHECKBOX_COL_WIDTH + visibleColumns.reduce((sum, key) => sum + (columnWidths[key] ?? parseInt(colDef(key).minWidth, 10)), 0) + 60}px` }}>
                     <TableHeader className="sticky top-0 z-20 bg-card">
                       <TableRow className={`bg-muted/30 hover:bg-muted/30 ${
                         density === "condensed" ? "[&>th]:h-8" : density === "comfort" ? "[&>th]:h-11" : ""
@@ -1651,7 +1651,7 @@ export function VendorsListPage() {
                               } : undefined}
                               className={`whitespace-nowrap relative group/colheader ${isFrozen ? "sticky bg-[#f8fafc] z-20" : ""} ${hasFilter && !isFrozen ? "bg-primary/[0.03]" : ""} ${isDraggable ? "cursor-grab" : ""} ${def.align === "right" ? "text-right" : ""}`}
                               style={{
-                                width: `${width}px`,
+                                width: `${width}px`, minWidth: `${width}px`, maxWidth: `${width}px`,
                                 overflow: "hidden",
                                 ...(isFrozen ? { left: `${frozenOffsets[key] ?? 0}px` } : {}),
                                 ...(key === lastFrozenKey && !isBeingDragged ? { boxShadow: "inset -1px 0 0 0 rgba(0,0,0,0.08), 3px 0 6px -2px rgba(0,0,0,0.06)" } : {}),
@@ -2014,7 +2014,7 @@ export function VendorsListPage() {
                                 const w = columnWidths[key] ?? parseInt(colDef(key).minWidth, 10);
                                 const isDraggedCol = draggingColumnKey === key;
                                 const cellWidthStyle: React.CSSProperties = {
-                                  width: `${w}px`, overflow: "hidden",
+                                  width: `${w}px`, minWidth: `${w}px`, maxWidth: `${w}px`, overflow: "hidden", textOverflow: "ellipsis",
                                   ...(isDraggedCol ? {
                                     backgroundColor: "rgba(10,119,255,0.035)",
                                   } : {}),
