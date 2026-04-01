@@ -665,7 +665,7 @@ function PricingRuleCard({ rule, onClick }: { rule: PricingRule; onClick: () => 
                 </TooltipContent>
               </Tooltip>
             ) : (
-              <span className="px-1.5 py-[2px] rounded-md text-[10px] border border-[#E2E8F0] bg-white text-[#64748B]" style={{ fontWeight: 500 }}>Custom</span>
+              <span className="inline-flex items-center px-1.5 py-[3px] rounded-md border border-[#CBD5E1] bg-white text-[9px] text-[#475569]" style={{ fontWeight: 600 }}>CUSTOM</span>
             )}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -746,14 +746,17 @@ function PricingRuleCard({ rule, onClick }: { rule: PricingRule; onClick: () => 
                   onClick={(e) => { e.stopPropagation(); setActiveTier(i); }}
                   className={`h-[22px] rounded-md text-[10px] tabular-nums transition-all duration-200 cursor-pointer flex items-center justify-center px-2 ${
                     isActive
-                      ? "bg-[#F1F5F9] text-[#334155] ring-1 ring-[#CBD5E1]"
-                      : "bg-transparent text-[#C0C9D4] hover:bg-[#F8FAFC] hover:text-[#94A3B8]"
+                      ? "shadow-sm"
+                      : "bg-transparent text-[#C0C9D4] hover:text-[#94A3B8]"
                   }`}
-                  style={{ fontWeight: isActive ? 600 : 500 }}
+                  style={{
+                    fontWeight: isActive ? 600 : 500,
+                    ...(isActive ? { backgroundColor: `${pill.text}18`, color: pill.text, boxShadow: `0 0 0 1px ${pill.text}40` } : {}),
+                  }}
                 >
                   T{i + 1}
                   {isActive && (
-                    <span className="ml-1 text-[9px] text-[#94A3B8]" style={{ fontWeight: 400 }}>
+                    <span className="ml-1 text-[9px] opacity-60" style={{ fontWeight: 400 }}>
                       {shownTier.discount}
                     </span>
                   )}
@@ -1358,7 +1361,7 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
                         {rule.basis === "volume" ? "Volume" : "Value"}-Based
                       </span>
                       {isPreset && (
-                        <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-md border border-[#CBD5E1] bg-[#F1F5F9] text-[#64748B]" style={{ fontWeight: 600 }}>
+                        <span className="inline-flex items-center gap-1 px-1.5 py-[3px] rounded-md bg-[#F1F5F9] border border-[#CBD5E1] text-[9px] text-[#64748B]" style={{ fontWeight: 600 }}>
                           <Lock className="w-2.5 h-2.5" /> TEMPLATE
                         </span>
                       )}
@@ -1740,7 +1743,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
           </button>
 
           {/* Category toggle — inline with search */}
-          <div className="inline-flex items-center gap-1.5 shrink-0">
+          <div className="inline-flex items-center rounded-lg bg-[#F8FAFC] border border-[#E2E8F0]/60 p-0.5 shrink-0">
             {([
               { key: "discount" as CategoryView, label: "Discounts", icon: TrendingDown, color: "#047857", bg: "#ECFDF5" },
               { key: "premium" as CategoryView, label: "Premiums", icon: TrendingUp, color: "#6D28D9", bg: "#F5F3FF" },
@@ -1751,10 +1754,10 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                 <button
                   key={cat.key}
                   onClick={() => { setCategoryView(cat.key); setQuickFilter("all"); setCurrentPage(1); }}
-                  className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border text-[12px] transition-all cursor-pointer ${
-                    active ? "shadow-sm" : "border-transparent hover:bg-[#F8FAFC] hover:border-[#E2E8F0]"
+                  className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-md text-[12px] transition-all cursor-pointer ${
+                    active ? "shadow-sm" : "hover:bg-white/60"
                   }`}
-                  style={{ fontWeight: active ? 600 : 500, color: active ? cat.color : "#334155", backgroundColor: active ? cat.bg : undefined, borderColor: active ? `${cat.color}25` : undefined }}
+                  style={{ fontWeight: active ? 600 : 500, color: active ? cat.color : "#334155", backgroundColor: active ? cat.bg : undefined }}
                 >
                   <cat.icon className="w-3.5 h-3.5" />
                   {cat.label}
@@ -2562,7 +2565,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
               </div>
 
               {/* Category toggle — inline with search */}
-              <div className="inline-flex items-center gap-1.5 shrink-0">
+              <div className="inline-flex items-center rounded-lg bg-[#F8FAFC] border border-[#E2E8F0]/60 p-0.5 shrink-0">
                 {([
                   { key: "discount" as const, label: "Discounts", color: "#047857", bg: "#ECFDF5", icon: TrendingDown },
                   { key: "premium" as const, label: "Premiums", color: "#6D28D9", bg: "#F5F3FF", icon: TrendingUp },
@@ -2573,10 +2576,10 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                     <button
                       key={cat.key}
                       onClick={() => setExploreCategoryTab(cat.key)}
-                      className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border text-[12px] transition-all cursor-pointer ${
-                        active ? "shadow-sm" : "border-transparent hover:bg-[#F8FAFC] hover:border-[#E2E8F0]"
+                      className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-md text-[12px] transition-all cursor-pointer ${
+                        active ? "shadow-sm" : "hover:bg-white/60"
                       }`}
-                      style={{ fontWeight: active ? 600 : 500, color: active ? cat.color : "#334155", backgroundColor: active ? cat.bg : undefined, borderColor: active ? `${cat.color}25` : undefined }}
+                      style={{ fontWeight: active ? 600 : 500, color: active ? cat.color : "#334155", backgroundColor: active ? cat.bg : undefined }}
                     >
                       <cat.icon className="w-3.5 h-3.5" />
                       {cat.label}
@@ -2735,7 +2738,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                                   <Lock className="w-2.5 h-2.5" /> TEMPLATE
                                 </span>
                               ) : (
-                                <span className="px-1.5 py-[2px] rounded-md text-[10px] border border-[#E2E8F0] bg-white text-[#64748B]" style={{ fontWeight: 500 }}>Custom</span>
+                                <span className="inline-flex items-center px-1.5 py-[3px] rounded-md border border-[#CBD5E1] bg-white text-[9px] text-[#475569]" style={{ fontWeight: 600 }}>CUSTOM</span>
                               )}
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
@@ -2801,12 +2804,15 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                                         <button
                                           key={i}
                                           onClick={(e) => { e.stopPropagation(); setExploreActiveTiers(prev => ({ ...prev, [card.id]: i })); }}
-                                          className={`h-[22px] rounded-md text-[10px] tabular-nums transition-all duration-200 cursor-pointer flex items-center justify-center ${
+                                          className={`h-[22px] rounded-md text-[10px] tabular-nums transition-all duration-200 cursor-pointer flex items-center justify-center px-2 ${
                                             isActive
-                                              ? "bg-[#0A77FF] text-white px-2.5 shadow-sm"
-                                              : "bg-[#F1F5F9] text-[#94A3B8] hover:bg-[#E2E8F0] hover:text-[#64748B] px-2"
+                                              ? "shadow-sm"
+                                              : "bg-transparent text-[#C0C9D4] hover:text-[#94A3B8]"
                                           }`}
-                                          style={{ fontWeight: isActive ? 600 : 500 }}
+                                          style={{
+                                            fontWeight: isActive ? 600 : 500,
+                                            ...(isActive ? { backgroundColor: `${ePill.text}18`, color: ePill.text, boxShadow: `0 0 0 1px ${ePill.text}40` } : {}),
+                                          }}
                                         >
                                           T{i + 1}
                                         </button>

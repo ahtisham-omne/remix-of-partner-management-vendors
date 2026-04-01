@@ -91,20 +91,24 @@ function SplitTierDisplay({ term }: { term: PaymentTermPreset }) {
         <div className={`h-[24px] mb-1.5 ${isMulti ? "flex items-center gap-[3px]" : ""}`}>
           {isMulti && splits.map((s, i) => {
             const isActive = activeIdx === i;
+            const typeColor = term.badgeColor;
             return (
               <button
                 key={i}
                 onClick={(e) => { e.stopPropagation(); setActiveIdx(i); }}
                 className={`h-[22px] rounded-md text-[10px] tabular-nums transition-all duration-200 cursor-pointer flex items-center justify-center px-2 ${
                   isActive
-                    ? "bg-[#F1F5F9] text-[#334155] ring-1 ring-[#CBD5E1]"
-                    : "bg-transparent text-[#C0C9D4] hover:bg-[#F8FAFC] hover:text-[#94A3B8]"
+                    ? "shadow-sm"
+                    : "bg-transparent text-[#C0C9D4] hover:text-[#94A3B8]"
                 }`}
-                style={{ fontWeight: isActive ? 600 : 500 }}
+                style={{
+                  fontWeight: isActive ? 600 : 500,
+                  ...(isActive ? { backgroundColor: `${typeColor}18`, color: typeColor, boxShadow: `0 0 0 1px ${typeColor}40` } : {}),
+                }}
               >
                 S{i + 1}
                 {isActive && (
-                  <span className="ml-1 text-[9px] text-[#94A3B8]" style={{ fontWeight: 400 }}>
+                  <span className="ml-1 text-[9px] opacity-60" style={{ fontWeight: 400 }}>
                     {s.pct}%
                   </span>
                 )}
@@ -188,7 +192,7 @@ export function PaymentTermCard({
                 ? "border-[#CBD5E1] bg-white text-[#475569]"
                 : "bg-[#F1F5F9] border-[#CBD5E1] text-[#64748B]"
             }`} style={{ fontWeight: 600 }}>
-              {isCustom ? "Custom" : <><Lock className="w-2.5 h-2.5" /> TEMPLATE</>}
+              {isCustom ? "CUSTOM" : <><Lock className="w-2.5 h-2.5" /> TEMPLATE</>}
             </span>
           )}
           {/* Hover actions for editable selected card */}

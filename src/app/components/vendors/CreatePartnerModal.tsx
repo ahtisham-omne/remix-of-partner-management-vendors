@@ -1649,10 +1649,10 @@ function PrTemplateCardInner({
           </span>
           <span className={`inline-flex items-center gap-1 px-1.5 py-[3px] rounded-md border text-[9px] shrink-0 ${
             isCustom
-              ? "border-[#E2E8F0] bg-white text-[#64748B]"
-              : "bg-[#F1F5F9] border-[#E2E8F0] text-[#94A3B8]"
+              ? "border-[#CBD5E1] bg-white text-[#475569]"
+              : "bg-[#F1F5F9] border-[#CBD5E1] text-[#64748B]"
           }`} style={{ fontWeight: 600 }}>
-            {isCustom ? "Custom" : <><Lock className="w-2.5 h-2.5" /> TEMPLATE</>}
+            {isCustom ? "CUSTOM" : <><Lock className="w-2.5 h-2.5" /> TEMPLATE</>}
           </span>
         </div>
 
@@ -1692,14 +1692,17 @@ function PrTemplateCardInner({
                   onClick={(e) => { e.stopPropagation(); setActiveTier(i); }}
                   className={`h-[22px] rounded-md text-[10px] tabular-nums transition-all duration-200 cursor-pointer flex items-center justify-center px-2 ${
                     isActive
-                      ? "bg-[#F1F5F9] text-[#334155] ring-1 ring-[#CBD5E1]"
-                      : "bg-transparent text-[#C0C9D4] hover:bg-[#F8FAFC] hover:text-[#94A3B8]"
+                      ? "shadow-sm"
+                      : "bg-transparent text-[#C0C9D4] hover:text-[#94A3B8]"
                   }`}
-                  style={{ fontWeight: isActive ? 600 : 500 }}
+                  style={{
+                    fontWeight: isActive ? 600 : 500,
+                    ...(isActive ? { backgroundColor: `${pill.text}18`, color: pill.text, boxShadow: `0 0 0 1px ${pill.text}40` } : {}),
+                  }}
                 >
                   T{i + 1}
                   {isActive && (
-                    <span className="ml-1 text-[9px] text-[#94A3B8]" style={{ fontWeight: 400 }}>
+                    <span className="ml-1 text-[9px] opacity-60" style={{ fontWeight: 400 }}>
                       {shownTier?.discount}
                     </span>
                   )}
@@ -6103,7 +6106,7 @@ function ConfigPageContent({
                     </div>
 
                     {/* Type toggle — inline with search */}
-                    <div className="inline-flex items-center gap-1.5 shrink-0">
+                    <div className="inline-flex items-center rounded-lg bg-[#F8FAFC] border border-[#E2E8F0]/60 p-0.5 shrink-0">
                       {([
                         { key: "net", label: "NET", color: "#0A77FF", bg: "#EFF6FF", icon: Receipt },
                         { key: "prepayment", label: "Pre", color: "#7C3AED", bg: "#F5F3FF", icon: Clock },
@@ -6115,10 +6118,10 @@ function ConfigPageContent({
                           <button
                             key={cat.key}
                             onClick={() => setPtTypeFilters(cat.key)}
-                            className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border text-[12px] transition-all cursor-pointer ${
-                              active ? "shadow-sm" : "border-transparent hover:bg-[#F8FAFC] hover:border-[#E2E8F0]"
+                            className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-md text-[12px] transition-all cursor-pointer ${
+                              active ? "shadow-sm" : "hover:bg-white/60"
                             }`}
-                            style={{ fontWeight: active ? 600 : 500, color: active ? cat.color : "#334155", backgroundColor: active ? cat.bg : undefined, borderColor: active ? `${cat.color}25` : undefined }}
+                            style={{ fontWeight: active ? 600 : 500, color: active ? cat.color : "#334155", backgroundColor: active ? cat.bg : undefined }}
                           >
                             <cat.icon className="w-3.5 h-3.5" />
                             {cat.label}
@@ -6386,11 +6389,11 @@ function ConfigPageContent({
                       </span>
                       <div className="flex items-center gap-1.5 shrink-0">
                         {isPreset ? (
-                          <span className="inline-flex items-center gap-1 px-1.5 py-[3px] rounded-md bg-[#F1F5F9] border border-[#E2E8F0] text-[9px] text-[#94A3B8]" style={{ fontWeight: 600 }}>
-                            <Lock className="w-2.5 h-2.5" /> PRESET
+                          <span className="inline-flex items-center gap-1 px-1.5 py-[3px] rounded-md bg-[#F1F5F9] border border-[#CBD5E1] text-[9px] text-[#64748B]" style={{ fontWeight: 600 }}>
+                            <Lock className="w-2.5 h-2.5" /> TEMPLATE
                           </span>
                         ) : (
-                          <span className="px-1.5 py-[2px] rounded-md text-[10px] border border-[#E2E8F0] bg-white text-[#64748B]" style={{ fontWeight: 500 }}>Custom</span>
+                          <span className="inline-flex items-center px-1.5 py-[3px] rounded-md border border-[#CBD5E1] bg-white text-[9px] text-[#475569]" style={{ fontWeight: 600 }}>CUSTOM</span>
                         )}
                       </div>
                     </div>
@@ -6507,7 +6510,7 @@ function ConfigPageContent({
                     </div>
 
                     {/* Type toggle — inline with search */}
-                    <div className="inline-flex items-center gap-1.5 shrink-0">
+                    <div className="inline-flex items-center rounded-lg bg-[#F8FAFC] border border-[#E2E8F0]/60 p-0.5 shrink-0">
                       {([
                         { key: "discount", label: "Discounts", color: "#047857", bg: "#ECFDF5", icon: TrendingDown },
                         { key: "premium", label: "Premiums", color: "#7C3AED", bg: "#F5F3FF", icon: TrendingUp },
@@ -6518,10 +6521,10 @@ function ConfigPageContent({
                           <button
                             key={cat.key}
                             onClick={() => setPrTypeFilters(cat.key)}
-                            className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border text-[12px] transition-all cursor-pointer ${
-                              active ? "shadow-sm" : "border-transparent hover:bg-[#F8FAFC] hover:border-[#E2E8F0]"
+                            className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-md text-[12px] transition-all cursor-pointer ${
+                              active ? "shadow-sm" : "hover:bg-white/60"
                             }`}
-                            style={{ fontWeight: active ? 600 : 500, color: active ? cat.color : "#334155", backgroundColor: active ? cat.bg : undefined, borderColor: active ? `${cat.color}25` : undefined }}
+                            style={{ fontWeight: active ? 600 : 500, color: active ? cat.color : "#334155", backgroundColor: active ? cat.bg : undefined }}
                           >
                             <cat.icon className="w-3.5 h-3.5" />
                             {cat.label}
@@ -6696,13 +6699,13 @@ function ConfigPageContent({
                           {createPrBasis === "volume" ? "Volume" : "Value"}
                         </span>
                         {editingPrRuleId && !editingPrRuleId.startsWith("pr-custom-") && (
-                          <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#FEF3C7] text-[10px] text-[#D97706]" style={{ fontWeight: 600 }}>
-                            <Lock className="w-2.5 h-2.5" /> Preset
+                          <span className="hidden sm:inline-flex items-center gap-1 px-1.5 py-[3px] rounded-md bg-[#F1F5F9] border border-[#CBD5E1] text-[9px] text-[#64748B]" style={{ fontWeight: 600 }}>
+                            <Lock className="w-2.5 h-2.5" /> TEMPLATE
                           </span>
                         )}
                       </>
                     ) : (
-                      <span className="hidden sm:inline-flex items-center px-2.5 py-1 rounded-lg bg-[#F1F5F9] text-[10px] text-[#64748B] uppercase tracking-wide" style={{ fontWeight: 600 }}>Custom</span>
+                      <span className="hidden sm:inline-flex items-center px-1.5 py-[3px] rounded-md border border-[#CBD5E1] bg-white text-[9px] text-[#475569]" style={{ fontWeight: 600 }}>CUSTOM</span>
                     )}
                   </div>
                   <p className="text-[11px] sm:text-xs text-[#64748B] mt-0.5" style={{ fontWeight: 400 }}>
