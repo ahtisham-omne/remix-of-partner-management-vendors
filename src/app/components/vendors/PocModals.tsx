@@ -7,6 +7,7 @@ import {
   DialogDescription,
 } from "../ui/dialog";
 import { Input } from "../ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import {
   Select,
   SelectContent,
@@ -37,6 +38,7 @@ import {
   Hash,
   Camera,
   Linkedin,
+  ChevronDown,
   Twitter,
   Trash2,
   Sparkles,
@@ -431,6 +433,7 @@ export function CreatePocModal({
   const [emailRows, setEmailRows] = useState<EmailRow[]>([{ id: "em-1", type: "Work", address: "" }]);
   const [socialRows, setSocialRows] = useState<SocialRow[]>([{ id: "sc-1", type: "LinkedIn", url: "" }]);
   const [deptSearch, setDeptSearch] = useState("");
+  const [deptDropdownOpen, setDeptDropdownOpen] = useState(false);
   const [customDepts, setCustomDepts] = useState<string[]>([]);
 
   const allDepts = [...DEFAULT_DEPARTMENTS, ...customDepts];
@@ -534,10 +537,51 @@ export function CreatePocModal({
                   </div>
                   <div>
                     <label className="text-xs sm:text-[13px] text-[#0F172A] mb-1 block" style={{ fontWeight: 500 }}>Department</label>
-                    <Select value={newPocDepartment} onValueChange={(v) => onNewPocDepartmentChange(v as any)}>
-                      <SelectTrigger className="!h-10 rounded-lg border-[#E2E8F0] bg-white text-sm [&>svg]:text-[#94A3B8]"><SelectValue placeholder="Select department" /></SelectTrigger>
-                      <SelectContent className="z-[350] rounded-lg max-h-[240px]">{DEFAULT_DEPARTMENTS.map((d) => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent>
-                    </Select>
+                    <Popover open={deptDropdownOpen} onOpenChange={setDeptDropdownOpen}>
+                      <PopoverTrigger asChild>
+                        <button type="button" className="w-full h-10 rounded-lg border border-[#E2E8F0] bg-white px-3 text-sm text-left flex items-center justify-between hover:border-[#CBD5E1] transition-colors cursor-pointer">
+                          <span className={newPocDepartment ? "text-[#0F172A]" : "text-[#B8C4D0]"}>{newPocDepartment || "Select department"}</span>
+                          <ChevronDown className="w-3.5 h-3.5 text-[#94A3B8]" />
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent side="bottom" align="start" sideOffset={4} className="w-[--radix-popover-trigger-width] p-0 z-[350] rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-[#E2E8F0]/80" onOpenAutoFocus={(e) => e.preventDefault()}>
+                        {/* Search */}
+                        <div className="p-2 border-b border-[#F1F5F9]">
+                          <div className="relative">
+                            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8]" />
+                            <input value={deptSearch} onChange={(e) => setDeptSearch(e.target.value)} placeholder="Search departments..." className="w-full h-8 pl-8 pr-3 rounded-md border border-[#E2E8F0] bg-[#F8FAFC] text-[12px] focus:outline-none focus:border-[#0A77FF]" autoFocus />
+                          </div>
+                        </div>
+                        {/* Options */}
+                        <div className="max-h-[200px] overflow-y-auto py-1">
+                          {filteredDepts.map((d) => (
+                            <button key={d} type="button" onClick={() => { onNewPocDepartmentChange(d as any); setDeptDropdownOpen(false); setDeptSearch(""); }}
+                              className={`w-full flex items-center gap-2.5 px-3 py-2 text-left text-[12px] transition-colors ${newPocDepartment === d ? "bg-[#EDF4FF]/50 text-[#0A77FF]" : "text-[#334155] hover:bg-[#F8FAFC]"}`}
+                              style={{ fontWeight: newPocDepartment === d ? 600 : 400 }}>
+                              <span className="flex-1">{d}</span>
+                              {newPocDepartment === d && <Check className="w-3.5 h-3.5 text-[#0A77FF] shrink-0" />}
+                            </button>
+                          ))}
+                          {filteredDepts.length === 0 && !canCreateDept && (
+                            <p className="px-3 py-3 text-[12px] text-[#94A3B8] text-center">No departments found</p>
+                          )}
+                        </div>
+                        {/* Create new */}
+                        {canCreateDept && (
+                          <div className="border-t border-[#F1F5F9] p-2">
+                            <button type="button" onClick={() => {
+                              const newDept = deptSearch.trim();
+                              setCustomDepts((p) => [...p, newDept]);
+                              onNewPocDepartmentChange(newDept as any);
+                              setDeptSearch("");
+                              setDeptDropdownOpen(false);
+                            }} className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-[12px] text-[#0A77FF] hover:bg-[#EDF4FF] transition-colors cursor-pointer" style={{ fontWeight: 600 }}>
+                              <Plus className="w-3.5 h-3.5" />Create "{deptSearch.trim()}"
+                            </button>
+                          </div>
+                        )}
+                      </PopoverContent>
+                    </Popover>
                   </div>
                 </div>
               </div>
