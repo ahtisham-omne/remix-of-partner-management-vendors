@@ -1740,7 +1740,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
           </button>
 
           {/* Category toggle — inline with search */}
-          <div className="inline-flex items-center rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] p-0.5 shrink-0">
+          <div className="inline-flex items-center gap-1.5 shrink-0">
             {([
               { key: "discount" as CategoryView, label: "Discounts", icon: TrendingDown, color: "#047857", bg: "#ECFDF5" },
               { key: "premium" as CategoryView, label: "Premiums", icon: TrendingUp, color: "#6D28D9", bg: "#F5F3FF" },
@@ -1751,15 +1751,15 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                 <button
                   key={cat.key}
                   onClick={() => { setCategoryView(cat.key); setQuickFilter("all"); setCurrentPage(1); }}
-                  className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-[11px] transition-all cursor-pointer ${
-                    active ? "shadow-sm" : "hover:bg-white/60"
+                  className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border text-[12px] transition-all cursor-pointer ${
+                    active ? "shadow-sm" : "border-transparent hover:bg-[#F8FAFC] hover:border-[#E2E8F0]"
                   }`}
-                  style={{ fontWeight: active ? 600 : 500, color: active ? cat.color : "#334155", backgroundColor: active ? cat.bg : undefined }}
+                  style={{ fontWeight: active ? 600 : 500, color: active ? cat.color : "#334155", backgroundColor: active ? cat.bg : undefined, borderColor: active ? `${cat.color}25` : undefined }}
                 >
-                  <cat.icon className="w-3 h-3" />
+                  <cat.icon className="w-3.5 h-3.5" />
                   {cat.label}
                   <span
-                    className="text-[9px] rounded-full px-1 py-px min-w-[16px] text-center"
+                    className="text-[10px] rounded-full px-1.5 py-px min-w-[18px] text-center"
                     style={{ fontWeight: 600, color: active ? cat.color : "#475569", backgroundColor: active ? `${cat.color}15` : "#E2E8F0" }}
                   >
                     {count}
@@ -2562,7 +2562,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
               </div>
 
               {/* Category toggle — inline with search */}
-              <div className="inline-flex items-center rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] p-0.5 shrink-0">
+              <div className="inline-flex items-center gap-1.5 shrink-0">
                 {([
                   { key: "discount" as const, label: "Discounts", color: "#047857", bg: "#ECFDF5", icon: TrendingDown },
                   { key: "premium" as const, label: "Premiums", color: "#6D28D9", bg: "#F5F3FF", icon: TrendingUp },
@@ -2573,15 +2573,15 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                     <button
                       key={cat.key}
                       onClick={() => setExploreCategoryTab(cat.key)}
-                      className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-[11px] transition-all cursor-pointer ${
-                        active ? "shadow-sm" : "hover:bg-white/60"
+                      className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border text-[12px] transition-all cursor-pointer ${
+                        active ? "shadow-sm" : "border-transparent hover:bg-[#F8FAFC] hover:border-[#E2E8F0]"
                       }`}
-                      style={{ fontWeight: active ? 600 : 500, color: active ? cat.color : "#334155", backgroundColor: active ? cat.bg : undefined }}
+                      style={{ fontWeight: active ? 600 : 500, color: active ? cat.color : "#334155", backgroundColor: active ? cat.bg : undefined, borderColor: active ? `${cat.color}25` : undefined }}
                     >
-                      <cat.icon className="w-3 h-3" />
+                      <cat.icon className="w-3.5 h-3.5" />
                       {cat.label}
                       <span
-                        className="text-[9px] rounded-full px-1 py-px min-w-[16px] text-center"
+                        className="text-[10px] rounded-full px-1.5 py-px min-w-[18px] text-center"
                         style={{ fontWeight: 600, color: active ? cat.color : "#475569", backgroundColor: active ? `${cat.color}15` : "#E2E8F0" }}
                       >
                         {count}

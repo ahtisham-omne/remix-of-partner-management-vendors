@@ -6103,7 +6103,7 @@ function ConfigPageContent({
                     </div>
 
                     {/* Type toggle — inline with search */}
-                    <div className="inline-flex items-center rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] p-0.5 shrink-0">
+                    <div className="inline-flex items-center gap-1.5 shrink-0">
                       {([
                         { key: "net", label: "NET", color: "#0A77FF", bg: "#EFF6FF", icon: Receipt },
                         { key: "prepayment", label: "Pre", color: "#7C3AED", bg: "#F5F3FF", icon: Clock },
@@ -6115,15 +6115,15 @@ function ConfigPageContent({
                           <button
                             key={cat.key}
                             onClick={() => setPtTypeFilters(cat.key)}
-                            className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-[11px] transition-all cursor-pointer ${
-                              active ? "shadow-sm" : "hover:bg-white/60"
+                            className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border text-[12px] transition-all cursor-pointer ${
+                              active ? "shadow-sm" : "border-transparent hover:bg-[#F8FAFC] hover:border-[#E2E8F0]"
                             }`}
-                            style={{ fontWeight: active ? 600 : 500, color: active ? cat.color : "#334155", backgroundColor: active ? cat.bg : undefined }}
+                            style={{ fontWeight: active ? 600 : 500, color: active ? cat.color : "#334155", backgroundColor: active ? cat.bg : undefined, borderColor: active ? `${cat.color}25` : undefined }}
                           >
-                            <cat.icon className="w-3 h-3" />
+                            <cat.icon className="w-3.5 h-3.5" />
                             {cat.label}
                             <span
-                              className="text-[9px] rounded-full px-1 py-px min-w-[16px] text-center"
+                              className="text-[10px] rounded-full px-1.5 py-px min-w-[18px] text-center"
                               style={{ fontWeight: 600, color: active ? cat.color : "#475569", backgroundColor: active ? `${cat.color}15` : "#E2E8F0" }}
                             >
                               {count}
@@ -6507,7 +6507,7 @@ function ConfigPageContent({
                     </div>
 
                     {/* Type toggle — inline with search */}
-                    <div className="inline-flex items-center rounded-lg border border-[#E2E8F0] bg-[#F1F5F9] p-0.5 shrink-0">
+                    <div className="inline-flex items-center gap-1.5 shrink-0">
                       {([
                         { key: "discount", label: "Discounts", color: "#047857", bg: "#ECFDF5", icon: TrendingDown },
                         { key: "premium", label: "Premiums", color: "#7C3AED", bg: "#F5F3FF", icon: TrendingUp },
@@ -6518,15 +6518,15 @@ function ConfigPageContent({
                           <button
                             key={cat.key}
                             onClick={() => setPrTypeFilters(cat.key)}
-                            className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-[11px] transition-all cursor-pointer ${
-                              active ? "shadow-sm" : "hover:bg-white/60"
+                            className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border text-[12px] transition-all cursor-pointer ${
+                              active ? "shadow-sm" : "border-transparent hover:bg-[#F8FAFC] hover:border-[#E2E8F0]"
                             }`}
-                            style={{ fontWeight: active ? 600 : 500, color: active ? cat.color : "#334155", backgroundColor: active ? cat.bg : undefined }}
+                            style={{ fontWeight: active ? 600 : 500, color: active ? cat.color : "#334155", backgroundColor: active ? cat.bg : undefined, borderColor: active ? `${cat.color}25` : undefined }}
                           >
-                            <cat.icon className="w-3 h-3" />
+                            <cat.icon className="w-3.5 h-3.5" />
                             {cat.label}
                             <span
-                              className="text-[9px] rounded-full px-1 py-px min-w-[16px] text-center"
+                              className="text-[10px] rounded-full px-1.5 py-px min-w-[18px] text-center"
                               style={{ fontWeight: 600, color: active ? cat.color : "#475569", backgroundColor: active ? `${cat.color}15` : "#E2E8F0" }}
                             >
                               {count}
