@@ -15,7 +15,7 @@ function getUserColor(i: number) { return { bg: USER_BG_COLORS[i % USER_BG_COLOR
 function HighlightText({ text, query }: { text: string; query: string }) {
   if (!query.trim()) return <>{text}</>;
   const parts = text.split(new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "gi"));
-  return <>{parts.map((p, i) => p.toLowerCase() === query.toLowerCase() ? <mark key={i} className="bg-[#FEF9C3] text-inherit rounded-sm px-0.5">{p}</mark> : <React.Fragment key={i}>{p}</React.Fragment>)}</>;
+  return <>{parts.map((p, i) => p.toLowerCase() === query.toLowerCase() ? <mark key={i} className="bg-transparent px-0.5 rounded-sm" style={{ backgroundColor: "#FEFCE8", color: "#854D0E", fontWeight: 500 }}>{p}</mark> : <React.Fragment key={i}>{p}</React.Fragment>)}</>;
 }
 
 function LicenseBadge({ type }: { type: LicenseType }) {

@@ -1585,7 +1585,7 @@ function highlightMatch(text: string, query: string): React.ReactNode {
   if (parts.length === 1) return text;
   return parts.map((part, i) =>
     regex.test(part) ? (
-      <mark key={i} className="bg-[#FDE68A] text-inherit rounded-[2px] px-[1px]">{part}</mark>
+      <mark key={i} className="bg-transparent px-0.5 rounded-sm" style={{ backgroundColor: "#FEFCE8", color: "#854D0E", fontWeight: 500 }}>{part}</mark>
     ) : (
       part
     )

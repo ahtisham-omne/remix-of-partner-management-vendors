@@ -46,7 +46,7 @@ function highlightMatch(text: string, query?: string) {
   return (
     <>
       {text.slice(0, idx)}
-      <mark className="bg-[#FEF9C3] text-inherit rounded-sm px-0">{text.slice(idx, idx + query.length)}</mark>
+      <mark className="bg-transparent px-0.5 rounded-sm" style={{ backgroundColor: "#FEFCE8", color: "#854D0E", fontWeight: 500 }}>{text.slice(idx, idx + query.length)}</mark>
       {text.slice(idx + query.length)}
     </>
   );
