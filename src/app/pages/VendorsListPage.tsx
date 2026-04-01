@@ -169,7 +169,7 @@ const COLUMN_DEFS: (ColumnConfig & { minWidth: string; sortable?: boolean; align
   { key: "customer_sub_types", label: "Customer Sub-Types", minWidth: "170px" },
   { key: "num_items", label: "No. of Items", minWidth: "180px", sortable: true },
   { key: "partner_locations", label: "Partner Locations", minWidth: "190px", sortable: true },
-  { key: "global_contacts", label: "Global Point of Contacts", minWidth: "200px" },
+  { key: "global_contacts", label: "Points of Contact", minWidth: "200px" },
   { key: "partner_group", label: "Partner Group", minWidth: "130px" },
   { key: "net_profit", label: "Net Profit ($)", minWidth: "130px", sortable: true, align: "right" },
   { key: "credit_limit", label: "Credit Limit ($)", minWidth: "130px", sortable: true, align: "right" },

@@ -203,7 +203,7 @@ const COLUMN_DEFS: ColumnDef[] = [
   { key: "vendor_type", label: "Vendor type", minWidth: 130, sortable: true },
   { key: "num_items", label: "Items", minWidth: 140, sortable: false },
   { key: "partner_locations", label: "Locations", minWidth: 160, sortable: false },
-  { key: "global_contacts", label: "Point of contact", minWidth: 180, sortable: false },
+  { key: "global_contacts", label: "Points of Contact", minWidth: 180, sortable: false },
   { key: "partner_group", label: "Partner group", minWidth: 140, sortable: true },
   { key: "net_profit", label: "Net profit (%)", minWidth: 110, sortable: true, align: "right" },
   { key: "credit_limit", label: "Credit limit", minWidth: 120, sortable: true, align: "right" },

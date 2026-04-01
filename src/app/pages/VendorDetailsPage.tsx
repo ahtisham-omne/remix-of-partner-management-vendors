@@ -181,7 +181,7 @@ const TABS = [
   { id: "items", label: "Items" },
   { id: "pricing_rules", label: "Pricing Rules" },
   { id: "partner_communication", label: "Partner Communication" },
-  { id: "global_contacts", label: "Global Point of Contact" },
+  { id: "global_contacts", label: "Points of Contact" },
   { id: "carrier_profile", label: "Carrier Profile" },
   { id: "payment_methods", label: "Payment Methods" },
   { id: "purchase_orders", label: "Purchase Orders" },
@@ -3872,7 +3872,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
     const parts = text.split(regex);
     return parts.map((part, i) =>
       regex.test(part) ? (
-        <span key={i} className="bg-[#FEF08A] rounded-sm px-px">{part}</span>
+        <mark key={i} className="bg-transparent px-0.5 rounded-sm" style={{ backgroundColor: "#FEFCE8", color: "#854D0E", fontWeight: 500 }}>{part}</mark>
       ) : (
         part
       )
@@ -6257,7 +6257,7 @@ function ContactsTab({ vendor, cfg }: { vendor: Vendor; cfg?: VendorConfigData }
     const parts = text.split(regex);
     return parts.map((part, i) =>
       regex.test(part) ? (
-        <span key={i} className="bg-[#FEF08A] rounded-sm px-px">{part}</span>
+        <mark key={i} className="bg-transparent px-0.5 rounded-sm" style={{ backgroundColor: "#FEFCE8", color: "#854D0E", fontWeight: 500 }}>{part}</mark>
       ) : (
         part
       )
@@ -6294,11 +6294,19 @@ function ContactsTab({ vendor, cfg }: { vendor: Vendor; cfg?: VendorConfigData }
     return pages;
   };
 
+  const [scopeFilter, setScopeFilter] = useState<"all" | "global" | "location">("all");
+
   const QUICK_DEPT_FILTERS: { key: "all" | "Sales" | "Supply Chain Management" | "Finance"; label: string; count: number }[] = [
     { key: "all", label: "All", count: selectedContacts.length },
     { key: "Sales", label: "Sales", count: selectedDeptCounts["Sales"] || 0 },
     { key: "Supply Chain Management", label: "Supply Chain", count: selectedDeptCounts["Supply Chain Management"] || 0 },
     { key: "Finance", label: "Finance", count: selectedDeptCounts["Finance"] || 0 },
+  ];
+
+  const SCOPE_FILTERS = [
+    { key: "all" as const, label: "All Contacts", count: selectedContacts.length },
+    { key: "global" as const, label: "Global", count: Math.min(selectedContacts.length, Math.max(vendor.globalPointOfContacts.length, 3)) },
+    { key: "location" as const, label: "Location", count: Math.max(0, selectedContacts.length - Math.max(vendor.globalPointOfContacts.length, 3)) },
   ];
 
   const pocDeptCounts = useMemo(() => {
@@ -6503,8 +6511,30 @@ function ContactsTab({ vendor, cfg }: { vendor: Vendor; cfg?: VendorConfigData }
           </div>
         </div>
 
-        {/* Row 2: Quick Filter Pills */}
+        {/* Row 2: Scope + Department Filter Pills */}
         <div className="flex items-center gap-1.5 overflow-x-auto px-4 pb-3 shrink-0">
+          {/* Scope filter: All / Global / Location */}
+          {SCOPE_FILTERS.map((f) => {
+            const isActive = scopeFilter === f.key;
+            return (
+              <button
+                key={f.key}
+                onClick={() => { setScopeFilter(f.key); setTabPage(1); }}
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                  isActive
+                    ? "border-primary bg-[#EDF4FF] hover:bg-[#D6E8FF]"
+                    : "border-border text-muted-foreground hover:bg-muted/60 hover:text-foreground hover:border-muted-foreground/30"
+                }`}
+                style={{ fontWeight: isActive ? 500 : 400, color: isActive ? "#0A77FF" : undefined }}
+              >
+                {f.label}
+                <span className={`text-[10px] rounded-full px-1.5 py-px min-w-[18px] text-center ${isActive ? "bg-primary/10" : "bg-muted"}`}
+                  style={{ fontWeight: 600, color: isActive ? "#0A77FF" : "#475569" }}>{f.count}</span>
+              </button>
+            );
+          })}
+          <span className="w-px h-5 bg-border/60 shrink-0" />
+          {/* Department filters */}
           {QUICK_DEPT_FILTERS.map((f) => {
             const isActive = tabDeptFilter === f.key;
             return (

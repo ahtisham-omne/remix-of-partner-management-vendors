@@ -853,7 +853,7 @@ export function Step2PartnerForm({
             <Globe className="w-3.5 h-3.5 text-[#0A77FF]" />
           </div>
           <div>
-            <span className="text-xs sm:text-[13px] text-[#0F172A] block" style={{ fontWeight: 600 }}>Global Point of Contact</span>
+            <span className="text-xs sm:text-[13px] text-[#0F172A] block" style={{ fontWeight: 600 }}>Point of Contact</span>
             <span className="text-[10px] sm:text-[11px] text-[#94A3B8] block mt-px">Assign partner-level contacts across all locations</span>
           </div>
         </div>
