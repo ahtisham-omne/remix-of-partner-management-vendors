@@ -35,7 +35,13 @@ import {
   Building2,
   Smartphone,
   Hash,
+  Camera,
+  Linkedin,
+  Twitter,
+  Trash2,
+  Sparkles,
 } from "lucide-react";
+import { Textarea } from "../ui/textarea";
 import type { ContactPerson } from "./partnerConstants";
 
 const POC_PER_PAGE = 20;
@@ -371,6 +377,14 @@ const DEPT_AVATAR_COLORS: Record<string, { bg: string; text: string; ring: strin
   "Finance": { bg: "#FEF5E7", text: "#D97706", ring: "#FDE68A" },
 };
 
+// ── Phone/Email row types ──
+type PhoneRow = { id: string; type: string; code: string; number: string; ext: string };
+type EmailRow = { id: string; type: string; address: string };
+
+const PHONE_TYPES = ["Office", "Mobile", "Landline", "Fax", "Other"];
+const EMAIL_TYPES = ["Work", "Personal", "Secondary", "Other"];
+const DEFAULT_DEPARTMENTS = ["Sales", "Supply Chain Management", "Finance", "Operations", "Engineering", "Human Resources", "Legal", "Marketing", "IT", "Quality Assurance", "Logistics", "Procurement"];
+
 interface CreatePocModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -399,36 +413,55 @@ interface CreatePocModalProps {
 }
 
 export function CreatePocModal({
-  open,
-  onOpenChange,
-  contextName,
-  newPocName,
-  onNewPocNameChange,
-  newPocDepartment,
-  onNewPocDepartmentChange,
-  newPocRole,
-  onNewPocRoleChange,
-  newPocLandline,
-  onNewPocLandlineChange,
-  newPocLandlineCode,
-  onNewPocLandlineCodeChange,
-  newPocExt,
-  onNewPocExtChange,
-  newPocMobile,
-  onNewPocMobileChange,
-  newPocMobileCode,
-  onNewPocMobileCodeChange,
-  newPocEmail,
-  onNewPocEmailChange,
-  saveAndCreateAnother,
-  onSaveAndCreateAnotherChange,
-  onSave,
+  open, onOpenChange, contextName,
+  newPocName, onNewPocNameChange, newPocDepartment, onNewPocDepartmentChange,
+  newPocRole, onNewPocRoleChange,
+  newPocLandline, onNewPocLandlineChange, newPocLandlineCode, onNewPocLandlineCodeChange,
+  newPocExt, onNewPocExtChange, newPocMobile, onNewPocMobileChange,
+  newPocMobileCode, onNewPocMobileCodeChange, newPocEmail, onNewPocEmailChange,
+  saveAndCreateAnother, onSaveAndCreateAnotherChange, onSave,
 }: CreatePocModalProps) {
-  const [focusedField, setFocusedField] = useState<string | null>(null);
+  // Internal state for new fields
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [linkedin, setLinkedin] = useState("");
+  const [twitter, setTwitter] = useState("");
+  const [website, setWebsite] = useState("");
+  const [company, setCompany] = useState(contextName || "");
+  const [notes, setNotes] = useState("");
+  const [phoneRows, setPhoneRows] = useState<PhoneRow[]>([{ id: "ph-1", type: "Office", code: newPocLandlineCode, number: "", ext: "" }]);
+  const [emailRows, setEmailRows] = useState<EmailRow[]>([{ id: "em-1", type: "Work", address: "" }]);
+  const [deptSearch, setDeptSearch] = useState("");
+  const [customDepts, setCustomDepts] = useState<string[]>([]);
+
+  const allDepts = [...DEFAULT_DEPARTMENTS, ...customDepts];
+  const filteredDepts = deptSearch ? allDepts.filter((d) => d.toLowerCase().includes(deptSearch.toLowerCase())) : allDepts;
+  const canCreateDept = deptSearch.trim() && !allDepts.some((d) => d.toLowerCase() === deptSearch.trim().toLowerCase());
 
   const initials = newPocName.trim() ? getInitials(newPocName.trim()) : "";
   const deptAvatarColor = DEPT_AVATAR_COLORS[newPocDepartment] || DEPT_AVATAR_COLORS["Sales"];
   const isValid = newPocName.trim().length > 0;
+
+  // Sync first phone/email row back to parent props
+  const handlePhoneChange = (idx: number, field: keyof PhoneRow, val: string) => {
+    setPhoneRows((prev) => { const n = [...prev]; n[idx] = { ...n[idx], [field]: val }; return n; });
+    if (idx === 0) {
+      if (field === "number") onNewPocLandlineChange(val);
+      if (field === "code") onNewPocLandlineCodeChange(val);
+      if (field === "ext") onNewPocExtChange(val);
+    }
+    if (idx === 1 && field === "number") onNewPocMobileChange(val);
+  };
+  const handleEmailChange = (idx: number, val: string) => {
+    setEmailRows((prev) => { const n = [...prev]; n[idx] = { ...n[idx], address: val }; return n; });
+    if (idx === 0) onNewPocEmailChange(val);
+  };
+
+  const addPhoneRow = () => setPhoneRows((p) => [...p, { id: `ph-${Date.now()}`, type: "Mobile", code: "+1", number: "", ext: "" }]);
+  const addEmailRow = () => setEmailRows((p) => [...p, { id: `em-${Date.now()}`, type: "Personal", address: "" }]);
+  const removePhoneRow = (id: string) => setPhoneRows((p) => p.filter((r) => r.id !== id));
+  const removeEmailRow = (id: string) => setEmailRows((p) => p.filter((r) => r.id !== id));
+
+  const inputCls = "h-10 rounded-lg border-[#E2E8F0] bg-white text-sm text-[#0F172A] placeholder:text-[#B8C4D0] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/15";
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -436,12 +469,12 @@ export function CreatePocModal({
         className="flex flex-col p-0 gap-0 overflow-hidden sm:rounded-2xl border-0 sm:border z-[215]"
         hideCloseButton
         overlayClassName="z-[212] bg-black/50"
-        style={{ maxWidth: 680, width: "calc(100% - 2rem)", maxHeight: "85vh", borderRadius: 16, boxShadow: "0 24px 80px -12px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.05)" }}
+        style={{ maxWidth: 720, width: "calc(100% - 2rem)", maxHeight: "88vh", borderRadius: 16, boxShadow: "0 24px 80px -12px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.05)" }}
       >
         <DialogTitle className="sr-only">Create New Point of Contact</DialogTitle>
         <DialogDescription className="sr-only">Create a new contact</DialogDescription>
 
-        {/* Header — matches partner creation form */}
+        {/* Header */}
         <div className="px-5 pt-4 pb-3 shrink-0 bg-white border-b border-border">
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-start gap-3 min-w-0">
@@ -451,258 +484,197 @@ export function CreatePocModal({
               </div>
               <div className="min-w-0">
                 <h2 className="text-[15px] sm:text-[17px] text-[#0F172A]" style={{ fontWeight: 700 }}>Create New Contact</h2>
-                <p className="text-[12px] text-[#64748B] mt-0.5" style={{ fontWeight: 400 }}>
-                  {contextName ? <>For <span className="text-[#0F172A]" style={{ fontWeight: 500 }}>{contextName}</span></> : "Add a new point of contact to the directory."}
-                </p>
+                <p className="text-[12px] text-[#64748B] mt-0.5">{contextName ? <>For <span className="text-[#0F172A]" style={{ fontWeight: 500 }}>{contextName}</span></> : "Add a new point of contact to the directory."}</p>
               </div>
             </div>
-            <button onClick={() => onOpenChange(false)} className="p-1.5 rounded-lg hover:bg-[#F1F5F9] transition-colors cursor-pointer shrink-0">
-              <X className="w-4 h-4 text-[#94A3B8]" />
-            </button>
+            <button onClick={() => onOpenChange(false)} className="p-1.5 rounded-lg hover:bg-[#F1F5F9] transition-colors cursor-pointer shrink-0"><X className="w-4 h-4 text-[#94A3B8]" /></button>
           </div>
         </div>
 
-        {/* Form body — matches partner creation form bg */}
-        <div className="flex-1 overflow-y-auto px-5 py-5 bg-[#FAFBFC] scrollbar-hide">
-          {/* Personnel Info Section */}
-          <div className="mb-5">
-            <h4 className="text-[13px] sm:text-sm text-foreground" style={{ fontWeight: 600 }}>Personnel Info</h4>
-            <p className="text-[11px] text-[#94A3B8] mt-0.5 mb-3">Name, department, and role of the contact person.</p>
+        {/* Form body */}
+        <div className="flex-1 overflow-y-auto px-5 py-5 bg-[#FAFBFC] scrollbar-hide space-y-5">
 
+          {/* ── Section 1: Profile ── */}
+          <div>
+            <h4 className="text-[13px] sm:text-sm text-foreground" style={{ fontWeight: 600 }}>Profile</h4>
+            <p className="text-[11px] text-[#94A3B8] mt-0.5 mb-3">Basic information about the contact person.</p>
             <div className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-              <div className="p-3.5 sm:p-4 space-y-3.5">
-                {/* Name + Department row */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                  <div>
-                    <label className="flex items-center gap-1 text-[12px] text-[#475569] mb-1.5" style={{ fontWeight: 500 }}>
-                      <span>Full Name</span>
-                      <span className="text-[#EF4444]">*</span>
-                    </label>
-                    <div className={`relative rounded-lg transition-all duration-200 ${focusedField === "name" ? "ring-2 ring-[#0A77FF]/15" : ""}`}>
-                      <Input
-                        value={newPocName}
-                        onChange={(e) => onNewPocNameChange(e.target.value)}
-                        onFocus={() => setFocusedField("name")}
-                        onBlur={() => setFocusedField(null)}
-                        placeholder="Enter full name"
-                        className="h-10 rounded-lg border-[#E2E8F0] bg-white text-sm text-[#0F172A] placeholder:text-[#B8C4D0] focus:border-[#0A77FF] focus:ring-0"
-                      />
+              <div className="p-4 space-y-4">
+                {/* Photo + Name row */}
+                <div className="flex items-start gap-4">
+                  {/* Photo upload */}
+                  <button type="button" onClick={() => { /* placeholder */ }} className="w-16 h-16 rounded-xl bg-[#F1F5F9] border-2 border-dashed border-[#E2E8F0] hover:border-[#0A77FF]/30 hover:bg-[#EDF4FF] flex flex-col items-center justify-center shrink-0 cursor-pointer transition-all group">
+                    {profileImage ? (
+                      <img src={profileImage} alt="" className="w-full h-full rounded-xl object-cover" />
+                    ) : initials ? (
+                      <span className="text-[18px]" style={{ fontWeight: 700, color: deptAvatarColor.text }}>{initials}</span>
+                    ) : (
+                      <Camera className="w-5 h-5 text-[#94A3B8] group-hover:text-[#0A77FF] transition-colors" />
+                    )}
+                  </button>
+                  <div className="flex-1 min-w-0 space-y-3">
+                    <div>
+                      <label className="text-[12px] text-[#475569] mb-1.5 block" style={{ fontWeight: 500 }}>Full Name <span className="text-[#EF4444]">*</span></label>
+                      <Input value={newPocName} onChange={(e) => onNewPocNameChange(e.target.value)} placeholder="Enter full name" className={inputCls} />
+                    </div>
+                    <div>
+                      <label className="text-[12px] text-[#475569] mb-1.5 block" style={{ fontWeight: 500 }}>Company</label>
+                      <Input value={company} onChange={(e) => setCompany(e.target.value)} placeholder="Company or organization" className={inputCls} />
                     </div>
                   </div>
+                </div>
+                {/* Role + Department row */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                   <div>
-                    <label className="flex items-center gap-1 text-[12px] text-[#475569] mb-1.5" style={{ fontWeight: 500 }}>
-                      Department
-                    </label>
-                    <Select value={newPocDepartment} onValueChange={(v) => onNewPocDepartmentChange(v as "Sales" | "Supply Chain Management" | "Finance")}>
-                      <SelectTrigger className="h-10 rounded-lg border-[#E2E8F0] bg-white text-sm hover:border-[#CBD5E1] transition-colors focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/15 [&>svg]:text-[#94A3B8]">
-                        <SelectValue placeholder="Select department" />
-                      </SelectTrigger>
-                      <SelectContent className="z-[350] rounded-lg">
-                        <SelectItem value="Sales">
-                          <span className="flex items-center gap-2">
-                            <span className="w-2 h-2 rounded-full bg-[#0A77FF]" />
-                            Sales
-                          </span>
-                        </SelectItem>
-                        <SelectItem value="Supply Chain Management">
-                          <span className="flex items-center gap-2">
-                            <span className="w-2 h-2 rounded-full bg-[#059669]" />
-                            Supply Chain Management
-                          </span>
-                        </SelectItem>
-                        <SelectItem value="Finance">
-                          <span className="flex items-center gap-2">
-                            <span className="w-2 h-2 rounded-full bg-[#D97706]" />
-                            Finance
-                          </span>
-                        </SelectItem>
+                    <label className="text-[12px] text-[#475569] mb-1.5 flex items-center gap-1" style={{ fontWeight: 500 }}><Briefcase className="w-3 h-3 text-[#94A3B8]" />Role / Title</label>
+                    <Input value={newPocRole} onChange={(e) => onNewPocRoleChange(e.target.value)} placeholder="e.g. Procurement Manager" className={inputCls} />
+                  </div>
+                  <div>
+                    <label className="text-[12px] text-[#475569] mb-1.5 flex items-center gap-1" style={{ fontWeight: 500 }}><Building2 className="w-3 h-3 text-[#94A3B8]" />Department</label>
+                    <Select value={newPocDepartment} onValueChange={(v) => onNewPocDepartmentChange(v as any)}>
+                      <SelectTrigger className="h-10 rounded-lg border-[#E2E8F0] bg-white text-sm [&>svg]:text-[#94A3B8]"><SelectValue placeholder="Select department" /></SelectTrigger>
+                      <SelectContent className="z-[350] rounded-lg max-h-[240px]">
+                        {DEFAULT_DEPARTMENTS.map((d) => (
+                          <SelectItem key={d} value={d}>{d}</SelectItem>
+                        ))}
+                        {customDepts.map((d) => (
+                          <SelectItem key={d} value={d}><span className="flex items-center gap-1.5">{d} <span className="text-[10px] text-[#94A3B8]">Custom</span></span></SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
 
-                {/* Role row */}
-                <div className="sm:w-1/2 sm:pr-[7px]">
-                  <label className="flex items-center gap-1 text-[12px] text-[#475569] mb-1.5" style={{ fontWeight: 500 }}>
-                    <Briefcase className="w-3 h-3 text-[#94A3B8]" />
-                    Role / Title
-                  </label>
-                  <div className={`relative rounded-lg transition-all duration-200 ${focusedField === "role" ? "ring-2 ring-[#0A77FF]/15" : ""}`}>
-                    <Input
-                      value={newPocRole}
-                      onChange={(e) => onNewPocRoleChange(e.target.value)}
-                      onFocus={() => setFocusedField("role")}
-                      onBlur={() => setFocusedField(null)}
-                      placeholder="e.g. Sales Manager, Procurement Lead"
-                      className="h-10 rounded-lg border-[#E2E8F0] bg-white text-sm text-[#0F172A] placeholder:text-[#B8C4D0] focus:border-[#0A77FF] focus:ring-0"
-                    />
+          {/* ── Section 2: Social Profiles ── */}
+          <div>
+            <h4 className="text-[13px] sm:text-sm text-foreground" style={{ fontWeight: 600 }}>Social Profiles</h4>
+            <p className="text-[11px] text-[#94A3B8] mt-0.5 mb-3">LinkedIn, social media, and web presence.</p>
+            <div className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+              <div className="p-4 space-y-3">
+                {/* LinkedIn */}
+                <div>
+                  <label className="text-[12px] text-[#475569] mb-1.5 flex items-center gap-1" style={{ fontWeight: 500 }}><Linkedin className="w-3 h-3 text-[#0A66C2]" />LinkedIn</label>
+                  <div className="flex items-center gap-2">
+                    <Input value={linkedin} onChange={(e) => setLinkedin(e.target.value)} placeholder="linkedin.com/in/username" className={`flex-1 ${inputCls}`} />
+                    <button type="button" onClick={() => { import("sonner").then(({ toast }) => toast.info("Auto-fill from LinkedIn coming soon — will populate name, role, company, and photo.")); }}
+                      className="inline-flex items-center gap-1.5 h-10 px-3 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#64748B] hover:bg-[#F8FAFC] hover:border-[#CBD5E1] transition-colors cursor-pointer shrink-0" style={{ fontWeight: 500 }}>
+                      <Sparkles className="w-3.5 h-3.5 text-[#0A77FF]" />Auto-fill
+                    </button>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-[12px] text-[#475569] mb-1.5 flex items-center gap-1" style={{ fontWeight: 500 }}><Twitter className="w-3 h-3 text-[#1DA1F2]" />Twitter / X</label>
+                    <Input value={twitter} onChange={(e) => setTwitter(e.target.value)} placeholder="@username" className={inputCls} />
+                  </div>
+                  <div>
+                    <label className="text-[12px] text-[#475569] mb-1.5 flex items-center gap-1" style={{ fontWeight: 500 }}><Globe className="w-3 h-3 text-[#64748B]" />Website</label>
+                    <Input value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="https://example.com" className={inputCls} />
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Contact Details Section */}
+          {/* ── Section 3: Phone Numbers (dynamic rows) ── */}
           <div>
-            <h4 className="text-[13px] sm:text-sm text-foreground" style={{ fontWeight: 600 }}>Contact Details</h4>
-            <p className="text-[11px] text-[#94A3B8] mt-0.5 mb-3">Phone numbers and email address for reaching this contact.</p>
-
+            <h4 className="text-[13px] sm:text-sm text-foreground" style={{ fontWeight: 600 }}>Phone Numbers</h4>
+            <p className="text-[11px] text-[#94A3B8] mt-0.5 mb-3">Add one or more phone numbers with type classification.</p>
             <div className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-              <div className="p-3.5 sm:p-4 space-y-3.5">
-                {/* Landline + Ext row */}
-                <div className="grid grid-cols-1 sm:grid-cols-[1fr_120px] gap-3.5">
-                  <div>
-                    <label className="flex items-center gap-1 text-[12px] text-[#475569] mb-1.5" style={{ fontWeight: 500 }}>
-                      <Phone className="w-3 h-3 text-[#94A3B8]" />
-                      Landline Phone Number
-                    </label>
-                    <div className={`flex items-center rounded-lg border border-[#E2E8F0] bg-white overflow-hidden h-10 transition-all duration-200 ${focusedField === "landline" ? "border-[#0A77FF] ring-2 ring-[#0A77FF]/15" : "hover:border-[#CBD5E1]"}`}>
-                      <Select value={newPocLandlineCode} onValueChange={onNewPocLandlineCodeChange}>
-                        <SelectTrigger className="h-full border-0 border-r border-[#E2E8F0] rounded-none bg-[#FAFBFC] px-2.5 text-xs w-[85px] shrink-0 shadow-none focus:ring-0 hover:bg-[#F1F5F9] transition-colors">
-                          <span className="flex items-center gap-1.5">
-                            <span className="text-[14px] leading-none">{getCountryFlag(newPocLandlineCode)}</span>
-                            <span className="text-[12px] text-[#475569]" style={{ fontWeight: 500 }}>{newPocLandlineCode}</span>
-                          </span>
-                        </SelectTrigger>
-                        <SelectContent className="z-[350] rounded-lg">
-                          {COUNTRY_CODES.map((cc) => (
-                            <SelectItem key={cc.code} value={cc.code}>
-                              <span className="flex items-center gap-2">
-                                <span className="text-[14px]">{cc.flag}</span>
-                                <span>{cc.label}</span>
-                                <span className="text-[#94A3B8]">{cc.code}</span>
-                              </span>
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
+              <div className="p-4 space-y-3">
+                {phoneRows.map((row, idx) => (
+                  <div key={row.id} className="flex items-end gap-2">
+                    <div className="w-[100px] shrink-0">
+                      {idx === 0 && <label className="text-[11px] text-[#94A3B8] mb-1 block" style={{ fontWeight: 500 }}>Type</label>}
+                      <Select value={row.type} onValueChange={(v) => { setPhoneRows((p) => { const n = [...p]; n[idx] = { ...n[idx], type: v }; return n; }); }}>
+                        <SelectTrigger className="h-10 rounded-lg border-[#E2E8F0] text-xs [&>svg]:text-[#94A3B8]"><SelectValue /></SelectTrigger>
+                        <SelectContent className="z-[350]">{PHONE_TYPES.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
                       </Select>
-                      <input
-                        value={newPocLandline}
-                        onChange={(e) => onNewPocLandlineChange(e.target.value)}
-                        onFocus={() => setFocusedField("landline")}
-                        onBlur={() => setFocusedField(null)}
-                        placeholder="Enter phone number"
-                        className="flex-1 h-full px-3 text-sm text-[#0F172A] outline-none bg-transparent placeholder:text-[#B8C4D0]"
-                      />
                     </div>
-                  </div>
-                  <div>
-                    <label className="flex items-center gap-1 text-[12px] text-[#475569] mb-1.5" style={{ fontWeight: 500 }}>
-                      <Hash className="w-3 h-3 text-[#94A3B8]" />
-                      Extension
-                    </label>
-                    <div className={`relative rounded-lg transition-all duration-200 ${focusedField === "ext" ? "ring-2 ring-[#0A77FF]/15" : ""}`}>
-                      <Input
-                        value={newPocExt}
-                        onChange={(e) => onNewPocExtChange(e.target.value)}
-                        onFocus={() => setFocusedField("ext")}
-                        onBlur={() => setFocusedField(null)}
-                        placeholder="Ext."
-                        className="h-10 rounded-lg border-[#E2E8F0] bg-white text-sm text-[#0F172A] placeholder:text-[#B8C4D0] focus:border-[#0A77FF] focus:ring-0"
-                      />
+                    <div className="flex-1 min-w-0">
+                      {idx === 0 && <label className="text-[11px] text-[#94A3B8] mb-1 block" style={{ fontWeight: 500 }}>Number</label>}
+                      <div className="flex items-center rounded-lg border border-[#E2E8F0] bg-white overflow-hidden h-10 hover:border-[#CBD5E1] transition-colors">
+                        <Select value={row.code} onValueChange={(v) => handlePhoneChange(idx, "code", v)}>
+                          <SelectTrigger className="h-full border-0 border-r border-[#E2E8F0] rounded-none bg-[#FAFBFC] px-2 text-xs w-[72px] shrink-0 shadow-none focus:ring-0">
+                            <span className="text-[12px]">{getCountryFlag(row.code)} {row.code}</span>
+                          </SelectTrigger>
+                          <SelectContent className="z-[350]">{COUNTRY_CODES.map((cc) => <SelectItem key={cc.code} value={cc.code}><span className="flex items-center gap-2"><span>{cc.flag}</span>{cc.code}</span></SelectItem>)}</SelectContent>
+                        </Select>
+                        <input value={row.number} onChange={(e) => handlePhoneChange(idx, "number", e.target.value)} placeholder="Phone number" className="flex-1 h-full px-3 text-sm text-[#0F172A] outline-none bg-transparent placeholder:text-[#B8C4D0]" />
+                      </div>
                     </div>
+                    <div className="w-[80px] shrink-0">
+                      {idx === 0 && <label className="text-[11px] text-[#94A3B8] mb-1 block" style={{ fontWeight: 500 }}>Ext.</label>}
+                      <Input value={row.ext} onChange={(e) => handlePhoneChange(idx, "ext", e.target.value)} placeholder="Ext." className={inputCls} />
+                    </div>
+                    {phoneRows.length > 1 && (
+                      <button onClick={() => removePhoneRow(row.id)} className="w-10 h-10 rounded-lg flex items-center justify-center text-[#94A3B8] hover:text-[#EF4444] hover:bg-[#FEF2F2] transition-colors cursor-pointer shrink-0"><Trash2 className="w-3.5 h-3.5" /></button>
+                    )}
                   </div>
-                </div>
+                ))}
+                <button type="button" onClick={addPhoneRow} className="inline-flex items-center gap-1.5 text-[12px] text-[#0A77FF] hover:text-[#0862D0] cursor-pointer" style={{ fontWeight: 500 }}><Plus className="w-3.5 h-3.5" />Add phone number</button>
+              </div>
+            </div>
+          </div>
 
-                {/* Mobile + Email row */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                  <div>
-                    <label className="flex items-center gap-1 text-[12px] text-[#475569] mb-1.5" style={{ fontWeight: 500 }}>
-                      <Smartphone className="w-3 h-3 text-[#94A3B8]" />
-                      Mobile Number
-                    </label>
-                    <div className={`flex items-center rounded-lg border border-[#E2E8F0] bg-white overflow-hidden h-10 transition-all duration-200 ${focusedField === "mobile" ? "border-[#0A77FF] ring-2 ring-[#0A77FF]/15" : "hover:border-[#CBD5E1]"}`}>
-                      <Select value={newPocMobileCode} onValueChange={onNewPocMobileCodeChange}>
-                        <SelectTrigger className="h-full border-0 border-r border-[#E2E8F0] rounded-none bg-[#FAFBFC] px-2.5 text-xs w-[85px] shrink-0 shadow-none focus:ring-0 hover:bg-[#F1F5F9] transition-colors">
-                          <span className="flex items-center gap-1.5">
-                            <span className="text-[14px] leading-none">{getCountryFlag(newPocMobileCode)}</span>
-                            <span className="text-[12px] text-[#475569]" style={{ fontWeight: 500 }}>{newPocMobileCode}</span>
-                          </span>
-                        </SelectTrigger>
-                        <SelectContent className="z-[350] rounded-lg">
-                          {COUNTRY_CODES.map((cc) => (
-                            <SelectItem key={cc.code} value={cc.code}>
-                              <span className="flex items-center gap-2">
-                                <span className="text-[14px]">{cc.flag}</span>
-                                <span>{cc.label}</span>
-                                <span className="text-[#94A3B8]">{cc.code}</span>
-                              </span>
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
+          {/* ── Section 4: Email Addresses (dynamic rows) ── */}
+          <div>
+            <h4 className="text-[13px] sm:text-sm text-foreground" style={{ fontWeight: 600 }}>Email Addresses</h4>
+            <p className="text-[11px] text-[#94A3B8] mt-0.5 mb-3">Add one or more email addresses with type classification.</p>
+            <div className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+              <div className="p-4 space-y-3">
+                {emailRows.map((row, idx) => (
+                  <div key={row.id} className="flex items-end gap-2">
+                    <div className="w-[110px] shrink-0">
+                      {idx === 0 && <label className="text-[11px] text-[#94A3B8] mb-1 block" style={{ fontWeight: 500 }}>Type</label>}
+                      <Select value={row.type} onValueChange={(v) => { setEmailRows((p) => { const n = [...p]; n[idx] = { ...n[idx], type: v }; return n; }); }}>
+                        <SelectTrigger className="h-10 rounded-lg border-[#E2E8F0] text-xs [&>svg]:text-[#94A3B8]"><SelectValue /></SelectTrigger>
+                        <SelectContent className="z-[350]">{EMAIL_TYPES.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
                       </Select>
-                      <input
-                        value={newPocMobile}
-                        onChange={(e) => onNewPocMobileChange(e.target.value)}
-                        onFocus={() => setFocusedField("mobile")}
-                        onBlur={() => setFocusedField(null)}
-                        placeholder="Enter mobile number"
-                        className="flex-1 h-full px-3 text-sm text-[#0F172A] outline-none bg-transparent placeholder:text-[#B8C4D0]"
-                      />
                     </div>
-                  </div>
-                  <div>
-                    <label className="flex items-center gap-1 text-[12px] text-[#475569] mb-1.5" style={{ fontWeight: 500 }}>
-                      <Mail className="w-3 h-3 text-[#94A3B8]" />
-                      Email Address
-                    </label>
-                    <div className={`relative rounded-lg transition-all duration-200 ${focusedField === "email" ? "ring-2 ring-[#0A77FF]/15" : ""}`}>
-                      <Input
-                        value={newPocEmail}
-                        onChange={(e) => onNewPocEmailChange(e.target.value)}
-                        onFocus={() => setFocusedField("email")}
-                        onBlur={() => setFocusedField(null)}
-                        placeholder="name@company.com"
-                        type="email"
-                        className="h-10 rounded-lg border-[#E2E8F0] bg-white text-sm text-[#0F172A] placeholder:text-[#B8C4D0] focus:border-[#0A77FF] focus:ring-0"
-                      />
+                    <div className="flex-1 min-w-0">
+                      {idx === 0 && <label className="text-[11px] text-[#94A3B8] mb-1 block" style={{ fontWeight: 500 }}>Email</label>}
+                      <Input value={row.address} onChange={(e) => handleEmailChange(idx, e.target.value)} placeholder="name@company.com" type="email" className={inputCls} />
                     </div>
+                    {emailRows.length > 1 && (
+                      <button onClick={() => removeEmailRow(row.id)} className="w-10 h-10 rounded-lg flex items-center justify-center text-[#94A3B8] hover:text-[#EF4444] hover:bg-[#FEF2F2] transition-colors cursor-pointer shrink-0"><Trash2 className="w-3.5 h-3.5" /></button>
+                    )}
                   </div>
-                </div>
+                ))}
+                <button type="button" onClick={addEmailRow} className="inline-flex items-center gap-1.5 text-[12px] text-[#0A77FF] hover:text-[#0862D0] cursor-pointer" style={{ fontWeight: 500 }}><Plus className="w-3.5 h-3.5" />Add email address</button>
+              </div>
+            </div>
+          </div>
+
+          {/* ── Section 5: Notes ── */}
+          <div>
+            <h4 className="text-[13px] sm:text-sm text-foreground" style={{ fontWeight: 600 }}>Additional Notes</h4>
+            <p className="text-[11px] text-[#94A3B8] mt-0.5 mb-3">Any additional context about this contact.</p>
+            <div className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+              <div className="p-4">
+                <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Add any notes about this contact..." className="min-h-[80px] rounded-lg border-[#E2E8F0] bg-white text-sm placeholder:text-[#B8C4D0] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/15 resize-none" />
               </div>
             </div>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="shrink-0 border-t border-border bg-white px-4 sm:px-5 py-3 flex items-center justify-between sm:rounded-b-2xl">
-          <button
-            onClick={() => onSaveAndCreateAnotherChange(!saveAndCreateAnother)}
-            className="flex items-center gap-2 cursor-pointer select-none group/check"
-          >
-            <div
-              className={`w-[18px] h-[18px] rounded-[5px] border-[1.5px] flex items-center justify-center transition-all duration-150 ${
-                saveAndCreateAnother
-                  ? "bg-[#0A77FF] border-[#0A77FF]"
-                  : "border-[#CBD5E1] bg-white group-hover/check:border-[#94A3B8]"
-              }`}
-            >
+        <div className="shrink-0 border-t border-border bg-white px-5 py-3 flex items-center justify-between sm:rounded-b-2xl">
+          <button onClick={() => onSaveAndCreateAnotherChange(!saveAndCreateAnother)} className="flex items-center gap-2 cursor-pointer select-none group/check">
+            <div className={`w-[18px] h-[18px] rounded-[5px] border-[1.5px] flex items-center justify-center transition-all duration-150 ${saveAndCreateAnother ? "bg-[#0A77FF] border-[#0A77FF]" : "border-[#CBD5E1] bg-white group-hover/check:border-[#94A3B8]"}`}>
               {saveAndCreateAnother && <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />}
             </div>
-            <span className="text-xs sm:text-[13px] text-[#475569] group-hover/check:text-[#334155] transition-colors" style={{ fontWeight: 500 }}>
-              Save and create another
-            </span>
+            <span className="text-[13px] text-[#475569] group-hover/check:text-[#334155] transition-colors" style={{ fontWeight: 500 }}>Save and create another</span>
           </button>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => onOpenChange(false)}
-              className="px-3.5 sm:px-4 py-2 rounded-lg border border-[#E2E8F0] bg-white text-xs sm:text-[13px] text-[#334155] hover:bg-[#F8FAFC] hover:border-[#CBD5E1] transition-all cursor-pointer"
-              style={{ fontWeight: 500 }}
-            >
-              Discard
-            </button>
-            <button
-              onClick={onSave}
-              disabled={!isValid}
-              className={`px-3.5 sm:px-5 py-2 rounded-lg text-xs sm:text-[13px] text-white transition-all shadow-sm cursor-pointer inline-flex items-center gap-1.5 ${
-                isValid
-                  ? "bg-[#0A77FF] hover:bg-[#0960D9] hover:shadow-md"
-                  : "bg-[#0A77FF]/40 cursor-not-allowed shadow-none"
-              }`}
-              style={{ fontWeight: 600 }}
-            >
-              <Check className="w-3.5 h-3.5" />
-              Save Contact
+          <div className="flex items-center gap-2.5">
+            <button onClick={() => onOpenChange(false)} className="px-4 py-2 rounded-lg border border-[#E2E8F0] bg-white text-[13px] text-[#334155] hover:bg-[#F8FAFC] transition-colors cursor-pointer" style={{ fontWeight: 500 }}>Discard</button>
+            <button onClick={onSave} disabled={!isValid}
+              className={`px-5 py-2 rounded-lg text-[13px] text-white transition-all shadow-sm cursor-pointer inline-flex items-center gap-1.5 ${isValid ? "bg-[#0A77FF] hover:bg-[#0960D9]" : "bg-[#0A77FF]/40 cursor-not-allowed"}`}
+              style={{ fontWeight: 600 }}>
+              <Check className="w-3.5 h-3.5" />Save Contact
             </button>
           </div>
         </div>
