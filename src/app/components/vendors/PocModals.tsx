@@ -717,7 +717,7 @@ export function CreatePocModal({
             <button onClick={onSave} disabled={!isValid}
               className={`px-5 py-2 rounded-lg text-[13px] text-white transition-all shadow-sm cursor-pointer inline-flex items-center gap-1.5 ${isValid ? "bg-[#0A77FF] hover:bg-[#0960D9]" : "bg-[#0A77FF]/40 cursor-not-allowed"}`}
               style={{ fontWeight: 600 }}>
-              <Check className="w-3.5 h-3.5" />Save Contact
+              Save Contact
             </button>
           </div>
         </div>
