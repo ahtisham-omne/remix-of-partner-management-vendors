@@ -50,33 +50,36 @@ function StatusPill({ status }: { status: UserStatus }) {
   );
 }
 
-// ── Searchable Filter Dropdown ──
-function FilterDropdown({ label, value, options, onChange, accentColor }: {
-  label: string; value: string; options: string[]; onChange: (v: string) => void; accentColor: string;
+// ── Searchable Multi-Select Filter Dropdown ──
+function FilterDropdown({ label, selected, options, onToggle, onClear, searchable }: {
+  label: string; selected: Set<string>; options: string[]; onToggle: (v: string) => void; onClear: () => void; searchable?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const [filterSearch, setFilterSearch] = useState("");
-  const isActive = value !== "all";
-  const filtered = options.filter((o) => o === "all" || o.toLowerCase().includes(filterSearch.toLowerCase()));
+  const count = selected.size;
+  const filtered = searchable && filterSearch ? options.filter((o) => o.toLowerCase().includes(filterSearch.toLowerCase())) : options;
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={(o) => { setOpen(o); if (!o) setFilterSearch(""); }}>
       <PopoverTrigger asChild>
         <button type="button"
           className={`inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border text-xs transition-colors cursor-pointer ${
-            isActive
+            count > 0
               ? "border-primary/30 bg-[#EDF4FF] text-[#0A77FF]"
               : "border-border bg-white text-foreground hover:bg-muted/50 hover:border-muted-foreground/30"
           }`}
-          style={{ fontWeight: isActive ? 600 : 500 }}
+          style={{ fontWeight: count > 0 ? 600 : 500 }}
         >
-          <SlidersHorizontal className={`w-3 h-3 ${isActive ? "text-[#0A77FF]" : "text-muted-foreground"}`} />
-          {isActive ? value : label}
+          <SlidersHorizontal className={`w-3 h-3 ${count > 0 ? "text-[#0A77FF]" : "text-muted-foreground"}`} />
+          {label}
+          {count > 0 && (
+            <span className="text-[10px] min-w-[18px] h-[18px] rounded-full bg-[#0A77FF] text-white flex items-center justify-center px-1" style={{ fontWeight: 600 }}>{count}</span>
+          )}
           <ChevronDown className="w-3 h-3 text-muted-foreground" />
         </button>
       </PopoverTrigger>
-      <PopoverContent side="bottom" align="start" sideOffset={4} className="w-[200px] p-0 z-[350] rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-[#E2E8F0]/80">
-        {options.length > 5 && (
+      <PopoverContent side="bottom" align="start" sideOffset={4} className="w-[220px] p-0 z-[350] rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-[#E2E8F0]/80" onOpenAutoFocus={(e) => e.preventDefault()}>
+        {searchable && (
           <div className="p-2 border-b border-[#F1F5F9]">
             <div className="relative">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8]" />
@@ -90,22 +93,31 @@ function FilterDropdown({ label, value, options, onChange, accentColor }: {
             </div>
           </div>
         )}
-        <div className="max-h-[200px] overflow-y-auto py-1 scrollbar-hide">
+        <div className="max-h-[240px] overflow-y-auto py-1">
+          {filtered.length === 0 && (
+            <p className="px-3 py-3 text-[12px] text-[#94A3B8] text-center">No results</p>
+          )}
           {filtered.map((opt) => {
-            const isAll = opt === "all";
-            const isSelected = isAll ? value === "all" : value === opt;
+            const isSelected = selected.has(opt);
             return (
               <button key={opt} type="button"
-                onClick={() => { onChange(isAll ? "all" : (value === opt ? "all" : opt)); setOpen(false); setFilterSearch(""); }}
+                onClick={() => onToggle(opt)}
                 className={`w-full flex items-center gap-2.5 px-3 py-2 text-left text-[12px] transition-colors ${isSelected ? "bg-[#EDF4FF]/50" : "hover:bg-[#F8FAFC]"}`}
-                style={{ fontWeight: isSelected ? 600 : 400 }}
               >
-                <span className={`flex-1 ${isSelected ? "text-[#0A77FF]" : "text-[#334155]"}`}>{isAll ? `All ${label}s` : opt}</span>
-                {isSelected && <Check className="w-3.5 h-3.5 text-[#0A77FF] shrink-0" />}
+                <div className="w-[16px] h-[16px] rounded-[4px] border-[1.5px] flex items-center justify-center shrink-0 transition-all"
+                  style={{ borderColor: isSelected ? "#0A77FF" : "#CBD5E1", backgroundColor: isSelected ? "#0A77FF" : "transparent" }}>
+                  {isSelected && <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
+                </div>
+                <span className={`flex-1 ${isSelected ? "text-[#0A77FF]" : "text-[#334155]"}`} style={{ fontWeight: isSelected ? 600 : 400 }}>{opt}</span>
               </button>
             );
           })}
         </div>
+        {count > 0 && (
+          <div className="px-2 py-1.5 border-t border-[#F1F5F9]">
+            <button type="button" onClick={() => { onClear(); setOpen(false); }} className="text-[11px] text-[#94A3B8] hover:text-[#EF4444] cursor-pointer" style={{ fontWeight: 500 }}>Clear selection</button>
+          </div>
+        )}
       </PopoverContent>
     </Popover>
   );
@@ -134,9 +146,9 @@ export function SearchableUserPicker({
   const [modalOpen, setModalOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [tab, setTab] = useState<"roles" | "users">("roles");
-  const [deptFilter, setDeptFilter] = useState<string>("all");
-  const [licenseFilter, setLicenseFilter] = useState<string>("all");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [deptFilter, setDeptFilter] = useState<Set<string>>(new Set());
+  const [licenseFilter, setLicenseFilter] = useState<Set<string>>(new Set());
+  const [statusFilter, setStatusFilter] = useState<Set<string>>(new Set());
   const [listFilter, setListFilter] = useState<"all" | "roles" | "users">("all");
 
   const departments = useMemo(() => {
@@ -147,9 +159,9 @@ export function SearchableUserPicker({
 
   const filteredUsers = useMemo(() => {
     let list = [...SYSTEM_USERS];
-    if (deptFilter !== "all") list = list.filter((u) => u.department === deptFilter);
-    if (licenseFilter !== "all") list = list.filter((u) => u.licenseType === licenseFilter);
-    if (statusFilter !== "all") list = list.filter((u) => u.status === statusFilter);
+    if (deptFilter.size > 0) list = list.filter((u) => deptFilter.has(u.department));
+    if (licenseFilter.size > 0) list = list.filter((u) => licenseFilter.has(u.licenseType));
+    if (statusFilter.size > 0) list = list.filter((u) => statusFilter.has(u.status));
     if (search.trim()) {
       const q = search.toLowerCase();
       list = list.filter((u) => u.name.toLowerCase().includes(q) || u.role.toLowerCase().includes(q) || u.department.toLowerCase().includes(q) || u.email.toLowerCase().includes(q));
@@ -159,9 +171,9 @@ export function SearchableUserPicker({
 
   const filteredRoles = useMemo(() => {
     let list = [...SYSTEM_ROLES];
-    if (deptFilter !== "all") list = list.filter((r) => r.department === deptFilter);
-    if (licenseFilter !== "all") list = list.filter((r) => r.licenseType === licenseFilter);
-    if (statusFilter !== "all") list = list.filter((r) => r.status === statusFilter);
+    if (deptFilter.size > 0) list = list.filter((r) => deptFilter.has(r.department));
+    if (licenseFilter.size > 0) list = list.filter((r) => licenseFilter.has(r.licenseType));
+    if (statusFilter.size > 0) list = list.filter((r) => statusFilter.has(r.status));
     if (search.trim()) {
       const q = search.toLowerCase();
       list = list.filter((r) => r.name.toLowerCase().includes(q) || r.department.toLowerCase().includes(q));
@@ -178,7 +190,8 @@ export function SearchableUserPicker({
 
   const showRolesInList = listFilter === "all" || listFilter === "roles";
   const showUsersInList = listFilter === "all" || listFilter === "users";
-  const hasActiveFilters = deptFilter !== "all" || licenseFilter !== "all" || statusFilter !== "all";
+  const hasActiveFilters = deptFilter.size > 0 || licenseFilter.size > 0 || statusFilter.size > 0;
+  const toggleSet = (set: Set<string>, val: string) => { const next = new Set(set); next.has(val) ? next.delete(val) : next.add(val); return next; };
 
   return (
     <div>
@@ -252,7 +265,7 @@ export function SearchableUserPicker({
       )}
 
       {/* CTA */}
-      <button type="button" onClick={() => { setModalOpen(true); setSearch(""); setDeptFilter("all"); setLicenseFilter("all"); setStatusFilter("all"); }}
+      <button type="button" onClick={() => { setModalOpen(true); setSearch(""); setDeptFilter(new Set()); setLicenseFilter(new Set()); setStatusFilter(new Set()); }}
         className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-dashed transition-all cursor-pointer text-[12px] hover:bg-[#FAFBFC]"
         style={{ borderColor: accentBorder, color: accentText, fontWeight: 600 }}
       >
@@ -314,35 +327,36 @@ export function SearchableUserPicker({
 
               <span className="w-px h-5 bg-[#E2E8F0]" />
 
-              {/* Department dropdown */}
+              {/* Department — searchable multi-select */}
               <FilterDropdown
                 label="Department"
-                value={deptFilter}
-                options={["all", ...departments]}
-                onChange={setDeptFilter}
-                accentColor={accentColor}
+                selected={deptFilter}
+                options={departments}
+                onToggle={(v) => setDeptFilter(toggleSet(deptFilter, v))}
+                onClear={() => setDeptFilter(new Set())}
+                searchable
               />
 
-              {/* License dropdown */}
+              {/* License — multi-select */}
               <FilterDropdown
                 label="License"
-                value={licenseFilter}
-                options={["all", "Full Access", "Field User", "Read Only"]}
-                onChange={setLicenseFilter}
-                accentColor={accentColor}
+                selected={licenseFilter}
+                options={["Full Access", "Field User"]}
+                onToggle={(v) => setLicenseFilter(toggleSet(licenseFilter, v))}
+                onClear={() => setLicenseFilter(new Set())}
               />
 
-              {/* Status dropdown */}
+              {/* Status — multi-select */}
               <FilterDropdown
                 label="Status"
-                value={statusFilter}
-                options={["all", "Active", "Disabled"]}
-                onChange={setStatusFilter}
-                accentColor={accentColor}
+                selected={statusFilter}
+                options={["Active", "Inactive"]}
+                onToggle={(v) => setStatusFilter(toggleSet(statusFilter, v))}
+                onClear={() => setStatusFilter(new Set())}
               />
 
               {hasActiveFilters && (
-                <button type="button" onClick={() => { setDeptFilter("all"); setLicenseFilter("all"); setStatusFilter("all"); }}
+                <button type="button" onClick={() => { setDeptFilter(new Set()); setLicenseFilter(new Set()); setStatusFilter(new Set()); }}
                   className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs text-[#94A3B8] hover:text-[#EF4444] hover:bg-[#FEF2F2] cursor-pointer transition-colors border border-transparent hover:border-[#FECACA]" style={{ fontWeight: 500 }}>
                   <X className="w-3 h-3" />Clear all
                 </button>
@@ -350,9 +364,28 @@ export function SearchableUserPicker({
             </div>
           </div>
 
-          {/* Table header — matches listing page */}
+          {/* Table header — matches listing page with select all */}
           <div className="flex items-center gap-3 px-5 py-2 bg-muted/30 border-b border-border shrink-0">
-            <div className="w-[18px]" />
+            {/* Select all checkbox */}
+            {(() => {
+              const currentList = tab === "roles" ? filteredRoles : filteredUsers;
+              const allIds = currentList.map((item) => item.id);
+              const allSelected = allIds.length > 0 && allIds.every((id) => selectedIds.has(id));
+              const someSelected = !allSelected && allIds.some((id) => selectedIds.has(id));
+              return (
+                <button type="button" onClick={() => {
+                  const next = new Set(selectedIds);
+                  if (allSelected) { allIds.forEach((id) => next.delete(id)); } else { allIds.forEach((id) => next.add(id)); }
+                  onSelectionChange(next);
+                }}
+                  className="w-[18px] h-[18px] rounded-[5px] border-[1.5px] flex items-center justify-center shrink-0 transition-all cursor-pointer"
+                  style={{ borderColor: allSelected || someSelected ? accentColor : "#CBD5E1", backgroundColor: allSelected ? accentColor : "transparent" }}
+                >
+                  {allSelected && <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
+                  {someSelected && !allSelected && <div className="w-2 h-0.5 rounded-full" style={{ backgroundColor: accentColor }} />}
+                </button>
+              );
+            })()}
             <div className="w-9" />
             <span className="flex-1 text-muted-foreground text-xs font-normal">{tab === "roles" ? "Role" : "User"}</span>
             <span className="w-[100px] text-muted-foreground text-xs font-normal">Department</span>
