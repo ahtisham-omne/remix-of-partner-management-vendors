@@ -2010,18 +2010,21 @@ export function VendorsListPage() {
                                         <HoverCardTrigger asChild onClick={(e: React.MouseEvent) => e.stopPropagation()}>
                                           <div className="cursor-pointer"><CarrierIcon carrier={vendor.defaultCarrierVendor} /></div>
                                         </HoverCardTrigger>
-                                        <HoverCardContent side="bottom" align="start" className="w-[240px] p-0 rounded-xl border-0 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
-                                          <div className="px-3.5 py-3 flex items-center gap-3 border-b border-[#F1F5F9]">
-                                            <CarrierIcon carrier={vendor.defaultCarrierVendor} />
-                                            <div className="min-w-0">
-                                              <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{vendor.defaultCarrierVendor}</p>
-                                              <p className="text-[10px] text-[#94A3B8]">Default Vendor Carrier</p>
+                                        <HoverCardContent side="bottom" align="start" className="w-[280px] p-0 rounded-xl border-0 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+                                          <div className="bg-gradient-to-br from-[#1E293B] to-[#334155] px-3.5 py-3 relative overflow-hidden">
+                                            <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-white/[0.04]" />
+                                            <div className="flex items-center gap-3 relative">
+                                              <div className="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center shrink-0 overflow-hidden"><CarrierIcon carrier={vendor.defaultCarrierVendor} /></div>
+                                              <div className="min-w-0">
+                                                <p className="text-[14px] text-white truncate" style={{ fontWeight: 600 }}>{vendor.defaultCarrierVendor}</p>
+                                                <p className="text-[11px] text-[#94A3B8]">Default Vendor Carrier</p>
+                                              </div>
                                             </div>
                                           </div>
-                                          <div className="px-3.5 py-2.5 space-y-1.5 bg-[#FAFBFC]">
-                                            <div className="flex items-center justify-between text-[11px]"><span className="text-[#64748B]">Service Type</span><span className="text-[#0F172A]" style={{ fontWeight: 500 }}>Ground & Express</span></div>
-                                            <div className="flex items-center justify-between text-[11px]"><span className="text-[#64748B]">Avg. Delivery</span><span className="text-[#0F172A]" style={{ fontWeight: 500 }}>3–5 business days</span></div>
-                                            <div className="flex items-center justify-between text-[11px]"><span className="text-[#64748B]">Tracking</span><span className="text-[#059669]" style={{ fontWeight: 500 }}>Available</span></div>
+                                          <div className="bg-white px-3.5 py-3 space-y-2">
+                                            <div className="flex items-center justify-between text-[12px]"><span className="text-[#64748B]">Service Type</span><span className="text-[#0F172A]" style={{ fontWeight: 500 }}>Ground & Express</span></div>
+                                            <div className="flex items-center justify-between text-[12px]"><span className="text-[#64748B]">Avg. Delivery</span><span className="text-[#0F172A]" style={{ fontWeight: 500 }}>3–5 business days</span></div>
+                                            <div className="flex items-center justify-between text-[12px]"><span className="text-[#64748B]">Tracking</span><span className="text-[#059669]" style={{ fontWeight: 500 }}>Available</span></div>
                                           </div>
                                         </HoverCardContent>
                                       </HoverCard>
@@ -2040,18 +2043,21 @@ export function VendorsListPage() {
                                         <HoverCardTrigger asChild onClick={(e: React.MouseEvent) => e.stopPropagation()}>
                                           <div className="cursor-pointer"><CarrierIcon carrier={vendor.defaultCarrierCustomer} /></div>
                                         </HoverCardTrigger>
-                                        <HoverCardContent side="bottom" align="start" className="w-[240px] p-0 rounded-xl border-0 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
-                                          <div className="px-3.5 py-3 flex items-center gap-3 border-b border-[#F1F5F9]">
-                                            <CarrierIcon carrier={vendor.defaultCarrierCustomer} />
-                                            <div className="min-w-0">
-                                              <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{vendor.defaultCarrierCustomer}</p>
-                                              <p className="text-[10px] text-[#94A3B8]">Default Customer Carrier</p>
+                                        <HoverCardContent side="bottom" align="start" className="w-[280px] p-0 rounded-xl border-0 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+                                          <div className="bg-gradient-to-br from-[#1E293B] to-[#334155] px-3.5 py-3 relative overflow-hidden">
+                                            <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-white/[0.04]" />
+                                            <div className="flex items-center gap-3 relative">
+                                              <div className="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center shrink-0 overflow-hidden"><CarrierIcon carrier={vendor.defaultCarrierCustomer} /></div>
+                                              <div className="min-w-0">
+                                                <p className="text-[14px] text-white truncate" style={{ fontWeight: 600 }}>{vendor.defaultCarrierCustomer}</p>
+                                                <p className="text-[11px] text-[#94A3B8]">Default Customer Carrier</p>
+                                              </div>
                                             </div>
                                           </div>
-                                          <div className="px-3.5 py-2.5 space-y-1.5 bg-[#FAFBFC]">
-                                            <div className="flex items-center justify-between text-[11px]"><span className="text-[#64748B]">Service Type</span><span className="text-[#0F172A]" style={{ fontWeight: 500 }}>Standard & Priority</span></div>
-                                            <div className="flex items-center justify-between text-[11px]"><span className="text-[#64748B]">Avg. Delivery</span><span className="text-[#0F172A]" style={{ fontWeight: 500 }}>2–7 business days</span></div>
-                                            <div className="flex items-center justify-between text-[11px]"><span className="text-[#64748B]">Tracking</span><span className="text-[#059669]" style={{ fontWeight: 500 }}>Available</span></div>
+                                          <div className="bg-white px-3.5 py-3 space-y-2">
+                                            <div className="flex items-center justify-between text-[12px]"><span className="text-[#64748B]">Service Type</span><span className="text-[#0F172A]" style={{ fontWeight: 500 }}>Standard & Priority</span></div>
+                                            <div className="flex items-center justify-between text-[12px]"><span className="text-[#64748B]">Avg. Delivery</span><span className="text-[#0F172A]" style={{ fontWeight: 500 }}>2–7 business days</span></div>
+                                            <div className="flex items-center justify-between text-[12px]"><span className="text-[#64748B]">Tracking</span><span className="text-[#059669]" style={{ fontWeight: 500 }}>Available</span></div>
                                           </div>
                                         </HoverCardContent>
                                       </HoverCard>
