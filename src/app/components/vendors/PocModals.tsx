@@ -453,7 +453,7 @@ export function CreatePocModal({
         <DialogDescription className="sr-only">Create a new contact</DialogDescription>
 
         {/* Header */}
-        <div className="px-3 sm:px-5 pt-3 sm:pt-4 pb-3 shrink-0 bg-white rounded-t-none sm:rounded-t-2xl border-b border-[#EEF2F6]">
+        <div className="px-4 sm:px-5 pt-4 pb-3 shrink-0 bg-white rounded-t-none sm:rounded-t-2xl border-b border-border">
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-center gap-3 min-w-0">
               {/* Live avatar preview */}
@@ -503,18 +503,12 @@ export function CreatePocModal({
         </div>
 
         {/* Form body */}
-        <div className="flex-1 overflow-y-auto px-3 sm:px-5 py-4 sm:py-5 bg-[#FAFBFC]">
+        <div className="flex-1 overflow-y-auto px-4 sm:px-5 py-4 sm:py-5 bg-white">
           {/* Personnel Info Section */}
           <div className="mb-5">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-6 h-6 rounded-md bg-[#EBF3FF] flex items-center justify-center shrink-0">
-                <Users className="w-3.5 h-3.5 text-[#0A77FF]" />
-              </div>
-              <span className="text-xs text-[#0F172A]" style={{ fontWeight: 600 }}>Personnel Info</span>
-              
-            </div>
+            <p className="text-[13px] text-[#0F172A] mb-3" style={{ fontWeight: 600 }}>Personnel Info</p>
 
-            <div className="rounded-xl border border-[#E8ECF1] bg-white overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.02)]">
+            <div className="rounded-xl border border-border bg-white overflow-hidden">
               <div className="p-3.5 sm:p-4 space-y-3.5">
                 {/* Name + Department row */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
@@ -542,7 +536,7 @@ export function CreatePocModal({
                       <SelectTrigger className="h-10 rounded-lg border-[#E2E8F0] bg-white text-sm hover:border-[#CBD5E1] transition-colors focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/15 [&>svg]:text-[#94A3B8]">
                         <SelectValue placeholder="Select department" />
                       </SelectTrigger>
-                      <SelectContent className="z-[250] rounded-lg">
+                      <SelectContent className="z-[350] rounded-lg">
                         <SelectItem value="Sales">
                           <span className="flex items-center gap-2">
                             <span className="w-2 h-2 rounded-full bg-[#0A77FF]" />
@@ -589,15 +583,9 @@ export function CreatePocModal({
 
           {/* Contact Details Section */}
           <div>
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-6 h-6 rounded-md bg-[#ECFDF5] flex items-center justify-center shrink-0">
-                <Phone className="w-3.5 h-3.5 text-[#059669]" />
-              </div>
-              <span className="text-xs text-[#0F172A]" style={{ fontWeight: 600 }}>Contact Details</span>
-              
-            </div>
+            <p className="text-[13px] text-[#0F172A] mb-3" style={{ fontWeight: 600 }}>Contact Details</p>
 
-            <div className="rounded-xl border border-[#E8ECF1] bg-white overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.02)]">
+            <div className="rounded-xl border border-border bg-white overflow-hidden">
               <div className="p-3.5 sm:p-4 space-y-3.5">
                 {/* Landline + Ext row */}
                 <div className="grid grid-cols-1 sm:grid-cols-[1fr_120px] gap-3.5">
@@ -614,7 +602,7 @@ export function CreatePocModal({
                             <span className="text-[12px] text-[#475569]" style={{ fontWeight: 500 }}>{newPocLandlineCode}</span>
                           </span>
                         </SelectTrigger>
-                        <SelectContent className="z-[250] rounded-lg">
+                        <SelectContent className="z-[350] rounded-lg">
                           {COUNTRY_CODES.map((cc) => (
                             <SelectItem key={cc.code} value={cc.code}>
                               <span className="flex items-center gap-2">
@@ -669,7 +657,7 @@ export function CreatePocModal({
                             <span className="text-[12px] text-[#475569]" style={{ fontWeight: 500 }}>{newPocMobileCode}</span>
                           </span>
                         </SelectTrigger>
-                        <SelectContent className="z-[250] rounded-lg">
+                        <SelectContent className="z-[350] rounded-lg">
                           {COUNTRY_CODES.map((cc) => (
                             <SelectItem key={cc.code} value={cc.code}>
                               <span className="flex items-center gap-2">
@@ -715,7 +703,7 @@ export function CreatePocModal({
         </div>
 
         {/* Footer */}
-        <div className="shrink-0 border-t border-[#EEF2F6] bg-white px-3 sm:px-5 py-2.5 sm:py-3 flex items-center justify-between sm:rounded-b-2xl">
+        <div className="shrink-0 border-t border-border bg-white px-4 sm:px-5 py-3 flex items-center justify-between sm:rounded-b-2xl">
           <button
             onClick={() => onSaveAndCreateAnotherChange(!saveAndCreateAnother)}
             className="flex items-center gap-2 cursor-pointer select-none group/check"
