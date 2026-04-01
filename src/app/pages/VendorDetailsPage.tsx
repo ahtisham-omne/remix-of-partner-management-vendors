@@ -1689,10 +1689,14 @@ function ContentCard({ title, icon: Icon, count, children, action, currentSize, 
             <Tooltip>
               <TooltipTrigger asChild>
                 <button type="button" className="inline-flex" tabIndex={-1} onClick={(e) => e.stopPropagation()}>
-                  <Info className="w-3 h-3 text-[#CBD5E1] hover:text-[#94A3B8] transition-colors" />
+                  <Info className="w-3 h-3 text-muted-foreground/30 hover:text-muted-foreground/60 transition-colors" />
                 </button>
               </TooltipTrigger>
-              <TooltipContent side="top" sideOffset={6} className="z-[300] max-w-[220px]">
+              <TooltipContent
+                side="bottom"
+                sideOffset={6}
+                className="z-[300] max-w-[260px] rounded-xl bg-white/95 backdrop-blur-md text-[#334155] border border-[#E2E8F0]/80 px-3.5 py-2.5 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.12),0_4px_12px_-4px_rgba(0,0,0,0.05)]"
+              >
                 <p className="text-[11px] leading-relaxed">{tooltip}</p>
               </TooltipContent>
             </Tooltip>
@@ -2447,41 +2451,65 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
             
 
             if (wKey === "spend_trend") {
-            icon = TrendingUp; title = "Spend Trend"; tip = "Monthly spend trend over the current year.";
+            icon = TrendingUp; title = "Spend Trend"; tip = "Tracks total monthly spend with this partner across all purchase orders and invoices. Use this to identify seasonal patterns and budget alignment.";
             cardAction = <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>This Year</span>;
+            const totalYTD = SPEND_TREND_DATA.reduce((s, d) => s + d.amount, 0);
+            const avgMonthly = Math.round(totalYTD / SPEND_TREND_DATA.length);
+            const peakMonth = SPEND_TREND_DATA.reduce((a, b) => a.amount > b.amount ? a : b);
             content = (
-              <div style={{ height: CH[sz] }} className="-ml-2">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={SPEND_TREND_DATA} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
-                    <defs><linearGradient id="spendGradientUniq" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#0A77FF" stopOpacity={0.15} /><stop offset="100%" stopColor="#0A77FF" stopOpacity={0.01} /></linearGradient></defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
-                    <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
-                    <YAxis tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
-                    <ReTooltip contentStyle={{ borderRadius: 8, border: "1px solid #E2E8F0", fontSize: 12 }} formatter={(val: number) => [`$${val.toLocaleString()}`, "Spend"]} />
-                    <Area type="monotone" dataKey="amount" stroke="#0A77FF" strokeWidth={2} fill="url(#spendGradientUniq)" />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
+              <>
+                <div style={{ height: CH[sz] }} className="-ml-2">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={SPEND_TREND_DATA} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
+                      <defs><linearGradient id="spendGradientUniq" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#0A77FF" stopOpacity={0.15} /><stop offset="100%" stopColor="#0A77FF" stopOpacity={0.01} /></linearGradient></defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
+                      <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
+                      <YAxis tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
+                      <ReTooltip contentStyle={{ borderRadius: 8, border: "1px solid #E2E8F0", fontSize: 12 }} formatter={(val: number) => [`$${val.toLocaleString()}`, "Spend"]} />
+                      <Area type="monotone" dataKey="amount" stroke="#0A77FF" strokeWidth={2} fill="url(#spendGradientUniq)" />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+                {sz !== "sm" && (
+                  <div className="flex items-center gap-4 mt-2 pt-2 border-t border-[#F1F5F9]">
+                    <div><p className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>YTD Total</p><p className="text-[14px] text-[#0F172A]" style={{ fontWeight: 700 }}>{formatCurrency(totalYTD)}</p></div>
+                    <div><p className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Monthly Avg</p><p className="text-[14px] text-[#0F172A]" style={{ fontWeight: 700 }}>{formatCurrency(avgMonthly)}</p></div>
+                    {sz === "lg" && <div><p className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Peak</p><p className="text-[14px] text-[#0A77FF]" style={{ fontWeight: 700 }}>{peakMonth.month} · {formatCurrency(peakMonth.amount)}</p></div>}
+                  </div>
+                )}
+              </>
             );
           } else if (wKey === "order_activity") {
-            icon = BarChart3; title = "Order Activity"; tip = "Weekly order and return volume.";
+            icon = BarChart3; title = "Order Activity"; tip = "Shows daily order volume and return rates for the current week. Helps identify peak ordering days and track return patterns for quality monitoring.";
             cardAction = (<div className="flex items-center gap-3"><div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-[#0A77FF]" /><span className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Orders</span></div><div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-[#F59E0B]" /><span className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Returns</span></div></div>);
+            const totalOrders = ORDER_ACTIVITY_DATA.reduce((s, d) => s + d.orders, 0);
+            const totalReturns = ORDER_ACTIVITY_DATA.reduce((s, d) => s + d.returns, 0);
+            const returnPct = totalOrders > 0 ? ((totalReturns / totalOrders) * 100).toFixed(1) : "0";
             content = (
-              <div style={{ height: CH[sz] }} className="-ml-2">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={ORDER_ACTIVITY_DATA} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
-                    <XAxis dataKey="day" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
-                    <YAxis tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
-                    <ReTooltip contentStyle={{ borderRadius: 8, border: "1px solid #E2E8F0", fontSize: 12 }} />
-                    <Bar dataKey="orders" fill="#0A77FF" radius={[4, 4, 0, 0]} barSize={sz === "sm" ? 14 : 24} name="Orders" />
-                    <Bar dataKey="returns" fill="#F59E0B" radius={[4, 4, 0, 0]} barSize={sz === "sm" ? 14 : 24} name="Returns" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
+              <>
+                <div style={{ height: CH[sz] }} className="-ml-2">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={ORDER_ACTIVITY_DATA} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
+                      <XAxis dataKey="day" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
+                      <YAxis tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
+                      <ReTooltip contentStyle={{ borderRadius: 8, border: "1px solid #E2E8F0", fontSize: 12 }} />
+                      <Bar dataKey="orders" fill="#0A77FF" radius={[4, 4, 0, 0]} barSize={sz === "sm" ? 14 : 24} name="Orders" />
+                      <Bar dataKey="returns" fill="#F59E0B" radius={[4, 4, 0, 0]} barSize={sz === "sm" ? 14 : 24} name="Returns" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+                {sz !== "sm" && (
+                  <div className="flex items-center gap-4 mt-2 pt-2 border-t border-[#F1F5F9]">
+                    <div><p className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>This Week</p><p className="text-[14px] text-[#0F172A]" style={{ fontWeight: 700 }}>{totalOrders} orders</p></div>
+                    <div><p className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Returns</p><p className="text-[14px] text-[#F59E0B]" style={{ fontWeight: 700 }}>{totalReturns} ({returnPct}%)</p></div>
+                    {sz === "lg" && <div><p className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Peak Day</p><p className="text-[14px] text-[#0A77FF]" style={{ fontWeight: 700 }}>Thursday · 8</p></div>}
+                  </div>
+                )}
+              </>
             );
           } else if (wKey === "spend_by_category") {
-            icon = PieChart; title = "Spend by Category"; tip = "Total spend breakdown across categories.";
+            icon = PieChart; title = "Spend by Category"; tip = "Breakdown of total partner spend across procurement categories. Identifies which categories drive the most cost and helps with budget allocation and contract negotiations.";
             content = (
               <>
                 <div className="flex items-center gap-4">
@@ -2514,7 +2542,7 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
               </>
             );
           } else if (wKey === "credit_health") {
-            icon = Shield; title = "Credit Health"; tip = "Credit utilization gauge showing available vs used credit.";
+            icon = Shield; title = "Credit Health"; tip = "Shows how much of the approved credit line is currently in use. Utilization above 80% triggers risk alerts. Includes available balance, current usage, and total limit.";
             content = (
               <>
                 <div className="flex items-center justify-between mb-2"><span className="text-[12px] text-[#475569]" style={{ fontWeight: 500 }}>Credit Utilization</span><span className="text-[13px] text-[#0F172A]" style={{ fontWeight: 700 }}>{creditPct}%</span></div>
@@ -2530,7 +2558,7 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
               </>
             );
           } else if (wKey === "delivery_perf") {
-            icon = TrendingUp; title = "Delivery Performance"; tip = "On-time delivery rate trend over time.";
+            icon = TrendingUp; title = "Delivery Performance"; tip = "Tracks the percentage of orders delivered on or before the promised date. Monitors trends over 6 months to identify supply chain reliability improvements or deterioration.";
             content = (
               <>
                 <div style={{ height: CH[sz] }} className="-ml-2">
@@ -2555,7 +2583,7 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
               </>
             );
           } else if (wKey === "invoice_aging") {
-            icon = Receipt; title = "Invoice Aging"; tip = "Overdue invoices grouped by aging bucket.";
+            icon = Receipt; title = "Invoice Aging"; tip = "Groups outstanding invoices by how long they've been overdue: 0-30, 31-60, 61-90, and 90+ days. Higher amounts in older buckets indicate payment collection risk.";
             content = (
               <>
                 <div style={{ height: CH[sz] }} className="-ml-2">
@@ -2586,7 +2614,7 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
               </>
             );
           } else if (wKey === "primary_contact") {
-            icon = Users; title = "Primary Contact"; tip = "Main point of contact and response time trend.";
+            icon = Users; title = "Primary Contact"; tip = "Main point of contact for this partner. Includes contact details and average response time trend across recent weeks to measure communication reliability.";
             content = (
               <>
                 <div className="flex items-start gap-3">
@@ -2619,7 +2647,7 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
               </>
             );
           } else if (wKey === "return_rate") {
-            icon = BarChart3; title = "Return Rate"; tip = "Return and defect rate trends over recent months.";
+            icon = BarChart3; title = "Return Rate"; tip = "Tracks product return percentage and defect rates over the last 6 months. A declining trend indicates improving quality. Rates above 5% may trigger vendor quality reviews.";
             content = (
               <>
                 <div style={{ height: CH[sz] }} className="-ml-2">
@@ -2641,7 +2669,7 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
               </>
             );
           } else if (wKey === "top_items") {
-            icon = Package; title = "Top Items by Spend"; tip = "Highest spend items from this partner.";
+            icon = Package; title = "Top Items by Spend"; tip = "Ranks the top 5 most purchased items by total spend amount. Useful for identifying key SKUs for volume discount negotiations and supply chain risk assessment.";
             content = (
               <div style={{ height: CH[sz] }} className="-ml-2">
                 <ResponsiveContainer width="100%" height="100%">
@@ -2664,7 +2692,7 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
               </div>
             );
           } else if (wKey === "recent_orders") {
-            icon = ClipboardList; title = "Recent Orders"; tip = "Latest purchase orders and their delivery status.";
+            icon = ClipboardList; title = "Recent Orders"; tip = "Shows the 5 most recent purchase orders with their current fulfillment status and value. Color-coded bars indicate delivery status: green (delivered), blue (in transit), amber (pending).";
             content = (
               <>
                 <div style={{ height: CH[sz] }} className="-ml-2">
@@ -2694,7 +2722,7 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
               </>
             );
           } else if (wKey === "payment_history") {
-            icon = Banknote; title = "Payment History"; tip = "Monthly payment and pending amounts trend.";
+            icon = Banknote; title = "Payment History"; tip = "Displays monthly payment amounts (completed) vs pending payments over the last 6 months. The solid green area shows cleared payments, the dashed amber line shows outstanding amounts.";
             content = (
               <>
                 <div style={{ height: CH[sz] }} className="-ml-2">
@@ -2721,7 +2749,7 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
               </>
             );
           } else if (wKey === "compliance_docs") {
-            icon = Shield; title = "Compliance & Documents"; tip = "Document validity status and compliance score.";
+            icon = Shield; title = "Compliance & Documents"; tip = "Overall compliance score based on document validity. Tracks tax forms, insurance certificates, NDAs, and quality certifications. Documents expiring within 30 days are flagged as warnings.";
             content = (
               <>
                 <div className="flex items-center gap-4">
@@ -2760,7 +2788,7 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
             );
           } else if (wKey === "notes") {
             if (!vendor.notes) return null;
-            icon = MessageSquare; title = "Notes & Activity"; tip = "Internal notes and recent activity timeline.";
+            icon = MessageSquare; title = "Notes & Activity"; tip = "Internal partner notes and a chronological timeline of recent activities including payments, deliveries, approvals, and manual annotations by team members.";
             content = (
               <div>
                 <p className={`text-[12px] text-[#475569] leading-relaxed ${sz === "sm" ? "line-clamp-2" : "mb-3"}`}>{vendor.notes}</p>
