@@ -135,80 +135,25 @@ export function PocSectionContent({
             </div>
           </div>
 
-          {/* Contact cards */}
+          {/* Contact cards — standardized design */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
             {selectedContacts.map((contact) => {
-              const dc = DEPT_COLORS[contact.department] || DEPT_COLORS["Sales"];
+              const at = getAvatarTint(contact.avatarColor);
               return (
-                <div
-                  key={contact.id}
-                  className="relative rounded-xl border bg-white group transition-all duration-200 hover:shadow-[0_4px_16px_-2px_rgba(0,0,0,0.08)] overflow-hidden"
-                  style={{ borderColor: "#E8ECF1" }}
-                >
-                  <div className="h-[3px] w-full" style={{ background: `linear-gradient(90deg, ${dc.accent}, ${dc.accent}80)` }} />
-                  <button
-                    onClick={() => onRemove(contact.id)}
-                    className="absolute top-[11px] right-2.5 w-6 h-6 rounded-full bg-white border border-[#F1F5F9] text-[#94A3B8] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-[#FEF2F2] hover:text-[#EF4444] hover:border-[#FECACA] shadow-sm cursor-pointer"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                  <div className="p-3 pt-2.5">
-                    <div className="flex items-start gap-2.5">
-                      <div className="relative">
-                        <div
-                          className="w-10 h-10 rounded-full flex items-center justify-center text-white text-xs shrink-0 shadow-[0_2px_8px_-1px_rgba(0,0,0,0.15)]"
-                          style={{ backgroundColor: contact.avatarColor, fontWeight: 700 }}
-                        >
-                          {getInitials(contact.name)}
-                        </div>
-                        <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-white flex items-center justify-center">
-                          <div className="w-2 h-2 rounded-full bg-[#22C55E]" />
-                        </div>
-                      </div>
-                      <div className="min-w-0 flex-1 pr-5">
+                <div key={contact.id} className="group relative rounded-xl border border-[#E8ECF1] bg-white transition-all duration-200 hover:border-[#BFDBFE] hover:shadow-[0_4px_16px_-4px_rgba(10,119,255,0.10)] overflow-hidden">
+                  <button onClick={() => onRemove(contact.id)} className="absolute top-3 right-3 w-6 h-6 rounded-full bg-white border border-[#F1F5F9] text-[#94A3B8] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-[#FEF2F2] hover:text-[#EF4444] hover:border-[#FECACA] shadow-sm cursor-pointer z-10"><X className="w-3 h-3" /></button>
+                  <div className="p-3.5">
+                    <div className="flex items-center gap-3 pr-6">
+                      <div className="w-9 h-9 rounded-xl flex items-center justify-center text-[10px] shrink-0" style={{ backgroundColor: at.bg, color: at.text, fontWeight: 700 }}>{getInitials(contact.name)}</div>
+                      <div className="min-w-0 flex-1">
                         <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{contact.name}</p>
-                        <span className="text-[10px] text-[#94A3B8] truncate block">{contact.company}</span>
+                        <p className="text-[11px] text-[#334155] truncate" style={{ fontWeight: 500 }}>{contact.department === "Supply Chain Management" ? "Supply Chain" : contact.department} <span className="text-[#CBD5E1]">·</span> <span className="text-[#94A3B8]" style={{ fontWeight: 400 }}>{contact.company}</span></p>
                       </div>
+                      <span className="inline-flex items-center text-[10px] px-2 py-[2px] rounded-full border shrink-0" style={{ fontWeight: 500, backgroundColor: "#ECFDF5", color: "#065F46", borderColor: "#A7F3D0" }}>Active</span>
                     </div>
-                    <div className="mt-2.5 mb-2 flex items-center gap-1.5">
-                      <span
-                        className="inline-flex items-center gap-1 px-2 py-[3px] rounded-full text-[10px]"
-                        style={{ fontWeight: 600, backgroundColor: dc.bg, color: dc.text, border: `1px solid ${dc.border}` }}
-                      >
-                        <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: dc.accent }} />
-                        {contact.department}
-                      </span>
-                      {isGlobal && (
-                        <span className="inline-flex items-center gap-1 px-2 py-[3px] rounded-full text-[10px] bg-[#F0F9FF] text-[#0369A1] border border-[#BAE6FD]" style={{ fontWeight: 600 }}>
-                          <Globe className="w-2.5 h-2.5" />
-                          Global
-                        </span>
-                      )}
-                    </div>
-                    <div className="space-y-1 pt-2 border-t border-[#F1F5F9]">
-                      <div className="flex items-center gap-2 text-[11px] text-[#475569]">
-                        <div className="w-5 h-5 rounded bg-[#F8FAFC] flex items-center justify-center shrink-0">
-                          <Phone className="w-2.5 h-2.5 text-[#94A3B8]" />
-                        </div>
-                        <span className="truncate">{contact.phone}</span>
-                      </div>
-                      {contact.secondaryPhone && (
-                        <div className="flex items-center gap-2 text-[11px] text-[#475569]">
-                          <div className="w-5 h-5 rounded bg-[#F8FAFC] flex items-center justify-center shrink-0">
-                            <PhoneCall className="w-2.5 h-2.5 text-[#94A3B8]" />
-                          </div>
-                          <span className="truncate">{contact.secondaryPhone}</span>
-                          {contact.secondaryPhoneExt && (
-                            <span className="text-[10px] text-[#94A3B8] shrink-0">ext.{contact.secondaryPhoneExt}</span>
-                          )}
-                        </div>
-                      )}
-                      <div className="flex items-center gap-2 text-[11px] text-[#475569]">
-                        <div className="w-5 h-5 rounded bg-[#F8FAFC] flex items-center justify-center shrink-0">
-                          <Mail className="w-2.5 h-2.5 text-[#94A3B8]" />
-                        </div>
-                        <span className="truncate">{contact.email}</span>
-                      </div>
+                    <div className="mt-2.5 pt-2.5 border-t border-[#F1F5F9] space-y-1">
+                      <div className="flex items-center gap-2 text-[11px] text-[#475569]"><Mail className="w-3 h-3 text-[#94A3B8] shrink-0" /><span className="truncate">{contact.email}</span></div>
+                      <div className="flex items-center gap-2 text-[11px] text-[#475569]"><Phone className="w-3 h-3 text-[#94A3B8] shrink-0" /><span>{contact.phone}</span></div>
                     </div>
                   </div>
                 </div>

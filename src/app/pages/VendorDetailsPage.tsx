@@ -6623,78 +6623,22 @@ function ContactsTab({ vendor, cfg }: { vendor: Vendor; cfg?: VendorConfigData }
           <div className="p-4 min-h-0 overflow-y-auto flex-1">
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
               {tabPaginated.map((contact) => {
-                const dc = TAB_DEPT_COLORS[contact.department] || TAB_DEPT_COLORS["Sales"];
                 const at = getTabAvatarTint(contact.avatarColor);
                 return (
-                  <div
-                    key={contact.id}
-                    className="group relative rounded-xl border border-[#E8ECF1] bg-white transition-all duration-200 hover:border-[#BFDBFE] hover:shadow-[0_4px_16px_-4px_rgba(10,119,255,0.10)] overflow-hidden"
-                  >
-                    {/* Remove button */}
-                    <button
-                      onClick={() => handleRemovePoc(contact.id)}
-                      className="absolute top-3 right-3 w-6 h-6 rounded-full bg-white border border-[#F1F5F9] text-[#94A3B8] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-[#FEF2F2] hover:text-[#EF4444] hover:border-[#FECACA] shadow-sm cursor-pointer z-10"
-                    >
-                      <X className="w-3 h-3" />
-                    </button>
-                    <div className="p-4">
-                      {/* Avatar + Name + Company */}
-                      <div className="flex items-start gap-3 pr-6">
-                        <div
-                          className="w-10 h-10 rounded-full flex items-center justify-center text-[11px] shrink-0"
-                          style={{ backgroundColor: at.bg, color: at.text, fontWeight: 700 }}
-                        >
-                          {getTabInitials(contact.name)}
-                        </div>
+                  <div key={contact.id} className="group relative rounded-xl border border-[#E8ECF1] bg-white transition-all duration-200 hover:border-[#BFDBFE] hover:shadow-[0_4px_16px_-4px_rgba(10,119,255,0.10)] overflow-hidden">
+                    <button onClick={() => handleRemovePoc(contact.id)} className="absolute top-3 right-3 w-6 h-6 rounded-full bg-white border border-[#F1F5F9] text-[#94A3B8] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-[#FEF2F2] hover:text-[#EF4444] hover:border-[#FECACA] shadow-sm cursor-pointer z-10"><X className="w-3 h-3" /></button>
+                    <div className="p-3.5">
+                      <div className="flex items-center gap-3 pr-6">
+                        <div className="w-9 h-9 rounded-xl flex items-center justify-center text-[10px] shrink-0" style={{ backgroundColor: at.bg, color: at.text, fontWeight: 700 }}>{getTabInitials(contact.name)}</div>
                         <div className="min-w-0 flex-1">
                           <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{pocHighlightText(contact.name)}</p>
-                          <p className="text-[11px] text-[#64748B] truncate mt-0.5">{pocHighlightText(contact.company)}</p>
+                          <p className="text-[11px] text-[#334155] truncate" style={{ fontWeight: 500 }}>{contact.department === "Supply Chain Management" ? "Supply Chain" : contact.department} <span className="text-[#CBD5E1]">·</span> <span className="text-[#94A3B8]" style={{ fontWeight: 400 }}>{contact.company}</span></p>
                         </div>
+                        <span className="inline-flex items-center text-[10px] px-2 py-[2px] rounded-full border shrink-0" style={{ fontWeight: 500, backgroundColor: "#ECFDF5", color: "#065F46", borderColor: "#A7F3D0" }}>Active</span>
                       </div>
-
-                      {/* Department badge */}
-                      <div className="mt-2.5 mb-3">
-                        <span
-                          className="inline-flex items-center gap-1 px-2 py-[3px] rounded-full text-[10px]"
-                          style={{ fontWeight: 600, backgroundColor: dc.bg, color: dc.text, border: `1px solid ${dc.border}` }}
-                        >
-                          <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: dc.accent }} />
-                          {contact.department === "Supply Chain Management" ? "Supply Chain" : contact.department}
-                        </span>
-                      </div>
-
-                      {/* Contact details */}
-                      <div className="space-y-1.5 pt-2.5 border-t border-[#F1F5F9]">
-                        {contact.phone && (
-                          <div className="flex items-center gap-2 text-[11px] text-[#475569]">
-                            <div className="w-5 h-5 rounded bg-[#F8FAFC] flex items-center justify-center shrink-0">
-                              <Phone className="w-2.5 h-2.5 text-[#94A3B8]" />
-                            </div>
-                            <span className="truncate">{pocHighlightText(contact.phone)}</span>
-                            {contact.phoneExt && (
-                              <span className="text-[10px] text-[#94A3B8] shrink-0">ext.{contact.phoneExt}</span>
-                            )}
-                          </div>
-                        )}
-                        {contact.secondaryPhone && (
-                          <div className="flex items-center gap-2 text-[11px] text-[#475569]">
-                            <div className="w-5 h-5 rounded bg-[#F8FAFC] flex items-center justify-center shrink-0">
-                              <PhoneCall className="w-2.5 h-2.5 text-[#94A3B8]" />
-                            </div>
-                            <span className="truncate">{contact.secondaryPhone}</span>
-                            {contact.secondaryPhoneExt && (
-                              <span className="text-[10px] text-[#94A3B8] shrink-0">ext.{contact.secondaryPhoneExt}</span>
-                            )}
-                          </div>
-                        )}
-                        {contact.email && (
-                          <div className="flex items-center gap-2 text-[11px] text-[#475569]">
-                            <div className="w-5 h-5 rounded bg-[#F8FAFC] flex items-center justify-center shrink-0">
-                              <Mail className="w-2.5 h-2.5 text-[#94A3B8]" />
-                            </div>
-                            <span className="truncate">{pocHighlightText(contact.email)}</span>
-                          </div>
-                        )}
+                      <div className="mt-2.5 pt-2.5 border-t border-[#F1F5F9] space-y-1">
+                        <div className="flex items-center gap-2 text-[11px] text-[#475569]"><Mail className="w-3 h-3 text-[#94A3B8] shrink-0" /><span className="truncate">{pocHighlightText(contact.email)}</span></div>
+                        <div className="flex items-center gap-2 text-[11px] text-[#475569]"><Phone className="w-3 h-3 text-[#94A3B8] shrink-0" /><span>{contact.phone}</span></div>
                       </div>
                     </div>
                   </div>
@@ -6703,68 +6647,46 @@ function ContactsTab({ vendor, cfg }: { vendor: Vendor; cfg?: VendorConfigData }
             </div>
           </div>
         ) : (
-          /* Table view for condensed/comfort */
-          <div className="min-h-0 overflow-auto flex-1">
-            <table className="w-full text-sm">
-              <thead className="sticky top-0 bg-card z-10">
-                <tr className={`bg-muted/30 ${globalPocDensity === "condensed" ? "[&>th]:py-1.5" : "[&>th]:py-2.5"}`}>
-                  <th className="text-left px-4 text-muted-foreground text-xs border-b border-border" style={{ fontWeight: 600 }}>Contact Name</th>
-                  <th className="text-left px-4 text-muted-foreground text-xs border-b border-border" style={{ fontWeight: 600 }}>Company</th>
-                  <th className="text-left px-4 text-muted-foreground text-xs border-b border-border" style={{ fontWeight: 600 }}>Department</th>
-                  <th className="text-left px-4 text-muted-foreground text-xs border-b border-border" style={{ fontWeight: 600 }}>Phone</th>
-                  <th className="text-left px-4 text-muted-foreground text-xs border-b border-border" style={{ fontWeight: 600 }}>Email</th>
-                  <th className="text-right px-4 text-muted-foreground text-xs border-b border-border" style={{ fontWeight: 600 }}>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
+          /* Table view for condensed/comfort — matches listing page */
+          <div className="min-h-0 overflow-auto scrollbar-hide flex-1 border-t border-border">
+            <Table>
+              <TableHeader className="sticky top-0 z-10 bg-white">
+                <TableRow className={`bg-muted/30 hover:bg-muted/30 ${globalPocDensity === "condensed" ? "[&>th]:h-8" : "[&>th]:h-10"}`}>
+                  <TableHead className="min-w-[200px]">Name</TableHead>
+                  <TableHead className="w-[120px]">Department</TableHead>
+                  <TableHead className="w-[200px]">Email</TableHead>
+                  <TableHead className="w-[130px]">Phone</TableHead>
+                  <TableHead className="w-[80px]">Status</TableHead>
+                  <TableHead className="w-[60px]" />
+                </TableRow>
+              </TableHeader>
+              <TableBody>
                 {tabPaginated.map((contact) => {
-                  const dc = TAB_DEPT_COLORS[contact.department] || TAB_DEPT_COLORS["Sales"];
                   const at = getTabAvatarTint(contact.avatarColor);
+                  const isCmf = globalPocDensity === "comfort";
                   return (
-                    <tr key={contact.id} className="hover:bg-[#F8FBFF] transition-colors group">
-                      <td className={`px-4 ${globalPocDensity === "condensed" ? "py-1.5" : "py-2.5"}`}>
-                        <div className="flex items-center gap-2.5">
-                          <div
-                            className={`${globalPocDensity === "condensed" ? "w-6 h-6 text-[9px]" : "w-7 h-7 text-[10px]"} rounded-full flex items-center justify-center shrink-0`}
-                            style={{ backgroundColor: at.bg, color: at.text, fontWeight: 700 }}
-                          >
-                            {getTabInitials(contact.name)}
+                    <TableRow key={contact.id} className={`group ${isCmf ? "[&>td]:py-3 [&>td]:pl-4 [&>td]:pr-2" : "[&>td]:py-1 [&>td]:pl-4 [&>td]:pr-2"}`}>
+                      <TableCell>
+                        <div className={`flex items-center ${isCmf ? "gap-3" : "gap-2.5"}`}>
+                          <div className={`${isCmf ? "w-9 h-9" : "w-8 h-8"} rounded-lg flex items-center justify-center shrink-0 border border-[#E8ECF1]`} style={{ backgroundColor: at.bg, color: at.text, fontSize: isCmf ? 12 : 11, fontWeight: 700 }}>{getTabInitials(contact.name)}</div>
+                          <div className="min-w-0">
+                            <span className={`${isCmf ? "text-[13.5px]" : "text-sm"} truncate block`} style={{ fontWeight: 500 }}>{pocHighlightText(contact.name)}</span>
+                            {isCmf && <span className="text-xs text-muted-foreground/60 truncate block">{contact.company}</span>}
                           </div>
-                          <span className="text-sm text-[#0F172A]" style={{ fontWeight: 500 }}>{pocHighlightText(contact.name)}</span>
                         </div>
-                      </td>
-                      <td className={`px-4 ${globalPocDensity === "condensed" ? "py-1.5" : "py-2.5"}`}>
-                        <span className="text-sm text-[#475569]">{pocHighlightText(contact.company)}</span>
-                      </td>
-                      <td className={`px-4 ${globalPocDensity === "condensed" ? "py-1.5" : "py-2.5"}`}>
-                        <span
-                          className="inline-flex items-center gap-1 px-2 py-[2px] rounded-full text-[10px]"
-                          style={{ fontWeight: 600, backgroundColor: dc.bg, color: dc.text, border: `1px solid ${dc.border}` }}
-                        >
-                          <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: dc.accent }} />
-                          {contact.department === "Supply Chain Management" ? "Supply Chain" : contact.department}
-                        </span>
-                      </td>
-                      <td className={`px-4 ${globalPocDensity === "condensed" ? "py-1.5" : "py-2.5"}`}>
-                        <span className="text-sm text-[#475569] tabular-nums">{contact.phone}</span>
-                        {contact.phoneExt && <span className="text-[10px] text-[#94A3B8] ml-1">ext.{contact.phoneExt}</span>}
-                      </td>
-                      <td className={`px-4 ${globalPocDensity === "condensed" ? "py-1.5" : "py-2.5"}`}>
-                        <span className="text-sm text-[#475569] truncate block max-w-[180px]">{pocHighlightText(contact.email)}</span>
-                      </td>
-                      <td className={`px-4 text-right ${globalPocDensity === "condensed" ? "py-1.5" : "py-2.5"}`}>
-                        <button
-                          onClick={() => handleRemovePoc(contact.id)}
-                          className="w-6 h-6 rounded flex items-center justify-center text-[#94A3B8] hover:text-[#EF4444] hover:bg-[#FEF2F2] cursor-pointer transition-colors opacity-0 group-hover:opacity-100"
-                        >
-                          <X className="w-3.5 h-3.5" />
-                        </button>
-                      </td>
-                    </tr>
+                      </TableCell>
+                      <TableCell><span className={`${isCmf ? "text-[13px]" : "text-sm"} text-[#475569]`}>{contact.department === "Supply Chain Management" ? "SCM" : contact.department}</span></TableCell>
+                      <TableCell><span className={`${isCmf ? "text-[13px]" : "text-sm"} text-muted-foreground truncate block max-w-[180px]`}>{pocHighlightText(contact.email)}</span></TableCell>
+                      <TableCell><span className={`${isCmf ? "text-[13px]" : "text-sm"} text-muted-foreground`}>{contact.phone}</span>{isCmf && contact.phoneExt && <span className="text-xs text-muted-foreground/50 ml-1">ext. {contact.phoneExt}</span>}</TableCell>
+                      <TableCell><span className="inline-flex items-center text-[11px] px-2 py-0.5 rounded-full border" style={{ fontWeight: 500, backgroundColor: "#ECFDF5", color: "#065F46", borderColor: "#A7F3D0" }}>Active</span></TableCell>
+                      <TableCell>
+                        <button onClick={() => handleRemovePoc(contact.id)} className="w-6 h-6 rounded flex items-center justify-center text-[#94A3B8] hover:text-[#EF4444] hover:bg-[#FEF2F2] cursor-pointer transition-colors opacity-0 group-hover:opacity-100"><X className="w-3.5 h-3.5" /></button>
+                      </TableCell>
+                    </TableRow>
                   );
                 })}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
           </div>
         )}
 
