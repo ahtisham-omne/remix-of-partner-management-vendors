@@ -2483,46 +2483,51 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
           } else if (wKey === "spend_by_category") {
             icon = PieChart; title = "Spend by Category"; tip = "Total spend breakdown across categories.";
             content = (
-              <div className={`flex ${sz === "sm" ? "items-center gap-3" : "flex-col items-center gap-4"}`}>
-                <div className="shrink-0 relative" style={{ width: sz === "sm" ? 80 : 150, height: sz === "sm" ? 80 : 150 }}>
-                  <RePieChart width={sz === "sm" ? 80 : 150} height={sz === "sm" ? 80 : 150}>
-                    <Pie data={spendCategories} cx="50%" cy="50%" innerRadius={sz === "sm" ? 24 : 46} outerRadius={sz === "sm" ? 36 : 70} paddingAngle={2} dataKey="value" stroke="none">
-                      {spendCategories.map((_, i) => (<Cell key={`cell-${i}`} fill={PIE_COLORS[i % PIE_COLORS.length]} />))}
-                    </Pie>
-                  </RePieChart>
-                  <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <span className="text-[11px] text-[#0F172A]" style={{ fontWeight: 700 }}>{sz === "sm" ? `$${Math.round(vendor.totalSpent / 1000)}K` : formatCurrency(vendor.totalSpent)}</span>
+              <>
+                <div className="flex items-center gap-4">
+                  <div className="shrink-0 relative" style={{ width: 120, height: 120 }}>
+                    <RePieChart width={120} height={120}>
+                      <Pie data={spendCategories} cx="50%" cy="50%" innerRadius={36} outerRadius={56} paddingAngle={2} dataKey="value" stroke="none">
+                        {spendCategories.map((_, i) => (<Cell key={`cell-${i}`} fill={PIE_COLORS[i % PIE_COLORS.length]} />))}
+                      </Pie>
+                    </RePieChart>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                      <span className="text-[12px] text-[#0F172A]" style={{ fontWeight: 700 }}>{formatCurrency(vendor.totalSpent)}</span>
+                    </div>
                   </div>
-                </div>
-                {sz !== "sm" && (
-                  <div className="w-full space-y-2">
+                  <div className="flex-1 min-w-0 space-y-1.5">
                     {spendCategories.map((cat, idx) => (
                       <div key={cat.name} className="flex items-center justify-between">
-                        <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: PIE_COLORS[idx] }} /><span className="text-[12px] text-[#475569]" style={{ fontWeight: 500 }}>{cat.name}</span></div>
-                        <div className="flex items-center gap-3"><span className="text-[12px] text-[#0F172A]" style={{ fontWeight: 600 }}>{formatCurrency(cat.value)}</span><span className="text-[11px] text-[#94A3B8] w-8 text-right" style={{ fontWeight: 500 }}>{cat.pct}%</span></div>
+                        <div className="flex items-center gap-2"><span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: PIE_COLORS[idx] }} /><span className="text-[11px] text-[#475569]" style={{ fontWeight: 500 }}>{cat.name}</span></div>
+                        <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>{cat.pct}%</span>
                       </div>
                     ))}
                   </div>
+                </div>
+                {sz !== "sm" && (
+                  <div className="flex items-center gap-4 mt-3 pt-2 border-t border-[#F1F5F9]">
+                    {spendCategories.map((cat, idx) => (
+                      <div key={cat.name}><p className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>{cat.name}</p><p className="text-[13px] text-[#0F172A]" style={{ fontWeight: 700 }}>{formatCurrency(cat.value)}</p></div>
+                    ))}
+                  </div>
                 )}
-              </div>
+              </>
             );
           } else if (wKey === "credit_health") {
             icon = Shield; title = "Credit Health"; tip = "Credit utilization gauge showing available vs used credit.";
             content = (
-              <div className="space-y-4">
-                <div>
-                  <div className="flex items-center justify-between mb-2"><span className="text-[12px] text-[#475569]" style={{ fontWeight: 500 }}>Credit Utilization</span><span className="text-[13px] text-[#0F172A]" style={{ fontWeight: 700 }}>{creditPct}%</span></div>
-                  <div className="w-full h-2.5 rounded-full bg-[#F1F5F9] overflow-hidden"><div className="h-full rounded-full transition-all" style={{ width: `${Math.min(creditPct, 100)}%`, backgroundColor: creditPct > 80 ? "#DC2626" : creditPct > 50 ? "#D97706" : "#059669" }} /></div>
-                  <div className="flex items-center justify-between mt-1.5"><span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>$0</span><span className="text-[10px]" style={{ fontWeight: 500, color: creditStatusColor }}>{creditStatusLabel}</span><span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>{formatCurrency(vendor.creditLimit)}</span></div>
-                </div>
+              <>
+                <div className="flex items-center justify-between mb-2"><span className="text-[12px] text-[#475569]" style={{ fontWeight: 500 }}>Credit Utilization</span><span className="text-[13px] text-[#0F172A]" style={{ fontWeight: 700 }}>{creditPct}%</span></div>
+                <div className="w-full h-3 rounded-full bg-[#F1F5F9] overflow-hidden"><div className="h-full rounded-full transition-all" style={{ width: `${Math.min(creditPct, 100)}%`, backgroundColor: creditPct > 80 ? "#DC2626" : creditPct > 50 ? "#D97706" : "#059669" }} /></div>
+                <div className="flex items-center justify-between mt-1.5"><span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>$0</span><span className="text-[10px]" style={{ fontWeight: 500, color: creditStatusColor }}>{creditStatusLabel}</span><span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>{formatCurrency(vendor.creditLimit)}</span></div>
                 {sz !== "sm" && (
-                  <div className="grid grid-cols-3 gap-3 pt-2 border-t border-[#F1F5F9]">
+                  <div className="grid grid-cols-3 gap-3 mt-3 pt-2 border-t border-[#F1F5F9]">
                     <div><p className="text-[10px] text-[#94A3B8] mb-0.5" style={{ fontWeight: 500 }}>Available</p><p className="text-[14px] text-[#0F172A]" style={{ fontWeight: 700 }}>{formatCurrency(Math.max(available, 0))}</p></div>
                     <div><p className="text-[10px] text-[#94A3B8] mb-0.5" style={{ fontWeight: 500 }}>Used</p><p className="text-[14px] text-[#0F172A]" style={{ fontWeight: 700 }}>{formatCurrency(vendor.creditUtilization)}</p></div>
                     <div><p className="text-[10px] text-[#94A3B8] mb-0.5" style={{ fontWeight: 500 }}>Limit</p><p className="text-[14px] text-[#0F172A]" style={{ fontWeight: 700 }}>{formatCurrency(vendor.creditLimit)}</p></div>
                   </div>
                 )}
-              </div>
+              </>
             );
           } else if (wKey === "delivery_perf") {
             icon = TrendingUp; title = "Delivery Performance"; tip = "On-time delivery rate trend over time.";
@@ -2584,22 +2589,28 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
             icon = Users; title = "Primary Contact"; tip = "Main point of contact and response time trend.";
             content = (
               <>
-                <div className="flex items-start gap-3 mb-3">
+                <div className="flex items-start gap-3">
                   <div className="w-9 h-9 rounded-full bg-[#F1F5F9] flex items-center justify-center shrink-0"><span className="text-xs text-[#475569]" style={{ fontWeight: 600 }}>{vendor.primaryContact.name.split(" ").map((n) => n[0]).join("")}</span></div>
                   <div className="min-w-0 flex-1">
                     <p className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>{vendor.primaryContact.name}</p>
                     <p className="text-[11px] text-[#64748B] mt-0.5">{vendor.primaryContact.designation}</p>
-                    {sz !== "sm" && <div className="flex items-center gap-3 mt-1.5"><div className="flex items-center gap-1.5 text-[11px] text-[#334155]"><Mail className="w-3 h-3 text-[#94A3B8]" />{vendor.primaryContact.email || "—"}</div></div>}
+                    {sz !== "sm" && (
+                      <div className="flex items-center gap-3 mt-1">
+                        <div className="flex items-center gap-1.5 text-[11px] text-[#334155]"><Mail className="w-3 h-3 text-[#94A3B8]" />{vendor.primaryContact.email || "—"}</div>
+                        <div className="flex items-center gap-1.5 text-[11px] text-[#334155]"><Phone className="w-3 h-3 text-[#94A3B8]" />{vendor.primaryContact.phone || "—"}</div>
+                      </div>
+                    )}
                   </div>
                 </div>
                 {sz !== "sm" && (
-                  <div style={{ height: sz === "lg" ? 160 : 100 }} className="-ml-2 border-t border-[#F1F5F9] pt-2">
+                  <div style={{ height: CH[sz] }} className="-ml-2 mt-3 border-t border-[#F1F5F9] pt-2">
                     <p className="text-[10px] text-[#94A3B8] mb-1 ml-2" style={{ fontWeight: 500 }}>Response Time (hours)</p>
-                    <ResponsiveContainer width="100%" height="80%">
+                    <ResponsiveContainer width="100%" height="85%">
                       <LineChart data={[{ week: "W1", hours: 4.2 }, { week: "W2", hours: 3.8 }, { week: "W3", hours: 2.5 }, { week: "W4", hours: 3.1 }, { week: "W5", hours: 1.8 }, { week: "W6", hours: 2.2 }]} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
                         <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
                         <XAxis dataKey="week" tick={{ fontSize: 10, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
                         <YAxis tick={{ fontSize: 10, fill: "#94A3B8" }} axisLine={false} tickLine={false} domain={[0, 6]} />
+                        <ReTooltip contentStyle={{ borderRadius: 8, border: "1px solid #E2E8F0", fontSize: 11 }} formatter={(v: number) => [`${v}h`, "Avg"]} />
                         <Line type="monotone" dataKey="hours" stroke="#7C3AED" strokeWidth={2} dot={{ r: 3, fill: "#7C3AED" }} />
                       </LineChart>
                     </ResponsiveContainer>
@@ -2656,7 +2667,7 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
             icon = ClipboardList; title = "Recent Orders"; tip = "Latest purchase orders and their delivery status.";
             content = (
               <>
-                <div style={{ height: CH[sz] }} className="-ml-2 mb-2">
+                <div style={{ height: CH[sz] }} className="-ml-2">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={[
                       { po: "28180", amount: Math.round(vendor.totalSpent * 0.04) }, { po: "28255", amount: Math.round(vendor.totalSpent * 0.07) },
@@ -2666,13 +2677,20 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
                       <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
                       <XAxis dataKey="po" tick={{ fontSize: 9, fill: "#94A3B8" }} axisLine={false} tickLine={false} tickFormatter={(v) => `PO-${v}`} />
                       <YAxis tick={{ fontSize: 10, fill: "#94A3B8" }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
-                      <Bar dataKey="amount" radius={[4, 4, 0, 0]} barSize={sz === "sm" ? 12 : 20}>
+                      <ReTooltip contentStyle={{ borderRadius: 8, border: "1px solid #E2E8F0", fontSize: 12 }} formatter={(v: number) => [`$${v.toLocaleString()}`, "Amount"]} />
+                      <Bar dataKey="amount" radius={[4, 4, 0, 0]} barSize={sz === "sm" ? 16 : 24}>
                         {[0, 1, 2, 3, 4].map((i) => (<Cell key={i} fill={[1, 2, 4].includes(i) ? "#059669" : i === 3 ? "#0A77FF" : "#D97706"} />))}
                       </Bar>
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
-                <div className="flex items-center gap-3"><div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#059669]" /><span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Delivered</span></div><div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#0A77FF]" /><span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>In Transit</span></div><div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#D97706]" /><span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Pending</span></div></div>
+                {sz !== "sm" && (
+                  <div className="flex items-center gap-3 mt-2 pt-2 border-t border-[#F1F5F9]">
+                    <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#059669]" /><span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Delivered</span></div>
+                    <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#0A77FF]" /><span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>In Transit</span></div>
+                    <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#D97706]" /><span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Pending</span></div>
+                  </div>
+                )}
               </>
             );
           } else if (wKey === "payment_history") {
@@ -2706,15 +2724,15 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
             icon = Shield; title = "Compliance & Documents"; tip = "Document validity status and compliance score.";
             content = (
               <>
-                <div className="flex items-center gap-4 mb-3">
-                  <div className="shrink-0 relative" style={{ width: sz === "sm" ? 70 : 100, height: sz === "sm" ? 70 : 100 }}>
-                    <RePieChart width={sz === "sm" ? 70 : 100} height={sz === "sm" ? 70 : 100}>
-                      <Pie data={[{ value: 75 }, { value: 25 }]} cx="50%" cy="50%" innerRadius={sz === "sm" ? 22 : 32} outerRadius={sz === "sm" ? 32 : 44} startAngle={90} endAngle={-270} dataKey="value" stroke="none">
+                <div className="flex items-center gap-4">
+                  <div className="shrink-0 relative" style={{ width: 90, height: 90 }}>
+                    <RePieChart width={90} height={90}>
+                      <Pie data={[{ value: 75 }, { value: 25 }]} cx="50%" cy="50%" innerRadius={28} outerRadius={40} startAngle={90} endAngle={-270} dataKey="value" stroke="none">
                         <Cell fill="#059669" /><Cell fill="#F1F5F9" />
                       </Pie>
                     </RePieChart>
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
-                      <span className={`text-[#059669] ${sz === "sm" ? "text-[12px]" : "text-[16px]"}`} style={{ fontWeight: 700 }}>75%</span>
+                      <span className="text-[14px] text-[#059669]" style={{ fontWeight: 700 }}>75%</span>
                     </div>
                   </div>
                   <div className="space-y-1.5 flex-1 min-w-0">
@@ -2724,7 +2742,7 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
                   </div>
                 </div>
                 {sz !== "sm" && (
-                  <div className="space-y-2 border-t border-[#F1F5F9] pt-2.5">
+                  <div className="space-y-2 mt-3 border-t border-[#F1F5F9] pt-2.5">
                     {[
                       { name: "W-9 Tax Form", status: "Valid", sc: "#059669", sb: "#ECFDF5" },
                       { name: "Certificate of Insurance", status: "Valid", sc: "#059669", sb: "#ECFDF5" },
