@@ -157,25 +157,25 @@ const QUICK_FILTER_OPTIONS: { key: QuickFilter; label: string; showCount: boolea
 
 /* ─── Column configuration for the data table ─── */
 const COLUMN_DEFS: (ColumnConfig & { minWidth: string; sortable?: boolean; align?: "left" | "right" })[] = [
-  { key: "partner_name", label: "Partners", minWidth: "220px", sortable: true },
-  { key: "partner_type", label: "Partner Type", minWidth: "160px", sortable: true },
-  { key: "vendor_sub_types", label: "Vendor Sub-Types", minWidth: "200px" },
-  { key: "customer_sub_types", label: "Customer Sub-Types", minWidth: "200px" },
+  { key: "partner_name", label: "Partners", minWidth: "240px", sortable: true },
+  { key: "partner_type", label: "Partner Type", minWidth: "140px", sortable: true },
+  { key: "vendor_sub_types", label: "Vendor Sub-Types", minWidth: "170px" },
+  { key: "customer_sub_types", label: "Customer Sub-Types", minWidth: "170px" },
   { key: "num_items", label: "No. of Items", minWidth: "180px", sortable: true },
-  { key: "partner_locations", label: "Partner Locations", minWidth: "200px", sortable: true },
+  { key: "partner_locations", label: "Partner Locations", minWidth: "190px", sortable: true },
   { key: "global_contacts", label: "Global Point of Contacts", minWidth: "200px" },
-  { key: "partner_group", label: "Partner Group", minWidth: "120px" },
-  { key: "net_profit", label: "Net Profit / Net Margin ($)", minWidth: "170px", sortable: true, align: "right" },
+  { key: "partner_group", label: "Partner Group", minWidth: "130px" },
+  { key: "net_profit", label: "Net Profit ($)", minWidth: "130px", sortable: true, align: "right" },
   { key: "credit_limit", label: "Credit Limit ($)", minWidth: "130px", sortable: true, align: "right" },
-  { key: "credit_utilization", label: "Credit Utilization ($)", minWidth: "150px", sortable: true, align: "right" },
-  { key: "services", label: "Services", minWidth: "130px" },
-  { key: "carrier_vendor", label: "Default Carrier (Vendor)", minWidth: "220px" },
-  { key: "carrier_customer", label: "Default Carrier (Customer)", minWidth: "220px" },
-  { key: "country", label: "Country", minWidth: "140px" },
-  { key: "website", label: "Website", minWidth: "160px" },
-  { key: "email", label: "Email Address", minWidth: "220px" },
-  { key: "created_by", label: "Created By", minWidth: "180px" },
-  { key: "created_on", label: "Created On", minWidth: "130px" },
+  { key: "credit_utilization", label: "Credit Util. ($)", minWidth: "130px", sortable: true, align: "right" },
+  { key: "services", label: "Services", minWidth: "140px" },
+  { key: "carrier_vendor", label: "Carrier (Vendor)", minWidth: "180px" },
+  { key: "carrier_customer", label: "Carrier (Customer)", minWidth: "180px" },
+  { key: "country", label: "Country", minWidth: "150px" },
+  { key: "website", label: "Website", minWidth: "150px" },
+  { key: "email", label: "Email", minWidth: "200px" },
+  { key: "created_by", label: "Created By", minWidth: "170px" },
+  { key: "created_on", label: "Created On", minWidth: "120px" },
   { key: "status", label: "Status", minWidth: "90px" },
 ];
 
@@ -1617,7 +1617,7 @@ export function VendorsListPage() {
                   <Table style={{ tableLayout: "fixed", width: `${CHECKBOX_COL_WIDTH + visibleColumns.reduce((sum, key) => sum + (columnWidths[key] ?? parseInt(colDef(key).minWidth, 10)), 0) + 60}px` }}>
                     <TableHeader className="sticky top-0 z-20 bg-card">
                       <TableRow className={`bg-muted/30 hover:bg-muted/30 ${
-                        density === "condensed" ? "[&>th]:h-8" : density === "comfort" ? "[&>th]:h-11" : ""
+                        density === "condensed" ? "[&>th]:h-8" : density === "comfort" ? "[&>th]:h-9" : ""
                       }`}>
                         {/* Checkbox column — sticky leftmost */}
                         <TableHead
@@ -1871,7 +1871,7 @@ export function VendorsListPage() {
                                           }))}
                                           onItemClick={(item) => setQuickViewData({ type: "item", item, vendorName: vendor.displayName })}
                                         >
-                                          <span className="text-xs shrink-0 cursor-default" style={{ fontWeight: 500, color: '#085FCC' }}>+{extraItems} more</span>
+                                          <span className="text-[11px] shrink-0 cursor-default leading-none" style={{ fontWeight: 600, color: '#085FCC' }}>+{extraItems}</span>
                                         </OverflowTooltip>
                                       )}
                                     </div>
@@ -1900,7 +1900,7 @@ export function VendorsListPage() {
                                           }))}
                                           onItemClick={(item) => setQuickViewData({ type: "location", item, vendorName: vendor.displayName })}
                                         >
-                                          <span className="text-xs shrink-0 cursor-default" style={{ fontWeight: 500, color: '#085FCC' }}>+{extraLocations} more</span>
+                                          <span className="text-[11px] shrink-0 cursor-default leading-none" style={{ fontWeight: 600, color: '#085FCC' }}>+{extraLocations}</span>
                                         </OverflowTooltip>
                                       )}
                                     </div>
@@ -1937,7 +1937,7 @@ export function VendorsListPage() {
                                               })}
                                               onItemClick={(item) => setQuickViewData({ type: "contact", item, vendorName: vendor.displayName })}
                                             >
-                                              <span className="text-xs shrink-0 cursor-default" style={{ fontWeight: 500, color: '#085FCC' }}>+{extraContacts} more</span>
+                                              <span className="text-[11px] shrink-0 cursor-default leading-none" style={{ fontWeight: 600, color: '#085FCC' }}>+{extraContacts}</span>
                                             </OverflowTooltip>
                                           )}
                                         </>
@@ -2043,7 +2043,7 @@ export function VendorsListPage() {
                                 density === "condensed"
                                   ? "[&>td]:py-1 [&>td]:pl-4 [&>td]:pr-2"
                                   : density === "comfort"
-                                  ? "[&>td]:py-3 [&>td]:pl-4 [&>td]:pr-3"
+                                  ? "[&>td]:py-2 [&>td]:pl-4 [&>td]:pr-2"
                                   : ""
                               } ${newlyCreatedId === vendor.id ? "animate-row-flash" : ""}`}
                               onClick={() => navigate(`/vendors/${vendor.id}`)}
