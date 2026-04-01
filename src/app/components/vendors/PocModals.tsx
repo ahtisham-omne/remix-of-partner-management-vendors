@@ -537,14 +537,30 @@ export function CreatePocModal({
                       <SelectContent className="z-[350] rounded-lg max-h-[240px]">{DEFAULT_DEPARTMENTS.map((d) => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent>
                     </Select>
                   </div>
-                  <div>
-                    <label className="text-xs sm:text-[13px] text-[#0F172A] mb-1 flex items-center gap-1" style={{ fontWeight: 500 }}><Linkedin className="w-3 h-3 text-[#0A66C2]" />LinkedIn</label>
-                    <Input value={linkedin} onChange={(e) => setLinkedin(e.target.value)} placeholder="linkedin.com/in/username" className={inputCls} />
-                  </div>
-                  <div>
-                    <label className="text-xs sm:text-[13px] text-[#0F172A] mb-1 flex items-center gap-1" style={{ fontWeight: 500 }}><Globe className="w-3 h-3 text-[#64748B]" />Website</label>
-                    <Input value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="https://example.com" className={inputCls} />
-                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ── Social Profiles — boxed card ── */}
+          <div className="rounded-lg border border-[#E2E8F0] bg-white overflow-hidden shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
+            <div className="px-3 sm:px-4 py-2 sm:py-2.5 border-b border-[#EEF2F6] flex items-center gap-2 bg-[#FAFBFC]">
+              <div className="w-6 h-6 rounded-md bg-[#F5F3FF] flex items-center justify-center shrink-0"><Globe className="w-3.5 h-3.5 text-[#7C3AED]" /></div>
+              <span className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Social Profiles</span>
+            </div>
+            <div className="px-3 sm:px-4 py-2.5">
+              <div className="grid grid-cols-1 min-[480px]:grid-cols-2 gap-x-3 sm:gap-x-4 gap-y-2.5 sm:gap-y-3">
+                <div>
+                  <label className="text-xs sm:text-[13px] text-[#0F172A] mb-1 flex items-center gap-1" style={{ fontWeight: 500 }}><Linkedin className="w-3 h-3 text-[#0A66C2]" />LinkedIn</label>
+                  <Input value={linkedin} onChange={(e) => setLinkedin(e.target.value)} placeholder="linkedin.com/in/username" className={inputCls} />
+                </div>
+                <div>
+                  <label className="text-xs sm:text-[13px] text-[#0F172A] mb-1 flex items-center gap-1" style={{ fontWeight: 500 }}><Twitter className="w-3 h-3 text-[#1DA1F2]" />Twitter / X</label>
+                  <Input value={twitter} onChange={(e) => setTwitter(e.target.value)} placeholder="@username" className={inputCls} />
+                </div>
+                <div>
+                  <label className="text-xs sm:text-[13px] text-[#0F172A] mb-1 flex items-center gap-1" style={{ fontWeight: 500 }}><Globe className="w-3 h-3 text-[#64748B]" />Website</label>
+                  <Input value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="https://example.com" className={inputCls} />
                 </div>
               </div>
             </div>
