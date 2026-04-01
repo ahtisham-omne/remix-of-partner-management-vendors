@@ -38,6 +38,11 @@ import {
   SelectValue,
 } from "../components/ui/select";
 import {
+  HoverCard,
+  HoverCardTrigger,
+  HoverCardContent,
+} from "../components/ui/hover-card";
+import {
   Table,
   TableBody,
   TableCell,
@@ -94,6 +99,7 @@ import {
   MapPin,
   Package,
   Mail,
+  Building2,
   ClipboardList,
   FileText,
   FileUp,
@@ -1907,8 +1913,30 @@ export function VendorsListPage() {
                                     <div className={`flex items-center ${isRelaxed ? "gap-2.5" : "gap-2"}`}>
                                       {globalPointOfContacts.length > 0 ? (
                                         <>
-                                          {(() => { const photoUrl = getPersonAvatar(globalPointOfContacts[0]?.name || ""); const t = getAvatarTint(globalPointOfContacts[0]?.name || ""); return (
-                                          <LogoAvatar logoUrl={photoUrl} initials={globalPointOfContacts[0]?.initials || "?"} bg={t.bg} size={isRelaxed ? "lg" : "md"} type="person" />
+                                          {(() => { const poc = globalPointOfContacts[0]; const photoUrl = getPersonAvatar(poc?.name || ""); const t = getAvatarTint(poc?.name || ""); return (
+                                          <HoverCard>
+                                            <HoverCardTrigger asChild onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+                                              <div className="cursor-pointer"><LogoAvatar logoUrl={photoUrl} initials={poc?.initials || "?"} bg={t.bg} size={isRelaxed ? "lg" : "md"} type="person" /></div>
+                                            </HoverCardTrigger>
+                                            <HoverCardContent side="bottom" align="start" className="w-[260px] p-0 rounded-xl border border-[#E2E8F0]/80 shadow-[0_8px_30px_rgba(0,0,0,0.12)]" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+                                              <div className="p-3.5">
+                                                <div className="flex items-center gap-3">
+                                                  <div className="w-10 h-10 rounded-lg overflow-hidden border border-[#E8ECF1] shrink-0" style={{ backgroundColor: photoUrl ? "transparent" : t.bg }}>
+                                                    {photoUrl ? <img src={photoUrl} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-[12px] text-[#334155]" style={{ fontWeight: 700 }}>{poc?.initials}</div>}
+                                                  </div>
+                                                  <div className="min-w-0">
+                                                    <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{poc?.name}</p>
+                                                    {(poc as any)?.role && <p className="text-[11px] text-[#64748B] truncate">{(poc as any).role}</p>}
+                                                  </div>
+                                                </div>
+                                                <div className="mt-3 pt-2.5 border-t border-[#F1F5F9] space-y-1.5">
+                                                  {(poc as any)?.email && <div className="flex items-center gap-2 text-[11px] text-[#334155]"><Mail className="w-3 h-3 text-[#94A3B8] shrink-0" /><span className="truncate">{(poc as any).email}</span></div>}
+                                                  {(poc as any)?.phone && <div className="flex items-center gap-2 text-[11px] text-[#334155]"><Phone className="w-3 h-3 text-[#94A3B8] shrink-0" /><span>{(poc as any).phone}</span></div>}
+                                                  {(poc as any)?.department && <div className="flex items-center gap-2 text-[11px] text-[#334155]"><Building2 className="w-3 h-3 text-[#94A3B8] shrink-0" /><span>{(poc as any).department}</span></div>}
+                                                </div>
+                                              </div>
+                                            </HoverCardContent>
+                                          </HoverCard>
                                           ); })()}
                                           <div className="min-w-0">
                                             <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate block max-w-[90px]`}>{highlightText(globalPointOfContacts[0]?.name)}</span>
@@ -1961,7 +1989,22 @@ export function VendorsListPage() {
                                 return (
                                   <TableCell key={colKey}>
                                     <div className={`flex items-center ${isRelaxed ? "gap-2.5" : "gap-2"}`}>
-                                      <CarrierIcon carrier={vendor.defaultCarrierVendor} />
+                                      <HoverCard>
+                                        <HoverCardTrigger asChild onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+                                          <div className="cursor-pointer"><CarrierIcon carrier={vendor.defaultCarrierVendor} /></div>
+                                        </HoverCardTrigger>
+                                        <HoverCardContent side="bottom" align="start" className="w-[220px] p-0 rounded-xl border border-[#E2E8F0]/80 shadow-[0_8px_30px_rgba(0,0,0,0.12)]" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+                                          <div className="p-3.5">
+                                            <div className="flex items-center gap-3">
+                                              <CarrierIcon carrier={vendor.defaultCarrierVendor} />
+                                              <div className="min-w-0">
+                                                <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{vendor.defaultCarrierVendor}</p>
+                                                <p className="text-[11px] text-[#64748B]">Default Vendor Carrier</p>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </HoverCardContent>
+                                      </HoverCard>
                                       <div className="min-w-0">
                                         <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate block max-w-[160px]`} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{vendor.defaultCarrierVendor}</span>
                                         {isRelaxed && <span className="text-[10px] text-muted-foreground/50 block">Vendor Carrier</span>}
@@ -1973,7 +2016,22 @@ export function VendorsListPage() {
                                 return (
                                   <TableCell key={colKey}>
                                     <div className={`flex items-center ${isRelaxed ? "gap-2.5" : "gap-2"}`}>
-                                      <CarrierIcon carrier={vendor.defaultCarrierCustomer} />
+                                      <HoverCard>
+                                        <HoverCardTrigger asChild onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+                                          <div className="cursor-pointer"><CarrierIcon carrier={vendor.defaultCarrierCustomer} /></div>
+                                        </HoverCardTrigger>
+                                        <HoverCardContent side="bottom" align="start" className="w-[220px] p-0 rounded-xl border border-[#E2E8F0]/80 shadow-[0_8px_30px_rgba(0,0,0,0.12)]" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+                                          <div className="p-3.5">
+                                            <div className="flex items-center gap-3">
+                                              <CarrierIcon carrier={vendor.defaultCarrierCustomer} />
+                                              <div className="min-w-0">
+                                                <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{vendor.defaultCarrierCustomer}</p>
+                                                <p className="text-[11px] text-[#64748B]">Default Customer Carrier</p>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </HoverCardContent>
+                                      </HoverCard>
                                       <div className="min-w-0">
                                         <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate block max-w-[160px]`} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{vendor.defaultCarrierCustomer}</span>
                                         {isRelaxed && <span className="text-[10px] text-muted-foreground/50 block">Customer Carrier</span>}
@@ -2003,8 +2061,25 @@ export function VendorsListPage() {
                                     <div className={`flex items-center ${isRelaxed ? "gap-2.5" : "gap-2"}`}>
                                       {vendor.createdByContact ? (
                                         <>
-                                          {(() => { const photoUrl = getPersonAvatar(vendor.createdByContact.name || ""); const t = getAvatarTint(vendor.createdByContact.name || ""); return (
-                                          <LogoAvatar logoUrl={photoUrl} initials={vendor.createdByContact.initials || "?"} bg={t.bg} size={isRelaxed ? "lg" : "md"} type="person" />
+                                          {(() => { const cb = vendor.createdByContact; const photoUrl = getPersonAvatar(cb.name || ""); const t = getAvatarTint(cb.name || ""); return (
+                                          <HoverCard>
+                                            <HoverCardTrigger asChild onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+                                              <div className="cursor-pointer"><LogoAvatar logoUrl={photoUrl} initials={cb.initials || "?"} bg={t.bg} size={isRelaxed ? "lg" : "md"} type="person" /></div>
+                                            </HoverCardTrigger>
+                                            <HoverCardContent side="bottom" align="start" className="w-[240px] p-0 rounded-xl border border-[#E2E8F0]/80 shadow-[0_8px_30px_rgba(0,0,0,0.12)]" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+                                              <div className="p-3.5">
+                                                <div className="flex items-center gap-3">
+                                                  <div className="w-10 h-10 rounded-lg overflow-hidden border border-[#E8ECF1] shrink-0" style={{ backgroundColor: photoUrl ? "transparent" : t.bg }}>
+                                                    {photoUrl ? <img src={photoUrl} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-[12px] text-[#334155]" style={{ fontWeight: 700 }}>{cb.initials}</div>}
+                                                  </div>
+                                                  <div className="min-w-0">
+                                                    <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{cb.name}</p>
+                                                    <p className="text-[11px] text-[#64748B]">{(cb as any).role || "Team Member"}</p>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            </HoverCardContent>
+                                          </HoverCard>
                                           ); })()}
                                           <div className="min-w-0">
                                             <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate block max-w-[120px]`} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{highlightText(vendor.createdByContact.name)}</span>
