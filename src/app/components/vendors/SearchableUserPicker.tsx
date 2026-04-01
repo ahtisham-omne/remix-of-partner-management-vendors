@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { Search, X, Users, Shield, Plus, Bell, Info } from "lucide-react";
+import { Search, X, Users, Shield, Plus, Bell, Info, Mail, ChevronDown } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "../ui/dialog";
 import { Tooltip, TooltipTrigger, TooltipContent } from "../ui/tooltip";
 import { SYSTEM_USERS, SYSTEM_ROLES, type LicenseType, type UserStatus } from "./partnerConstants";
@@ -26,7 +26,7 @@ function LicenseBadge({ type }: { type: LicenseType }) {
   };
   const s = styles[type];
   return (
-    <span className="inline-flex items-center text-[10px] px-1.5 py-[2px] rounded-md border shrink-0" style={{ fontWeight: 500, backgroundColor: s.bg, color: s.text, borderColor: s.border }}>
+    <span className="inline-flex items-center text-[11px] px-2 py-0.5 rounded-md border shrink-0" style={{ fontWeight: 500, backgroundColor: s.bg, color: s.text, borderColor: s.border }}>
       {type}
     </span>
   );
@@ -36,7 +36,7 @@ function StatusPill({ status }: { status: UserStatus }) {
   const isActive = status === "Active";
   return (
     <span
-      className="inline-flex items-center text-[10px] px-2 py-[2px] rounded-full border shrink-0"
+      className="inline-flex items-center text-[11px] px-2.5 py-0.5 rounded-full border shrink-0"
       style={{
         fontWeight: 500,
         backgroundColor: isActive ? "#ECFDF5" : "#F1F5F9",
@@ -118,12 +118,16 @@ export function SearchableUserPicker({
   const showUsersInList = listFilter === "all" || listFilter === "users";
   const hasActiveFilters = deptFilter !== "all" || licenseFilter !== "all" || statusFilter !== "all";
 
+  // Shared select style for filter dropdowns
+  const selectCls = "text-[12px] text-[#334155] bg-white border border-[#E2E8F0] rounded-lg px-3 py-1.5 outline-none cursor-pointer appearance-none pr-7 hover:border-[#CBD5E1] transition-colors";
+  const selectBg = { backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat", backgroundPosition: "right 8px center" } as React.CSSProperties;
+
   return (
     <div>
       <div className="flex items-center justify-between mb-2">
-        <p className="text-[11px] text-[#334155]" style={{ fontWeight: 600 }}>{label}</p>
+        <p className="text-[12px] text-[#334155]" style={{ fontWeight: 600 }}>{label}</p>
         {totalSelected > 0 && (
-          <span className="text-[10px] px-1.5 py-0.5 rounded-full" style={{ fontWeight: 600, backgroundColor: accentBg, color: accentText }}>
+          <span className="text-[11px] px-2 py-0.5 rounded-full" style={{ fontWeight: 600, backgroundColor: accentBg, color: accentText }}>
             {totalSelected} recipient{totalSelected !== 1 ? "s" : ""}
           </span>
         )}
@@ -136,7 +140,7 @@ export function SearchableUserPicker({
             <div className="flex items-center gap-1 mb-2">
               {(["all", "roles", "users"] as const).map((f) => (
                 <button key={f} type="button" onClick={() => setListFilter(f)}
-                  className={`px-2 py-0.5 rounded-full text-[9px] border transition-colors ${listFilter === f ? "border-[#0A77FF] text-[#0A77FF] bg-[#EDF4FF]" : "border-[#E2E8F0] text-[#94A3B8] bg-white hover:bg-[#F8FAFC]"}`}
+                  className={`px-2.5 py-1 rounded-full text-[11px] border transition-colors ${listFilter === f ? "border-[#0A77FF] text-[#0A77FF] bg-[#EDF4FF]" : "border-[#E2E8F0] text-[#94A3B8] bg-white hover:bg-[#F8FAFC]"}`}
                   style={{ fontWeight: listFilter === f ? 600 : 500 }}
                 >{f === "all" ? `All (${totalSelected})` : f === "roles" ? `Roles (${selectedRoles.length})` : `Users (${selectedUsers.length})`}</button>
               ))}
@@ -145,7 +149,7 @@ export function SearchableUserPicker({
           {showRolesInList && selectedRoles.length > 0 && (
             <>
               {listFilter === "all" && selectedUsers.length > 0 && (
-                <div className="flex items-center gap-1.5 mb-1 mt-1"><Shield className="w-3 h-3 text-[#94A3B8]" /><span className="text-[9px] text-[#94A3B8] uppercase tracking-wide" style={{ fontWeight: 600 }}>Roles</span></div>
+                <div className="flex items-center gap-1.5 mb-1 mt-1"><Shield className="w-3 h-3 text-[#94A3B8]" /><span className="text-[10px] text-[#94A3B8] uppercase tracking-wide" style={{ fontWeight: 600 }}>Roles</span></div>
               )}
               <div className="space-y-1">
                 {selectedRoles.map((role, i) => {
@@ -153,10 +157,10 @@ export function SearchableUserPicker({
                   return (
                     <div key={role.id} className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg border border-[#F1F5F9] bg-white">
                       <div className="w-6 h-6 rounded-md flex items-center justify-center shrink-0" style={{ backgroundColor: c.bg }}><Shield className="w-3 h-3" style={{ color: c.text }} /></div>
-                      <p className="text-[11px] text-[#0F172A] truncate flex-1" style={{ fontWeight: 600 }}>{role.name}</p>
+                      <p className="text-[12px] text-[#0F172A] truncate flex-1" style={{ fontWeight: 600 }}>{role.name}</p>
                       <LicenseBadge type={role.licenseType} />
                       <StatusPill status={role.status} />
-                      <span className="text-[9px] px-1.5 py-[2px] rounded-full bg-[#F1F5F9] text-[#64748B] shrink-0" style={{ fontWeight: 500 }}>{role.userCount} users</span>
+                      <span className="text-[10px] px-1.5 py-[2px] rounded-full bg-[#F1F5F9] text-[#64748B] shrink-0" style={{ fontWeight: 500 }}>{role.userCount} users</span>
                       <button onClick={() => remove(role.id)} className="p-0.5 rounded hover:bg-[#FEF2F2] transition-colors cursor-pointer shrink-0"><X className="w-3 h-3 text-[#CBD5E1] hover:text-[#EF4444]" /></button>
                     </div>
                   );
@@ -167,7 +171,7 @@ export function SearchableUserPicker({
           {showUsersInList && selectedUsers.length > 0 && (
             <>
               {listFilter === "all" && selectedRoles.length > 0 && (
-                <div className="flex items-center gap-1.5 mb-1 mt-2"><Users className="w-3 h-3 text-[#94A3B8]" /><span className="text-[9px] text-[#94A3B8] uppercase tracking-wide" style={{ fontWeight: 600 }}>Users</span></div>
+                <div className="flex items-center gap-1.5 mb-1 mt-2"><Users className="w-3 h-3 text-[#94A3B8]" /><span className="text-[10px] text-[#94A3B8] uppercase tracking-wide" style={{ fontWeight: 600 }}>Users</span></div>
               )}
               <div className="space-y-1">
                 {selectedUsers.map((user, i) => {
@@ -176,7 +180,7 @@ export function SearchableUserPicker({
                   return (
                     <div key={user.id} className={`flex items-center gap-2 px-2.5 py-1.5 rounded-lg border border-[#F1F5F9] bg-white ${isDisabled ? "opacity-60" : ""}`}>
                       <div className="w-6 h-6 rounded-full flex items-center justify-center text-[8px] shrink-0" style={{ fontWeight: 700, backgroundColor: c.bg, color: c.text }}>{user.name.split(" ").map((n) => n[0]).join("").slice(0, 2)}</div>
-                      <p className="text-[11px] text-[#0F172A] truncate flex-1" style={{ fontWeight: 600 }}>{user.name}</p>
+                      <p className="text-[12px] text-[#0F172A] truncate flex-1" style={{ fontWeight: 600 }}>{user.name}</p>
                       <LicenseBadge type={user.licenseType} />
                       <StatusPill status={user.status} />
                       <button onClick={() => remove(user.id)} className="p-0.5 rounded hover:bg-[#FEF2F2] transition-colors cursor-pointer shrink-0"><X className="w-3 h-3 text-[#CBD5E1] hover:text-[#EF4444]" /></button>
@@ -191,35 +195,35 @@ export function SearchableUserPicker({
 
       {/* CTA */}
       <button type="button" onClick={() => { setModalOpen(true); setSearch(""); setDeptFilter("all"); setLicenseFilter("all"); setStatusFilter("all"); }}
-        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-dashed transition-all cursor-pointer text-[11px] hover:bg-[#FAFBFC]"
+        className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-dashed transition-all cursor-pointer text-[12px] hover:bg-[#FAFBFC]"
         style={{ borderColor: accentBorder, color: accentText, fontWeight: 600 }}
       >
-        <Plus className="w-3 h-3" />{totalSelected > 0 ? "Manage recipients" : "Add notification recipients"}
+        <Plus className="w-3.5 h-3.5" />{totalSelected > 0 ? "Manage recipients" : "Add notification recipients"}
       </button>
 
       {/* Modal */}
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-        <DialogContent className="!p-0 !gap-0 !bg-white overflow-hidden flex flex-col z-[300] !border-[#E2E8F0]/60 w-[calc(100%-2rem)] sm:w-[620px] 2xl:w-[720px]"
-          style={{ maxWidth: "min(800px, calc(100vw - 2rem))", maxHeight: "min(85vh, 720px)", borderRadius: 16, boxShadow: "0 24px 80px -12px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.05)" }}
+        <DialogContent className="!p-0 !gap-0 !bg-white overflow-hidden flex flex-col z-[300] !border-[#E2E8F0]/60 w-[calc(100%-2rem)] sm:w-[680px] 2xl:w-[780px]"
+          style={{ maxWidth: "min(860px, calc(100vw - 2rem))", maxHeight: "min(85vh, 760px)", borderRadius: 16, boxShadow: "0 24px 80px -12px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.05)" }}
           hideCloseButton>
           <DialogTitle className="sr-only">Select Notification Recipients</DialogTitle>
           <DialogDescription className="sr-only">Search and select users or roles to notify.</DialogDescription>
 
           {/* Header */}
-          <div className="px-5 pt-4 pb-3 border-b border-[#F1F5F9] bg-white shrink-0">
-            <div className="flex items-center justify-between mb-3.5">
+          <div className="px-5 pt-5 pb-4 border-b border-[#E2E8F0] bg-white shrink-0">
+            <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ backgroundColor: accentBg }}><Bell className="w-4 h-4" style={{ color: accentColor }} /></div>
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: accentBg }}><Bell className="w-5 h-5" style={{ color: accentColor }} /></div>
                 <div>
-                  <h3 className="text-[14px] text-[#0F172A]" style={{ fontWeight: 700 }}>Notification Recipients</h3>
-                  <p className="text-[11px] text-[#94A3B8] mt-0.5">Select roles or individual users to notify</p>
+                  <h3 className="text-[15px] text-[#0F172A]" style={{ fontWeight: 700 }}>Notification Recipients</h3>
+                  <p className="text-[12px] text-[#94A3B8] mt-0.5">Select roles or individual users to notify</p>
                 </div>
               </div>
-              <button onClick={() => setModalOpen(false)} className="p-1.5 rounded-lg hover:bg-[#F1F5F9] transition-colors cursor-pointer"><X className="w-4 h-4 text-[#94A3B8]" /></button>
+              <button onClick={() => setModalOpen(false)} className="p-2 rounded-lg hover:bg-[#F1F5F9] transition-colors cursor-pointer"><X className="w-4.5 h-4.5 text-[#94A3B8]" /></button>
             </div>
 
             {/* Search */}
-            <div className="relative">
+            <div className="relative mb-3">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
               <input value={search} onChange={(e) => setSearch(e.target.value)}
                 placeholder={tab === "roles" ? "Search roles by name or department…" : "Search users by name, role, or email…"}
@@ -227,70 +231,90 @@ export function SearchableUserPicker({
               {search && <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 rounded-full hover:bg-[#F1F5F9] transition-colors cursor-pointer"><X className="w-3.5 h-3.5 text-[#94A3B8]" /></button>}
             </div>
 
-            {/* Filters row */}
-            <div className="flex items-center gap-1.5 mt-2.5 flex-wrap">
+            {/* Tabs + Filters row */}
+            <div className="flex items-center gap-2 flex-wrap">
               {/* Tab pills */}
               {(["roles", "users"] as const).map((t) => (
                 <button key={t} type="button" onClick={() => { setTab(t); setSearch(""); }}
-                  className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] border transition-colors ${tab === t ? "border-[#0A77FF] text-[#0A77FF] bg-[#EDF4FF]" : "border-[#E2E8F0] text-[#64748B] bg-white hover:bg-[#F8FAFC]"}`}
+                  className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-[12px] border transition-all ${tab === t ? "border-[#0A77FF] text-[#0A77FF] bg-[#EDF4FF] shadow-sm" : "border-[#E2E8F0] text-[#64748B] bg-white hover:bg-[#F8FAFC] hover:border-[#CBD5E1]"}`}
                   style={{ fontWeight: tab === t ? 600 : 500 }}
-                >{t === "roles" ? <Shield className="w-3 h-3" /> : <Users className="w-3 h-3" />}{t === "roles" ? "Roles" : "Users"}<span className="text-[9px] ml-0.5 opacity-60">{t === "roles" ? filteredRoles.length : filteredUsers.length}</span></button>
+                >
+                  {t === "roles" ? <Shield className="w-3.5 h-3.5" /> : <Users className="w-3.5 h-3.5" />}
+                  {t === "roles" ? "Roles" : "Users"}
+                  <span className="text-[10px] px-1.5 py-px rounded-full ml-0.5" style={{ backgroundColor: tab === t ? "rgba(10,119,255,0.12)" : "#F1F5F9", fontWeight: 600 }}>
+                    {t === "roles" ? filteredRoles.length : filteredUsers.length}
+                  </span>
+                </button>
               ))}
-              <span className="w-px h-4 bg-[#E2E8F0]" />
-              {/* Department */}
-              <select value={deptFilter} onChange={(e) => setDeptFilter(e.target.value)}
-                className="text-[10px] text-[#64748B] bg-white border border-[#E2E8F0] rounded-full px-2.5 py-1 outline-none cursor-pointer appearance-none pr-5"
-                style={{ fontWeight: 500, backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat", backgroundPosition: "right 6px center" }}
-              ><option value="all">Dept: All</option>{departments.map((d) => <option key={d} value={d}>{d}</option>)}</select>
-              {/* License */}
-              <select value={licenseFilter} onChange={(e) => setLicenseFilter(e.target.value)}
-                className="text-[10px] text-[#64748B] bg-white border border-[#E2E8F0] rounded-full px-2.5 py-1 outline-none cursor-pointer appearance-none pr-5"
-                style={{ fontWeight: 500, backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat", backgroundPosition: "right 6px center" }}
-              ><option value="all">License: All</option><option value="Full Access">Full Access</option><option value="Field User">Field User</option><option value="Read Only">Read Only</option></select>
-              {/* Status */}
-              <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}
-                className="text-[10px] text-[#64748B] bg-white border border-[#E2E8F0] rounded-full px-2.5 py-1 outline-none cursor-pointer appearance-none pr-5"
-                style={{ fontWeight: 500, backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat", backgroundPosition: "right 6px center" }}
-              ><option value="all">Status: All</option><option value="Active">Active</option><option value="Disabled">Disabled</option></select>
+
+              <span className="w-px h-5 bg-[#E2E8F0]" />
+
+              {/* Filter dropdowns — proper sized */}
+              <select value={deptFilter} onChange={(e) => setDeptFilter(e.target.value)} className={selectCls} style={{ fontWeight: 500, ...selectBg }}>
+                <option value="all">All Departments</option>
+                {departments.map((d) => <option key={d} value={d}>{d}</option>)}
+              </select>
+              <select value={licenseFilter} onChange={(e) => setLicenseFilter(e.target.value)} className={selectCls} style={{ fontWeight: 500, ...selectBg }}>
+                <option value="all">All Licenses</option>
+                <option value="Full Access">Full Access</option>
+                <option value="Field User">Field User</option>
+                <option value="Read Only">Read Only</option>
+              </select>
+              <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className={selectCls} style={{ fontWeight: 500, ...selectBg }}>
+                <option value="all">All Status</option>
+                <option value="Active">Active</option>
+                <option value="Disabled">Disabled</option>
+              </select>
               {hasActiveFilters && (
                 <button type="button" onClick={() => { setDeptFilter("all"); setLicenseFilter("all"); setStatusFilter("all"); }}
-                  className="text-[10px] text-[#94A3B8] hover:text-[#EF4444] cursor-pointer" style={{ fontWeight: 500 }}>Clear filters</button>
+                  className="text-[12px] text-[#94A3B8] hover:text-[#EF4444] cursor-pointer px-2 py-1 rounded-lg hover:bg-[#FEF2F2] transition-colors" style={{ fontWeight: 500 }}>Clear</button>
               )}
             </div>
           </div>
 
+          {/* Table header */}
+          <div className="flex items-center gap-3 px-5 py-2 bg-[#F8FAFC] border-b border-[#E2E8F0] shrink-0">
+            <div className="w-[18px]" />
+            <div className="w-9" />
+            <span className="flex-1 text-[11px] text-[#64748B] uppercase tracking-wider" style={{ fontWeight: 600 }}>
+              {tab === "roles" ? "Role" : "User"}
+            </span>
+            <span className="w-[90px] text-[11px] text-[#64748B] uppercase tracking-wider text-center" style={{ fontWeight: 600 }}>License</span>
+            <span className="w-[80px] text-[11px] text-[#64748B] uppercase tracking-wider text-center" style={{ fontWeight: 600 }}>Status</span>
+          </div>
+
           {/* List */}
-          <div className="flex-1 min-h-0 overflow-y-auto scrollbar-hide bg-[#FAFBFC]">
+          <div className="flex-1 min-h-0 overflow-y-auto scrollbar-hide bg-white">
             {tab === "roles" ? (
               filteredRoles.length === 0 ? (
-                <div className="px-5 py-8 text-center"><Shield className="w-7 h-7 text-[#E2E8F0] mx-auto mb-2" /><p className="text-[12px] text-[#94A3B8]" style={{ fontWeight: 500 }}>No roles match your filters</p></div>
+                <div className="px-5 py-12 text-center"><Shield className="w-8 h-8 text-[#E2E8F0] mx-auto mb-2" /><p className="text-[13px] text-[#94A3B8]" style={{ fontWeight: 500 }}>No roles match your filters</p></div>
               ) : (
-                <div className="p-2 space-y-1">
+                <div>
                   {filteredRoles.map((role, i) => {
                     const isSelected = selectedIds.has(role.id);
                     const c = getRoleColor(i);
                     const isDisabledRole = role.status === "Disabled";
                     return (
                       <button key={role.id} type="button" onClick={() => toggle(role.id)}
-                        className={`w-full flex items-center gap-3 px-3.5 py-2.5 text-left transition-all rounded-lg ${isSelected ? "bg-white border border-[#0A77FF]/15 shadow-sm" : "bg-white border border-transparent hover:border-[#E2E8F0] hover:shadow-sm"} ${isDisabledRole ? "opacity-60" : ""}`}>
-                        <div className="w-[16px] h-[16px] rounded-[4px] border-[1.5px] flex items-center justify-center shrink-0 transition-all"
+                        className={`w-full flex items-center gap-3 px-5 py-3 text-left transition-colors border-b border-[#F8FAFC] ${isSelected ? "bg-[#EDF4FF]/40" : "hover:bg-[#F8FAFC]"} ${isDisabledRole ? "opacity-60" : ""}`}>
+                        <div className="w-[18px] h-[18px] rounded-[5px] border-[1.5px] flex items-center justify-center shrink-0 transition-all"
                           style={{ borderColor: isSelected ? accentColor : "#CBD5E1", backgroundColor: isSelected ? accentColor : "transparent" }}>
-                          {isSelected && <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
+                          {isSelected && <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
                         </div>
-                        <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ backgroundColor: c.bg }}><Shield className="w-4 h-4" style={{ color: c.text }} /></div>
+                        <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style={{ backgroundColor: c.bg }}><Shield className="w-4.5 h-4.5" style={{ color: c.text }} /></div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-1.5">
                             <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}><HighlightText text={role.name} query={search} /></p>
                             {role.description && (
                               <Tooltip><TooltipTrigger asChild><span><Info className="w-3 h-3 text-[#CBD5E1] shrink-0" /></span></TooltipTrigger>
-                                <TooltipContent side="bottom" className="max-w-[220px] text-[11px] z-[350]">{role.description}</TooltipContent>
+                                <TooltipContent side="bottom" className="max-w-[240px] text-[11px] z-[350] rounded-xl bg-white/95 backdrop-blur-md border border-[#E2E8F0]/80 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.12)]">{role.description}</TooltipContent>
                               </Tooltip>
                             )}
                           </div>
-                          <p className="text-[10px] text-[#94A3B8] truncate"><HighlightText text={role.department} query={search} /> · {role.activeUsers}/{role.userCount} active</p>
+                          <p className="text-[11px] text-[#94A3B8] truncate mt-0.5"><HighlightText text={role.department} query={search} /> · {role.activeUsers}/{role.userCount} active</p>
                         </div>
-                        <LicenseBadge type={role.licenseType} />
-                        <StatusPill status={role.status} />
+                        <div className="w-[90px] flex justify-center"><LicenseBadge type={role.licenseType} /></div>
+                        <div className="w-[80px] flex justify-center"><StatusPill status={role.status} /></div>
                       </button>
                     );
                   })}
@@ -298,29 +322,33 @@ export function SearchableUserPicker({
               )
             ) : (
               filteredUsers.length === 0 ? (
-                <div className="px-5 py-8 text-center"><Users className="w-7 h-7 text-[#E2E8F0] mx-auto mb-2" /><p className="text-[12px] text-[#94A3B8]" style={{ fontWeight: 500 }}>No users match your filters</p></div>
+                <div className="px-5 py-12 text-center"><Users className="w-8 h-8 text-[#E2E8F0] mx-auto mb-2" /><p className="text-[13px] text-[#94A3B8]" style={{ fontWeight: 500 }}>No users match your filters</p></div>
               ) : (
-                <div className="p-2 space-y-1">
+                <div>
                   {filteredUsers.map((user, i) => {
                     const isSelected = selectedIds.has(user.id);
                     const c = getUserColor(i);
                     const isDisabledUser = user.status === "Disabled";
                     return (
                       <button key={user.id} type="button" onClick={() => toggle(user.id)}
-                        className={`w-full flex items-center gap-3 px-3.5 py-2.5 text-left transition-all rounded-lg ${isSelected ? "bg-white border border-[#0A77FF]/15 shadow-sm" : "bg-white border border-transparent hover:border-[#E2E8F0] hover:shadow-sm"} ${isDisabledUser ? "opacity-50" : ""}`}>
-                        <div className="w-[16px] h-[16px] rounded-[4px] border-[1.5px] flex items-center justify-center shrink-0 transition-all"
+                        className={`w-full flex items-center gap-3 px-5 py-3 text-left transition-colors border-b border-[#F8FAFC] ${isSelected ? "bg-[#EDF4FF]/40" : "hover:bg-[#F8FAFC]"} ${isDisabledUser ? "opacity-50" : ""}`}>
+                        <div className="w-[18px] h-[18px] rounded-[5px] border-[1.5px] flex items-center justify-center shrink-0 transition-all"
                           style={{ borderColor: isSelected ? accentColor : "#CBD5E1", backgroundColor: isSelected ? accentColor : "transparent" }}>
-                          {isSelected && <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
+                          {isSelected && <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
                         </div>
-                        <div className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] shrink-0" style={{ fontWeight: 700, backgroundColor: c.bg, color: c.text }}>
+                        <div className="w-9 h-9 rounded-full flex items-center justify-center text-[11px] shrink-0" style={{ fontWeight: 700, backgroundColor: c.bg, color: c.text }}>
                           {user.name.split(" ").map((n) => n[0]).join("").slice(0, 2)}
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}><HighlightText text={user.name} query={search} /></p>
-                          <p className="text-[10px] text-[#94A3B8] truncate"><HighlightText text={user.role} query={search} /> · <HighlightText text={user.department} query={search} /></p>
+                          <div className="flex items-center gap-2 mt-0.5">
+                            <p className="text-[11px] text-[#94A3B8] truncate"><HighlightText text={user.role} query={search} /> · <HighlightText text={user.department} query={search} /></p>
+                            <span className="text-[10px] text-[#CBD5E1]">·</span>
+                            <span className="text-[10px] text-[#94A3B8] truncate flex items-center gap-1"><Mail className="w-2.5 h-2.5" />{user.email}</span>
+                          </div>
                         </div>
-                        <LicenseBadge type={user.licenseType} />
-                        <StatusPill status={user.status} />
+                        <div className="w-[90px] flex justify-center"><LicenseBadge type={user.licenseType} /></div>
+                        <div className="w-[80px] flex justify-center"><StatusPill status={user.status} /></div>
                       </button>
                     );
                   })}
@@ -330,13 +358,13 @@ export function SearchableUserPicker({
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-between px-5 py-3 border-t border-[#E2E8F0] bg-white shrink-0">
-            <span className="text-[12px] text-[#64748B]" style={{ fontWeight: 500 }}>{totalSelected > 0 ? `${totalSelected} recipient${totalSelected !== 1 ? "s" : ""} selected` : "No recipients selected"}</span>
-            <div className="flex items-center gap-2.5">
+          <div className="flex items-center justify-between px-5 py-3.5 border-t border-[#E2E8F0] bg-white shrink-0">
+            <span className="text-[13px] text-[#64748B]" style={{ fontWeight: 500 }}>{totalSelected > 0 ? `${totalSelected} recipient${totalSelected !== 1 ? "s" : ""} selected` : "No recipients selected"}</span>
+            <div className="flex items-center gap-3">
               {totalSelected > 0 && (
-                <button onClick={() => onSelectionChange(new Set())} className="text-[12px] text-[#64748B] hover:text-[#EF4444] transition-colors cursor-pointer px-3 py-1.5 rounded-lg hover:bg-[#FEF2F2] border border-transparent hover:border-[#FECACA]" style={{ fontWeight: 500 }}>Clear all</button>
+                <button onClick={() => onSelectionChange(new Set())} className="text-[13px] text-[#64748B] hover:text-[#EF4444] transition-colors cursor-pointer px-3.5 py-2 rounded-lg hover:bg-[#FEF2F2] border border-[#E2E8F0] hover:border-[#FECACA]" style={{ fontWeight: 500 }}>Clear all</button>
               )}
-              <button onClick={() => setModalOpen(false)} className="px-4 py-1.5 rounded-lg text-[13px] text-white cursor-pointer transition-colors hover:opacity-90 shadow-sm" style={{ fontWeight: 600, backgroundColor: accentColor }}>Done</button>
+              <button onClick={() => setModalOpen(false)} className="px-5 py-2 rounded-lg text-[13px] text-white cursor-pointer transition-colors hover:opacity-90 shadow-sm" style={{ fontWeight: 600, backgroundColor: accentColor }}>Done</button>
             </div>
           </div>
         </DialogContent>
