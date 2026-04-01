@@ -199,32 +199,32 @@ export function SearchableUserPicker({
 
       {/* Modal */}
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-        <DialogContent className="!p-0 !gap-0 !bg-white overflow-hidden flex flex-col z-[300] !border-[#E2E8F0]/60"
-          style={{ maxWidth: 620, width: "calc(100% - 2rem)", maxHeight: "80vh", borderRadius: 16, boxShadow: "0 24px 80px -12px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.05)" }}
+        <DialogContent className="!p-0 !gap-0 !bg-white overflow-hidden flex flex-col z-[300] !border-[#E2E8F0]/60 w-[calc(100%-2rem)] sm:w-[620px] 2xl:w-[720px]"
+          style={{ maxWidth: "min(800px, calc(100vw - 2rem))", maxHeight: "min(85vh, 720px)", borderRadius: 16, boxShadow: "0 24px 80px -12px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.05)" }}
           hideCloseButton>
           <DialogTitle className="sr-only">Select Notification Recipients</DialogTitle>
           <DialogDescription className="sr-only">Search and select users or roles to notify.</DialogDescription>
 
           {/* Header */}
-          <div className="px-4 pt-3.5 pb-3 border-b border-[#F1F5F9] bg-white shrink-0">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ backgroundColor: accentBg }}><Bell className="w-3.5 h-3.5" style={{ color: accentColor }} /></div>
+          <div className="px-5 pt-4 pb-3 border-b border-[#F1F5F9] bg-white shrink-0">
+            <div className="flex items-center justify-between mb-3.5">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ backgroundColor: accentBg }}><Bell className="w-4 h-4" style={{ color: accentColor }} /></div>
                 <div>
-                  <h3 className="text-[13px] text-[#0F172A]" style={{ fontWeight: 700 }}>Notification Recipients</h3>
-                  <p className="text-[10px] text-[#94A3B8]">Select roles or individual users to notify</p>
+                  <h3 className="text-[14px] text-[#0F172A]" style={{ fontWeight: 700 }}>Notification Recipients</h3>
+                  <p className="text-[11px] text-[#94A3B8] mt-0.5">Select roles or individual users to notify</p>
                 </div>
               </div>
-              <button onClick={() => setModalOpen(false)} className="p-1 rounded-md hover:bg-[#F1F5F9] transition-colors cursor-pointer"><X className="w-4 h-4 text-[#94A3B8]" /></button>
+              <button onClick={() => setModalOpen(false)} className="p-1.5 rounded-lg hover:bg-[#F1F5F9] transition-colors cursor-pointer"><X className="w-4 h-4 text-[#94A3B8]" /></button>
             </div>
 
             {/* Search */}
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8]" />
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
               <input value={search} onChange={(e) => setSearch(e.target.value)}
                 placeholder={tab === "roles" ? "Search roles by name or department…" : "Search users by name, role, or email…"}
-                className="w-full h-9 pl-9 pr-8 rounded-lg border border-[#E2E8F0] bg-white text-[12px] text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-none focus:border-[#0A77FF] focus:ring-2 focus:ring-[#0A77FF]/10" autoFocus />
-              {search && <button onClick={() => setSearch("")} className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded hover:bg-[#F1F5F9]"><X className="w-3 h-3 text-[#94A3B8]" /></button>}
+                className="w-full h-10 pl-10 pr-9 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] text-[13px] text-[#0F172A] placeholder:text-[#94A3B8]/60 focus:outline-none focus:border-[#0A77FF] focus:ring-2 focus:ring-[#0A77FF]/10 focus:bg-white transition-colors" autoFocus />
+              {search && <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 rounded-full hover:bg-[#F1F5F9] transition-colors cursor-pointer"><X className="w-3.5 h-3.5 text-[#94A3B8]" /></button>}
             </div>
 
             {/* Filters row */}
@@ -260,19 +260,19 @@ export function SearchableUserPicker({
           </div>
 
           {/* List */}
-          <div className="flex-1 min-h-0 overflow-y-auto scrollbar-hide bg-white">
+          <div className="flex-1 min-h-0 overflow-y-auto scrollbar-hide bg-[#FAFBFC]">
             {tab === "roles" ? (
               filteredRoles.length === 0 ? (
                 <div className="px-5 py-8 text-center"><Shield className="w-7 h-7 text-[#E2E8F0] mx-auto mb-2" /><p className="text-[12px] text-[#94A3B8]" style={{ fontWeight: 500 }}>No roles match your filters</p></div>
               ) : (
-                <div className="py-0.5">
+                <div className="p-2 space-y-1">
                   {filteredRoles.map((role, i) => {
                     const isSelected = selectedIds.has(role.id);
                     const c = getRoleColor(i);
                     const isDisabledRole = role.status === "Disabled";
                     return (
                       <button key={role.id} type="button" onClick={() => toggle(role.id)}
-                        className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-[#F8FAFC] ${isSelected ? "bg-[#EDF4FF]/30" : ""} ${isDisabledRole ? "opacity-60" : ""}`}>
+                        className={`w-full flex items-center gap-3 px-3.5 py-2.5 text-left transition-all rounded-lg ${isSelected ? "bg-white border border-[#0A77FF]/15 shadow-sm" : "bg-white border border-transparent hover:border-[#E2E8F0] hover:shadow-sm"} ${isDisabledRole ? "opacity-60" : ""}`}>
                         <div className="w-[16px] h-[16px] rounded-[4px] border-[1.5px] flex items-center justify-center shrink-0 transition-all"
                           style={{ borderColor: isSelected ? accentColor : "#CBD5E1", backgroundColor: isSelected ? accentColor : "transparent" }}>
                           {isSelected && <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
@@ -300,14 +300,14 @@ export function SearchableUserPicker({
               filteredUsers.length === 0 ? (
                 <div className="px-5 py-8 text-center"><Users className="w-7 h-7 text-[#E2E8F0] mx-auto mb-2" /><p className="text-[12px] text-[#94A3B8]" style={{ fontWeight: 500 }}>No users match your filters</p></div>
               ) : (
-                <div className="py-0.5">
+                <div className="p-2 space-y-1">
                   {filteredUsers.map((user, i) => {
                     const isSelected = selectedIds.has(user.id);
                     const c = getUserColor(i);
                     const isDisabledUser = user.status === "Disabled";
                     return (
                       <button key={user.id} type="button" onClick={() => toggle(user.id)}
-                        className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-[#F8FAFC] ${isSelected ? "bg-[#EDF4FF]/30" : ""} ${isDisabledUser ? "opacity-50" : ""}`}>
+                        className={`w-full flex items-center gap-3 px-3.5 py-2.5 text-left transition-all rounded-lg ${isSelected ? "bg-white border border-[#0A77FF]/15 shadow-sm" : "bg-white border border-transparent hover:border-[#E2E8F0] hover:shadow-sm"} ${isDisabledUser ? "opacity-50" : ""}`}>
                         <div className="w-[16px] h-[16px] rounded-[4px] border-[1.5px] flex items-center justify-center shrink-0 transition-all"
                           style={{ borderColor: isSelected ? accentColor : "#CBD5E1", backgroundColor: isSelected ? accentColor : "transparent" }}>
                           {isSelected && <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
@@ -330,13 +330,13 @@ export function SearchableUserPicker({
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-between px-4 py-2.5 border-t border-[#F1F5F9] bg-[#FAFBFC] shrink-0">
-            <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>{totalSelected > 0 ? `${totalSelected} selected` : "No recipients selected"}</span>
-            <div className="flex items-center gap-2">
+          <div className="flex items-center justify-between px-5 py-3 border-t border-[#E2E8F0] bg-white shrink-0">
+            <span className="text-[12px] text-[#64748B]" style={{ fontWeight: 500 }}>{totalSelected > 0 ? `${totalSelected} recipient${totalSelected !== 1 ? "s" : ""} selected` : "No recipients selected"}</span>
+            <div className="flex items-center gap-2.5">
               {totalSelected > 0 && (
-                <button onClick={() => onSelectionChange(new Set())} className="text-[11px] text-[#94A3B8] hover:text-[#EF4444] transition-colors cursor-pointer px-2 py-1 rounded-md hover:bg-[#FEF2F2]" style={{ fontWeight: 500 }}>Clear all</button>
+                <button onClick={() => onSelectionChange(new Set())} className="text-[12px] text-[#64748B] hover:text-[#EF4444] transition-colors cursor-pointer px-3 py-1.5 rounded-lg hover:bg-[#FEF2F2] border border-transparent hover:border-[#FECACA]" style={{ fontWeight: 500 }}>Clear all</button>
               )}
-              <button onClick={() => setModalOpen(false)} className="px-3.5 py-1.5 rounded-lg text-[12px] text-white cursor-pointer transition-colors hover:opacity-90" style={{ fontWeight: 600, backgroundColor: accentColor }}>Done</button>
+              <button onClick={() => setModalOpen(false)} className="px-4 py-1.5 rounded-lg text-[13px] text-white cursor-pointer transition-colors hover:opacity-90 shadow-sm" style={{ fontWeight: 600, backgroundColor: accentColor }}>Done</button>
             </div>
           </div>
         </DialogContent>
