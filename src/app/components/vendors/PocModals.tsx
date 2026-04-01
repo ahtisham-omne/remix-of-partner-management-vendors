@@ -491,87 +491,58 @@ export function CreatePocModal({
           </div>
         </div>
 
-        {/* Form body */}
-        <div className="flex-1 overflow-y-auto px-5 py-5 bg-[#FAFBFC] scrollbar-hide space-y-5">
+        {/* Form body — matches partner creation form */}
+        <div className="flex-1 overflow-y-auto px-3 sm:px-4 pt-3 pb-4 bg-[#FAFBFC] scrollbar-hide space-y-3">
 
-          {/* ── Section 1: Profile ── */}
-          <div>
-            <h4 className="text-[13px] sm:text-sm text-foreground" style={{ fontWeight: 600 }}>Profile</h4>
-            <p className="text-[11px] text-[#94A3B8] mt-0.5 mb-3">Basic information about the contact person.</p>
-            <div className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-              <div className="p-4 space-y-4">
-                {/* Photo + Name row */}
-                <div className="flex items-start gap-4">
-                  {/* Photo upload */}
-                  <button type="button" onClick={() => { /* placeholder */ }} className="w-16 h-16 rounded-xl bg-[#F1F5F9] border-2 border-dashed border-[#E2E8F0] hover:border-[#0A77FF]/30 hover:bg-[#EDF4FF] flex flex-col items-center justify-center shrink-0 cursor-pointer transition-all group">
+          {/* ── Contact Details — boxed card matching Partner Details ── */}
+          <div className="rounded-lg border border-[#E2E8F0] bg-white overflow-visible shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
+            <div className="px-3 sm:px-4 py-2 sm:py-2.5 border-b border-[#EEF2F6] flex items-center gap-2 bg-[#FAFBFC]">
+              <div className="w-6 h-6 rounded-md bg-[#0A77FF]/8 flex items-center justify-center shrink-0"><Users className="w-3.5 h-3.5 text-[#0A77FF]" /></div>
+              <span className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Contact Details</span>
+              <span className="text-[9px] sm:text-[10px] text-[#94A3B8] tracking-wider uppercase hidden min-[480px]:inline" style={{ fontWeight: 500 }}>Required</span>
+            </div>
+            <div className="px-2.5 sm:px-3 pt-2 sm:pt-2.5 pb-1.5 sm:pb-2">
+              {/* Photo on left, fields in 2-col grid on right */}
+              <div className="grid grid-cols-1 sm:grid-cols-[auto_1fr] gap-3 sm:gap-4">
+                {/* Left — Profile Picture */}
+                <div className="hidden sm:flex flex-col items-center w-[100px]">
+                  <div className={`relative w-full aspect-square rounded-xl cursor-pointer group transition-all ${profileImage ? "ring-2 ring-[#E2E8F0] hover:ring-[#0A77FF]/30" : "border-2 border-dashed border-[#CBD5E1] hover:border-[#0A77FF]/50 bg-[#F8FAFC] hover:bg-[#EDF4FF]/50"}`}>
                     {profileImage ? (
-                      <img src={profileImage} alt="" className="w-full h-full rounded-xl object-cover" />
+                      <><img src={profileImage} alt="" className="w-full h-full rounded-xl object-cover" /><div className="absolute inset-0 rounded-xl bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center"><Camera className="w-5 h-5 text-white opacity-0 group-hover:opacity-100 transition-opacity" /></div></>
                     ) : initials ? (
-                      <span className="text-[18px]" style={{ fontWeight: 700, color: deptAvatarColor.text }}>{initials}</span>
+                      <div className="w-full h-full flex flex-col items-center justify-center"><span className="text-[22px]" style={{ fontWeight: 700, color: deptAvatarColor.text }}>{initials}</span></div>
                     ) : (
-                      <Camera className="w-5 h-5 text-[#94A3B8] group-hover:text-[#0A77FF] transition-colors" />
+                      <div className="w-full h-full flex flex-col items-center justify-center gap-1"><div className="w-8 h-8 rounded-lg bg-[#F1F5F9] group-hover:bg-[#EDF4FF] flex items-center justify-center transition-colors"><Camera className="w-4 h-4 text-[#94A3B8] group-hover:text-[#0A77FF] transition-colors" /></div><span className="text-[10px] text-[#94A3B8] group-hover:text-[#0A77FF] transition-colors" style={{ fontWeight: 500 }}>Upload</span></div>
                     )}
-                  </button>
-                  <div className="flex-1 min-w-0 space-y-3">
-                    <div>
-                      <label className="text-[12px] text-[#475569] mb-1.5 block" style={{ fontWeight: 500 }}>Full Name <span className="text-[#EF4444]">*</span></label>
-                      <Input value={newPocName} onChange={(e) => onNewPocNameChange(e.target.value)} placeholder="Enter full name" className={inputCls} />
-                    </div>
-                    <div>
-                      <label className="text-[12px] text-[#475569] mb-1.5 block" style={{ fontWeight: 500 }}>Company</label>
-                      <Input value={company} onChange={(e) => setCompany(e.target.value)} placeholder="Company or organization" className={inputCls} />
-                    </div>
                   </div>
                 </div>
-                {/* Role + Department row */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                {/* Right — fields in 2-col grid */}
+                <div className="grid grid-cols-1 min-[480px]:grid-cols-2 gap-x-3 sm:gap-x-4 gap-y-2.5 sm:gap-y-3">
                   <div>
-                    <label className="text-[12px] text-[#475569] mb-1.5 flex items-center gap-1" style={{ fontWeight: 500 }}><Briefcase className="w-3 h-3 text-[#94A3B8]" />Role / Title</label>
+                    <label className="text-xs sm:text-[13px] text-[#0F172A] mb-1 block" style={{ fontWeight: 500 }}>Full Name<span className="text-[#EF4444]">*</span></label>
+                    <Input value={newPocName} onChange={(e) => onNewPocNameChange(e.target.value)} placeholder="Enter full name" className={inputCls} />
+                  </div>
+                  <div>
+                    <label className="text-xs sm:text-[13px] text-[#0F172A] mb-1 block" style={{ fontWeight: 500 }}>Company</label>
+                    <Input value={company} onChange={(e) => setCompany(e.target.value)} placeholder="Company or organization" className={inputCls} />
+                  </div>
+                  <div>
+                    <label className="text-xs sm:text-[13px] text-[#0F172A] mb-1 block" style={{ fontWeight: 500 }}>Role / Title</label>
                     <Input value={newPocRole} onChange={(e) => onNewPocRoleChange(e.target.value)} placeholder="e.g. Procurement Manager" className={inputCls} />
                   </div>
                   <div>
-                    <label className="text-[12px] text-[#475569] mb-1.5 flex items-center gap-1" style={{ fontWeight: 500 }}><Building2 className="w-3 h-3 text-[#94A3B8]" />Department</label>
+                    <label className="text-xs sm:text-[13px] text-[#0F172A] mb-1 block" style={{ fontWeight: 500 }}>Department</label>
                     <Select value={newPocDepartment} onValueChange={(v) => onNewPocDepartmentChange(v as any)}>
-                      <SelectTrigger className="h-10 rounded-lg border-[#E2E8F0] bg-white text-sm [&>svg]:text-[#94A3B8]"><SelectValue placeholder="Select department" /></SelectTrigger>
-                      <SelectContent className="z-[350] rounded-lg max-h-[240px]">
-                        {DEFAULT_DEPARTMENTS.map((d) => (
-                          <SelectItem key={d} value={d}>{d}</SelectItem>
-                        ))}
-                        {customDepts.map((d) => (
-                          <SelectItem key={d} value={d}><span className="flex items-center gap-1.5">{d} <span className="text-[10px] text-[#94A3B8]">Custom</span></span></SelectItem>
-                        ))}
-                      </SelectContent>
+                      <SelectTrigger className="!h-10 rounded-lg border-[#E2E8F0] bg-white text-sm [&>svg]:text-[#94A3B8]"><SelectValue placeholder="Select department" /></SelectTrigger>
+                      <SelectContent className="z-[350] rounded-lg max-h-[240px]">{DEFAULT_DEPARTMENTS.map((d) => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent>
                     </Select>
                   </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* ── Section 2: Social Profiles ── */}
-          <div>
-            <h4 className="text-[13px] sm:text-sm text-foreground" style={{ fontWeight: 600 }}>Social Profiles</h4>
-            <p className="text-[11px] text-[#94A3B8] mt-0.5 mb-3">LinkedIn, social media, and web presence.</p>
-            <div className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-              <div className="p-4 space-y-3">
-                {/* LinkedIn */}
-                <div>
-                  <label className="text-[12px] text-[#475569] mb-1.5 flex items-center gap-1" style={{ fontWeight: 500 }}><Linkedin className="w-3 h-3 text-[#0A66C2]" />LinkedIn</label>
-                  <div className="flex items-center gap-2">
-                    <Input value={linkedin} onChange={(e) => setLinkedin(e.target.value)} placeholder="linkedin.com/in/username" className={`flex-1 ${inputCls}`} />
-                    <button type="button" onClick={() => { import("sonner").then(({ toast }) => toast.info("Auto-fill from LinkedIn coming soon — will populate name, role, company, and photo.")); }}
-                      className="inline-flex items-center gap-1.5 h-10 px-3 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#64748B] hover:bg-[#F8FAFC] hover:border-[#CBD5E1] transition-colors cursor-pointer shrink-0" style={{ fontWeight: 500 }}>
-                      <Sparkles className="w-3.5 h-3.5 text-[#0A77FF]" />Auto-fill
-                    </button>
-                  </div>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="text-[12px] text-[#475569] mb-1.5 flex items-center gap-1" style={{ fontWeight: 500 }}><Twitter className="w-3 h-3 text-[#1DA1F2]" />Twitter / X</label>
-                    <Input value={twitter} onChange={(e) => setTwitter(e.target.value)} placeholder="@username" className={inputCls} />
+                    <label className="text-xs sm:text-[13px] text-[#0F172A] mb-1 flex items-center gap-1" style={{ fontWeight: 500 }}><Linkedin className="w-3 h-3 text-[#0A66C2]" />LinkedIn</label>
+                    <Input value={linkedin} onChange={(e) => setLinkedin(e.target.value)} placeholder="linkedin.com/in/username" className={inputCls} />
                   </div>
                   <div>
-                    <label className="text-[12px] text-[#475569] mb-1.5 flex items-center gap-1" style={{ fontWeight: 500 }}><Globe className="w-3 h-3 text-[#64748B]" />Website</label>
+                    <label className="text-xs sm:text-[13px] text-[#0F172A] mb-1 flex items-center gap-1" style={{ fontWeight: 500 }}><Globe className="w-3 h-3 text-[#64748B]" />Website</label>
                     <Input value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="https://example.com" className={inputCls} />
                   </div>
                 </div>
@@ -579,84 +550,56 @@ export function CreatePocModal({
             </div>
           </div>
 
-          {/* ── Section 3: Phone Numbers (dynamic rows) ── */}
-          <div>
-            <h4 className="text-[13px] sm:text-sm text-foreground" style={{ fontWeight: 600 }}>Phone Numbers</h4>
-            <p className="text-[11px] text-[#94A3B8] mt-0.5 mb-3">Add one or more phone numbers with type classification.</p>
-            <div className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-              <div className="p-4 space-y-3">
-                {phoneRows.map((row, idx) => (
-                  <div key={row.id} className="flex items-end gap-2">
-                    <div className="w-[100px] shrink-0">
-                      {idx === 0 && <label className="text-[11px] text-[#94A3B8] mb-1 block" style={{ fontWeight: 500 }}>Type</label>}
-                      <Select value={row.type} onValueChange={(v) => { setPhoneRows((p) => { const n = [...p]; n[idx] = { ...n[idx], type: v }; return n; }); }}>
-                        <SelectTrigger className="h-10 rounded-lg border-[#E2E8F0] text-xs [&>svg]:text-[#94A3B8]"><SelectValue /></SelectTrigger>
-                        <SelectContent className="z-[350]">{PHONE_TYPES.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
-                      </Select>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      {idx === 0 && <label className="text-[11px] text-[#94A3B8] mb-1 block" style={{ fontWeight: 500 }}>Number</label>}
-                      <div className="flex items-center rounded-lg border border-[#E2E8F0] bg-white overflow-hidden h-10 hover:border-[#CBD5E1] transition-colors">
-                        <Select value={row.code} onValueChange={(v) => handlePhoneChange(idx, "code", v)}>
-                          <SelectTrigger className="h-full border-0 border-r border-[#E2E8F0] rounded-none bg-[#FAFBFC] px-2 text-xs w-[72px] shrink-0 shadow-none focus:ring-0">
-                            <span className="text-[12px]">{getCountryFlag(row.code)} {row.code}</span>
-                          </SelectTrigger>
-                          <SelectContent className="z-[350]">{COUNTRY_CODES.map((cc) => <SelectItem key={cc.code} value={cc.code}><span className="flex items-center gap-2"><span>{cc.flag}</span>{cc.code}</span></SelectItem>)}</SelectContent>
-                        </Select>
-                        <input value={row.number} onChange={(e) => handlePhoneChange(idx, "number", e.target.value)} placeholder="Phone number" className="flex-1 h-full px-3 text-sm text-[#0F172A] outline-none bg-transparent placeholder:text-[#B8C4D0]" />
-                      </div>
-                    </div>
-                    <div className="w-[80px] shrink-0">
-                      {idx === 0 && <label className="text-[11px] text-[#94A3B8] mb-1 block" style={{ fontWeight: 500 }}>Ext.</label>}
-                      <Input value={row.ext} onChange={(e) => handlePhoneChange(idx, "ext", e.target.value)} placeholder="Ext." className={inputCls} />
-                    </div>
-                    {phoneRows.length > 1 && (
-                      <button onClick={() => removePhoneRow(row.id)} className="w-10 h-10 rounded-lg flex items-center justify-center text-[#94A3B8] hover:text-[#EF4444] hover:bg-[#FEF2F2] transition-colors cursor-pointer shrink-0"><Trash2 className="w-3.5 h-3.5" /></button>
-                    )}
-                  </div>
-                ))}
-                <button type="button" onClick={addPhoneRow} className="inline-flex items-center gap-1.5 text-[12px] text-[#0A77FF] hover:text-[#0862D0] cursor-pointer" style={{ fontWeight: 500 }}><Plus className="w-3.5 h-3.5" />Add phone number</button>
+          {/* ── Phone Numbers — boxed card ── */}
+          <div className="rounded-lg border border-[#E2E8F0] bg-white overflow-visible shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
+            <div className="px-3 sm:px-4 py-2 sm:py-2.5 border-b border-[#EEF2F6] flex items-center justify-between bg-[#FAFBFC]">
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded-md bg-[#ECFDF5] flex items-center justify-center shrink-0"><Phone className="w-3.5 h-3.5 text-[#059669]" /></div>
+                <span className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Phone Numbers</span>
               </div>
+              <button type="button" onClick={addPhoneRow} className="inline-flex items-center gap-1 text-[11px] text-[#0A77FF] hover:text-[#0862D0] cursor-pointer" style={{ fontWeight: 600 }}><Plus className="w-3 h-3" />Add</button>
+            </div>
+            <div className="px-3 sm:px-4 py-2.5 space-y-2">
+              {phoneRows.map((row, idx) => (
+                <div key={row.id} className="flex items-center gap-2">
+                  <Select value={row.type} onValueChange={(v) => { setPhoneRows((p) => { const n = [...p]; n[idx] = { ...n[idx], type: v }; return n; }); }}>
+                    <SelectTrigger className="!h-10 rounded-lg border-[#E2E8F0] text-xs w-[90px] shrink-0 [&>svg]:text-[#94A3B8]"><SelectValue /></SelectTrigger>
+                    <SelectContent className="z-[350]">{PHONE_TYPES.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
+                  </Select>
+                  <div className="flex items-center rounded-lg border border-[#E2E8F0] bg-white overflow-hidden h-10 flex-1 min-w-0 hover:border-[#CBD5E1] transition-colors">
+                    <Select value={row.code} onValueChange={(v) => handlePhoneChange(idx, "code", v)}>
+                      <SelectTrigger className="h-full border-0 border-r border-[#E2E8F0] rounded-none bg-[#FAFBFC] px-2 text-xs w-[68px] shrink-0 shadow-none focus:ring-0"><span className="text-[11px]">{getCountryFlag(row.code)} {row.code}</span></SelectTrigger>
+                      <SelectContent className="z-[350]">{COUNTRY_CODES.map((cc) => <SelectItem key={cc.code} value={cc.code}><span className="flex items-center gap-1"><span>{cc.flag}</span>{cc.code}</span></SelectItem>)}</SelectContent>
+                    </Select>
+                    <input value={row.number} onChange={(e) => handlePhoneChange(idx, "number", e.target.value)} placeholder="Phone number" className="flex-1 h-full px-2.5 text-sm text-[#0F172A] outline-none bg-transparent placeholder:text-[#B8C4D0]" />
+                  </div>
+                  <Input value={row.ext} onChange={(e) => handlePhoneChange(idx, "ext", e.target.value)} placeholder="Ext." className={`w-[70px] shrink-0 ${inputCls}`} />
+                  {phoneRows.length > 1 && <button onClick={() => removePhoneRow(row.id)} className="w-8 h-8 rounded-lg flex items-center justify-center text-[#CBD5E1] hover:text-[#EF4444] hover:bg-[#FEF2F2] transition-colors cursor-pointer shrink-0"><Trash2 className="w-3.5 h-3.5" /></button>}
+                </div>
+              ))}
             </div>
           </div>
 
-          {/* ── Section 4: Email Addresses (dynamic rows) ── */}
-          <div>
-            <h4 className="text-[13px] sm:text-sm text-foreground" style={{ fontWeight: 600 }}>Email Addresses</h4>
-            <p className="text-[11px] text-[#94A3B8] mt-0.5 mb-3">Add one or more email addresses with type classification.</p>
-            <div className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-              <div className="p-4 space-y-3">
-                {emailRows.map((row, idx) => (
-                  <div key={row.id} className="flex items-end gap-2">
-                    <div className="w-[110px] shrink-0">
-                      {idx === 0 && <label className="text-[11px] text-[#94A3B8] mb-1 block" style={{ fontWeight: 500 }}>Type</label>}
-                      <Select value={row.type} onValueChange={(v) => { setEmailRows((p) => { const n = [...p]; n[idx] = { ...n[idx], type: v }; return n; }); }}>
-                        <SelectTrigger className="h-10 rounded-lg border-[#E2E8F0] text-xs [&>svg]:text-[#94A3B8]"><SelectValue /></SelectTrigger>
-                        <SelectContent className="z-[350]">{EMAIL_TYPES.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
-                      </Select>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      {idx === 0 && <label className="text-[11px] text-[#94A3B8] mb-1 block" style={{ fontWeight: 500 }}>Email</label>}
-                      <Input value={row.address} onChange={(e) => handleEmailChange(idx, e.target.value)} placeholder="name@company.com" type="email" className={inputCls} />
-                    </div>
-                    {emailRows.length > 1 && (
-                      <button onClick={() => removeEmailRow(row.id)} className="w-10 h-10 rounded-lg flex items-center justify-center text-[#94A3B8] hover:text-[#EF4444] hover:bg-[#FEF2F2] transition-colors cursor-pointer shrink-0"><Trash2 className="w-3.5 h-3.5" /></button>
-                    )}
-                  </div>
-                ))}
-                <button type="button" onClick={addEmailRow} className="inline-flex items-center gap-1.5 text-[12px] text-[#0A77FF] hover:text-[#0862D0] cursor-pointer" style={{ fontWeight: 500 }}><Plus className="w-3.5 h-3.5" />Add email address</button>
+          {/* ── Email Addresses — boxed card ── */}
+          <div className="rounded-lg border border-[#E2E8F0] bg-white overflow-visible shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
+            <div className="px-3 sm:px-4 py-2 sm:py-2.5 border-b border-[#EEF2F6] flex items-center justify-between bg-[#FAFBFC]">
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded-md bg-[#EFF6FF] flex items-center justify-center shrink-0"><Mail className="w-3.5 h-3.5 text-[#0A77FF]" /></div>
+                <span className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Email Addresses</span>
               </div>
+              <button type="button" onClick={addEmailRow} className="inline-flex items-center gap-1 text-[11px] text-[#0A77FF] hover:text-[#0862D0] cursor-pointer" style={{ fontWeight: 600 }}><Plus className="w-3 h-3" />Add</button>
             </div>
-          </div>
-
-          {/* ── Section 5: Notes ── */}
-          <div>
-            <h4 className="text-[13px] sm:text-sm text-foreground" style={{ fontWeight: 600 }}>Additional Notes</h4>
-            <p className="text-[11px] text-[#94A3B8] mt-0.5 mb-3">Any additional context about this contact.</p>
-            <div className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-              <div className="p-4">
-                <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Add any notes about this contact..." className="min-h-[80px] rounded-lg border-[#E2E8F0] bg-white text-sm placeholder:text-[#B8C4D0] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/15 resize-none" />
-              </div>
+            <div className="px-3 sm:px-4 py-2.5 space-y-2">
+              {emailRows.map((row, idx) => (
+                <div key={row.id} className="flex items-center gap-2">
+                  <Select value={row.type} onValueChange={(v) => { setEmailRows((p) => { const n = [...p]; n[idx] = { ...n[idx], type: v }; return n; }); }}>
+                    <SelectTrigger className="!h-10 rounded-lg border-[#E2E8F0] text-xs w-[100px] shrink-0 [&>svg]:text-[#94A3B8]"><SelectValue /></SelectTrigger>
+                    <SelectContent className="z-[350]">{EMAIL_TYPES.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
+                  </Select>
+                  <Input value={row.address} onChange={(e) => handleEmailChange(idx, e.target.value)} placeholder="name@company.com" type="email" className={`flex-1 ${inputCls}`} />
+                  {emailRows.length > 1 && <button onClick={() => removeEmailRow(row.id)} className="w-8 h-8 rounded-lg flex items-center justify-center text-[#CBD5E1] hover:text-[#EF4444] hover:bg-[#FEF2F2] transition-colors cursor-pointer shrink-0"><Trash2 className="w-3.5 h-3.5" /></button>}
+                </div>
+              ))}
             </div>
           </div>
         </div>
