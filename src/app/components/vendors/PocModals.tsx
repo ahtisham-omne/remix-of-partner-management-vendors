@@ -395,8 +395,8 @@ interface CreatePocModalProps {
   contextName?: string;
   newPocName: string;
   onNewPocNameChange: (val: string) => void;
-  newPocDepartment: "Sales" | "Supply Chain Management" | "Finance";
-  onNewPocDepartmentChange: (val: "Sales" | "Supply Chain Management" | "Finance") => void;
+  newPocDepartment: string;
+  onNewPocDepartmentChange: (val: string) => void;
   newPocRole: string;
   onNewPocRoleChange: (val: string) => void;
   newPocLandline: string;
@@ -515,7 +515,7 @@ export function CreatePocModal({
                   <input ref={profileInputRef} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) { const reader = new FileReader(); reader.onload = (ev) => setProfileImage(ev.target?.result as string); reader.readAsDataURL(f); } e.target.value = ""; }} />
                   <div
                     onClick={() => profileInputRef.current?.click()}
-                    className={`relative w-full aspect-square rounded-xl cursor-pointer group transition-all ${profileImage ? "ring-2 ring-[#E2E8F0] hover:ring-[#0A77FF]/30" : "border-2 border-dashed border-[#CBD5E1] hover:border-[#0A77FF]/50 bg-[#F8FAFC] hover:bg-[#EDF4FF]/50"}`}
+                    className={`relative w-full h-full rounded-xl cursor-pointer group transition-all ${profileImage ? "ring-2 ring-[#E2E8F0] hover:ring-[#0A77FF]/30" : "border-2 border-dashed border-[#CBD5E1] hover:border-[#0A77FF]/50 bg-[#F8FAFC] hover:bg-[#EDF4FF]/50"}`}
                   >
                     {profileImage ? (
                       <>

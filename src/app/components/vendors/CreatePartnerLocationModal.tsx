@@ -277,7 +277,7 @@ export function CreatePartnerLocationModal({
 
   function resetNewPocForm() {
     setNewPocName("");
-    setNewPocDepartment("Sales");
+    setNewPocDepartment("");
     setNewPocRole("");
     setNewPocLandline("");
     setNewPocLandlineCode("+1");

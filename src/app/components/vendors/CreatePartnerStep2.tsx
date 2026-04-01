@@ -179,7 +179,7 @@ export function Step2PartnerForm({
   }, []);
 
   const resetGlobalNewPocForm = useCallback(() => {
-    setGNewPocName(""); setGNewPocDepartment("Sales"); setGNewPocRole("");
+    setGNewPocName(""); setGNewPocDepartment(""); setGNewPocRole("");
     setGNewPocLandline(""); setGNewPocLandlineCode("+1"); setGNewPocExt("");
     setGNewPocMobile(""); setGNewPocMobileCode("+1"); setGNewPocEmail("");
   }, []);

@@ -6194,7 +6194,7 @@ function ContactsTab({ vendor, cfg }: { vendor: Vendor; cfg?: VendorConfigData }
   // ── Create Modal state ──
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newPocName, setNewPocName] = useState("");
-  const [newPocDepartment, setNewPocDepartment] = useState<"Sales" | "Supply Chain Management" | "Finance">("Sales");
+  const [newPocDepartment, setNewPocDepartment] = useState("");
   const [newPocRole, setNewPocRole] = useState("");
   const [newPocLandline, setNewPocLandline] = useState("");
   const [newPocLandlineCode, setNewPocLandlineCode] = useState("+1");
@@ -6370,7 +6370,7 @@ function ContactsTab({ vendor, cfg }: { vendor: Vendor; cfg?: VendorConfigData }
   }, [pocTempSelected, selectedPocIds]);
 
   const resetCreateForm = useCallback(() => {
-    setNewPocName(""); setNewPocDepartment("Sales"); setNewPocRole("");
+    setNewPocName(""); setNewPocDepartment(""); setNewPocRole("");
     setNewPocLandline(""); setNewPocLandlineCode("+1"); setNewPocExt("");
     setNewPocMobile(""); setNewPocMobileCode("+1"); setNewPocEmail("");
   }, []);

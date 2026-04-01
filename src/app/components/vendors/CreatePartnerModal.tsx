@@ -2207,7 +2207,7 @@ function Step2PartnerForm({
   const [selectedGlobalPocIds, setSelectedGlobalPocIds] = useState<Set<string>>(new Set());
   // Create new POC form state (for global POC)
   const [gNewPocName, setGNewPocName] = useState("");
-  const [gNewPocDepartment, setGNewPocDepartment] = useState<"Sales" | "Supply Chain Management" | "Finance">("Sales");
+  const [gNewPocDepartment, setGNewPocDepartment] = useState("");
   const [gNewPocRole, setGNewPocRole] = useState("");
   const [gNewPocLandline, setGNewPocLandline] = useState("");
   const [gNewPocLandlineCode, setGNewPocLandlineCode] = useState("+1");
@@ -2272,7 +2272,7 @@ function Step2PartnerForm({
   }, []);
 
   const resetGlobalNewPocForm = useCallback(() => {
-    setGNewPocName(""); setGNewPocDepartment("Sales"); setGNewPocRole("");
+    setGNewPocName(""); setGNewPocDepartment(""); setGNewPocRole("");
     setGNewPocLandline(""); setGNewPocLandlineCode("+1"); setGNewPocExt("");
     setGNewPocMobile(""); setGNewPocMobileCode("+1"); setGNewPocEmail("");
   }, []);
@@ -4102,7 +4102,7 @@ function ConfigPageContent({
 
   // Create New POC form state
   const [newPocName, setNewPocName] = useState("");
-  const [newPocDepartment, setNewPocDepartment] = useState<"Sales" | "Supply Chain Management" | "Finance">("Sales");
+  const [newPocDepartment, setNewPocDepartment] = useState("");
   const [newPocRole, setNewPocRole] = useState("");
   const [newPocLandline, setNewPocLandline] = useState("");
   const [newPocLandlineCode, setNewPocLandlineCode] = useState("+1");
@@ -4181,7 +4181,7 @@ function ConfigPageContent({
 
   function resetNewPocForm() {
     setNewPocName("");
-    setNewPocDepartment("Sales");
+    setNewPocDepartment("");
     setNewPocRole("");
     setNewPocLandline("");
     setNewPocLandlineCode("+1");
