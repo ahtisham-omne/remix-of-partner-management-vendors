@@ -357,8 +357,8 @@ export function SelectPocDictionaryModal({
           </div>
         </div>
 
-        {/* PocDataTable — matching listing page card wrapper */}
-        <div className="flex-1 min-h-0 overflow-hidden mx-3 sm:mx-4 my-3 border border-border rounded-xl bg-card flex flex-col">
+        {/* PocDataTable — full-width edge-to-edge */}
+        <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
           <PocDataTable
             contacts={pocPagedContacts}
             selectedIds={pocTempSelected}

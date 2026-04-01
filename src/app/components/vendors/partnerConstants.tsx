@@ -1135,6 +1135,33 @@ export const CONTACT_DICTIONARY: ContactPerson[] = [
   { id: "C-024", name: "Sofia Martinez", company: "Electronics Distribution", department: "Supply Chain Management", phone: "(713) 999-2211", phoneExt: "", secondaryPhone: "(713) 999-2212", secondaryPhoneExt: "3515", email: "smartinez@elecdist.com", avatarColor: "#0A77FF" },
 ];
 
+// ── Generate 500 contacts total ──
+(() => {
+  const firstNames = ["Alex","Jordan","Taylor","Morgan","Casey","Riley","Quinn","Blake","Drew","Avery","Cameron","Dakota","Emery","Finley","Harper","Jamie","Kai","Logan","Micah","Noel","Parker","Reese","Sage","Skyler","Toby","Val","Wren","Ash","Bay","Cleo","Darcy","Ellis","Frankie","Gray","Haven","Indie","Jules","Kit","Lane","Marley","Nico","Oakley","Peyton","Remy","Sam","Tatum","Uri","Winter","Zara","Ari","Briar","Cruz","Devin","Eden","Flynn","Greer","Hollis","Ira","Joss","Kira","Lee","Milan","Nash","Onyx","Phoenix","Rae","Shea","True","Uma","Vega","West","Xen","Yael","Zion"];
+  const lastNames = ["Anderson","Baker","Clark","Davis","Edwards","Foster","Garcia","Harris","Irving","Jones","Kim","Lewis","Miller","Nelson","Owens","Patel","Quinn","Roberts","Smith","Taylor","Upton","Vargas","Williams","Xiao","Young","Zhang","Abbott","Bennett","Coleman","Dixon","Evans","Fletcher","Grant","Hayes","Ingram","Jackson","Knight","Lambert","Morrison","Nash","Ortiz","Palmer","Reed","Stevens","Tucker","Underwood","Vincent","Walsh","York","Zimmer"];
+  const companies = ["Acme Corp","TechVault","NexGen Solutions","Apex Industries","Summit Group","Vertex Labs","Pioneer Systems","Atlas Logistics","Beacon Analytics","Cascade Networks","Delta Manufacturing","Echo Enterprises","Falcon Dynamics","Granite Holdings","Horizon Partners","Ionic Solutions","Jade Innovations","Keystone Global","Lumen Corp","Metro Supply"];
+  const depts: ("Sales" | "Supply Chain Management" | "Finance")[] = ["Sales", "Supply Chain Management", "Finance"];
+  const colors = ["#0A77FF", "#7C3AED", "#059669", "#D97706"];
+  const existing = CONTACT_DICTIONARY.length;
+  for (let i = existing; i < 500; i++) {
+    const fn = firstNames[i % firstNames.length];
+    const ln = lastNames[i % lastNames.length];
+    const h = (i * 31 + 7) % 10000;
+    CONTACT_DICTIONARY.push({
+      id: `C-${String(i + 1).padStart(3, "0")}`,
+      name: `${fn} ${ln}`,
+      company: companies[i % companies.length],
+      department: depts[i % depts.length],
+      phone: `(${300 + (h % 700)}) ${100 + (h % 900)}-${1000 + (h % 9000)}`,
+      phoneExt: i % 4 === 0 ? String(100 + (h % 900)) : "",
+      secondaryPhone: i % 3 === 0 ? `(${400 + (h % 600)}) ${200 + (h % 800)}-${2000 + (h % 8000)}` : "",
+      secondaryPhoneExt: i % 5 === 0 ? String(200 + (h % 800)) : "",
+      email: `${fn.toLowerCase()}.${ln.toLowerCase()}@${companies[i % companies.length].toLowerCase().replace(/\s+/g, "")}.com`,
+      avatarColor: colors[i % colors.length],
+    });
+  }
+})();
+
 // ── System Users (all users in the system for notifications/alerts) ──
 export type LicenseType = "Full Access" | "Field User" | "Read Only";
 export type UserStatus = "Active" | "Disabled";

@@ -1,13 +1,11 @@
-import React, { useState, useMemo, useCallback } from "react";
-import { Search, X, Plus, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Users, Mail, Phone, Building2, AlignJustify, List as ListIcon, ChevronDown, Check } from "lucide-react";
+import React, { useState } from "react";
+import { Search, X, Plus, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Users, AlignJustify, List as ListIcon, LayoutGrid, ChevronDown, Check, SlidersHorizontal } from "lucide-react";
 import { Input } from "../ui/input";
 import { Checkbox } from "../ui/checkbox";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "../ui/table";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import type { ContactPerson } from "./partnerConstants";
 
@@ -24,10 +22,52 @@ const TINTS: Record<string, { bg: string; text: string }> = {
   "#059669": { bg: "#E8FAF3", text: "#059669" }, "#D97706": { bg: "#FEF5E7", text: "#B45D04" },
 };
 function tint(c: string) { return TINTS[c] || { bg: "#F0F4FF", text: c || "#64748B" }; }
-function initials(n: string) { return n.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2); }
+function ini(n: string) { return n.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2); }
 
-// ── Density ──
-type Density = "condensed" | "comfort";
+// ── Filter Dropdown (multi-select) ──
+function FilterDrop({ label, selected, options, onToggle, onClear }: {
+  label: string; selected: Set<string>; options: string[]; onToggle: (v: string) => void; onClear: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const count = selected.size;
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button type="button" className={`inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border text-xs transition-colors cursor-pointer ${
+          count > 0 ? "border-primary/30 bg-[#EDF4FF] text-[#0A77FF]" : "border-border bg-white text-foreground hover:bg-muted/50 hover:border-muted-foreground/30"
+        }`} style={{ fontWeight: count > 0 ? 600 : 500 }}>
+          <SlidersHorizontal className={`w-3 h-3 ${count > 0 ? "text-[#0A77FF]" : "text-muted-foreground"}`} />
+          {label}
+          {count > 0 && <span className="text-[10px] min-w-[18px] h-[18px] rounded-full bg-[#0A77FF] text-white flex items-center justify-center px-1" style={{ fontWeight: 600 }}>{count}</span>}
+          <ChevronDown className="w-3 h-3 text-muted-foreground" />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent side="bottom" align="start" sideOffset={4} className="w-[200px] p-0 z-[350] rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-[#E2E8F0]/80" onOpenAutoFocus={(e) => e.preventDefault()}>
+        <div className="max-h-[240px] overflow-y-auto py-1">
+          {options.map((opt) => {
+            const isSel = selected.has(opt);
+            return (
+              <button key={opt} type="button" onClick={() => onToggle(opt)}
+                className={`w-full flex items-center gap-2.5 px-3 py-2 text-left text-[12px] transition-colors ${isSel ? "bg-[#EDF4FF]/50" : "hover:bg-[#F8FAFC]"}`}>
+                <div className="w-[16px] h-[16px] rounded-[4px] border-[1.5px] flex items-center justify-center shrink-0" style={{ borderColor: isSel ? "#0A77FF" : "#CBD5E1", backgroundColor: isSel ? "#0A77FF" : "transparent" }}>
+                  {isSel && <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
+                </div>
+                <span className={`flex-1 ${isSel ? "text-[#0A77FF]" : "text-[#334155]"}`} style={{ fontWeight: isSel ? 600 : 400 }}>{opt}</span>
+              </button>
+            );
+          })}
+        </div>
+        {count > 0 && (
+          <div className="px-2 py-1.5 border-t border-[#F1F5F9]">
+            <button type="button" onClick={() => { onClear(); setOpen(false); }} className="text-[11px] text-[#94A3B8] hover:text-[#EF4444] cursor-pointer" style={{ fontWeight: 500 }}>Clear</button>
+          </div>
+        )}
+      </PopoverContent>
+    </Popover>
+  );
+}
+
+type Density = "condensed" | "comfort" | "card";
 
 // ── Props ──
 export interface PocDataTableProps {
@@ -44,6 +84,7 @@ export interface PocDataTableProps {
   onPageChange: (page: number) => void;
   totalCount: number;
   perPage?: number;
+  onPerPageChange?: (n: number) => void;
   onCreateNew?: () => void;
   selectable?: boolean;
 }
@@ -51,29 +92,27 @@ export interface PocDataTableProps {
 export function PocDataTable({
   contacts, selectedIds, onToggleSelect, onSelectAll,
   searchQuery, onSearchChange, categoryFilter, onCategoryFilterChange,
-  page, totalPages, onPageChange, totalCount, perPage = 20,
+  page, totalPages, onPageChange, totalCount, perPage = 20, onPerPageChange,
   onCreateNew, selectable = true,
 }: PocDataTableProps) {
   const [density, setDensity] = useState<Density>("condensed");
+  const [deptFilter, setDeptFilter] = useState<Set<string>>(new Set());
   const isComfort = density === "comfort";
+  const isCard = density === "card";
+
+  const toggleSet = (s: Set<string>, v: string) => { const n = new Set(s); n.has(v) ? n.delete(v) : n.add(v); return n; };
 
   const allIds = contacts.map((c) => c.id);
   const allSel = selectable && selectedIds ? allIds.length > 0 && allIds.every((id) => selectedIds.has(id)) : false;
   const someSel = selectable && selectedIds ? !allSel && allIds.some((id) => selectedIds.has(id)) : false;
 
-  const FILTERS = [
-    { key: "all", label: "All", count: totalCount },
-    { key: "Sales", label: "Sales" },
-    { key: "Supply Chain Management", label: "Supply Chain" },
-    { key: "Finance", label: "Finance" },
-  ];
+  const PER_PAGE_OPTIONS = [10, 20, 50, 100];
 
   return (
     <div className="flex flex-col flex-1 min-h-0">
       {/* ── Row 1: Search + Filters + Count + Density + Create ── */}
       <div className="flex items-center justify-between gap-3 px-4 pt-3.5 pb-2 shrink-0">
         <div className="flex items-center gap-2.5 flex-1 min-w-0">
-          {/* Search */}
           <div className="relative flex-1 max-w-xs">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70 pointer-events-none" />
             <Input
@@ -88,44 +127,44 @@ export function PocDataTable({
               </button>
             )}
           </div>
+          {/* Filter dropdowns */}
+          <FilterDrop label="Department" selected={deptFilter} options={["Sales", "Supply Chain Management", "Finance"]} onToggle={(v) => setDeptFilter(toggleSet(deptFilter, v))} onClear={() => setDeptFilter(new Set())} />
         </div>
 
         <div className="flex items-center gap-1.5 shrink-0">
-          {/* Count */}
           <span className="text-sm tabular-nums mr-1 hidden sm:inline" style={{ fontWeight: 500 }}>
             <span className="text-foreground">{totalCount}</span>
             <span className="text-muted-foreground/70"> contacts</span>
           </span>
-
           <div className="w-px h-5 bg-border/60 mx-0.5 hidden sm:block" />
-
           {/* Density */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button className="inline-flex items-center justify-center h-9 gap-2 px-3 rounded-lg border border-border bg-white shadow-sm hover:bg-muted/40 transition-colors cursor-pointer">
-                {isComfort ? <ListIcon className="w-[18px] h-[18px] text-muted-foreground/80" /> : <AlignJustify className="w-[18px] h-[18px] text-muted-foreground/80" />}
-                <span className="text-sm hidden md:inline" style={{ fontWeight: 500 }}>{isComfort ? "Comfort" : "Condensed"}</span>
+                {isCard ? <LayoutGrid className="w-[18px] h-[18px] text-muted-foreground/80" /> : isComfort ? <ListIcon className="w-[18px] h-[18px] text-muted-foreground/80" /> : <AlignJustify className="w-[18px] h-[18px] text-muted-foreground/80" />}
+                <span className="text-sm hidden md:inline" style={{ fontWeight: 500 }}>{isCard ? "Card" : isComfort ? "Comfort" : "Condensed"}</span>
                 <ChevronDown className="w-3.5 h-3.5 text-muted-foreground/60" />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-[180px]">
-              {(["condensed", "comfort"] as Density[]).map((d) => (
-                <DropdownMenuItem key={d} onClick={() => setDensity(d)} className={density === d ? "bg-muted/50" : ""}>
-                  {d === "condensed" ? <AlignJustify className="w-4 h-4 mr-2 text-muted-foreground" /> : <ListIcon className="w-4 h-4 mr-2 text-muted-foreground" />}
-                  {d === "condensed" ? "Condensed" : "Comfort"}
-                  {density === d && <Check className="w-3.5 h-3.5 ml-auto text-primary" />}
+            <DropdownMenuContent align="end" className="w-[200px] p-1.5">
+              {([
+                { key: "condensed" as Density, label: "Condensed", desc: "Compact view", Icon: AlignJustify },
+                { key: "comfort" as Density, label: "Comfort", desc: "Spacious view", Icon: ListIcon },
+                { key: "card" as Density, label: "Card View", desc: "Grid layout", Icon: LayoutGrid },
+              ]).map((opt) => (
+                <DropdownMenuItem key={opt.key} onClick={() => setDensity(opt.key)} className={`flex items-center gap-2.5 px-2.5 py-2 rounded-lg ${density === opt.key ? "bg-muted/50" : ""}`}>
+                  <opt.Icon className="w-4 h-4 text-muted-foreground shrink-0" />
+                  <div className="min-w-0"><p className="text-sm" style={{ fontWeight: 500 }}>{opt.label}</p><p className="text-[10px] text-muted-foreground/60">{opt.desc}</p></div>
+                  {density === opt.key && <Check className="w-3.5 h-3.5 ml-auto text-primary shrink-0" />}
                 </DropdownMenuItem>
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
-
-          {/* Create */}
           {onCreateNew && (
             <>
               <div className="w-px h-5 bg-border/60 mx-0.5 hidden sm:block" />
               <button onClick={onCreateNew} className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-sm shadow-sm transition-colors cursor-pointer" style={{ fontWeight: 600 }}>
-                <Plus className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Create New</span>
+                <Plus className="w-3.5 h-3.5" /><span className="hidden sm:inline">Create New</span>
               </button>
             </>
           )}
@@ -133,8 +172,13 @@ export function PocDataTable({
       </div>
 
       {/* ── Row 2: Filter pills ── */}
-      <div className="flex items-center gap-1.5 overflow-x-auto px-4 pb-2.5 shrink-0">
-        {FILTERS.map((f) => {
+      <div className="flex items-center gap-1.5 overflow-x-auto px-4 pb-2.5 shrink-0 scrollbar-hide">
+        {([
+          { key: "all", label: "All", count: totalCount },
+          { key: "Sales", label: "Sales" },
+          { key: "Supply Chain Management", label: "Supply Chain" },
+          { key: "Finance", label: "Finance" },
+        ]).map((f) => {
           const isActive = categoryFilter === f.key;
           return (
             <button key={f.key} onClick={() => onCategoryFilterChange(f.key)}
@@ -144,7 +188,7 @@ export function PocDataTable({
               style={{ fontWeight: isActive ? 500 : 400, color: isActive ? "#0A77FF" : undefined }}
             >
               {f.label}
-              {f.count != null && (
+              {"count" in f && f.count != null && (
                 <span className={`text-[10px] rounded-full px-1.5 py-px min-w-[18px] text-center ${isActive ? "bg-primary/10" : "bg-muted"}`}
                   style={{ fontWeight: 600, color: isActive ? "#0A77FF" : "#475569" }}>{f.count}</span>
               )}
@@ -153,127 +197,146 @@ export function PocDataTable({
         })}
       </div>
 
-      {/* ── Table ── */}
-      <div className="flex-1 min-h-0 overflow-auto border-t border-border">
-        <Table>
-          <TableHeader className="sticky top-0 z-10 bg-card">
-            <TableRow className={`bg-muted/30 hover:bg-muted/30 ${isComfort ? "[&>th]:h-10" : "[&>th]:h-8"}`}>
-              {selectable && (
-                <TableHead className="w-[40px] min-w-[40px] max-w-[40px] !pl-4 !pr-0">
-                  <Checkbox
-                    checked={allSel ? true : someSel ? "indeterminate" : false}
-                    onCheckedChange={() => onSelectAll?.(allIds)}
-                  />
-                </TableHead>
-              )}
-              <TableHead className="min-w-[200px]">Name</TableHead>
-              <TableHead className="w-[130px]">Department</TableHead>
-              <TableHead className="w-[200px]">Email</TableHead>
-              <TableHead className="w-[140px]">Phone</TableHead>
-              <TableHead className="w-[140px]">Secondary Phone</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {contacts.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={selectable ? 6 : 5} className="h-32 text-center">
-                  <div className="flex flex-col items-center justify-center py-8">
-                    <Users className="w-8 h-8 text-[#E2E8F0] mb-2" />
-                    <p className="text-sm text-muted-foreground" style={{ fontWeight: 500 }}>No contacts found</p>
-                    <p className="text-xs text-muted-foreground/60 mt-0.5">Try adjusting your search or filters</p>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ) : (
-              contacts.map((c) => {
+      {/* ── Table / Card View ── */}
+      {isCard ? (
+        /* Card grid view */
+        <div className="flex-1 min-h-0 overflow-y-auto scrollbar-hide px-4 py-3 bg-[#FAFBFC] border-t border-border">
+          {contacts.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16"><Users className="w-8 h-8 text-[#E2E8F0] mb-2" /><p className="text-sm text-muted-foreground" style={{ fontWeight: 500 }}>No contacts found</p></div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {contacts.map((c) => {
                 const isSel = selectable && selectedIds ? selectedIds.has(c.id) : false;
                 const t = tint(c.avatarColor);
                 return (
-                  <TableRow
-                    key={c.id}
-                    onClick={() => selectable && onToggleSelect?.(c.id)}
-                    className={`${selectable ? "cursor-pointer" : ""} ${isSel ? "bg-primary/[0.03]" : ""} ${
-                      isComfort ? "[&>td]:py-3 [&>td]:pl-4 [&>td]:pr-2" : "[&>td]:py-1 [&>td]:pl-4 [&>td]:pr-2"
-                    }`}
-                  >
+                  <button key={c.id} type="button" onClick={() => selectable && onToggleSelect?.(c.id)}
+                    className={`text-left rounded-xl border transition-all duration-150 ${selectable ? "cursor-pointer" : ""} ${
+                      isSel ? "border-[#0A77FF] bg-[#FAFCFF] shadow-[0_0_0_1px_#0A77FF]" : "border-[#E8ECF1] bg-white hover:border-[#BFDBFE] hover:shadow-sm"
+                    }`}>
+                    <div className="p-3.5">
+                      <div className="flex items-start gap-3">
+                        <div className="w-10 h-10 rounded-lg flex items-center justify-center text-[11px] shrink-0 border border-[#E8ECF1]" style={{ backgroundColor: t.bg, color: t.text, fontWeight: 700 }}>{ini(c.name)}</div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}><Hl text={c.name} q={searchQuery} /></p>
+                          <p className="text-[11px] text-[#64748B] truncate mt-0.5">{c.company}</p>
+                        </div>
+                        {selectable && (
+                          <div className={`w-[18px] h-[18px] rounded-[5px] border-[1.5px] flex items-center justify-center shrink-0 mt-0.5 ${isSel ? "bg-[#0A77FF] border-[#0A77FF]" : "border-[#CBD5E1]"}`}>
+                            {isSel && <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
+                          </div>
+                        )}
+                      </div>
+                      <p className="text-[11px] text-[#64748B] mt-2">{c.department === "Supply Chain Management" ? "Supply Chain" : c.department}</p>
+                      <div className="space-y-1 mt-2 pt-2 border-t border-[#F1F5F9]">
+                        <p className="text-[11px] text-[#475569] truncate">{c.email}</p>
+                        <p className="text-[11px] text-[#475569]">{c.phone}{c.phoneExt ? ` ext. ${c.phoneExt}` : ""}</p>
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      ) : (
+        /* Table view */
+        <div className="flex-1 min-h-0 overflow-auto scrollbar-hide border-t border-border">
+          <Table>
+            <TableHeader className="sticky top-0 z-10 bg-card">
+              <TableRow className={`bg-muted/30 hover:bg-muted/30 ${isComfort ? "[&>th]:h-10" : "[&>th]:h-8"}`}>
+                {selectable && (
+                  <TableHead className="w-[40px] min-w-[40px] !pl-4 !pr-0">
+                    <Checkbox checked={allSel ? true : someSel ? "indeterminate" : false} onCheckedChange={() => onSelectAll?.(allIds)} />
+                  </TableHead>
+                )}
+                <TableHead className="min-w-[200px]">Name</TableHead>
+                <TableHead className="w-[130px]">Department</TableHead>
+                <TableHead className="w-[200px]">Email</TableHead>
+                <TableHead className="w-[140px]">Phone</TableHead>
+                <TableHead className="w-[140px]">Secondary</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {contacts.length === 0 ? (
+                <TableRow><TableCell colSpan={selectable ? 6 : 5} className="h-32 text-center"><div className="flex flex-col items-center py-8"><Users className="w-8 h-8 text-[#E2E8F0] mb-2" /><p className="text-sm text-muted-foreground" style={{ fontWeight: 500 }}>No contacts found</p></div></TableCell></TableRow>
+              ) : contacts.map((c) => {
+                const isSel = selectable && selectedIds ? selectedIds.has(c.id) : false;
+                const t = tint(c.avatarColor);
+                return (
+                  <TableRow key={c.id} onClick={() => selectable && onToggleSelect?.(c.id)}
+                    className={`${selectable ? "cursor-pointer" : ""} ${isSel ? "bg-primary/[0.03]" : ""} ${isComfort ? "[&>td]:py-3 [&>td]:pl-4 [&>td]:pr-2" : "[&>td]:py-1 [&>td]:pl-4 [&>td]:pr-2"}`}>
                     {selectable && (
-                      <TableCell className="w-[40px] !pl-4 !pr-0">
-                        <Checkbox checked={isSel} onCheckedChange={() => onToggleSelect?.(c.id)} onClick={(e) => e.stopPropagation()} />
-                      </TableCell>
+                      <TableCell className="w-[40px] !pl-4 !pr-0"><Checkbox checked={isSel} onCheckedChange={() => onToggleSelect?.(c.id)} onClick={(e) => e.stopPropagation()} /></TableCell>
                     )}
-                    {/* Name + Company */}
                     <TableCell>
                       <div className={`flex items-center ${isComfort ? "gap-3" : "gap-2.5"}`}>
-                        <div
-                          className={`${isComfort ? "w-9 h-9" : "w-8 h-8"} rounded-lg flex items-center justify-center shrink-0 overflow-hidden border border-[#E8ECF1]`}
-                          style={{ backgroundColor: t.bg, color: t.text, fontSize: isComfort ? 12 : 11, fontWeight: 700 }}
-                        >
-                          {initials(c.name)}
-                        </div>
+                        <div className={`${isComfort ? "w-9 h-9" : "w-8 h-8"} rounded-lg flex items-center justify-center shrink-0 border border-[#E8ECF1]`} style={{ backgroundColor: t.bg, color: t.text, fontSize: isComfort ? 12 : 11, fontWeight: 700 }}>{ini(c.name)}</div>
                         <div className="min-w-0">
                           <span className={`${isComfort ? "text-[13.5px]" : "text-sm"} truncate block`} style={{ fontWeight: 500 }}><Hl text={c.name} q={searchQuery} /></span>
                           {isComfort && <span className="text-xs text-muted-foreground/60 truncate block">{c.company}</span>}
                         </div>
                       </div>
                     </TableCell>
-                    {/* Department — plain text */}
+                    <TableCell><span className={`${isComfort ? "text-[13.5px]" : "text-sm"} text-[#475569]`}>{c.department === "Supply Chain Management" ? "Supply Chain" : c.department}</span></TableCell>
+                    <TableCell><span className={`${isComfort ? "text-[13.5px]" : "text-sm"} text-muted-foreground truncate block max-w-[180px]`}><Hl text={c.email} q={searchQuery} /></span></TableCell>
                     <TableCell>
-                      <span className={`${isComfort ? "text-[13.5px]" : "text-sm"} text-[#475569]`}>
-                        {c.department === "Supply Chain Management" ? "Supply Chain" : c.department}
-                      </span>
+                      <div><span className={`${isComfort ? "text-[13.5px]" : "text-sm"} text-muted-foreground`}>{c.phone}</span>{isComfort && c.phoneExt && <span className="text-xs text-muted-foreground/50 ml-1">ext. {c.phoneExt}</span>}</div>
                     </TableCell>
-                    {/* Email */}
                     <TableCell>
-                      <span className={`${isComfort ? "text-[13.5px]" : "text-sm"} text-muted-foreground truncate block max-w-[180px]`}>
-                        <Hl text={c.email} q={searchQuery} />
-                      </span>
-                    </TableCell>
-                    {/* Phone */}
-                    <TableCell>
-                      <div className="min-w-0">
-                        <span className={`${isComfort ? "text-[13.5px]" : "text-sm"} text-muted-foreground block`}>{c.phone}</span>
-                        {isComfort && c.phoneExt && <span className="text-xs text-muted-foreground/50">ext. {c.phoneExt}</span>}
-                      </div>
-                    </TableCell>
-                    {/* Secondary Phone */}
-                    <TableCell>
-                      <div className="min-w-0">
-                        <span className={`${isComfort ? "text-[13.5px]" : "text-sm"} text-muted-foreground block`}>{c.secondaryPhone || "—"}</span>
-                        {isComfort && c.secondaryPhoneExt && <span className="text-xs text-muted-foreground/50">ext. {c.secondaryPhoneExt}</span>}
-                      </div>
+                      <div><span className={`${isComfort ? "text-[13.5px]" : "text-sm"} text-muted-foreground`}>{c.secondaryPhone || "—"}</span>{isComfort && c.secondaryPhoneExt && <span className="text-xs text-muted-foreground/50 ml-1">ext. {c.secondaryPhoneExt}</span>}</div>
                     </TableCell>
                   </TableRow>
                 );
-              })
-            )}
-          </TableBody>
-        </Table>
-      </div>
-
-      {/* ── Pagination — matches listing page ── */}
-      {totalPages > 0 && (
-        <div className="flex items-center justify-between px-4 py-2.5 border-t border-border shrink-0">
-          <span className="text-xs text-muted-foreground tabular-nums" style={{ fontWeight: 500 }}>
-            {contacts.length > 0 ? `${(page - 1) * perPage + 1}–${Math.min(page * perPage, totalCount)} of ${totalCount}` : `0 of ${totalCount}`}
-          </span>
-          <div className="flex items-center gap-0.5">
-            <button onClick={() => onPageChange(1)} disabled={page <= 1} className="w-8 h-8 rounded-md flex items-center justify-center hover:bg-muted/60 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"><ChevronsLeft className="w-3.5 h-3.5 text-muted-foreground" /></button>
-            <button onClick={() => onPageChange(page - 1)} disabled={page <= 1} className="w-8 h-8 rounded-md flex items-center justify-center hover:bg-muted/60 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"><ChevronLeft className="w-3.5 h-3.5 text-muted-foreground" /></button>
-            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-              const start = Math.max(1, Math.min(page - 2, totalPages - 4));
-              const p = start + i;
-              if (p > totalPages) return null;
-              return (
-                <button key={p} onClick={() => onPageChange(p)}
-                  className={`w-8 h-8 rounded-md text-xs transition-colors cursor-pointer ${p === page ? "bg-primary text-white" : "hover:bg-muted/60 text-muted-foreground"}`}
-                  style={{ fontWeight: p === page ? 600 : 400 }}>{p}</button>
-              );
-            })}
-            <button onClick={() => onPageChange(page + 1)} disabled={page >= totalPages} className="w-8 h-8 rounded-md flex items-center justify-center hover:bg-muted/60 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"><ChevronRight className="w-3.5 h-3.5 text-muted-foreground" /></button>
-            <button onClick={() => onPageChange(totalPages)} disabled={page >= totalPages} className="w-8 h-8 rounded-md flex items-center justify-center hover:bg-muted/60 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"><ChevronsRight className="w-3.5 h-3.5 text-muted-foreground" /></button>
-          </div>
+              })}
+            </TableBody>
+          </Table>
         </div>
       )}
+
+      {/* ── Pagination — centered, matches listing page ── */}
+      <div className="flex items-center justify-between px-4 py-2.5 border-t border-border shrink-0">
+        {/* Records per page */}
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <span style={{ fontWeight: 500 }}>Records per page</span>
+          {onPerPageChange ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="px-2 py-1 rounded border border-border text-xs text-foreground cursor-pointer hover:bg-muted/50" style={{ fontWeight: 500 }}>{perPage}<ChevronDown className="w-3 h-3 inline ml-1 text-muted-foreground" /></button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-[80px]">
+                {PER_PAGE_OPTIONS.map((n) => (
+                  <DropdownMenuItem key={n} onClick={() => onPerPageChange(n)} className={perPage === n ? "bg-muted/50" : ""}>{n}{perPage === n && <Check className="w-3 h-3 ml-auto text-primary" />}</DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <span className="px-2 py-1 rounded border border-border text-xs text-foreground" style={{ fontWeight: 500 }}>{perPage}</span>
+          )}
+        </div>
+
+        {/* Page numbers — centered */}
+        <div className="flex items-center gap-0.5">
+          <button onClick={() => onPageChange(1)} disabled={page <= 1} className="w-8 h-8 rounded-md flex items-center justify-center hover:bg-muted/60 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"><ChevronsLeft className="w-3.5 h-3.5 text-muted-foreground" /></button>
+          <button onClick={() => onPageChange(page - 1)} disabled={page <= 1} className="w-8 h-8 rounded-md flex items-center justify-center hover:bg-muted/60 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"><ChevronLeft className="w-3.5 h-3.5 text-muted-foreground" /></button>
+          {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+            const start = Math.max(1, Math.min(page - 2, totalPages - 4));
+            const p = start + i;
+            if (p > totalPages) return null;
+            return (
+              <button key={p} onClick={() => onPageChange(p)}
+                className={`w-8 h-8 rounded-md text-xs transition-colors cursor-pointer ${p === page ? "bg-primary text-white" : "hover:bg-muted/60 text-muted-foreground"}`}
+                style={{ fontWeight: p === page ? 600 : 400 }}>{p}</button>
+            );
+          })}
+          <button onClick={() => onPageChange(page + 1)} disabled={page >= totalPages} className="w-8 h-8 rounded-md flex items-center justify-center hover:bg-muted/60 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"><ChevronRight className="w-3.5 h-3.5 text-muted-foreground" /></button>
+          <button onClick={() => onPageChange(totalPages)} disabled={page >= totalPages} className="w-8 h-8 rounded-md flex items-center justify-center hover:bg-muted/60 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"><ChevronsRight className="w-3.5 h-3.5 text-muted-foreground" /></button>
+        </div>
+
+        {/* Range indicator */}
+        <span className="text-xs text-muted-foreground tabular-nums" style={{ fontWeight: 500 }}>
+          {contacts.length > 0 ? `${(page - 1) * perPage + 1}–${Math.min(page * perPage, totalCount)} of ${totalCount}` : `0 results`}
+        </span>
+      </div>
     </div>
   );
 }
