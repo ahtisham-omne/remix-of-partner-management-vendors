@@ -134,13 +134,13 @@ export function PocDataTable({
           <div className="w-px h-5 bg-border/60 mx-0.5 hidden sm:block" />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="inline-flex items-center justify-center h-9 gap-2 px-3 rounded-lg border border-border bg-white shadow-sm hover:bg-muted/40 transition-colors cursor-pointer">
+              <button type="button" onClick={(e) => e.stopPropagation()} className="inline-flex items-center justify-center h-9 gap-2 px-3 rounded-lg border border-border bg-white shadow-sm hover:bg-muted/40 transition-colors cursor-pointer">
                 {isCard ? <LayoutGrid className="w-[18px] h-[18px] text-muted-foreground/80" /> : isComfort ? <ListIcon className="w-[18px] h-[18px] text-muted-foreground/80" /> : <AlignJustify className="w-[18px] h-[18px] text-muted-foreground/80" />}
                 <span className="text-sm hidden md:inline" style={{ fontWeight: 500 }}>{isCard ? "Card" : isComfort ? "Comfort" : "Condensed"}</span>
                 <ChevronDown className="w-3.5 h-3.5 text-muted-foreground/60" />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-[200px] p-1.5">
+            <DropdownMenuContent align="end" className="w-[200px] p-1.5 z-[350]">
               {([{ key: "condensed" as Density, label: "Condensed", desc: "Compact view", Icon: AlignJustify }, { key: "comfort" as Density, label: "Comfort", desc: "Spacious view", Icon: ListIcon }, { key: "card" as Density, label: "Card View", desc: "Grid layout", Icon: LayoutGrid }]).map((opt) => (
                 <DropdownMenuItem key={opt.key} onClick={() => setDensity(opt.key)} className={`flex items-center gap-2.5 px-2.5 py-2 rounded-lg ${density === opt.key ? "bg-muted/50" : ""}`}>
                   <opt.Icon className="w-4 h-4 text-muted-foreground shrink-0" /><div className="min-w-0"><p className="text-sm" style={{ fontWeight: 500 }}>{opt.label}</p><p className="text-[10px] text-muted-foreground/60">{opt.desc}</p></div>
@@ -244,7 +244,7 @@ export function PocDataTable({
             {onPerPageChange ? (
               <Select value={String(perPage)} onValueChange={(v) => onPerPageChange(Number(v))}>
                 <SelectTrigger className="w-[70px] h-8"><SelectValue /></SelectTrigger>
-                <SelectContent>
+                <SelectContent className="z-[350]">
                   <SelectItem value="10">10</SelectItem>
                   <SelectItem value="20">20</SelectItem>
                   <SelectItem value="50">50</SelectItem>
