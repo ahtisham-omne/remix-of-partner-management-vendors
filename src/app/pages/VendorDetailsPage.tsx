@@ -160,6 +160,8 @@ import {
   Area,
   BarChart,
   Bar,
+  LineChart,
+  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -168,6 +170,8 @@ import {
   Pie,
   Cell,
   Tooltip as ReTooltip,
+  RadialBarChart,
+  RadialBar,
 } from "recharts";
 
 // ── Tab definitions ──
@@ -204,8 +208,10 @@ export function VendorDetailsPage() {
   const [statusChangeTarget, setStatusChangeTarget] = useState<string | null>(null);
   const [statusConfirmOpen, setStatusConfirmOpen] = useState(false);
 
-  // Dashboard KPI state (lifted for full-width rendering)
+  // Dashboard KPI + widget state (lifted for full-width rendering)
   const [dashActiveKpis, setDashActiveKpis] = useState<string[]>(DEFAULT_DASH_KPIS);
+  const [dashActiveWidgets, setDashActiveWidgets] = useState<string[]>(["spend_trend", "order_activity", "spend_by_category", "credit_health", "delivery_perf", "invoice_aging", "primary_contact", "return_rate", "top_items", "recent_orders", "payment_history", "compliance_docs", "notes"]);
+  const [dashWidgetSizes, setDashWidgetSizes] = useState<Record<string, "sm" | "md" | "lg">>({});
   const [customizePanelOpen, setCustomizePanelOpen] = useState(false);
   const [lastRefreshed, setLastRefreshed] = useState(() => new Date());
 
@@ -213,6 +219,25 @@ export function VendorDetailsPage() {
     setDashActiveKpis((prev) =>
       prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
     );
+  }, []);
+
+  const handleToggleWidget = useCallback((key: string) => {
+    setDashActiveWidgets((prev) =>
+      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
+    );
+  }, []);
+
+  const handleWidgetSizeChange = useCallback((key: string, size: "sm" | "md" | "lg") => {
+    setDashWidgetSizes((prev) => ({ ...prev, [key]: size }));
+  }, []);
+
+  const moveWidget = useCallback((fromIndex: number, toIndex: number) => {
+    setDashActiveWidgets((prev) => {
+      const next = [...prev];
+      const [moved] = next.splice(fromIndex, 1);
+      next.splice(toIndex, 0, moved);
+      return next;
+    });
   }, []);
 
   const moveKpi = useCallback((fromIndex: number, toIndex: number) => {
@@ -916,7 +941,7 @@ export function VendorDetailsPage() {
             {/* ── LEFT PANEL ── */}
             <div className="flex-1 min-w-0">
               {activeTab === "dashboard" && (
-                <DashboardTab vendor={vendor} cfg={cfg} formatCurrency={formatCurrency} formatDate={formatDate} />
+                <DashboardTab vendor={vendor} cfg={cfg} formatCurrency={formatCurrency} formatDate={formatDate} activeWidgets={dashActiveWidgets} widgetSizes={dashWidgetSizes} onWidgetSizeChange={handleWidgetSizeChange} moveWidget={moveWidget} />
               )}
               {activeTab === "partner_locations" && (
                 <PartnerLocationsTab vendor={vendor} cfg={cfg} formatDate={formatDate} />
@@ -1108,6 +1133,10 @@ export function VendorDetailsPage() {
           onOpenChange={setCustomizePanelOpen}
           activeKpis={dashActiveKpis}
           onToggleKpi={handleToggleKpi}
+          activeWidgets={dashActiveWidgets}
+          onToggleWidget={handleToggleWidget}
+          widgetSizes={dashWidgetSizes}
+          onWidgetSizeChange={handleWidgetSizeChange}
           vendor={vendor}
           formatCurrency={formatCurrency}
           formatDate={formatDate}
@@ -1626,17 +1655,21 @@ function CarrierShippingCard({ carrier }: {
 
 
 
-function ContentCard({ title, icon: Icon, count, children, action }: {
+function ContentCard({ title, icon: Icon, count, children, action, currentSize, onSizeChange, dragHandle }: {
   title: string;
   icon?: React.ElementType;
   count?: number;
   children: React.ReactNode;
   action?: React.ReactNode;
+  currentSize?: "sm" | "md" | "lg";
+  onSizeChange?: (size: "sm" | "md" | "lg") => void;
+  dragHandle?: React.ReactNode;
 }) {
   return (
     <div className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
       <div className="px-4 py-3 border-b border-[#F1F5F9] flex items-center justify-between">
         <div className="flex items-center gap-2.5">
+          {dragHandle}
           {Icon && (
             <div className="w-7 h-7 rounded-lg bg-[#EDF4FF] flex items-center justify-center shrink-0">
               <Icon className="w-3.5 h-3.5 text-[#0A77FF]" />
@@ -1647,9 +1680,79 @@ function ContentCard({ title, icon: Icon, count, children, action }: {
             <span className="text-[10px] text-[#0A77FF] px-1.5 py-0.5 rounded-md bg-[#EDF4FF]" style={{ fontWeight: 600 }}>{count}</span>
           )}
         </div>
-        {action}
+        <div className="flex items-center gap-2">
+          {onSizeChange && currentSize && (
+            <div className="flex items-center gap-px p-0.5 rounded-md bg-[#F1F5F9]">
+              {(["sm", "md", "lg"] as const).map((s) => (
+                <button
+                  key={s}
+                  onClick={() => onSizeChange(s)}
+                  className={`px-1.5 py-0.5 rounded text-[9px] transition-all duration-100 cursor-pointer ${
+                    currentSize === s ? "bg-white text-[#0F172A] shadow-sm" : "text-[#94A3B8] hover:text-[#64748B]"
+                  }`}
+                  style={{ fontWeight: currentSize === s ? 600 : 500 }}
+                >
+                  {s === "sm" ? "S" : s === "md" ? "M" : "L"}
+                </button>
+              ))}
+            </div>
+          )}
+          {action}
+        </div>
       </div>
       <div className="p-4">{children}</div>
+    </div>
+  );
+}
+
+// ── Draggable Widget Wrapper ──
+const WIDGET_DND_TYPE = "DASHBOARD_WIDGET";
+
+function DraggableWidget({ widgetKey, index, moveWidget, children }: {
+  widgetKey: string;
+  index: number;
+  moveWidget: (from: number, to: number) => void;
+  children: React.ReactNode;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [{ isDragging }, drag, preview] = useDrag({
+    type: WIDGET_DND_TYPE,
+    item: () => ({ key: widgetKey, index }),
+    collect: (monitor) => ({ isDragging: monitor.isDragging() }),
+  });
+  const [, drop] = useDrop({
+    accept: WIDGET_DND_TYPE,
+    hover(item: { key: string; index: number }, monitor) {
+      if (!ref.current) return;
+      const dragIndex = item.index;
+      const hoverIndex = index;
+      if (dragIndex === hoverIndex) return;
+      const hoverBoundingRect = ref.current.getBoundingClientRect();
+      const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
+      const clientOffset = monitor.getClientOffset();
+      if (!clientOffset) return;
+      const hoverClientY = clientOffset.y - hoverBoundingRect.top;
+      if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) return;
+      if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) return;
+      moveWidget(dragIndex, hoverIndex);
+      item.index = hoverIndex;
+    },
+  });
+  preview(drop(ref));
+  return (
+    <div ref={ref} style={{ opacity: isDragging ? 0.4 : 1, transition: "opacity 150ms" }}>
+      {React.Children.map(children, (child) => {
+        if (React.isValidElement(child)) {
+          return React.cloneElement(child as React.ReactElement<{ dragHandle?: React.ReactNode }>, {
+            dragHandle: (
+              <div ref={(node) => { drag(node); }} className="cursor-grab active:cursor-grabbing p-0.5 -ml-1 rounded hover:bg-[#F1F5F9] transition-colors">
+                <GripVertical className="w-3.5 h-3.5 text-[#CBD5E1]" />
+              </div>
+            ),
+          });
+        }
+        return child;
+      })}
     </div>
   );
 }
@@ -1842,18 +1945,21 @@ function DashKpiIcon({ name, className, style }: { name: string; className?: str
 }
 
 // ----- Dashboard Customize Widget Panel -----
-function DashboardCustomizePanel({ open, onOpenChange, activeKpis, onToggleKpi, vendor, formatCurrency, formatDate }: {
+function DashboardCustomizePanel({ open, onOpenChange, activeKpis, onToggleKpi, activeWidgets, onToggleWidget, widgetSizes, onWidgetSizeChange, vendor, formatCurrency, formatDate }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   activeKpis: string[];
   onToggleKpi: (key: string) => void;
+  activeWidgets: string[];
+  onToggleWidget: (key: string) => void;
+  widgetSizes: Record<string, "sm" | "md" | "lg">;
+  onWidgetSizeChange: (key: string, size: "sm" | "md" | "lg") => void;
   vendor: Vendor;
   formatCurrency: (v: number) => string;
   formatDate: (d: string) => string;
 }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [panelTab, setPanelTab] = useState<"kpis" | "widgets">("kpis");
-  const [widgetSize, setWidgetSize] = useState<"sm" | "md" | "lg">("md");
   const [mounted, setMounted] = useState(false);
   const [visible, setVisible] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -1972,7 +2078,7 @@ function DashboardCustomizePanel({ open, onOpenChange, activeKpis, onToggleKpi, 
         </div>
 
         {/* Search */}
-        <div className="px-5 pt-3.5 pb-1 shrink-0">
+        <div className="px-5 pt-3.5 pb-0 shrink-0">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50 pointer-events-none" />
             <input
@@ -1982,51 +2088,24 @@ function DashboardCustomizePanel({ open, onOpenChange, activeKpis, onToggleKpi, 
               className="w-full h-10 pl-10 pr-3 rounded-lg border border-border bg-white text-sm text-foreground placeholder:text-muted-foreground/50 outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-colors"
             />
           </div>
+        </div>
 
-          {/* Tab switcher: KPIs / Widgets */}
-          <div className="flex items-center gap-1 mt-3 p-0.5 rounded-lg bg-[#F1F5F9]">
-            {(["kpis", "widgets"] as const).map((t) => (
-              <button
-                key={t}
-                onClick={() => setPanelTab(t)}
-                className={`flex-1 text-[12px] py-1.5 rounded-md transition-all duration-150 cursor-pointer ${
-                  panelTab === t
-                    ? "bg-white text-[#0F172A] shadow-sm"
-                    : "text-[#64748B] hover:text-[#334155]"
-                }`}
-                style={{ fontWeight: panelTab === t ? 600 : 500 }}
-              >
-                {t === "kpis" ? "KPIs" : "Widgets"}
-              </button>
-            ))}
-          </div>
-
-          {/* Size selector — only for widgets tab */}
-          {panelTab === "widgets" && (
-            <div className="flex items-center gap-2 mt-3">
-              <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Size:</span>
-              <div className="flex items-center gap-1">
-                {([
-                  { key: "sm" as const, label: "S", w: "60px", h: "24px" },
-                  { key: "md" as const, label: "M", w: "80px", h: "32px" },
-                  { key: "lg" as const, label: "L", w: "100px", h: "40px" },
-                ] as const).map((sz) => (
-                  <button
-                    key={sz.key}
-                    onClick={() => setWidgetSize(sz.key)}
-                    className={`flex items-center justify-center rounded-md border text-[11px] transition-all duration-150 cursor-pointer ${
-                      widgetSize === sz.key
-                        ? "border-[#0A77FF]/30 bg-[#EBF3FF] text-[#0A77FF]"
-                        : "border-[#E2E8F0] bg-white text-[#64748B] hover:border-[#CBD5E1]"
-                    }`}
-                    style={{ width: 32, height: 28, fontWeight: widgetSize === sz.key ? 600 : 500 }}
-                  >
-                    {sz.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
+        {/* Tab bar — matches header tab style */}
+        <div className="flex items-center gap-0 px-5 border-b border-[#F1F5F9] shrink-0 mt-3">
+          {(["kpis", "widgets"] as const).map((t) => (
+            <button
+              key={t}
+              onClick={() => setPanelTab(t)}
+              className={`px-4 py-2.5 border-b-2 text-[13px] transition-all duration-200 cursor-pointer whitespace-nowrap ${
+                panelTab === t
+                  ? "border-[#0A77FF] text-[#0A77FF]"
+                  : "border-transparent text-[#64748B] hover:text-[#334155] hover:border-[#CBD5E1]"
+              }`}
+              style={{ fontWeight: panelTab === t ? 600 : 400 }}
+            >
+              {t === "kpis" ? "KPIs" : "Widgets"}
+            </button>
+          ))}
         </div>
 
         {/* Scrollable content */}
@@ -2074,62 +2153,215 @@ function DashboardCustomizePanel({ open, onOpenChange, activeKpis, onToggleKpi, 
               ))}
             </>
           ) : (
-            /* ── Widgets tab — chart/widget previews ── */
+            /* ── Widgets tab — preview cards with click-to-toggle ── */
             <div className="mt-4 space-y-3">
-              {[
-                { key: "spend_trend", label: "Spend Trend", desc: "Monthly spend over time", icon: "TrendingUp", preview: "area" },
-                { key: "order_activity", label: "Order Activity", desc: "Orders placed per month", icon: "BarChart3", preview: "bar" },
-                { key: "spend_by_category", label: "Spend by Category", desc: "Breakdown by category", icon: "PieChart", preview: "pie" },
-                { key: "credit_health", label: "Credit Health", desc: "Utilization gauge", icon: "CreditCard", preview: "gauge" },
-                { key: "about_partner", label: "About Partner", desc: "Key partner details", icon: "Building2", preview: "info" },
-                { key: "primary_contact", label: "Primary Contact", desc: "Main contact person", icon: "User", preview: "contact" },
-              ].map((w) => {
-                const sizeLabel = widgetSize === "sm" ? "Small" : widgetSize === "md" ? "Medium" : "Large";
+              {([
+                { key: "spend_trend", label: "Spend Trend", type: "chart" as const },
+                { key: "order_activity", label: "Order Activity", type: "chart" as const },
+                { key: "spend_by_category", label: "Spend by Category", type: "chart" as const },
+                { key: "credit_health", label: "Credit Health", type: "gauge" as const },
+                { key: "primary_contact", label: "Primary Contact", type: "contact" as const },
+                { key: "top_items", label: "Top Items", type: "list" as const },
+                { key: "recent_orders", label: "Recent Orders", type: "list" as const },
+                { key: "payment_history", label: "Payment History", type: "list" as const },
+                { key: "compliance_docs", label: "Compliance & Documents", type: "list" as const },
+                { key: "delivery_perf", label: "Delivery Performance", type: "chart" as const },
+                { key: "return_rate", label: "Return Rate", type: "chart" as const },
+                { key: "invoice_aging", label: "Invoice Aging", type: "list" as const },
+                { key: "notes", label: "Notes", type: "text" as const },
+              ] as const).map((w) => {
+                const sz = widgetSizes[w.key] || "md";
+                const isActive = activeWidgets.includes(w.key);
                 return (
                   <div
                     key={w.key}
-                    className="rounded-lg border border-[#E2E8F0] bg-white hover:border-[#CBD5E1] hover:shadow-sm transition-all duration-150 cursor-pointer overflow-hidden"
+                    onClick={() => onToggleWidget(w.key)}
+                    className={`rounded-xl overflow-hidden transition-all duration-150 cursor-pointer ${
+                      isActive
+                        ? "border border-[#0A77FF]/25 bg-[#0A77FF]/[0.02] shadow-[0_0_0_1px_rgba(10,119,255,0.08)]"
+                        : "border border-[#E2E8F0] bg-white hover:border-[#CBD5E1] hover:shadow-sm"
+                    }`}
                   >
-                    {/* Preview thumbnail */}
-                    <div className="bg-[#F8FAFC] border-b border-[#F1F5F9] flex items-center justify-center" style={{ height: widgetSize === "sm" ? 48 : widgetSize === "md" ? 64 : 80 }}>
-                      {w.preview === "area" && (
-                        <svg viewBox="0 0 120 40" className="w-[80%] h-[70%]" fill="none">
-                          <path d="M0 35 Q20 28 40 25 T80 15 T120 8 V40 H0Z" fill="#0A77FF" fillOpacity="0.08" />
-                          <path d="M0 35 Q20 28 40 25 T80 15 T120 8" stroke="#0A77FF" strokeWidth="1.5" fill="none" />
-                        </svg>
-                      )}
-                      {w.preview === "bar" && (
-                        <svg viewBox="0 0 120 40" className="w-[80%] h-[70%]" fill="none">
-                          {[10, 22, 30, 18, 35, 28, 32].map((h, i) => (
-                            <rect key={i} x={i * 17 + 2} y={40 - h} width="12" height={h} rx="2" fill="#0A77FF" fillOpacity={0.15 + i * 0.08} />
+                    {/* Header */}
+                    <div className="flex items-center justify-between px-3 py-2 border-b border-[#F8FAFC]">
+                      <span className={`text-[12px] transition-colors ${isActive ? "text-[#0A77FF]" : "text-[#0F172A]"}`} style={{ fontWeight: 600 }}>{w.label}</span>
+                      <div className="flex items-center gap-1.5">
+                        {/* Per-card size toggle */}
+                        <div className="flex items-center gap-px p-px rounded-md bg-[#F1F5F9]" onClick={(e) => e.stopPropagation()}>
+                          {(["sm", "md", "lg"] as const).map((s) => (
+                            <button
+                              key={s}
+                              onClick={() => onWidgetSizeChange(w.key, s)}
+                              className={`px-1.5 py-0.5 rounded text-[9px] transition-all duration-100 cursor-pointer ${
+                                sz === s ? "bg-white text-[#0F172A] shadow-sm" : "text-[#94A3B8] hover:text-[#64748B]"
+                              }`}
+                              style={{ fontWeight: sz === s ? 600 : 500 }}
+                            >
+                              {s === "sm" ? "S" : s === "md" ? "M" : "L"}
+                            </button>
                           ))}
-                        </svg>
-                      )}
-                      {w.preview === "pie" && (
-                        <svg viewBox="0 0 40 40" className="w-[50%] h-[70%]">
-                          <circle cx="20" cy="20" r="16" fill="none" stroke="#E2E8F0" strokeWidth="6" />
-                          <circle cx="20" cy="20" r="16" fill="none" stroke="#0A77FF" strokeWidth="6" strokeDasharray="40 100" strokeDashoffset="0" />
-                          <circle cx="20" cy="20" r="16" fill="none" stroke="#3B82F6" strokeWidth="6" strokeDasharray="30 100" strokeDashoffset="-40" />
-                          <circle cx="20" cy="20" r="16" fill="none" stroke="#93C5FD" strokeWidth="6" strokeDasharray="20 100" strokeDashoffset="-70" />
-                        </svg>
-                      )}
-                      {(w.preview === "gauge" || w.preview === "info" || w.preview === "contact") && (
-                        <div className="flex items-center gap-1.5">
-                          <div className="w-5 h-5 rounded bg-[#E2E8F0]" />
-                          <div className="space-y-1">
-                            <div className="w-16 h-1.5 rounded bg-[#E2E8F0]" />
-                            <div className="w-10 h-1.5 rounded bg-[#F1F5F9]" />
-                          </div>
+                        </div>
+                        {/* Active indicator */}
+                        {isActive ? <Check className="w-3.5 h-3.5 text-[#0A77FF]" /> : <Plus className="w-3.5 h-3.5 text-[#94A3B8]" />}
+                      </div>
+                    </div>
+
+                    {/* Preview body — changes with size */}
+                    <div className="px-3" style={{ paddingTop: 8, paddingBottom: sz === "sm" ? 8 : 10 }}>
+                      {w.type === "chart" && (
+                        <div>
+                          {sz === "sm" ? (
+                            <div className="flex items-center justify-between">
+                              <svg viewBox="0 0 80 24" className="w-[60px] h-[18px]" fill="none">
+                                <path d="M0 20 Q10 14 20 16 T40 10 T60 6 T80 4" stroke={isActive ? "#0A77FF" : "#CBD5E1"} strokeWidth="1.5" fill="none" />
+                              </svg>
+                              <span className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>$142K</span>
+                            </div>
+                          ) : sz === "md" ? (
+                            <div>
+                              <div className="flex items-baseline justify-between mb-2">
+                                <span className="text-[15px] text-[#0F172A]" style={{ fontWeight: 700 }}>$142,800</span>
+                                <span className="text-[10px] text-[#059669]" style={{ fontWeight: 500 }}>+12.3%</span>
+                              </div>
+                              <svg viewBox="0 0 160 32" className="w-full h-[28px]" fill="none">
+                                <path d="M0 28 Q20 22 40 20 T80 14 T120 8 T160 4 V32 H0Z" fill={isActive ? "#0A77FF" : "#94A3B8"} fillOpacity="0.06" />
+                                <path d="M0 28 Q20 22 40 20 T80 14 T120 8 T160 4" stroke={isActive ? "#0A77FF" : "#CBD5E1"} strokeWidth="1.5" fill="none" />
+                              </svg>
+                            </div>
+                          ) : (
+                            <div>
+                              <div className="flex items-baseline justify-between mb-1">
+                                <span className="text-[16px] text-[#0F172A]" style={{ fontWeight: 700 }}>$142,800</span>
+                                <span className="text-[10px] text-[#059669]" style={{ fontWeight: 500 }}>+12.3% vs last year</span>
+                              </div>
+                              <svg viewBox="0 0 160 44" className="w-full h-[40px]" fill="none">
+                                <path d="M0 38 Q20 30 40 28 T80 20 T120 12 T160 6 V44 H0Z" fill={isActive ? "#0A77FF" : "#94A3B8"} fillOpacity="0.06" />
+                                <path d="M0 38 Q20 30 40 28 T80 20 T120 12 T160 6" stroke={isActive ? "#0A77FF" : "#CBD5E1"} strokeWidth="1.5" fill="none" />
+                                {[0, 40, 80, 120, 160].map((x, i) => (
+                                  <text key={i} x={x} y="44" fill="#94A3B8" fontSize="6" textAnchor="middle">{["Jan", "Mar", "Jun", "Sep", "Dec"][i]}</text>
+                                ))}
+                              </svg>
+                              <div className="flex items-center gap-3 mt-1.5">
+                                <span className="text-[10px] text-[#94A3B8]">High: <span className="text-[#334155]" style={{ fontWeight: 500 }}>$28.4K</span></span>
+                                <span className="text-[10px] text-[#94A3B8]">Low: <span className="text-[#334155]" style={{ fontWeight: 500 }}>$8.2K</span></span>
+                                <span className="text-[10px] text-[#94A3B8]">Avg: <span className="text-[#334155]" style={{ fontWeight: 500 }}>$17.9K</span></span>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       )}
-                    </div>
-                    {/* Card info */}
-                    <div className="px-3 py-2.5 flex items-center justify-between">
-                      <div className="min-w-0">
-                        <p className="text-[12px] text-[#0F172A]" style={{ fontWeight: 600 }}>{w.label}</p>
-                        <p className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 400 }}>{w.desc}</p>
-                      </div>
-                      <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#F1F5F9] text-[#64748B] border border-[#E2E8F0] shrink-0" style={{ fontWeight: 600 }}>{sizeLabel}</span>
+                      {w.type === "gauge" && (
+                        <div>
+                          {sz === "sm" ? (
+                            <div className="flex items-center justify-between">
+                              <div className="w-[50px] h-1.5 rounded-full bg-[#F1F5F9] overflow-hidden"><div className="h-full rounded-full" style={{ width: "62%", backgroundColor: isActive ? "#D1FAE5" : "#E2E8F0" }} /></div>
+                              <span className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>62%</span>
+                            </div>
+                          ) : (
+                            <div>
+                              <div className="flex items-baseline justify-between mb-2">
+                                <span className="text-[15px] text-[#0F172A]" style={{ fontWeight: 700 }}>{formatCurrency(vendor.creditUtilization)}</span>
+                                <span className="text-[10px] text-[#059669]" style={{ fontWeight: 500 }}>Healthy</span>
+                              </div>
+                              <div className="w-full h-2 rounded-full bg-[#F1F5F9] overflow-hidden"><div className="h-full rounded-full" style={{ width: "62%", backgroundColor: isActive ? "#D1FAE5" : "#E2E8F0" }} /></div>
+                              {sz === "lg" && (
+                                <div className="flex items-center justify-between mt-1.5 text-[10px] text-[#94A3B8]">
+                                  <span>Limit: <span className="text-[#334155]" style={{ fontWeight: 500 }}>{formatCurrency(vendor.creditLimit)}</span></span>
+                                  <span>Available: <span className="text-[#059669]" style={{ fontWeight: 500 }}>{formatCurrency(vendor.creditLimit - vendor.creditUtilization)}</span></span>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      {w.type === "contact" && (
+                        <div>
+                          <div className="flex items-center gap-2.5 mb-2">
+                            <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${isActive ? "bg-[#EDF4FF]" : "bg-[#F1F5F9]"}`}>
+                              <span className={`text-[9px] ${isActive ? "text-[#0A77FF]" : "text-[#475569]"}`} style={{ fontWeight: 600 }}>{vendor.primaryContact.name.split(" ").map(n => n[0]).join("")}</span>
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-[12px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{vendor.primaryContact.name}</p>
+                              {sz !== "sm" && <p className="text-[10px] text-[#94A3B8] truncate">{vendor.primaryContact.designation}</p>}
+                            </div>
+                          </div>
+                          {sz !== "sm" && (
+                            <svg viewBox="0 0 160 28" className="w-full h-[22px]" fill="none">
+                              <path d="M0 24 Q15 18 30 20 T60 14 T90 10 T120 12 T150 6" stroke="#7C3AED" strokeWidth="1.5" fill="none" />
+                              {[0, 30, 60, 90, 120, 150].map((x, i) => (<circle key={i} cx={x} cy={[24, 20, 14, 10, 12, 6][i]} r="2" fill="#7C3AED" />))}
+                            </svg>
+                          )}
+                        </div>
+                      )}
+                      {w.type === "list" && (
+                        <div>
+                          {/* Mini bar chart for list-type widgets */}
+                          {(w.key === "top_items" || w.key === "invoice_aging") ? (
+                            <div>
+                              <svg viewBox="0 0 160 40" className="w-full" style={{ height: sz === "sm" ? 24 : sz === "md" ? 32 : 40 }} fill="none">
+                                {(w.key === "top_items" ? [30, 24, 18, 14, 10] : [35, 22, 18, 12]).map((h, i, arr) => {
+                                  const bw = 160 / arr.length - 4;
+                                  const colors = w.key === "top_items" ? ["#0A77FF", "#7C3AED", "#059669", "#94A3B8", "#CBD5E1"] : ["#0A77FF", "#3B82F6", "#D97706", "#DC2626"];
+                                  return <rect key={i} x={i * (bw + 4) + 2} y={40 - h} width={bw} height={h} rx="3" fill={isActive ? colors[i] : "#E2E8F0"} />;
+                                })}
+                              </svg>
+                              {sz === "lg" && (
+                                <div className="flex items-center gap-2 mt-1.5">
+                                  {(w.key === "top_items" ? ["$25.6K", "$15.7K", "$12.3K"] : ["0-30d", "31-60d", "61-90d"]).map((l, i) => (
+                                    <span key={i} className="text-[9px] text-[#94A3B8]" style={{ fontWeight: 500 }}>{l}</span>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          ) : (w.key === "recent_orders" || w.key === "payment_history") ? (
+                            <div>
+                              <svg viewBox="0 0 160 40" className="w-full" style={{ height: sz === "sm" ? 24 : sz === "md" ? 32 : 40 }} fill="none">
+                                {w.key === "recent_orders" ? (
+                                  <>
+                                    <path d="M0 32 Q20 28 40 24 T80 16 T120 12 T160 8" stroke={isActive ? "#059669" : "#CBD5E1"} strokeWidth="1.5" fill="none" />
+                                    {[0, 40, 80, 120, 160].map((x, i) => (<circle key={i} cx={x} cy={[32, 24, 16, 12, 8][i]} r="2.5" fill={["#D97706", "#059669", "#059669", "#0A77FF", "#059669"][i]} />))}
+                                  </>
+                                ) : (
+                                  <>
+                                    <path d="M0 30 Q20 26 40 20 T80 14 T120 18 T160 10 V40 H0Z" fill={isActive ? "#059669" : "#94A3B8"} fillOpacity="0.08" />
+                                    <path d="M0 30 Q20 26 40 20 T80 14 T120 18 T160 10" stroke={isActive ? "#059669" : "#CBD5E1"} strokeWidth="1.5" fill="none" />
+                                  </>
+                                )}
+                              </svg>
+                            </div>
+                          ) : (
+                            <div>
+                              {/* Compliance donut */}
+                              <div className="flex items-center gap-3">
+                                <svg viewBox="0 0 40 40" style={{ width: sz === "sm" ? 28 : 36, height: sz === "sm" ? 28 : 36 }}>
+                                  <circle cx="20" cy="20" r="16" fill="none" stroke="#F1F5F9" strokeWidth="5" />
+                                  <circle cx="20" cy="20" r="16" fill="none" stroke={isActive ? "#059669" : "#CBD5E1"} strokeWidth="5" strokeDasharray="75 100" strokeDashoffset="25" />
+                                </svg>
+                                <div className="min-w-0">
+                                  <span className="text-[13px] text-[#059669]" style={{ fontWeight: 700 }}>75%</span>
+                                  {sz !== "sm" && <p className="text-[9px] text-[#94A3B8]">3/4 valid</p>}
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      {w.type === "text" && (
+                        <div>
+                          {/* Activity timeline dots */}
+                          <div className="flex items-center gap-1.5 mb-1.5">
+                            {["#059669", "#0A77FF", "#7C3AED", "#F59E0B"].map((c, i) => (
+                              <div key={i} className="flex items-center gap-1">
+                                <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: isActive ? c : "#E2E8F0" }} />
+                                {i < 3 && <div className="w-3 h-px" style={{ backgroundColor: "#E2E8F0" }} />}
+                              </div>
+                            ))}
+                          </div>
+                          <p className={`text-[10px] text-[#475569] leading-relaxed ${sz === "sm" ? "line-clamp-1" : "line-clamp-2"}`}>
+                            Recent: Payment received, Order delivered, Note added
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </div>
                 );
@@ -2143,14 +2375,23 @@ function DashboardCustomizePanel({ open, onOpenChange, activeKpis, onToggleKpi, 
 }
 
 // ----- DASHBOARD TAB (was Overview) -----
-function DashboardTab({ vendor, cfg, formatCurrency, formatDate }: {
+function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, widgetSizes, onWidgetSizeChange, moveWidget }: {
   vendor: Vendor;
   cfg?: VendorConfigData;
   formatCurrency: (val: number) => string;
   formatDate: (dateStr: string) => string;
+  activeWidgets: string[];
+  widgetSizes: Record<string, "sm" | "md" | "lg">;
+  onWidgetSizeChange: (key: string, size: "sm" | "md" | "lg") => void;
+  moveWidget: (from: number, to: number) => void;
 }) {
   const creditPct = getCreditUtilizationPct(vendor);
   const available = vendor.creditLimit - vendor.creditUtilization;
+  // Helper: chart height based on widget size
+  const chartH = (key: string, sm: number, md: number, lg: number) => {
+    const sz = widgetSizes[key] || "md";
+    return sz === "sm" ? sm : sz === "lg" ? lg : md;
+  };
   const spendCategories = [
     { name: "Services", value: Math.round(vendor.totalSpent * 0.4), pct: 40 },
     { name: "Materials", value: Math.round(vendor.totalSpent * 0.3), pct: 30 },
@@ -2173,14 +2414,17 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate }: {
     <div className="grid grid-cols-1 xl:grid-cols-[1fr_340px] gap-4 items-start">
 
       {/* ═══ LEFT COLUMN — Charts & Widgets ═══ */}
+      <DndProvider backend={HTML5Backend}>
       <div className="space-y-4 min-w-0">
 
         {/* Spend Trend */}
-        <ContentCard title="Spend Trend" icon={TrendingUp} action={
+        {activeWidgets.includes("spend_trend") && (
+        <DraggableWidget widgetKey="spend_trend" index={activeWidgets.indexOf("spend_trend")} moveWidget={moveWidget}>
+        <ContentCard title="Spend Trend" icon={TrendingUp} currentSize={widgetSizes.spend_trend || "md"} onSizeChange={(s) => onWidgetSizeChange("spend_trend", s)} action={
           <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>This Year</span>
         }>
-          <div className="h-[220px] -ml-2">
-            <ResponsiveContainer width="100%" height={220}>
+          <div style={{ height: chartH("spend_trend", 140, 220, 300) }} className="-ml-2">
+            <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={SPEND_TREND_DATA} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
                 <defs key="area-defs">
                   <linearGradient id="spendGradientUniq" x1="0" y1="0" x2="0" y2="1">
@@ -2191,57 +2435,49 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate }: {
                 <CartesianGrid key="area-grid" strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
                 <XAxis key="area-x" dataKey="month" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
                 <YAxis key="area-y" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
-                <ReTooltip
-                  key="area-tooltip"
-                  contentStyle={{ borderRadius: 8, border: "1px solid #E2E8F0", boxShadow: "0 4px 12px rgba(0,0,0,0.08)", fontSize: 12 }}
-                  formatter={(val: number) => [`$${val.toLocaleString()}`, "Spend"]}
-                />
+                <ReTooltip key="area-tooltip" contentStyle={{ borderRadius: 8, border: "1px solid #E2E8F0", boxShadow: "0 4px 12px rgba(0,0,0,0.08)", fontSize: 12 }} formatter={(val: number) => [`$${val.toLocaleString()}`, "Spend"]} />
                 <Area key="area-amount" type="monotone" dataKey="amount" stroke="#0A77FF" strokeWidth={2} fill="url(#spendGradientUniq)" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
         </ContentCard>
+        </DraggableWidget>
+        )}
 
         {/* Order Activity */}
-        <ContentCard title="Order Activity" icon={BarChart3} action={
+        {activeWidgets.includes("order_activity") && (
+        <DraggableWidget widgetKey="order_activity" index={activeWidgets.indexOf("order_activity")} moveWidget={moveWidget}>
+        <ContentCard title="Order Activity" icon={BarChart3} currentSize={widgetSizes.order_activity || "md"} onSizeChange={(s) => onWidgetSizeChange("order_activity", s)} action={
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#0A77FF]" />
-              <span className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Orders</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#F59E0B]" />
-              <span className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Returns</span>
-            </div>
+            <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-[#0A77FF]" /><span className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Orders</span></div>
+            <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-[#F59E0B]" /><span className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Returns</span></div>
           </div>
         }>
-          <div className="h-[220px] -ml-2">
-            <ResponsiveContainer width="100%" height={220}>
+          <div style={{ height: chartH("order_activity", 140, 220, 300) }} className="-ml-2">
+            <ResponsiveContainer width="100%" height="100%">
               <BarChart data={ORDER_ACTIVITY_DATA} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
                 <CartesianGrid key="bar-grid" strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
                 <XAxis key="bar-x" dataKey="day" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
                 <YAxis key="bar-y" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
-                <ReTooltip
-                  key="bar-tooltip"
-                  contentStyle={{ borderRadius: 8, border: "1px solid #E2E8F0", boxShadow: "0 4px 12px rgba(0,0,0,0.08)", fontSize: 12 }}
-                />
+                <ReTooltip key="bar-tooltip" contentStyle={{ borderRadius: 8, border: "1px solid #E2E8F0", boxShadow: "0 4px 12px rgba(0,0,0,0.08)", fontSize: 12 }} />
                 <Bar key="bar-orders" dataKey="orders" fill="#0A77FF" radius={[4, 4, 0, 0]} barSize={24} name="Orders" />
                 <Bar key="bar-returns" dataKey="returns" fill="#F59E0B" radius={[4, 4, 0, 0]} barSize={24} name="Returns" />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </ContentCard>
+        </DraggableWidget>
+        )}
 
         {/* Spend by Category + Credit Health */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <ContentCard title="Spend by Category" icon={PieChart}>
+          {activeWidgets.includes("spend_by_category") && (
+          <ContentCard title="Spend by Category" icon={PieChart} currentSize={widgetSizes.spend_by_category || "md"} onSizeChange={(s) => onWidgetSizeChange("spend_by_category", s)}>
             <div className="flex flex-col items-center gap-4">
               <div className="w-[150px] h-[150px] shrink-0 relative">
                 <RePieChart width={150} height={150}>
                   <Pie key="pie-spend" data={spendCategories} cx="50%" cy="50%" innerRadius={46} outerRadius={70} paddingAngle={2} dataKey="value" stroke="none">
-                    {spendCategories.map((_entry, index) => (
-                      <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
-                    ))}
+                    {spendCategories.map((_entry, index) => (<Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />))}
                   </Pie>
                 </RePieChart>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
@@ -2251,107 +2487,304 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate }: {
               <div className="w-full space-y-2">
                 {spendCategories.map((cat, idx) => (
                   <div key={cat.name} className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: PIE_COLORS[idx] }} />
-                      <span className="text-[12px] text-[#475569]" style={{ fontWeight: 500 }}>{cat.name}</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="text-[12px] text-[#0F172A]" style={{ fontWeight: 600 }}>{formatCurrency(cat.value)}</span>
-                      <span className="text-[11px] text-[#94A3B8] w-8 text-right" style={{ fontWeight: 500 }}>{cat.pct}%</span>
-                    </div>
+                    <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: PIE_COLORS[idx] }} /><span className="text-[12px] text-[#475569]" style={{ fontWeight: 500 }}>{cat.name}</span></div>
+                    <div className="flex items-center gap-3"><span className="text-[12px] text-[#0F172A]" style={{ fontWeight: 600 }}>{formatCurrency(cat.value)}</span><span className="text-[11px] text-[#94A3B8] w-8 text-right" style={{ fontWeight: 500 }}>{cat.pct}%</span></div>
                   </div>
                 ))}
               </div>
             </div>
           </ContentCard>
+          )}
 
-          <ContentCard title="Credit Health" icon={Shield}>
+          {activeWidgets.includes("credit_health") && (
+          <ContentCard title="Credit Health" icon={Shield} currentSize={widgetSizes.credit_health || "md"} onSizeChange={(s) => onWidgetSizeChange("credit_health", s)}>
             <div className="space-y-4">
               <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-[12px] text-[#475569]" style={{ fontWeight: 500 }}>Credit Utilization</span>
-                  <span className="text-[13px] text-[#0F172A]" style={{ fontWeight: 700 }}>{creditPct}%</span>
-                </div>
-                <div className="w-full h-2.5 rounded-full bg-[#F1F5F9] overflow-hidden">
-                  <div className="h-full rounded-full transition-all" style={{ width: `${Math.min(creditPct, 100)}%`, backgroundColor: creditPct > 80 ? "#DC2626" : creditPct > 50 ? "#D97706" : "#059669" }} />
-                </div>
-                <div className="flex items-center justify-between mt-1.5">
-                  <span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>$0</span>
-                  <span className="text-[10px]" style={{ fontWeight: 500, color: creditStatusColor }}>{creditStatusLabel}</span>
-                  <span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>{formatCurrency(vendor.creditLimit)}</span>
-                </div>
+                <div className="flex items-center justify-between mb-2"><span className="text-[12px] text-[#475569]" style={{ fontWeight: 500 }}>Credit Utilization</span><span className="text-[13px] text-[#0F172A]" style={{ fontWeight: 700 }}>{creditPct}%</span></div>
+                <div className="w-full h-2.5 rounded-full bg-[#F1F5F9] overflow-hidden"><div className="h-full rounded-full transition-all" style={{ width: `${Math.min(creditPct, 100)}%`, backgroundColor: creditPct > 80 ? "#DC2626" : creditPct > 50 ? "#D97706" : "#059669" }} /></div>
+                <div className="flex items-center justify-between mt-1.5"><span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>$0</span><span className="text-[10px]" style={{ fontWeight: 500, color: creditStatusColor }}>{creditStatusLabel}</span><span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>{formatCurrency(vendor.creditLimit)}</span></div>
               </div>
               <div className="grid grid-cols-3 gap-3 pt-2 border-t border-[#F1F5F9]">
-                <div>
-                  <p className="text-[10px] text-[#94A3B8] mb-0.5" style={{ fontWeight: 500 }}>Available</p>
-                  <p className="text-[14px] text-[#0F172A]" style={{ fontWeight: 700 }}>{formatCurrency(Math.max(available, 0))}</p>
-                </div>
-                <div>
-                  <p className="text-[10px] text-[#94A3B8] mb-0.5" style={{ fontWeight: 500 }}>Used</p>
-                  <p className="text-[14px] text-[#0F172A]" style={{ fontWeight: 700 }}>{formatCurrency(vendor.creditUtilization)}</p>
-                </div>
-                <div>
-                  <p className="text-[10px] text-[#94A3B8] mb-0.5" style={{ fontWeight: 500 }}>Limit</p>
-                  <p className="text-[14px] text-[#0F172A]" style={{ fontWeight: 700 }}>{formatCurrency(vendor.creditLimit)}</p>
-                </div>
+                <div><p className="text-[10px] text-[#94A3B8] mb-0.5" style={{ fontWeight: 500 }}>Available</p><p className="text-[14px] text-[#0F172A]" style={{ fontWeight: 700 }}>{formatCurrency(Math.max(available, 0))}</p></div>
+                <div><p className="text-[10px] text-[#94A3B8] mb-0.5" style={{ fontWeight: 500 }}>Used</p><p className="text-[14px] text-[#0F172A]" style={{ fontWeight: 700 }}>{formatCurrency(vendor.creditUtilization)}</p></div>
+                <div><p className="text-[10px] text-[#94A3B8] mb-0.5" style={{ fontWeight: 500 }}>Limit</p><p className="text-[14px] text-[#0F172A]" style={{ fontWeight: 700 }}>{formatCurrency(vendor.creditLimit)}</p></div>
               </div>
             </div>
           </ContentCard>
+          )}
         </div>
 
-        {/* About this Partner */}
-        <ContentCard title="About this Partner" icon={Info}>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
-            <DetailRow label="Company Name" value={vendor.companyName} />
-            <DetailRow label="Partner Code" value={vendor.code} mono />
-            <DetailRow label="Category" value={CATEGORY_LABELS[vendor.category]} />
-            <DetailRow label="Vendor Type" value={vendor.vendorType || "—"} />
-            <DetailRow label="Services" value={vendor.services || "—"} />
-            <DetailRow label="Tax ID" value={vendor.taxId || "—"} mono />
-            <DetailRow label="Country" value={`${vendor.countryFlag} ${vendor.country}`} />
-            <DetailRow label="Payment Terms" value={PAYMENT_TERMS_LABELS[vendor.paymentTerms]} />
-            {(vendor.description || cfg?.description) && (
-              <div className="sm:col-span-2">
-                <p className="text-[10px] text-[#94A3B8] mb-0.5" style={{ fontWeight: 500 }}>Description</p>
-                <p className="text-[12px] text-[#334155] leading-relaxed">{vendor.description || cfg?.description || "—"}</p>
-              </div>
-            )}
-          </div>
-        </ContentCard>
-
-        {/* Primary Contact */}
-        <ContentCard title="Primary Contact" icon={Users}>
-          <div className="flex items-start gap-3">
-            <div className="w-9 h-9 rounded-full bg-[#F1F5F9] flex items-center justify-center shrink-0">
-              <span className="text-xs text-[#475569]" style={{ fontWeight: 600 }}>
-                {vendor.primaryContact.name.split(" ").map((n) => n[0]).join("")}
-              </span>
+        {/* Delivery Performance + Invoice Aging — new visual charts */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {activeWidgets.includes("delivery_perf") && (
+          <ContentCard title="Delivery Performance" icon={TrendingUp} currentSize={widgetSizes.delivery_perf || "md"} onSizeChange={(s) => onWidgetSizeChange("delivery_perf", s)}>
+            <div style={{ height: chartH("delivery_perf", 120, 180, 260) }} className="-ml-2">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={[
+                  { month: "Oct", rate: 91 }, { month: "Nov", rate: 88 }, { month: "Dec", rate: 93 },
+                  { month: "Jan", rate: 95 }, { month: "Feb", rate: 92 }, { month: "Mar", rate: 94 },
+                ]} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
+                  <defs><linearGradient id="delivGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#059669" stopOpacity={0.15} /><stop offset="100%" stopColor="#059669" stopOpacity={0.01} /></linearGradient></defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
+                  <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} domain={[80, 100]} tickFormatter={(v) => `${v}%`} />
+                  <ReTooltip contentStyle={{ borderRadius: 8, border: "1px solid #E2E8F0", boxShadow: "0 4px 12px rgba(0,0,0,0.08)", fontSize: 12 }} formatter={(val: number) => [`${val}%`, "On-Time"]} />
+                  <Area type="monotone" dataKey="rate" stroke="#059669" strokeWidth={2} fill="url(#delivGrad)" />
+                </AreaChart>
+              </ResponsiveContainer>
             </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>{vendor.primaryContact.name}</p>
-              <p className="text-[11px] text-[#64748B] mt-0.5">{vendor.primaryContact.designation}</p>
-              <Separator className="my-2" />
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
-                <div className="flex items-center gap-1.5 text-[12px] text-[#334155]">
-                  <Mail className="w-3 h-3 text-[#94A3B8]" />
-                  {vendor.primaryContact.email || "—"}
+            <div className="flex items-center gap-4 mt-2 pt-2 border-t border-[#F1F5F9]">
+              <div><p className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Current</p><p className="text-[14px] text-[#059669]" style={{ fontWeight: 700 }}>94%</p></div>
+              <div><p className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Average</p><p className="text-[14px] text-[#0F172A]" style={{ fontWeight: 700 }}>92.2%</p></div>
+              <div><p className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Late Deliveries</p><p className="text-[14px] text-[#D97706]" style={{ fontWeight: 700 }}>6%</p></div>
+            </div>
+          </ContentCard>
+          )}
+
+          {activeWidgets.includes("invoice_aging") && (
+          <ContentCard title="Invoice Aging" icon={Receipt} currentSize={widgetSizes.invoice_aging || "md"} onSizeChange={(s) => onWidgetSizeChange("invoice_aging", s)}>
+            <div style={{ height: chartH("invoice_aging", 120, 180, 260) }} className="-ml-2">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={[
+                  { range: "0-30d", amount: Math.round(vendor.outstandingBalance * 0.4), count: 5 },
+                  { range: "31-60d", amount: Math.round(vendor.outstandingBalance * 0.25), count: 3 },
+                  { range: "61-90d", amount: Math.round(vendor.outstandingBalance * 0.2), count: 2 },
+                  { range: "90d+", amount: Math.round(vendor.outstandingBalance * 0.15), count: 1 },
+                ]} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
+                  <XAxis dataKey="range" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
+                  <ReTooltip contentStyle={{ borderRadius: 8, border: "1px solid #E2E8F0", boxShadow: "0 4px 12px rgba(0,0,0,0.08)", fontSize: 12 }} formatter={(val: number) => [`$${val.toLocaleString()}`, "Amount"]} />
+                  <Bar dataKey="amount" radius={[4, 4, 0, 0]} barSize={36}>
+                    {[0, 1, 2, 3].map((i) => (<Cell key={i} fill={["#0A77FF", "#3B82F6", "#D97706", "#DC2626"][i]} />))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="flex items-center gap-4 mt-2 pt-2 border-t border-[#F1F5F9]">
+              <div><p className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Total Overdue</p><p className="text-[14px] text-[#DC2626]" style={{ fontWeight: 700 }}>{formatCurrency(Math.round(vendor.outstandingBalance * 0.35))}</p></div>
+              <div><p className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Invoices</p><p className="text-[14px] text-[#0F172A]" style={{ fontWeight: 700 }}>11</p></div>
+              <div><p className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Avg Days</p><p className="text-[14px] text-[#D97706]" style={{ fontWeight: 700 }}>42</p></div>
+            </div>
+          </ContentCard>
+          )}
+        </div>
+
+        {/* Primary Contact + Return Rate */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {activeWidgets.includes("primary_contact") && (
+          <ContentCard title="Primary Contact" icon={Users} currentSize={widgetSizes.primary_contact || "md"} onSizeChange={(s) => onWidgetSizeChange("primary_contact", s)}>
+            <div className="flex items-start gap-3 mb-3">
+              <div className="w-9 h-9 rounded-full bg-[#F1F5F9] flex items-center justify-center shrink-0"><span className="text-xs text-[#475569]" style={{ fontWeight: 600 }}>{vendor.primaryContact.name.split(" ").map((n) => n[0]).join("")}</span></div>
+              <div className="min-w-0 flex-1">
+                <p className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>{vendor.primaryContact.name}</p>
+                <p className="text-[11px] text-[#64748B] mt-0.5">{vendor.primaryContact.designation}</p>
+              </div>
+            </div>
+            {/* Response time line chart */}
+            <div style={{ height: chartH("primary_contact", 80, 120, 160) }} className="-ml-2 border-t border-[#F1F5F9] pt-2">
+              <p className="text-[10px] text-[#94A3B8] mb-1 ml-2" style={{ fontWeight: 500 }}>Response Time (hours)</p>
+              <ResponsiveContainer width="100%" height="80%">
+                <LineChart data={[
+                  { week: "W1", hours: 4.2 }, { week: "W2", hours: 3.8 }, { week: "W3", hours: 2.5 },
+                  { week: "W4", hours: 3.1 }, { week: "W5", hours: 1.8 }, { week: "W6", hours: 2.2 },
+                ]} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
+                  <XAxis dataKey="week" tick={{ fontSize: 10, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 10, fill: "#94A3B8" }} axisLine={false} tickLine={false} domain={[0, 6]} />
+                  <ReTooltip contentStyle={{ borderRadius: 8, border: "1px solid #E2E8F0", fontSize: 11 }} formatter={(v: number) => [`${v}h`, "Avg Response"]} />
+                  <Line type="monotone" dataKey="hours" stroke="#7C3AED" strokeWidth={2} dot={{ r: 3, fill: "#7C3AED" }} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </ContentCard>
+          )}
+
+          {activeWidgets.includes("return_rate") && (
+          <ContentCard title="Return Rate" icon={BarChart3} currentSize={widgetSizes.return_rate || "md"} onSizeChange={(s) => onWidgetSizeChange("return_rate", s)}>
+            <div style={{ height: chartH("return_rate", 120, 180, 260) }} className="-ml-2">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={[
+                  { month: "Oct", rate: 3.2, defect: 1.8 }, { month: "Nov", rate: 2.8, defect: 1.5 }, { month: "Dec", rate: 2.1, defect: 1.2 },
+                  { month: "Jan", rate: 2.5, defect: 1.4 }, { month: "Feb", rate: 1.9, defect: 0.9 }, { month: "Mar", rate: 2.1, defect: 1.1 },
+                ]} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
+                  <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} tickFormatter={(v) => `${v}%`} />
+                  <ReTooltip contentStyle={{ borderRadius: 8, border: "1px solid #E2E8F0", fontSize: 12 }} />
+                  <Line type="monotone" dataKey="rate" stroke="#F59E0B" strokeWidth={2} dot={{ r: 3, fill: "#F59E0B" }} name="Return %" />
+                  <Line type="monotone" dataKey="defect" stroke="#DC2626" strokeWidth={2} dot={{ r: 3, fill: "#DC2626" }} name="Defect %" strokeDasharray="5 5" />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="flex items-center gap-4 mt-1 pt-2 border-t border-[#F1F5F9]">
+              <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-[#F59E0B]" /><span className="text-[10px] text-[#64748B]" style={{ fontWeight: 500 }}>Returns 2.1%</span></div>
+              <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-[#DC2626]" /><span className="text-[10px] text-[#64748B]" style={{ fontWeight: 500 }}>Defects 1.1%</span></div>
+            </div>
+          </ContentCard>
+          )}
+        </div>
+
+        {/* Top Items (horizontal bar) + Recent Orders (line chart + list) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {activeWidgets.includes("top_items") && (
+          <ContentCard title="Top Items by Spend" icon={Package} currentSize={widgetSizes.top_items || "md"} onSizeChange={(s) => onWidgetSizeChange("top_items", s)}>
+            <div style={{ height: chartH("top_items", 130, 200, 280) }} className="-ml-2">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart layout="vertical" data={[
+                  { name: "Steel Alloy A", spend: Math.round(vendor.totalSpent * 0.18) },
+                  { name: "Precision Bearings", spend: Math.round(vendor.totalSpent * 0.14) },
+                  { name: "Hydraulic Pump", spend: Math.round(vendor.totalSpent * 0.11) },
+                  { name: "Carbon Fiber", spend: Math.round(vendor.totalSpent * 0.09) },
+                  { name: "Ind. Lubricant", spend: Math.round(vendor.totalSpent * 0.07) },
+                ]} margin={{ top: 5, right: 30, left: 5, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" horizontal={false} />
+                  <XAxis type="number" tick={{ fontSize: 10, fill: "#94A3B8" }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
+                  <YAxis type="category" dataKey="name" tick={{ fontSize: 10, fill: "#64748B" }} axisLine={false} tickLine={false} width={90} />
+                  <ReTooltip contentStyle={{ borderRadius: 8, border: "1px solid #E2E8F0", fontSize: 12 }} formatter={(v: number) => [`$${v.toLocaleString()}`, "Spend"]} />
+                  <Bar dataKey="spend" radius={[0, 4, 4, 0]} barSize={16}>
+                    {[0, 1, 2, 3, 4].map((i) => (<Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </ContentCard>
+          )}
+
+          {activeWidgets.includes("recent_orders") && (
+          <ContentCard title="Recent Orders" icon={ClipboardList} currentSize={widgetSizes.recent_orders || "md"} onSizeChange={(s) => onWidgetSizeChange("recent_orders", s)}>
+            {/* Order value sparkline */}
+            <div style={{ height: chartH("recent_orders", 70, 100, 160) }} className="-ml-2 mb-3">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={[
+                  { po: "28180", amount: Math.round(vendor.totalSpent * 0.04), status: "pending" },
+                  { po: "28255", amount: Math.round(vendor.totalSpent * 0.07), status: "delivered" },
+                  { po: "28312", amount: Math.round(vendor.totalSpent * 0.05), status: "delivered" },
+                  { po: "28390", amount: Math.round(vendor.totalSpent * 0.06), status: "transit" },
+                  { po: "28451", amount: Math.round(vendor.totalSpent * 0.08), status: "delivered" },
+                ]} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
+                  <XAxis dataKey="po" tick={{ fontSize: 9, fill: "#94A3B8" }} axisLine={false} tickLine={false} tickFormatter={(v) => `PO-${v}`} />
+                  <YAxis tick={{ fontSize: 10, fill: "#94A3B8" }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
+                  <Bar dataKey="amount" radius={[4, 4, 0, 0]} barSize={20}>
+                    {[0, 1, 2, 3, 4].map((i) => (<Cell key={i} fill={[1, 2, 4].includes(i) ? "#059669" : i === 3 ? "#0A77FF" : "#D97706"} />))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#059669]" /><span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Delivered</span></div>
+              <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#0A77FF]" /><span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>In Transit</span></div>
+              <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#D97706]" /><span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Pending</span></div>
+            </div>
+          </ContentCard>
+          )}
+        </div>
+
+        {/* Payment History (line chart) + Compliance (radial gauge) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {activeWidgets.includes("payment_history") && (
+          <ContentCard title="Payment History" icon={Banknote} currentSize={widgetSizes.payment_history || "md"} onSizeChange={(s) => onWidgetSizeChange("payment_history", s)}>
+            <div style={{ height: chartH("payment_history", 120, 180, 260) }} className="-ml-2">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={[
+                  { month: "Oct", paid: Math.round(vendor.totalSpent * 0.03), pending: Math.round(vendor.totalSpent * 0.01) },
+                  { month: "Nov", paid: Math.round(vendor.totalSpent * 0.05), pending: Math.round(vendor.totalSpent * 0.008) },
+                  { month: "Dec", paid: Math.round(vendor.totalSpent * 0.04), pending: Math.round(vendor.totalSpent * 0.015) },
+                  { month: "Jan", paid: Math.round(vendor.totalSpent * 0.06), pending: Math.round(vendor.totalSpent * 0.005) },
+                  { month: "Feb", paid: Math.round(vendor.totalSpent * 0.08), pending: Math.round(vendor.totalSpent * 0.012) },
+                  { month: "Mar", paid: Math.round(vendor.totalSpent * 0.06), pending: Math.round(vendor.totalSpent * 0.01) },
+                ]} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="paidGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#059669" stopOpacity={0.12} /><stop offset="100%" stopColor="#059669" stopOpacity={0.01} /></linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
+                  <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
+                  <ReTooltip contentStyle={{ borderRadius: 8, border: "1px solid #E2E8F0", fontSize: 12 }} formatter={(v: number) => [`$${v.toLocaleString()}`, ""]} />
+                  <Area type="monotone" dataKey="paid" stroke="#059669" strokeWidth={2} fill="url(#paidGrad)" name="Paid" />
+                  <Area type="monotone" dataKey="pending" stroke="#D97706" strokeWidth={1.5} fill="none" strokeDasharray="4 4" name="Pending" />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="flex items-center gap-3 mt-1 pt-2 border-t border-[#F1F5F9]">
+              <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-[#059669]" /><span className="text-[10px] text-[#64748B]" style={{ fontWeight: 500 }}>Paid</span></div>
+              <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-[#D97706]" /><span className="text-[10px] text-[#64748B]" style={{ fontWeight: 500 }}>Pending</span></div>
+              <span className="text-[10px] text-[#94A3B8] ml-auto" style={{ fontWeight: 500 }}>4 transactions this month</span>
+            </div>
+          </ContentCard>
+          )}
+
+          {activeWidgets.includes("compliance_docs") && (
+          <ContentCard title="Compliance & Documents" icon={Shield} currentSize={widgetSizes.compliance_docs || "md"} onSizeChange={(s) => onWidgetSizeChange("compliance_docs", s)}>
+            {/* Compliance score radial */}
+            <div className="flex items-center gap-4 mb-3">
+              <div className="w-[100px] h-[100px] shrink-0 relative">
+                <RePieChart width={100} height={100}>
+                  <Pie data={[{ value: 75 }, { value: 25 }]} cx="50%" cy="50%" innerRadius={32} outerRadius={44} startAngle={90} endAngle={-270} dataKey="value" stroke="none">
+                    <Cell fill="#059669" />
+                    <Cell fill="#F1F5F9" />
+                  </Pie>
+                </RePieChart>
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <span className="text-[16px] text-[#059669]" style={{ fontWeight: 700 }}>75%</span>
+                  <span className="text-[8px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Score</span>
                 </div>
-                <div className="flex items-center gap-1.5 text-[12px] text-[#334155]">
-                  <Phone className="w-3 h-3 text-[#94A3B8]" />
-                  {vendor.primaryContact.phone || "—"}
+              </div>
+              <div className="space-y-1.5 flex-1 min-w-0">
+                <div className="flex items-center justify-between"><span className="text-[11px] text-[#334155]" style={{ fontWeight: 500 }}>Valid Docs</span><span className="text-[11px] text-[#059669]" style={{ fontWeight: 600 }}>3/4</span></div>
+                <div className="flex items-center justify-between"><span className="text-[11px] text-[#334155]" style={{ fontWeight: 500 }}>Expiring Soon</span><span className="text-[11px] text-[#D97706]" style={{ fontWeight: 600 }}>1</span></div>
+                <div className="flex items-center justify-between"><span className="text-[11px] text-[#334155]" style={{ fontWeight: 500 }}>Expired</span><span className="text-[11px] text-[#DC2626]" style={{ fontWeight: 600 }}>0</span></div>
+              </div>
+            </div>
+            <div className="space-y-2 border-t border-[#F1F5F9] pt-2.5">
+              {[
+                { name: "W-9 Tax Form", status: "Valid", statusColor: "#059669", statusBg: "#ECFDF5" },
+                { name: "Certificate of Insurance", status: "Valid", statusColor: "#059669", statusBg: "#ECFDF5" },
+                { name: "NDA Agreement", status: "Active", statusColor: "#059669", statusBg: "#ECFDF5" },
+                { name: "Quality Cert (ISO)", status: "Expiring", statusColor: "#D97706", statusBg: "#FFFBEB" },
+              ].map((doc, i) => (
+                <div key={i} className="flex items-center justify-between py-0.5">
+                  <span className="text-[11px] text-[#334155]" style={{ fontWeight: 500 }}>{doc.name}</span>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded-full shrink-0" style={{ fontWeight: 500, color: doc.statusColor, backgroundColor: doc.statusBg }}>{doc.status}</span>
+                </div>
+              ))}
+            </div>
+          </ContentCard>
+          )}
+        </div>
+
+        {/* Notes — with activity timeline visual */}
+        {activeWidgets.includes("notes") && vendor.notes && (
+          <ContentCard title="Notes & Activity" icon={MessageSquare} currentSize={widgetSizes.notes || "md"} onSizeChange={(s) => onWidgetSizeChange("notes", s)}>
+            <div className="flex gap-4">
+              <div className="flex-1 min-w-0">
+                <p className="text-[12px] text-[#475569] leading-relaxed mb-3">{vendor.notes}</p>
+                <div className="space-y-3 border-t border-[#F1F5F9] pt-3">
+                  {[
+                    { time: "Mar 28", action: "Payment received", detail: "PAY-9841 · $8,520", color: "#059669" },
+                    { time: "Mar 21", action: "Order delivered", detail: "PO-28390 · 42 items", color: "#0A77FF" },
+                    { time: "Mar 15", action: "Note added", detail: "Quality review completed", color: "#7C3AED" },
+                    { time: "Mar 10", action: "Invoice approved", detail: "INV-1204 · $11,400", color: "#F59E0B" },
+                  ].map((event, i) => (
+                    <div key={i} className="flex items-start gap-2.5">
+                      <div className="flex flex-col items-center mt-0.5">
+                        <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: event.color }} />
+                        {i < 3 && <div className="w-px h-6 bg-[#E2E8F0] mt-0.5" />}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-[11px] text-[#0F172A]" style={{ fontWeight: 500 }}>{event.action}</p>
+                        <p className="text-[10px] text-[#94A3B8]">{event.time} · {event.detail}</p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
-          </div>
-        </ContentCard>
-
-        {/* Notes */}
-        {vendor.notes && (
-          <ContentCard title="Notes" icon={MessageSquare}>
-            <p className="text-[12px] text-[#475569] leading-relaxed">{vendor.notes}</p>
           </ContentCard>
         )}
       </div>
+      </DndProvider>
 
       {/* ═══ RIGHT COLUMN — Information Cards ═══ */}
       <div className="space-y-3.5 min-w-0 overflow-hidden xl:sticky xl:bottom-5 xl:top-[160px] xl:self-end">
@@ -2395,6 +2828,16 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate }: {
           </div>
           <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 mb-2.5">
             <div className="min-w-0">
+              <DashInfoLabel>Partner Code</DashInfoLabel>
+              <p className="text-[12px] text-[#334155] truncate font-mono" style={{ fontWeight: 500 }}>{vendor.code}</p>
+            </div>
+            <div className="min-w-0">
+              <DashInfoLabel>Category</DashInfoLabel>
+              <p className="text-[12px] text-[#334155] truncate" style={{ fontWeight: 500 }}>{CATEGORY_LABELS[vendor.category]}</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 mb-2.5">
+            <div className="min-w-0">
               <DashInfoLabel>Email</DashInfoLabel>
               <p className="text-[12px] text-[#334155] truncate" style={{ fontWeight: 500 }}>{vendor.emailAddress || "—"}</p>
             </div>
@@ -2409,8 +2852,18 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate }: {
               <p className="text-[12px] text-[#334155] truncate" style={{ fontWeight: 500 }}>{vendor.primaryContact.phone || "—"}</p>
             </div>
             <div className="min-w-0">
-              <DashInfoLabel>Category</DashInfoLabel>
-              <p className="text-[12px] text-[#334155] truncate" style={{ fontWeight: 500 }}>{CATEGORY_LABELS[vendor.category]}</p>
+              <DashInfoLabel>Tax ID</DashInfoLabel>
+              <p className="text-[12px] text-[#334155] truncate font-mono" style={{ fontWeight: 500 }}>{vendor.taxId || "—"}</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 mb-2.5">
+            <div className="min-w-0">
+              <DashInfoLabel>Services</DashInfoLabel>
+              <p className="text-[12px] text-[#334155] truncate" style={{ fontWeight: 500 }}>{vendor.services || "—"}</p>
+            </div>
+            <div className="min-w-0">
+              <DashInfoLabel>Country</DashInfoLabel>
+              <p className="text-[12px] text-[#334155] truncate" style={{ fontWeight: 500 }}>{vendor.countryFlag} {vendor.country}</p>
             </div>
           </div>
           {vendor.billingAddress.street && (
