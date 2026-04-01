@@ -1655,7 +1655,7 @@ function CarrierShippingCard({ carrier }: {
 
 
 
-function ContentCard({ title, icon: Icon, count, children, action, currentSize, onSizeChange, dragHandle }: {
+function ContentCard({ title, icon: Icon, count, children, action, currentSize, onSizeChange, tooltip, dragRef, isDragging }: {
   title: string;
   icon?: React.ElementType;
   count?: number;
@@ -1663,19 +1663,40 @@ function ContentCard({ title, icon: Icon, count, children, action, currentSize, 
   action?: React.ReactNode;
   currentSize?: "sm" | "md" | "lg";
   onSizeChange?: (size: "sm" | "md" | "lg") => void;
-  dragHandle?: React.ReactNode;
+  tooltip?: string;
+  dragRef?: React.Ref<HTMLDivElement>;
+  isDragging?: boolean;
 }) {
   return (
-    <div className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-      <div className="px-4 py-3 border-b border-[#F1F5F9] flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          {dragHandle}
+    <div
+      style={{ opacity: isDragging ? 0.4 : 1 }}
+      className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)] transition-all duration-200 hover:shadow-[0_2px_8px_-2px_rgba(0,0,0,0.06)] h-full"
+    >
+      <div className="px-4 py-2.5 border-b border-[#F1F5F9] flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          {dragRef && (
+            <div ref={dragRef} className="cursor-grab active:cursor-grabbing p-0.5 -ml-1 rounded hover:bg-[#F1F5F9] transition-colors">
+              <GripVertical className="w-3.5 h-3.5 text-[#CBD5E1]" />
+            </div>
+          )}
           {Icon && (
             <div className="w-7 h-7 rounded-lg bg-[#EDF4FF] flex items-center justify-center shrink-0">
               <Icon className="w-3.5 h-3.5 text-[#0A77FF]" />
             </div>
           )}
           <span className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>{title}</span>
+          {tooltip && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button type="button" className="inline-flex" tabIndex={-1} onClick={(e) => e.stopPropagation()}>
+                  <Info className="w-3 h-3 text-[#CBD5E1] hover:text-[#94A3B8] transition-colors" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="top" sideOffset={6} className="z-[300] max-w-[220px]">
+                <p className="text-[11px] leading-relaxed">{tooltip}</p>
+              </TooltipContent>
+            </Tooltip>
+          )}
           {count != null && (
             <span className="text-[10px] text-[#0A77FF] px-1.5 py-0.5 rounded-md bg-[#EDF4FF]" style={{ fontWeight: 600 }}>{count}</span>
           )}
@@ -1705,17 +1726,17 @@ function ContentCard({ title, icon: Icon, count, children, action, currentSize, 
   );
 }
 
-// ── Draggable Widget Wrapper ──
+// ── Draggable Widget Wrapper with proper DnD ──
 const WIDGET_DND_TYPE = "DASHBOARD_WIDGET";
 
-function DraggableWidget({ widgetKey, index, moveWidget, children }: {
+function DraggableWidgetCard({ widgetKey, index, moveWidget, children }: {
   widgetKey: string;
   index: number;
   moveWidget: (from: number, to: number) => void;
-  children: React.ReactNode;
+  children: (dragRef: React.Ref<HTMLDivElement>, isDragging: boolean) => React.ReactNode;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const [{ isDragging }, drag, preview] = useDrag({
+  const [{ isDragging }, drag] = useDrag({
     type: WIDGET_DND_TYPE,
     item: () => ({ key: widgetKey, index }),
     collect: (monitor) => ({ isDragging: monitor.isDragging() }),
@@ -1724,35 +1745,24 @@ function DraggableWidget({ widgetKey, index, moveWidget, children }: {
     accept: WIDGET_DND_TYPE,
     hover(item: { key: string; index: number }, monitor) {
       if (!ref.current) return;
-      const dragIndex = item.index;
-      const hoverIndex = index;
-      if (dragIndex === hoverIndex) return;
-      const hoverBoundingRect = ref.current.getBoundingClientRect();
-      const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
+      const dragIdx = item.index;
+      const hoverIdx = index;
+      if (dragIdx === hoverIdx) return;
+      const rect = ref.current.getBoundingClientRect();
+      const midY = (rect.bottom - rect.top) / 2;
       const clientOffset = monitor.getClientOffset();
       if (!clientOffset) return;
-      const hoverClientY = clientOffset.y - hoverBoundingRect.top;
-      if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) return;
-      if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) return;
-      moveWidget(dragIndex, hoverIndex);
-      item.index = hoverIndex;
+      const hoverY = clientOffset.y - rect.top;
+      if (dragIdx < hoverIdx && hoverY < midY) return;
+      if (dragIdx > hoverIdx && hoverY > midY) return;
+      moveWidget(dragIdx, hoverIdx);
+      item.index = hoverIdx;
     },
   });
-  preview(drop(ref));
+  drop(ref);
   return (
-    <div ref={ref} style={{ opacity: isDragging ? 0.4 : 1, transition: "opacity 150ms" }}>
-      {React.Children.map(children, (child) => {
-        if (React.isValidElement(child)) {
-          return React.cloneElement(child as React.ReactElement<{ dragHandle?: React.ReactNode }>, {
-            dragHandle: (
-              <div ref={(node) => { drag(node); }} className="cursor-grab active:cursor-grabbing p-0.5 -ml-1 rounded hover:bg-[#F1F5F9] transition-colors">
-                <GripVertical className="w-3.5 h-3.5 text-[#CBD5E1]" />
-              </div>
-            ),
-          });
-        }
-        return child;
-      })}
+    <div ref={ref}>
+      {children((node) => { drag(node); }, isDragging)}
     </div>
   );
 }
@@ -2387,11 +2397,6 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
 }) {
   const creditPct = getCreditUtilizationPct(vendor);
   const available = vendor.creditLimit - vendor.creditUtilization;
-  // Helper: chart height based on widget size
-  const chartH = (key: string, sm: number, md: number, lg: number) => {
-    const sz = widgetSizes[key] || "md";
-    return sz === "sm" ? sm : sz === "lg" ? lg : md;
-  };
   const spendCategories = [
     { name: "Services", value: Math.round(vendor.totalSpent * 0.4), pct: 40 },
     { name: "Materials", value: Math.round(vendor.totalSpent * 0.3), pct: 30 },
@@ -2413,378 +2418,406 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
     <>
     <div className="grid grid-cols-1 xl:grid-cols-[1fr_340px] gap-4 items-start">
 
-      {/* ═══ LEFT COLUMN — Charts & Widgets ═══ */}
+      {/* ═══ LEFT COLUMN — Charts & Widgets (dynamic from activeWidgets) ═══ */}
       <DndProvider backend={HTML5Backend}>
-      <div className="space-y-4 min-w-0">
+      <div className="space-y-3 min-w-0">
+        {(() => {
+          // Widget definitions with size-aware span: "full" = full-width, "half" = side by side
+          // Size overrides: sm → always half, lg → always full, md → uses default
+          const getSpan = (defaultSpan: "full" | "half", sz: "sm" | "md" | "lg") =>
+            sz === "lg" ? "full" : sz === "sm" ? "half" : defaultSpan;
 
-        {/* Spend Trend */}
-        {activeWidgets.includes("spend_trend") && (
-        <DraggableWidget widgetKey="spend_trend" index={activeWidgets.indexOf("spend_trend")} moveWidget={moveWidget}>
-        <ContentCard title="Spend Trend" icon={TrendingUp} currentSize={widgetSizes.spend_trend || "md"} onSizeChange={(s) => onWidgetSizeChange("spend_trend", s)} action={
-          <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>This Year</span>
-        }>
-          <div style={{ height: chartH("spend_trend", 140, 220, 300) }} className="-ml-2">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={SPEND_TREND_DATA} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
-                <defs key="area-defs">
-                  <linearGradient id="spendGradientUniq" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#0A77FF" stopOpacity={0.15} />
-                    <stop offset="100%" stopColor="#0A77FF" stopOpacity={0.01} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid key="area-grid" strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
-                <XAxis key="area-x" dataKey="month" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
-                <YAxis key="area-y" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
-                <ReTooltip key="area-tooltip" contentStyle={{ borderRadius: 8, border: "1px solid #E2E8F0", boxShadow: "0 4px 12px rgba(0,0,0,0.08)", fontSize: 12 }} formatter={(val: number) => [`$${val.toLocaleString()}`, "Spend"]} />
-                <Area key="area-amount" type="monotone" dataKey="amount" stroke="#0A77FF" strokeWidth={2} fill="url(#spendGradientUniq)" />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        </ContentCard>
-        </DraggableWidget>
-        )}
+          // Build widget nodes with their spans
+          type WidgetNode = { key: string; idx: number; span: "full" | "half"; node: React.ReactNode };
+          const nodes: WidgetNode[] = [];
 
-        {/* Order Activity */}
-        {activeWidgets.includes("order_activity") && (
-        <DraggableWidget widgetKey="order_activity" index={activeWidgets.indexOf("order_activity")} moveWidget={moveWidget}>
-        <ContentCard title="Order Activity" icon={BarChart3} currentSize={widgetSizes.order_activity || "md"} onSizeChange={(s) => onWidgetSizeChange("order_activity", s)} action={
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-[#0A77FF]" /><span className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Orders</span></div>
-            <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-[#F59E0B]" /><span className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Returns</span></div>
-          </div>
-        }>
-          <div style={{ height: chartH("order_activity", 140, 220, 300) }} className="-ml-2">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={ORDER_ACTIVITY_DATA} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
-                <CartesianGrid key="bar-grid" strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
-                <XAxis key="bar-x" dataKey="day" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
-                <YAxis key="bar-y" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
-                <ReTooltip key="bar-tooltip" contentStyle={{ borderRadius: 8, border: "1px solid #E2E8F0", boxShadow: "0 4px 12px rgba(0,0,0,0.08)", fontSize: 12 }} />
-                <Bar key="bar-orders" dataKey="orders" fill="#0A77FF" radius={[4, 4, 0, 0]} barSize={24} name="Orders" />
-                <Bar key="bar-returns" dataKey="returns" fill="#F59E0B" radius={[4, 4, 0, 0]} barSize={24} name="Returns" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </ContentCard>
-        </DraggableWidget>
-        )}
+          // Standardized chart height tiers
+          const CHART_H = { sm: 120, md: 200, lg: 280 } as const;
+          const CHART_H_HALF = { sm: 120, md: 180, lg: 240 } as const;
 
-        {/* Spend by Category + Credit Health */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {activeWidgets.includes("spend_by_category") && (
-          <ContentCard title="Spend by Category" icon={PieChart} currentSize={widgetSizes.spend_by_category || "md"} onSizeChange={(s) => onWidgetSizeChange("spend_by_category", s)}>
-            <div className="flex flex-col items-center gap-4">
-              <div className="w-[150px] h-[150px] shrink-0 relative">
-                <RePieChart width={150} height={150}>
-                  <Pie key="pie-spend" data={spendCategories} cx="50%" cy="50%" innerRadius={46} outerRadius={70} paddingAngle={2} dataKey="value" stroke="none">
-                    {spendCategories.map((_entry, index) => (<Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />))}
-                  </Pie>
-                </RePieChart>
-                <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-[13px] text-[#0F172A]" style={{ fontWeight: 700 }}>{formatCurrency(vendor.totalSpent)}</span>
-                </div>
+          activeWidgets.forEach((wKey, wIdx) => {
+            const sz = widgetSizes[wKey] || "md";
+            const sizeProps = { currentSize: sz as "sm" | "md" | "lg", onSizeChange: (s: "sm" | "md" | "lg") => onWidgetSizeChange(wKey, s) };
+
+            let content: React.ReactNode = null;
+            let icon: React.ElementType = Info;
+            let title = "";
+            let tip = "";
+            let cardAction: React.ReactNode = undefined;
+            let defaultSpan: "full" | "half" = "half";
+
+            if (wKey === "spend_trend") {
+            icon = TrendingUp; title = "Spend Trend"; tip = "Monthly spend trend over the current year."; defaultSpan = "full";
+            cardAction = <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>This Year</span>;
+            content = (
+              <div style={{ height: CHART_H[sz] }} className="-ml-2">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={SPEND_TREND_DATA} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
+                    <defs><linearGradient id="spendGradientUniq" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#0A77FF" stopOpacity={0.15} /><stop offset="100%" stopColor="#0A77FF" stopOpacity={0.01} /></linearGradient></defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
+                    <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
+                    <ReTooltip contentStyle={{ borderRadius: 8, border: "1px solid #E2E8F0", fontSize: 12 }} formatter={(val: number) => [`$${val.toLocaleString()}`, "Spend"]} />
+                    <Area type="monotone" dataKey="amount" stroke="#0A77FF" strokeWidth={2} fill="url(#spendGradientUniq)" />
+                  </AreaChart>
+                </ResponsiveContainer>
               </div>
-              <div className="w-full space-y-2">
-                {spendCategories.map((cat, idx) => (
-                  <div key={cat.name} className="flex items-center justify-between">
-                    <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: PIE_COLORS[idx] }} /><span className="text-[12px] text-[#475569]" style={{ fontWeight: 500 }}>{cat.name}</span></div>
-                    <div className="flex items-center gap-3"><span className="text-[12px] text-[#0F172A]" style={{ fontWeight: 600 }}>{formatCurrency(cat.value)}</span><span className="text-[11px] text-[#94A3B8] w-8 text-right" style={{ fontWeight: 500 }}>{cat.pct}%</span></div>
+            );
+          } else if (wKey === "order_activity") {
+            icon = BarChart3; title = "Order Activity"; tip = "Weekly order and return volume."; defaultSpan = "full";
+            cardAction = (<div className="flex items-center gap-3"><div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-[#0A77FF]" /><span className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Orders</span></div><div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-[#F59E0B]" /><span className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Returns</span></div></div>);
+            content = (
+              <div style={{ height: CHART_H[sz] }} className="-ml-2">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={ORDER_ACTIVITY_DATA} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
+                    <XAxis dataKey="day" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
+                    <ReTooltip contentStyle={{ borderRadius: 8, border: "1px solid #E2E8F0", fontSize: 12 }} />
+                    <Bar dataKey="orders" fill="#0A77FF" radius={[4, 4, 0, 0]} barSize={sz === "sm" ? 14 : 24} name="Orders" />
+                    <Bar dataKey="returns" fill="#F59E0B" radius={[4, 4, 0, 0]} barSize={sz === "sm" ? 14 : 24} name="Returns" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            );
+          } else if (wKey === "spend_by_category") {
+            icon = PieChart; title = "Spend by Category"; tip = "Total spend breakdown across categories.";
+            content = (
+              <div className={`flex ${sz === "sm" ? "items-center gap-3" : "flex-col items-center gap-4"}`}>
+                <div className="shrink-0 relative" style={{ width: sz === "sm" ? 80 : 150, height: sz === "sm" ? 80 : 150 }}>
+                  <RePieChart width={sz === "sm" ? 80 : 150} height={sz === "sm" ? 80 : 150}>
+                    <Pie data={spendCategories} cx="50%" cy="50%" innerRadius={sz === "sm" ? 24 : 46} outerRadius={sz === "sm" ? 36 : 70} paddingAngle={2} dataKey="value" stroke="none">
+                      {spendCategories.map((_, i) => (<Cell key={`cell-${i}`} fill={PIE_COLORS[i % PIE_COLORS.length]} />))}
+                    </Pie>
+                  </RePieChart>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <span className={`text-[#0F172A] ${sz === "sm" ? "text-[10px]" : "text-[13px]"}`} style={{ fontWeight: 700 }}>{formatCurrency(vendor.totalSpent)}</span>
                   </div>
-                ))}
-              </div>
-            </div>
-          </ContentCard>
-          )}
-
-          {activeWidgets.includes("credit_health") && (
-          <ContentCard title="Credit Health" icon={Shield} currentSize={widgetSizes.credit_health || "md"} onSizeChange={(s) => onWidgetSizeChange("credit_health", s)}>
-            <div className="space-y-4">
-              <div>
-                <div className="flex items-center justify-between mb-2"><span className="text-[12px] text-[#475569]" style={{ fontWeight: 500 }}>Credit Utilization</span><span className="text-[13px] text-[#0F172A]" style={{ fontWeight: 700 }}>{creditPct}%</span></div>
-                <div className="w-full h-2.5 rounded-full bg-[#F1F5F9] overflow-hidden"><div className="h-full rounded-full transition-all" style={{ width: `${Math.min(creditPct, 100)}%`, backgroundColor: creditPct > 80 ? "#DC2626" : creditPct > 50 ? "#D97706" : "#059669" }} /></div>
-                <div className="flex items-center justify-between mt-1.5"><span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>$0</span><span className="text-[10px]" style={{ fontWeight: 500, color: creditStatusColor }}>{creditStatusLabel}</span><span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>{formatCurrency(vendor.creditLimit)}</span></div>
-              </div>
-              <div className="grid grid-cols-3 gap-3 pt-2 border-t border-[#F1F5F9]">
-                <div><p className="text-[10px] text-[#94A3B8] mb-0.5" style={{ fontWeight: 500 }}>Available</p><p className="text-[14px] text-[#0F172A]" style={{ fontWeight: 700 }}>{formatCurrency(Math.max(available, 0))}</p></div>
-                <div><p className="text-[10px] text-[#94A3B8] mb-0.5" style={{ fontWeight: 500 }}>Used</p><p className="text-[14px] text-[#0F172A]" style={{ fontWeight: 700 }}>{formatCurrency(vendor.creditUtilization)}</p></div>
-                <div><p className="text-[10px] text-[#94A3B8] mb-0.5" style={{ fontWeight: 500 }}>Limit</p><p className="text-[14px] text-[#0F172A]" style={{ fontWeight: 700 }}>{formatCurrency(vendor.creditLimit)}</p></div>
-              </div>
-            </div>
-          </ContentCard>
-          )}
-        </div>
-
-        {/* Delivery Performance + Invoice Aging — new visual charts */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {activeWidgets.includes("delivery_perf") && (
-          <ContentCard title="Delivery Performance" icon={TrendingUp} currentSize={widgetSizes.delivery_perf || "md"} onSizeChange={(s) => onWidgetSizeChange("delivery_perf", s)}>
-            <div style={{ height: chartH("delivery_perf", 120, 180, 260) }} className="-ml-2">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={[
-                  { month: "Oct", rate: 91 }, { month: "Nov", rate: 88 }, { month: "Dec", rate: 93 },
-                  { month: "Jan", rate: 95 }, { month: "Feb", rate: 92 }, { month: "Mar", rate: 94 },
-                ]} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
-                  <defs><linearGradient id="delivGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#059669" stopOpacity={0.15} /><stop offset="100%" stopColor="#059669" stopOpacity={0.01} /></linearGradient></defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
-                  <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} domain={[80, 100]} tickFormatter={(v) => `${v}%`} />
-                  <ReTooltip contentStyle={{ borderRadius: 8, border: "1px solid #E2E8F0", boxShadow: "0 4px 12px rgba(0,0,0,0.08)", fontSize: 12 }} formatter={(val: number) => [`${val}%`, "On-Time"]} />
-                  <Area type="monotone" dataKey="rate" stroke="#059669" strokeWidth={2} fill="url(#delivGrad)" />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-            <div className="flex items-center gap-4 mt-2 pt-2 border-t border-[#F1F5F9]">
-              <div><p className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Current</p><p className="text-[14px] text-[#059669]" style={{ fontWeight: 700 }}>94%</p></div>
-              <div><p className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Average</p><p className="text-[14px] text-[#0F172A]" style={{ fontWeight: 700 }}>92.2%</p></div>
-              <div><p className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Late Deliveries</p><p className="text-[14px] text-[#D97706]" style={{ fontWeight: 700 }}>6%</p></div>
-            </div>
-          </ContentCard>
-          )}
-
-          {activeWidgets.includes("invoice_aging") && (
-          <ContentCard title="Invoice Aging" icon={Receipt} currentSize={widgetSizes.invoice_aging || "md"} onSizeChange={(s) => onWidgetSizeChange("invoice_aging", s)}>
-            <div style={{ height: chartH("invoice_aging", 120, 180, 260) }} className="-ml-2">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={[
-                  { range: "0-30d", amount: Math.round(vendor.outstandingBalance * 0.4), count: 5 },
-                  { range: "31-60d", amount: Math.round(vendor.outstandingBalance * 0.25), count: 3 },
-                  { range: "61-90d", amount: Math.round(vendor.outstandingBalance * 0.2), count: 2 },
-                  { range: "90d+", amount: Math.round(vendor.outstandingBalance * 0.15), count: 1 },
-                ]} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
-                  <XAxis dataKey="range" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
-                  <ReTooltip contentStyle={{ borderRadius: 8, border: "1px solid #E2E8F0", boxShadow: "0 4px 12px rgba(0,0,0,0.08)", fontSize: 12 }} formatter={(val: number) => [`$${val.toLocaleString()}`, "Amount"]} />
-                  <Bar dataKey="amount" radius={[4, 4, 0, 0]} barSize={36}>
-                    {[0, 1, 2, 3].map((i) => (<Cell key={i} fill={["#0A77FF", "#3B82F6", "#D97706", "#DC2626"][i]} />))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-            <div className="flex items-center gap-4 mt-2 pt-2 border-t border-[#F1F5F9]">
-              <div><p className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Total Overdue</p><p className="text-[14px] text-[#DC2626]" style={{ fontWeight: 700 }}>{formatCurrency(Math.round(vendor.outstandingBalance * 0.35))}</p></div>
-              <div><p className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Invoices</p><p className="text-[14px] text-[#0F172A]" style={{ fontWeight: 700 }}>11</p></div>
-              <div><p className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Avg Days</p><p className="text-[14px] text-[#D97706]" style={{ fontWeight: 700 }}>42</p></div>
-            </div>
-          </ContentCard>
-          )}
-        </div>
-
-        {/* Primary Contact + Return Rate */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {activeWidgets.includes("primary_contact") && (
-          <ContentCard title="Primary Contact" icon={Users} currentSize={widgetSizes.primary_contact || "md"} onSizeChange={(s) => onWidgetSizeChange("primary_contact", s)}>
-            <div className="flex items-start gap-3 mb-3">
-              <div className="w-9 h-9 rounded-full bg-[#F1F5F9] flex items-center justify-center shrink-0"><span className="text-xs text-[#475569]" style={{ fontWeight: 600 }}>{vendor.primaryContact.name.split(" ").map((n) => n[0]).join("")}</span></div>
-              <div className="min-w-0 flex-1">
-                <p className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>{vendor.primaryContact.name}</p>
-                <p className="text-[11px] text-[#64748B] mt-0.5">{vendor.primaryContact.designation}</p>
-              </div>
-            </div>
-            {/* Response time line chart */}
-            <div style={{ height: chartH("primary_contact", 80, 120, 160) }} className="-ml-2 border-t border-[#F1F5F9] pt-2">
-              <p className="text-[10px] text-[#94A3B8] mb-1 ml-2" style={{ fontWeight: 500 }}>Response Time (hours)</p>
-              <ResponsiveContainer width="100%" height="80%">
-                <LineChart data={[
-                  { week: "W1", hours: 4.2 }, { week: "W2", hours: 3.8 }, { week: "W3", hours: 2.5 },
-                  { week: "W4", hours: 3.1 }, { week: "W5", hours: 1.8 }, { week: "W6", hours: 2.2 },
-                ]} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
-                  <XAxis dataKey="week" tick={{ fontSize: 10, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fontSize: 10, fill: "#94A3B8" }} axisLine={false} tickLine={false} domain={[0, 6]} />
-                  <ReTooltip contentStyle={{ borderRadius: 8, border: "1px solid #E2E8F0", fontSize: 11 }} formatter={(v: number) => [`${v}h`, "Avg Response"]} />
-                  <Line type="monotone" dataKey="hours" stroke="#7C3AED" strokeWidth={2} dot={{ r: 3, fill: "#7C3AED" }} />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </ContentCard>
-          )}
-
-          {activeWidgets.includes("return_rate") && (
-          <ContentCard title="Return Rate" icon={BarChart3} currentSize={widgetSizes.return_rate || "md"} onSizeChange={(s) => onWidgetSizeChange("return_rate", s)}>
-            <div style={{ height: chartH("return_rate", 120, 180, 260) }} className="-ml-2">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={[
-                  { month: "Oct", rate: 3.2, defect: 1.8 }, { month: "Nov", rate: 2.8, defect: 1.5 }, { month: "Dec", rate: 2.1, defect: 1.2 },
-                  { month: "Jan", rate: 2.5, defect: 1.4 }, { month: "Feb", rate: 1.9, defect: 0.9 }, { month: "Mar", rate: 2.1, defect: 1.1 },
-                ]} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
-                  <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} tickFormatter={(v) => `${v}%`} />
-                  <ReTooltip contentStyle={{ borderRadius: 8, border: "1px solid #E2E8F0", fontSize: 12 }} />
-                  <Line type="monotone" dataKey="rate" stroke="#F59E0B" strokeWidth={2} dot={{ r: 3, fill: "#F59E0B" }} name="Return %" />
-                  <Line type="monotone" dataKey="defect" stroke="#DC2626" strokeWidth={2} dot={{ r: 3, fill: "#DC2626" }} name="Defect %" strokeDasharray="5 5" />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-            <div className="flex items-center gap-4 mt-1 pt-2 border-t border-[#F1F5F9]">
-              <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-[#F59E0B]" /><span className="text-[10px] text-[#64748B]" style={{ fontWeight: 500 }}>Returns 2.1%</span></div>
-              <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-[#DC2626]" /><span className="text-[10px] text-[#64748B]" style={{ fontWeight: 500 }}>Defects 1.1%</span></div>
-            </div>
-          </ContentCard>
-          )}
-        </div>
-
-        {/* Top Items (horizontal bar) + Recent Orders (line chart + list) */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {activeWidgets.includes("top_items") && (
-          <ContentCard title="Top Items by Spend" icon={Package} currentSize={widgetSizes.top_items || "md"} onSizeChange={(s) => onWidgetSizeChange("top_items", s)}>
-            <div style={{ height: chartH("top_items", 130, 200, 280) }} className="-ml-2">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart layout="vertical" data={[
-                  { name: "Steel Alloy A", spend: Math.round(vendor.totalSpent * 0.18) },
-                  { name: "Precision Bearings", spend: Math.round(vendor.totalSpent * 0.14) },
-                  { name: "Hydraulic Pump", spend: Math.round(vendor.totalSpent * 0.11) },
-                  { name: "Carbon Fiber", spend: Math.round(vendor.totalSpent * 0.09) },
-                  { name: "Ind. Lubricant", spend: Math.round(vendor.totalSpent * 0.07) },
-                ]} margin={{ top: 5, right: 30, left: 5, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" horizontal={false} />
-                  <XAxis type="number" tick={{ fontSize: 10, fill: "#94A3B8" }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
-                  <YAxis type="category" dataKey="name" tick={{ fontSize: 10, fill: "#64748B" }} axisLine={false} tickLine={false} width={90} />
-                  <ReTooltip contentStyle={{ borderRadius: 8, border: "1px solid #E2E8F0", fontSize: 12 }} formatter={(v: number) => [`$${v.toLocaleString()}`, "Spend"]} />
-                  <Bar dataKey="spend" radius={[0, 4, 4, 0]} barSize={16}>
-                    {[0, 1, 2, 3, 4].map((i) => (<Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </ContentCard>
-          )}
-
-          {activeWidgets.includes("recent_orders") && (
-          <ContentCard title="Recent Orders" icon={ClipboardList} currentSize={widgetSizes.recent_orders || "md"} onSizeChange={(s) => onWidgetSizeChange("recent_orders", s)}>
-            {/* Order value sparkline */}
-            <div style={{ height: chartH("recent_orders", 70, 100, 160) }} className="-ml-2 mb-3">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={[
-                  { po: "28180", amount: Math.round(vendor.totalSpent * 0.04), status: "pending" },
-                  { po: "28255", amount: Math.round(vendor.totalSpent * 0.07), status: "delivered" },
-                  { po: "28312", amount: Math.round(vendor.totalSpent * 0.05), status: "delivered" },
-                  { po: "28390", amount: Math.round(vendor.totalSpent * 0.06), status: "transit" },
-                  { po: "28451", amount: Math.round(vendor.totalSpent * 0.08), status: "delivered" },
-                ]} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
-                  <XAxis dataKey="po" tick={{ fontSize: 9, fill: "#94A3B8" }} axisLine={false} tickLine={false} tickFormatter={(v) => `PO-${v}`} />
-                  <YAxis tick={{ fontSize: 10, fill: "#94A3B8" }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
-                  <Bar dataKey="amount" radius={[4, 4, 0, 0]} barSize={20}>
-                    {[0, 1, 2, 3, 4].map((i) => (<Cell key={i} fill={[1, 2, 4].includes(i) ? "#059669" : i === 3 ? "#0A77FF" : "#D97706"} />))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#059669]" /><span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Delivered</span></div>
-              <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#0A77FF]" /><span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>In Transit</span></div>
-              <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#D97706]" /><span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Pending</span></div>
-            </div>
-          </ContentCard>
-          )}
-        </div>
-
-        {/* Payment History (line chart) + Compliance (radial gauge) */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {activeWidgets.includes("payment_history") && (
-          <ContentCard title="Payment History" icon={Banknote} currentSize={widgetSizes.payment_history || "md"} onSizeChange={(s) => onWidgetSizeChange("payment_history", s)}>
-            <div style={{ height: chartH("payment_history", 120, 180, 260) }} className="-ml-2">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={[
-                  { month: "Oct", paid: Math.round(vendor.totalSpent * 0.03), pending: Math.round(vendor.totalSpent * 0.01) },
-                  { month: "Nov", paid: Math.round(vendor.totalSpent * 0.05), pending: Math.round(vendor.totalSpent * 0.008) },
-                  { month: "Dec", paid: Math.round(vendor.totalSpent * 0.04), pending: Math.round(vendor.totalSpent * 0.015) },
-                  { month: "Jan", paid: Math.round(vendor.totalSpent * 0.06), pending: Math.round(vendor.totalSpent * 0.005) },
-                  { month: "Feb", paid: Math.round(vendor.totalSpent * 0.08), pending: Math.round(vendor.totalSpent * 0.012) },
-                  { month: "Mar", paid: Math.round(vendor.totalSpent * 0.06), pending: Math.round(vendor.totalSpent * 0.01) },
-                ]} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="paidGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#059669" stopOpacity={0.12} /><stop offset="100%" stopColor="#059669" stopOpacity={0.01} /></linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
-                  <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
-                  <ReTooltip contentStyle={{ borderRadius: 8, border: "1px solid #E2E8F0", fontSize: 12 }} formatter={(v: number) => [`$${v.toLocaleString()}`, ""]} />
-                  <Area type="monotone" dataKey="paid" stroke="#059669" strokeWidth={2} fill="url(#paidGrad)" name="Paid" />
-                  <Area type="monotone" dataKey="pending" stroke="#D97706" strokeWidth={1.5} fill="none" strokeDasharray="4 4" name="Pending" />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-            <div className="flex items-center gap-3 mt-1 pt-2 border-t border-[#F1F5F9]">
-              <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-[#059669]" /><span className="text-[10px] text-[#64748B]" style={{ fontWeight: 500 }}>Paid</span></div>
-              <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-[#D97706]" /><span className="text-[10px] text-[#64748B]" style={{ fontWeight: 500 }}>Pending</span></div>
-              <span className="text-[10px] text-[#94A3B8] ml-auto" style={{ fontWeight: 500 }}>4 transactions this month</span>
-            </div>
-          </ContentCard>
-          )}
-
-          {activeWidgets.includes("compliance_docs") && (
-          <ContentCard title="Compliance & Documents" icon={Shield} currentSize={widgetSizes.compliance_docs || "md"} onSizeChange={(s) => onWidgetSizeChange("compliance_docs", s)}>
-            {/* Compliance score radial */}
-            <div className="flex items-center gap-4 mb-3">
-              <div className="w-[100px] h-[100px] shrink-0 relative">
-                <RePieChart width={100} height={100}>
-                  <Pie data={[{ value: 75 }, { value: 25 }]} cx="50%" cy="50%" innerRadius={32} outerRadius={44} startAngle={90} endAngle={-270} dataKey="value" stroke="none">
-                    <Cell fill="#059669" />
-                    <Cell fill="#F1F5F9" />
-                  </Pie>
-                </RePieChart>
-                <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-[16px] text-[#059669]" style={{ fontWeight: 700 }}>75%</span>
-                  <span className="text-[8px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Score</span>
                 </div>
+                {sz !== "sm" && (
+                  <div className="w-full space-y-2">
+                    {spendCategories.map((cat, idx) => (
+                      <div key={cat.name} className="flex items-center justify-between">
+                        <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: PIE_COLORS[idx] }} /><span className="text-[12px] text-[#475569]" style={{ fontWeight: 500 }}>{cat.name}</span></div>
+                        <div className="flex items-center gap-3"><span className="text-[12px] text-[#0F172A]" style={{ fontWeight: 600 }}>{formatCurrency(cat.value)}</span><span className="text-[11px] text-[#94A3B8] w-8 text-right" style={{ fontWeight: 500 }}>{cat.pct}%</span></div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
-              <div className="space-y-1.5 flex-1 min-w-0">
-                <div className="flex items-center justify-between"><span className="text-[11px] text-[#334155]" style={{ fontWeight: 500 }}>Valid Docs</span><span className="text-[11px] text-[#059669]" style={{ fontWeight: 600 }}>3/4</span></div>
-                <div className="flex items-center justify-between"><span className="text-[11px] text-[#334155]" style={{ fontWeight: 500 }}>Expiring Soon</span><span className="text-[11px] text-[#D97706]" style={{ fontWeight: 600 }}>1</span></div>
-                <div className="flex items-center justify-between"><span className="text-[11px] text-[#334155]" style={{ fontWeight: 500 }}>Expired</span><span className="text-[11px] text-[#DC2626]" style={{ fontWeight: 600 }}>0</span></div>
-              </div>
-            </div>
-            <div className="space-y-2 border-t border-[#F1F5F9] pt-2.5">
-              {[
-                { name: "W-9 Tax Form", status: "Valid", statusColor: "#059669", statusBg: "#ECFDF5" },
-                { name: "Certificate of Insurance", status: "Valid", statusColor: "#059669", statusBg: "#ECFDF5" },
-                { name: "NDA Agreement", status: "Active", statusColor: "#059669", statusBg: "#ECFDF5" },
-                { name: "Quality Cert (ISO)", status: "Expiring", statusColor: "#D97706", statusBg: "#FFFBEB" },
-              ].map((doc, i) => (
-                <div key={i} className="flex items-center justify-between py-0.5">
-                  <span className="text-[11px] text-[#334155]" style={{ fontWeight: 500 }}>{doc.name}</span>
-                  <span className="text-[10px] px-1.5 py-0.5 rounded-full shrink-0" style={{ fontWeight: 500, color: doc.statusColor, backgroundColor: doc.statusBg }}>{doc.status}</span>
+            );
+          } else if (wKey === "credit_health") {
+            icon = Shield; title = "Credit Health"; tip = "Credit utilization gauge showing available vs used credit.";
+            content = (
+              <div className="space-y-4">
+                <div>
+                  <div className="flex items-center justify-between mb-2"><span className="text-[12px] text-[#475569]" style={{ fontWeight: 500 }}>Credit Utilization</span><span className="text-[13px] text-[#0F172A]" style={{ fontWeight: 700 }}>{creditPct}%</span></div>
+                  <div className="w-full h-2.5 rounded-full bg-[#F1F5F9] overflow-hidden"><div className="h-full rounded-full transition-all" style={{ width: `${Math.min(creditPct, 100)}%`, backgroundColor: creditPct > 80 ? "#DC2626" : creditPct > 50 ? "#D97706" : "#059669" }} /></div>
+                  <div className="flex items-center justify-between mt-1.5"><span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>$0</span><span className="text-[10px]" style={{ fontWeight: 500, color: creditStatusColor }}>{creditStatusLabel}</span><span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>{formatCurrency(vendor.creditLimit)}</span></div>
                 </div>
-              ))}
-            </div>
-          </ContentCard>
-          )}
-        </div>
-
-        {/* Notes — with activity timeline visual */}
-        {activeWidgets.includes("notes") && vendor.notes && (
-          <ContentCard title="Notes & Activity" icon={MessageSquare} currentSize={widgetSizes.notes || "md"} onSizeChange={(s) => onWidgetSizeChange("notes", s)}>
-            <div className="flex gap-4">
-              <div className="flex-1 min-w-0">
-                <p className="text-[12px] text-[#475569] leading-relaxed mb-3">{vendor.notes}</p>
-                <div className="space-y-3 border-t border-[#F1F5F9] pt-3">
-                  {[
-                    { time: "Mar 28", action: "Payment received", detail: "PAY-9841 · $8,520", color: "#059669" },
-                    { time: "Mar 21", action: "Order delivered", detail: "PO-28390 · 42 items", color: "#0A77FF" },
-                    { time: "Mar 15", action: "Note added", detail: "Quality review completed", color: "#7C3AED" },
-                    { time: "Mar 10", action: "Invoice approved", detail: "INV-1204 · $11,400", color: "#F59E0B" },
-                  ].map((event, i) => (
-                    <div key={i} className="flex items-start gap-2.5">
-                      <div className="flex flex-col items-center mt-0.5">
-                        <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: event.color }} />
-                        {i < 3 && <div className="w-px h-6 bg-[#E2E8F0] mt-0.5" />}
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-[11px] text-[#0F172A]" style={{ fontWeight: 500 }}>{event.action}</p>
-                        <p className="text-[10px] text-[#94A3B8]">{event.time} · {event.detail}</p>
-                      </div>
+                {sz !== "sm" && (
+                  <div className="grid grid-cols-3 gap-3 pt-2 border-t border-[#F1F5F9]">
+                    <div><p className="text-[10px] text-[#94A3B8] mb-0.5" style={{ fontWeight: 500 }}>Available</p><p className="text-[14px] text-[#0F172A]" style={{ fontWeight: 700 }}>{formatCurrency(Math.max(available, 0))}</p></div>
+                    <div><p className="text-[10px] text-[#94A3B8] mb-0.5" style={{ fontWeight: 500 }}>Used</p><p className="text-[14px] text-[#0F172A]" style={{ fontWeight: 700 }}>{formatCurrency(vendor.creditUtilization)}</p></div>
+                    <div><p className="text-[10px] text-[#94A3B8] mb-0.5" style={{ fontWeight: 500 }}>Limit</p><p className="text-[14px] text-[#0F172A]" style={{ fontWeight: 700 }}>{formatCurrency(vendor.creditLimit)}</p></div>
+                  </div>
+                )}
+              </div>
+            );
+          } else if (wKey === "delivery_perf") {
+            icon = TrendingUp; title = "Delivery Performance"; tip = "On-time delivery rate trend over time.";
+            content = (
+              <>
+                <div style={{ height: CHART_H_HALF[sz] }} className="-ml-2">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={[{ month: "Oct", rate: 91 }, { month: "Nov", rate: 88 }, { month: "Dec", rate: 93 }, { month: "Jan", rate: 95 }, { month: "Feb", rate: 92 }, { month: "Mar", rate: 94 }]} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
+                      <defs><linearGradient id="delivGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#059669" stopOpacity={0.15} /><stop offset="100%" stopColor="#059669" stopOpacity={0.01} /></linearGradient></defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
+                      <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
+                      <YAxis tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} domain={[80, 100]} tickFormatter={(v) => `${v}%`} />
+                      <ReTooltip contentStyle={{ borderRadius: 8, border: "1px solid #E2E8F0", fontSize: 12 }} formatter={(v: number) => [`${v}%`, "On-Time"]} />
+                      <Area type="monotone" dataKey="rate" stroke="#059669" strokeWidth={2} fill="url(#delivGrad)" />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+                {sz !== "sm" && (
+                  <div className="flex items-center gap-4 mt-2 pt-2 border-t border-[#F1F5F9]">
+                    <div><p className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Current</p><p className="text-[14px] text-[#059669]" style={{ fontWeight: 700 }}>94%</p></div>
+                    <div><p className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Average</p><p className="text-[14px] text-[#0F172A]" style={{ fontWeight: 700 }}>92.2%</p></div>
+                    <div><p className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Late</p><p className="text-[14px] text-[#D97706]" style={{ fontWeight: 700 }}>6%</p></div>
+                  </div>
+                )}
+              </>
+            );
+          } else if (wKey === "invoice_aging") {
+            icon = Receipt; title = "Invoice Aging"; tip = "Overdue invoices grouped by aging bucket.";
+            content = (
+              <>
+                <div style={{ height: CHART_H_HALF[sz] }} className="-ml-2">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={[
+                      { range: "0-30d", amount: Math.round(vendor.outstandingBalance * 0.4) },
+                      { range: "31-60d", amount: Math.round(vendor.outstandingBalance * 0.25) },
+                      { range: "61-90d", amount: Math.round(vendor.outstandingBalance * 0.2) },
+                      { range: "90d+", amount: Math.round(vendor.outstandingBalance * 0.15) },
+                    ]} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
+                      <XAxis dataKey="range" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
+                      <YAxis tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
+                      <ReTooltip contentStyle={{ borderRadius: 8, border: "1px solid #E2E8F0", fontSize: 12 }} formatter={(v: number) => [`$${v.toLocaleString()}`, "Amount"]} />
+                      <Bar dataKey="amount" radius={[4, 4, 0, 0]} barSize={sz === "sm" ? 20 : 36}>
+                        {[0, 1, 2, 3].map((i) => (<Cell key={i} fill={["#0A77FF", "#3B82F6", "#D97706", "#DC2626"][i]} />))}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+                {sz !== "sm" && (
+                  <div className="flex items-center gap-4 mt-2 pt-2 border-t border-[#F1F5F9]">
+                    <div><p className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Total Overdue</p><p className="text-[14px] text-[#DC2626]" style={{ fontWeight: 700 }}>{formatCurrency(Math.round(vendor.outstandingBalance * 0.35))}</p></div>
+                    <div><p className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Invoices</p><p className="text-[14px] text-[#0F172A]" style={{ fontWeight: 700 }}>11</p></div>
+                    <div><p className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Avg Days</p><p className="text-[14px] text-[#D97706]" style={{ fontWeight: 700 }}>42</p></div>
+                  </div>
+                )}
+              </>
+            );
+          } else if (wKey === "primary_contact") {
+            icon = Users; title = "Primary Contact"; tip = "Main point of contact and response time trend.";
+            content = (
+              <>
+                <div className="flex items-start gap-3 mb-3">
+                  <div className="w-9 h-9 rounded-full bg-[#F1F5F9] flex items-center justify-center shrink-0"><span className="text-xs text-[#475569]" style={{ fontWeight: 600 }}>{vendor.primaryContact.name.split(" ").map((n) => n[0]).join("")}</span></div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>{vendor.primaryContact.name}</p>
+                    <p className="text-[11px] text-[#64748B] mt-0.5">{vendor.primaryContact.designation}</p>
+                    {sz !== "sm" && <div className="flex items-center gap-3 mt-1.5"><div className="flex items-center gap-1.5 text-[11px] text-[#334155]"><Mail className="w-3 h-3 text-[#94A3B8]" />{vendor.primaryContact.email || "—"}</div></div>}
+                  </div>
+                </div>
+                {sz !== "sm" && (
+                  <div style={{ height: sz === "sm" ? 0 : CHART_H_HALF[sz] - 80 }} className="-ml-2 border-t border-[#F1F5F9] pt-2">
+                    <p className="text-[10px] text-[#94A3B8] mb-1 ml-2" style={{ fontWeight: 500 }}>Response Time (hours)</p>
+                    <ResponsiveContainer width="100%" height="80%">
+                      <LineChart data={[{ week: "W1", hours: 4.2 }, { week: "W2", hours: 3.8 }, { week: "W3", hours: 2.5 }, { week: "W4", hours: 3.1 }, { week: "W5", hours: 1.8 }, { week: "W6", hours: 2.2 }]} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
+                        <XAxis dataKey="week" tick={{ fontSize: 10, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
+                        <YAxis tick={{ fontSize: 10, fill: "#94A3B8" }} axisLine={false} tickLine={false} domain={[0, 6]} />
+                        <Line type="monotone" dataKey="hours" stroke="#7C3AED" strokeWidth={2} dot={{ r: 3, fill: "#7C3AED" }} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                )}
+              </>
+            );
+          } else if (wKey === "return_rate") {
+            icon = BarChart3; title = "Return Rate"; tip = "Return and defect rate trends over recent months.";
+            content = (
+              <>
+                <div style={{ height: CHART_H_HALF[sz] }} className="-ml-2">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={[
+                      { month: "Oct", rate: 3.2, defect: 1.8 }, { month: "Nov", rate: 2.8, defect: 1.5 }, { month: "Dec", rate: 2.1, defect: 1.2 },
+                      { month: "Jan", rate: 2.5, defect: 1.4 }, { month: "Feb", rate: 1.9, defect: 0.9 }, { month: "Mar", rate: 2.1, defect: 1.1 },
+                    ]} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
+                      <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
+                      <YAxis tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} tickFormatter={(v) => `${v}%`} />
+                      <ReTooltip contentStyle={{ borderRadius: 8, border: "1px solid #E2E8F0", fontSize: 12 }} />
+                      <Line type="monotone" dataKey="rate" stroke="#F59E0B" strokeWidth={2} dot={{ r: 3, fill: "#F59E0B" }} name="Return %" />
+                      <Line type="monotone" dataKey="defect" stroke="#DC2626" strokeWidth={2} dot={{ r: 3, fill: "#DC2626" }} name="Defect %" strokeDasharray="5 5" />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+                <div className="flex items-center gap-4 mt-1 pt-2 border-t border-[#F1F5F9]"><div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-[#F59E0B]" /><span className="text-[10px] text-[#64748B]" style={{ fontWeight: 500 }}>Returns 2.1%</span></div><div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-[#DC2626]" /><span className="text-[10px] text-[#64748B]" style={{ fontWeight: 500 }}>Defects 1.1%</span></div></div>
+              </>
+            );
+          } else if (wKey === "top_items") {
+            icon = Package; title = "Top Items by Spend"; tip = "Highest spend items from this partner.";
+            content = (
+              <div style={{ height: CHART_H_HALF[sz] }} className="-ml-2">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart layout="vertical" data={[
+                    { name: "Steel Alloy A", spend: Math.round(vendor.totalSpent * 0.18) },
+                    { name: "Precision Bearings", spend: Math.round(vendor.totalSpent * 0.14) },
+                    { name: "Hydraulic Pump", spend: Math.round(vendor.totalSpent * 0.11) },
+                    { name: "Carbon Fiber", spend: Math.round(vendor.totalSpent * 0.09) },
+                    { name: "Ind. Lubricant", spend: Math.round(vendor.totalSpent * 0.07) },
+                  ]} margin={{ top: 5, right: 30, left: 5, bottom: 5 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" horizontal={false} />
+                    <XAxis type="number" tick={{ fontSize: 10, fill: "#94A3B8" }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
+                    <YAxis type="category" dataKey="name" tick={{ fontSize: 10, fill: "#64748B" }} axisLine={false} tickLine={false} width={90} />
+                    <ReTooltip contentStyle={{ borderRadius: 8, border: "1px solid #E2E8F0", fontSize: 12 }} formatter={(v: number) => [`$${v.toLocaleString()}`, "Spend"]} />
+                    <Bar dataKey="spend" radius={[0, 4, 4, 0]} barSize={sz === "sm" ? 10 : 16}>
+                      {[0, 1, 2, 3, 4].map((i) => (<Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            );
+          } else if (wKey === "recent_orders") {
+            icon = ClipboardList; title = "Recent Orders"; tip = "Latest purchase orders and their delivery status.";
+            content = (
+              <>
+                <div style={{ height: CHART_H_HALF[sz] }} className="-ml-2 mb-2">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={[
+                      { po: "28180", amount: Math.round(vendor.totalSpent * 0.04) }, { po: "28255", amount: Math.round(vendor.totalSpent * 0.07) },
+                      { po: "28312", amount: Math.round(vendor.totalSpent * 0.05) }, { po: "28390", amount: Math.round(vendor.totalSpent * 0.06) },
+                      { po: "28451", amount: Math.round(vendor.totalSpent * 0.08) },
+                    ]} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
+                      <XAxis dataKey="po" tick={{ fontSize: 9, fill: "#94A3B8" }} axisLine={false} tickLine={false} tickFormatter={(v) => `PO-${v}`} />
+                      <YAxis tick={{ fontSize: 10, fill: "#94A3B8" }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
+                      <Bar dataKey="amount" radius={[4, 4, 0, 0]} barSize={sz === "sm" ? 12 : 20}>
+                        {[0, 1, 2, 3, 4].map((i) => (<Cell key={i} fill={[1, 2, 4].includes(i) ? "#059669" : i === 3 ? "#0A77FF" : "#D97706"} />))}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+                <div className="flex items-center gap-3"><div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#059669]" /><span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Delivered</span></div><div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#0A77FF]" /><span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>In Transit</span></div><div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#D97706]" /><span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Pending</span></div></div>
+              </>
+            );
+          } else if (wKey === "payment_history") {
+            icon = Banknote; title = "Payment History"; tip = "Monthly payment and pending amounts trend.";
+            content = (
+              <>
+                <div style={{ height: CHART_H_HALF[sz] }} className="-ml-2">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={[
+                      { month: "Oct", paid: Math.round(vendor.totalSpent * 0.03), pending: Math.round(vendor.totalSpent * 0.01) },
+                      { month: "Nov", paid: Math.round(vendor.totalSpent * 0.05), pending: Math.round(vendor.totalSpent * 0.008) },
+                      { month: "Dec", paid: Math.round(vendor.totalSpent * 0.04), pending: Math.round(vendor.totalSpent * 0.015) },
+                      { month: "Jan", paid: Math.round(vendor.totalSpent * 0.06), pending: Math.round(vendor.totalSpent * 0.005) },
+                      { month: "Feb", paid: Math.round(vendor.totalSpent * 0.08), pending: Math.round(vendor.totalSpent * 0.012) },
+                      { month: "Mar", paid: Math.round(vendor.totalSpent * 0.06), pending: Math.round(vendor.totalSpent * 0.01) },
+                    ]} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
+                      <defs><linearGradient id="paidGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#059669" stopOpacity={0.12} /><stop offset="100%" stopColor="#059669" stopOpacity={0.01} /></linearGradient></defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
+                      <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
+                      <YAxis tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
+                      <ReTooltip contentStyle={{ borderRadius: 8, border: "1px solid #E2E8F0", fontSize: 12 }} formatter={(v: number) => [`$${v.toLocaleString()}`, ""]} />
+                      <Area type="monotone" dataKey="paid" stroke="#059669" strokeWidth={2} fill="url(#paidGrad)" name="Paid" />
+                      <Area type="monotone" dataKey="pending" stroke="#D97706" strokeWidth={1.5} fill="none" strokeDasharray="4 4" name="Pending" />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+                <div className="flex items-center gap-3 mt-1 pt-2 border-t border-[#F1F5F9]"><div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-[#059669]" /><span className="text-[10px] text-[#64748B]" style={{ fontWeight: 500 }}>Paid</span></div><div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-[#D97706]" /><span className="text-[10px] text-[#64748B]" style={{ fontWeight: 500 }}>Pending</span></div></div>
+              </>
+            );
+          } else if (wKey === "compliance_docs") {
+            icon = Shield; title = "Compliance & Documents"; tip = "Document validity status and compliance score.";
+            content = (
+              <>
+                <div className="flex items-center gap-4 mb-3">
+                  <div className="shrink-0 relative" style={{ width: sz === "sm" ? 70 : 100, height: sz === "sm" ? 70 : 100 }}>
+                    <RePieChart width={sz === "sm" ? 70 : 100} height={sz === "sm" ? 70 : 100}>
+                      <Pie data={[{ value: 75 }, { value: 25 }]} cx="50%" cy="50%" innerRadius={sz === "sm" ? 22 : 32} outerRadius={sz === "sm" ? 32 : 44} startAngle={90} endAngle={-270} dataKey="value" stroke="none">
+                        <Cell fill="#059669" /><Cell fill="#F1F5F9" />
+                      </Pie>
+                    </RePieChart>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                      <span className={`text-[#059669] ${sz === "sm" ? "text-[12px]" : "text-[16px]"}`} style={{ fontWeight: 700 }}>75%</span>
                     </div>
-                  ))}
+                  </div>
+                  <div className="space-y-1.5 flex-1 min-w-0">
+                    <div className="flex items-center justify-between"><span className="text-[11px] text-[#334155]" style={{ fontWeight: 500 }}>Valid Docs</span><span className="text-[11px] text-[#059669]" style={{ fontWeight: 600 }}>3/4</span></div>
+                    <div className="flex items-center justify-between"><span className="text-[11px] text-[#334155]" style={{ fontWeight: 500 }}>Expiring Soon</span><span className="text-[11px] text-[#D97706]" style={{ fontWeight: 600 }}>1</span></div>
+                    <div className="flex items-center justify-between"><span className="text-[11px] text-[#334155]" style={{ fontWeight: 500 }}>Expired</span><span className="text-[11px] text-[#DC2626]" style={{ fontWeight: 600 }}>0</span></div>
+                  </div>
                 </div>
+                {sz !== "sm" && (
+                  <div className="space-y-2 border-t border-[#F1F5F9] pt-2.5">
+                    {[
+                      { name: "W-9 Tax Form", status: "Valid", sc: "#059669", sb: "#ECFDF5" },
+                      { name: "Certificate of Insurance", status: "Valid", sc: "#059669", sb: "#ECFDF5" },
+                      { name: "NDA Agreement", status: "Active", sc: "#059669", sb: "#ECFDF5" },
+                      { name: "Quality Cert (ISO)", status: "Expiring", sc: "#D97706", sb: "#FFFBEB" },
+                    ].map((doc, i) => (
+                      <div key={i} className="flex items-center justify-between py-0.5">
+                        <span className="text-[11px] text-[#334155]" style={{ fontWeight: 500 }}>{doc.name}</span>
+                        <span className="text-[10px] px-1.5 py-0.5 rounded-full shrink-0" style={{ fontWeight: 500, color: doc.sc, backgroundColor: doc.sb }}>{doc.status}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
+            );
+          } else if (wKey === "notes") {
+            if (!vendor.notes) return null;
+            icon = MessageSquare; title = "Notes & Activity"; tip = "Internal notes and recent activity timeline.";
+            content = (
+              <div>
+                <p className={`text-[12px] text-[#475569] leading-relaxed ${sz === "sm" ? "line-clamp-2" : "mb-3"}`}>{vendor.notes}</p>
+                {sz !== "sm" && (
+                  <div className="space-y-3 border-t border-[#F1F5F9] pt-3">
+                    {[
+                      { time: "Mar 28", action: "Payment received", detail: "PAY-9841 · $8,520", color: "#059669" },
+                      { time: "Mar 21", action: "Order delivered", detail: "PO-28390 · 42 items", color: "#0A77FF" },
+                      { time: "Mar 15", action: "Note added", detail: "Quality review completed", color: "#7C3AED" },
+                      ...(sz === "lg" ? [{ time: "Mar 10", action: "Invoice approved", detail: "INV-1204 · $11,400", color: "#F59E0B" }] : []),
+                    ].map((event, i, arr) => (
+                      <div key={i} className="flex items-start gap-2.5">
+                        <div className="flex flex-col items-center mt-0.5"><div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: event.color }} />{i < arr.length - 1 && <div className="w-px h-6 bg-[#E2E8F0] mt-0.5" />}</div>
+                        <div className="min-w-0"><p className="text-[11px] text-[#0F172A]" style={{ fontWeight: 500 }}>{event.action}</p><p className="text-[10px] text-[#94A3B8]">{event.time} · {event.detail}</p></div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
-            </div>
-          </ContentCard>
-        )}
+            );
+          }
+
+          if (!content) return;
+
+            const span = getSpan(defaultSpan, sz);
+            nodes.push({
+              key: wKey,
+              idx: wIdx,
+              span,
+              node: (
+                <DraggableWidgetCard key={wKey} widgetKey={wKey} index={wIdx} moveWidget={moveWidget}>
+                  {(dragRef, dragging) => (
+                    <ContentCard title={title} icon={icon} {...sizeProps} tooltip={tip} action={cardAction} dragRef={dragRef} isDragging={dragging}>
+                      {content}
+                    </ContentCard>
+                  )}
+                </DraggableWidgetCard>
+              ),
+            });
+          });
+
+          // Group nodes: full-width render alone, consecutive halves render in 2-col grid
+          const output: React.ReactNode[] = [];
+          let halfBuf: WidgetNode[] = [];
+
+          const flushHalves = () => {
+            if (halfBuf.length === 0) return;
+            if (halfBuf.length === 1) {
+              output.push(halfBuf[0].node);
+            } else {
+              output.push(
+                <div key={`grid-${halfBuf[0].key}`} className="grid grid-cols-1 lg:grid-cols-2 gap-3 items-stretch">
+                  {halfBuf.map((h) => h.node)}
+                </div>
+              );
+            }
+            halfBuf = [];
+          };
+
+          for (const n of nodes) {
+            if (n.span === "full") {
+              flushHalves();
+              output.push(n.node);
+            } else {
+              halfBuf.push(n);
+              if (halfBuf.length === 2) flushHalves();
+            }
+          }
+          flushHalves();
+
+          return output;
+        })()}
       </div>
       </DndProvider>
+
 
       {/* ═══ RIGHT COLUMN — Information Cards ═══ */}
       <div className="space-y-3.5 min-w-0 overflow-hidden xl:sticky xl:bottom-5 xl:top-[160px] xl:self-end">
