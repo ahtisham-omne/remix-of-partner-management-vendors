@@ -1780,17 +1780,12 @@ export function VendorsListPage() {
                               case "partner_type":
                                 return (
                                   <TableCell key={colKey}>
-                                    <div>
-                                      <div className={`flex items-center ${isRelaxed ? "gap-2" : "gap-1.5"}`}>
-                                        {partnerTypes.map((type) => (
-                                          <span key={type} className={`inline-flex items-center ${isRelaxed ? "px-2.5 py-1 text-xs" : "px-2 py-0.5 text-xs"} rounded-md border`} style={{ fontWeight: 500, backgroundColor: type === "vendor" ? "#EFF6FF" : "#F5F3FF", color: type === "vendor" ? "#1E40AF" : "#5B21B6", borderColor: type === "vendor" ? "#BFDBFE" : "#DDD6FE" }}>
-                                            {type === "vendor" ? "Vendor" : "Customer"}
-                                          </span>
-                                        ))}
-                                      </div>
-                                      {isRelaxed && (vendor.vendorSubTypes?.length || vendor.customerSubTypes?.length) ? (
-                                        <span className="text-[10px] text-muted-foreground/50 truncate block mt-0.5 max-w-[140px]">{[...(vendor.vendorSubTypes || []), ...(vendor.customerSubTypes || [])].slice(0, 2).join(", ")}</span>
-                                      ) : null}
+                                    <div className={`flex items-center ${isRelaxed ? "gap-2" : "gap-1.5"}`}>
+                                      {partnerTypes.map((type) => (
+                                        <span key={type} className={`inline-flex items-center ${isRelaxed ? "px-2.5 py-1 text-xs" : "px-2 py-0.5 text-xs"} rounded-md border`} style={{ fontWeight: 500, backgroundColor: type === "vendor" ? "#EFF6FF" : "#F5F3FF", color: type === "vendor" ? "#1E40AF" : "#5B21B6", borderColor: type === "vendor" ? "#BFDBFE" : "#DDD6FE" }}>
+                                          {type === "vendor" ? "Vendor" : "Customer"}
+                                        </span>
+                                      ))}
                                     </div>
                                   </TableCell>
                                 );
@@ -1871,7 +1866,7 @@ export function VendorsListPage() {
                                           }))}
                                           onItemClick={(item) => setQuickViewData({ type: "item", item, vendorName: vendor.displayName })}
                                         >
-                                          <span className="text-[11px] shrink-0 cursor-default leading-none" style={{ fontWeight: 600, color: '#085FCC' }}>+{extraItems}</span>
+                                          <span className="text-[11px] shrink-0 cursor-default leading-none" style={{ fontWeight: 600, color: '#085FCC' }}>+{extraItems} more</span>
                                         </OverflowTooltip>
                                       )}
                                     </div>
@@ -1900,7 +1895,7 @@ export function VendorsListPage() {
                                           }))}
                                           onItemClick={(item) => setQuickViewData({ type: "location", item, vendorName: vendor.displayName })}
                                         >
-                                          <span className="text-[11px] shrink-0 cursor-default leading-none" style={{ fontWeight: 600, color: '#085FCC' }}>+{extraLocations}</span>
+                                          <span className="text-[11px] shrink-0 cursor-default leading-none" style={{ fontWeight: 600, color: '#085FCC' }}>+{extraLocations} more</span>
                                         </OverflowTooltip>
                                       )}
                                     </div>
@@ -1937,7 +1932,7 @@ export function VendorsListPage() {
                                               })}
                                               onItemClick={(item) => setQuickViewData({ type: "contact", item, vendorName: vendor.displayName })}
                                             >
-                                              <span className="text-[11px] shrink-0 cursor-default leading-none" style={{ fontWeight: 600, color: '#085FCC' }}>+{extraContacts}</span>
+                                              <span className="text-[11px] shrink-0 cursor-default leading-none" style={{ fontWeight: 600, color: '#085FCC' }}>+{extraContacts} more</span>
                                             </OverflowTooltip>
                                           )}
                                         </>
