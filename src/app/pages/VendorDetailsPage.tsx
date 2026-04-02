@@ -3996,11 +3996,15 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
   }, [locColumnOrder]);
   const locTotalWidth = useMemo(() => LOC_CHECKBOX_W + locVisibleColumns.reduce((s, k) => s + (locColumnWidths[k] ?? parseInt(locColDef(k).minWidth, 10)), 0) + 60, [locVisibleColumns, locColumnWidths]);
 
-  const handleLocSort = useCallback((key: string) => {
-    setLocSortConfig(prev => {
-      if (prev?.key === key) return prev.direction === "asc" ? { key, direction: "desc" } : null;
-      return { key, direction: "asc" };
-    });
+  const handleLocSort = useCallback((key: string, direction?: "asc" | "desc" | null) => {
+    if (direction !== undefined) {
+      setLocSortConfig(direction === null ? null : { key, direction });
+    } else {
+      setLocSortConfig(prev => {
+        if (prev?.key === key) return prev.direction === "asc" ? { key, direction: "desc" } : null;
+        return { key, direction: "asc" };
+      });
+    }
   }, []);
 
   // ── Column drag reorder (mouse-event based — matches listing page) ──
@@ -4608,6 +4612,8 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                             sortable={def.sortable}
                             sortConfig={locSortConfig}
                             onSort={handleLocSort}
+                            onAddFilter={() => {}}
+                            onHideColumn={() => {}}
                             isLocked={isLocked}
                           >
                             <div className="inline-flex items-center gap-1">
@@ -4942,8 +4948,10 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
             contacts: (d.contacts as string[])?.length || 0,
             items: 0,
             serviceCenters: 0,
+            pocNames: [],
+            serviceCenterNames: [],
             status: (d.status || "Active").toLowerCase() === "active" ? "active" : "inactive",
-            createdBy: { name: "You", initials: "YO", bgColor: "#0A77FF" },
+            createdBy: { name: "You", initials: "YO", bgColor: "#EDF4FF", fgColor: "#0A77FF" },
             lastUpdated: new Date().toISOString(),
             phone: d.phone || "",
             email: d.email || "",

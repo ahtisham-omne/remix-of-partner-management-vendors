@@ -2287,7 +2287,7 @@ export function VendorsListPage() {
                                           </DropdownMenuItem>
                                         )}
                                         <DropdownMenuItem variant="destructive" onClick={() => { setSelectedVendorId(vendor.id); setArchiveDialogOpen(true); }}>
-                                          <Archive className="w-4 h-4 mr-2" />
+                                          <Archive className="w-4 h-4 mr-2 text-[#DC2626]" />
                                           Archive
                                         </DropdownMenuItem>
                                       </>

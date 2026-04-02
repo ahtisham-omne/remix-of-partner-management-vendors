@@ -61,6 +61,15 @@ interface CreatePartnerLocationModalProps {
   onOpenChange: (open: boolean) => void;
   onLocationCreated?: (data: Record<string, unknown>) => void;
   vendorName?: string;
+  editData?: {
+    locationName?: string;
+    phone?: string;
+    email?: string;
+    address?: string;
+    status?: "Active" | "Inactive";
+    description?: string;
+    image?: string;
+  } | null;
 }
 
 const COUNTRY_CODES = [
@@ -125,7 +134,9 @@ export function CreatePartnerLocationModal({
   onOpenChange,
   onLocationCreated,
   vendorName,
+  editData,
 }: CreatePartnerLocationModalProps) {
+  const isEditMode = !!editData;
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [showCancelConfirmation, setShowCancelConfirmation] = useState(false);
 
@@ -195,6 +206,19 @@ export function CreatePartnerLocationModal({
 
   // Errors
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Populate fields when editing
+  useEffect(() => {
+    if (open && editData) {
+      setLocationName(editData.locationName || "");
+      setPhone(editData.phone?.replace(/^\+\d+\s*/, "") || "");
+      setEmail(editData.email || "");
+      setAddress(editData.address || "");
+      setStatus((editData.status as "Active" | "Inactive") || "Active");
+      setDescription(editData.description || "");
+      if (editData.image) setProfileImage(editData.image);
+    }
+  }, [open, editData]);
 
   const statusConfig = {
     Active: { text: "#065F46", bg: "#ECFDF5", border: "#A7F3D0", label: "Active" },
@@ -477,7 +501,7 @@ export function CreatePartnerLocationModal({
               "0 24px 48px -12px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.05)",
           }}
         >
-          <DialogTitle className="sr-only">Create New Partner Location</DialogTitle>
+          <DialogTitle className="sr-only">{isEditMode ? "Edit Partner Location" : "Create New Partner Location"}</DialogTitle>
           <DialogDescription className="sr-only">
             Configure the details for the new partner location.
           </DialogDescription>
@@ -490,15 +514,15 @@ export function CreatePartnerLocationModal({
                   className="text-[15px] sm:text-[17px] text-[#0F172A]"
                   style={{ fontWeight: 700 }}
                 >
-                  Create New Partner Location
+                  {isEditMode ? "Edit Partner Location" : "Create New Partner Location"}
                 </h2>
                 <p
                   className="text-[11px] sm:text-xs text-[#64748B] mt-0.5"
                   style={{ fontWeight: 400 }}
                 >
                   {vendorName
-                    ? `Add a new location for ${vendorName}.`
-                    : "Configure the details and address for the new location."}
+                    ? (isEditMode ? `Edit location details for ${vendorName}.` : `Add a new location for ${vendorName}.`)
+                    : (isEditMode ? "Update the location details." : "Configure the details and address for the new location.")}
                 </p>
               </div>
               <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
@@ -964,7 +988,7 @@ export function CreatePartnerLocationModal({
               onClick={handleSave}
               className="gap-1.5 rounded-lg px-3 sm:px-5 text-xs sm:text-[13px] h-8 sm:h-9 shadow-sm"
             >
-              Create Location
+              {isEditMode ? "Save Changes" : "Create Location"}
             </Button>
           </div>
         </DialogContent>

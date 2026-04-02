@@ -1242,7 +1242,7 @@ export default function DataTableStyleReference() {
                               </>
                             ) : (
                               <DropdownMenuItem variant="destructive">
-                                <Archive className="w-4 h-4 mr-2" /> Archive
+                                <Archive className="w-4 h-4 mr-2 text-[#DC2626]" /> Archive
                               </DropdownMenuItem>
                             )}
                           </DropdownMenuContent>
