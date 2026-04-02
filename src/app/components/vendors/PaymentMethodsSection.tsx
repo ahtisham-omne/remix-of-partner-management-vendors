@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import {
-  Plus, X, CreditCard, ChevronLeft, Check, Pencil, Trash2, Star,
+  Plus, X, CreditCard, ChevronLeft, Check, Pencil, Trash2, Star, Archive,
   ArrowUpDown, ExternalLink, ChevronDown, MoreHorizontal, Eye, EyeOff,
   Building2, Hash, Phone, MapPin, FileText, Percent, AlertCircle, Wallet, User, Search,
 } from "lucide-react";
@@ -696,10 +696,10 @@ export function PaymentMethodCard({
             <Tooltip>
               <TooltipTrigger asChild>
                 <button onClick={onDelete} className="p-1 rounded-md hover:bg-[#FEF2F2] transition-colors cursor-pointer opacity-0 group-hover:opacity-100">
-                  <Trash2 className="w-3 h-3 text-[#94A3B8] hover:text-[#EF4444]" />
+                  <Archive className="w-3 h-3 text-[#94A3B8] hover:text-[#DC2626]" />
                 </button>
               </TooltipTrigger>
-              <TooltipContent className="z-[300]"><p className="text-xs">Delete</p></TooltipContent>
+              <TooltipContent className="z-[300]"><p className="text-xs">Archive</p></TooltipContent>
             </Tooltip>
           </div>
         </div>

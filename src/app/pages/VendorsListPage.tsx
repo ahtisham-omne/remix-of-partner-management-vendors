@@ -2626,37 +2626,35 @@ export function VendorsListPage() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Delete Dialog */}
+      {/* Archive Dialog (was Delete) */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent
           className="sm:max-w-[400px] p-0 gap-0 overflow-hidden rounded-2xl border-0 shadow-[0_24px_80px_-12px_rgba(0,0,0,0.25)]"
           onInteractOutside={() => setDeleteDialogOpen(false)}
         >
-          {/* Icon: #DC2626 on #FEE2E2 ≈ 3.5:1 AA-Large ✓ · Pill: #991B1B on #FEF2F2 ≈ 7.0:1 AAA ✓ */}
           <div className="relative flex flex-col items-center pt-10 pb-6" style={{ background: "linear-gradient(180deg, #FEF2F2 0%, rgba(254,242,242,0.3) 70%, transparent 100%)" }}>
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[180px] h-[80px] rounded-full blur-[50px] opacity-25" style={{ backgroundColor: "#DC2626" }} />
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[180px] h-[80px] rounded-full blur-[50px] opacity-25" style={{ backgroundColor: "#EF4444" }} />
             <div className="relative w-16 h-16 rounded-2xl flex items-center justify-center" style={{ backgroundColor: "#FEE2E2" }}>
-              <Trash2 className="w-8 h-8" style={{ color: "#DC2626" }} />
+              <Archive className="w-8 h-8" style={{ color: "#DC2626" }} />
             </div>
             <span
               className="mt-4 px-3 py-1 rounded-full text-[11px]"
               style={{ fontWeight: 600, backgroundColor: "#FEF2F2", color: "#991B1B", textTransform: "uppercase" as const, letterSpacing: "0.05em" }}
             >
-              Danger
+              Caution
             </span>
           </div>
-          {/* CTA: #DC2626 on #fff ≈ 4.0:1 AA-Large ✓ · Cancel: #334155 on #F1F5F9 ≈ 7.1:1 AAA ✓ */}
           <div className="flex flex-col items-center text-center px-8 pb-8">
             <AlertDialogHeader className="p-0 gap-0 text-center">
               <AlertDialogTitle className="text-[18px] tracking-[-0.02em]" style={{ fontWeight: 600, color: "#0F172A" }}>
-                Delete permanently?
+                Archive this partner?
               </AlertDialogTitle>
             </AlertDialogHeader>
             <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "#475569", lineHeight: "1.65" }}>
               <span style={{ fontWeight: 600, color: "#1E293B" }}>
                 {selectedVendorId ? (getVendor(selectedVendorId)?.displayName ?? "This partner") : "This partner"}
               </span>{" "}
-              and all associated data will be permanently erased. This action cannot be undone.
+              will be removed from active workflows. Historical records are preserved and you can unarchive later.
             </AlertDialogDescription>
             <div className="w-full mt-7 flex flex-col gap-2.5">
               <AlertDialogAction
@@ -2664,7 +2662,7 @@ export function VendorsListPage() {
                 className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors hover:opacity-90"
                 style={{ fontWeight: 600, backgroundColor: "#DC2626", color: "#fff" }}
               >
-                Delete Forever
+                Archive Partner
               </AlertDialogAction>
               <AlertDialogCancel
                 className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors"

@@ -1237,7 +1237,7 @@ export default function DataTableStyleReference() {
                               <>
                                 <DropdownMenuItem><RotateCcw className="w-4 h-4 mr-2" /> Restore</DropdownMenuItem>
                                 <DropdownMenuItem variant="destructive">
-                                  <Trash2 className="w-4 h-4 mr-2" /> Delete Permanently
+                                  <Archive className="w-4 h-4 mr-2 text-[#DC2626]" /> Archive
                                 </DropdownMenuItem>
                               </>
                             ) : (

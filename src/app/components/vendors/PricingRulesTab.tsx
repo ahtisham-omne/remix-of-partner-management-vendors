@@ -694,8 +694,8 @@ function PricingRuleCard({ rule, onClick }: { rule: PricingRule; onClick: () => 
                 {!isPreset && (
                   <>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem className="gap-2 py-1.5 cursor-pointer text-[13px] text-red-600 focus:text-red-600" onSelect={() => toast.info("Delete coming soon")}>
-                      <Trash2 className="w-3.5 h-3.5" /> Delete
+                    <DropdownMenuItem className="gap-2 py-1.5 cursor-pointer text-[13px] text-[#DC2626] focus:text-[#DC2626] focus:bg-[#FEF2F2]" onSelect={() => toast.info("Archive coming soon")}>
+                      <Archive className="w-3.5 h-3.5 text-[#DC2626]" /> Archive
                     </DropdownMenuItem>
                   </>
                 )}

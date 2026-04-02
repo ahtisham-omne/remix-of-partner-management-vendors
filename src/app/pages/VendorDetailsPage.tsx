@@ -4512,6 +4512,10 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                             <DropdownMenuItem onClick={() => toast.info("Edit location coming soon!")}>
                               <Pencil className="w-4 h-4 mr-2" /> Edit
                             </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem className="text-[#DC2626] focus:text-[#DC2626] focus:bg-[#FEF2F2]" onClick={() => toast.info("Archive coming soon")}>
+                              <Archive className="w-4 h-4 mr-2 text-[#DC2626]" /> Archive
+                            </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </div>
@@ -4847,10 +4851,10 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem
-                              className="text-destructive"
-                              onClick={() => toast.info("Delete location coming soon!")}
+                              className="text-[#DC2626] focus:text-[#DC2626] focus:bg-[#FEF2F2]"
+                              onClick={() => toast.info("Archive coming soon")}
                             >
-                              <Trash2 className="w-4 h-4 mr-2" /> Delete
+                              <Archive className="w-4 h-4 mr-2 text-[#DC2626]" /> Archive
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -5087,7 +5091,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                     </button>
                     {/* Archive Button */}
                     <button onClick={() => toast.info("Archive coming soon")} className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#475569] hover:bg-[#F8FAFC] hover:border-[#CBD5E1] transition-all cursor-pointer" style={{ fontWeight: 500 }}>
-                      <Archive className="w-3.5 h-3.5" /> Archive
+                      <Archive className="w-3.5 h-3.5 text-[#DC2626]" /> Archive
                     </button>
                     {/* More Dropdown */}
                     <DropdownMenu>
