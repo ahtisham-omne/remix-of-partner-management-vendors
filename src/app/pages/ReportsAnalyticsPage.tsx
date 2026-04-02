@@ -25,7 +25,7 @@ export function ReportsAnalyticsPage() {
   ];
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full bg-[#F8FAFC]">
       <div className="px-6 py-4 border-b border-border bg-card">
         <h1 className="text-foreground" style={{ fontSize: "20px", fontWeight: 600 }}>
           Reports & Analytics

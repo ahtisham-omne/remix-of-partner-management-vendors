@@ -28,11 +28,11 @@ export function FilterPills({ options, activeKey, onSelect }: FilterPillsProps) 
             onClick={() => onSelect(opt.key)}
             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
               isActive
-                ? "border-[#0A77FF]/25 bg-[#EDF4FF] hover:bg-[#D6E8FF] active:bg-[#ADD1FF]"
-                : "border-[#E2E8F0] bg-transparent text-[#334155] hover:bg-[#F1F5F9] hover:border-[#CBD5E1] active:bg-[#E2E8F0]"
+                ? "border-primary bg-[#EDF4FF] hover:bg-[#D6E8FF] active:bg-[#ADD1FF]"
+                : "border-border text-muted-foreground hover:bg-muted/60 hover:text-foreground hover:border-muted-foreground/30 active:bg-muted"
             }`}
             style={{
-              fontWeight: isActive ? 600 : 500,
+              fontWeight: isActive ? 500 : 400,
               color: isActive ? "#0A77FF" : undefined,
             }}
           >
@@ -40,7 +40,7 @@ export function FilterPills({ options, activeKey, onSelect }: FilterPillsProps) 
             {opt.showCount && opt.count !== undefined && (
               <span
                 className={`text-[10px] rounded-full px-1.5 py-px min-w-[18px] text-center ${
-                  isActive ? "bg-[#0A77FF]/12" : "bg-[#E2E8F0]"
+                  isActive ? "bg-primary/10" : "bg-muted"
                 }`}
                 style={{
                   fontWeight: 600,

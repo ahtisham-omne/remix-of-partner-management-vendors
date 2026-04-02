@@ -19,11 +19,23 @@ import { CreatePartnerLocationModal } from "../components/vendors/CreatePartnerL
 import { CreatePartnerModal } from "../components/vendors/CreatePartnerModal";
 import { PartnerItemsTab } from "../components/vendors/PartnerItemsTab";
 import { PricingRulesTabNew } from "../components/vendors/PricingRulesTab";
+import { KpiInsightsPanel, ALL_KPI_DEFINITIONS, DEFAULT_ACTIVE_KPIS } from "../components/vendors/KpiInsightsPanel";
 import { PaymentMethodCard as PaymentMethodCardBase } from "../components/vendors/PaymentMethodsSection";
 import { PaymentTermDetailModal } from "../components/vendors/PaymentTermDetailModal";
 import { PaymentTermCard } from "../components/vendors/PaymentTermCard";
 import { PAYMENT_TERM_PRESETS, type PaymentTermPreset } from "../components/vendors/partnerConstants";
 import { PocSectionContent, SelectPocDictionaryModal, CreatePocModal } from "../components/vendors/PocModals";
+import {
+  ColumnHeaderMenu,
+  isFilterActive,
+  type SortConfig,
+} from "../components/vendors/ColumnHeaderMenu";
+import { OverflowTooltip } from "../components/vendors/OverflowTooltip";
+import {
+  HoverCard,
+  HoverCardTrigger,
+  HoverCardContent,
+} from "../components/ui/hover-card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -147,8 +159,12 @@ import {
   MapPinPlus,
   FileUp,
   ArchiveRestore,
+  ArrowUp,
+  ArrowDown,
+  ArrowUpDown,
 } from "lucide-react";
-import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo, cloneElement } from "react";
+import { createPortal } from "react-dom";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { toAAAColor } from "../utils/colors";
@@ -214,6 +230,7 @@ export function VendorDetailsPage() {
   const [dashWidgetSizes, setDashWidgetSizes] = useState<Record<string, "sm" | "md" | "lg">>({});
   const [customizePanelOpen, setCustomizePanelOpen] = useState(false);
   const [lastRefreshed, setLastRefreshed] = useState(() => new Date());
+  const [dashDateRange, setDashDateRange] = useState("last_30");
 
   const handleToggleKpi = useCallback((key: string) => {
     setDashActiveKpis((prev) =>
@@ -282,6 +299,45 @@ export function VendorDetailsPage() {
 
   // Generate location data for KPI computations (must be after vendor is available)
   const locationsData = useMemo(() => vendor ? generateLocationsFromVendor(vendor) : [], [vendor]);
+
+  // ── Location KPIs state (matches listing page pattern) ──
+  const LOC_KPI_ALL = [
+    { key: "loc_total", label: "Total Locations", category: "Overview", iconName: "MapPin", tooltip: "Count of all registered partner locations including warehouses, offices, and distribution centers." },
+    { key: "loc_active", label: "Active Locations", category: "Overview", iconName: "CheckCircle2", tooltip: "Locations currently operational and available for transactions, shipping, and order fulfillment." },
+    { key: "loc_inactive", label: "Inactive Locations", category: "Overview", iconName: "CircleSlash", tooltip: "Locations that have been temporarily suspended or deactivated. They are excluded from new transactions." },
+    { key: "loc_contacts", label: "Total Contacts", category: "People", iconName: "Users", tooltip: "Combined number of assigned point-of-contacts across all locations. Includes primary and secondary contacts." },
+    { key: "loc_centers", label: "Service Centers", category: "Operational", iconName: "Wrench", tooltip: "Facilities providing maintenance, repair, or after-sales service. Higher counts indicate stronger on-ground support." },
+    { key: "loc_items", label: "Total Items", category: "Operational", iconName: "Package", tooltip: "Aggregate number of SKUs and inventory items managed across all partner locations." },
+    { key: "loc_countries", label: "Countries", category: "Overview", iconName: "Globe", tooltip: "Number of unique countries where this partner has registered locations. Indicates geographic footprint." },
+    { key: "loc_avg_contacts", label: "Avg Contacts/Location", category: "People", iconName: "User", tooltip: "Average number of assigned contacts per location. Low values may indicate understaffed sites." },
+  ];
+  const LOC_KPI_DEFAULT = ["loc_total", "loc_active", "loc_contacts", "loc_centers"];
+  const [locActiveKpis, setLocActiveKpis] = useState<string[]>([...LOC_KPI_DEFAULT]);
+  const [locKpiPanelOpen, setLocKpiPanelOpen] = useState(false);
+
+  const handleLocToggleKpi = useCallback((key: string) => {
+    setLocActiveKpis(prev => prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]);
+  }, []);
+
+  const moveLocKpi = useCallback((fromIndex: number, toIndex: number) => {
+    setLocActiveKpis(prev => { const next = [...prev]; const [moved] = next.splice(fromIndex, 1); next.splice(toIndex, 0, moved); return next; });
+  }, []);
+
+  const computeLocKpiValue = useCallback((key: string): string => {
+    const locs = locationsData;
+    const active = locs.filter(l => l.status === "active").length;
+    switch (key) {
+      case "loc_total": return String(locs.length);
+      case "loc_active": return String(active);
+      case "loc_inactive": return String(locs.length - active);
+      case "loc_contacts": return String(locs.reduce((s, l) => s + l.contacts, 0));
+      case "loc_centers": return String(locs.reduce((s, l) => s + l.serviceCenters, 0));
+      case "loc_items": return String(locs.reduce((s, l) => s + l.items, 0));
+      case "loc_countries": return String(new Set(locs.map(l => l.country)).size);
+      case "loc_avg_contacts": { const avg = locs.length > 0 ? (locs.reduce((s, l) => s + l.contacts, 0) / locs.length).toFixed(1) : "0"; return avg; }
+      default: return "—";
+    }
+  }, [locationsData]);
 
   if (!vendor) {
     return (
@@ -856,21 +912,57 @@ export function VendorDetailsPage() {
               {/* Info bar */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-[12px] text-[#64748B]">
-                  <span>Data view as of</span>
-                  <span style={{ fontWeight: 500 }} className="text-[#334155]">{format(lastRefreshed, "MM/dd/yyyy h:mm a")}</span>
+                  <span className="text-sm text-muted-foreground" style={{ fontWeight: 500 }}>Dashboard</span>
+                  {/* Date Range Filter */}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] text-muted-foreground hover:bg-muted/50 hover:text-foreground transition-colors cursor-pointer">
+                        <Calendar className="w-3 h-3" />
+                        <span style={{ fontWeight: 500 }}>
+                          {dashDateRange === "last_7" && "Last 7 days"}
+                          {dashDateRange === "last_30" && "Last 30 days"}
+                          {dashDateRange === "last_90" && "Last 90 days"}
+                          {dashDateRange === "last_365" && "Last 12 months"}
+                          {dashDateRange === "all_time" && "All time"}
+                        </span>
+                        <ChevronDown className="w-2.5 h-2.5" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="w-[170px]">
+                      {[
+                        { key: "last_7", label: "Last 7 days" },
+                        { key: "last_30", label: "Last 30 days" },
+                        { key: "last_90", label: "Last 90 days" },
+                        { key: "last_365", label: "Last 12 months" },
+                        { key: "all_time", label: "All time" },
+                      ].map((opt) => (
+                        <DropdownMenuItem
+                          key={opt.key}
+                          className="flex items-center justify-between cursor-pointer"
+                          onClick={() => setDashDateRange(opt.key)}
+                        >
+                          <span className="text-sm">{opt.label}</span>
+                          {dashDateRange === opt.key && (
+                            <Check className="w-3.5 h-3.5" style={{ color: "#0A77FF" }} />
+                          )}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                   <span className="text-[#CBD5E1]">|</span>
-                  <button onClick={handleRefresh} className="inline-flex items-center gap-1 text-[#0A77FF] hover:text-[#0862D4] transition-colors cursor-pointer" style={{ fontWeight: 500 }}>
+                  <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 400 }}>Updated {format(lastRefreshed, "h:mm a")}</span>
+                  <button onClick={handleRefresh} className="inline-flex items-center gap-1 text-[11px] text-[#0A77FF] hover:text-[#0862D4] transition-colors cursor-pointer" style={{ fontWeight: 500 }}>
                     <RefreshCw className="w-3 h-3" />
-                    Refresh Page
+                    Refresh
                   </button>
                 </div>
                 <button
                   onClick={() => setCustomizePanelOpen(true)}
-                  className="inline-flex items-center gap-1.5 text-[12px] text-[#0A77FF] hover:bg-[#0A77FF]/5 px-3 py-1.5 rounded-lg border border-[#0A77FF]/20 transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] text-[#334155] text-[12px] shadow-sm transition-all cursor-pointer"
                   style={{ fontWeight: 500 }}
                 >
-                  <Sliders className="w-3.5 h-3.5" />
-                  Customize Widget
+                  <Sliders className="w-3.5 h-3.5 text-[#94A3B8]" />
+                  Customize Widgets
                 </button>
               </div>
 
@@ -903,39 +995,47 @@ export function VendorDetailsPage() {
             </div>
           )}
 
-          {/* Fixed 4 KPI stat cards — Partner Locations tab */}
-          {activeTab === "partner_locations" && (() => {
-            const locActive = locationsData.filter((l) => l.status === "active").length;
-            const locActivePct = locationsData.length > 0 ? Math.round((locActive / locationsData.length) * 100) : 0;
-            const locTotalContacts = locationsData.reduce((s, l) => s + l.contacts, 0);
-            const locTotalCenters = locationsData.reduce((s, l) => s + l.serviceCenters, 0);
-            const LOC_FIXED_KPIS = [
-              { label: "Total Locations", value: String(locationsData.length), iconName: "MapPin", change: undefined as string | undefined, changeColor: undefined as string | undefined },
-              { label: "Active Locations", value: String(locActive), iconName: "CheckCircle2", change: `${locActivePct}%`, changeColor: "#059669" },
-              { label: "Total Contacts", value: String(locTotalContacts), iconName: "Users", change: undefined, changeColor: undefined },
-              { label: "Service Centers", value: String(locTotalCenters), iconName: "Wrench", change: undefined, changeColor: undefined },
-            ];
-            return (
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                {LOC_FIXED_KPIS.map((kpi) => (
-                  <div key={kpi.label} className="border border-[#E2E8F0] rounded-lg bg-white group relative min-w-0 transition-all duration-200 overflow-hidden hover:-translate-y-[1px] hover:border-[#93B8F7] hover:shadow-[0_2px_8px_-3px_rgba(10,119,255,0.06)]">
-                    <div className="px-3 py-2">
-                      <div className="flex items-center justify-between gap-1 mb-1">
-                        <p className="text-[10.5px] text-[#64748B] whitespace-nowrap" style={{ fontWeight: 500 }}>{kpi.label}</p>
-                        <DashKpiIcon name={kpi.iconName} className="w-3.5 h-3.5 shrink-0" style={{ color: "#94A3B8" }} />
-                      </div>
-                      <div className="flex items-baseline gap-1.5">
-                        {kpi.change && (
-                          <span className="text-[10px] shrink-0" style={{ fontWeight: 500, color: kpi.changeColor || "#059669" }}>{kpi.change}</span>
-                        )}
-                        <p className="text-[15px] text-[#0F172A] tracking-tight whitespace-nowrap" style={{ fontWeight: 600, lineHeight: 1.2 }}>{kpi.value}</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+          {/* Location KPIs — draggable, with Add Insights panel (matches listing page) */}
+          {activeTab === "partner_locations" && locActiveKpis.length > 0 && (
+            <div className="mb-1">
+              {/* Header row */}
+              <div className="flex items-center justify-between mb-2.5">
+                <span className="text-sm text-muted-foreground" style={{ fontWeight: 500 }}>Location Insights</span>
+                <button
+                  onClick={() => setLocKpiPanelOpen(true)}
+                  className="inline-flex items-center gap-1 text-[11px] hover:bg-muted/50 px-2 py-0.5 rounded-md transition-colors cursor-pointer"
+                  style={{ fontWeight: 500, color: "#0A77FF" }}
+                >
+                  <Plus className="w-3 h-3" />
+                  Add Insights
+                </button>
               </div>
-            );
-          })()}
+              {/* KPI Cards — draggable responsive grid */}
+              <DndProvider backend={HTML5Backend}>
+                <div className="grid gap-2.5" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(210px, 1fr))" }}>
+                  {locActiveKpis.map((kpiKey, idx) => {
+                    const def = LOC_KPI_ALL.find(k => k.key === kpiKey);
+                    if (!def) return null;
+                    return (
+                      <DraggableKpiCard
+                        key={kpiKey}
+                        index={idx}
+                        kpiKey={kpiKey}
+                        label={def.label}
+                        value={computeLocKpiValue(kpiKey)}
+                        iconName={def.iconName}
+                        tooltip={def.tooltip}
+                        moveCard={moveLocKpi}
+                        onRemove={() => handleLocToggleKpi(kpiKey)}
+                      />
+                    );
+                  })}
+                </div>
+              </DndProvider>
+            </div>
+          )}
+          {/* Location KPI Customize Panel — side drawer (matches KpiInsightsPanel exactly) */}
+          {activeTab === "partner_locations" && <LocKpiInsightsDrawer open={locKpiPanelOpen} onOpenChange={setLocKpiPanelOpen} activeKpis={locActiveKpis} onToggleKpi={handleLocToggleKpi} allKpis={LOC_KPI_ALL} computeValue={computeLocKpiValue} />}
 
           <div className="flex gap-5 items-start">
             {/* ── LEFT PANEL ── */}
@@ -1725,7 +1825,7 @@ function ContentCard({ title, icon: Icon, count, children, action, currentSize, 
           {action}
         </div>
       </div>
-      <div className="p-4 flex-1 flex flex-col justify-between">{children}</div>
+      <div className={`flex-1 flex flex-col justify-between ${currentSize === "sm" ? "p-3" : "p-4"}`}>{children}</div>
     </div>
   );
 }
@@ -2439,7 +2539,7 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
 
           // Standardized chart heights per size — same for EVERY widget
           // sm: compact 2-per-row cards, md: standard, lg: full-width expanded
-          const CH: Record<string, number> = { sm: 120, md: 200, lg: 280 };
+          const CH: Record<string, number> = { sm: 140, md: 200, lg: 280 };
 
           activeWidgets.forEach((wKey, wIdx) => {
             const sz = widgetSizes[wKey] || "md";
@@ -2456,9 +2556,9 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
             const chartBox = (h: number, chart: React.ReactNode) => (
               <div style={{ height: h }} className="-ml-2"><ResponsiveContainer width="100%" height="100%">{chart}</ResponsiveContainer></div>
             );
-            const statRow = (stats: { label: string; value: string; color?: string }[]) => (
-              <div className="flex items-center gap-4 mt-2 pt-2 border-t border-[#F1F5F9]">
-                {stats.map((s, i) => (<div key={i}><p className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>{s.label}</p><p className="text-[13px]" style={{ fontWeight: 700, color: s.color || "#0F172A" }}>{s.value}</p></div>))}
+            const statRow = (stats: { label: string; value: string; color?: string }[], compact?: boolean) => (
+              <div className={`flex items-center ${compact ? "gap-3 mt-1.5 pt-1.5" : "gap-4 mt-2 pt-2"} border-t border-[#F1F5F9]`}>
+                {stats.map((s, i) => (<div key={i}><p className={`${compact ? "text-[9px]" : "text-[10px]"} text-[#94A3B8]`} style={{ fontWeight: 500 }}>{s.label}</p><p className={compact ? "text-[11px]" : "text-[13px]"} style={{ fontWeight: 700, color: s.color || "#0F172A" }}>{s.value}</p></div>))}
               </div>
             );
             const ttStyle = { borderRadius: 8, border: "1px solid #E2E8F0", boxShadow: "0 4px 12px rgba(0,0,0,0.08)", fontSize: 12 };
@@ -2482,6 +2582,10 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
                     <Area type="monotone" dataKey="amount" stroke="#0A77FF" strokeWidth={2} fill="url(#spendGradientUniq)" />
                   </AreaChart>
                 ))}
+                {sz === "sm" && statRow([
+                  { label: "YTD", value: formatCurrency(totalYTD) },
+                  { label: "Avg/mo", value: formatCurrency(avgMonthly) },
+                ], true)}
                 {sz === "md" && statRow([
                   { label: "YTD Total", value: formatCurrency(totalYTD) },
                   { label: "Monthly Avg", value: formatCurrency(avgMonthly) },
@@ -2512,6 +2616,10 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
                     <Bar dataKey="returns" fill="#F59E0B" radius={[4, 4, 0, 0]} barSize={sz === "sm" ? 14 : 24} name="Returns" />
                   </BarChart>
                 ))}
+                {sz === "sm" && statRow([
+                  { label: "Orders", value: `${totalOrd}` },
+                  { label: "Returns", value: `${retPct}%`, color: "#F59E0B" },
+                ], true)}
                 {sz === "md" && statRow([
                   { label: "This Week", value: `${totalOrd} orders` },
                   { label: "Returns", value: `${totalRet} (${retPct}%)`, color: "#F59E0B" },
@@ -2551,6 +2659,7 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
                     ))}
                   </div>
                 </div>
+                {sz === "sm" && statRow(spendCategories.slice(0, 2).map(c => ({ label: c.name, value: formatCurrency(c.value) })), true)}
                 {sz === "md" && statRow(spendCategories.slice(0, 3).map(c => ({ label: c.name, value: formatCurrency(c.value) })))}
                 {sz === "lg" && statRow(spendCategories.map(c => ({ label: c.name, value: formatCurrency(c.value) })))}
               </>
@@ -2562,6 +2671,10 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
                 <div className="flex items-center justify-between mb-2"><span className="text-[12px] text-[#475569]" style={{ fontWeight: 500 }}>Credit Utilization</span><span className="text-[13px] text-[#0F172A]" style={{ fontWeight: 700 }}>{creditPct}%</span></div>
                 <div className="w-full h-3 rounded-full bg-[#F1F5F9] overflow-hidden"><div className="h-full rounded-full transition-all" style={{ width: `${Math.min(creditPct, 100)}%`, backgroundColor: creditPct > 80 ? "#DC2626" : creditPct > 50 ? "#D97706" : "#059669" }} /></div>
                 <div className="flex items-center justify-between mt-1.5"><span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>$0</span><span className="text-[10px]" style={{ fontWeight: 500, color: creditStatusColor }}>{creditStatusLabel}</span><span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>{formatCurrency(vendor.creditLimit)}</span></div>
+                {sz === "sm" && statRow([
+                  { label: "Available", value: formatCurrency(Math.max(available, 0)), color: "#059669" },
+                  { label: "Limit", value: formatCurrency(vendor.creditLimit) },
+                ], true)}
                 {sz === "md" && statRow([
                   { label: "Available", value: formatCurrency(Math.max(available, 0)), color: "#059669" },
                   { label: "Used", value: formatCurrency(vendor.creditUtilization) },
@@ -2589,6 +2702,10 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
                     <Area type="monotone" dataKey="rate" stroke="#059669" strokeWidth={2} fill="url(#delivGrad)" />
                   </AreaChart>
                 ))}
+                {sz === "sm" && statRow([
+                  { label: "On-Time", value: "94%", color: "#059669" },
+                  { label: "Late", value: "6%", color: "#D97706" },
+                ], true)}
                 {sz === "md" && statRow([
                   { label: "Current", value: "94%", color: "#059669" },
                   { label: "Average", value: "92.2%" },
@@ -2622,6 +2739,10 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
                     </Bar>
                   </BarChart>
                 ))}
+                {sz === "sm" && statRow([
+                  { label: "Overdue", value: formatCurrency(Math.round(vendor.outstandingBalance * 0.35)), color: "#DC2626" },
+                  { label: "Avg Days", value: "42", color: "#D97706" },
+                ], true)}
                 {sz === "md" && statRow([
                   { label: "Total Overdue", value: formatCurrency(Math.round(vendor.outstandingBalance * 0.35)), color: "#DC2626" },
                   { label: "Invoices", value: "11" },
@@ -2646,6 +2767,22 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
                     <p className="text-[11px] text-[#64748B] mt-0.5">{vendor.primaryContact.designation}</p>
                   </div>
                 </div>
+                {sz === "sm" && (
+                  <>
+                    <div className="mt-2 pt-1.5 border-t border-[#F1F5F9] space-y-1">
+                      <div className="flex items-center gap-1.5 text-[10px] text-[#334155]"><Mail className="w-3 h-3 text-[#94A3B8]" /><span className="truncate">{vendor.primaryContact.email || "—"}</span></div>
+                      <div className="flex items-center gap-1.5 text-[10px] text-[#334155]"><Phone className="w-3 h-3 text-[#94A3B8]" />{vendor.primaryContact.phone || "—"}</div>
+                    </div>
+                    <div style={{ height: 60 }} className="-ml-2 mt-1.5">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <LineChart data={[{ w: "W1", h: 4.2 }, { w: "W2", h: 3.8 }, { w: "W3", h: 2.5 }, { w: "W4", h: 3.1 }, { w: "W5", h: 1.8 }, { w: "W6", h: 2.2 }]} margin={{ top: 2, right: 8, left: 0, bottom: 0 }}>
+                          <XAxis dataKey="w" tick={{ fontSize: 8, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
+                          <Line type="monotone" dataKey="h" stroke="#7C3AED" strokeWidth={1.5} dot={{ r: 1.5, fill: "#7C3AED" }} />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </>
+                )}
                 {sz === "md" && (
                   <>
                     <div className="flex items-center gap-3 mt-2 pt-2 border-t border-[#F1F5F9]">
@@ -2699,6 +2836,7 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
                     <Line type="monotone" dataKey="defect" stroke="#DC2626" strokeWidth={2} dot={{ r: 3, fill: "#DC2626" }} name="Defect %" strokeDasharray="5 5" />
                   </LineChart>
                 ))}
+                {sz === "sm" && statRow([{ label: "Returns", value: "2.1%", color: "#F59E0B" }, { label: "Defects", value: "1.1%", color: "#DC2626" }], true)}
                 {sz === "md" && statRow([{ label: "Returns", value: "2.1%", color: "#F59E0B" }, { label: "Defects", value: "1.1%", color: "#DC2626" }])}
                 {sz === "lg" && statRow([{ label: "Returns", value: "2.1%", color: "#F59E0B" }, { label: "Defects", value: "1.1%", color: "#DC2626" }, { label: "6-Mo Trend", value: "↓ Improving", color: "#059669" }, { label: "Items Returned", value: "12" }])}
               </>
@@ -2725,6 +2863,7 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
                     </Bar>
                   </BarChart>
                 ))}
+                {sz === "sm" && statRow([{ label: "#1", value: "Steel Alloy A" }, { label: "Top 5", value: formatCurrency(topItemsData.reduce((s, d) => s + d.spend, 0)) }], true)}
                 {sz === "md" && statRow([{ label: "Top Item", value: "Steel Alloy A" }, { label: "Total (Top 5)", value: formatCurrency(topItemsData.reduce((s, d) => s + d.spend, 0)) }])}
                 {sz === "lg" && statRow([{ label: "Top Item", value: "Steel Alloy A" }, { label: "Top 5 Total", value: formatCurrency(topItemsData.reduce((s, d) => s + d.spend, 0)) }, { label: "% of Spend", value: "59%" }, { label: "Unique SKUs", value: "5" }])}
               </>
@@ -2748,6 +2887,7 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
                     </Bar>
                   </BarChart>
                 ))}
+                {sz === "sm" && statRow([{ label: "Delivered", value: "3", color: "#059669" }, { label: "Pending", value: "1", color: "#D97706" }], true)}
                 {sz === "md" && statRow([{ label: "Delivered", value: "3", color: "#059669" }, { label: "In Transit", value: "1", color: "#0A77FF" }, { label: "Pending", value: "1", color: "#D97706" }])}
                 {sz === "lg" && statRow([{ label: "Delivered", value: "3", color: "#059669" }, { label: "In Transit", value: "1", color: "#0A77FF" }, { label: "Pending", value: "1", color: "#D97706" }, { label: "Total Value", value: formatCurrency(Math.round(vendor.totalSpent * 0.3)) }])}
               </>
@@ -2776,6 +2916,7 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
                     <Area type="monotone" dataKey="pending" stroke="#D97706" strokeWidth={1.5} fill="none" strokeDasharray="4 4" name="Pending" />
                   </AreaChart>
                 ))}
+                {sz === "sm" && statRow([{ label: "Paid", value: formatCurrency(paidTotal), color: "#059669" }, { label: "Pending", value: formatCurrency(pendTotal), color: "#D97706" }], true)}
                 {sz === "md" && statRow([{ label: "Total Paid", value: formatCurrency(paidTotal), color: "#059669" }, { label: "Pending", value: formatCurrency(pendTotal), color: "#D97706" }])}
                 {sz === "lg" && statRow([{ label: "Total Paid", value: formatCurrency(paidTotal), color: "#059669" }, { label: "Pending", value: formatCurrency(pendTotal), color: "#D97706" }, { label: "Transactions", value: "24" }, { label: "Avg Payment", value: formatCurrency(Math.round(paidTotal / 24)) }])}
               </>
@@ -2823,7 +2964,20 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
             icon = MessageSquare; title = "Notes & Activity"; tip = "Internal partner notes and a chronological timeline of recent activities including payments, deliveries, approvals, and manual annotations by team members.";
             content = (
               <div>
-                <p className={`text-[12px] text-[#475569] leading-relaxed ${sz === "sm" ? "line-clamp-2" : "mb-3"}`}>{vendor.notes}</p>
+                <p className={`text-[12px] text-[#475569] leading-relaxed ${sz === "sm" ? "line-clamp-3 mb-2" : "mb-3"}`}>{vendor.notes}</p>
+                {sz === "sm" && (
+                  <div className="space-y-2 border-t border-[#F1F5F9] pt-2">
+                    {[
+                      { time: "Mar 28", action: "Payment received", detail: "PAY-9841 · $8,520", color: "#059669" },
+                      { time: "Mar 21", action: "Order delivered", detail: "PO-28390 · 42 items", color: "#0A77FF" },
+                    ].map((event, i, arr) => (
+                      <div key={i} className="flex items-start gap-2">
+                        <div className="flex flex-col items-center mt-0.5"><div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: event.color }} />{i < arr.length - 1 && <div className="w-px h-5 bg-[#E2E8F0] mt-0.5" />}</div>
+                        <div className="min-w-0"><p className="text-[10px] text-[#0F172A]" style={{ fontWeight: 500 }}>{event.action}</p><p className="text-[9px] text-[#94A3B8]">{event.time} · {event.detail}</p></div>
+                      </div>
+                    ))}
+                  </div>
+                )}
                 {sz !== "sm" && (
                   <div className="space-y-3 border-t border-[#F1F5F9] pt-3">
                     {[
@@ -3358,6 +3512,128 @@ function DashInfoLabel({ children, tooltip: labelTooltip }: { children: React.Re
   );
 }
 
+// ── Location KPI Insights Drawer (matches KpiInsightsPanel exactly) ──
+function LocKpiInsightsDrawer({ open, onOpenChange, activeKpis, onToggleKpi, allKpis, computeValue }: {
+  open: boolean; onOpenChange: (open: boolean) => void; activeKpis: string[]; onToggleKpi: (key: string) => void;
+  allKpis: { key: string; label: string; category: string; iconName: string; tooltip: string }[];
+  computeValue: (key: string) => string;
+}) {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [mounted, setMounted] = useState(false);
+  const [visible, setVisible] = useState(false);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (open) { setMounted(true); if (timeoutRef.current) clearTimeout(timeoutRef.current); requestAnimationFrame(() => { requestAnimationFrame(() => setVisible(true)); }); }
+    else { setVisible(false); timeoutRef.current = setTimeout(() => setMounted(false), 280); }
+    return () => { if (timeoutRef.current) clearTimeout(timeoutRef.current); };
+  }, [open]);
+
+  const categories = useMemo(() => {
+    const catMap = new Map<string, typeof allKpis>();
+    for (const kpi of allKpis) {
+      if (searchQuery && !kpi.label.toLowerCase().includes(searchQuery.toLowerCase()) && !kpi.category.toLowerCase().includes(searchQuery.toLowerCase())) continue;
+      if (!catMap.has(kpi.category)) catMap.set(kpi.category, []);
+      catMap.get(kpi.category)!.push(kpi);
+    }
+    return Array.from(catMap.entries()).map(([name, kpis]) => ({ name, kpis }));
+  }, [searchQuery, allKpis]);
+
+  if (!mounted) return null;
+
+  return createPortal(
+    <>
+      {/* Backdrop */}
+      <div className="fixed inset-0 z-[200] transition-opacity duration-[250ms] ease-in-out" style={{ backgroundColor: visible ? "rgba(0,0,0,0.25)" : "rgba(0,0,0,0)", pointerEvents: visible ? "auto" : "none" }} onClick={() => onOpenChange(false)} />
+      {/* Drawer */}
+      <div className="fixed right-0 top-0 bottom-0 z-[200] w-full max-w-[400px] bg-white flex flex-col shadow-2xl transition-transform duration-[280ms] ease-[cubic-bezier(0.32,0.72,0,1)]" style={{ transform: visible ? "translateX(0)" : "translateX(100%)" }}>
+        {/* Header */}
+        <div className="px-5 pt-5 pb-0 shrink-0">
+          <div className="flex items-start justify-between">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ backgroundColor: "#EDF4FF" }}>
+                <ChartColumn className="w-5 h-5" style={{ color: "#0A77FF" }} />
+              </div>
+              <div>
+                <h2 className="text-base text-foreground" style={{ fontWeight: 600 }}>Add Insights</h2>
+                <p className="text-[13px] text-muted-foreground mt-0.5">Customize your dashboard with relevant location metrics.</p>
+              </div>
+            </div>
+            <button onClick={() => onOpenChange(false)} className="p-1.5 rounded-md hover:bg-muted/50 transition-colors cursor-pointer -mt-0.5 -mr-1">
+              <X className="w-4 h-4 text-muted-foreground" />
+            </button>
+          </div>
+          {/* Toggle all */}
+          <div className="flex items-center justify-between mt-4 px-1">
+            <span className="text-[12px] text-muted-foreground" style={{ fontWeight: 500 }}>{activeKpis.length} of {allKpis.length} insights active</span>
+            <button
+              onClick={() => {
+                const allKeys = allKpis.map(k => k.key);
+                const allActive = allKeys.every(k => activeKpis.includes(k));
+                if (allActive) { activeKpis.forEach(k => onToggleKpi(k)); } else { allKeys.filter(k => !activeKpis.includes(k)).forEach(k => onToggleKpi(k)); }
+              }}
+              className={`flex items-center gap-1.5 text-[12px] px-3 py-1.5 rounded-full border transition-all duration-200 cursor-pointer ${
+                allKpis.every(k => activeKpis.includes(k.key))
+                  ? "bg-[#EBF3FF] border-[#0A77FF]/25 text-[#0A77FF] hover:bg-[#DCEAFF] hover:border-[#0A77FF]/40 shadow-sm shadow-[#0A77FF]/10"
+                  : activeKpis.length === 0
+                  ? "bg-[#F8FAFC] border-[#E2E8F0] text-[#94A3B8] hover:bg-[#F1F5F9] hover:border-[#CBD5E1] hover:text-[#64748B]"
+                  : "bg-[#F8FAFC] border-[#E2E8F0] text-[#64748B] hover:bg-[#EBF3FF] hover:border-[#0A77FF]/25 hover:text-[#0A77FF]"
+              }`}
+              style={{ fontWeight: 600 }}
+            >
+              {allKpis.every(k => activeKpis.includes(k.key)) ? (<><ToggleRight className="w-4 h-4 text-[#0A77FF]" /><span>All On</span></>) : activeKpis.length === 0 ? (<><ToggleLeft className="w-4 h-4" /><span>All Off</span></>) : (<><ToggleLeft className="w-4 h-4" /><span>Enable All</span></>)}
+            </button>
+          </div>
+        </div>
+        {/* Search */}
+        <div className="px-5 pt-3.5 pb-1 shrink-0">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50 pointer-events-none" />
+            <input placeholder="Search metrics..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full h-10 pl-10 pr-3 rounded-lg border border-border bg-white text-sm text-foreground placeholder:text-muted-foreground/50 outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-colors" />
+          </div>
+        </div>
+        {/* Scrollable Content */}
+        <div className="flex-1 overflow-y-auto px-4 pb-4 scrollbar-hide">
+          {categories.length === 0 && (<div className="flex flex-col items-center py-12 text-muted-foreground"><Search className="w-5 h-5 mb-2 opacity-40" /><p className="text-xs text-muted-foreground/60">No metrics found</p></div>)}
+          {categories.map((cat) => (
+            <div key={cat.name} className="mt-5 first:mt-4">
+              <div className="flex items-center gap-1.5 mb-2">
+                <span className="text-[12px] text-muted-foreground/70 uppercase tracking-wide" style={{ fontWeight: 600 }}>{cat.name}</span>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                {cat.kpis.map((kpi) => {
+                  const isActive = activeKpis.includes(kpi.key);
+                  const value = computeValue(kpi.key);
+                  return (
+                    <button
+                      key={kpi.key}
+                      onClick={() => onToggleKpi(kpi.key)}
+                      className={`relative text-left rounded-lg border px-3 py-2.5 transition-all duration-150 cursor-pointer group ${
+                        isActive
+                          ? "border-[#0A77FF]/25 bg-[#0A77FF]/[0.04] shadow-[0_0_0_1px_rgba(10,119,255,0.08)]"
+                          : "border-border/60 bg-white hover:border-border hover:bg-muted/20 hover:shadow-sm"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between gap-1">
+                        <span className={`text-[11.5px] truncate transition-colors ${isActive ? "text-[#0A77FF]" : "text-muted-foreground/70"}`} style={{ fontWeight: 500 }} title={kpi.label}>{kpi.label}</span>
+                        <div className="shrink-0">
+                          {isActive ? <Check className="w-3.5 h-3.5" style={{ color: "#0A77FF" }} /> : <Plus className="w-3.5 h-3.5 text-muted-foreground/25 group-hover:text-muted-foreground/50 transition-colors" />}
+                        </div>
+                      </div>
+                      <p className={`text-[15px] mt-1 transition-colors ${isActive ? "text-foreground" : "text-foreground/80"}`} style={{ fontWeight: 550 }}>{value}</p>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </>,
+    document.body
+  );
+}
+
 function DraggableKpiCard({ index, kpiKey, label, value, subtitle, iconName, tooltip, change, changeColor, moveCard, onRemove }: {
   index: number; kpiKey: string; label: string; value: string; subtitle?: string; iconName?: string; tooltip?: string;
   change?: string; changeColor?: string; moveCard: (from: number, to: number) => void; onRemove?: () => void;
@@ -3488,8 +3764,10 @@ interface PartnerLocationData {
   contacts: number;
   items: number;
   serviceCenters: number;
+  pocNames: { name: string; initials: string; bgColor: string; fgColor?: string; photo?: string }[];
+  serviceCenterNames: string[];
   status: "active" | "inactive";
-  createdBy: { name: string; initials: string; bgColor: string };
+  createdBy: { name: string; initials: string; bgColor: string; fgColor?: string; photo?: string };
   lastUpdated: string;
   phone: string;
   email: string;
@@ -3555,14 +3833,33 @@ const MOCK_CITIES = [
 ];
 
 const CREATOR_NAMES = [
-  { name: "Ahtisham Ahmad", initials: "AA", bgColor: "#6366f1" },
-  { name: "Sarah Mitchell", initials: "SM", bgColor: "#0ea5e9" },
-  { name: "James Wilson", initials: "JW", bgColor: "#10b981" },
-  { name: "Maria Garcia", initials: "MG", bgColor: "#f59e0b" },
-  { name: "David Chen", initials: "DC", bgColor: "#8b5cf6" },
-  { name: "Emily Johnson", initials: "EJ", bgColor: "#ec4899" },
-  { name: "Robert Taylor", initials: "RT", bgColor: "#14b8a6" },
-  { name: "Lisa Anderson", initials: "LA", bgColor: "#f97316" },
+  { name: "Ahtisham Ahmad", initials: "AA", bgColor: "#EDF4FF", fgColor: "#0A77FF", photo: "https://randomuser.me/api/portraits/men/36.jpg" },
+  { name: "Sarah Mitchell", initials: "SM", bgColor: "#F0FDF4", fgColor: "#16A34A", photo: "https://randomuser.me/api/portraits/women/44.jpg" },
+  { name: "James Wilson", initials: "JW", bgColor: "#FFF7ED", fgColor: "#EA580C", photo: "https://randomuser.me/api/portraits/men/46.jpg" },
+  { name: "Maria Garcia", initials: "MG", bgColor: "#F5F3FF", fgColor: "#7C3AED", photo: "https://randomuser.me/api/portraits/women/33.jpg" },
+  { name: "David Chen", initials: "DC", bgColor: "#ECFEFF", fgColor: "#0891B2", photo: "https://randomuser.me/api/portraits/men/75.jpg" },
+  { name: "Emily Johnson", initials: "EJ", bgColor: "#FFF1F2", fgColor: "#E11D48", photo: "https://randomuser.me/api/portraits/women/65.jpg" },
+  { name: "Robert Taylor", initials: "RT", bgColor: "#F0FDFA", fgColor: "#0D9488", photo: "https://randomuser.me/api/portraits/men/22.jpg" },
+  { name: "Lisa Anderson", initials: "LA", bgColor: "#FEF9C3", fgColor: "#A16207", photo: "https://randomuser.me/api/portraits/women/17.jpg" },
+];
+
+const POC_NAMES = [
+  { name: "Sarah Mitchell", initials: "SM", bgColor: "#EDF4FF", fgColor: "#0A77FF", photo: "https://randomuser.me/api/portraits/women/44.jpg" },
+  { name: "James Wilson", initials: "JW", bgColor: "#F0FDF4", fgColor: "#16A34A", photo: "https://randomuser.me/api/portraits/men/46.jpg" },
+  { name: "Maria Garcia", initials: "MG", bgColor: "#FFF7ED", fgColor: "#EA580C", photo: "https://randomuser.me/api/portraits/women/33.jpg" },
+  { name: "David Chen", initials: "DC", bgColor: "#F5F3FF", fgColor: "#7C3AED", photo: "https://randomuser.me/api/portraits/men/75.jpg" },
+  { name: "Emily Johnson", initials: "EJ", bgColor: "#ECFEFF", fgColor: "#0891B2", photo: "https://randomuser.me/api/portraits/women/65.jpg" },
+  { name: "Robert Taylor", initials: "RT", bgColor: "#FFF1F2", fgColor: "#E11D48", photo: "https://randomuser.me/api/portraits/men/22.jpg" },
+  { name: "Lisa Anderson", initials: "LA", bgColor: "#FEF9C3", fgColor: "#A16207", photo: "https://randomuser.me/api/portraits/women/17.jpg" },
+  { name: "Kevin Brown", initials: "KB", bgColor: "#F0FDFA", fgColor: "#0D9488", photo: "https://randomuser.me/api/portraits/men/64.jpg" },
+  { name: "Amanda White", initials: "AW", bgColor: "#FDF2F8", fgColor: "#DB2777", photo: "https://randomuser.me/api/portraits/women/56.jpg" },
+  { name: "Daniel Martinez", initials: "DM", bgColor: "#EFF6FF", fgColor: "#2563EB", photo: "https://randomuser.me/api/portraits/men/18.jpg" },
+];
+
+const SERVICE_CENTER_NAMES = [
+  "Main Warehouse", "Distribution Hub", "Quality Lab", "Assembly Floor", "Shipping Dock",
+  "Cold Storage", "R&D Center", "Packaging Unit", "Returns Processing", "Maintenance Bay",
+  "Parts Storage", "Inspection Station", "Loading Bay", "Repair Center", "Testing Facility",
 ];
 
 const LOCATION_IMAGES = [
@@ -3599,6 +3896,8 @@ function generateLocationsFromVendor(vendor: Vendor): PartnerLocationData[] {
       contacts: ((seed * 3 + idx * 5) % 25) + 2,
       items: ((seed * 7 + idx * 11) % 800) + 50,
       serviceCenters: ((seed * 2 + idx) % 12) + 1,
+      pocNames: Array.from({ length: Math.min(((seed * 3 + idx * 5) % 25) + 2, 6) }, (_, i) => POC_NAMES[(seed + i + idx * 3) % POC_NAMES.length]),
+      serviceCenterNames: Array.from({ length: Math.min(((seed * 2 + idx) % 12) + 1, 8) }, (_, i) => SERVICE_CENTER_NAMES[(seed + i + idx * 2) % SERVICE_CENTER_NAMES.length]),
       status: idx % 7 === 0 ? "inactive" as const : "active" as const,
       createdBy: creator,
       lastUpdated: updDate.toISOString(),
@@ -3662,6 +3961,110 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
   const [locPocDensity, setLocPocDensity] = useState<LocDensity>("card");
   const [currentPage, setCurrentPage] = useState(1);
   const [recordsPerPage, setRecordsPerPage] = useState(20);
+
+  // ── Column infrastructure (matches VendorsListPage exactly) ──
+  const LOC_COLUMNS: { key: string; label: string; minWidth: string; sortable?: boolean }[] = [
+    { key: "location_name", label: "Location Name", minWidth: "280px", sortable: true },
+    { key: "address", label: "Address", minWidth: "240px" },
+    { key: "city_state", label: "City / State", minWidth: "160px", sortable: true },
+    { key: "poc", label: "Point of Contact", minWidth: "240px" },
+    { key: "service_centers", label: "Service Centers", minWidth: "220px" },
+    { key: "created_by", label: "Created By", minWidth: "200px" },
+    { key: "last_updated", label: "Last Updated", minWidth: "150px", sortable: true },
+    { key: "status", label: "Status", minWidth: "110px", sortable: true },
+  ];
+  const LOC_LOCKED_COLUMNS = ["location_name"];
+  const LOC_CHECKBOX_W = 40;
+
+  const [locColumnOrder, setLocColumnOrder] = useState<string[]>(LOC_COLUMNS.map(c => c.key));
+  const [locColumnWidths, setLocColumnWidths] = useState<Record<string, number>>(() => Object.fromEntries(LOC_COLUMNS.map(c => [c.key, parseInt(c.minWidth, 10)])));
+  const [locSortConfig, setLocSortConfig] = useState<SortConfig | null>(null);
+  const [locDraggingColumnKey, setLocDraggingColumnKey] = useState<string | null>(null);
+  const [locIsResizing, setLocIsResizing] = useState(false);
+  const [locResizingColumnKey, setLocResizingColumnKey] = useState<string | null>(null);
+
+  const locColDragRef = useRef<{ columnKey: string; startX: number; startY: number; isDragging: boolean; lastSwapTime: number } | null>(null);
+  const locSuppressClickRef = useRef(false);
+  const locResizeRef = useRef<{ columnKey: string; startX: number; startWidth: number } | null>(null);
+
+  const locColDef = (key: string) => LOC_COLUMNS.find(c => c.key === key)!;
+  const locVisibleColumns = useMemo(() => {
+    const ordered = locColumnOrder.filter(k => LOC_COLUMNS.some(c => c.key === k));
+    if (!ordered.includes("location_name")) ordered.unshift("location_name");
+    else if (ordered[0] !== "location_name") { ordered.splice(ordered.indexOf("location_name"), 1); ordered.unshift("location_name"); }
+    return ordered;
+  }, [locColumnOrder]);
+  const locTotalWidth = useMemo(() => LOC_CHECKBOX_W + locVisibleColumns.reduce((s, k) => s + (locColumnWidths[k] ?? parseInt(locColDef(k).minWidth, 10)), 0) + 60, [locVisibleColumns, locColumnWidths]);
+
+  const handleLocSort = useCallback((key: string) => {
+    setLocSortConfig(prev => {
+      if (prev?.key === key) return prev.direction === "asc" ? { key, direction: "desc" } : null;
+      return { key, direction: "asc" };
+    });
+  }, []);
+
+  // ── Column drag reorder (mouse-event based — matches listing page) ──
+  const handleLocHeaderMouseDown = useCallback((e: React.MouseEvent, columnKey: string) => {
+    if (LOC_LOCKED_COLUMNS.includes(columnKey) || locIsResizing || e.button !== 0) return;
+    const startX = e.clientX; const startY = e.clientY;
+    locColDragRef.current = { columnKey, startX, startY, isDragging: false, lastSwapTime: 0 };
+    const THRESHOLD = 5; const SETTLE = 60;
+    const onMove = (me: MouseEvent) => {
+      if (!locColDragRef.current) return;
+      const dx = me.clientX - locColDragRef.current.startX;
+      const dy = me.clientY - locColDragRef.current.startY;
+      if (!locColDragRef.current.isDragging) {
+        if (Math.sqrt(dx * dx + dy * dy) < THRESHOLD) return;
+        locColDragRef.current.isDragging = true;
+        document.body.style.userSelect = "none"; document.body.style.cursor = "grabbing";
+        setLocDraggingColumnKey(locColDragRef.current.columnKey);
+      }
+      const now = performance.now();
+      if (now - locColDragRef.current.lastSwapTime < SETTLE) return;
+      const cursorX = me.clientX; const draggedKey = locColDragRef.current.columnKey;
+      const draggedTh = document.querySelector<HTMLElement>(`th[data-loc-col-key="${draggedKey}"]`);
+      if (!draggedTh) return;
+      const draggedRect = draggedTh.getBoundingClientRect();
+      if (cursorX >= draggedRect.left && cursorX <= draggedRect.right) return;
+      const allThs = document.querySelectorAll<HTMLElement>("th[data-loc-col-key]");
+      for (const th of allThs) {
+        const rect = th.getBoundingClientRect();
+        if (cursorX < rect.left || cursorX > rect.right) continue;
+        const k = th.getAttribute("data-loc-col-key");
+        if (!k || k === draggedKey || LOC_LOCKED_COLUMNS.includes(k)) break;
+        setLocColumnOrder(prev => { const next = [...prev]; const s = next.indexOf(draggedKey); const t = next.indexOf(k); if (s === -1 || t === -1 || s === t) return prev; next.splice(s, 1); next.splice(t, 0, draggedKey); return next; });
+        locColDragRef.current.lastSwapTime = now; break;
+      }
+    };
+    const onUp = () => {
+      document.removeEventListener("mousemove", onMove); document.removeEventListener("mouseup", onUp);
+      document.body.style.userSelect = ""; document.body.style.cursor = "";
+      if (locColDragRef.current?.isDragging) { locSuppressClickRef.current = true; requestAnimationFrame(() => { locSuppressClickRef.current = false; }); }
+      locColDragRef.current = null; setLocDraggingColumnKey(null);
+    };
+    document.addEventListener("mousemove", onMove); document.addEventListener("mouseup", onUp);
+  }, [locIsResizing]);
+
+  // ── Column resize (matches listing page) ──
+  const handleLocResizeStart = useCallback((e: React.MouseEvent, columnKey: string) => {
+    e.preventDefault(); e.stopPropagation();
+    const startWidth = locColumnWidths[columnKey] ?? parseInt(locColDef(columnKey).minWidth, 10);
+    locResizeRef.current = { columnKey, startX: e.clientX, startWidth };
+    setLocIsResizing(true); setLocResizingColumnKey(columnKey);
+    const onMove = (me: MouseEvent) => {
+      if (!locResizeRef.current) return;
+      const delta = me.clientX - locResizeRef.current.startX;
+      const newW = Math.max(1, locResizeRef.current.startWidth + delta);
+      setLocColumnWidths(prev => ({ ...prev, [locResizeRef.current!.columnKey]: newW }));
+    };
+    const onUp = () => {
+      locResizeRef.current = null; setLocIsResizing(false); setLocResizingColumnKey(null);
+      document.removeEventListener("mousemove", onMove); document.removeEventListener("mouseup", onUp);
+      document.body.style.cursor = ""; document.body.style.userSelect = "";
+    };
+    document.addEventListener("mousemove", onMove); document.addEventListener("mouseup", onUp);
+    document.body.style.cursor = "col-resize"; document.body.style.userSelect = "none";
+  }, [locColumnWidths]);
 
   // ── Carrier & Shipping tab state ──
   type CarrierSubTab = "vendor" | "customer";
@@ -4145,10 +4548,10 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                       <div className="px-3.5 py-2.5 border-t border-[#F1F5F9] flex items-center justify-between text-[10.5px] text-[#94A3B8]">
                         <div className="flex items-center gap-1.5 min-w-0">
                           <div
-                            className="w-5 h-5 rounded-full flex items-center justify-center text-white text-[8px] shrink-0"
-                            style={{ backgroundColor: toAAAColor(loc.createdBy.bgColor), fontWeight: 600 }}
+                            className="w-5 h-5 rounded-md flex items-center justify-center text-[8px] shrink-0 overflow-hidden border border-[#E8ECF1]"
+                            style={{ backgroundColor: loc.createdBy.photo ? "transparent" : loc.createdBy.bgColor, fontWeight: 600 }}
                           >
-                            {loc.createdBy.initials}
+                            {loc.createdBy.photo ? <img src={loc.createdBy.photo} alt="" className="w-full h-full object-cover" /> : <span style={{ color: loc.createdBy.fgColor || "#334155" }}>{loc.createdBy.initials}</span>}
                           </div>
                           <span className="text-[#475569] truncate" style={{ fontWeight: 500 }}>{loc.createdBy.name}</span>
                         </div>
@@ -4165,29 +4568,73 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
             )}
           </div>
         ) : (
-          /* Table View (condensed/comfort) */
-          <div className="min-h-0 overflow-auto flex-1">
-            <Table>
+          /* Table View (condensed/comfort) — matches VendorsListPage exactly */
+          <div className={`min-h-0 overflow-auto flex-1 ${locIsResizing || locDraggingColumnKey ? "select-none" : ""}`}>
+            <Table style={{ tableLayout: "fixed", width: `${locTotalWidth}px` }}>
               <TableHeader className="sticky top-0 z-20 bg-card">
-                <TableRow className={`bg-muted/30 hover:bg-muted/30 ${
-                  density === "condensed" ? "[&>th]:h-8" : "[&>th]:h-11"
-                }`}>
-                  <TableHead className="w-[40px] min-w-[40px] max-w-[40px] !pl-3 !pr-0">
-                    <Checkbox
-                      checked={allPageSelected ? true : somePageSelected ? "indeterminate" : false}
-                      onCheckedChange={handleSelectAll}
-                      aria-label="Select all rows"
-                    />
+                <TableRow className={`bg-muted/30 hover:bg-muted/30 ${density === "condensed" ? "[&>th]:h-8" : "[&>th]:h-9"}`}>
+                  {/* Checkbox — sticky left */}
+                  <TableHead className="sticky left-0 z-20 bg-[#f8fafc] w-[40px] min-w-[40px] max-w-[40px] !pl-2 !pr-0">
+                    <Checkbox checked={allPageSelected ? true : somePageSelected ? "indeterminate" : false} onCheckedChange={handleSelectAll} aria-label="Select all rows" />
                   </TableHead>
-                  <TableHead className="text-xs !pl-3" style={{ fontWeight: 600 }}>Location Name</TableHead>
-                  <TableHead className="text-xs !pl-3" style={{ fontWeight: 600 }}>Address</TableHead>
-                  <TableHead className="text-xs !pl-3" style={{ fontWeight: 600 }}>City / State</TableHead>
-                  <TableHead className="text-xs !pl-3 text-center" style={{ fontWeight: 600 }}>Contacts</TableHead>
-                  <TableHead className="text-xs !pl-3 text-center" style={{ fontWeight: 600 }}>Service Centers</TableHead>
-                  <TableHead className="text-xs !pl-3" style={{ fontWeight: 600 }}>Status</TableHead>
-                  <TableHead className="text-xs !pl-3" style={{ fontWeight: 600 }}>Created By</TableHead>
-                  <TableHead className="text-xs !pl-3" style={{ fontWeight: 600 }}>Last Updated</TableHead>
-                  <TableHead className="text-xs !pl-3 w-[60px]" style={{ fontWeight: 600 }}>Actions</TableHead>
+                  {/* Dynamic columns */}
+                  {locVisibleColumns.map((key) => {
+                    const def = locColDef(key);
+                    const isLocked = LOC_LOCKED_COLUMNS.includes(key);
+                    const isDraggable = !isLocked;
+                    const currentSort: "asc" | "desc" | null = locSortConfig?.key === key ? locSortConfig.direction : null;
+                    const w = locColumnWidths[key] ?? parseInt(def.minWidth, 10);
+                    const isBeingDragged = locDraggingColumnKey === key;
+                    return (
+                      <TableHead
+                        key={key}
+                        data-loc-col-key={key}
+                        onMouseDown={isDraggable ? (e) => handleLocHeaderMouseDown(e, key) : undefined}
+                        onClickCapture={isDraggable ? (e) => { if (locSuppressClickRef.current) { e.stopPropagation(); e.preventDefault(); } } : undefined}
+                        className={`whitespace-nowrap relative group/colheader ${isDraggable ? "cursor-grab" : ""}`}
+                        style={{
+                          width: `${w}px`, minWidth: `${w}px`, maxWidth: `${w}px`, overflow: "hidden",
+                          ...(isBeingDragged ? { background: "linear-gradient(180deg, rgba(10,119,255,0.08) 0%, rgba(10,119,255,0.03) 100%)" } : {}),
+                        }}
+                      >
+                        {isBeingDragged && <div className="absolute top-0 left-0 right-0 h-[2px] rounded-b-full" style={{ backgroundColor: "#0A77FF" }} />}
+                        {isDraggable && (
+                          <GripVertical className={`absolute left-1 top-1/2 -translate-y-1/2 w-3 h-3 transition-opacity z-[5] pointer-events-none ${isBeingDragged ? "opacity-100 text-primary" : "opacity-0 group-hover/colheader:opacity-100 text-muted-foreground/40"}`} />
+                        )}
+                        <div className="flex items-center">
+                          <ColumnHeaderMenu
+                            columnKey={key}
+                            label={def.label}
+                            sortable={def.sortable}
+                            sortConfig={locSortConfig}
+                            onSort={handleLocSort}
+                            isLocked={isLocked}
+                          >
+                            <div className="inline-flex items-center gap-1">
+                              <span className="text-[13px]" style={currentSort ? { color: "#0A77FF" } : undefined}>{def.label}</span>
+                              {currentSort === "asc" && <ArrowUp className="w-3 h-3 shrink-0" style={{ color: "#0A77FF" }} />}
+                              {currentSort === "desc" && <ArrowDown className="w-3 h-3 shrink-0" style={{ color: "#0A77FF" }} />}
+                              {!currentSort && def.sortable && <ArrowUpDown className="w-3 h-3 shrink-0 text-muted-foreground opacity-0 group-hover/colheader:opacity-100 transition-opacity" />}
+                            </div>
+                          </ColumnHeaderMenu>
+                        </div>
+                        {/* Resize handle */}
+                        <div
+                          onMouseDown={(e) => { e.stopPropagation(); handleLocResizeStart(e, key); }}
+                          onClick={(e) => e.stopPropagation()}
+                          onDoubleClick={(e) => { e.stopPropagation(); setLocColumnWidths(prev => ({ ...prev, [key]: parseInt(def.minWidth, 10) })); }}
+                          className="absolute right-0 top-0 bottom-0 w-[5px] cursor-col-resize z-10 group/resize"
+                          style={{ touchAction: "none" }}
+                        >
+                          <div className={`absolute right-0 top-1 bottom-1 w-[2px] rounded-full transition-colors ${locResizingColumnKey === key ? "bg-primary" : "bg-transparent group-hover/resize:bg-primary/40"}`} />
+                        </div>
+                      </TableHead>
+                    );
+                  })}
+                  {/* Actions — sticky right */}
+                  <TableHead className="whitespace-nowrap w-[60px] sticky right-0 bg-[#f8fafc] z-20 !pl-2 !pr-2" style={{ boxShadow: "inset 1px 0 0 0 rgba(0,0,0,0.08)" }}>
+                    <span className="text-[13px]">Actions</span>
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -4201,75 +4648,181 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  paginated.map((loc) => (
+                  paginated.map((loc) => {
+                    const isComfort = density === "comfort";
+                    const avatarCls = isComfort ? "w-8 h-8" : "w-7 h-7";
+                    const avatarTxt = isComfort ? "text-[10px]" : "text-[9px]";
+                    const LocAvatar = ({ person }: { person: { initials: string; bgColor: string; fgColor?: string; photo?: string } }) => (
+                      <div className={`${avatarCls} rounded-lg flex items-center justify-center shrink-0 overflow-hidden border border-[#E8ECF1]`} style={{ backgroundColor: person.photo ? "transparent" : person.bgColor }}>
+                        {person.photo ? <img src={person.photo} alt="" className="w-full h-full object-cover" /> : <span className={avatarTxt} style={{ fontWeight: 700, color: person.fgColor || "#334155" }}>{person.initials}</span>}
+                      </div>
+                    );
+                    const renderLocCell = (colKey: string) => {
+                      switch (colKey) {
+                        case "location_name": return (
+                          <TableCell key={colKey}>
+                            <div className="flex items-center gap-2.5">
+                              <div className={`${isComfort ? "w-9 h-9" : "w-7 h-7"} rounded-md overflow-hidden bg-[#F1F5F9] shrink-0`}>
+                                <img src={loc.image} alt={loc.name} className="w-full h-full object-cover" />
+                              </div>
+                              <div className="min-w-0">
+                                <span className="text-sm text-foreground truncate block" style={{ fontWeight: 500 }}>{highlightText(loc.name)}</span>
+                                {isComfort && <span className="text-[11px] text-[#94A3B8] truncate block">{loc.city}, {loc.state}</span>}
+                              </div>
+                            </div>
+                          </TableCell>
+                        );
+                        case "address": return (<TableCell key={colKey} className="text-sm text-muted-foreground truncate">{loc.address}</TableCell>);
+                        case "city_state": return (<TableCell key={colKey} className="text-sm text-muted-foreground whitespace-nowrap">{loc.city}, {loc.state}</TableCell>);
+                        case "poc": return (
+                          <TableCell key={colKey}>
+                            {loc.pocNames.length > 0 ? (
+                              <div className={`flex items-center ${isComfort ? "gap-2.5" : "gap-2"}`}>
+                                {/* Avatar with HoverCard */}
+                                <HoverCard>
+                                  <HoverCardTrigger asChild onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+                                    <div className="cursor-pointer"><LocAvatar person={loc.pocNames[0]} /></div>
+                                  </HoverCardTrigger>
+                                  <HoverCardContent side="bottom" align="start" className="w-[280px] p-0 rounded-xl border-0 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+                                    <div className="bg-gradient-to-br from-[#1E293B] to-[#334155] px-4 py-3 relative overflow-hidden">
+                                      <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-white/[0.04]" />
+                                      <div className="flex items-center gap-3 relative">
+                                        <div className="w-11 h-11 rounded-xl overflow-hidden border-2 border-white/20 shrink-0" style={{ backgroundColor: loc.pocNames[0].photo ? "transparent" : loc.pocNames[0].bgColor }}>
+                                          {loc.pocNames[0].photo ? <img src={loc.pocNames[0].photo} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-[13px] text-white" style={{ fontWeight: 700 }}>{loc.pocNames[0].initials}</div>}
+                                        </div>
+                                        <div className="min-w-0">
+                                          <p className="text-[14px] text-white truncate" style={{ fontWeight: 600 }}>{loc.pocNames[0].name}</p>
+                                          <p className="text-[11px] text-[#94A3B8] truncate">Contact · {loc.name}</p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    <div className="bg-white px-4 py-3 space-y-2">
+                                      <div className="flex items-center gap-2.5 text-[12px] text-[#334155]"><Mail className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" /><span className="truncate">{loc.pocNames[0].name.toLowerCase().replace(/\s+/g, ".")}@company.com</span></div>
+                                      <div className="flex items-center gap-2.5 text-[12px] text-[#334155]"><Phone className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" /><span>+1 (555) 012-3456</span></div>
+                                      <div className="flex items-center gap-2.5 text-[12px] text-[#334155]"><Building2 className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" /><span>{loc.name}</span></div>
+                                    </div>
+                                  </HoverCardContent>
+                                </HoverCard>
+                                <div className="min-w-0">
+                                  <span className="text-sm truncate block max-w-[90px]" style={{ fontWeight: 500 }}>{loc.pocNames[0].name}</span>
+                                  {isComfort && <span className="text-[10px] text-muted-foreground/60 block">Contact</span>}
+                                </div>
+                                {loc.pocNames.length > 1 && (
+                                  <OverflowTooltip
+                                    category="Point of Contacts"
+                                    items={loc.pocNames.slice(1).map((p, i) => ({
+                                      id: `${loc.id}-poc-${i}`,
+                                      name: p.name,
+                                      subtitle: "CONTACT",
+                                      initials: p.initials,
+                                      avatarBg: p.bgColor,
+                                      avatarFg: p.fgColor,
+                                    }))}
+                                  >
+                                    <span className="text-[11px] shrink-0 cursor-default leading-none" style={{ fontWeight: 600, color: "#085FCC" }}>+{loc.pocNames.length - 1} more</span>
+                                  </OverflowTooltip>
+                                )}
+                              </div>
+                            ) : (<span className="text-sm text-muted-foreground">{"\u2013"}</span>)}
+                          </TableCell>
+                        );
+                        case "service_centers": return (
+                          <TableCell key={colKey}>
+                            <div className="flex items-center gap-1.5">
+                              <span className={`inline-flex items-center gap-1 ${isComfort ? "px-2 py-0.5 text-xs" : "px-1.5 py-px text-[11px]"} rounded-md border`} style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#475569", borderColor: "#E2E8F0" }}>
+                                <Wrench className="w-3 h-3 text-[#94A3B8]" />
+                                {loc.serviceCenterNames[0] || "Center"}
+                              </span>
+                              {loc.serviceCenterNames.length > 1 && (
+                                <OverflowTooltip
+                                  category="Service Centers"
+                                  items={loc.serviceCenterNames.slice(1).map((sc, i) => ({
+                                    id: `${loc.id}-sc-${i}`,
+                                    name: sc,
+                                    subtitle: "SERVICE CENTER",
+                                  }))}
+                                >
+                                  <span className="inline-flex items-center px-1.5 py-0.5 rounded-md text-xs border cursor-default" style={{ fontWeight: 600, backgroundColor: "#F1F5F9", color: "#475569", borderColor: "#E2E8F0" }}>+{loc.serviceCenterNames.length - 1}</span>
+                                </OverflowTooltip>
+                              )}
+                            </div>
+                          </TableCell>
+                        );
+                        case "created_by": return (
+                          <TableCell key={colKey}>
+                            <div className={`flex items-center ${isComfort ? "gap-2.5" : "gap-2"}`}>
+                              {/* Avatar with HoverCard */}
+                              <HoverCard>
+                                <HoverCardTrigger asChild onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+                                  <div className="cursor-pointer"><LocAvatar person={loc.createdBy} /></div>
+                                </HoverCardTrigger>
+                                <HoverCardContent side="bottom" align="start" className="w-[280px] p-0 rounded-xl border-0 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+                                  <div className="bg-gradient-to-br from-[#1E293B] to-[#334155] px-4 py-3 relative overflow-hidden">
+                                    <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-white/[0.04]" />
+                                    <div className="flex items-center gap-3 relative">
+                                      <div className="w-11 h-11 rounded-xl overflow-hidden border-2 border-white/20 shrink-0" style={{ backgroundColor: loc.createdBy.photo ? "transparent" : loc.createdBy.bgColor }}>
+                                        {loc.createdBy.photo ? <img src={loc.createdBy.photo} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-[13px] text-white" style={{ fontWeight: 700 }}>{loc.createdBy.initials}</div>}
+                                      </div>
+                                      <div className="min-w-0">
+                                        <p className="text-[14px] text-white truncate" style={{ fontWeight: 600 }}>{loc.createdBy.name}</p>
+                                        <p className="text-[11px] text-[#94A3B8] truncate">Team Member</p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div className="bg-white px-4 py-3 space-y-2">
+                                    <div className="flex items-center gap-2.5 text-[12px] text-[#334155]"><Mail className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" /><span className="truncate">{loc.createdBy.name.toLowerCase().replace(/\s+/g, ".")}@company.com</span></div>
+                                    <div className="flex items-center gap-2.5 text-[12px] text-[#334155]"><Building2 className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" /><span>Operations</span></div>
+                                    <div className="flex items-center gap-2.5 text-[12px] text-[#334155]"><Phone className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" /><span>+1 (555) 987-6543</span></div>
+                                  </div>
+                                </HoverCardContent>
+                              </HoverCard>
+                              <div className="min-w-0">
+                                <span className="text-sm text-foreground truncate block max-w-[120px]" style={{ fontWeight: 500 }}>{loc.createdBy.name}</span>
+                                {isComfort && <span className="text-[10px] text-muted-foreground/50 block">Team Member</span>}
+                              </div>
+                            </div>
+                          </TableCell>
+                        );
+                        case "last_updated": return (
+                          <TableCell key={colKey}>
+                            <div>
+                              <span className="text-sm text-muted-foreground whitespace-nowrap">{formatDate(loc.lastUpdated)}</span>
+                              {isComfort && <span className="text-[10px] text-muted-foreground/50 block">{(() => { const d = Math.floor((Date.now() - new Date(loc.lastUpdated).getTime()) / 86400000); return d < 30 ? `${d}d ago` : d < 365 ? `${Math.floor(d / 30)}mo ago` : `${Math.floor(d / 365)}y ago`; })()}</span>}
+                            </div>
+                          </TableCell>
+                        );
+                        case "status": return (
+                          <TableCell key={colKey}>
+                            <span className="inline-flex items-center justify-center rounded-full border px-2.5 py-0.5 text-xs whitespace-nowrap shrink-0" style={{ fontWeight: 500, backgroundColor: loc.status === "active" ? "#ECFDF5" : "#FFFBEB", color: loc.status === "active" ? "#065F46" : "#92400E", borderColor: loc.status === "active" ? "#A7F3D0" : "#FDE68A" }}>
+                              {loc.status === "active" ? "Active" : "Inactive"}
+                            </span>
+                          </TableCell>
+                        );
+                        default: return (<TableCell key={colKey}>{"\u2013"}</TableCell>);
+                      }
+                    };
+                    return (
                     <TableRow
                       key={loc.id}
                       className={`cursor-pointer group hover:bg-[#F0F7FF] ${
-                        density === "condensed"
-                          ? "[&>td]:py-1 [&>td]:pl-3 [&>td]:pr-2"
-                          : "[&>td]:py-3 [&>td]:pl-3 [&>td]:pr-3"
+                        density === "condensed" ? "[&>td]:py-1 [&>td]:pl-3 [&>td]:pr-2" : "[&>td]:py-2 [&>td]:pl-3 [&>td]:pr-3"
                       } ${highlightedLocationId === loc.id ? "animate-row-flash bg-[#EDF4FF]/60" : ""}`}
                       onClick={() => handleOpenLocation(loc)}
                     >
-                      <TableCell className="!pl-3 !pr-0" onClick={(e) => e.stopPropagation()}>
-                        <Checkbox
-                          checked={selectedRows.has(loc.id)}
-                          onCheckedChange={() => handleSelectRow(loc.id)}
-                          aria-label={`Select ${loc.name}`}
-                        />
+                      <TableCell className="sticky left-0 z-10 bg-card group-hover:bg-[#F0F7FF] w-[40px] min-w-[40px] max-w-[40px] !pl-2 !pr-0" onClick={(e) => e.stopPropagation()}>
+                        <Checkbox checked={selectedRows.has(loc.id)} onCheckedChange={() => handleSelectRow(loc.id)} aria-label={`Select ${loc.name}`} />
                       </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2.5 min-w-[140px]">
-                          <div className="w-7 h-7 rounded-md bg-[#EDF4FF] flex items-center justify-center shrink-0">
-                            <Grid3X3 className="w-3.5 h-3.5 text-[#0A77FF]" />
-                          </div>
-                          <span className="text-sm text-foreground truncate" style={{ fontWeight: 500 }}>
-                            {highlightText(loc.name)}
-                          </span>
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-sm text-muted-foreground max-w-[180px] truncate">
-                        {loc.address}
-                      </TableCell>
-                      <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
-                        {loc.city}, {loc.state}
-                      </TableCell>
-                      <TableCell className="text-sm text-center tabular-nums" style={{ fontWeight: 500 }}>
-                        {loc.contacts}
-                      </TableCell>
-                      <TableCell className="text-sm text-center tabular-nums" style={{ fontWeight: 500 }}>
-                        {loc.serviceCenters}
-                      </TableCell>
-                      <TableCell>
-                        <span
-                          className="inline-flex items-center px-2 py-0.5 rounded text-[10px] border"
-                          style={{
-                            fontWeight: 600,
-                            backgroundColor: loc.status === "active" ? "#F0FDF4" : "#FEF2F2",
-                            color: loc.status === "active" ? "#166534" : "#DC2626",
-                            borderColor: loc.status === "active" ? "#BBF7D0" : "#FECACA",
-                          }}
-                        >
-                          {loc.status === "active" ? "Active" : "Inactive"}
-                        </span>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2 min-w-[110px]">
-                          <div
-                            className="w-6 h-6 rounded-full flex items-center justify-center text-white text-[8px] shrink-0"
-                            style={{ backgroundColor: toAAAColor(loc.createdBy.bgColor), fontWeight: 600 }}
-                          >
-                            {loc.createdBy.initials}
-                          </div>
-                          <span className="text-sm text-foreground truncate" style={{ fontWeight: 500 }}>
-                            {loc.createdBy.name}
-                          </span>
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
-                        {formatDate(loc.lastUpdated)}
-                      </TableCell>
-                      <TableCell onClick={(e) => e.stopPropagation()}>
+                      {locVisibleColumns.map((colKey) => {
+                        const cell = renderLocCell(colKey);
+                        const w = locColumnWidths[colKey] ?? parseInt(locColDef(colKey).minWidth, 10);
+                        const isDraggedCol = locDraggingColumnKey === colKey;
+                        const cellWidthStyle: React.CSSProperties = {
+                          width: `${w}px`, minWidth: `${w}px`, maxWidth: `${w}px`, overflow: "hidden", textOverflow: "ellipsis",
+                          ...(isDraggedCol ? { backgroundColor: "rgba(10,119,255,0.035)" } : {}),
+                        };
+                        return cloneElement(cell, { style: { ...cell.props.style, ...cellWidthStyle } });
+                      })}
+                      <TableCell className="sticky right-0 bg-card group-hover:bg-[#F0F7FF] z-10 !pl-2 !pr-2" style={{ boxShadow: "inset 1px 0 0 0 rgba(0,0,0,0.08)" }} onClick={(e) => e.stopPropagation()}>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <button
@@ -4297,7 +4850,8 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                         </DropdownMenu>
                       </TableCell>
                     </TableRow>
-                  ))
+                    );
+                  })
                 )}
               </TableBody>
             </Table>

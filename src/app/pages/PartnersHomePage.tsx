@@ -353,7 +353,7 @@ export function PartnersHomePage() {
   const orderedModules = moduleOrder.map((i) => modules[i]).filter(Boolean);
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full bg-[#F8FAFC]">
       {/* Top Bar */}
       <div className="flex items-center justify-between px-6 lg:px-8 h-12 border-b border-border bg-card shrink-0">
         <div className="flex items-center gap-2 text-[13px] text-muted-foreground">

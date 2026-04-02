@@ -2396,8 +2396,8 @@ function Step2PartnerForm({
   }, []);
 
   const statusConfig = {
-    Active: { color: "#10B981", bg: "#ECFDF5", label: "Active" },
-    Inactive: { color: "#EF4444", bg: "#FEF2F2", label: "Inactive" },
+    Active: { text: "#065F46", bg: "#ECFDF5", border: "#A7F3D0", label: "Active" },
+    Inactive: { text: "#92400E", bg: "#FFFBEB", border: "#FDE68A", label: "Inactive" },
   } as const;
 
   return (
@@ -2621,24 +2621,30 @@ function Step2PartnerForm({
                 <Select value={status} onValueChange={(val: string) => setStatus(val as "Active" | "Inactive")}>
                   <SelectTrigger className="mt-1 !h-10 rounded-lg border-[#E2E8F0] bg-white text-sm hover:border-[#CBD5E1] transition-colors focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 [&>svg]:text-[#94A3B8]">
                     <SelectValue>
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full" style={{ backgroundColor: statusConfig[status].color }} />
-                        <span className="text-[#0F172A]">{statusConfig[status].label}</span>
-                      </div>
+                      <span
+                        className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs whitespace-nowrap"
+                        style={{ fontWeight: 500, backgroundColor: statusConfig[status].bg, color: statusConfig[status].text, borderColor: statusConfig[status].border }}
+                      >
+                        {statusConfig[status].label}
+                      </span>
                     </SelectValue>
                   </SelectTrigger>
                   <SelectContent className="z-[250] rounded-lg">
                     <SelectItem value="Active">
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-[#10B981]" />
+                      <span
+                        className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs whitespace-nowrap"
+                        style={{ fontWeight: 500, backgroundColor: "#ECFDF5", color: "#065F46", borderColor: "#A7F3D0" }}
+                      >
                         Active
-                      </div>
+                      </span>
                     </SelectItem>
                     <SelectItem value="Inactive">
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-[#EF4444]" />
+                      <span
+                        className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs whitespace-nowrap"
+                        style={{ fontWeight: 500, backgroundColor: "#FFFBEB", color: "#92400E", borderColor: "#FDE68A" }}
+                      >
                         Inactive
-                      </div>
+                      </span>
                     </SelectItem>
                   </SelectContent>
                 </Select>
@@ -2811,7 +2817,7 @@ function Step2PartnerForm({
                   onChange={(e) => setDescription(e.target.value)}
                   className="mt-1 w-full h-[64px] sm:h-[72px] rounded-lg border border-[#E2E8F0] bg-white px-3 py-2 pb-5 text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 focus:outline-none resize-none transition-colors"
                 />
-                <p className="absolute bottom-1.5 right-2.5 text-[11px] text-[#94A3B8] pointer-events-none">{description.length}/5,000</p>
+                <p className="absolute bottom-1.5 right-2.5 text-[11px] text-[#94A3B8] pointer-events-none">{description.length}/5000</p>
               </div>
             </div>
           </div>
@@ -5822,7 +5828,7 @@ function ConfigPageContent({
                                   className="rounded-lg border-[#E2E8F0] bg-white min-h-[38px] resize-none text-sm placeholder:text-[#94A3B8] pb-5"
                                   rows={2}
                                 />
-                                <p className="absolute bottom-1.5 right-2.5 text-[11px] text-[#94A3B8] pointer-events-none">{createPtDescription.length}/5,000</p>
+                                <p className="absolute bottom-1.5 right-2.5 text-[11px] text-[#94A3B8] pointer-events-none">{createPtDescription.length}/5000</p>
                               </div>
                             </div>
                           )}
@@ -5838,7 +5844,7 @@ function ConfigPageContent({
                                   className="rounded-lg border-[#E2E8F0] bg-white min-h-[64px] resize-none text-sm placeholder:text-[#94A3B8] pb-5"
                                   rows={2}
                                 />
-                                <p className="absolute bottom-1.5 right-2.5 text-[11px] text-[#94A3B8] pointer-events-none">{createPtDescription.length}/5,000</p>
+                                <p className="absolute bottom-1.5 right-2.5 text-[11px] text-[#94A3B8] pointer-events-none">{createPtDescription.length}/5000</p>
                               </div>
                             </div>
                           )}
@@ -6899,7 +6905,7 @@ function ConfigPageContent({
                           <label className="text-[12px] text-[#0F172A] mb-1.5 block" style={{ fontWeight: 600 }}>Description</label>
                           <div className="relative">
                             <Textarea value={createPrDescription} onChange={(e) => { if (e.target.value.length <= 5000) setCreatePrDescription(e.target.value); }} placeholder="Brief summary of pricing rule purpose or context." className="rounded-lg border-[#E2E8F0] bg-white min-h-[64px] resize-none text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 pb-5" rows={2} />
-                            <p className="absolute bottom-1.5 right-2.5 text-[11px] text-[#94A3B8] pointer-events-none">{createPrDescription.length}/5,000</p>
+                            <p className="absolute bottom-1.5 right-2.5 text-[11px] text-[#94A3B8] pointer-events-none">{createPrDescription.length}/5000</p>
                           </div>
                         </div>
                       </div>

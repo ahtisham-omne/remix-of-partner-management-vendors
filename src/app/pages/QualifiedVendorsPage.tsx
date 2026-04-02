@@ -24,7 +24,7 @@ export function QualifiedVendorsPage() {
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full bg-[#F8FAFC]">
       <div className="px-6 py-4 border-b border-border bg-card">
         <div className="flex items-center justify-between">
           <div>

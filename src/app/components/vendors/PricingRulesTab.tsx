@@ -2171,7 +2171,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                               className="rounded-lg border-[#E2E8F0] bg-white min-h-[64px] resize-none text-sm placeholder:text-[#94A3B8] pb-5"
                               rows={2}
                             />
-                            <p className="absolute bottom-1.5 right-2.5 text-[11px] text-[#94A3B8] pointer-events-none">{createDescription.length}/5,000</p>
+                            <p className="absolute bottom-1.5 right-2.5 text-[11px] text-[#94A3B8] pointer-events-none">{createDescription.length}/5000</p>
                           </div>
                         </div>
                       </div>
