@@ -4383,7 +4383,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
               style={{ fontWeight: 600 }}
             >
               <Plus className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Create</span>
+              <span className="hidden sm:inline">Create New Location</span>
             </button>
           </div>
         </div>

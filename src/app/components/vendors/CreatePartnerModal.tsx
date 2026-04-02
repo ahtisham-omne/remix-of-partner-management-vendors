@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useCallback, useRef, useEffect, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { cn } from "../ui/utils";
 import { ShippingMethodChipsRow } from "./ShippingMethodChipsRow";
 import fedexLogo from "@/assets/carriers/fedex.png";
@@ -176,6 +177,7 @@ import {
 } from "./partnerConstants";
 import { SelectPocDictionaryModal, CreatePocModal } from "./PocModals";
 import { PocPillsRow } from "./PocPillComponents";
+import { AddressAutocomplete } from "./AddressAutocomplete";
 import { SearchableUserPicker } from "./SearchableUserPicker";
 
 /** Props for multi-step partner creation modal */
@@ -2198,6 +2200,10 @@ function Step2PartnerForm({
   const [addressFocused, setAddressFocused] = useState(false);
   const [addressSelected, setAddressSelected] = useState(false);
   const addressRef = useRef<HTMLDivElement>(null);
+  const addressInputWrapRef = useRef<HTMLDivElement>(null);
+  const [addrDropdownPos, setAddrDropdownPos] = useState<{ top: number; left: number; width: number } | null>(null);
+  const addrInteractingRef = useRef(false);
+  const addrDropdownRef = useRef<HTMLDivElement>(null);
 
   // ── Global Point of Contact (partner-level) ──
   const [globalPocContactDictionary, setGlobalPocContactDictionary] = useState<ContactPerson[]>([...CONTACT_DICTIONARY]);
@@ -2378,21 +2384,33 @@ function Step2PartnerForm({
 
   const addressSuggestions = useMemo(() => {
     if (!address.trim() || address.length < 2 || addressSelected) return [];
-    const q = address.toLowerCase();
-    return MOCK_ADDRESS_SUGGESTIONS.filter(
-      (s) => s.main.toLowerCase().includes(q) || s.secondary.toLowerCase().includes(q)
-    ).slice(0, 5);
+    const words = address.toLowerCase().split(/\s+/).filter(Boolean);
+    return MOCK_ADDRESS_SUGGESTIONS.filter((s) => {
+      const full = `${s.main} ${s.secondary}`.toLowerCase();
+      return words.every(w => full.includes(w));
+    }).slice(0, 6);
   }, [address, addressSelected, MOCK_ADDRESS_SUGGESTIONS]);
 
-  // Close address dropdown when clicking outside
+  // Close address dropdown when clicking outside (checks both input area and portal dropdown)
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
-      if (addressRef.current && !addressRef.current.contains(e.target as Node)) {
-        setAddressFocused(false);
-      }
+      const target = e.target as Node;
+      if (addressRef.current?.contains(target)) return;
+      if (addrDropdownRef.current?.contains(target)) return;
+      setAddressFocused(false);
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Compute address dropdown portal position
+  useEffect(() => {
+    if (!addressFocused || !addressInputWrapRef.current) { setAddrDropdownPos(null); return; }
+    const updatePos = () => { const el = addressInputWrapRef.current; if (!el) return; const r = el.getBoundingClientRect(); setAddrDropdownPos({ top: r.bottom, left: r.left, width: r.width }); };
+    updatePos();
+    window.addEventListener("scroll", updatePos, true);
+    window.addEventListener("resize", updatePos);
+    return () => { window.removeEventListener("scroll", updatePos, true); window.removeEventListener("resize", updatePos); };
   }, []);
 
   const statusConfig = {
@@ -2448,8 +2466,8 @@ function Step2PartnerForm({
       )}
 
       {/* ── Partner Details — boxed card ── */}
-      <div className="rounded-lg border border-[#E2E8F0] bg-white overflow-hidden shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
-        <div className="px-3 sm:px-4 py-2 sm:py-2.5 border-b border-[#EEF2F6] flex items-center gap-2 bg-[#FAFBFC]">
+      <div className="rounded-lg border border-[#E2E8F0] bg-white shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
+        <div className="px-3 sm:px-4 py-2 sm:py-2.5 border-b border-[#EEF2F6] flex items-center gap-2 bg-[#FAFBFC] rounded-t-lg">
           <div className="w-6 h-6 rounded-md bg-[#0A77FF]/8 flex items-center justify-center shrink-0">
             <Info className="w-3.5 h-3.5 text-[#0A77FF]" />
           </div>
@@ -2735,78 +2753,7 @@ function Step2PartnerForm({
               </div>
 
               {/* Row 3 Left: Address */}
-              <div ref={addressRef} className="relative">
-                <Label htmlFor="create-partner-address" className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>
-                  Address
-                </Label>
-                <div className="relative mt-1">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8] pointer-events-none z-[1]" />
-                  <Input
-                    id="create-partner-address"
-                    placeholder="Search for an address..."
-                    value={address}
-                    onChange={(e) => {
-                      onAddressChange(e.target.value);
-                      setAddressSelected(false);
-                    }}
-                    onFocus={() => {
-                      setAddressFocused(true);
-                      if (addressSelected) setAddressSelected(false);
-                    }}
-                    className={`pl-9 pr-8 rounded-lg border-[#E2E8F0] bg-white !h-10 text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 ${
-                      addressFocused && addressSuggestions.length > 0 ? "rounded-b-none border-b-transparent" : ""
-                    }`}
-                  />
-                  {address.length > 0 && (
-                    <button
-                      type="button"
-                      onClick={() => { onAddressChange(""); setAddressFocused(true); setAddressSelected(false); }}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#94A3B8] hover:text-[#64748B] transition-colors z-[1]"
-                    >
-                      <X className="w-3.5 h-3.5" />
-                    </button>
-                  )}
-                </div>
-
-                {/* Google Places–style suggestions dropdown */}
-                {addressFocused && addressSuggestions.length > 0 && (
-                  <div className="absolute left-0 right-0 top-[calc(100%)] z-50 rounded-b-lg border border-t-0 border-[#0A77FF] bg-white shadow-[0_8px_24px_rgba(0,0,0,0.12)] overflow-hidden ring-1 ring-[#0A77FF]/20">
-                    {addressSuggestions.map((suggestion, idx) => (
-                      <button
-                        key={idx}
-                        type="button"
-                        onClick={() => {
-                          onAddressChange(`${suggestion.main}, ${suggestion.secondary}`);
-                          setAddressFocused(false);
-                          setAddressSelected(true);
-                        }}
-                        className="w-full flex items-start gap-3 px-3 py-2.5 text-left hover:bg-[#F8FAFC] transition-colors cursor-pointer border-b border-[#F1F5F9] last:border-b-0 group/addr"
-                      >
-                        <div className="w-8 h-8 rounded-full bg-[#F1F5F9] group-hover/addr:bg-[#EDF4FF] flex items-center justify-center shrink-0 mt-0.5 transition-colors">
-                          <MapPin className="w-3.5 h-3.5 text-[#64748B] group-hover/addr:text-[#0A77FF] transition-colors" />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <div className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 500 }}>{suggestion.main}</div>
-                          <div className="text-[11px] text-[#94A3B8] truncate mt-0.5">{suggestion.secondary}</div>
-                        </div>
-                      </button>
-                    ))}
-                    <div className="px-3 py-2 flex justify-end border-t border-[#E2E8F0] bg-[#FAFBFC]">
-                      <div className="flex items-center gap-1">
-                        <span className="text-[10px] text-[#9CA3AF]">Powered by</span>
-                        <svg width="52" height="16" viewBox="0 0 272 92" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M115.75 47.18c0 12.77-9.99 22.18-22.25 22.18s-22.25-9.41-22.25-22.18C71.25 34.32 81.24 25 93.5 25s22.25 9.32 22.25 22.18zm-9.74 0c0-7.98-5.79-13.44-12.51-13.44S80.99 39.2 80.99 47.18c0 7.9 5.79 13.44 12.51 13.44s12.51-5.55 12.51-13.44z" fill="#EA4335"/>
-                          <path d="M163.75 47.18c0 12.77-9.99 22.18-22.25 22.18s-22.25-9.41-22.25-22.18c0-12.85 9.99-22.18 22.25-22.18s22.25 9.32 22.25 22.18zm-9.74 0c0-7.98-5.79-13.44-12.51-13.44s-12.51 5.46-12.51 13.44c0 7.9 5.79 13.44 12.51 13.44s12.51-5.55 12.51-13.44z" fill="#FBBC05"/>
-                          <path d="M209.75 26.34v39.82c0 16.38-9.66 23.07-21.08 23.07-10.75 0-17.22-7.19-19.66-13.07l8.48-3.53c1.51 3.61 5.21 7.87 11.17 7.87 7.31 0 11.84-4.51 11.84-13v-3.19h-.34c-2.18 2.69-6.38 5.04-11.68 5.04-11.09 0-21.25-9.66-21.25-22.09 0-12.52 10.16-22.26 21.25-22.26 5.29 0 9.49 2.35 11.68 4.96h.34v-3.61h9.25zm-8.56 20.92c0-7.81-5.21-13.52-11.84-13.52-6.72 0-12.35 5.71-12.35 13.52 0 7.73 5.63 13.36 12.35 13.36 6.63 0 11.84-5.63 11.84-13.36z" fill="#4285F4"/>
-                          <path d="M225 3v65h-9.5V3h9.5z" fill="#34A853"/>
-                          <path d="M262.02 54.48l7.56 5.04c-2.44 3.61-8.32 9.83-18.48 9.83-12.6 0-22.01-9.74-22.01-22.18 0-13.19 9.49-22.18 20.92-22.18 11.51 0 17.14 9.16 18.98 14.11l1.01 2.52-29.65 12.28c2.27 4.45 5.8 6.72 10.75 6.72 4.96 0 8.4-2.44 10.92-6.14zm-23.27-7.98l19.82-8.23c-1.09-2.77-4.37-4.7-8.23-4.7-4.95 0-11.84 4.37-11.59 12.93z" fill="#EA4335"/>
-                          <path d="M35.29 41.19V32H67.6c.32 1.68.48 3.67.48 5.83 0 7.23-1.97 16.17-8.32 22.51C53.65 66.67 46.01 70 35.29 70 15.82 70 0 54.73 0 35.26S15.82.52 35.29.52c10.8 0 18.52 4.25 24.27 9.74l-6.82 6.82c-4.1-3.86-9.66-6.82-17.45-6.82C22.47 10.27 10.11 23.02 10.11 35.27c0 12.25 12.36 25 25.18 25 9.19 0 14.4-3.69 17.72-7.02 2.7-2.7 4.46-6.56 5.15-11.84H35.29z" fill="#4285F4"/>
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
+              <AddressAutocomplete id="create-partner-address" value={address} onChange={onAddressChange} />
 
               {/* Row 3 Right: Description */}
               <div className="relative">

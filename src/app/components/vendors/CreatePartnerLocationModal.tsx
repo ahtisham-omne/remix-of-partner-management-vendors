@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useCallback, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import {
   Dialog,
   DialogContent,
@@ -41,6 +42,10 @@ import {
   Camera,
   Users,
   UserPlus,
+  Paperclip,
+  FileText,
+  Trash2,
+  Upload,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -49,6 +54,7 @@ import {
 } from "./partnerConstants";
 import { SelectPocDictionaryModal, CreatePocModal } from "./PocModals";
 import { PocPillsRow } from "./PocPillComponents";
+import { AddressAutocomplete } from "./AddressAutocomplete";
 
 interface CreatePartnerLocationModalProps {
   open: boolean;
@@ -136,6 +142,10 @@ export function CreatePartnerLocationModal({
   const [addressFocused, setAddressFocused] = useState(false);
   const [addressSelected, setAddressSelected] = useState(false);
   const addressRef = useRef<HTMLDivElement>(null);
+  const addressInputWrapRef = useRef<HTMLDivElement>(null);
+  const [addrDropdownPos, setAddrDropdownPos] = useState<{ top: number; left: number; width: number } | null>(null);
+  const addrInteractingRef = useRef(false);
+  const addrDropdownRef = useRef<HTMLDivElement>(null);
 
   // Profile image
   const [profileImage, setProfileImage] = useState<string | null>(null);
@@ -168,12 +178,27 @@ export function CreatePartnerLocationModal({
   const [newPocEmail, setNewPocEmail] = useState("");
   const [saveAndCreateAnother, setSaveAndCreateAnother] = useState(false);
 
+  // Attachments
+  const [attachments, setAttachments] = useState<{ id: string; name: string; size: string; type: string }[]>([]);
+  const attachInputRef = useRef<HTMLInputElement>(null);
+  const [attachDragActive, setAttachDragActive] = useState(false);
+  const handleAttachFiles = useCallback((files: FileList | null) => {
+    if (!files) return;
+    const newFiles = Array.from(files).map((f) => ({
+      id: `att-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      name: f.name,
+      size: f.size < 1024 ? `${f.size} B` : f.size < 1048576 ? `${(f.size / 1024).toFixed(1)} KB` : `${(f.size / 1048576).toFixed(1)} MB`,
+      type: f.type.split("/")[1]?.toUpperCase() || "FILE",
+    }));
+    setAttachments(prev => [...prev, ...newFiles]);
+  }, []);
+
   // Errors
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const statusConfig = {
-    Active: { color: "#10B981", bg: "#ECFDF5", label: "Active" },
-    Inactive: { color: "#EF4444", bg: "#FEF2F2", label: "Inactive" },
+    Active: { text: "#065F46", bg: "#ECFDF5", border: "#A7F3D0", label: "Active" },
+    Inactive: { text: "#92400E", bg: "#FFFBEB", border: "#FDE68A", label: "Inactive" },
   } as const;
 
   const filteredPhoneCountries = useMemo(() => {
@@ -188,25 +213,42 @@ export function CreatePartnerLocationModal({
     return COUNTRY_CODES.find((c) => c.code === phoneCountryCode) || COUNTRY_CODES[0];
   }, [phoneCountryCode]);
 
-  // Address suggestions (Google Maps style mock)
+  // Address suggestions (Google Places-style mock — fuzzy match on all parts)
   const addressSuggestions = useMemo(() => {
     if (!address.trim() || address.length < 2 || addressSelected) return [];
-    const q = address.toLowerCase();
-    return MOCK_ADDRESS_SUGGESTIONS.filter(
-      (s) => s.main.toLowerCase().includes(q) || s.secondary.toLowerCase().includes(q)
-    ).slice(0, 5);
+    const words = address.toLowerCase().split(/\s+/).filter(Boolean);
+    return MOCK_ADDRESS_SUGGESTIONS.filter((s) => {
+      const full = `${s.main} ${s.secondary}`.toLowerCase();
+      return words.every(w => full.includes(w));
+    }).slice(0, 6);
   }, [address, addressSelected]);
 
-  // Close address dropdown when clicking outside
+  // Close address dropdown when clicking outside (checks both input area and portal dropdown)
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
-      if (addressRef.current && !addressRef.current.contains(e.target as Node)) {
-        setAddressFocused(false);
-      }
+      const target = e.target as Node;
+      if (addressRef.current?.contains(target)) return;
+      if (addrDropdownRef.current?.contains(target)) return;
+      setAddressFocused(false);
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // Compute address dropdown position for portal rendering
+  useEffect(() => {
+    if (!addressFocused || !addressInputWrapRef.current) { setAddrDropdownPos(null); return; }
+    const updatePos = () => {
+      const el = addressInputWrapRef.current;
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      setAddrDropdownPos({ top: r.bottom, left: r.left, width: r.width });
+    };
+    updatePos();
+    window.addEventListener("scroll", updatePos, true);
+    window.addEventListener("resize", updatePos);
+    return () => { window.removeEventListener("scroll", updatePos, true); window.removeEventListener("resize", updatePos); };
+  }, [addressFocused, address]);
 
   const handleProfileFile = useCallback((file: File) => {
     if (!file.type.startsWith("image/")) return;
@@ -340,6 +382,7 @@ export function CreatePartnerLocationModal({
     setAddressSelected(false);
     setProfileImage(null);
     setSelectedPocIds(new Set());
+    setAttachments([]);
     setContactSearch("");
     setCountrySearch("");
     setCountryPickerOpen(false);
@@ -486,8 +529,8 @@ export function CreatePartnerLocationModal({
             <div className="px-4 py-4 transition-all duration-300 ease-out space-y-3 sm:space-y-4">
 
               {/* ── Location Details Card ── */}
-              <div className="rounded-lg border border-[#E2E8F0] bg-white overflow-hidden shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
-                <div className="px-3 sm:px-4 py-2 sm:py-2.5 border-b border-[#EEF2F6] flex items-center gap-2 bg-[#FAFBFC]">
+              <div className="rounded-lg border border-[#E2E8F0] bg-white shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
+                <div className="px-3 sm:px-4 py-2 sm:py-2.5 border-b border-[#EEF2F6] flex items-center gap-2 bg-[#FAFBFC] rounded-t-lg">
                   <div className="w-6 h-6 rounded-md bg-[#0A77FF]/8 flex items-center justify-center shrink-0">
                     <Info className="w-3.5 h-3.5 text-[#0A77FF]" />
                   </div>
@@ -662,24 +705,20 @@ export function CreatePartnerLocationModal({
                         <Select value={status} onValueChange={(val: string) => setStatus(val as "Active" | "Inactive")}>
                           <SelectTrigger className="mt-1 !h-10 rounded-lg border-[#E2E8F0] bg-white text-sm hover:border-[#CBD5E1] transition-colors focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 [&>svg]:text-[#94A3B8]">
                             <SelectValue>
-                              <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: statusConfig[status].color }} />
-                                <span className="text-[#0F172A]">{statusConfig[status].label}</span>
-                              </div>
+                              <span
+                                className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs whitespace-nowrap"
+                                style={{ fontWeight: 500, backgroundColor: statusConfig[status].bg, color: statusConfig[status].text, borderColor: statusConfig[status].border }}
+                              >
+                                {statusConfig[status].label}
+                              </span>
                             </SelectValue>
                           </SelectTrigger>
                           <SelectContent className="z-[250] rounded-lg">
                             <SelectItem value="Active">
-                              <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 rounded-full bg-[#10B981]" />
-                                Active
-                              </div>
+                              <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs whitespace-nowrap" style={{ fontWeight: 500, backgroundColor: "#ECFDF5", color: "#065F46", borderColor: "#A7F3D0" }}>Active</span>
                             </SelectItem>
                             <SelectItem value="Inactive">
-                              <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 rounded-full bg-[#EF4444]" />
-                                Inactive
-                              </div>
+                              <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs whitespace-nowrap" style={{ fontWeight: 500, backgroundColor: "#FFFBEB", color: "#92400E", borderColor: "#FDE68A" }}>Inactive</span>
                             </SelectItem>
                           </SelectContent>
                         </Select>
@@ -780,79 +819,8 @@ export function CreatePartnerLocationModal({
                         />
                       </div>
 
-                      {/* Row 3 Left: Address (Google Maps style single-line) */}
-                      <div ref={addressRef} className="relative">
-                        <Label htmlFor="loc-address" className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>
-                          Address
-                        </Label>
-                        <div className="relative mt-1">
-                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8] pointer-events-none z-[1]" />
-                          <Input
-                            id="loc-address"
-                            placeholder="Search for an address..."
-                            value={address}
-                            onChange={(e) => {
-                              setAddress(e.target.value);
-                              setAddressSelected(false);
-                            }}
-                            onFocus={() => {
-                              setAddressFocused(true);
-                              if (addressSelected) setAddressSelected(false);
-                            }}
-                            className={`pl-9 pr-8 rounded-lg border-[#E2E8F0] bg-white !h-10 text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 ${
-                              addressFocused && addressSuggestions.length > 0 ? "rounded-b-none border-b-transparent" : ""
-                            }`}
-                          />
-                          {address.length > 0 && (
-                            <button
-                              type="button"
-                              onClick={() => { setAddress(""); setAddressFocused(true); setAddressSelected(false); }}
-                              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#94A3B8] hover:text-[#64748B] transition-colors z-[1]"
-                            >
-                              <X className="w-3.5 h-3.5" />
-                            </button>
-                          )}
-                        </div>
-
-                        {/* Google Places-style suggestions dropdown */}
-                        {addressFocused && addressSuggestions.length > 0 && (
-                          <div className="absolute left-0 right-0 top-[calc(100%)] z-50 rounded-b-lg border border-t-0 border-[#0A77FF] bg-white shadow-[0_8px_24px_rgba(0,0,0,0.12)] overflow-hidden ring-1 ring-[#0A77FF]/20">
-                            {addressSuggestions.map((suggestion, idx) => (
-                              <button
-                                key={idx}
-                                type="button"
-                                onClick={() => {
-                                  setAddress(`${suggestion.main}, ${suggestion.secondary}`);
-                                  setAddressFocused(false);
-                                  setAddressSelected(true);
-                                }}
-                                className="w-full flex items-start gap-3 px-3 py-2.5 text-left hover:bg-[#F8FAFC] transition-colors cursor-pointer border-b border-[#F1F5F9] last:border-b-0 group/addr"
-                              >
-                                <div className="w-8 h-8 rounded-full bg-[#F1F5F9] group-hover/addr:bg-[#EDF4FF] flex items-center justify-center shrink-0 mt-0.5 transition-colors">
-                                  <MapPin className="w-3.5 h-3.5 text-[#64748B] group-hover/addr:text-[#0A77FF] transition-colors" />
-                                </div>
-                                <div className="min-w-0 flex-1">
-                                  <div className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 500 }}>{suggestion.main}</div>
-                                  <div className="text-[11px] text-[#94A3B8] truncate mt-0.5">{suggestion.secondary}</div>
-                                </div>
-                              </button>
-                            ))}
-                            <div className="px-3 py-2 flex justify-end border-t border-[#E2E8F0] bg-[#FAFBFC]">
-                              <div className="flex items-center gap-1">
-                                <span className="text-[10px] text-[#9CA3AF]">Powered by</span>
-                                <svg width="52" height="16" viewBox="0 0 272 92" xmlns="http://www.w3.org/2000/svg">
-                                  <path d="M115.75 47.18c0 12.77-9.99 22.18-22.25 22.18s-22.25-9.41-22.25-22.18C71.25 34.32 81.24 25 93.5 25s22.25 9.32 22.25 22.18zm-9.74 0c0-7.98-5.79-13.44-12.51-13.44S80.99 39.2 80.99 47.18c0 7.9 5.79 13.44 12.51 13.44s12.51-5.55 12.51-13.44z" fill="#EA4335"/>
-                                  <path d="M163.75 47.18c0 12.77-9.99 22.18-22.25 22.18s-22.25-9.41-22.25-22.18c0-12.85 9.99-22.18 22.25-22.18s22.25 9.32 22.25 22.18zm-9.74 0c0-7.98-5.79-13.44-12.51-13.44s-12.51 5.46-12.51 13.44c0 7.9 5.79 13.44 12.51 13.44s12.51-5.55 12.51-13.44z" fill="#FBBC05"/>
-                                  <path d="M209.75 26.34v39.82c0 16.38-9.66 23.07-21.08 23.07-10.75 0-17.22-7.19-19.66-13.07l8.48-3.53c1.51 3.61 5.21 7.87 11.17 7.87 7.31 0 11.84-4.51 11.84-13v-3.19h-.34c-2.18 2.69-6.38 5.04-11.68 5.04-11.09 0-21.25-9.66-21.25-22.09 0-12.52 10.16-22.26 21.25-22.26 5.29 0 9.49 2.35 11.68 4.96h.34v-3.61h9.25zm-8.56 20.92c0-7.81-5.21-13.52-11.84-13.52-6.72 0-12.35 5.71-12.35 13.52 0 7.73 5.63 13.36 12.35 13.36 6.63 0 11.84-5.63 11.84-13.36z" fill="#4285F4"/>
-                                  <path d="M225 3v65h-9.5V3h9.5z" fill="#34A853"/>
-                                  <path d="M262.02 54.48l7.56 5.04c-2.44 3.61-8.32 9.83-18.48 9.83-12.6 0-22.01-9.74-22.01-22.18 0-13.19 9.49-22.18 20.92-22.18 11.51 0 17.14 9.16 18.98 14.11l1.01 2.52-29.65 12.28c2.27 4.45 5.8 6.72 10.75 6.72 4.96 0 8.4-2.44 10.92-6.14zm-23.27-7.98l19.82-8.23c-1.09-2.77-4.37-4.7-8.23-4.7-4.95 0-11.84 4.37-11.59 12.93z" fill="#EA4335"/>
-                                  <path d="M35.29 41.19V32H67.6c.32 1.68.48 3.67.48 5.83 0 7.23-1.97 16.17-8.32 22.51C53.65 66.67 46.01 70 35.29 70 15.82 70 0 54.73 0 35.26S15.82.52 35.29.52c10.8 0 18.52 4.25 24.27 9.74l-6.82 6.82c-4.1-3.86-9.66-6.82-17.45-6.82C22.47 10.27 10.11 23.02 10.11 35.27c0 12.25 12.36 25 25.18 25 9.19 0 14.4-3.69 17.72-7.02 2.7-2.7 4.46-6.56 5.15-11.84H35.29z" fill="#4285F4"/>
-                                </svg>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
+                      {/* Row 3 Left: Address */}
+                      <AddressAutocomplete id="loc-address" value={address} onChange={setAddress} />
 
                       {/* Row 3 Right: Description */}
                       <div className="relative">
@@ -863,7 +831,7 @@ export function CreatePartnerLocationModal({
                           onChange={(e) => setDescription(e.target.value)}
                           className="mt-1 w-full h-[64px] sm:h-[72px] rounded-lg border border-[#E2E8F0] bg-white px-3 py-2 pb-5 text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 focus:outline-none resize-none transition-colors"
                         />
-                        <p className="absolute bottom-1.5 right-2.5 text-[11px] text-[#94A3B8] pointer-events-none">{description.length}/500</p>
+                        <p className="absolute bottom-1.5 right-2.5 text-[11px] text-[#94A3B8] pointer-events-none">{description.length}/5000</p>
                       </div>
                     </div>
                   </div>
@@ -922,6 +890,64 @@ export function CreatePartnerLocationModal({
                   </div>
                 )}
               </div>
+
+              {/* ── Attachments (matches partner creation form exactly) ── */}
+              <div>
+                <div className="flex items-center gap-2 mb-2.5">
+                  <div className="w-6 h-6 rounded-md bg-[#0A77FF]/8 flex items-center justify-center shrink-0">
+                    <Paperclip className="w-3.5 h-3.5 text-[#0A77FF]" />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Attachments</span>
+                    {attachments.length > 0 && (
+                      <span className="text-[10px] text-[#64748B] bg-[#F1F5F9] px-1.5 py-0.5 rounded-full" style={{ fontWeight: 500 }}>{attachments.length}</span>
+                    )}
+                  </div>
+                </div>
+                {/* Drop zone */}
+                <div
+                  onDragOver={(e) => { e.preventDefault(); setAttachDragActive(true); }}
+                  onDragLeave={() => setAttachDragActive(false)}
+                  onDrop={(e) => { e.preventDefault(); setAttachDragActive(false); handleAttachFiles(e.dataTransfer.files); }}
+                  onClick={() => attachInputRef.current?.click()}
+                  className={`rounded-lg border-2 border-dashed p-3 sm:p-4 text-center cursor-pointer transition-all ${
+                    attachDragActive
+                      ? "border-[#0A77FF] bg-[#EDF4FF]/30"
+                      : "border-[#E2E8F0] bg-white hover:border-[#CBD5E1] hover:bg-[#FAFBFC]"
+                  }`}
+                >
+                  <input ref={attachInputRef} type="file" multiple onChange={(e) => { handleAttachFiles(e.target.files); e.target.value = ""; }} className="hidden" />
+                  <div className="flex flex-col items-center gap-2">
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${attachDragActive ? "bg-[#D6E8FF] text-[#0A77FF]" : "bg-[#F1F5F9] text-[#94A3B8]"}`}>
+                      <Upload className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <p className="text-xs sm:text-sm text-[#0F172A]" style={{ fontWeight: 500 }}>
+                        <span className="text-[#0A77FF]">Click to upload</span><span className="hidden sm:inline"> or drag and drop</span>
+                      </p>
+                      <p className="text-[10px] sm:text-xs text-[#94A3B8] mt-0.5">PDF, DOC, XLS, PNG, JPG up to 10MB</p>
+                    </div>
+                  </div>
+                </div>
+                {/* Uploaded files list */}
+                {attachments.length > 0 && (
+                  <div className="mt-2.5 space-y-1.5">
+                    {attachments.map((att) => (
+                      <div key={att.id} className="flex items-center gap-2.5 px-3 py-2 rounded-md border border-[#E2E8F0] bg-white hover:bg-[#FAFBFC] transition-colors group">
+                        <span className="text-base">{att.type.includes("PDF") ? "\uD83D\uDCC4" : att.type.includes("PNG") || att.type.includes("JPG") || att.type.includes("JPEG") ? "\uD83D\uDDBC\uFE0F" : att.type.includes("XLS") ? "\uD83D\uDCCA" : att.type.includes("DOC") ? "\uD83D\uDCDD" : "\uD83D\uDCCE"}</span>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm text-[#0F172A] truncate" style={{ fontWeight: 500 }}>{att.name}</p>
+                          <p className="text-[11px] text-[#94A3B8]">{att.size}</p>
+                        </div>
+                        <button type="button" onClick={(e) => { e.stopPropagation(); setAttachments(prev => prev.filter(a => a.id !== att.id)); }} className="w-7 h-7 rounded-md flex items-center justify-center text-[#94A3B8] hover:text-[#EF4444] hover:bg-[#FEF2F2] transition-colors sm:opacity-0 sm:group-hover:opacity-100">
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
             </div>
           </div>
 
@@ -938,9 +964,7 @@ export function CreatePartnerLocationModal({
               onClick={handleSave}
               className="gap-1.5 rounded-lg px-3 sm:px-5 text-xs sm:text-[13px] h-8 sm:h-9 shadow-sm"
             >
-              <Plus className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Create Location</span>
-              <span className="sm:hidden">Create</span>
+              Create Location
             </Button>
           </div>
         </DialogContent>
