@@ -31,6 +31,16 @@ import {
   DialogTitle,
   DialogDescription,
 } from "../ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "../ui/alert-dialog";
 import { Tooltip, TooltipTrigger, TooltipContent } from "../ui/tooltip";
 import {
   Search,
@@ -157,6 +167,56 @@ const EXTRA_DEFS = [
   { partNo: "PIPE-SS-150", desc: "304 Stainless Pipe, 1.5\" Sch 40, 20ft", mfr: "PipePro", sku: "SS304-150-40", cat: "Plumbing", addCat: "Pipe", ctrl: "Non-Serialized" as const },
   { partNo: "WIRE-THHN-12", desc: "THHN Wire, 12 AWG, Stranded, Black, 500ft", mfr: "WireTech", sku: "THHN-12-BK", cat: "Electrical", addCat: "Wire", ctrl: "Non-Serialized" as const },
   { partNo: "ADHV-EPXY-ST", desc: "Structural Epoxy Adhesive, 50ml Dual Cart", mfr: "BondMax", sku: "SE-50-DC", cat: "Adhesives", addCat: "Structural", ctrl: "Non-Serialized" as const },
+  // Extended realistic items for 500+ total
+  { partNo: "MOTR-AC-075", desc: "AC Induction Motor, 3/4 HP, 1725 RPM, TEFC", mfr: "MotorDrive", sku: "AC-075-TEFC", cat: "Motors", addCat: "AC Motors", ctrl: "Serialized" as const },
+  { partNo: "PUMP-CENT-200", desc: "Centrifugal Pump, 2\" NPT, Cast Iron, 5HP", mfr: "FlowMaster", sku: "CP-200-CI5", cat: "Pumps", addCat: "Centrifugal", ctrl: "Serialized" as const },
+  { partNo: "VALV-SOL-12V", desc: "12V DC Solenoid Valve, 2-Way, 1/4\" NPT", mfr: "FlowControl", sku: "SV-12V-025", cat: "Valves", addCat: "Solenoid", ctrl: "Non-Serialized" as const },
+  { partNo: "BEAR-PILL-204", desc: "Pillow Block Bearing, UCP204, 20mm Bore", mfr: "MotionPro", sku: "UCP204-20", cat: "Bearings", addCat: "Mounted", ctrl: "Serialized" as const },
+  { partNo: "GEAR-SPUR-48P", desc: "Steel Spur Gear, 48 Pitch, 24 Teeth, 1/4\" Bore", mfr: "GearWorks", sku: "SG-48P-24T", cat: "Power Trans", addCat: "Gears", ctrl: "Non-Serialized" as const },
+  { partNo: "CHAIN-RLR-40", desc: "Roller Chain, #40, Single Strand, 10ft", mfr: "ChainPro", sku: "RC-40-10FT", cat: "Power Trans", addCat: "Chains", ctrl: "Non-Serialized" as const },
+  { partNo: "SPKT-40B-15", desc: "Sprocket, #40 Chain, 15 Teeth, 5/8\" Bore", mfr: "ChainPro", sku: "SP-40B-15T", cat: "Power Trans", addCat: "Sprockets", ctrl: "Non-Serialized" as const },
+  { partNo: "CYLD-PNEU-32", desc: "Pneumatic Cylinder, 32mm Bore, 100mm Stroke", mfr: "AirLine", sku: "PC-32-100", cat: "Pneumatics", addCat: "Cylinders", ctrl: "Serialized" as const },
+  { partNo: "GASK-SPIR-4IN", desc: "Spiral Wound Gasket, 4\" 150#, 304/Graphite", mfr: "SealTech", sku: "SWG-4-150", cat: "Seals", addCat: "Gaskets", ctrl: "Non-Serialized" as const },
+  { partNo: "FLNG-WN-4IN", desc: "Weld Neck Flange, 4\" 150#, A105 Carbon Steel", mfr: "PipePro", sku: "WNF-4-150", cat: "Plumbing", addCat: "Flanges", ctrl: "Non-Serialized" as const },
+  { partNo: "ELEC-CB-30A", desc: "Miniature Circuit Breaker, 30A, 2-Pole, C-Curve", mfr: "CircuitPro", sku: "MCB-30A-2P", cat: "Electrical", addCat: "Breakers", ctrl: "Non-Serialized" as const },
+  { partNo: "ELEC-VFD-5HP", desc: "Variable Frequency Drive, 5HP, 480V, 3-Phase", mfr: "MotorDrive", sku: "VFD-5HP-480", cat: "Electrical", addCat: "Drives", ctrl: "Serialized" as const },
+  { partNo: "TOOL-TAP-M10", desc: "Spiral Point Tap, M10 x 1.5, HSS-E TiN Coated", mfr: "PrecisionTools", sku: "SPT-M10-15", cat: "Tools", addCat: "Threading", ctrl: "Non-Serialized" as const },
+  { partNo: "TOOL-DRL-8MM", desc: "Cobalt Jobber Drill Bit, 8mm, 135-Degree Split Pt", mfr: "PrecisionTools", sku: "CDB-8MM-135", cat: "Tools", addCat: "Drill Bits", ctrl: "Non-Serialized" as const },
+  { partNo: "ABRS-BELT-36", desc: "Sanding Belt, 4\" x 36\", Aluminum Oxide, 80 Grit", mfr: "GrindMaster", sku: "SB-436-80", cat: "Abrasives", addCat: "Belts", ctrl: "Non-Serialized" as const },
+  { partNo: "SFTY-HELM-WHT", desc: "Hard Hat, Type I Class E, Ratchet Adjust, White", mfr: "SafeHand", sku: "HH-TI-CE-W", cat: "Safety", addCat: "Head Protection", ctrl: "Non-Serialized" as const },
+  { partNo: "SFTY-GOGL-AF", desc: "Safety Goggles, Anti-Fog, Indirect Vent, Clear", mfr: "SafeHand", sku: "SG-AF-CLR", cat: "Safety", addCat: "Eye Protection", ctrl: "Non-Serialized" as const },
+  { partNo: "LUBR-OIL-HYD", desc: "Hydraulic Oil AW-46, 5 Gallon Pail", mfr: "LubeTech", sku: "HO-AW46-5G", cat: "Lubricants", addCat: "Oils", ctrl: "Non-Serialized" as const },
+  { partNo: "FILT-AIR-HEPA", desc: "HEPA Air Filter, 24\" x 24\" x 12\", 99.97%", mfr: "FilterMax", sku: "HEPA-2424-12", cat: "Filters", addCat: "Air Filters", ctrl: "Non-Serialized" as const },
+  { partNo: "MATL-SS-316L", desc: "316L Stainless Round Bar, 1\" Dia x 6ft", mfr: "AluSupply", sku: "SS316L-1R-6", cat: "Raw Materials", addCat: "Round Bar", ctrl: "Non-Serialized" as const },
+  { partNo: "MATL-CU-110", desc: "C110 Copper Sheet, 12\" x 12\" x 0.032\"", mfr: "AluSupply", sku: "CU110-12-032", cat: "Raw Materials", addCat: "Sheet Stock", ctrl: "Non-Serialized" as const },
+  { partNo: "FAST-SOC-M8", desc: "Socket Head Cap Screw, M8 x 1.25 x 30mm, A2", mfr: "BoltMaster Inc.", sku: "SHCS-M8-30", cat: "Fasteners", addCat: "Socket Head", ctrl: "Non-Serialized" as const },
+  { partNo: "FAST-NUT-M12", desc: "Hex Nut, M12 x 1.75, Grade 8, Zinc Plated", mfr: "BoltMaster Inc.", sku: "HN-M12-G8", cat: "Fasteners", addCat: "Nuts", ctrl: "Non-Serialized" as const },
+  { partNo: "FAST-WSHR-516", desc: "Flat Washer, 5/16\", SAE, Zinc Plated, 100pk", mfr: "BoltMaster Inc.", sku: "FW-516-100", cat: "Fasteners", addCat: "Washers", ctrl: "Non-Serialized" as const },
+  { partNo: "HOSE-HYD-38", desc: "Hydraulic Hose, 3/8\" ID, 4000 PSI, 10ft", mfr: "HydraForce", sku: "HH-38-4K-10", cat: "Hydraulics", addCat: "Hoses", ctrl: "Non-Serialized" as const },
+  { partNo: "CONTR-PLC-16", desc: "Micro PLC, 16 I/O, Ethernet, 24V DC", mfr: "SenseLogic", sku: "MPLC-16IO-E", cat: "Electrical", addCat: "PLCs", ctrl: "Serialized" as const },
+  { partNo: "CONTR-HMI-7IN", desc: "HMI Touch Panel, 7\" Color TFT, Ethernet", mfr: "SenseLogic", sku: "HMI-7C-ETH", cat: "Electrical", addCat: "HMIs", ctrl: "Serialized" as const },
+  { partNo: "WELD-WIRE-ER70", desc: "MIG Wire ER70S-6, .035\", 33lb Spool", mfr: "WeldPro", sku: "MW-ER70-035", cat: "Welding", addCat: "MIG Wire", ctrl: "Non-Serialized" as const },
+  { partNo: "WELD-GAS-C25", desc: "Shielding Gas C25, 75% Ar / 25% CO2, 80cf", mfr: "WeldPro", sku: "SG-C25-80CF", cat: "Welding", addCat: "Gas", ctrl: "Non-Serialized" as const },
+  { partNo: "MATL-HDPE-SHT", desc: "HDPE Sheet, Natural, 1/2\" x 24\" x 48\"", mfr: "ThermoShield", sku: "HDPE-12-2448", cat: "Raw Materials", addCat: "Plastics", ctrl: "Non-Serialized" as const },
+  { partNo: "ELEC-XFMR-1KV", desc: "Control Transformer, 1KVA, 480V to 120V", mfr: "CircuitPro", sku: "CT-1KVA-480", cat: "Electrical", addCat: "Transformers", ctrl: "Serialized" as const },
+  { partNo: "TOOL-REAM-10", desc: "Chucking Reamer, 10mm, HSS, Straight Flute", mfr: "PrecisionTools", sku: "CR-10MM-HSS", cat: "Tools", addCat: "Reamers", ctrl: "Non-Serialized" as const },
+  { partNo: "PNEU-REG-14", desc: "Air Pressure Regulator, 1/4\" NPT, 0-150 PSI", mfr: "AirLine", sku: "APR-14-150", cat: "Pneumatics", addCat: "Regulators", ctrl: "Non-Serialized" as const },
+  { partNo: "PNEU-TUBE-8", desc: "Polyurethane Tubing, 8mm OD, Blue, 100m", mfr: "AirLine", sku: "PU-8MM-BL", cat: "Pneumatics", addCat: "Tubing", ctrl: "Non-Serialized" as const },
+  { partNo: "MATL-NYLON-ROD", desc: "Nylon 6/6 Rod, 2\" Dia x 4ft, Natural", mfr: "ThermoShield", sku: "NY66-2R-4FT", cat: "Raw Materials", addCat: "Plastics", ctrl: "Non-Serialized" as const },
+  { partNo: "BEAR-THRST-512", desc: "Thrust Ball Bearing, 51200 Series, 10mm ID", mfr: "MotionPro", sku: "TB-51200-10", cat: "Bearings", addCat: "Thrust", ctrl: "Non-Serialized" as const },
+  { partNo: "FAST-RVET-316", desc: "Pop Rivet, 3/16\" x 1/4\", Aluminum, 500pk", mfr: "BoltMaster Inc.", sku: "PR-316-500", cat: "Fasteners", addCat: "Rivets", ctrl: "Non-Serialized" as const },
+  { partNo: "ELEC-CNDL-34", desc: "Rigid Conduit, 3/4\", Galvanized Steel, 10ft", mfr: "WireTech", sku: "RC-34-GS-10", cat: "Electrical", addCat: "Conduit", ctrl: "Non-Serialized" as const },
+  { partNo: "TOOL-CLMP-6IN", desc: "Bar Clamp, 6\" Capacity, Quick-Release", mfr: "PrecisionTools", sku: "BC-6QR", cat: "Tools", addCat: "Clamps", ctrl: "Non-Serialized" as const },
+  { partNo: "SFTY-RESP-P100", desc: "Half Facepiece Respirator, P100 Filters, Med", mfr: "SafeHand", sku: "HFR-P100-M", cat: "Safety", addCat: "Respiratory", ctrl: "Non-Serialized" as const },
+  { partNo: "HYDR-FILT-RET", desc: "Hydraulic Return Line Filter, 25 Micron, 3/4\"", mfr: "FilterMax", sku: "HRL-25M-075", cat: "Filters", addCat: "Hydraulic", ctrl: "Non-Serialized" as const },
+  { partNo: "MATL-BRASS-360", desc: "360 Brass Hex Bar, 3/4\" AF x 3ft", mfr: "AluSupply", sku: "BR360-075H", cat: "Raw Materials", addCat: "Hex Bar", ctrl: "Non-Serialized" as const },
+  { partNo: "MOTR-SERV-400", desc: "AC Servo Motor, 400W, 3000 RPM, w/ Encoder", mfr: "MotorDrive", sku: "SRV-400W-3K", cat: "Motors", addCat: "Servo", ctrl: "Serialized" as const },
+  { partNo: "PUMP-DIAP-1IN", desc: "Air-Operated Diaphragm Pump, 1\" Poly, 53 GPM", mfr: "FlowMaster", sku: "DP-1P-53GPM", cat: "Pumps", addCat: "Diaphragm", ctrl: "Serialized" as const },
+  { partNo: "VALV-GATE-2IN", desc: "Gate Valve, 2\", 150# Flanged, WCB Body", mfr: "FlowControl", sku: "GV-2-150-WCB", cat: "Valves", addCat: "Gate", ctrl: "Non-Serialized" as const },
+  { partNo: "ADHV-THREAD-M", desc: "Medium Strength Threadlocker, Blue, 50ml", mfr: "BondMax", sku: "TL-MED-BL-50", cat: "Adhesives", addCat: "Threadlocker", ctrl: "Non-Serialized" as const },
+  { partNo: "INSUL-TAPE-EL", desc: "Electrical Tape, 3/4\" x 66ft, Black, 10pk", mfr: "WireTech", sku: "ET-075-66-10", cat: "Insulation", addCat: "Tape", ctrl: "Non-Serialized" as const },
+  { partNo: "TOOL-WRCH-SET", desc: "Combination Wrench Set, 12pc, SAE, Chrome", mfr: "PrecisionTools", sku: "CWS-12SAE", cat: "Tools", addCat: "Wrenches", ctrl: "Non-Serialized" as const },
+  { partNo: "TOOL-SOCK-38", desc: "Socket Set, 3/8\" Drive, 22pc, 6-Point, Metric", mfr: "PrecisionTools", sku: "SS-38-22M", cat: "Tools", addCat: "Sockets", ctrl: "Non-Serialized" as const },
 ];
 
 const ALT_UNITS_LIST = ["Box (100)", "Carton (10)", "Bag (100)", "Tube (1)", "Pallet (50)", "Box (10)", "Case (24)", "Pack (12)", "Drum (55gal)", "Spool (1000ft)"];
@@ -206,13 +266,13 @@ function generateItemsFromVendor(vendor: Vendor): PartnerItemData[] {
     });
   }
 
-  // Generate extra items using EXTRA_DEFS + random data
-  const codes = vendor.itemCodes || [];
-  const extraCount = Math.max(codes.length, 12);
+  // Generate 494 extra items (total ~500) using EXTRA_DEFS + random data
+  const extraCount = 494;
   for (let i = 0; i < extraCount; i++) {
     const r = rng;
     const def = EXTRA_DEFS[i % EXTRA_DEFS.length];
-    const partNo = def.partNo + (i >= EXTRA_DEFS.length ? `-${String(i).padStart(2, "0")}` : "");
+    const suffix = Math.floor(i / EXTRA_DEFS.length);
+    const partNo = suffix === 0 ? def.partNo : `${def.partNo}-${String(suffix).padStart(2, "0")}`;
     const stockStatuses: ("In Stock" | "Low Stock" | "Out of Stock")[] = ["In Stock", "In Stock", "In Stock", "Low Stock", "Out of Stock"];
     const acqOptions: ("Purchased" | "Manufactured" | "Purchase")[][] = [
       ["Purchased"], ["Manufactured"], ["Purchased", "Manufactured"], ["Purchase"], ["Purchased"],
@@ -466,11 +526,14 @@ function AddItemModal({
     toast.success(`${items.length} item${items.length !== 1 ? "s" : ""} added to ${activeSubTab === "sell" ? "items they sell" : "items they purchase"}`);
   }
 
+  const [bulkRemoveConfirmOpen, setBulkRemoveConfirmOpen] = useState(false);
+
   function handleBulkRemove() {
     const count = addedSelectedIds.size;
     addedSelectedIds.forEach((id) => onItemRemoved(id));
     toast.success(`${count} item${count !== 1 ? "s" : ""} removed from ${activeSubTab === "sell" ? "items they sell" : "items they purchase"}`);
     setAddedSelectedIds(new Set());
+    setBulkRemoveConfirmOpen(false);
   }
 
   const tradeLabel = activeSubTab === "sell" ? "Items They Sell" : "Items They Purchase";
@@ -555,11 +618,12 @@ function AddItemModal({
   // Shared table row renderer for both views
   const renderItemRow = (item: PartnerItemData, mode: "browse" | "added") => {
     const isSelected = mode === "browse" ? selectedIds.has(item.id) : false;
+    const isAddedSelected = mode === "added" ? addedSelectedIds.has(item.id) : false;
     return (
       <TableRow
         key={item.id}
-        className={`cursor-pointer group bg-white hover:bg-[#F0F7FF] [&>td]:py-1 [&>td]:pl-3 [&>td]:pr-2 ${isSelected ? "!bg-[#EDF4FF]/60" : ""}`}
-        onClick={() => mode === "browse" ? toggleItem(item.id) : undefined}
+        className={`cursor-pointer group bg-white hover:bg-[#F0F7FF] [&>td]:py-1 [&>td]:pl-3 [&>td]:pr-2 ${isSelected || isAddedSelected ? "!bg-[#EDF4FF]/60" : ""}`}
+        onClick={() => mode === "browse" ? toggleItem(item.id) : toggleAddedItem(item.id)}
       >
         {/* Checkbox */}
         <TableCell className="sticky left-0 z-10 bg-white group-hover:bg-[#F0F7FF] !pl-2 !pr-0" onClick={(e) => e.stopPropagation()}>
@@ -678,8 +742,9 @@ function AddItemModal({
           </div>
         </div>
 
-        {/* Search + View tabs row */}
-        <div className="px-3 sm:px-5 py-2 border-b border-[#EEF2F6] bg-white shrink-0">
+        {/* Search + View tabs + Sorting pills */}
+        <div className="px-3 sm:px-5 pt-2 bg-white shrink-0">
+          {/* Row: Search + View toggle + Count */}
           <div className="flex items-center gap-3">
             {/* Search — leftmost */}
             <div className="relative flex-1 max-w-xs">
@@ -742,33 +807,33 @@ function AddItemModal({
               </span>
             </div>
           </div>
-        </div>
 
-        {/* Sorting pills */}
-        <div className="flex items-center gap-1.5 overflow-x-auto px-3 sm:px-5 py-2 border-b border-[#EEF2F6] bg-white shrink-0">
-          {MODAL_SORT_OPTIONS.map((opt) => {
-            const isActive = modalSort === opt.key;
-            return (
-              <button
-                key={opt.key}
-                onClick={() => { setModalSort(opt.key); setCurrentPage(1); }}
-                className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[11px] transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                  isActive
-                    ? "border-primary bg-[#EDF4FF] hover:bg-[#D6E8FF] active:bg-[#ADD1FF]"
-                    : "border-border text-muted-foreground hover:bg-muted/60 hover:text-foreground hover:border-muted-foreground/30 active:bg-muted"
-                }`}
-                style={{ fontWeight: isActive ? 500 : 400, color: isActive ? "#0A77FF" : undefined }}
-              >
-                {opt.label}
-                <span
-                  className={`text-[10px] rounded-full px-1.5 py-px min-w-[16px] text-center ${isActive ? "bg-primary/10" : "bg-muted"}`}
-                  style={{ fontWeight: 600, color: isActive ? "#0A77FF" : "#475569" }}
+          {/* Sorting pills */}
+          <div className="flex items-center gap-1.5 overflow-x-auto pt-2.5 pb-2.5">
+            {MODAL_SORT_OPTIONS.map((opt) => {
+              const isActive = modalSort === opt.key;
+              return (
+                <button
+                  key={opt.key}
+                  onClick={() => { setModalSort(opt.key); setCurrentPage(1); }}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                    isActive
+                      ? "border-primary bg-[#EDF4FF] hover:bg-[#D6E8FF] active:bg-[#ADD1FF]"
+                      : "border-border text-muted-foreground hover:bg-muted/60 hover:text-foreground hover:border-muted-foreground/30 active:bg-muted"
+                  }`}
+                  style={{ fontWeight: isActive ? 500 : 400, color: isActive ? "#0A77FF" : undefined }}
                 >
-                  {opt.count}
-                </span>
-              </button>
-            );
-          })}
+                  {opt.label}
+                  <span
+                    className={`text-[10px] rounded-full px-1.5 py-px min-w-[18px] text-center ${isActive ? "bg-primary/10" : "bg-muted"}`}
+                    style={{ fontWeight: 600, color: isActive ? "#0A77FF" : "#475569" }}
+                  >
+                    {opt.count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* Table */}
@@ -924,24 +989,35 @@ function AddItemModal({
             )}
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="outline" onClick={() => onOpenChange(false)} className="border-[#E2E8F0] text-[#64748B] hover:text-[#0F172A] rounded-lg px-4 text-xs h-9">
-              {view === "added" ? "Done" : "Cancel"}
+            <Button
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              className="rounded-lg px-4 text-xs h-9 bg-white border-[#E2E8F0] text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#0F172A]"
+            >
+              Cancel
             </Button>
             {view === "added" && addedSelectedIds.size > 0 && (
               <Button
-                onClick={handleBulkRemove}
-                variant="outline"
-                className="gap-1.5 rounded-lg px-4 text-xs h-9 border-[#FECACA] text-[#DC2626] hover:bg-[#FEF2F2] hover:text-[#DC2626]"
+                onClick={() => setBulkRemoveConfirmOpen(true)}
+                className="gap-1.5 rounded-lg px-4 text-xs h-9 bg-[#DC2626] text-white hover:bg-[#B91C1C] shadow-sm"
               >
                 <Trash2 className="w-3.5 h-3.5" />
                 Remove {addedSelectedIds.size} Item{addedSelectedIds.size !== 1 ? "s" : ""}
+              </Button>
+            )}
+            {view === "added" && addedSelectedIds.size === 0 && (
+              <Button
+                onClick={() => onOpenChange(false)}
+                className="rounded-lg px-4 text-xs h-9 bg-[#0A77FF] text-white hover:bg-[#0862D0] shadow-sm"
+              >
+                Done
               </Button>
             )}
             {view === "browse" && (
               <Button
                 onClick={handleAdd}
                 disabled={selectedIds.size === 0}
-                className="gap-1.5 rounded-lg px-4 text-xs h-9 shadow-sm"
+                className="gap-1.5 rounded-lg px-4 text-xs h-9 bg-[#0A77FF] text-white hover:bg-[#0862D0] shadow-sm disabled:opacity-50"
               >
                 <Plus className="w-3.5 h-3.5" />
                 Add {selectedIds.size > 0 ? `${selectedIds.size} Item${selectedIds.size !== 1 ? "s" : ""} ${tradeShort}` : `Items ${tradeShort}`}
@@ -950,6 +1026,30 @@ function AddItemModal({
           </div>
         </div>
       </DialogContent>
+
+      {/* Bulk remove confirmation */}
+      <AlertDialog open={bulkRemoveConfirmOpen} onOpenChange={setBulkRemoveConfirmOpen}>
+        <AlertDialogContent className="sm:max-w-[400px]">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove {addedSelectedIds.size} item{addedSelectedIds.size !== 1 ? "s" : ""}?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {addedSelectedIds.size === 1
+                ? "This item will be removed from "
+                : `These ${addedSelectedIds.size} items will be removed from `}
+              {activeSubTab === "sell" ? "items they sell" : "items they purchase"}. You can add them back later from the inventory.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleBulkRemove}
+              className="bg-[#DC2626] text-white hover:bg-[#B91C1C]"
+            >
+              Remove
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Dialog>
   );
 }
@@ -983,6 +1083,7 @@ export function PartnerItemsTab({ vendor }: { vendor: Vendor }) {
   const [recordsPerPage, setRecordsPerPage] = useState(20);
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
   const [addModalOpen, setAddModalOpen] = useState(false);
+  const [removeConfirmId, setRemoveConfirmId] = useState<string | null>(null);
 
   // Column state
   const [columnOrder, setColumnOrder] = useState<string[]>([...DEFAULT_COLUMN_ORDER]);
@@ -1537,7 +1638,7 @@ export function PartnerItemsTab({ vendor }: { vendor: Vendor }) {
             </div>
 
             {/* Toolbar row: Search + Filters ... Count + Density + ColumnSelector */}
-            <div className="flex items-center justify-between gap-3 px-4 py-2 border-b border-border/50">
+            <div className="flex items-center justify-between gap-3 px-4 py-2">
             <div className="flex items-center gap-2.5 flex-1 min-w-0">
               <div className="relative flex-1 max-w-xs">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70 pointer-events-none" />
@@ -1631,14 +1732,14 @@ export function PartnerItemsTab({ vendor }: { vendor: Vendor }) {
           </div>
 
           {/* Quick Filter Pills */}
-          <div className="flex items-center gap-1.5 overflow-x-auto px-4 pb-2 shrink-0">
+          <div className="flex items-center gap-1.5 overflow-x-auto px-4 pb-3 shrink-0">
             {QUICK_FILTERS.map((f) => {
               const isActive = itemFilter === f.key;
               return (
                 <button
                   key={f.key}
                   onClick={() => { setItemFilter(f.key); setCurrentPage(1); }}
-                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[11px] transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                     isActive
                       ? "border-primary bg-[#EDF4FF] hover:bg-[#D6E8FF] active:bg-[#ADD1FF]"
                       : "border-border text-muted-foreground hover:bg-muted/60 hover:text-foreground hover:border-muted-foreground/30 active:bg-muted"
@@ -1647,7 +1748,7 @@ export function PartnerItemsTab({ vendor }: { vendor: Vendor }) {
                 >
                   {f.label}
                   <span
-                    className={`text-[10px] rounded-full px-1.5 py-px min-w-[16px] text-center ${isActive ? "bg-primary/10" : "bg-muted"}`}
+                    className={`text-[10px] rounded-full px-1.5 py-px min-w-[18px] text-center ${isActive ? "bg-primary/10" : "bg-muted"}`}
                     style={{ fontWeight: 600, color: isActive ? "#0A77FF" : "#475569" }}
                   >
                     {f.count}
@@ -1737,12 +1838,9 @@ export function PartnerItemsTab({ vendor }: { vendor: Vendor }) {
                                 <DropdownMenuItem onClick={() => toast.info("View item details coming soon!")}>
                                   <Eye className="w-4 h-4 mr-2" /> View Details
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => toast.info("Edit item coming soon!")}>
-                                  <Pencil className="w-4 h-4 mr-2" /> Edit
-                                </DropdownMenuItem>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem className="text-[#DC2626] focus:text-[#DC2626] focus:bg-[#FEF2F2]" onClick={() => toast.info("Archive coming soon")}>
-                                  <Archive className="w-4 h-4 mr-2 text-[#DC2626]" /> Archive
+                                <DropdownMenuItem className="text-[#DC2626] focus:text-[#DC2626] focus:bg-[#FEF2F2]" onClick={() => setRemoveConfirmId(item.id)}>
+                                  <Trash2 className="w-4 h-4 mr-2 text-[#DC2626]" /> Remove Item
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
@@ -1987,15 +2085,12 @@ export function PartnerItemsTab({ vendor }: { vendor: Vendor }) {
                                 <DropdownMenuItem onClick={() => toast.info("View Details — coming soon")}>
                                   <Eye className="w-4 h-4 mr-2" /> View Details
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => toast.info("Edit — coming soon")}>
-                                  <Pencil className="w-4 h-4 mr-2" /> Edit
-                                </DropdownMenuItem>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem onClick={() => toast.info("Archive — coming soon")}>
-                                  <Archive className="w-4 h-4 mr-2" /> Archive
-                                </DropdownMenuItem>
-                                <DropdownMenuItem variant="destructive" onClick={() => toast.info("Delete — coming soon")}>
-                                  <Trash2 className="w-4 h-4 mr-2" /> Delete
+                                <DropdownMenuItem
+                                  className="text-[#DC2626] focus:text-[#DC2626] focus:bg-[#FEF2F2]"
+                                  onClick={() => setRemoveConfirmId(item.id)}
+                                >
+                                  <Trash2 className="w-4 h-4 mr-2 text-[#DC2626]" /> Remove Item
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
@@ -2165,6 +2260,32 @@ export function PartnerItemsTab({ vendor }: { vendor: Vendor }) {
         onItemRemoved={handleItemRemoved}
         activeSubTab={subTab}
       />
+
+      {/* Remove item confirmation */}
+      <AlertDialog open={!!removeConfirmId} onOpenChange={(open) => { if (!open) setRemoveConfirmId(null); }}>
+        <AlertDialogContent className="sm:max-w-[400px]">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove this item?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This item will be removed from {subTab === "sell" ? "items they sell" : "items they purchase"}. You can add it back later from the inventory.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (removeConfirmId) {
+                  handleItemRemoved(removeConfirmId);
+                  setRemoveConfirmId(null);
+                }
+              }}
+              className="bg-[#DC2626] text-white hover:bg-[#B91C1C]"
+            >
+              Remove
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }
