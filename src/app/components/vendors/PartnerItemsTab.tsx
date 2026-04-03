@@ -41,6 +41,8 @@ import {
   Maximize2,
   Minimize2,
   Sparkles,
+  Tag,
+  ShoppingCart,
 } from "lucide-react";
 import { toast } from "sonner";
 import type { Vendor } from "../../data/vendors";
@@ -694,26 +696,29 @@ export function PartnerItemsTab({ vendor }: { vendor: Vendor }) {
     <>
       <div className="border border-border rounded-xl bg-card overflow-clip flex flex-col" style={{ minHeight: 400 }}>
 
-        {/* Sub-tabs row */}
-        <div className="flex items-center border-b border-[#EEF2F6] bg-[#F8FAFC] px-1 shrink-0">
-          {SUB_TABS.map((t) => {
+        {/* Sub-tabs — modern segmented control */}
+        <div className="px-4 pt-3.5 pb-2 shrink-0">
+          <div className="inline-flex items-center rounded-xl bg-[#F1F5F9] p-1 w-full sm:w-auto">
+          {([
+            { key: "sell" as SubTab, label: "Items They Sell", icon: Tag },
+            { key: "purchase" as SubTab, label: "Items They Purchase", icon: ShoppingCart },
+          ]).map((t) => {
             const isActive = subTab === t.key;
             return (
               <button
                 key={t.key}
                 onClick={() => { setSubTab(t.key); setCurrentPage(1); }}
-                className={`flex-1 text-center py-2.5 text-sm transition-colors cursor-pointer relative ${
-                  isActive ? "text-[#0A77FF]" : "text-[#64748B] hover:text-[#334155]"
+                className={`flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg text-[13px] transition-all cursor-pointer ${
+                  isActive ? "bg-white shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.04)] text-[#0F172A]" : "text-[#64748B] hover:text-[#334155]"
                 }`}
                 style={{ fontWeight: isActive ? 600 : 500 }}
               >
+                <t.icon className={`w-4 h-4 ${isActive ? "text-[#0A77FF]" : "text-[#94A3B8]"}`} />
                 {t.label}
-                {isActive && (
-                  <div className="absolute bottom-0 left-2 right-2 h-[2px] rounded-t-full bg-[#0A77FF]" />
-                )}
               </button>
             );
           })}
+          </div>
         </div>
 
         {/* Row 1: Search + Filters ... Count + Density + Add */}

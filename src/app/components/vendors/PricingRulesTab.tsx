@@ -1702,22 +1702,25 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
     <div className="border border-border rounded-xl bg-card overflow-clip flex flex-col" style={{ minHeight: 400 }}>
       <PricingRuleDetailModal rule={selectedRule} open={detailOpen} onClose={() => setDetailOpen(false)} mode={detailMode} onApply={(r) => { toast.success(`"${r.name}" applied to this partner.`); }} onDuplicate={(r) => toast.info(`Duplicated "${r.name}"`)} onDisable={(r) => toast.success(`"${r.name}" disabled`)} />
 
-      {/* Sub-tabs */}
-      <div className="flex items-center border-b border-[#EEF2F6] bg-[#F8FAFC] shrink-0">
+      {/* Sub-tabs — modern segmented control */}
+      <div className="px-4 pt-3.5 pb-2 shrink-0">
+        <div className="inline-flex items-center rounded-xl bg-[#F1F5F9] p-1 w-full sm:w-auto">
         {(["vendor", "customer"] as SubTab[]).map((t) => {
           const active = subTab === t;
           return (
             <button
               key={t}
               onClick={() => { setSubTab(t); setCurrentPage(1); setQuickFilter("all"); setCategoryView("discount"); }}
-              className={`flex-1 text-center py-2.5 text-sm transition-all cursor-pointer relative ${active ? "text-[#0A77FF] bg-white" : "text-[#64748B] hover:text-[#334155]"}`}
+              className={`flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg text-[13px] transition-all cursor-pointer ${
+                active ? "bg-white shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.04)] text-[#0F172A]" : "text-[#64748B] hover:text-[#334155]"
+              }`}
               style={{ fontWeight: active ? 600 : 500 }}
             >
               {t === "vendor" ? "Vendor" : "Customer"}
-              {active && <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#0A77FF]" />}
             </button>
           );
         })}
+        </div>
       </div>
 
       {/* Row 1: Search + Filters | Count + CTAs */}

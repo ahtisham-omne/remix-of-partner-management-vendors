@@ -5583,26 +5583,26 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
 
                     return (
                     <div className="flex-1 flex flex-col overflow-hidden">
-                      {/* Sub-tabs — exact Items tab pattern */}
-                      <div className="flex items-center border-b border-[#EEF2F6] bg-[#F8FAFC] px-1 shrink-0">
+                      {/* Sub-tabs — modern segmented control */}
+                      <div className="px-4 pt-3.5 pb-2 shrink-0">
+                        <div className="inline-flex items-center rounded-xl bg-[#F1F5F9] p-1 w-full sm:w-auto">
                         {CARRIER_SUB_TABS.map((t) => {
                           const isActive = carrierSubTab === t.key;
                           return (
                             <button
                               key={t.key}
                               onClick={() => { setCarrierSubTab(t.key); setCarrierFilter("all"); setCarrierSearch(""); }}
-                              className={`flex-1 text-center py-2.5 text-sm transition-colors cursor-pointer relative ${
-                                isActive ? "text-[#0A77FF]" : "text-[#64748B] hover:text-[#334155]"
+                              className={`flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg text-[13px] transition-all cursor-pointer ${
+                                isActive ? "bg-white shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.04)] text-[#0F172A]" : "text-[#64748B] hover:text-[#334155]"
                               }`}
                               style={{ fontWeight: isActive ? 600 : 500 }}
                             >
+                              <Truck className={`w-4 h-4 ${isActive ? "text-[#0A77FF]" : "text-[#94A3B8]"}`} />
                               {t.label}
-                              {isActive && (
-                                <div className="absolute bottom-0 left-2 right-2 h-[2px] rounded-t-full bg-[#0A77FF]" />
-                              )}
                             </button>
                           );
                         })}
+                        </div>
                       </div>
 
                       {/* Toolbar — matching Items tab */}
