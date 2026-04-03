@@ -853,6 +853,7 @@ export const CREATE_PT_TRIGGERS = [
   { id: "production_start", label: "Production Start" },
   { id: "production_end", label: "Production End" },
   { id: "shipping", label: "Shipping" },
+  { id: "delivery", label: "Delivery" },
 ];
 
 export const CREATE_PT_DURATIONS = [
