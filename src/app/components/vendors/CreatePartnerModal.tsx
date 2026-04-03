@@ -1695,7 +1695,7 @@ function PrTemplateCardInner({
                   className={`h-[22px] rounded-md text-[10px] tabular-nums transition-all duration-200 cursor-pointer flex items-center justify-center px-2 ${
                     isActive
                       ? "shadow-sm"
-                      : "bg-transparent text-[#C0C9D4] hover:text-[#94A3B8]"
+                      : "bg-[#F1F5F9] text-[#64748B] hover:bg-[#E2E8F0]"
                   }`}
                   style={{
                     fontWeight: isActive ? 600 : 500,
@@ -4403,7 +4403,7 @@ function ConfigPageContent({
                             <span className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{highlightMatch(partner.name, dialogSearch)}</span>
                           </button>
                           <div className="flex items-center gap-2 shrink-0">
-                            {partner.isDefault && <span className="text-[9px] text-[#0A77FF] bg-[#EDF4FF] border border-[#0A77FF]/20 px-1.5 py-0.5 rounded" style={{ fontWeight: 600 }}>Default</span>}
+                            {partner.isDefault && <span className="text-[9px] text-[#0A77FF] bg-[#EDF4FF] border border-[#0A77FF]/20 px-1.5 py-0.5 rounded" style={{ fontWeight: 600 }}>Primary</span>}
                             {hasLocs && <span className="text-[10px] text-[#94A3B8] bg-[#F8FAFC] border border-[#E8ECF1] px-1.5 py-0.5 rounded" style={{ fontWeight: 500 }}>{locsToShow.length} loc{locsToShow.length !== 1 ? "s" : ""}</span>}
                             {isPartnerSelected && <Check className="w-4 h-4 text-[#0A77FF]" />}
                           </div>
@@ -4553,7 +4553,7 @@ function ConfigPageContent({
                     {partnerObj.isDefault && (
                       <div className="flex items-center gap-1 mt-2 pt-2 border-t border-[#F1F5F9]">
                         <Star className="w-3 h-3 text-[#F59E0B]" />
-                        <span className="text-[10px] text-[#64748B]" style={{ fontWeight: 500 }}>Default selection</span>
+                        <span className="text-[10px] text-[#64748B]" style={{ fontWeight: 500 }}>Primary selection</span>
                       </div>
                     )}
                   </div>
@@ -7550,7 +7550,7 @@ function ConfigPageContent({
                           {entry.name || "Untitled Method"}
                         </span>
                         {entry.isDefault && (
-                          <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20" style={{ fontWeight: 600 }}>Default</span>
+                          <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20" style={{ fontWeight: 600 }}>Primary</span>
                         )}
                       </div>
                       <div className="flex items-center gap-2">
@@ -7560,7 +7560,7 @@ function ConfigPageContent({
                             onCheckedChange={() => toggleCarrierDefault(entry.id)}
                             className="data-[state=checked]:bg-primary w-8 h-[18px]"
                           />
-                          <span className="text-[11px] text-muted-foreground" style={{ fontWeight: 500 }}>Default</span>
+                          <span className="text-[11px] text-muted-foreground" style={{ fontWeight: 500 }}>Primary</span>
                         </label>
                         <button
                           onClick={() => removeCarrierService(entry.id)}
@@ -7689,7 +7689,7 @@ function ConfigPageContent({
                             {selectedCarrier ? selectedCarrier.name : "Select a Carrier"}
                           </span>
                           {entry.isDefault && (
-                            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20" style={{ fontWeight: 600 }}>Default</span>
+                            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20" style={{ fontWeight: 600 }}>Primary</span>
                           )}
                         </div>
                         <div className="flex items-center gap-2">
@@ -7699,7 +7699,7 @@ function ConfigPageContent({
                               onCheckedChange={() => toggleVendorDefault(entry.id)}
                               className="data-[state=checked]:bg-primary w-8 h-[18px]"
                             />
-                            <span className="text-[11px] text-muted-foreground" style={{ fontWeight: 500 }}>Default</span>
+                            <span className="text-[11px] text-muted-foreground" style={{ fontWeight: 500 }}>Primary</span>
                           </label>
                           <button
                             onClick={() => removeVendorShippingPref(entry.id)}
@@ -7880,7 +7880,7 @@ function ConfigPageContent({
                                       <div className="flex items-center gap-2">
                                         <span className="text-sm text-foreground truncate" style={{ fontWeight: 500 }}>{method.name}</span>
                                         {method.isDefault && (
-                                          <span className="text-[9px] px-1.5 py-0.5 rounded-full border border-primary/20 bg-primary/10 text-primary" style={{ fontWeight: 600 }}>Default</span>
+                                          <span className="text-[9px] px-1.5 py-0.5 rounded-full border border-primary/20 bg-primary/10 text-primary" style={{ fontWeight: 600 }}>Primary</span>
                                         )}
                                       </div>
                                       <p className="text-[11px] text-muted-foreground truncate mt-0.5">{method.desc}</p>

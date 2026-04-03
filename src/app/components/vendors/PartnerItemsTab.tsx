@@ -22,6 +22,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "../ui/dialog";
+import { Tooltip, TooltipTrigger, TooltipContent } from "../ui/tooltip";
 import {
   Search,
   X,
@@ -77,16 +78,16 @@ export interface PartnerItemData {
 
 const ITEM_TYPES = ["Parts", "Equipment - Capital", "Equipment - Non-Capital", "Miscellaneous"] as const;
 
-const STOCK_STATUS_STYLES: Record<string, { dot: string; text: string }> = {
-  "In Stock": { dot: "#22C55E", text: "#16A34A" },
-  "Low Stock": { dot: "#F59E0B", text: "#D97706" },
-  "Out of Stock": { dot: "#EF4444", text: "#DC2626" },
+const STOCK_STATUS_STYLES: Record<string, { color: string; bg: string; border: string }> = {
+  "In Stock": { color: "#065F46", bg: "#ECFDF5", border: "#A7F3D0" },
+  "Low Stock": { color: "#92400E", bg: "#FFFBEB", border: "#FDE68A" },
+  "Out of Stock": { color: "#991B1B", bg: "#FEF2F2", border: "#FECACA" },
 };
 
-const ACQ_BADGE_STYLES: Record<string, { color: string; bg: string }> = {
-  "Purchased": { color: "#7C3AED", bg: "#F5F3FF" },
-  "Manufactured": { color: "#7C3AED", bg: "#F5F3FF" },
-  "Purchase": { color: "#059669", bg: "#ECFDF5" },
+const ACQ_BADGE_STYLES: Record<string, { color: string; bg: string; border: string }> = {
+  "Purchased": { color: "#065F46", bg: "#ECFDF5", border: "#A7F3D0" },
+  "Manufactured": { color: "#1E40AF", bg: "#EFF6FF", border: "#BFDBFE" },
+  "Purchase": { color: "#065F46", bg: "#ECFDF5", border: "#A7F3D0" },
 };
 
 const STATUS_STYLES: Record<string, { color: string; bg: string; border: string }> = {
@@ -262,9 +263,8 @@ const INVENTORY_ITEMS = generateInventoryItems();
 function StockStatusDot({ status }: { status: string }) {
   const s = STOCK_STATUS_STYLES[status] || STOCK_STATUS_STYLES["In Stock"];
   return (
-    <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
-      <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: s.dot }} />
-      <span className="text-sm" style={{ color: s.text, fontWeight: 500 }}>{status}</span>
+    <span className="inline-flex items-center justify-center rounded-full border px-2.5 py-0.5 text-xs whitespace-nowrap shrink-0" style={{ fontWeight: 500, backgroundColor: s.bg, color: s.color, borderColor: s.border }}>
+      {status}
     </span>
   );
 }
@@ -273,8 +273,8 @@ function AcqBadge({ method }: { method: string }) {
   const s = ACQ_BADGE_STYLES[method] || ACQ_BADGE_STYLES["Purchased"];
   return (
     <span
-      className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] whitespace-nowrap"
-      style={{ color: s.color, backgroundColor: s.bg, fontWeight: 500 }}
+      className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] whitespace-nowrap border"
+      style={{ color: s.color, backgroundColor: s.bg, borderColor: s.border, fontWeight: 500 }}
     >
       {method}
     </span>
@@ -441,22 +441,29 @@ function AddItemModal({
           </div>
         </div>
 
-        {/* Table */}
-        <div className="flex-1 min-h-0 overflow-auto bg-[#FAFBFC]">
-          <Table>
-            <TableHeader className="sticky top-0 bg-[#F8FAFC] z-10 [&_th]:border-b [&_th]:border-border/60">
-              <TableRow>
-                <TableHead className="text-xs !pl-3 w-[40px]" style={{ fontWeight: 600 }}></TableHead>
-                <TableHead className="text-xs !pl-3" style={{ fontWeight: 600 }}>Item</TableHead>
-                <TableHead className="text-xs !pl-3" style={{ fontWeight: 600 }}>Description</TableHead>
-                <TableHead className="text-xs !pl-3" style={{ fontWeight: 600 }}>Status</TableHead>
-                <TableHead className="text-xs !pl-3" style={{ fontWeight: 600 }}>Category</TableHead>
+        {/* Table — exact match to main items table */}
+        <div className="flex-1 min-h-0 overflow-auto">
+          <Table style={{ tableLayout: "fixed", minWidth: 1500 }}>
+            <TableHeader className="sticky top-0 z-20 bg-card">
+              <TableRow className="bg-muted/30 hover:bg-muted/30 [&>th]:h-8">
+                <TableHead className="sticky left-0 z-20 bg-[#f8fafc] w-[40px] min-w-[40px] max-w-[40px] !pl-2 !pr-0" />
+                <TableHead className="text-[13px] text-foreground !pl-3" style={{ fontWeight: 600, width: 180 }}>Item</TableHead>
+                <TableHead className="text-[13px] text-foreground !pl-3" style={{ fontWeight: 600, width: 260 }}>Description</TableHead>
+                <TableHead className="text-[13px] text-foreground !pl-3" style={{ fontWeight: 600, width: 100 }}>Status</TableHead>
+                <TableHead className="text-[13px] text-foreground !pl-3" style={{ fontWeight: 600, width: 130 }}>Control Type</TableHead>
+                <TableHead className="text-[13px] text-foreground !pl-3" style={{ fontWeight: 600, width: 130 }}>Primary Cat.</TableHead>
+                <TableHead className="text-[13px] text-foreground !pl-3" style={{ fontWeight: 600, width: 130 }}>Additional Cat.</TableHead>
+                <TableHead className="text-[13px] text-foreground !pl-3 text-right" style={{ fontWeight: 600, width: 100 }}>On-Hand</TableHead>
+                <TableHead className="text-[13px] text-foreground !pl-3" style={{ fontWeight: 600, width: 100 }}>Alt. Units</TableHead>
+                <TableHead className="text-[13px] text-foreground !pl-3" style={{ fontWeight: 600, width: 150 }}>Inbound Loc.</TableHead>
+                <TableHead className="text-[13px] text-foreground !pl-3" style={{ fontWeight: 600, width: 150 }}>Outbound Loc.</TableHead>
+                <TableHead className="text-[13px] text-foreground !pl-3" style={{ fontWeight: 600, width: 200 }}>Acquisition</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {paginated.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center py-16 text-muted-foreground">
+                  <TableCell colSpan={12} className="text-center py-16 text-muted-foreground">
                     <div className="flex flex-col items-center gap-2">
                       <Package className="w-8 h-8" />
                       <p className="text-sm">No items found</p>
@@ -469,30 +476,39 @@ function AddItemModal({
                   return (
                     <TableRow
                       key={item.id}
-                      className={`cursor-pointer hover:bg-[#F0F7FF] [&>td]:py-3 [&>td]:pl-3 [&>td]:pr-2 ${isSelected ? "bg-[#EDF4FF]/60" : ""}`}
+                      className={`cursor-pointer group hover:bg-[#F0F7FF] [&>td]:py-1 [&>td]:pl-3 [&>td]:pr-2 ${isSelected ? "bg-[#EDF4FF]/60" : ""}`}
                       onClick={() => toggleItem(item.id)}
                     >
-                      <TableCell className="!pl-3 !pr-0" onClick={(e) => e.stopPropagation()}>
+                      <TableCell className="sticky left-0 z-10 bg-card group-hover:bg-[#F0F7FF] !pl-2 !pr-0" onClick={(e) => e.stopPropagation()}>
                         <Checkbox checked={isSelected} onCheckedChange={() => toggleItem(item.id)} />
                       </TableCell>
                       <TableCell>
-                        <div className="flex items-center gap-3 min-w-[140px]">
-                          <div className="w-9 h-9 rounded-lg bg-[#F1F5F9] overflow-hidden shrink-0 border border-[#E2E8F0]">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-7 h-7 rounded-lg bg-[#F1F5F9] overflow-hidden shrink-0 border border-[#E8ECF1]">
                             <img src={item.image} alt="" className="w-full h-full object-cover" />
                           </div>
-                          <span className="text-[13px] text-[#0F172A] font-mono whitespace-nowrap" style={{ fontWeight: 500 }}>
-                            {item.partNo}
-                          </span>
+                          <span className="text-sm text-foreground font-mono whitespace-nowrap" style={{ fontWeight: 500 }}>{item.partNo}</span>
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div className="min-w-[180px]">
-                          <p className="text-sm text-[#334155] truncate max-w-[280px]" style={{ fontWeight: 400 }}>{item.description}</p>
-                          <p className="text-[11px] text-[#94A3B8] mt-0.5" style={{ fontWeight: 400 }}>{item.manufacturer} &nbsp; {item.sku}</p>
-                        </div>
+                        <p className="text-sm text-foreground truncate" style={{ fontWeight: 400 }}>{item.description}</p>
                       </TableCell>
                       <TableCell><StockStatusDot status={item.stockStatus} /></TableCell>
-                      <TableCell><span className="text-sm text-[#475569]">{item.category}</span></TableCell>
+                      <TableCell><span className="text-[13px] text-foreground whitespace-nowrap">{item.itemControlType}</span></TableCell>
+                      <TableCell><span className="text-[13px] text-foreground whitespace-nowrap">{item.category}</span></TableCell>
+                      <TableCell><CategoryPill label={item.additionalCategory} /></TableCell>
+                      <TableCell className="text-right !pr-3">
+                        <span className="text-[14px] text-foreground tabular-nums" style={{ fontWeight: 600 }}>{item.onHand.toLocaleString()}</span>
+                        <p className="text-[10px] text-muted-foreground">{item.onHandUnit}</p>
+                      </TableCell>
+                      <TableCell><span className="text-[13px] text-foreground whitespace-nowrap">{item.altUnits}</span></TableCell>
+                      <TableCell><span className="text-[13px] text-foreground truncate block max-w-[140px]">{item.inboundLocation}</span></TableCell>
+                      <TableCell><span className="text-[13px] text-foreground truncate block max-w-[140px]">{item.outboundLocation}</span></TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-1 flex-wrap">
+                          {item.acquisitionMethods.map((m) => <AcqBadge key={m} method={m} />)}
+                        </div>
+                      </TableCell>
                     </TableRow>
                   );
                 })
@@ -501,17 +517,30 @@ function AddItemModal({
           </Table>
         </div>
 
-        {/* Pagination + Footer */}
-        <div className="shrink-0 border-t border-[#EEF2F6] bg-white px-3 sm:px-5 py-2.5 flex items-center justify-between gap-2 sm:rounded-b-2xl">
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <span>Page {page} of {totalPages}</span>
-            <div className="flex items-center gap-1">
-              <button onClick={() => setPage(1)} disabled={page === 1} className="p-1 rounded hover:bg-muted/60 disabled:opacity-30 cursor-pointer disabled:cursor-default"><ChevronsLeft className="w-3.5 h-3.5" /></button>
-              <button onClick={() => setPage(Math.max(1, page - 1))} disabled={page === 1} className="p-1 rounded hover:bg-muted/60 disabled:opacity-30 cursor-pointer disabled:cursor-default"><ChevronLeft className="w-3.5 h-3.5" /></button>
-              <button onClick={() => setPage(Math.min(totalPages, page + 1))} disabled={page === totalPages} className="p-1 rounded hover:bg-muted/60 disabled:opacity-30 cursor-pointer disabled:cursor-default"><ChevronRight className="w-3.5 h-3.5" /></button>
-              <button onClick={() => setPage(totalPages)} disabled={page === totalPages} className="p-1 rounded hover:bg-muted/60 disabled:opacity-30 cursor-pointer disabled:cursor-default"><ChevronsRight className="w-3.5 h-3.5" /></button>
-            </div>
+        {/* Pagination */}
+        <div className="flex flex-col sm:flex-row items-center justify-center px-4 py-2.5 border-t border-border gap-3 shrink-0">
+          <div className="flex items-center gap-2 text-sm text-foreground">
+            <span className="text-muted-foreground">Records per page</span>
+            <select value={perPage} disabled className="h-8 px-2 pr-7 rounded-lg border border-border bg-white text-sm cursor-pointer outline-none">
+              <option>{perPage}</option>
+            </select>
           </div>
+          <div className="flex items-center gap-1">
+            <button onClick={() => setPage(Math.max(1, page - 1))} disabled={page === 1} className="h-8 px-2.5 rounded-md text-sm text-muted-foreground hover:bg-muted/60 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-default" style={{ fontWeight: 500 }}>Prev</button>
+            {(() => {
+              const pages: (number | "...")[] = [];
+              if (totalPages <= 7) { for (let i = 1; i <= totalPages; i++) pages.push(i); }
+              else { pages.push(1); if (page > 3) pages.push("..."); for (let i = Math.max(2, page - 1); i <= Math.min(totalPages - 1, page + 1); i++) pages.push(i); if (page < totalPages - 2) pages.push("..."); pages.push(totalPages); }
+              return pages.map((p, idx) => p === "..." ? <span key={`d${idx}`} className="px-1.5 text-muted-foreground text-sm">...</span> : (
+                <button key={p} onClick={() => setPage(p as number)} className={`h-8 w-8 rounded-md text-sm transition-colors cursor-pointer ${page === p ? "bg-[#0A77FF] text-white" : "text-muted-foreground hover:bg-muted/60"}`} style={{ fontWeight: page === p ? 600 : 500 }}>{p}</button>
+              ));
+            })()}
+            <button onClick={() => setPage(Math.min(totalPages, page + 1))} disabled={page === totalPages} className="h-8 px-2.5 rounded-md text-sm text-muted-foreground hover:bg-muted/60 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-default" style={{ fontWeight: 500 }}>Next</button>
+          </div>
+        </div>
+
+        {/* Footer — actions */}
+        <div className="shrink-0 border-t border-[#EEF2F6] bg-white px-3 sm:px-5 py-2.5 flex items-center justify-end gap-2 sm:rounded-b-2xl">
           <div className="flex items-center gap-2">
             <Button variant="outline" onClick={() => onOpenChange(false)} className="border-[#E2E8F0] text-[#64748B] hover:text-[#0F172A] rounded-lg px-4 text-xs h-9">
               Cancel
@@ -535,9 +564,9 @@ function AddItemModal({
 // Main Component
 // ──────────────────────────────────────────────
 
-type SubTab = "all" | "sell" | "purchase";
+type SubTab = "sell" | "purchase";
 type Density = "condensed" | "comfort" | "card";
-type ItemFilter = "all" | "Parts" | "Equipment - Capital" | "Equipment - Non-Capital" | "Miscellaneous" | "Active" | "Inactive";
+type ItemFilter = "all" | "Active" | "Inactive" | "Serialized" | "Non-Serialized";
 
 const DENSITY_CONFIG: { key: Density; label: string; description: string; icon: "align-justify" | "list" | "layout-grid" }[] = [
   { key: "condensed", label: "Condensed", description: "Compact view", icon: "align-justify" },
@@ -552,10 +581,10 @@ export function PartnerItemsTab({ vendor }: { vendor: Vendor }) {
 
   const allItems = useMemo(() => [...addedItems, ...generatedItems], [addedItems, generatedItems]);
 
-  const [subTab, setSubTab] = useState<SubTab>("all");
+  const [subTab, setSubTab] = useState<SubTab>("sell");
   const [searchQuery, setSearchQuery] = useState("");
   const [itemFilter, setItemFilter] = useState<ItemFilter>("all");
-  const [density, setDensity] = useState<Density>("comfort");
+  const [density, setDensity] = useState<Density>("condensed");
   const [currentPage, setCurrentPage] = useState(1);
   const [recordsPerPage, setRecordsPerPage] = useState(20);
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
@@ -571,9 +600,10 @@ export function PartnerItemsTab({ vendor }: { vendor: Vendor }) {
   // Quick filter counts
   const filterCounts = useMemo(() => {
     const c: Record<string, number> = { all: subTabFiltered.length };
-    ITEM_TYPES.forEach((t) => { c[t] = subTabFiltered.filter((it) => it.itemType === t).length; });
     c["Active"] = subTabFiltered.filter((it) => it.status === "Active").length;
     c["Inactive"] = subTabFiltered.filter((it) => it.status === "Inactive").length;
+    c["Serialized"] = subTabFiltered.filter((it) => it.itemControlType === "Serialized").length;
+    c["Non-Serialized"] = subTabFiltered.filter((it) => it.itemControlType === "Non-Serialized").length;
     return c;
   }, [subTabFiltered]);
 
@@ -582,7 +612,8 @@ export function PartnerItemsTab({ vendor }: { vendor: Vendor }) {
     let list = subTabFiltered;
     if (itemFilter === "Active") list = list.filter((it) => it.status === "Active");
     else if (itemFilter === "Inactive") list = list.filter((it) => it.status === "Inactive");
-    else if (itemFilter !== "all") list = list.filter((it) => it.itemType === itemFilter);
+    else if (itemFilter === "Serialized") list = list.filter((it) => it.itemControlType === "Serialized");
+    else if (itemFilter === "Non-Serialized") list = list.filter((it) => it.itemControlType === "Non-Serialized");
 
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
@@ -648,16 +679,13 @@ export function PartnerItemsTab({ vendor }: { vendor: Vendor }) {
 
   const QUICK_FILTERS: { key: ItemFilter; label: string; count: number }[] = [
     { key: "all", label: "All Items", count: filterCounts["all"] || 0 },
-    { key: "Parts", label: "Parts", count: filterCounts["Parts"] || 0 },
-    { key: "Equipment - Capital", label: "Equipment \u2022 Capital", count: filterCounts["Equipment - Capital"] || 0 },
-    { key: "Equipment - Non-Capital", label: "Equipment \u2022 Non-Capital", count: filterCounts["Equipment - Non-Capital"] || 0 },
-    { key: "Miscellaneous", label: "Miscellaneous", count: filterCounts["Miscellaneous"] || 0 },
     { key: "Active", label: "Active", count: filterCounts["Active"] || 0 },
     { key: "Inactive", label: "Inactive", count: filterCounts["Inactive"] || 0 },
+    { key: "Serialized", label: "Serialized", count: filterCounts["Serialized"] || 0 },
+    { key: "Non-Serialized", label: "Non-Serialized", count: filterCounts["Non-Serialized"] || 0 },
   ];
 
   const SUB_TABS: { key: SubTab; label: string }[] = [
-    { key: "all", label: "All Items" },
     { key: "sell", label: "Items They Sell" },
     { key: "purchase", label: "Items They Purchase" },
   ];
@@ -833,54 +861,54 @@ export function PartnerItemsTab({ vendor }: { vendor: Vendor }) {
                 )}
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
                 {paginated.map((item) => {
                   const isHighlighted = highlightedIds.has(item.id);
                   return (
                     <div
                       key={item.id}
-                      className={`bg-white border rounded-xl hover:shadow-[0_4px_16px_-4px_rgba(10,119,255,0.10),0_1px_3px_-1px_rgba(0,0,0,0.04)] hover:border-[#93B8F7]/50 transition-all duration-200 group/card flex flex-col overflow-hidden ${
+                      className={`bg-white border rounded-xl hover:border-[#BFDBFE] hover:shadow-[0_4px_16px_-4px_rgba(10,119,255,0.12)] transition-all duration-200 group/card flex flex-col ${
                         isHighlighted
-                          ? "border-[#0A77FF] shadow-[0_0_0_2px_rgba(10,119,255,0.15),0_8px_24px_-8px_rgba(10,119,255,0.20)]"
-                          : "border-[#E2E8F0]"
+                          ? "border-[#0A77FF] shadow-[0_0_0_2px_rgba(10,119,255,0.15)]"
+                          : "border-[#E8ECF1]"
                       }`}
-                      style={isHighlighted ? { animation: "highlight-pulse 1.5s ease-in-out 2" } : undefined}
                     >
-                      <div className="relative w-full h-[100px] overflow-hidden bg-[#F1F5F9]">
-                        <img src={item.image} alt={item.description} className="w-full h-full object-cover transition-transform duration-300 group-hover/card:scale-105" />
+                      {/* Image banner */}
+                      <div className="relative w-full h-[90px] overflow-hidden bg-[#F1F5F9] rounded-t-xl">
+                        <img src={item.image} alt="" className="w-full h-full object-cover transition-transform duration-300 group-hover/card:scale-105" />
+                        <div className="absolute top-2 left-2">
+                          <StockStatusDot status={item.stockStatus} />
+                        </div>
                         {isHighlighted && (
-                          <div className="absolute top-2 left-2 z-10">
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#0A77FF] text-white text-[10px] tracking-wider uppercase shadow-sm" style={{ fontWeight: 700 }}>
+                          <div className="absolute top-2 right-2">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#0A77FF] text-white text-[10px] uppercase shadow-sm" style={{ fontWeight: 700 }}>
                               <Sparkles className="w-3 h-3" />NEW
                             </span>
                           </div>
                         )}
-                        <div className="absolute top-2 right-2">
-                          <StockStatusDot status={item.stockStatus} />
-                        </div>
                       </div>
-                      <div className="p-3 flex flex-col gap-2 flex-1">
-                        <div className="flex items-start gap-2">
-                          <div className="min-w-0 flex-1">
-                            <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{item.description}</p>
-                            <p className="text-[11px] text-[#94A3B8] font-mono mt-0.5 flex items-center gap-1.5">
-                              {item.partNo}
-                              {item.hasBlueDot && <span className="w-1.5 h-1.5 rounded-full bg-[#0A77FF] shrink-0" />}
-                            </p>
-                          </div>
-                        </div>
-                        <p className="text-[11px] text-[#94A3B8]">{item.manufacturer} &middot; {item.sku}</p>
-                        <div className="flex items-center gap-1.5 flex-wrap">
+                      {/* Body */}
+                      <div className="p-3.5 flex flex-col flex-1">
+                        {/* Part no + description */}
+                        <p className="text-[11px] text-[#0A77FF] font-mono" style={{ fontWeight: 600 }}>{item.partNo}</p>
+                        <p className="text-[13px] text-[#0F172A] truncate mt-0.5" style={{ fontWeight: 600 }}>{item.description}</p>
+                        <p className="text-[11px] text-[#94A3B8] mt-0.5">{item.manufacturer} <span className="text-[#CBD5E1]">·</span> {item.sku}</p>
+
+                        {/* Categories */}
+                        <div className="flex items-center gap-1 mt-2.5 flex-wrap">
                           <CategoryPill label={item.category} />
-                          <CategoryPill label={item.additionalCategory} />
+                          {item.additionalCategory !== item.category && <CategoryPill label={item.additionalCategory} />}
                         </div>
-                        <div className="mt-auto pt-2 border-t border-[#F1F5F9] flex items-center justify-between">
+
+                        {/* Footer: acquisition + on-hand */}
+                        <div className="mt-auto pt-3 border-t border-[#F1F5F9] flex items-center justify-between mt-3">
                           <div className="flex items-center gap-1">
                             {item.acquisitionMethods.map((m) => <AcqBadge key={m} method={m} />)}
                           </div>
-                          <span className="text-[13px] text-[#0F172A] tabular-nums" style={{ fontWeight: 600 }}>
-                            {item.onHand.toLocaleString()}<span className="text-[10px] text-[#94A3B8] ml-0.5" style={{ fontWeight: 400 }}>{item.onHandUnit}</span>
-                          </span>
+                          <div className="text-right">
+                            <span className="text-[14px] text-[#0F172A] tabular-nums" style={{ fontWeight: 600 }}>{item.onHand.toLocaleString()}</span>
+                            <span className="text-[10px] text-[#94A3B8] ml-0.5">{item.onHandUnit}</span>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -892,26 +920,26 @@ export function PartnerItemsTab({ vendor }: { vendor: Vendor }) {
         ) : (
           /* Table View — Condensed / Comfort */
           <div className="min-h-0 overflow-auto flex-1">
-            <Table>
-              <TableHeader className="sticky top-0 bg-[#F8FAFC] z-10 [&_th]:border-b [&_th]:border-border/60">
-                <TableRow>
-                  <TableHead className="text-xs !pl-4 w-[40px]" style={{ fontWeight: 600 }}>
+            <Table style={{ tableLayout: "fixed", minWidth: 1500 }}>
+              <TableHeader className="sticky top-0 z-20 bg-card">
+                <TableRow className={`bg-muted/30 hover:bg-muted/30 ${density === "condensed" ? "[&>th]:h-8" : "[&>th]:h-9"}`}>
+                  <TableHead className="sticky left-0 z-20 bg-[#f8fafc] w-[40px] min-w-[40px] max-w-[40px] !pl-2 !pr-0">
                     <Checkbox
                       checked={paginated.length > 0 && selectedRows.size === paginated.length}
                       onCheckedChange={handleSelectAll}
                     />
                   </TableHead>
-                  <TableHead className="text-xs !pl-3" style={{ fontWeight: 600, color: "#64748B" }}>Item</TableHead>
-                  <TableHead className="text-xs !pl-3" style={{ fontWeight: 600, color: "#64748B" }}>Description</TableHead>
-                  <TableHead className="text-xs !pl-3" style={{ fontWeight: 600, color: "#64748B" }}>Status</TableHead>
-                  <TableHead className="text-xs !pl-3" style={{ fontWeight: 600, color: "#64748B" }}>Control Type</TableHead>
-                  <TableHead className="text-xs !pl-3" style={{ fontWeight: 600, color: "#64748B" }}>Primary Cat.</TableHead>
-                  <TableHead className="text-xs !pl-3" style={{ fontWeight: 600, color: "#64748B" }}>Additional Cat.</TableHead>
-                  <TableHead className="text-xs !pl-3 text-right" style={{ fontWeight: 600, color: "#64748B" }}>On-Hand</TableHead>
-                  <TableHead className="text-xs !pl-3" style={{ fontWeight: 600, color: "#64748B" }}>Alt. Units</TableHead>
-                  <TableHead className="text-xs !pl-3" style={{ fontWeight: 600, color: "#64748B" }}>Inbound Loc.</TableHead>
-                  <TableHead className="text-xs !pl-3" style={{ fontWeight: 600, color: "#64748B" }}>Outbound Loc.</TableHead>
-                  <TableHead className="text-xs !pl-3" style={{ fontWeight: 600, color: "#64748B" }}>Acquisition</TableHead>
+                  <TableHead className="text-[13px] text-foreground !pl-3" style={{ fontWeight: 600, width: 180 }}>Item</TableHead>
+                  <TableHead className="text-[13px] text-foreground !pl-3" style={{ fontWeight: 600, width: 260 }}>Description</TableHead>
+                  <TableHead className="text-[13px] text-foreground !pl-3" style={{ fontWeight: 600, width: 100 }}>Status</TableHead>
+                  <TableHead className="text-[13px] text-foreground !pl-3" style={{ fontWeight: 600, width: 130 }}>Control Type</TableHead>
+                  <TableHead className="text-[13px] text-foreground !pl-3" style={{ fontWeight: 600, width: 130 }}>Primary Cat.</TableHead>
+                  <TableHead className="text-[13px] text-foreground !pl-3" style={{ fontWeight: 600, width: 130 }}>Additional Cat.</TableHead>
+                  <TableHead className="text-[13px] text-foreground !pl-3 text-right" style={{ fontWeight: 600, width: 100 }}>On-Hand</TableHead>
+                  <TableHead className="text-[13px] text-foreground !pl-3" style={{ fontWeight: 600, width: 100 }}>Alt. Units</TableHead>
+                  <TableHead className="text-[13px] text-foreground !pl-3" style={{ fontWeight: 600, width: 150 }}>Inbound Loc.</TableHead>
+                  <TableHead className="text-[13px] text-foreground !pl-3" style={{ fontWeight: 600, width: 150 }}>Outbound Loc.</TableHead>
+                  <TableHead className="text-[13px] text-foreground !pl-3" style={{ fontWeight: 600, width: 200 }}>Acquisition</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -931,43 +959,43 @@ export function PartnerItemsTab({ vendor }: { vendor: Vendor }) {
                     return (
                       <TableRow
                         key={item.id}
-                        className={`group hover:bg-[#F8FBFF] border-b border-[#F1F5F9] ${
+                        className={`group hover:bg-[#F0F7FF] ${
                           isComfort
-                            ? "[&>td]:py-3.5 [&>td]:pl-3 [&>td]:pr-2"
-                            : "[&>td]:py-1.5 [&>td]:pl-3 [&>td]:pr-2"
+                            ? "[&>td]:py-2 [&>td]:pl-3 [&>td]:pr-2"
+                            : "[&>td]:py-1 [&>td]:pl-3 [&>td]:pr-2"
                         } ${isHighlighted ? "animate-row-flash bg-[#EDF4FF]/60" : ""}`}
                       >
-                        <TableCell className="!pl-4 !pr-0" onClick={(e) => e.stopPropagation()}>
+                        <TableCell className="sticky left-0 z-10 bg-card group-hover:bg-[#F0F7FF] !pl-2 !pr-0" onClick={(e) => e.stopPropagation()}>
                           <Checkbox
                             checked={selectedRows.has(item.id)}
                             onCheckedChange={() => handleSelectRow(item.id)}
                           />
                         </TableCell>
 
-                        {/* Item: thumbnail + part no + optional blue dot */}
+                        {/* Item: thumbnail + part no */}
                         <TableCell>
-                          <div className="flex items-center gap-3 min-w-[150px]">
-                            <div className={`${isComfort ? "w-10 h-10" : "w-7 h-7"} rounded-lg bg-[#F1F5F9] overflow-hidden shrink-0 border border-[#E2E8F0]`}>
+                          <div className={`flex items-center ${isComfort ? "gap-3" : "gap-2.5"}`}>
+                            <div className={`${isComfort ? "w-9 h-9" : "w-7 h-7"} rounded-lg bg-[#F1F5F9] overflow-hidden shrink-0 border border-[#E8ECF1]`}>
                               <img src={item.image} alt="" className="w-full h-full object-cover" />
                             </div>
-                            <div className="flex items-center gap-1.5">
-                              <span className="text-[13px] text-[#0F172A] font-mono whitespace-nowrap" style={{ fontWeight: 500 }}>
+                            <div className="min-w-0">
+                              <span className={`${isComfort ? "text-[13.5px]" : "text-sm"} text-foreground font-mono whitespace-nowrap block`} style={{ fontWeight: 500 }}>
                                 {highlightText(item.partNo)}
                               </span>
-                              {item.hasBlueDot && <span className="w-2 h-2 rounded-full bg-[#0A77FF] shrink-0" />}
+                              {isComfort && <span className="text-xs text-muted-foreground block">{item.manufacturer}</span>}
                             </div>
                           </div>
                         </TableCell>
 
-                        {/* Description: text + manufacturer + sku */}
+                        {/* Description: text + sku */}
                         <TableCell>
-                          <div className="min-w-[200px] max-w-[320px]">
-                            <p className={`text-[13px] text-[#334155] truncate ${isComfort ? "" : "max-w-[260px]"}`} style={{ fontWeight: 400 }}>
+                          <div className="min-w-0">
+                            <p className={`${isComfort ? "text-[13px]" : "text-sm"} text-foreground truncate`} style={{ fontWeight: 400 }}>
                               {highlightText(item.description)}
                             </p>
                             {isComfort && (
-                              <p className="text-[11px] text-[#94A3B8] mt-0.5 truncate" style={{ fontWeight: 400 }}>
-                                {item.manufacturer} &nbsp;&nbsp; {item.sku}
+                              <p className="text-[10px] text-muted-foreground mt-0.5 truncate">
+                                SKU: {item.sku}
                               </p>
                             )}
                           </div>
@@ -980,47 +1008,59 @@ export function PartnerItemsTab({ vendor }: { vendor: Vendor }) {
 
                         {/* Control Type */}
                         <TableCell>
-                          <span className="text-[13px] text-[#475569] whitespace-nowrap">{item.itemControlType}</span>
+                          <span className="text-[13px] text-foreground whitespace-nowrap">{item.itemControlType}</span>
                         </TableCell>
 
                         {/* Primary Cat */}
                         <TableCell>
-                          <span className="text-[13px] text-[#475569] whitespace-nowrap">{highlightText(item.category)}</span>
+                          <span className="text-[13px] text-foreground whitespace-nowrap">{highlightText(item.category)}</span>
                         </TableCell>
 
                         {/* Additional Cat */}
                         <TableCell>
-                          <CategoryPill label={item.additionalCategory} />
+                          <div className="flex items-center gap-1">
+                            <CategoryPill label={item.additionalCategory} />
+                            {item.category !== item.additionalCategory && (
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <span className="inline-flex items-center px-1.5 py-0.5 rounded-md text-xs border cursor-default" style={{ fontWeight: 600, backgroundColor: "#F1F5F9", color: "#475569", borderColor: "#E2E8F0" }}>+1</span>
+                                </TooltipTrigger>
+                                <TooltipContent side="bottom" className="z-[300]">
+                                  <span className="text-[11px]">{item.category}</span>
+                                </TooltipContent>
+                              </Tooltip>
+                            )}
+                          </div>
                         </TableCell>
 
                         {/* On-Hand */}
                         <TableCell className="text-right !pr-3">
                           <div className="text-right">
-                            <span className="text-[14px] text-[#0F172A] tabular-nums" style={{ fontWeight: 600 }}>
+                            <span className="text-[14px] text-foreground tabular-nums" style={{ fontWeight: 600 }}>
                               {item.onHand.toLocaleString()}
                             </span>
-                            <p className="text-[10px] text-[#94A3B8] mt-px" style={{ fontWeight: 400 }}>{item.onHandUnit}</p>
+                            <p className="text-[10px] text-muted-foreground mt-px" style={{ fontWeight: 400 }}>{item.onHandUnit}</p>
                           </div>
                         </TableCell>
 
                         {/* Alt Units */}
                         <TableCell>
-                          <span className="text-[13px] text-[#475569] whitespace-nowrap">{item.altUnits}</span>
+                          <span className="text-[13px] text-foreground whitespace-nowrap">{item.altUnits}</span>
                         </TableCell>
 
                         {/* Inbound Loc */}
                         <TableCell>
-                          <span className="text-[13px] text-[#475569] truncate block max-w-[180px]">{item.inboundLocation}</span>
+                          <span className="text-[13px] text-foreground truncate block max-w-[180px]">{item.inboundLocation}</span>
                         </TableCell>
 
                         {/* Outbound Loc */}
                         <TableCell>
-                          <span className="text-[13px] text-[#475569] truncate block max-w-[180px]">{item.outboundLocation}</span>
+                          <span className="text-[13px] text-foreground truncate block max-w-[180px]">{item.outboundLocation}</span>
                         </TableCell>
 
                         {/* Acquisition */}
                         <TableCell>
-                          <div className="flex flex-col items-end gap-1">
+                          <div className="flex items-center gap-1 flex-wrap">
                             {item.acquisitionMethods.map((m) => (
                               <AcqBadge key={m} method={m} />
                             ))}
@@ -1035,11 +1075,10 @@ export function PartnerItemsTab({ vendor }: { vendor: Vendor }) {
           </div>
         )}
 
-        {/* Pagination */}
-        <div className="border-t border-border shrink-0" />
-        <div className="flex items-center justify-between gap-3 px-4 py-2.5 shrink-0 bg-white">
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <span className="hidden sm:inline" style={{ fontWeight: 500 }}>Records per page</span>
+        {/* Pagination — matches partner listing page */}
+        <div className="flex flex-col sm:flex-row items-center justify-center px-4 py-3 border-t border-border gap-3 shrink-0">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <span>Records per page</span>
             <select
               value={recordsPerPage}
               onChange={(e) => { setRecordsPerPage(Number(e.target.value)); setCurrentPage(1); }}
@@ -1050,17 +1089,13 @@ export function PartnerItemsTab({ vendor }: { vendor: Vendor }) {
               ))}
             </select>
           </div>
-          <div className="flex items-center gap-1.5">
-            <button onClick={() => setCurrentPage(1)} disabled={currentPage === 1} className="p-1.5 rounded-lg hover:bg-muted/60 disabled:opacity-30 text-muted-foreground cursor-pointer disabled:cursor-default transition-colors">
-              <ChevronsLeft className="w-4 h-4" />
-            </button>
-            <button onClick={() => setCurrentPage(Math.max(1, currentPage - 1))} disabled={currentPage === 1} className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg hover:bg-muted/60 disabled:opacity-30 text-muted-foreground text-xs cursor-pointer disabled:cursor-default transition-colors" style={{ fontWeight: 500 }}>
-              <ChevronLeft className="w-3.5 h-3.5" />
+          <div className="flex items-center gap-1">
+            <button onClick={() => setCurrentPage(Math.max(1, currentPage - 1))} disabled={currentPage === 1} className="h-8 px-2.5 rounded-md text-sm text-muted-foreground hover:bg-muted/60 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-default" style={{ fontWeight: 500 }}>
               Prev
             </button>
             {(() => {
               const pages: (number | "...")[] = [];
-              if (totalPages <= 5) {
+              if (totalPages <= 7) {
                 for (let i = 1; i <= totalPages; i++) pages.push(i);
               } else {
                 pages.push(1);
@@ -1071,14 +1106,14 @@ export function PartnerItemsTab({ vendor }: { vendor: Vendor }) {
               }
               return pages.map((p, idx) =>
                 p === "..." ? (
-                  <span key={`dots-${idx}`} className="px-1 text-muted-foreground text-xs">...</span>
+                  <span key={`dots-${idx}`} className="px-1.5 text-muted-foreground text-sm">...</span>
                 ) : (
                   <button
                     key={p}
                     onClick={() => setCurrentPage(p as number)}
-                    className={`min-w-[32px] h-8 rounded-lg text-xs transition-colors cursor-pointer ${
+                    className={`h-8 w-8 rounded-md text-sm transition-colors cursor-pointer ${
                       currentPage === p
-                        ? "bg-[#0A77FF] text-white shadow-sm"
+                        ? "bg-[#0A77FF] text-white"
                         : "text-muted-foreground hover:bg-muted/60"
                     }`}
                     style={{ fontWeight: currentPage === p ? 600 : 500 }}
@@ -1088,12 +1123,8 @@ export function PartnerItemsTab({ vendor }: { vendor: Vendor }) {
                 )
               );
             })()}
-            <button onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))} disabled={currentPage === totalPages} className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg hover:bg-muted/60 disabled:opacity-30 text-muted-foreground text-xs cursor-pointer disabled:cursor-default transition-colors" style={{ fontWeight: 500 }}>
+            <button onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))} disabled={currentPage === totalPages} className="h-8 px-2.5 rounded-md text-sm text-muted-foreground hover:bg-muted/60 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-default" style={{ fontWeight: 500 }}>
               Next
-              <ChevronRight className="w-3.5 h-3.5" />
-            </button>
-            <button onClick={() => setCurrentPage(totalPages)} disabled={currentPage === totalPages} className="p-1.5 rounded-lg hover:bg-muted/60 disabled:opacity-30 text-muted-foreground cursor-pointer disabled:cursor-default transition-colors">
-              <ChevronsRight className="w-4 h-4" />
             </button>
           </div>
         </div>

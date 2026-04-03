@@ -2017,7 +2017,7 @@ export function VendorsListPage() {
                                               <div className="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center shrink-0 overflow-hidden"><CarrierIcon carrier={vendor.defaultCarrierVendor} /></div>
                                               <div className="min-w-0">
                                                 <p className="text-[14px] text-white truncate" style={{ fontWeight: 600 }}>{vendor.defaultCarrierVendor}</p>
-                                                <p className="text-[11px] text-[#94A3B8]">Default Vendor Carrier</p>
+                                                <p className="text-[11px] text-[#94A3B8]">Primary Vendor Carrier</p>
                                               </div>
                                             </div>
                                           </div>
@@ -2050,7 +2050,7 @@ export function VendorsListPage() {
                                               <div className="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center shrink-0 overflow-hidden"><CarrierIcon carrier={vendor.defaultCarrierCustomer} /></div>
                                               <div className="min-w-0">
                                                 <p className="text-[14px] text-white truncate" style={{ fontWeight: 600 }}>{vendor.defaultCarrierCustomer}</p>
-                                                <p className="text-[11px] text-[#94A3B8]">Default Customer Carrier</p>
+                                                <p className="text-[11px] text-[#94A3B8]">Primary Customer Carrier</p>
                                               </div>
                                             </div>
                                           </div>

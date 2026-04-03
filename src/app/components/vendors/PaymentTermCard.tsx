@@ -99,7 +99,7 @@ function SplitTierDisplay({ term }: { term: PaymentTermPreset }) {
                 className={`h-[22px] rounded-md text-[10px] tabular-nums transition-all duration-200 cursor-pointer flex items-center justify-center px-2 ${
                   isActive
                     ? "shadow-sm"
-                    : "bg-transparent text-[#C0C9D4] hover:text-[#94A3B8]"
+                    : "bg-[#F1F5F9] text-[#64748B] hover:bg-[#E2E8F0]"
                 }`}
                 style={{
                   fontWeight: isActive ? 600 : 500,

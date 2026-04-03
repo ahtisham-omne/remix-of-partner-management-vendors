@@ -181,7 +181,7 @@ export function SearchablePartnerDropdown({
             )}
           </div>
           {showDefaultBadge && selectedItem.isDefault && (
-            <span className="text-[10px] text-[#0A77FF] bg-[#EDF4FF] border border-[#0A77FF]/20 px-1.5 py-0.5 rounded shrink-0" style={{ fontWeight: 600 }}>Default</span>
+            <span className="text-[10px] text-[#0A77FF] bg-[#EDF4FF] border border-[#0A77FF]/20 px-1.5 py-0.5 rounded shrink-0" style={{ fontWeight: 600 }}>Primary</span>
           )}
         </div>
       ) : (
@@ -617,7 +617,7 @@ export function FundedByDropdown({
                   </div>
                   <span className="text-[#0F172A] truncate" style={{ fontWeight: 500 }}>{selectedItem.name}</span>
                   {selectedItem.isDefault && (
-                    <span className="text-[10px] text-[#0A77FF] bg-[#EDF4FF] border border-[#0A77FF]/20 px-1.5 py-0.5 rounded shrink-0" style={{ fontWeight: 600 }}>Default</span>
+                    <span className="text-[10px] text-[#0A77FF] bg-[#EDF4FF] border border-[#0A77FF]/20 px-1.5 py-0.5 rounded shrink-0" style={{ fontWeight: 600 }}>Primary</span>
                   )}
                 </div>
               ) : (
@@ -656,7 +656,7 @@ export function FundedByDropdown({
                 </div>
                 <span className="text-sm text-[#0F172A] truncate" style={{ fontWeight: 500 }}>{item.name}</span>
                 {item.isDefault && (
-                  <span className="text-[10px] text-[#0A77FF] bg-[#EDF4FF] border border-[#0A77FF]/20 px-1.5 py-0.5 rounded shrink-0 ml-auto" style={{ fontWeight: 600 }}>Default</span>
+                  <span className="text-[10px] text-[#0A77FF] bg-[#EDF4FF] border border-[#0A77FF]/20 px-1.5 py-0.5 rounded shrink-0 ml-auto" style={{ fontWeight: 600 }}>Primary</span>
                 )}
                 {selectedId === item.id && !item.isDefault && <Check className="w-4 h-4 text-[#0A77FF] ml-auto shrink-0" />}
               </button>
