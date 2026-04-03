@@ -5802,7 +5802,7 @@ function ConfigPageContent({
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent className="z-[250] rounded-lg">
-                                  {CREATE_PT_TRIGGERS.map((t) => (
+                                  {CREATE_PT_TRIGGERS.filter((t) => t.id !== "delivery").map((t) => (
                                     <SelectItem key={t.id} value={t.id} className="py-2 px-3 text-sm">{t.label}</SelectItem>
                                   ))}
                                 </SelectContent>
