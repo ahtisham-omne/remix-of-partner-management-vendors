@@ -47,13 +47,14 @@ function AlertDialogOverlay({
 function AlertDialogContent({
   className,
   onInteractOutside,
+  overlayClassName,
   ...props
-}: React.ComponentProps<typeof AlertDialogPrimitive.Content> & { onInteractOutside?: (e: any) => void }) {
+}: React.ComponentProps<typeof AlertDialogPrimitive.Content> & { onInteractOutside?: (e: any) => void; overlayClassName?: string }) {
   return (
     <AlertDialogPortal>
       <AlertDialogPrimitive.Overlay
         data-slot="alert-dialog-overlay"
-        className="fixed inset-0 z-[200] bg-black/50"
+        className={cn("fixed inset-0 z-[200] bg-black/50", overlayClassName)}
       />
       <AlertDialogPrimitive.Content
         data-slot="alert-dialog-content"

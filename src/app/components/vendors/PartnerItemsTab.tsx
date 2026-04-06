@@ -67,6 +67,7 @@ import {
   Pencil,
   Archive,
   Trash2,
+  AlertTriangle,
   GripVertical,
   ArrowUp,
   ArrowDown,
@@ -432,6 +433,9 @@ function AddItemModal({
   onItemsAdded,
   onItemRemoved,
   activeSubTab,
+  generic,
+  contextLabel,
+  contextType,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
@@ -440,6 +444,9 @@ function AddItemModal({
   onItemsAdded: (items: PartnerItemData[]) => void;
   onItemRemoved: (id: string) => void;
   activeSubTab: "sell" | "purchase";
+  generic?: boolean;
+  contextLabel?: string;
+  contextType?: "discount" | "premium";
 }) {
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [search, setSearch] = useState("");
@@ -523,7 +530,9 @@ function AddItemModal({
     const items = INVENTORY_ITEMS.filter((it) => selectedIds.has(it.id));
     onItemsAdded(items);
     onOpenChange(false);
-    toast.success(`${items.length} item${items.length !== 1 ? "s" : ""} added to ${activeSubTab === "sell" ? "items they sell" : "items they purchase"}`);
+    toast.success(generic
+      ? `${items.length} item${items.length !== 1 ? "s" : ""} added`
+      : `${items.length} item${items.length !== 1 ? "s" : ""} added to ${activeSubTab === "sell" ? "items they sell" : "items they purchase"}`);
   }
 
   const [bulkRemoveConfirmOpen, setBulkRemoveConfirmOpen] = useState(false);
@@ -531,13 +540,15 @@ function AddItemModal({
   function handleBulkRemove() {
     const count = addedSelectedIds.size;
     addedSelectedIds.forEach((id) => onItemRemoved(id));
-    toast.success(`${count} item${count !== 1 ? "s" : ""} removed from ${activeSubTab === "sell" ? "items they sell" : "items they purchase"}`);
+    toast.success(generic
+      ? `${count} item${count !== 1 ? "s" : ""} removed`
+      : `${count} item${count !== 1 ? "s" : ""} removed from ${activeSubTab === "sell" ? "items they sell" : "items they purchase"}`);
     setAddedSelectedIds(new Set());
     setBulkRemoveConfirmOpen(false);
   }
 
-  const tradeLabel = activeSubTab === "sell" ? "Items They Sell" : "Items They Purchase";
-  const tradeShort = activeSubTab === "sell" ? "They Sell" : "They Purchase";
+  const tradeLabel = generic ? "Items" : (activeSubTab === "sell" ? "Items They Sell" : "Items They Purchase");
+  const tradeShort = generic ? "" : (activeSubTab === "sell" ? "They Sell" : "They Purchase");
   const tradeIcon = activeSubTab === "sell" ? Tag : ShoppingCart;
   const TradeIcon = tradeIcon;
 
@@ -688,11 +699,12 @@ function AddItemModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className={`flex flex-col p-0 gap-0 border-0 sm:border ${modalSizeClass}`}
+        className={`flex flex-col p-0 gap-0 border-0 sm:border ${generic ? "z-[230]" : ""} ${modalSizeClass}`}
         hideCloseButton
+        overlayClassName={generic ? "z-[225]" : undefined}
         style={{ boxShadow: "0 24px 48px -12px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.05)" }}
       >
-        <DialogTitle className="sr-only">{activeSubTab === "sell" ? "Manage Items They Sell" : "Manage Items They Purchase"}</DialogTitle>
+        <DialogTitle className="sr-only">{generic ? "Manage Items" : (activeSubTab === "sell" ? "Manage Items They Sell" : "Manage Items They Purchase")}</DialogTitle>
         <DialogDescription className="sr-only">Add or remove {tradeLabel.toLowerCase()}.</DialogDescription>
 
         {/* Header */}
@@ -701,9 +713,10 @@ function AddItemModal({
             <div className="min-w-0">
               <div className="flex items-center gap-2.5">
                 <h2 className="text-[15px] sm:text-[17px] text-[#0F172A]" style={{ fontWeight: 700 }}>
-                  {activeSubTab === "sell" ? "Manage Items They Sell" : "Manage Items They Purchase"}
+                  {generic ? "Manage Items" : (activeSubTab === "sell" ? "Manage Items They Sell" : "Manage Items They Purchase")}
                 </h2>
-                {/* Trade direction indicator */}
+                {/* Trade direction indicator — hidden in generic mode */}
+                {!generic && (
                 <span
                   className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] border"
                   style={{
@@ -716,9 +729,28 @@ function AddItemModal({
                   <TradeIcon className="w-3 h-3" />
                   {tradeLabel}
                 </span>
+                )}
+                {/* Context label — e.g. pricing rule name, colored by type */}
+                {generic && contextLabel && (
+                <span
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] border whitespace-nowrap shrink-0"
+                  style={{
+                    fontWeight: 600,
+                    backgroundColor: contextType === "premium" ? "#F5F3FF" : "#ECFDF5",
+                    color: contextType === "premium" ? "#6D28D9" : "#047857",
+                    borderColor: contextType === "premium" ? "#DDD6FE" : "#A7F3D0",
+                  }}
+                >
+                  {contextType === "premium" ? "Premium" : "Discount"}
+                  <span className="text-[10px] opacity-60">·</span>
+                  {contextLabel}
+                </span>
+                )}
               </div>
               <p className="text-[11px] sm:text-xs text-[#64748B] mt-1" style={{ fontWeight: 400 }}>
-                {activeSubTab === "sell"
+                {generic
+                  ? "Browse inventory to add items, or manage already added items."
+                  : activeSubTab === "sell"
                   ? "Browse inventory to add items they sell, or manage already added items."
                   : "Browse inventory to add items they purchase, or manage already added items."}
               </p>
@@ -1027,27 +1059,69 @@ function AddItemModal({
         </div>
       </DialogContent>
 
-      {/* Bulk remove confirmation */}
+      {/* Bulk remove confirmation — gradient style */}
       <AlertDialog open={bulkRemoveConfirmOpen} onOpenChange={setBulkRemoveConfirmOpen}>
-        <AlertDialogContent className="sm:max-w-[400px]">
-          <AlertDialogHeader>
-            <AlertDialogTitle>Remove {addedSelectedIds.size} item{addedSelectedIds.size !== 1 ? "s" : ""}?</AlertDialogTitle>
-            <AlertDialogDescription>
-              {addedSelectedIds.size === 1
-                ? "This item will be removed from "
-                : `These ${addedSelectedIds.size} items will be removed from `}
-              {activeSubTab === "sell" ? "items they sell" : "items they purchase"}. You can add them back later from the inventory.
+        <AlertDialogContent
+          className={`sm:max-w-[420px] p-0 gap-0 overflow-hidden rounded-2xl border-0 shadow-[0_24px_80px_-12px_rgba(0,0,0,0.25)] ${generic ? "z-[240]" : ""}`}
+          overlayClassName={generic ? "z-[235]" : undefined}
+          onInteractOutside={() => setBulkRemoveConfirmOpen(false)}
+        >
+          {/* Gradient header */}
+          <div className="relative flex flex-col items-center pt-10 pb-6" style={{ background: "linear-gradient(180deg, #FEF2F2 0%, rgba(254,242,242,0.3) 70%, transparent 100%)" }}>
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[180px] h-[80px] rounded-full blur-[50px] opacity-25" style={{ backgroundColor: "#EF4444" }} />
+            <div className="relative w-16 h-16 rounded-2xl flex items-center justify-center" style={{ backgroundColor: "#FEE2E2" }}>
+              <Trash2 className="w-8 h-8" style={{ color: "#DC2626" }} />
+            </div>
+            <span className="mt-4 px-3 py-1 rounded-full text-[11px]" style={{ fontWeight: 600, backgroundColor: "#FEF2F2", color: "#991B1B", textTransform: "uppercase" as const, letterSpacing: "0.05em" }}>
+              Remove Items
+            </span>
+          </div>
+          {/* Content */}
+          <div className="flex flex-col items-center text-center px-8 pb-8">
+            <AlertDialogHeader className="p-0 gap-0 text-center">
+              <AlertDialogTitle className="text-[18px] tracking-[-0.02em]" style={{ fontWeight: 600, color: "#0F172A" }}>
+                Remove {addedSelectedIds.size} item{addedSelectedIds.size !== 1 ? "s" : ""}?
+              </AlertDialogTitle>
+            </AlertDialogHeader>
+            <AlertDialogDescription asChild>
+              <div className="text-[13px] mt-2 max-w-[340px] mx-auto" style={{ color: "#475569", lineHeight: "1.65" }}>
+                <p>The following items will be removed. You can add them back later.</p>
+                {/* Items list */}
+                <div className="mt-3 max-h-[120px] overflow-y-auto text-left rounded-lg border border-[#E2E8F0] bg-[#F8FAFC]">
+                  {Array.from(addedSelectedIds).slice(0, 10).map((id) => {
+                    const item = existingItems.find((it) => it.id === id);
+                    return item ? (
+                      <div key={id} className="flex items-center gap-2 px-3 py-1.5 border-b border-[#F1F5F9] last:border-0">
+                        <Package className="w-3 h-3 text-[#94A3B8] shrink-0" />
+                        <span className="text-[12px] text-[#0F172A] font-mono truncate" style={{ fontWeight: 500 }}>{item.partNo}</span>
+                        <span className="text-[11px] text-[#64748B] truncate">{item.description}</span>
+                      </div>
+                    ) : null;
+                  })}
+                  {addedSelectedIds.size > 10 && (
+                    <div className="px-3 py-1.5 text-[11px] text-[#94A3B8] text-center" style={{ fontWeight: 500 }}>
+                      +{addedSelectedIds.size - 10} more items
+                    </div>
+                  )}
+                </div>
+              </div>
             </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleBulkRemove}
-              className="bg-[#DC2626] text-white hover:bg-[#B91C1C]"
-            >
-              Remove
-            </AlertDialogAction>
-          </AlertDialogFooter>
+            <div className="w-full mt-7 flex flex-col gap-2.5">
+              <AlertDialogAction
+                onClick={handleBulkRemove}
+                className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors hover:opacity-90"
+                style={{ fontWeight: 600, backgroundColor: "#DC2626", color: "#fff" }}
+              >
+                Remove {addedSelectedIds.size} Item{addedSelectedIds.size !== 1 ? "s" : ""}
+              </AlertDialogAction>
+              <AlertDialogCancel
+                className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors"
+                style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#334155" }}
+              >
+                Cancel
+              </AlertDialogCancel>
+            </div>
+          </div>
         </AlertDialogContent>
       </AlertDialog>
     </Dialog>
@@ -1068,7 +1142,7 @@ const DENSITY_CONFIG: { key: Density; label: string; description: string; icon: 
   { key: "card", label: "Card View", description: "Grid layout", icon: "layout-grid" },
 ];
 
-export function PartnerItemsTab({ vendor }: { vendor: Vendor }) {
+export function PartnerItemsTab({ vendor, hideHeader, compact, contextLabel, contextType }: { vendor: Vendor; hideHeader?: boolean; compact?: boolean; contextLabel?: string; contextType?: "discount" | "premium" }) {
   const generatedItems = useMemo(() => generateItemsFromVendor(vendor), [vendor]);
   const [addedItems, setAddedItems] = useState<PartnerItemData[]>([]);
   const [highlightedIds, setHighlightedIds] = useState<Set<string>>(new Set());
@@ -1589,12 +1663,13 @@ export function PartnerItemsTab({ vendor }: { vendor: Vendor }) {
 
   return (
     <>
-      <div className="border border-border rounded-xl bg-card overflow-clip flex flex-1 min-h-0" style={{ minHeight: 400 }}>
+      <div className={`bg-card overflow-clip flex flex-1 min-h-0 ${compact ? "elevated-z" : "border border-border rounded-xl"}`} style={compact ? undefined : { minHeight: 400 }}>
         <div className="flex-1 min-w-0 overflow-clip flex flex-col">
 
           {/* Header: Sub-tabs + Toolbar */}
           <div className="bg-card shrink-0">
-            {/* Sub-tabs row */}
+            {/* Sub-tabs row — hidden when hideHeader is true */}
+            {!hideHeader && (
             <div className="flex items-center justify-between gap-3 px-4 pt-2.5 pb-2 border-b border-border">
               <div className="inline-flex items-center rounded-lg bg-[#F1F5F9] p-0.5">
               {([
@@ -1636,6 +1711,7 @@ export function PartnerItemsTab({ vendor }: { vendor: Vendor }) {
                 <span className="hidden sm:inline">{subTab === "sell" ? "Add Items They Sell" : "Add Items They Purchase"}</span>
               </button>
             </div>
+            )}
 
             {/* Toolbar row: Search + Filters ... Count + Density + ColumnSelector */}
             <div className="flex items-center justify-between gap-3 px-4 py-2">
@@ -1686,6 +1762,8 @@ export function PartnerItemsTab({ vendor }: { vendor: Vendor }) {
 
               <div className="w-px h-5 bg-border/60 mx-0.5 hidden sm:block" />
 
+              {!compact && (
+              <>
               {/* Density dropdown */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -1728,6 +1806,21 @@ export function PartnerItemsTab({ vendor }: { vendor: Vendor }) {
                 active={columnDrawerOpen}
                 onClick={() => setColumnDrawerOpen(!columnDrawerOpen)}
               />
+              </>
+              )}
+
+              {/* Add Item — shown in compact mode */}
+              {compact && (
+                <button
+                  type="button"
+                  onClick={() => setAddModalOpen(true)}
+                  className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-sm shadow-sm transition-colors cursor-pointer"
+                  style={{ fontWeight: 600 }}
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  Add Item
+                </button>
+              )}
             </div>
           </div>
 
@@ -1760,7 +1853,7 @@ export function PartnerItemsTab({ vendor }: { vendor: Vendor }) {
           </div>
 
           {/* Content */}
-          {density === "card" ? (
+          {density === "card" && !compact ? (
             /* Card View */
             <div className="p-4 min-h-0 overflow-y-auto flex-1">
               {paginated.length === 0 ? (
@@ -1834,7 +1927,7 @@ export function PartnerItemsTab({ vendor }: { vendor: Vendor }) {
                                   <MoreHorizontal className="w-4 h-4" />
                                 </button>
                               </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
+                              <DropdownMenuContent align="end" className={compact ? "z-[230]" : ""} onClick={(e) => e.stopPropagation()}>
                                 <DropdownMenuItem onClick={() => toast.info("View item details coming soon!")}>
                                   <Eye className="w-4 h-4 mr-2" /> View Details
                                 </DropdownMenuItem>
@@ -2079,7 +2172,7 @@ export function PartnerItemsTab({ vendor }: { vendor: Vendor }) {
                               </DropdownMenuTrigger>
                               <DropdownMenuContent
                                 align="end"
-                                className="w-[180px]"
+                                className={`w-[180px] ${compact ? "z-[230]" : ""}`}
                                 onClick={(e) => e.stopPropagation()}
                               >
                                 <DropdownMenuItem onClick={() => toast.info("View Details — coming soon")}>
@@ -2194,7 +2287,8 @@ export function PartnerItemsTab({ vendor }: { vendor: Vendor }) {
           )}
         </div>
 
-        {/* Column Selector Side Drawer */}
+        {/* Column Selector Side Drawer — hidden in compact mode */}
+        {!compact && (
         <ColumnSelector
           columns={ITEM_COLUMN_DEFS}
           columnOrder={columnOrder}
@@ -2205,6 +2299,7 @@ export function PartnerItemsTab({ vendor }: { vendor: Vendor }) {
           open={columnDrawerOpen}
           onOpenChange={setColumnDrawerOpen}
         />
+        )}
       </div>
 
       {/* Column drag ghost — positioned via ref for zero re-renders during mousemove */}
@@ -2259,31 +2354,71 @@ export function PartnerItemsTab({ vendor }: { vendor: Vendor }) {
         onItemsAdded={handleItemsAdded}
         onItemRemoved={handleItemRemoved}
         activeSubTab={subTab}
+        generic={compact}
+        contextLabel={contextLabel}
+        contextType={contextType}
       />
 
-      {/* Remove item confirmation */}
+      {/* Remove item confirmation — gradient style */}
       <AlertDialog open={!!removeConfirmId} onOpenChange={(open) => { if (!open) setRemoveConfirmId(null); }}>
-        <AlertDialogContent className="sm:max-w-[400px]">
-          <AlertDialogHeader>
-            <AlertDialogTitle>Remove this item?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This item will be removed from {subTab === "sell" ? "items they sell" : "items they purchase"}. You can add it back later from the inventory.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => {
-                if (removeConfirmId) {
-                  handleItemRemoved(removeConfirmId);
-                  setRemoveConfirmId(null);
-                }
-              }}
-              className="bg-[#DC2626] text-white hover:bg-[#B91C1C]"
-            >
-              Remove
-            </AlertDialogAction>
-          </AlertDialogFooter>
+        <AlertDialogContent
+          className={`sm:max-w-[400px] p-0 gap-0 overflow-hidden rounded-2xl border-0 shadow-[0_24px_80px_-12px_rgba(0,0,0,0.25)] ${compact ? "z-[240]" : ""}`}
+          overlayClassName={compact ? "z-[235]" : undefined}
+          onInteractOutside={() => setRemoveConfirmId(null)}
+        >
+          {(() => {
+            const removeItem = removeConfirmId ? allItems.find((it) => it.id === removeConfirmId) : null;
+            return (
+              <>
+                {/* Gradient header */}
+                <div className="relative flex flex-col items-center pt-10 pb-6" style={{ background: "linear-gradient(180deg, #FEF2F2 0%, rgba(254,242,242,0.3) 70%, transparent 100%)" }}>
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[180px] h-[80px] rounded-full blur-[50px] opacity-25" style={{ backgroundColor: "#EF4444" }} />
+                  <div className="relative w-16 h-16 rounded-2xl flex items-center justify-center" style={{ backgroundColor: "#FEE2E2" }}>
+                    <AlertTriangle className="w-8 h-8" style={{ color: "#DC2626" }} />
+                  </div>
+                  <span className="mt-4 px-3 py-1 rounded-full text-[11px]" style={{ fontWeight: 600, backgroundColor: "#FEF2F2", color: "#991B1B", textTransform: "uppercase" as const, letterSpacing: "0.05em" }}>
+                    Caution
+                  </span>
+                </div>
+                {/* Content */}
+                <div className="flex flex-col items-center text-center px-8 pb-8">
+                  <AlertDialogHeader className="p-0 gap-0 text-center">
+                    <AlertDialogTitle className="text-[18px] tracking-[-0.02em]" style={{ fontWeight: 600, color: "#0F172A" }}>
+                      Remove this item?
+                    </AlertDialogTitle>
+                  </AlertDialogHeader>
+                  <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "#475569", lineHeight: "1.65" }}>
+                    {removeItem && (
+                      <>
+                        <span style={{ fontWeight: 600, color: "#1E293B" }}>{removeItem.partNo}</span>
+                        {" "}will be removed{compact ? "" : ` from ${subTab === "sell" ? "items they sell" : "items they purchase"}`}. You can add it back later from the inventory.
+                      </>
+                    )}
+                  </AlertDialogDescription>
+                  <div className="w-full mt-7 flex flex-col gap-2.5">
+                    <AlertDialogAction
+                      onClick={() => {
+                        if (removeConfirmId) {
+                          handleItemRemoved(removeConfirmId);
+                          setRemoveConfirmId(null);
+                        }
+                      }}
+                      className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors hover:opacity-90"
+                      style={{ fontWeight: 600, backgroundColor: "#DC2626", color: "#fff" }}
+                    >
+                      Remove Item
+                    </AlertDialogAction>
+                    <AlertDialogCancel
+                      className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors"
+                      style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#334155" }}
+                    >
+                      Cancel
+                    </AlertDialogCancel>
+                  </div>
+                </div>
+              </>
+            );
+          })()}
         </AlertDialogContent>
       </AlertDialog>
     </>

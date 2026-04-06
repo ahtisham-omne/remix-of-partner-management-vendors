@@ -1,6 +1,17 @@
 import React, { useState, useMemo, useCallback } from "react";
+import { PartnerItemsTab } from "./PartnerItemsTab";
 import { FilterPills } from "./FilterPills";
 import { Input } from "../ui/input";
+import { Button } from "../ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "../ui/alert-dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -63,6 +74,7 @@ import {
   TrendingDown,
   TrendingUp,
   ToggleLeft,
+  CircleSlash,
   Maximize2,
   Minimize2,
   DollarSign,
@@ -80,6 +92,8 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import type { Vendor, VendorConfigData } from "../../data/vendors";
+import { getAvatarTint } from "../../utils/avatarTints";
+import { useVendors } from "../../context/VendorContext";
 import { Textarea } from "../ui/textarea";
 import {
   PRICING_RULE_PRESETS,
@@ -176,7 +190,7 @@ const PART_NOS = [
 
 const ITEM_CATS = ["Electronics", "Hardware", "Cabinet", "Parts", "Fasteners", "Foam & Padding"];
 const ITEM_TYPES = ["Parts", "Equipment + Capital", "Equipment + Non-Capital", "Miscellaneous"];
-const CAT_NAMES = ["Ram Pro Master 2500", "Ram Pro Master 3500", "Ram Pro Master Default", "Ford Transit", "Sprinter Van"];
+const CAT_NAMES = ["Ram Pro Master 2500", "Ram Pro Master 3500", "Ram Pro Master Default", "Ford Transit", "Sprinter Van", "Freightliner M2", "International MV", "Kenworth T680", "Peterbilt 579", "Volvo VNL", "Mack Anthem", "Western Star 4900"];
 const CREATORS = ["Ahtisham Ahmad", "Sarah Chen", "Marcus Obi", "Elena Volkov"];
 const PARTNER_NAMES = [
   "Toyota International", "Ford Motor Company", "General Motors (GM)", "Tesla, Inc.",
@@ -221,16 +235,59 @@ function genItems(rng: () => number, count: number): AssociatedItem[] {
   }));
 }
 
+const CAT_DESCRIPTIONS = [
+  "Heavy-duty components for commercial fleet vehicles",
+  "OEM replacement parts for ambulance platforms",
+  "Interior trim and panel assemblies",
+  "Exterior body panels and structural components",
+  "Electrical harness and wiring assemblies",
+  "Brake system components and friction materials",
+  "Engine and drivetrain performance parts",
+  "Suspension and steering system components",
+  "HVAC and climate control modules",
+  "Fuel system and emissions components",
+  "Transmission and gearbox assemblies",
+  "Lighting and visibility components",
+];
+const CAT_TAG_POOL = ["Electronics", "Engine", "Brake", "Transmission", "Safety", "Performance", "Exhaust", "Wiring", "Sensors", "Controls", "HVAC", "Fuel", "Lighting", "Suspension", "Interior", "Exterior"];
+const CAT_STATUSES: ("Active" | "Inactive")[] = ["Active", "Active", "Active", "Active", "Active", "Active", "Active", "Inactive", "Inactive", "Active"];
+const CAT_CREATOR_POOL = [
+  { initials: "AA", name: "Ahtisham Ahmad", color: "#0A77FF" },
+  { initials: "SJ", name: "Sarah Johnson", color: "#7C3AED" },
+  { initials: "DK", name: "David Kim", color: "#D97706" },
+  { initials: "EC", name: "Emily Chen", color: "#059669" },
+  { initials: "MO", name: "Marcus Obi", color: "#DC2626" },
+  { initials: "EV", name: "Elena Volkov", color: "#0891B2" },
+];
+const CAT_LINKED_CODES = ["HXB-M10-40", "BRK-PAD-22", "ENG-VLV-16", "WIR-HAR-08", "SUS-ARM-12", "TRN-GR-05", "FUL-INJ-09", "LGT-LED-14", "HVC-CMP-03", "EXT-PNL-07"];
+const CAT_DATES = ["Mar 22, 2026", "Mar 18, 2026", "Mar 15, 2026", "Mar 10, 2026", "Feb 28, 2026", "Feb 22, 2026", "Feb 15, 2026", "Feb 08, 2026", "Jan 30, 2026", "Jan 22, 2026", "Jan 15, 2026", "Jan 08, 2026"];
+
 function genCategories(rng: () => number, count: number): AssociatedCategory[] {
-  return Array.from({ length: count }, (_, i) => ({
-    id: `cat-${i}`,
-    code: `CAT-${String(Math.floor(rng() * 900) + 100)}`,
-    name: pickArr(CAT_NAMES, rng),
-    description: pickArr(["Ambulance parts", "Electric platform", "Interior panels", "Exterior panels"], rng),
-    itemType: "Parts",
-    status: "Active" as const,
-    linkedItems: Math.floor(rng() * 40) + 2,
-  }));
+  const actualCount = Math.max(count, 10);
+  return Array.from({ length: actualCount }, (_, i) => {
+    const tagCount = Math.floor(rng() * 4) + 1;
+    const tags: string[] = [];
+    for (let t = 0; t < tagCount; t++) tags.push(CAT_TAG_POOL[Math.floor(rng() * CAT_TAG_POOL.length)]);
+    const creator = CAT_CREATOR_POOL[i % CAT_CREATOR_POOL.length];
+    return {
+      id: `cat-${i}`,
+      code: `C-${String(1001 + i)}`,
+      name: pickArr(CAT_NAMES, rng),
+      description: CAT_DESCRIPTIONS[i % CAT_DESCRIPTIONS.length],
+      itemType: "Parts",
+      status: CAT_STATUSES[i % CAT_STATUSES.length],
+      linkedItems: Math.floor(rng() * 40) + 2,
+      // Extended fields stored as JSON-safe extras
+      _tags: [...new Set(tags)],
+      _linkedCode: CAT_LINKED_CODES[i % CAT_LINKED_CODES.length],
+      _linkedCount: Math.floor(rng() * 8) + 1,
+      _creatorInitials: creator.initials,
+      _creatorName: creator.name,
+      _creatorColor: creator.color,
+      _createdDate: CAT_DATES[i % CAT_DATES.length],
+      _isMe: i === 0,
+    } as AssociatedCategory & Record<string, unknown>;
+  });
 }
 
 function genPartners(rng: () => number, count: number): AssociatedPartner[] {
@@ -289,7 +346,7 @@ const HARDCODED_RULES: HardcodedRuleDef[] = [
     validFrom: "1 Jan 2025", validTo: "30 Jun 2025", hasDateLimit: true, durationDays: 180,
     createdBy: "Ahtisham Ahmad", createdDate: "15 Jan 2025",
     tiers: [{ minQty: "$1,000", maxQty: "$32,000", discount: "10%" }],
-    itemCount: 12, categoryCount: 3, partnerCount: 8,
+    itemCount: 12, categoryCount: 12, partnerCount: 8,
   },
   {
     id: "hc-preset-disc-vol-single",
@@ -301,7 +358,7 @@ const HARDCODED_RULES: HardcodedRuleDef[] = [
     validFrom: "15 Feb 2025", validTo: "15 Aug 2025", hasDateLimit: true, durationDays: 180,
     createdBy: "Sarah Chen", createdDate: "10 Feb 2025",
     tiers: [{ minQty: "100 EA", maxQty: "500 EA", discount: "15%" }],
-    itemCount: 8, categoryCount: 2, partnerCount: 5,
+    itemCount: 8, categoryCount: 10, partnerCount: 5,
   },
   {
     id: "hc-preset-disc-val-multi",
@@ -318,7 +375,7 @@ const HARDCODED_RULES: HardcodedRuleDef[] = [
       { minQty: "$5,000", maxQty: "$15,000", discount: "15%" },
       { minQty: "$15,001", maxQty: "$50,000", discount: "20%" },
     ],
-    itemCount: 15, categoryCount: 4, partnerCount: 12,
+    itemCount: 15, categoryCount: 14, partnerCount: 12,
   },
   {
     id: "hc-preset-disc-vol-multi",
@@ -334,7 +391,7 @@ const HARDCODED_RULES: HardcodedRuleDef[] = [
       { minQty: "200 EA", maxQty: "499 EA", discount: "10%" },
       { minQty: "500 EA", maxQty: "1,000 EA", discount: "18%" },
     ],
-    itemCount: 10, categoryCount: 3, partnerCount: 7,
+    itemCount: 10, categoryCount: 11, partnerCount: 7,
   },
 
   // ───── PRESET PREMIUM RULES ─────
@@ -348,7 +405,7 @@ const HARDCODED_RULES: HardcodedRuleDef[] = [
     validFrom: "1 Apr 2025", validTo: "30 Sep 2025", hasDateLimit: true, durationDays: 182,
     createdBy: "Sarah Chen", createdDate: "25 Mar 2025",
     tiers: [{ minQty: "$200", maxQty: "$12,000", discount: "30%" }],
-    itemCount: 6, categoryCount: 1, partnerCount: 4,
+    itemCount: 6, categoryCount: 10, partnerCount: 4,
   },
   {
     id: "hc-preset-prem-vol-single",
@@ -360,7 +417,7 @@ const HARDCODED_RULES: HardcodedRuleDef[] = [
     validFrom: "20 Mar 2025", validTo: "20 Sep 2025", hasDateLimit: true, durationDays: 184,
     createdBy: "Marcus Obi", createdDate: "15 Mar 2025",
     tiers: [{ minQty: "10 EA", maxQty: "400 EA", discount: "16%" }],
-    itemCount: 5, categoryCount: 2, partnerCount: 3,
+    itemCount: 5, categoryCount: 10, partnerCount: 3,
   },
   {
     id: "hc-preset-prem-val-multi",
@@ -376,7 +433,7 @@ const HARDCODED_RULES: HardcodedRuleDef[] = [
       { minQty: "$200", maxQty: "$499", discount: "15%", isFixRate: true },
       { minQty: "$500", maxQty: "$1,500", discount: "8%" },
     ],
-    itemCount: 9, categoryCount: 2, partnerCount: 6,
+    itemCount: 9, categoryCount: 10, partnerCount: 6,
   },
   {
     id: "hc-preset-prem-vol-multi",
@@ -393,7 +450,7 @@ const HARDCODED_RULES: HardcodedRuleDef[] = [
       { minQty: "50 EA", maxQty: "99 EA", discount: "8%" },
       { minQty: "100 EA", maxQty: "250 EA", discount: "3%" },
     ],
-    itemCount: 14, categoryCount: 5, partnerCount: 10,
+    itemCount: 14, categoryCount: 15, partnerCount: 10,
   },
 
   // ───── CUSTOM DISCOUNT RULES ─────
@@ -407,7 +464,7 @@ const HARDCODED_RULES: HardcodedRuleDef[] = [
     validFrom: "1 Apr 2025", validTo: "30 Jun 2025", hasDateLimit: true, durationDays: 90,
     createdBy: "Ahtisham Ahmad", createdDate: "20 Mar 2025",
     tiers: [{ minQty: "$2,500", maxQty: "$45,000", discount: "12%" }],
-    itemCount: 7, categoryCount: 2, partnerCount: 6,
+    itemCount: 7, categoryCount: 10, partnerCount: 6,
   },
   {
     id: "hc-custom-disc-vol-single",
@@ -419,7 +476,7 @@ const HARDCODED_RULES: HardcodedRuleDef[] = [
     validFrom: "15 Jan 2025", validTo: "15 Jul 2025", hasDateLimit: true, durationDays: 181,
     createdBy: "Sarah Chen", createdDate: "10 Jan 2025",
     tiers: [{ minQty: "250 EA", maxQty: "2,000 EA", discount: "20%" }],
-    itemCount: 18, categoryCount: 1, partnerCount: 9,
+    itemCount: 18, categoryCount: 10, partnerCount: 9,
   },
   {
     id: "hc-custom-disc-val-multi",
@@ -436,7 +493,7 @@ const HARDCODED_RULES: HardcodedRuleDef[] = [
       { minQty: "$10,000", maxQty: "$24,999", discount: "14%" },
       { minQty: "$25,000", maxQty: "$100,000", discount: "19%", isFixRate: true },
     ],
-    itemCount: 22, categoryCount: 5, partnerCount: 15,
+    itemCount: 22, categoryCount: 13, partnerCount: 15,
   },
   {
     id: "hc-custom-disc-vol-multi",
@@ -452,7 +509,7 @@ const HARDCODED_RULES: HardcodedRuleDef[] = [
       { minQty: "300 EA", maxQty: "749 EA", discount: "12%" },
       { minQty: "750 EA", maxQty: "3,000 EA", discount: "22%" },
     ],
-    itemCount: 11, categoryCount: 3, partnerCount: 8,
+    itemCount: 11, categoryCount: 12, partnerCount: 8,
   },
 
   // ───── CUSTOM PREMIUM RULES ─────
@@ -466,7 +523,7 @@ const HARDCODED_RULES: HardcodedRuleDef[] = [
     validFrom: "1 Mar 2025", validTo: "28 Feb 2026", hasDateLimit: false, durationDays: 365,
     createdBy: "Ahtisham Ahmad", createdDate: "25 Feb 2025",
     tiers: [{ minQty: "$50", maxQty: "$5,000", discount: "18%" }],
-    itemCount: 4, categoryCount: 1, partnerCount: 11,
+    itemCount: 4, categoryCount: 10, partnerCount: 11,
   },
   {
     id: "hc-custom-prem-vol-single",
@@ -478,7 +535,7 @@ const HARDCODED_RULES: HardcodedRuleDef[] = [
     validFrom: "10 Feb 2025", validTo: "10 Aug 2025", hasDateLimit: true, durationDays: 181,
     createdBy: "Sarah Chen", createdDate: "5 Feb 2025",
     tiers: [{ minQty: "1 EA", maxQty: "29 EA", discount: "12%" }],
-    itemCount: 0, categoryCount: 0, partnerCount: 5,
+    itemCount: 0, categoryCount: 10, partnerCount: 5,
   },
   {
     id: "hc-custom-prem-val-multi",
@@ -494,7 +551,7 @@ const HARDCODED_RULES: HardcodedRuleDef[] = [
       { minQty: "$5,000", maxQty: "$19,999", discount: "10%" },
       { minQty: "$20,000", maxQty: "$75,000", discount: "18%", isFixRate: true },
     ],
-    itemCount: 3, categoryCount: 1, partnerCount: 4,
+    itemCount: 3, categoryCount: 10, partnerCount: 4,
   },
   {
     id: "hc-custom-prem-vol-multi",
@@ -510,7 +567,7 @@ const HARDCODED_RULES: HardcodedRuleDef[] = [
       { minQty: "6 EA", maxQty: "15 EA", discount: "20%", isFixRate: true },
       { minQty: "16 EA", maxQty: "40 EA", discount: "10%" },
     ],
-    itemCount: 8, categoryCount: 2, partnerCount: 7,
+    itemCount: 8, categoryCount: 10, partnerCount: 7,
   },
 ];
 
@@ -523,7 +580,7 @@ function generatePricingRules(vendor: Vendor, cfg?: VendorConfigData): PricingRu
   cfgRules.forEach((cr) => {
     const p = PRICING_RULE_PRESETS.find((x) => x.id === cr.id);
     const itemCount = Math.floor(rng() * 14) + 3;
-    const catCount = Math.floor(rng() * 4) + 1;
+    const catCount = Math.floor(rng() * 6) + 10;
     const partnerCount = Math.floor(rng() * 10) + 3;
     const durDays = [60, 90, 180, 365][Math.floor(rng() * 4)];
     const start = new Date(2025, Math.floor(rng() * 4), Math.floor(rng() * 25) + 1);
@@ -689,7 +746,7 @@ function PricingRuleCard({ rule, onClick }: { rule: PricingRule; onClick: () => 
                   <Copy className="w-3.5 h-3.5 text-[#64748B]" /> Duplicate as Custom
                 </DropdownMenuItem>
                 <DropdownMenuItem className="gap-2 py-1.5 cursor-pointer text-[13px]" onSelect={() => toast.info("Toggle coming soon")}>
-                  <ToggleLeft className="w-3.5 h-3.5 text-[#64748B]" /> {rule.status === "Active" ? "Deactivate" : "Activate"}
+                  <CircleSlash className="w-3.5 h-3.5 text-[#64748B]" /> {rule.status === "Active" ? "Deactivate" : "Activate"}
                 </DropdownMenuItem>
                 {!isPreset && (
                   <>
@@ -878,12 +935,82 @@ function ItemTypeBadge({ type }: { type: string }) {
   );
 }
 
-export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", onApply, onDuplicate, onDisable }: { rule: PricingRule | null; open: boolean; onClose: () => void; mode?: "view" | "create"; onApply?: (rule: PricingRule) => void; onDuplicate?: (rule: PricingRule) => void; onDisable?: (rule: PricingRule) => void }) {
+// Generate inventory of available categories for the add modal
+const INVENTORY_CATEGORIES: (AssociatedCategory & Record<string, unknown>)[] = (() => {
+  const rng = seededRng(777);
+  const names = ["Fasteners & Hardware", "Brake Systems", "Engine Components", "Electrical Systems", "Suspension Parts", "HVAC Modules", "Fuel Systems", "Transmission Parts", "Lighting & Signals", "Body Panels", "Interior Trim", "Exhaust Systems", "Power Steering", "Cooling Systems", "Safety Equipment", "Wheel & Tire", "Fluid & Lubricants", "Gaskets & Seals", "Belts & Hoses", "Sensors & Controls", "Paint & Finish", "Glass & Mirrors", "Audio & Electronics", "Towing & Hitch", "Tools & Equipment"];
+  const descs = ["Complete range of components for vehicle assembly", "OEM-spec replacement and aftermarket parts", "High-performance grade components", "Commercial fleet service parts", "Heavy-duty industrial components"];
+  return names.map((name, i) => {
+    const tagCount = Math.floor(rng() * 3) + 1;
+    const tags: string[] = [];
+    for (let t = 0; t < tagCount; t++) tags.push(CAT_TAG_POOL[Math.floor(rng() * CAT_TAG_POOL.length)]);
+    const creator = CAT_CREATOR_POOL[i % CAT_CREATOR_POOL.length];
+    return {
+      id: `inv-cat-${i}`,
+      code: `C-${String(2001 + i)}`,
+      name,
+      description: descs[i % descs.length],
+      itemType: "Parts",
+      status: (rng() > 0.15 ? "Active" : "Inactive") as "Active" | "Inactive",
+      linkedItems: Math.floor(rng() * 30) + 5,
+      _tags: [...new Set(tags)],
+      _linkedCode: CAT_LINKED_CODES[i % CAT_LINKED_CODES.length],
+      _linkedCount: Math.floor(rng() * 6) + 1,
+      _creatorInitials: creator.initials,
+      _creatorName: creator.name,
+      _creatorColor: creator.color,
+      _createdDate: CAT_DATES[i % CAT_DATES.length],
+      _isMe: false,
+    };
+  });
+})();
+
+export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", onApply, onDuplicate, onDisable, onEdit, vendor }: { rule: PricingRule | null; open: boolean; onClose: () => void; mode?: "view" | "create"; onApply?: (rule: PricingRule) => void; onDuplicate?: (rule: PricingRule) => void; onDisable?: (rule: PricingRule) => void; onEdit?: (rule: PricingRule) => void; vendor?: Vendor }) {
   const [tab, setTab] = useState<string>("items");
   const [itemSearch, setItemSearch] = useState("");
   const [catSearch, setCatSearch] = useState("");
   const [partnerSearch, setPartnerSearch] = useState("");
   const [isFullscreen, setIsFullscreen] = useState(false);
+
+  // Category management state
+  const [addedCats, setAddedCats] = useState<(AssociatedCategory & Record<string, unknown>)[]>([]);
+  const [catModalOpen, setCatModalOpen] = useState(false);
+  const [catModalView, setCatModalView] = useState<"browse" | "added">("browse");
+  const [catModalSearch, setCatModalSearch] = useState("");
+  const [catModalAddedSearch, setCatModalAddedSearch] = useState("");
+  const [catModalSelectedIds, setCatModalSelectedIds] = useState<Set<string>>(new Set());
+  const [catModalAddedSelectedIds, setCatModalAddedSelectedIds] = useState<Set<string>>(new Set());
+  const [catRemoveConfirmOpen, setCatRemoveConfirmOpen] = useState(false);
+  const [catRemoveSingleId, setCatRemoveSingleId] = useState<string | null>(null);
+
+  // Partner management state
+  const [addedPartnerIds, setAddedPartnerIds] = useState<Set<string>>(new Set());
+  const [partnerModalOpen, setPartnerModalOpen] = useState(false);
+  const [partnerModalView, setPartnerModalView] = useState<"browse" | "added">("browse");
+  const [partnerModalSearch, setPartnerModalSearch] = useState("");
+  const [partnerModalAddedSearch, setPartnerModalAddedSearch] = useState("");
+  const [partnerModalSelectedIds, setPartnerModalSelectedIds] = useState<Set<string>>(new Set());
+  const [partnerModalAddedSelectedIds, setPartnerModalAddedSelectedIds] = useState<Set<string>>(new Set());
+  const [partnerRemoveConfirmOpen, setPartnerRemoveConfirmOpen] = useState(false);
+  const [partnerRemoveSingleId, setPartnerRemoveSingleId] = useState<string | null>(null);
+
+  // Archive & Disable confirmation state
+  const [archiveConfirmOpen, setArchiveConfirmOpen] = useState(false);
+  const [disableConfirmOpen, setDisableConfirmOpen] = useState(false);
+
+  // All hooks must be before early return
+  const { vendors: ctxVendors } = useVendors();
+  const rulePartners = rule?.partners || [];
+  const rulePartnerCount = rule?.partnerCount || 0;
+  const assignedPartnerIds = useMemo(() => new Set([...addedPartnerIds, ...rulePartners.map((p) => p.id)]), [addedPartnerIds, rulePartners]);
+  const allPartnerVendors = useMemo(() => ctxVendors.filter((v) => assignedPartnerIds.has(v.id)), [ctxVendors, assignedPartnerIds]);
+  const availablePartnerVendors = useMemo(() => ctxVendors.filter((v) => !assignedPartnerIds.has(v.id)), [ctxVendors, assignedPartnerIds]);
+  const assignedVendors = useMemo(() => {
+    const matched = ctxVendors.filter((v) => assignedPartnerIds.has(v.id));
+    if (matched.length >= rulePartnerCount) return matched;
+    const remaining = ctxVendors.filter((v) => !assignedPartnerIds.has(v.id));
+    return [...matched, ...remaining.slice(0, Math.max(0, rulePartnerCount - matched.length))];
+  }, [ctxVendors, assignedPartnerIds, rulePartnerCount]);
 
   if (!rule) return null;
   const isDis = rule.category === "discount";
@@ -891,6 +1018,13 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
   const theme = isDis
     ? { text: "#047857", pillBg: "#ECFDF5", pillBorder: "#D1FAE5" }
     : { text: "#6D28D9", pillBg: "#F5F3FF", pillBorder: "#EDE9FE" };
+
+  // All categories = rule's original + user-added
+  const allCats = [...addedCats, ...rule.categories];
+  const allCatIds = new Set(allCats.map((c) => c.id));
+
+  // Available inventory (not already added)
+  const availableCats = INVENTORY_CATEGORIES.filter((c) => !allCatIds.has(c.id));
 
   const modalBaseClass = "!fixed !inset-0 !translate-x-0 !translate-y-0 !m-auto !w-full !h-full transition-[max-width,max-height,border-radius] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]";
   const modalSizeClass = isFullscreen
@@ -900,17 +1034,79 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
   const filteredItems = rule.items.filter((it) =>
     !itemSearch.trim() || it.partNo.toLowerCase().includes(itemSearch.toLowerCase()) || it.description.toLowerCase().includes(itemSearch.toLowerCase())
   );
-  const filteredCats = rule.categories.filter((c) =>
-    !catSearch.trim() || c.name.toLowerCase().includes(catSearch.toLowerCase())
+  const filteredCats = allCats.filter((c) =>
+    !catSearch.trim() || c.name.toLowerCase().includes(catSearch.toLowerCase()) || c.code.toLowerCase().includes(catSearch.toLowerCase())
   );
+
+  // Category modal helpers
+  const catModalFiltered = catModalSearch.trim()
+    ? availableCats.filter((c) => c.name.toLowerCase().includes(catModalSearch.toLowerCase()) || c.code.toLowerCase().includes(catModalSearch.toLowerCase()))
+    : availableCats;
+  const catModalAddedFiltered = catModalAddedSearch.trim()
+    ? allCats.filter((c) => c.name.toLowerCase().includes(catModalAddedSearch.toLowerCase()) || c.code.toLowerCase().includes(catModalAddedSearch.toLowerCase()))
+    : allCats;
+
+  const handleAddCategories = () => {
+    const items = INVENTORY_CATEGORIES.filter((c) => catModalSelectedIds.has(c.id));
+    setAddedCats((prev) => [...items, ...prev]);
+    setCatModalOpen(false);
+    setCatModalSelectedIds(new Set());
+    toast.success(`${items.length} categor${items.length !== 1 ? "ies" : "y"} added`);
+  };
+
+  const handleRemoveCategory = (id: string) => {
+    setAddedCats((prev) => prev.filter((c) => c.id !== id));
+    setCatRemoveSingleId(null);
+    toast.success("Category removed");
+  };
+
+  const handleBulkRemoveCategories = () => {
+    catModalAddedSelectedIds.forEach((id) => {
+      setAddedCats((prev) => prev.filter((c) => c.id !== id));
+    });
+    const count = catModalAddedSelectedIds.size;
+    setCatModalAddedSelectedIds(new Set());
+    setCatRemoveConfirmOpen(false);
+    toast.success(`${count} categor${count !== 1 ? "ies" : "y"} removed`);
+  };
+
+  const handleAddPartners = () => {
+    setAddedPartnerIds((prev) => {
+      const next = new Set(prev);
+      partnerModalSelectedIds.forEach((id) => next.add(id));
+      return next;
+    });
+    const count = partnerModalSelectedIds.size;
+    setPartnerModalSelectedIds(new Set());
+    setPartnerModalOpen(false);
+    toast.success(`${count} partner${count !== 1 ? "s" : ""} added`);
+  };
+
+  const handleRemovePartner = (id: string) => {
+    setAddedPartnerIds((prev) => { const n = new Set(prev); n.delete(id); return n; });
+    setPartnerRemoveSingleId(null);
+    toast.success("Partner removed");
+  };
+
+  const handleBulkRemovePartners = () => {
+    setAddedPartnerIds((prev) => {
+      const n = new Set(prev);
+      partnerModalAddedSelectedIds.forEach((id) => n.delete(id));
+      return n;
+    });
+    const count = partnerModalAddedSelectedIds.size;
+    setPartnerModalAddedSelectedIds(new Set());
+    setPartnerRemoveConfirmOpen(false);
+    toast.success(`${count} partner${count !== 1 ? "s" : ""} removed`);
+  };
   const filteredPartners = rule.partners.filter((p) =>
     !partnerSearch.trim() || p.name.toLowerCase().includes(partnerSearch.toLowerCase())
   );
 
   const PR_DETAIL_TABS = [
     { id: "items", label: "Items", icon: Package, count: rule.itemCount },
-    { id: "categories", label: "Categories", icon: Layers, count: rule.categoryCount },
-    { id: "partner", label: "Partners", icon: Users, count: rule.partnerCount },
+    { id: "categories", label: "Categories", icon: Layers, count: allCats.length },
+    { id: "partner", label: "Partners", icon: Users, count: assignedVendors.length },
     { id: "notes", label: "Notes", icon: FileText, count: PR_DUMMY_NOTES.length },
     { id: "attachments", label: "Attachments", icon: Paperclip, count: PR_DUMMY_ATTACHMENTS.length },
     { id: "activity", label: "Recent Activity", icon: Clock, count: 0 },
@@ -942,7 +1138,7 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
               {mode === "view" && (
                 <>
                   <button
-                    onClick={() => !isPreset && toast.info("Edit coming soon")}
+                    onClick={() => { if (!isPreset && onEdit && rule) { onEdit(rule); onClose(); } }}
                     disabled={isPreset}
                     className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#334155] hover:bg-[#F8FAFC] transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white"
                     style={{ fontWeight: 500 }}
@@ -950,27 +1146,19 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
                     <Pencil className="w-3.5 h-3.5" /> Edit
                   </button>
                   <button
-                    onClick={() => !isPreset && toast.info("Archive coming soon")}
+                    onClick={() => !isPreset && setArchiveConfirmOpen(true)}
                     disabled={isPreset}
-                    className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#334155] hover:bg-[#F8FAFC] transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white"
+                    className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#FECACA] bg-[#FEF2F2] text-xs text-[#DC2626] hover:bg-[#FEE2E2] hover:border-[#FCA5A5] transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#FEF2F2]"
                     style={{ fontWeight: 500 }}
                   >
-                    <Archive className="w-3.5 h-3.5 text-[#DC2626]" /> Archive
+                    <Archive className="w-3.5 h-3.5" /> Archive
                   </button>
                   <button
-                    onClick={() => {
-                      if (rule && onDisable) {
-                        onDisable(rule);
-                        toast.success(`"${rule.name}" has been disabled`);
-                        onClose();
-                      } else {
-                        toast.info("Disable coming soon");
-                      }
-                    }}
-                    className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#334155] hover:bg-[#F8FAFC] transition-colors cursor-pointer"
+                    onClick={() => setDisableConfirmOpen(true)}
+                    className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#FDE68A] bg-[#FFFBEB] text-xs text-[#92400E] hover:bg-[#FEF3C7] hover:border-[#FCD34D] transition-colors cursor-pointer"
                     style={{ fontWeight: 500 }}
                   >
-                    <ToggleLeft className="w-3.5 h-3.5" /> Disable
+                    <CircleSlash className="w-3.5 h-3.5" /> Disable
                   </button>
                 </>
               )}
@@ -1014,259 +1202,462 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
               })}
             </div>
 
-            {/* Items Tab */}
-            {tab === "items" && (
+            {/* Items Tab — uses the shared PartnerItemsTab component */}
+            {tab === "items" && vendor && (
               <div className="flex-1 flex flex-col overflow-hidden">
-                <div className="px-4 py-3 shrink-0 bg-white border-b border-[#E2E8F0]">
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-2 flex-1 min-w-0">
-                      <div className="relative flex-1 max-w-[240px]">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8] pointer-events-none" />
-                        <input type="text" value={itemSearch} onChange={(e) => setItemSearch(e.target.value)} placeholder="Search items..." className="w-full pl-9 pr-3 h-8 text-xs bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg focus:outline-none focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 transition-colors placeholder:text-[#94A3B8]" />
-                      </div>
-                      <button className="h-8 px-3 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#334155] hover:bg-[#F8FAFC] cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 500 }}>
-                        <SlidersHorizontal className="w-3.5 h-3.5" /> Filters
-                      </button>
-                    </div>
-                    <button className="h-8 px-3 rounded-lg bg-[#0A77FF] text-white text-xs hover:bg-[#0A77FF]/90 cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 500 }}>
-                      + Add Item
-                    </button>
-                  </div>
-                </div>
-
-                <div className="flex-1 overflow-auto">
-                  {filteredItems.length === 0 ? (
-                    <div className="flex flex-col items-center gap-2 py-16 text-[#94A3B8]">
-                      <Package className="w-8 h-8" />
-                      <p className="text-[13px]" style={{ fontWeight: 500 }}>No items assigned</p>
-                    </div>
-                  ) : (
-                    <table className="w-full text-xs">
-                      <thead className="sticky top-0 z-10">
-                        <tr className="bg-[#F8FAFC]">
-                          <th className="text-left pl-4 pr-2 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Item</th>
-                          <th className="text-left pl-4 pr-2 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Description</th>
-                          <th className="text-left pl-4 pr-2 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Category</th>
-                          <th className="text-left pl-4 pr-2 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Item Type</th>
-                          <th className="text-left pl-4 pr-4 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Status</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {filteredItems.map((item) => {
-                          const statusColor = item.status === "Active"
-                            ? { bg: "#F0FDF4", text: "#16A34A", border: "#BBF7D0", dot: "#16A34A" }
-                            : { bg: "#FEF2F2", text: "#DC2626", border: "#FECACA", dot: "#DC2626" };
-                          return (
-                            <tr key={item.id} className="bg-white hover:bg-[#F8FAFC] transition-colors border-b border-[#F1F5F9]">
-                              <td className="pl-4 pr-2 py-3">
-                                <div className="flex items-center gap-3">
-                                  <div className="w-9 h-9 rounded-lg bg-[#F1F5F9] flex items-center justify-center shrink-0 border border-[#E2E8F0]">
-                                    <Package className="w-3.5 h-3.5 text-[#94A3B8]" />
-                                  </div>
-                                  <span className="font-mono text-[12px] text-[#0F172A] whitespace-nowrap" style={{ fontWeight: 600 }}>{item.partNo}</span>
-                                </div>
-                              </td>
-                              <td className="pl-4 pr-2 py-3 max-w-[220px]">
-                                <p className="text-[12px] text-[#0F172A] truncate" style={{ fontWeight: 500 }}>{item.description}</p>
-                              </td>
-                              <td className="pl-4 pr-2 py-3 text-[12px] text-[#334155] whitespace-nowrap" style={{ fontWeight: 500 }}>{item.category}</td>
-                              <td className="pl-4 pr-2 py-3 whitespace-nowrap">
-                                <ItemTypeBadge type={item.itemType} />
-                              </td>
-                              <td className="pl-4 pr-4 py-3 whitespace-nowrap">
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px]" style={{ fontWeight: 600, backgroundColor: statusColor.bg, color: statusColor.text, border: `1px solid ${statusColor.border}` }}>
-                                  <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: statusColor.dot }} />
-                                  {item.status}
-                                </span>
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  )}
-                </div>
-
-                <div className="flex items-center justify-between px-4 py-2.5 border-t border-[#E2E8F0] shrink-0 bg-white">
-                  <span className="text-[11px] text-[#64748B]">Showing <span className="text-[#0F172A]" style={{ fontWeight: 600 }}>{filteredItems.length}</span> of <span className="text-[#0F172A]" style={{ fontWeight: 600 }}>{rule.itemCount}</span> items</span>
-                  <div className="flex items-center gap-2 text-[11px] text-[#64748B]">
-                    <span>Records per page</span>
-                    <select className="h-6 px-1.5 rounded border border-[#E2E8F0] bg-white text-[11px] text-[#334155] cursor-pointer outline-none">
-                      <option>20</option><option>50</option>
-                    </select>
-                  </div>
+                <PartnerItemsTab vendor={vendor} hideHeader compact contextLabel={rule.name} contextType={rule.category === "discount" ? "discount" : "premium"} />
+              </div>
+            )}
+            {tab === "items" && !vendor && (
+              <div className="flex-1 flex items-center justify-center text-muted-foreground">
+                <div className="text-center">
+                  <Package className="w-8 h-8 mx-auto mb-2" />
+                  <p className="text-sm">No items data available</p>
                 </div>
               </div>
             )}
 
-            {/* Categories Tab */}
-            {tab === "categories" && (
-              <div className="flex-1 flex flex-col overflow-hidden">
-                <div className="px-4 py-3 shrink-0 bg-white border-b border-[#E2E8F0]">
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-2 flex-1 min-w-0">
-                      <div className="relative flex-1 max-w-[240px]">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8] pointer-events-none" />
-                        <input type="text" value={catSearch} onChange={(e) => setCatSearch(e.target.value)} placeholder="Search categories..." className="w-full pl-9 pr-3 h-8 text-xs bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg focus:outline-none focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 transition-colors placeholder:text-[#94A3B8]" />
-                      </div>
-                      <button className="h-8 px-3 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#334155] hover:bg-[#F8FAFC] cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 500 }}>
-                        <SlidersHorizontal className="w-3.5 h-3.5" /> Filters
-                      </button>
+            {/* Categories Tab — exact partner listing table match */}
+            {tab === "categories" && (() => {
+              const ST: Record<string, { bg: string; text: string; border: string }> = {
+                "Active": { bg: "#ECFDF5", text: "#065F46", border: "#A7F3D0" },
+                "Inactive": { bg: "#FFFBEB", text: "#92400E", border: "#FDE68A" },
+              };
+              // Ensure we always have data by reading extended fields
+              const cats = filteredCats.map((cat) => {
+                const e = cat as any;
+                return {
+                  ...cat,
+                  tags: (e._tags || [cat.name]) as string[],
+                  linkedCode: (e._linkedCode || cat.code) as string,
+                  linkedCount: (e._linkedCount ?? cat.linkedItems) as number,
+                  creatorInitials: (e._creatorInitials || "??") as string,
+                  creatorName: (e._creatorName || "Unknown") as string,
+                  creatorColor: (e._creatorColor || "#94A3B8") as string,
+                  createdDate: (e._createdDate || "—") as string,
+                  isMe: !!e._isMe,
+                };
+              });
+
+              return (
+              <div className="flex-1 flex flex-col overflow-hidden bg-white">
+                {/* Toolbar — same as partner listing */}
+                <div className="flex items-center justify-between gap-3 px-4 pt-3 pb-2 shrink-0">
+                  <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                    <div className="relative flex-1 max-w-xs">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70 pointer-events-none" />
+                      <input type="text" value={catSearch} onChange={(e) => setCatSearch(e.target.value)} placeholder="Search categories..." className="w-full pl-9 pr-8 h-9 text-sm bg-white border border-border/80 rounded-lg shadow-sm focus:outline-none focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 transition-colors placeholder:text-muted-foreground/50" />
+                      {catSearch && (
+                        <button onClick={() => setCatSearch("")} className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded-full hover:bg-muted/60 text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      )}
                     </div>
-                    <button className="h-8 px-3 rounded-lg bg-[#0A77FF] text-white text-xs hover:bg-[#0A77FF]/90 cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 500 }}>
-                      + Add Category
+                    <button className="inline-flex items-center justify-center h-9 gap-1.5 px-3 rounded-lg border border-border/80 bg-white shadow-sm hover:bg-muted/50 transition-colors cursor-pointer outline-none shrink-0 text-foreground" style={{ fontWeight: 500 }}>
+                      <SlidersHorizontal className="w-3.5 h-3.5 text-muted-foreground" />
+                      <span className="text-sm">Filters</span>
+                    </button>
+                  </div>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <span className="text-sm tabular-nums mr-1 hidden sm:inline" style={{ fontWeight: 500 }}>
+                      <span className="text-foreground">{cats.length}</span>
+                      <span className="text-muted-foreground/70"> categories</span>
+                    </span>
+                    <div className="w-px h-5 bg-border/60 mx-0.5 hidden sm:block" />
+                    <button onClick={() => { setCatModalOpen(true); setCatModalView("browse"); setCatModalSearch(""); setCatModalAddedSearch(""); setCatModalSelectedIds(new Set()); setCatModalAddedSelectedIds(new Set()); }} className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-sm shadow-sm transition-colors cursor-pointer" style={{ fontWeight: 600 }}>
+                      <Plus className="w-3.5 h-3.5" /> Add Category
                     </button>
                   </div>
                 </div>
-                <div className="flex-1 overflow-auto">
-                  {filteredCats.length === 0 ? (
-                    <div className="flex flex-col items-center gap-2 py-16 text-[#94A3B8]">
+
+                {/* Quick filter pills — same as partner listing */}
+                <div className="flex items-center gap-1.5 overflow-x-auto px-4 pb-3 shrink-0">
+                  {(["all", "Active", "Inactive"] as const).map((f) => {
+                    const cnt = f === "all" ? cats.length : cats.filter((c) => c.status === f).length;
+                    return (
+                      <button
+                        key={f}
+                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                          f === "all"
+                            ? "border-primary bg-[#EDF4FF] hover:bg-[#D6E8FF] active:bg-[#ADD1FF]"
+                            : "border-border text-muted-foreground hover:bg-muted/60 hover:text-foreground hover:border-muted-foreground/30 active:bg-muted"
+                        }`}
+                        style={{ fontWeight: f === "all" ? 500 : 400, color: f === "all" ? "#0A77FF" : undefined }}
+                      >
+                        {f === "all" ? "All Categories" : f}
+                        <span className={`text-[10px] rounded-full px-1.5 py-px min-w-[18px] text-center ${f === "all" ? "bg-primary/10" : "bg-muted"}`} style={{ fontWeight: 600, color: f === "all" ? "#0A77FF" : "#475569" }}>
+                          {cnt}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Divider */}
+                <div className="border-t border-border shrink-0" />
+
+                {/* Table — exact partner listing pattern */}
+                <div className="min-h-0 overflow-auto flex-1 scrollbar-hide">
+                  {cats.length === 0 ? (
+                    <div className="flex flex-col items-center gap-2 py-16 text-muted-foreground">
                       <Layers className="w-8 h-8" />
-                      <p className="text-[13px]" style={{ fontWeight: 500 }}>No categories assigned</p>
+                      <p className="text-sm" style={{ fontWeight: 500 }}>No categories assigned</p>
                     </div>
                   ) : (
-                    <table className="w-full text-xs">
-                      <thead className="sticky top-0 z-10">
-                        <tr className="bg-[#F8FAFC]">
-                          <th className="text-left pl-4 pr-2 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Code</th>
-                          <th className="text-left pl-4 pr-2 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Name</th>
-                          <th className="text-left pl-4 pr-2 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Description</th>
-                          <th className="text-right pl-4 pr-2 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Linked Items</th>
-                          <th className="text-left pl-4 pr-4 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Status</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {filteredCats.map((cat) => {
-                          const statusColor = cat.status === "Active"
-                            ? { bg: "#F0FDF4", text: "#16A34A", border: "#BBF7D0", dot: "#16A34A" }
-                            : { bg: "#FEF2F2", text: "#DC2626", border: "#FECACA", dot: "#DC2626" };
+                    <Table style={{ tableLayout: "fixed", width: `${40 + 140 + 220 + 200 + 160 + 170 + 120 + 100 + 60}px` }}>
+                      <TableHeader className="sticky top-0 z-20 bg-card">
+                        <TableRow className="bg-muted/30 hover:bg-muted/30 [&>th]:h-8">
+                          <TableHead className="sticky left-0 z-20 bg-[#f8fafc]" style={{ width: 40, minWidth: 40, maxWidth: 40, paddingLeft: 8, paddingRight: 0 }}>
+                            <Checkbox disabled className="opacity-40" />
+                          </TableHead>
+                          <TableHead style={{ width: 140, minWidth: 140, maxWidth: 140 }} className="text-[13px] text-foreground !pl-4"><span style={{ fontWeight: 600 }}>Code</span></TableHead>
+                          <TableHead style={{ width: 220, minWidth: 220, maxWidth: 220 }} className="text-[13px] text-foreground !pl-4"><span style={{ fontWeight: 600 }}>Description</span></TableHead>
+                          <TableHead style={{ width: 200, minWidth: 200, maxWidth: 200 }} className="text-[13px] text-foreground !pl-4"><span style={{ fontWeight: 600 }}>Tags</span></TableHead>
+                          <TableHead style={{ width: 160, minWidth: 160, maxWidth: 160 }} className="text-[13px] text-foreground !pl-4"><span style={{ fontWeight: 600 }}>Linked Records</span></TableHead>
+                          <TableHead style={{ width: 170, minWidth: 170, maxWidth: 170 }} className="text-[13px] text-foreground !pl-4"><span style={{ fontWeight: 600 }}>Created By</span></TableHead>
+                          <TableHead style={{ width: 120, minWidth: 120, maxWidth: 120 }} className="text-[13px] text-foreground !pl-4"><span style={{ fontWeight: 600 }}>Created Date</span></TableHead>
+                          <TableHead style={{ width: 100, minWidth: 100, maxWidth: 100 }} className="text-[13px] text-foreground !pl-4"><span style={{ fontWeight: 600 }}>Status</span></TableHead>
+                          <TableHead className="sticky right-0 z-20 bg-[#f8fafc] !pl-2 !pr-2" style={{ width: 60, minWidth: 60, maxWidth: 60, boxShadow: "inset 1px 0 0 0 rgba(0,0,0,0.08)" }}>
+                            <span className="text-[13px]">Actions</span>
+                          </TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {cats.map((cat) => {
+                          const s = ST[cat.status] || ST["Active"];
                           return (
-                            <tr key={cat.id} className="bg-white hover:bg-[#F8FAFC] transition-colors border-b border-[#F1F5F9]">
-                              <td className="pl-4 pr-2 py-3">
-                                <span className="font-mono text-[12px] text-[#0F172A]" style={{ fontWeight: 600 }}>{cat.code}</span>
-                              </td>
-                              <td className="pl-4 pr-2 py-3 text-[12px] text-[#334155]" style={{ fontWeight: 500 }}>{cat.name}</td>
-                              <td className="pl-4 pr-2 py-3 max-w-[180px]">
-                                <p className="text-[12px] text-[#475569] truncate">{cat.description}</p>
-                              </td>
-                              <td className="pl-4 pr-2 py-3 text-right">
-                                <span className="text-[14px] text-[#0F172A] tabular-nums" style={{ fontWeight: 600 }}>{cat.linkedItems}</span>
-                              </td>
-                              <td className="pl-4 pr-4 py-3 whitespace-nowrap">
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px]" style={{ fontWeight: 600, backgroundColor: statusColor.bg, color: statusColor.text, border: `1px solid ${statusColor.border}` }}>
-                                  <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: statusColor.dot }} />
+                            <TableRow key={cat.id} className="cursor-pointer group hover:bg-[#F0F7FF] [&>td]:py-1 [&>td]:pl-4 [&>td]:pr-2">
+                              {/* Checkbox */}
+                              <TableCell className="sticky left-0 z-10 bg-card group-hover:bg-[#F0F7FF] !pl-2 !pr-0" style={{ width: 40, minWidth: 40, maxWidth: 40 }}>
+                                <Checkbox />
+                              </TableCell>
+                              {/* Code */}
+                              <TableCell style={{ width: 140, minWidth: 140, maxWidth: 140, overflow: "hidden" }}>
+                                <div className="flex items-center gap-2">
+                                  <span className="font-mono text-sm text-foreground whitespace-nowrap" style={{ fontWeight: 500 }}>{cat.code}</span>
+                                  {cat.isMe && (
+                                    <span className="inline-flex items-center px-1.5 py-px rounded text-[9px] border" style={{ fontWeight: 600, backgroundColor: "#EDF4FF", color: "#0A77FF", borderColor: "#BFDBFE" }}>ME</span>
+                                  )}
+                                </div>
+                              </TableCell>
+                              {/* Description */}
+                              <TableCell style={{ width: 220, minWidth: 220, maxWidth: 220, overflow: "hidden" }}>
+                                <p className="text-sm text-foreground truncate" style={{ fontWeight: 400 }}>{cat.description}</p>
+                              </TableCell>
+                              {/* Tags */}
+                              <TableCell style={{ width: 200, minWidth: 200, maxWidth: 200, overflow: "hidden" }}>
+                                <div className="flex items-center gap-1">
+                                  {cat.tags.slice(0, 2).map((tag) => (
+                                    <span key={tag} className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] whitespace-nowrap bg-[#F1F5F9] text-[#475569] border border-[#E2E8F0]" style={{ fontWeight: 500 }}>
+                                      {tag}
+                                    </span>
+                                  ))}
+                                  {cat.tags.length > 2 && (
+                                    <span className="inline-flex items-center px-1.5 py-0.5 rounded-md text-[11px] border cursor-default" style={{ fontWeight: 600, backgroundColor: "#F1F5F9", color: "#475569", borderColor: "#E2E8F0" }}>
+                                      +{cat.tags.length - 2}
+                                    </span>
+                                  )}
+                                </div>
+                              </TableCell>
+                              {/* Linked Records */}
+                              <TableCell style={{ width: 160, minWidth: 160, maxWidth: 160, overflow: "hidden" }}>
+                                <div className="flex items-center gap-1.5">
+                                  <span className="font-mono text-sm text-[#0A77FF] cursor-pointer hover:underline" style={{ fontWeight: 500 }}>{cat.linkedCode}</span>
+                                  {cat.linkedCount > 0 && (
+                                    <span className="text-[11px] shrink-0 cursor-default leading-none" style={{ fontWeight: 600, color: "#085FCC" }}>+{cat.linkedCount} more</span>
+                                  )}
+                                </div>
+                              </TableCell>
+                              {/* Created By — matches partner listing avatar style */}
+                              <TableCell style={{ width: 170, minWidth: 170, maxWidth: 170, overflow: "hidden" }}>
+                                {(() => {
+                                  const tint = getAvatarTint(cat.creatorName);
+                                  return (
+                                    <div className="flex items-center gap-2">
+                                      <div className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] shrink-0 border" style={{ backgroundColor: tint.bg, color: tint.fg, borderColor: `${tint.fg}20`, fontWeight: 700 }}>
+                                        {cat.creatorInitials}
+                                      </div>
+                                      <span className="text-sm text-foreground truncate block max-w-[120px]">{cat.creatorName}</span>
+                                    </div>
+                                  );
+                                })()}
+                              </TableCell>
+                              {/* Created Date */}
+                              <TableCell style={{ width: 120, minWidth: 120, maxWidth: 120, overflow: "hidden" }}>
+                                <span className="text-sm text-foreground whitespace-nowrap">{cat.createdDate}</span>
+                              </TableCell>
+                              {/* Status */}
+                              <TableCell style={{ width: 100, minWidth: 100, maxWidth: 100, overflow: "hidden" }}>
+                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] border" style={{ fontWeight: 600, backgroundColor: s.bg, color: s.text, borderColor: s.border }}>
                                   {cat.status}
                                 </span>
-                              </td>
-                            </tr>
+                              </TableCell>
+                              {/* Actions */}
+                              <TableCell className="sticky right-0 bg-card group-hover:bg-[#F0F7FF] z-10 !pl-2 !pr-2" style={{ width: 60, minWidth: 60, maxWidth: 60, boxShadow: "inset 1px 0 0 0 rgba(0,0,0,0.08)" }}>
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                                    <button className="inline-flex items-center justify-center h-8 w-8 rounded-md text-muted-foreground hover:bg-muted/60 hover:text-foreground transition-colors cursor-pointer">
+                                      <MoreHorizontal className="w-4 h-4" />
+                                    </button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end" className="w-[180px] z-[230]" onClick={(e) => e.stopPropagation()}>
+                                    <DropdownMenuItem onClick={() => toast.info("View — coming soon")}>
+                                      <Eye className="w-4 h-4 mr-2" /> View
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => toast.info("Edit — coming soon")}>
+                                      <Pencil className="w-4 h-4 mr-2" /> Edit
+                                    </DropdownMenuItem>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem onClick={() => toast.info(cat.status === "Active" ? "Deactivated" : "Activated")}>
+                                      <CircleSlash className="w-4 h-4 mr-2" /> {cat.status === "Active" ? "Deactivate" : "Activate"}
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem className="text-[#DC2626] focus:text-[#DC2626] focus:bg-[#FEF2F2]" onClick={() => setCatRemoveSingleId(cat.id)}>
+                                      <Trash2 className="w-4 h-4 mr-2 text-[#DC2626]" /> Remove
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </TableCell>
+                            </TableRow>
                           );
                         })}
-                      </tbody>
-                    </table>
+                      </TableBody>
+                    </Table>
                   )}
                 </div>
-                <div className="flex items-center justify-between px-4 py-2.5 border-t border-[#E2E8F0] shrink-0 bg-white">
-                  <span className="text-[11px] text-[#64748B]">Showing <span className="text-[#0F172A]" style={{ fontWeight: 600 }}>{filteredCats.length}</span> of <span className="text-[#0F172A]" style={{ fontWeight: 600 }}>{rule.categoryCount}</span> categories</span>
-                  <div className="flex items-center gap-2 text-[11px] text-[#64748B]">
+
+                {/* Pagination — exact partner listing match */}
+                <div className="flex flex-col sm:flex-row items-center justify-center px-4 py-3 border-t border-border gap-3 shrink-0">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <span>Records per page</span>
-                    <select className="h-6 px-1.5 rounded border border-[#E2E8F0] bg-white text-[11px] text-[#334155] cursor-pointer outline-none">
-                      <option>20</option><option>50</option>
+                    <select className="h-8 px-2 pr-7 rounded-lg border border-border bg-white text-sm text-foreground cursor-pointer outline-none focus:border-primary focus:ring-1 focus:ring-primary/20">
+                      <option>20</option><option>50</option><option>100</option>
                     </select>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0" disabled>
+                      <ChevronsLeft className="w-4 h-4" />
+                    </Button>
+                    <Button variant="ghost" size="sm" className="h-8 gap-1 text-sm text-muted-foreground" disabled>
+                      <ChevronLeft className="w-3.5 h-3.5" />
+                      Prev
+                    </Button>
+
+                    <Button variant="default" size="sm" className="h-8 w-8 p-0 text-sm bg-primary text-primary-foreground">
+                      1
+                    </Button>
+
+                    <Button variant="ghost" size="sm" className="h-8 gap-1 text-sm text-muted-foreground" disabled>
+                      Next
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </Button>
+                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0" disabled>
+                      <ChevronsRight className="w-4 h-4" />
+                    </Button>
                   </div>
                 </div>
               </div>
-            )}
+              );
+            })()}
 
-            {/* Partners Tab */}
-            {tab === "partner" && (
-              <div className="flex-1 flex flex-col overflow-hidden">
-                <div className="px-4 py-3 shrink-0 bg-white border-b border-[#E2E8F0]">
-                  <div className="flex items-center gap-2">
-                    <div className="relative flex-1 max-w-[240px]">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8] pointer-events-none" />
-                      <input type="text" value={partnerSearch} onChange={(e) => setPartnerSearch(e.target.value)} placeholder="Search partners..." className="w-full pl-9 pr-3 h-8 text-xs bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg focus:outline-none focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 transition-colors placeholder:text-[#94A3B8]" />
+            {/* Partners Tab — uses real vendor data from context, partner listing table style */}
+            {tab === "partner" && (() => {
+              const allVendors = ctxVendors;
+              const pSearchQ = partnerSearch.toLowerCase();
+              const pFiltered = pSearchQ
+                ? allVendors.filter((v) => v.displayName?.toLowerCase().includes(pSearchQ) || v.companyName?.toLowerCase().includes(pSearchQ) || v.country?.toLowerCase().includes(pSearchQ))
+                : allVendors;
+              const ST_P: Record<string, { bg: string; text: string; border: string }> = {
+                "active": { bg: "#ECFDF5", text: "#065F46", border: "#A7F3D0" },
+                "inactive": { bg: "#FFFBEB", text: "#92400E", border: "#FDE68A" },
+                "archived": { bg: "#F1F5F9", text: "#475569", border: "#E2E8F0" },
+              };
+
+              return (
+              <div className="flex-1 flex flex-col overflow-hidden bg-white">
+                {/* Toolbar */}
+                <div className="flex items-center justify-between gap-3 px-4 pt-3 pb-2 shrink-0">
+                  <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                    <div className="relative flex-1 max-w-xs">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70 pointer-events-none" />
+                      <input type="text" value={partnerSearch} onChange={(e) => setPartnerSearch(e.target.value)} placeholder="Search partners..." className="w-full pl-9 pr-8 h-9 text-sm bg-white border border-border/80 rounded-lg shadow-sm focus:outline-none focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 transition-colors placeholder:text-muted-foreground/50" />
+                      {partnerSearch && (
+                        <button onClick={() => setPartnerSearch("")} className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded-full hover:bg-muted/60 text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      )}
                     </div>
-                    <button className="h-8 px-3 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#334155] hover:bg-[#F8FAFC] cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 500 }}>
-                      <SlidersHorizontal className="w-3.5 h-3.5" /> Filters
+                    <button className="inline-flex items-center justify-center h-9 gap-1.5 px-3 rounded-lg border border-border/80 bg-white shadow-sm hover:bg-muted/50 transition-colors cursor-pointer outline-none shrink-0 text-foreground" style={{ fontWeight: 500 }}>
+                      <SlidersHorizontal className="w-3.5 h-3.5 text-muted-foreground" />
+                      <span className="text-sm">Filters</span>
+                    </button>
+                  </div>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <span className="text-sm tabular-nums mr-1 hidden sm:inline" style={{ fontWeight: 500 }}>
+                      <span className="text-foreground">{pFiltered.length}</span>
+                      <span className="text-muted-foreground/70"> partners</span>
+                    </span>
+                    <div className="w-px h-5 bg-border/60 mx-0.5 hidden sm:block" />
+                    <button onClick={() => { setPartnerModalOpen(true); setPartnerModalView("browse"); setPartnerModalSearch(""); setPartnerModalAddedSearch(""); setPartnerModalSelectedIds(new Set()); setPartnerModalAddedSelectedIds(new Set()); }} className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-sm shadow-sm transition-colors cursor-pointer" style={{ fontWeight: 600 }}>
+                      <Plus className="w-3.5 h-3.5" /> Add Partner
                     </button>
                   </div>
                 </div>
-                <div className="flex-1 overflow-auto">
-                  {filteredPartners.length === 0 ? (
-                    <div className="flex flex-col items-center gap-2 py-16 text-[#94A3B8]">
+
+                {/* Quick filter pills */}
+                <div className="flex items-center gap-1.5 overflow-x-auto px-4 pb-3 shrink-0">
+                  {(["all", "active", "inactive", "archived"] as const).map((f) => {
+                    const cnt = f === "all" ? pFiltered.length : pFiltered.filter((v) => v.status === f).length;
+                    return (
+                      <button
+                        key={f}
+                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                          f === "all"
+                            ? "border-primary bg-[#EDF4FF] hover:bg-[#D6E8FF] active:bg-[#ADD1FF]"
+                            : "border-border text-muted-foreground hover:bg-muted/60 hover:text-foreground hover:border-muted-foreground/30 active:bg-muted"
+                        }`}
+                        style={{ fontWeight: f === "all" ? 500 : 400, color: f === "all" ? "#0A77FF" : undefined }}
+                      >
+                        {f === "all" ? "All Partners" : f.charAt(0).toUpperCase() + f.slice(1)}
+                        <span className={`text-[10px] rounded-full px-1.5 py-px min-w-[18px] text-center ${f === "all" ? "bg-primary/10" : "bg-muted"}`} style={{ fontWeight: 600, color: f === "all" ? "#0A77FF" : "#475569" }}>
+                          {cnt}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Divider */}
+                <div className="border-t border-border shrink-0" />
+
+                {/* Table — partner listing style */}
+                <div className="min-h-0 overflow-auto flex-1 scrollbar-hide">
+                  {pFiltered.length === 0 ? (
+                    <div className="flex flex-col items-center gap-2 py-16 text-muted-foreground">
                       <Users className="w-8 h-8" />
-                      <p className="text-[13px]" style={{ fontWeight: 500 }}>No partners found</p>
+                      <p className="text-sm" style={{ fontWeight: 500 }}>No partners found</p>
                     </div>
                   ) : (
-                    <table className="w-full text-xs">
-                      <thead className="sticky top-0 z-10">
-                        <tr className="bg-[#F8FAFC]">
-                          <th className="text-left pl-4 pr-2 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Partner</th>
-                          <th className="text-left pl-4 pr-2 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Type</th>
-                          <th className="text-left pl-4 pr-2 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Status</th>
-                          <th className="text-right pl-4 pr-2 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Items</th>
-                          <th className="text-right pl-4 pr-4 py-2.5 text-[#64748B] text-[11px] border-b border-[#E2E8F0] whitespace-nowrap" style={{ fontWeight: 500 }}>Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {filteredPartners.map((partner) => {
-                          const statusColor = partner.status === "Active"
-                            ? { bg: "#F0FDF4", text: "#16A34A", border: "#BBF7D0", dot: "#16A34A" }
-                            : { bg: "#FEF2F2", text: "#DC2626", border: "#FECACA", dot: "#DC2626" };
+                    <Table style={{ tableLayout: "fixed", width: `${40 + 240 + 140 + 180 + 150 + 130 + 100 + 60}px` }}>
+                      <TableHeader className="sticky top-0 z-20 bg-card">
+                        <TableRow className="bg-muted/30 hover:bg-muted/30 [&>th]:h-8">
+                          <TableHead className="sticky left-0 z-20 bg-[#f8fafc]" style={{ width: 40, minWidth: 40, maxWidth: 40, paddingLeft: 8, paddingRight: 0 }}>
+                            <Checkbox disabled className="opacity-40" />
+                          </TableHead>
+                          <TableHead style={{ width: 240, minWidth: 240, maxWidth: 240 }} className="text-[13px] text-foreground !pl-4"><span style={{ fontWeight: 600 }}>Partners</span></TableHead>
+                          <TableHead style={{ width: 140, minWidth: 140, maxWidth: 140 }} className="text-[13px] text-foreground !pl-4"><span style={{ fontWeight: 600 }}>Partner Type</span></TableHead>
+                          <TableHead style={{ width: 180, minWidth: 180, maxWidth: 180 }} className="text-[13px] text-foreground !pl-4"><span style={{ fontWeight: 600 }}>No. of Items</span></TableHead>
+                          <TableHead style={{ width: 150, minWidth: 150, maxWidth: 150 }} className="text-[13px] text-foreground !pl-4"><span style={{ fontWeight: 600 }}>Country</span></TableHead>
+                          <TableHead style={{ width: 130, minWidth: 130, maxWidth: 130 }} className="text-[13px] text-foreground !pl-4 text-right"><span style={{ fontWeight: 600 }}>Credit Limit ($)</span></TableHead>
+                          <TableHead style={{ width: 100, minWidth: 100, maxWidth: 100 }} className="text-[13px] text-foreground !pl-4"><span style={{ fontWeight: 600 }}>Status</span></TableHead>
+                          <TableHead className="sticky right-0 z-20 bg-[#f8fafc] !pl-2 !pr-2" style={{ width: 60, minWidth: 60, maxWidth: 60, boxShadow: "inset 1px 0 0 0 rgba(0,0,0,0.08)" }}>
+                            <span className="text-[13px]">Actions</span>
+                          </TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {pFiltered.slice(0, 20).map((v) => {
+                          const tint = getAvatarTint(v.displayName || v.companyName);
+                          const initials = (v.displayName || v.companyName).split(/[\s&]+/).filter(Boolean).map(w => w[0]).slice(0, 2).join("").toUpperCase();
+                          const partnerTypes = v.partnerTypes || [];
+                          const itemCodes = v.itemCodes || [];
+                          const st = ST_P[v.status] || ST_P["active"];
+                          const formatCurrency = (n: number) => new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
                           return (
-                            <tr key={partner.id} className="bg-white hover:bg-[#F8FAFC] transition-colors border-b border-[#F1F5F9]">
-                              <td className="pl-4 pr-2 py-3">
-                                <div className="flex items-center gap-3">
-                                  <div className="w-9 h-9 rounded-full bg-[#EBF3FF] flex items-center justify-center text-[10px] text-[#0A77FF] shrink-0" style={{ fontWeight: 600 }}>
-                                    {partner.avatar}
+                            <TableRow key={v.id} className="cursor-pointer group hover:bg-[#F0F7FF] [&>td]:py-1 [&>td]:pl-4 [&>td]:pr-2">
+                              <TableCell className="sticky left-0 z-10 bg-card group-hover:bg-[#F0F7FF] !pl-2 !pr-0" style={{ width: 40, minWidth: 40, maxWidth: 40 }}>
+                                <Checkbox />
+                              </TableCell>
+                              {/* Partner Name */}
+                              <TableCell style={{ width: 240, minWidth: 240, maxWidth: 240, overflow: "hidden" }}>
+                                <div className="flex items-center gap-2.5">
+                                  <div className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] shrink-0 border" style={{ backgroundColor: tint.bg, color: tint.fg, borderColor: `${tint.fg}20`, fontWeight: 700 }}>
+                                    {initials}
                                   </div>
-                                  <span className="text-[12px] text-[#0F172A] truncate" style={{ fontWeight: 500 }}>{partner.name}</span>
+                                  <span className="text-sm truncate block max-w-[170px]" style={{ fontWeight: 500 }}>{v.displayName}</span>
                                 </div>
-                              </td>
-                              <td className="pl-4 pr-2 py-3 whitespace-nowrap">
-                                <div className="flex items-center gap-1 flex-wrap">
-                                  {partner.types.slice(0, 2).map((type) => {
-                                    const tc = PARTNER_TYPE_COLORS[type] || PARTNER_TYPE_COLORS["Vendor"];
-                                    return (
-                                      <span key={type} className="inline-flex px-1.5 py-0.5 rounded text-[10px] border" style={{ fontWeight: 500, color: tc.text, backgroundColor: tc.bg, borderColor: tc.border }}>
-                                        {type}
-                                      </span>
-                                    );
-                                  })}
+                              </TableCell>
+                              {/* Partner Type */}
+                              <TableCell style={{ width: 140, minWidth: 140, maxWidth: 140, overflow: "hidden" }}>
+                                <div className="flex items-center gap-1.5">
+                                  {partnerTypes.map((type) => (
+                                    <span key={type} className="inline-flex items-center px-2 py-0.5 text-xs rounded-md border" style={{ fontWeight: 500, backgroundColor: type === "vendor" ? "#EFF6FF" : "#F5F3FF", color: type === "vendor" ? "#1E40AF" : "#5B21B6", borderColor: type === "vendor" ? "#BFDBFE" : "#DDD6FE" }}>
+                                      {type === "vendor" ? "Vendor" : "Customer"}
+                                    </span>
+                                  ))}
                                 </div>
-                              </td>
-                              <td className="pl-4 pr-2 py-3 whitespace-nowrap">
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px]" style={{ fontWeight: 600, backgroundColor: statusColor.bg, color: statusColor.text, border: `1px solid ${statusColor.border}` }}>
-                                  <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: statusColor.dot }} />
-                                  {partner.status}
+                              </TableCell>
+                              {/* No. of Items */}
+                              <TableCell style={{ width: 180, minWidth: 180, maxWidth: 180, overflow: "hidden" }}>
+                                <div className="flex items-center gap-1.5">
+                                  <span className="text-sm truncate" style={{ fontWeight: 500 }}>{itemCodes[0] || "\u2013"}</span>
+                                  {itemCodes.length > 1 && (
+                                    <span className="text-[11px] shrink-0 cursor-default leading-none" style={{ fontWeight: 600, color: "#085FCC" }}>+{itemCodes.length - 1} more</span>
+                                  )}
+                                </div>
+                              </TableCell>
+                              {/* Country */}
+                              <TableCell style={{ width: 150, minWidth: 150, maxWidth: 150, overflow: "hidden" }}>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-base">{v.countryFlag}</span>
+                                  <span className="text-sm">{v.country}</span>
+                                </div>
+                              </TableCell>
+                              {/* Credit Limit */}
+                              <TableCell className="text-right" style={{ width: 130, minWidth: 130, maxWidth: 130, overflow: "hidden" }}>
+                                <span className="text-sm">$ {formatCurrency(v.creditLimit)}</span>
+                              </TableCell>
+                              {/* Status */}
+                              <TableCell style={{ width: 100, minWidth: 100, maxWidth: 100, overflow: "hidden" }}>
+                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] border" style={{ fontWeight: 600, backgroundColor: st.bg, color: st.text, borderColor: st.border }}>
+                                  {v.status.charAt(0).toUpperCase() + v.status.slice(1)}
                                 </span>
-                              </td>
-                              <td className="pl-4 pr-2 py-3 text-right">
-                                <span className="text-[14px] text-[#0F172A] tabular-nums" style={{ fontWeight: 600 }}>{partner.itemCount}</span>
-                              </td>
-                              <td className="pl-4 pr-4 py-3 text-right">
-                                <button className="w-6 h-6 rounded flex items-center justify-center text-[#94A3B8] hover:text-[#475569] hover:bg-[#F1F5F9] cursor-pointer transition-colors">
-                                  <MoreHorizontal className="w-3.5 h-3.5" />
-                                </button>
-                              </td>
-                            </tr>
+                              </TableCell>
+                              {/* Actions */}
+                              <TableCell className="sticky right-0 bg-card group-hover:bg-[#F0F7FF] z-10 !pl-2 !pr-2" style={{ width: 60, minWidth: 60, maxWidth: 60, boxShadow: "inset 1px 0 0 0 rgba(0,0,0,0.08)" }}>
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                                    <button className="inline-flex items-center justify-center h-8 w-8 rounded-md text-muted-foreground hover:bg-muted/60 hover:text-foreground transition-colors cursor-pointer">
+                                      <MoreHorizontal className="w-4 h-4" />
+                                    </button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end" className="w-[180px] z-[230]" onClick={(e) => e.stopPropagation()}>
+                                    <DropdownMenuItem onClick={() => toast.info("View Details — coming soon")}>
+                                      <Eye className="w-4 h-4 mr-2" /> View Details
+                                    </DropdownMenuItem>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem className="text-[#DC2626] focus:text-[#DC2626] focus:bg-[#FEF2F2]" onClick={() => setPartnerRemoveSingleId(v.id)}>
+                                      <Trash2 className="w-4 h-4 mr-2 text-[#DC2626]" /> Remove
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </TableCell>
+                            </TableRow>
                           );
                         })}
-                      </tbody>
-                    </table>
+                      </TableBody>
+                    </Table>
                   )}
                 </div>
-                <div className="flex items-center justify-between px-4 py-2.5 border-t border-[#E2E8F0] shrink-0 bg-white">
-                  <span className="text-[11px] text-[#64748B]">Showing <span className="text-[#0F172A]" style={{ fontWeight: 600 }}>{filteredPartners.length}</span> of <span className="text-[#0F172A]" style={{ fontWeight: 600 }}>{rule.partnerCount}</span> partners</span>
-                  <div className="flex items-center gap-2 text-[11px] text-[#64748B]">
+
+                {/* Pagination */}
+                <div className="flex flex-col sm:flex-row items-center justify-center px-4 py-3 border-t border-border gap-3 shrink-0">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <span>Records per page</span>
-                    <select className="h-6 px-1.5 rounded border border-[#E2E8F0] bg-white text-[11px] text-[#334155] cursor-pointer outline-none">
-                      <option>20</option><option>50</option>
+                    <select className="h-8 px-2 pr-7 rounded-lg border border-border bg-white text-sm text-foreground cursor-pointer outline-none focus:border-primary focus:ring-1 focus:ring-primary/20">
+                      <option>20</option><option>50</option><option>100</option>
                     </select>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0" disabled><ChevronsLeft className="w-4 h-4" /></Button>
+                    <Button variant="ghost" size="sm" className="h-8 gap-1 text-sm text-muted-foreground" disabled><ChevronLeft className="w-3.5 h-3.5" />Prev</Button>
+                    <Button variant="default" size="sm" className="h-8 w-8 p-0 text-sm bg-primary text-primary-foreground">1</Button>
+                    <Button variant="ghost" size="sm" className="h-8 gap-1 text-sm text-muted-foreground" disabled>Next<ChevronRight className="w-3.5 h-3.5" /></Button>
+                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0" disabled><ChevronsRight className="w-4 h-4" /></Button>
                   </div>
                 </div>
               </div>
-            )}
+              );
+            })()}
 
             {/* Placeholder tabs */}
             {/* Notes Tab */}
@@ -1474,6 +1865,602 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
           </div>
         </div>
       </DialogContent>
+
+      {/* ─── Add/Manage Category Modal — matches items modal exactly ─── */}
+      <Dialog open={catModalOpen} onOpenChange={setCatModalOpen}>
+        <DialogContent
+          className="flex flex-col p-0 gap-0 border-0 sm:border z-[230] !fixed !inset-0 !translate-x-0 !translate-y-0 !m-auto !w-full !h-full !max-w-[100%] sm:!max-w-[960px] lg:!max-w-[1040px] !max-h-[100dvh] sm:!max-h-[88vh] rounded-none sm:!rounded-2xl transition-[max-width,max-height,border-radius] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
+          hideCloseButton
+          overlayClassName="z-[225]"
+          style={{ boxShadow: "0 24px 48px -12px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.05)" }}
+        >
+          <DialogTitle className="sr-only">Manage Categories</DialogTitle>
+          <DialogDescription className="sr-only">Add or remove categories for this pricing rule.</DialogDescription>
+
+          {/* Header — same as items modal */}
+          <div className="px-3 sm:px-5 pt-3 sm:pt-4 pb-2.5 sm:pb-3 shrink-0 bg-white rounded-t-none sm:rounded-t-2xl border-b border-[#EEF2F6]">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <div className="flex items-center gap-2.5">
+                  <h2 className="text-[15px] sm:text-[17px] text-[#0F172A]" style={{ fontWeight: 700 }}>Manage Categories</h2>
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] border whitespace-nowrap shrink-0" style={{ fontWeight: 600, backgroundColor: isDis ? "#ECFDF5" : "#F5F3FF", color: isDis ? "#047857" : "#6D28D9", borderColor: isDis ? "#A7F3D0" : "#DDD6FE" }}>
+                    {isDis ? "Discount" : "Premium"}<span className="text-[10px] opacity-60">·</span>{rule.name}
+                  </span>
+                </div>
+                <p className="text-[11px] sm:text-xs text-[#64748B] mt-1" style={{ fontWeight: 400 }}>Browse available categories to add, or manage already added ones.</p>
+              </div>
+              <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
+                <button onClick={() => setCatModalOpen(false)} className="w-8 h-8 rounded-lg flex items-center justify-center text-[#94A3B8] hover:text-[#64748B] hover:bg-[#F1F5F9] transition-all cursor-pointer">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Search + View tabs + Sorting pills — same layout as items modal */}
+          <div className="px-3 sm:px-5 pt-2 bg-white shrink-0">
+            <div className="flex items-center gap-3">
+              {/* Search — leftmost */}
+              <div className="relative flex-1 max-w-xs">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70 pointer-events-none" />
+                <input
+                  type="text"
+                  value={catModalView === "browse" ? catModalSearch : catModalAddedSearch}
+                  onChange={(e) => catModalView === "browse" ? setCatModalSearch(e.target.value) : setCatModalAddedSearch(e.target.value)}
+                  placeholder={catModalView === "browse" ? "Search available categories..." : "Search added categories..."}
+                  className="w-full pl-9 pr-8 h-8 text-[13px] bg-white border border-border/80 rounded-lg shadow-sm focus:outline-none focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 transition-colors placeholder:text-muted-foreground/50"
+                />
+                {(catModalView === "browse" ? catModalSearch : catModalAddedSearch) && (
+                  <button onClick={() => catModalView === "browse" ? setCatModalSearch("") : setCatModalAddedSearch("")} className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded-full hover:bg-muted/60 text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+
+              {/* View toggle */}
+              <div className="inline-flex items-center rounded-lg bg-[#F1F5F9] p-0.5 shrink-0">
+                <button onClick={() => setCatModalView("browse")} className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[12px] transition-all cursor-pointer ${catModalView === "browse" ? "bg-white shadow-[0_1px_3px_rgba(0,0,0,0.08)] text-[#0F172A]" : "text-[#64748B] hover:text-[#334155]"}`} style={{ fontWeight: catModalView === "browse" ? 600 : 500 }}>
+                  <Layers className={`w-3.5 h-3.5 ${catModalView === "browse" ? "text-[#0A77FF]" : "text-[#94A3B8]"}`} />
+                  Browse Categories
+                  <span className={`text-[10px] rounded-full px-1.5 py-px min-w-[16px] text-center ${catModalView === "browse" ? "bg-[#EDF4FF] text-[#0A77FF]" : "bg-[#E2E8F0] text-[#64748B]"}`} style={{ fontWeight: 600 }}>{availableCats.length}</span>
+                </button>
+                <button onClick={() => setCatModalView("added")} className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[12px] transition-all cursor-pointer ${catModalView === "added" ? "bg-white shadow-[0_1px_3px_rgba(0,0,0,0.08)] text-[#0F172A]" : "text-[#64748B] hover:text-[#334155]"}`} style={{ fontWeight: catModalView === "added" ? 600 : 500 }}>
+                  <Check className={`w-3.5 h-3.5 ${catModalView === "added" ? "text-[#059669]" : "text-[#94A3B8]"}`} />
+                  Added Categories
+                  <span className={`text-[10px] rounded-full px-1.5 py-px min-w-[16px] text-center ${catModalView === "added" ? "bg-[#ECFDF5] text-[#059669]" : "bg-[#E2E8F0] text-[#64748B]"}`} style={{ fontWeight: 600 }}>{allCats.length}</span>
+                </button>
+              </div>
+
+              {/* Count */}
+              <div className="flex items-center gap-2 ml-auto shrink-0">
+                {catModalView === "browse" && catModalSelectedIds.size > 0 && (
+                  <span className="text-xs text-[#0A77FF] shrink-0" style={{ fontWeight: 600 }}>{catModalSelectedIds.size} selected</span>
+                )}
+                <span className="text-xs text-muted-foreground shrink-0" style={{ fontWeight: 500 }}>
+                  {(catModalView === "browse" ? catModalFiltered : catModalAddedFiltered).length} {catModalView === "browse" ? "available" : "categories"}
+                </span>
+              </div>
+            </div>
+
+            {/* Sorting pills */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pt-2.5 pb-2.5">
+              {(["all", "Active", "Inactive"] as const).map((f) => {
+                const src = catModalView === "browse" ? catModalFiltered : catModalAddedFiltered;
+                const cnt = f === "all" ? src.length : src.filter((c) => c.status === f).length;
+                return (
+                  <button
+                    key={f}
+                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
+                      f === "all"
+                        ? "border-primary bg-[#EDF4FF] hover:bg-[#D6E8FF] active:bg-[#ADD1FF]"
+                        : "border-border text-muted-foreground hover:bg-muted/60 hover:text-foreground hover:border-muted-foreground/30 active:bg-muted"
+                    }`}
+                    style={{ fontWeight: f === "all" ? 500 : 400, color: f === "all" ? "#0A77FF" : undefined }}
+                  >
+                    {f === "all" ? "All" : f}
+                    <span className={`text-[10px] rounded-full px-1.5 py-px min-w-[18px] text-center ${f === "all" ? "bg-primary/10" : "bg-muted"}`} style={{ fontWeight: 600, color: f === "all" ? "#0A77FF" : "#475569" }}>
+                      {cnt}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Table — white bg, same row pattern as items modal */}
+          <div className="flex-1 min-h-0 overflow-auto bg-white">
+            <Table style={{ tableLayout: "fixed", minWidth: catModalView === "added" ? 860 : 800 }}>
+              <TableHeader className="sticky top-0 z-20 bg-white">
+                <TableRow className="bg-[#FAFBFC] hover:bg-[#FAFBFC] [&>th]:h-8">
+                  <TableHead className="sticky left-0 z-20 bg-[#FAFBFC] w-[40px] min-w-[40px] max-w-[40px] !pl-2 !pr-0">
+                    {(() => {
+                      const list = catModalView === "browse" ? catModalFiltered : catModalAddedFiltered;
+                      const selSet = catModalView === "browse" ? catModalSelectedIds : catModalAddedSelectedIds;
+                      const setFn = catModalView === "browse" ? setCatModalSelectedIds : setCatModalAddedSelectedIds;
+                      const allSel = list.length > 0 && list.every((c) => selSet.has(c.id));
+                      const someSel = list.some((c) => selSet.has(c.id));
+                      return (
+                        <Checkbox
+                          checked={allSel ? true : someSel ? "indeterminate" : false}
+                          onCheckedChange={() => {
+                            setFn((prev) => {
+                              const next = new Set(prev);
+                              list.forEach((c) => allSel ? next.delete(c.id) : next.add(c.id));
+                              return next;
+                            });
+                          }}
+                        />
+                      );
+                    })()}
+                  </TableHead>
+                  <TableHead className="text-[13px] text-foreground !pl-3" style={{ fontWeight: 600, width: 120 }}>Code</TableHead>
+                  <TableHead className="text-[13px] text-foreground !pl-3" style={{ fontWeight: 600, width: 200 }}>Name</TableHead>
+                  <TableHead className="text-[13px] text-foreground !pl-3" style={{ fontWeight: 600, width: 280 }}>Description</TableHead>
+                  <TableHead className="text-[13px] text-foreground !pl-3" style={{ fontWeight: 600, width: 100 }}>Status</TableHead>
+                  {catModalView === "added" && (
+                    <TableHead className="sticky right-0 z-20 bg-[#FAFBFC] w-[60px] min-w-[60px] max-w-[60px] !pl-2 !pr-2" style={{ boxShadow: "inset 1px 0 0 0 rgba(0,0,0,0.08)" }} />
+                  )}
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {(catModalView === "browse" ? catModalFiltered : catModalAddedFiltered).length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={catModalView === "added" ? 6 : 5} className="text-center py-16 text-muted-foreground">
+                      <div className="flex flex-col items-center gap-2">
+                        <Layers className="w-8 h-8" />
+                        <p className="text-sm">{catModalView === "browse" ? "No categories available" : "No categories added"}</p>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  (catModalView === "browse" ? catModalFiltered : catModalAddedFiltered).map((cat) => {
+                    const isSelected = catModalView === "browse" ? catModalSelectedIds.has(cat.id) : catModalAddedSelectedIds.has(cat.id);
+                    const stc = cat.status === "Active" ? { bg: "#ECFDF5", text: "#065F46", border: "#A7F3D0" } : { bg: "#FFFBEB", text: "#92400E", border: "#FDE68A" };
+                    return (
+                      <TableRow
+                        key={cat.id}
+                        className={`cursor-pointer group bg-white hover:bg-[#F0F7FF] [&>td]:py-1 [&>td]:pl-3 [&>td]:pr-2 ${isSelected ? "!bg-[#EDF4FF]/60" : ""}`}
+                        onClick={() => {
+                          const setFn = catModalView === "browse" ? setCatModalSelectedIds : setCatModalAddedSelectedIds;
+                          setFn((p) => { const n = new Set(p); n.has(cat.id) ? n.delete(cat.id) : n.add(cat.id); return n; });
+                        }}
+                      >
+                        <TableCell className="sticky left-0 z-10 bg-white group-hover:bg-[#F0F7FF] !pl-2 !pr-0" onClick={(e) => e.stopPropagation()}>
+                          <Checkbox
+                            checked={isSelected}
+                            onCheckedChange={() => {
+                              const setFn = catModalView === "browse" ? setCatModalSelectedIds : setCatModalAddedSelectedIds;
+                              setFn((p) => { const n = new Set(p); n.has(cat.id) ? n.delete(cat.id) : n.add(cat.id); return n; });
+                            }}
+                          />
+                        </TableCell>
+                        <TableCell className="bg-white group-hover:bg-[#F0F7FF]">
+                          <span className="font-mono text-sm text-foreground whitespace-nowrap" style={{ fontWeight: 500 }}>{cat.code}</span>
+                        </TableCell>
+                        <TableCell className="bg-white group-hover:bg-[#F0F7FF]">
+                          <span className="text-sm text-foreground" style={{ fontWeight: 500 }}>{cat.name}</span>
+                        </TableCell>
+                        <TableCell className="bg-white group-hover:bg-[#F0F7FF]">
+                          <p className="text-sm text-foreground truncate" style={{ fontWeight: 400 }}>{cat.description}</p>
+                        </TableCell>
+                        <TableCell className="bg-white group-hover:bg-[#F0F7FF]">
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] border" style={{ fontWeight: 600, backgroundColor: stc.bg, color: stc.text, borderColor: stc.border }}>{cat.status}</span>
+                        </TableCell>
+                        {catModalView === "added" && (
+                          <TableCell className="sticky right-0 z-10 bg-white group-hover:bg-[#F0F7FF] !px-0" style={{ boxShadow: "inset 1px 0 0 0 rgba(0,0,0,0.08)" }} onClick={(e) => e.stopPropagation()}>
+                            <div className="flex items-center justify-center">
+                              <button onClick={() => handleRemoveCategory(cat.id)} className="w-7 h-7 rounded-md flex items-center justify-center text-[#94A3B8] hover:text-[#DC2626] hover:bg-[#FEF2F2] transition-colors cursor-pointer" title="Remove">
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </TableCell>
+                        )}
+                      </TableRow>
+                    );
+                  })
+                )}
+              </TableBody>
+            </Table>
+          </div>
+
+          {/* Pagination */}
+          <div className="flex flex-col sm:flex-row items-center justify-center px-4 py-2.5 border-t border-border gap-3 shrink-0 bg-white">
+            <div className="flex items-center gap-1">
+              <Button variant="ghost" size="sm" className="h-7 w-7 p-0" disabled><ChevronsLeft className="w-3.5 h-3.5" /></Button>
+              <Button variant="ghost" size="sm" className="h-7 gap-1 text-[13px] text-muted-foreground" disabled><ChevronLeft className="w-3 h-3" />Prev</Button>
+              <Button variant="default" size="sm" className="h-7 w-7 p-0 text-[13px] bg-primary text-primary-foreground">1</Button>
+              <Button variant="ghost" size="sm" className="h-7 gap-1 text-[13px] text-muted-foreground" disabled>Next<ChevronRight className="w-3 h-3" /></Button>
+              <Button variant="ghost" size="sm" className="h-7 w-7 p-0" disabled><ChevronsRight className="w-3.5 h-3.5" /></Button>
+            </div>
+          </div>
+
+          {/* Footer — same as items modal */}
+          <div className="shrink-0 border-t border-[#EEF2F6] bg-white px-3 sm:px-5 py-2.5 flex items-center justify-between sm:rounded-b-2xl">
+            <div className="flex items-center gap-2 text-[12px] text-[#64748B]">
+              <span style={{ fontWeight: 500 }}>{allCats.length} categories added</span>
+              {catModalView === "browse" && catModalSelectedIds.size > 0 && (<><span className="text-[#CBD5E1]">·</span><span className="text-[#0A77FF]" style={{ fontWeight: 600 }}>{catModalSelectedIds.size} ready to add</span></>)}
+              {catModalView === "added" && catModalAddedSelectedIds.size > 0 && (<><span className="text-[#CBD5E1]">·</span><span className="text-[#DC2626]" style={{ fontWeight: 600 }}>{catModalAddedSelectedIds.size} selected</span></>)}
+            </div>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" onClick={() => setCatModalOpen(false)} className="rounded-lg px-4 text-xs h-9 bg-white border-[#E2E8F0] text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#0F172A]">Cancel</Button>
+              {catModalView === "added" && catModalAddedSelectedIds.size > 0 && (
+                <Button onClick={() => setCatRemoveConfirmOpen(true)} className="gap-1.5 rounded-lg px-4 text-xs h-9 bg-[#DC2626] text-white hover:bg-[#B91C1C] shadow-sm">
+                  <Trash2 className="w-3.5 h-3.5" /> Remove {catModalAddedSelectedIds.size} Categor{catModalAddedSelectedIds.size !== 1 ? "ies" : "y"}
+                </Button>
+              )}
+              {catModalView === "added" && catModalAddedSelectedIds.size === 0 && (
+                <Button onClick={() => setCatModalOpen(false)} className="rounded-lg px-4 text-xs h-9 bg-[#0A77FF] text-white hover:bg-[#0862D0] shadow-sm">Done</Button>
+              )}
+              {catModalView === "browse" && (
+                <Button onClick={handleAddCategories} disabled={catModalSelectedIds.size === 0} className="gap-1.5 rounded-lg px-4 text-xs h-9 bg-[#0A77FF] text-white hover:bg-[#0862D0] shadow-sm disabled:opacity-50">
+                  <Plus className="w-3.5 h-3.5" /> Add {catModalSelectedIds.size > 0 ? `${catModalSelectedIds.size} Categor${catModalSelectedIds.size !== 1 ? "ies" : "y"}` : "Categories"}
+                </Button>
+              )}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Bulk remove categories confirmation */}
+      <AlertDialog open={catRemoveConfirmOpen} onOpenChange={setCatRemoveConfirmOpen}>
+        <AlertDialogContent className="sm:max-w-[420px] p-0 gap-0 overflow-hidden rounded-2xl border-0 shadow-[0_24px_80px_-12px_rgba(0,0,0,0.25)] z-[240]" overlayClassName="z-[235]" onInteractOutside={() => setCatRemoveConfirmOpen(false)}>
+          <div className="relative flex flex-col items-center pt-10 pb-6" style={{ background: "linear-gradient(180deg, #FEF2F2 0%, rgba(254,242,242,0.3) 70%, transparent 100%)" }}>
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[180px] h-[80px] rounded-full blur-[50px] opacity-25" style={{ backgroundColor: "#EF4444" }} />
+            <div className="relative w-16 h-16 rounded-2xl flex items-center justify-center" style={{ backgroundColor: "#FEE2E2" }}>
+              <Trash2 className="w-8 h-8" style={{ color: "#DC2626" }} />
+            </div>
+            <span className="mt-4 px-3 py-1 rounded-full text-[11px]" style={{ fontWeight: 600, backgroundColor: "#FEF2F2", color: "#991B1B", textTransform: "uppercase" as const, letterSpacing: "0.05em" }}>Remove Categories</span>
+          </div>
+          <div className="flex flex-col items-center text-center px-8 pb-8">
+            <AlertDialogHeader className="p-0 gap-0 text-center">
+              <AlertDialogTitle className="text-[18px] tracking-[-0.02em]" style={{ fontWeight: 600, color: "#0F172A" }}>Remove {catModalAddedSelectedIds.size} categor{catModalAddedSelectedIds.size !== 1 ? "ies" : "y"}?</AlertDialogTitle>
+            </AlertDialogHeader>
+            <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "#475569", lineHeight: "1.65" }}>
+              These categories will be removed from this pricing rule. You can add them back later.
+            </AlertDialogDescription>
+            <div className="w-full mt-7 flex flex-col gap-2.5">
+              <AlertDialogAction onClick={handleBulkRemoveCategories} className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors hover:opacity-90" style={{ fontWeight: 600, backgroundColor: "#DC2626", color: "#fff" }}>
+                Remove {catModalAddedSelectedIds.size} Categor{catModalAddedSelectedIds.size !== 1 ? "ies" : "y"}
+              </AlertDialogAction>
+              <AlertDialogCancel className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors" style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#334155" }}>Cancel</AlertDialogCancel>
+            </div>
+          </div>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Single category remove confirmation */}
+      <AlertDialog open={!!catRemoveSingleId} onOpenChange={(o) => { if (!o) setCatRemoveSingleId(null); }}>
+        <AlertDialogContent className="sm:max-w-[400px] p-0 gap-0 overflow-hidden rounded-2xl border-0 shadow-[0_24px_80px_-12px_rgba(0,0,0,0.25)] z-[240]" overlayClassName="z-[235]" onInteractOutside={() => setCatRemoveSingleId(null)}>
+          {(() => {
+            const c = catRemoveSingleId ? allCats.find((cat) => cat.id === catRemoveSingleId) : null;
+            return (
+              <>
+                <div className="relative flex flex-col items-center pt-10 pb-6" style={{ background: "linear-gradient(180deg, #FEF2F2 0%, rgba(254,242,242,0.3) 70%, transparent 100%)" }}>
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[180px] h-[80px] rounded-full blur-[50px] opacity-25" style={{ backgroundColor: "#EF4444" }} />
+                  <div className="relative w-16 h-16 rounded-2xl flex items-center justify-center" style={{ backgroundColor: "#FEE2E2" }}>
+                    <AlertTriangle className="w-8 h-8" style={{ color: "#DC2626" }} />
+                  </div>
+                  <span className="mt-4 px-3 py-1 rounded-full text-[11px]" style={{ fontWeight: 600, backgroundColor: "#FEF2F2", color: "#991B1B", textTransform: "uppercase" as const, letterSpacing: "0.05em" }}>Caution</span>
+                </div>
+                <div className="flex flex-col items-center text-center px-8 pb-8">
+                  <AlertDialogHeader className="p-0 gap-0 text-center">
+                    <AlertDialogTitle className="text-[18px] tracking-[-0.02em]" style={{ fontWeight: 600, color: "#0F172A" }}>Remove this category?</AlertDialogTitle>
+                  </AlertDialogHeader>
+                  <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "#475569", lineHeight: "1.65" }}>
+                    {c && <><span style={{ fontWeight: 600, color: "#1E293B" }}>{c.code} — {c.name}</span>{" "}will be removed from this pricing rule.</>}
+                  </AlertDialogDescription>
+                  <div className="w-full mt-7 flex flex-col gap-2.5">
+                    <AlertDialogAction onClick={() => catRemoveSingleId && handleRemoveCategory(catRemoveSingleId)} className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors hover:opacity-90" style={{ fontWeight: 600, backgroundColor: "#DC2626", color: "#fff" }}>Remove Category</AlertDialogAction>
+                    <AlertDialogCancel className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors" style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#334155" }}>Cancel</AlertDialogCancel>
+                  </div>
+                </div>
+              </>
+            );
+          })()}
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* ─── Add/Manage Partner Modal ─── */}
+      {(() => {
+        const pmSearch = partnerModalView === "browse" ? partnerModalSearch : partnerModalAddedSearch;
+        const setPmSearch = partnerModalView === "browse" ? setPartnerModalSearch : setPartnerModalAddedSearch;
+        const pmQ = pmSearch.toLowerCase();
+        const pmBrowseList = pmQ ? availablePartnerVendors.filter((v) => v.displayName?.toLowerCase().includes(pmQ) || v.companyName?.toLowerCase().includes(pmQ) || v.country?.toLowerCase().includes(pmQ)) : availablePartnerVendors;
+        const pmAddedList = pmQ ? assignedVendors.filter((v) => v.displayName?.toLowerCase().includes(pmQ) || v.companyName?.toLowerCase().includes(pmQ) || v.country?.toLowerCase().includes(pmQ)) : assignedVendors;
+        const pmList = partnerModalView === "browse" ? pmBrowseList : pmAddedList;
+        const pmSelSet = partnerModalView === "browse" ? partnerModalSelectedIds : partnerModalAddedSelectedIds;
+        const pmSetSel = partnerModalView === "browse" ? setPartnerModalSelectedIds : setPartnerModalAddedSelectedIds;
+        const ST_PM: Record<string, { bg: string; text: string; border: string }> = { "active": { bg: "#ECFDF5", text: "#065F46", border: "#A7F3D0" }, "inactive": { bg: "#FFFBEB", text: "#92400E", border: "#FDE68A" }, "archived": { bg: "#F1F5F9", text: "#475569", border: "#E2E8F0" } };
+
+        return (
+        <Dialog open={partnerModalOpen} onOpenChange={setPartnerModalOpen}>
+          <DialogContent
+            className="flex flex-col p-0 gap-0 border-0 sm:border z-[230] !fixed !inset-0 !translate-x-0 !translate-y-0 !m-auto !w-full !h-full !max-w-[100%] sm:!max-w-[960px] lg:!max-w-[1040px] !max-h-[100dvh] sm:!max-h-[88vh] rounded-none sm:!rounded-2xl transition-[max-width,max-height,border-radius] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]"
+            hideCloseButton
+            overlayClassName="z-[225]"
+            style={{ boxShadow: "0 24px 48px -12px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.05)" }}
+          >
+            <DialogTitle className="sr-only">Manage Partners</DialogTitle>
+            <DialogDescription className="sr-only">Add or remove partners for this pricing rule.</DialogDescription>
+
+            {/* Header */}
+            <div className="px-3 sm:px-5 pt-3 sm:pt-4 pb-2.5 sm:pb-3 shrink-0 bg-white rounded-t-none sm:rounded-t-2xl border-b border-[#EEF2F6]">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2.5">
+                    <h2 className="text-[15px] sm:text-[17px] text-[#0F172A]" style={{ fontWeight: 700 }}>Manage Partners</h2>
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] border whitespace-nowrap shrink-0" style={{ fontWeight: 600, backgroundColor: isDis ? "#ECFDF5" : "#F5F3FF", color: isDis ? "#047857" : "#6D28D9", borderColor: isDis ? "#A7F3D0" : "#DDD6FE" }}>
+                      {isDis ? "Discount" : "Premium"}<span className="text-[10px] opacity-60">·</span>{rule.name}
+                    </span>
+                  </div>
+                  <p className="text-[11px] sm:text-xs text-[#64748B] mt-1" style={{ fontWeight: 400 }}>Browse partners to add, or manage already assigned ones.</p>
+                </div>
+                <button onClick={() => setPartnerModalOpen(false)} className="w-8 h-8 rounded-lg flex items-center justify-center text-[#94A3B8] hover:text-[#64748B] hover:bg-[#F1F5F9] transition-all cursor-pointer shrink-0">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* Search + View tabs + Pills */}
+            <div className="px-3 sm:px-5 pt-2 bg-white shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="relative flex-1 max-w-xs">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70 pointer-events-none" />
+                  <input type="text" value={pmSearch} onChange={(e) => setPmSearch(e.target.value)} placeholder={partnerModalView === "browse" ? "Search available partners..." : "Search assigned partners..."} className="w-full pl-9 pr-8 h-8 text-[13px] bg-white border border-border/80 rounded-lg shadow-sm focus:outline-none focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 transition-colors placeholder:text-muted-foreground/50" />
+                  {pmSearch && (
+                    <button onClick={() => setPmSearch("")} className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded-full hover:bg-muted/60 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"><X className="w-3.5 h-3.5" /></button>
+                  )}
+                </div>
+                <div className="inline-flex items-center rounded-lg bg-[#F1F5F9] p-0.5 shrink-0">
+                  <button onClick={() => setPartnerModalView("browse")} className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[12px] transition-all cursor-pointer ${partnerModalView === "browse" ? "bg-white shadow-[0_1px_3px_rgba(0,0,0,0.08)] text-[#0F172A]" : "text-[#64748B] hover:text-[#334155]"}`} style={{ fontWeight: partnerModalView === "browse" ? 600 : 500 }}>
+                    <Users className={`w-3.5 h-3.5 ${partnerModalView === "browse" ? "text-[#0A77FF]" : "text-[#94A3B8]"}`} />
+                    Browse Partners
+                    <span className={`text-[10px] rounded-full px-1.5 py-px min-w-[16px] text-center ${partnerModalView === "browse" ? "bg-[#EDF4FF] text-[#0A77FF]" : "bg-[#E2E8F0] text-[#64748B]"}`} style={{ fontWeight: 600 }}>{availablePartnerVendors.length}</span>
+                  </button>
+                  <button onClick={() => setPartnerModalView("added")} className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[12px] transition-all cursor-pointer ${partnerModalView === "added" ? "bg-white shadow-[0_1px_3px_rgba(0,0,0,0.08)] text-[#0F172A]" : "text-[#64748B] hover:text-[#334155]"}`} style={{ fontWeight: partnerModalView === "added" ? 600 : 500 }}>
+                    <Check className={`w-3.5 h-3.5 ${partnerModalView === "added" ? "text-[#059669]" : "text-[#94A3B8]"}`} />
+                    Assigned Partners
+                    <span className={`text-[10px] rounded-full px-1.5 py-px min-w-[16px] text-center ${partnerModalView === "added" ? "bg-[#ECFDF5] text-[#059669]" : "bg-[#E2E8F0] text-[#64748B]"}`} style={{ fontWeight: 600 }}>{assignedVendors.length}</span>
+                  </button>
+                </div>
+                <div className="flex items-center gap-2 ml-auto shrink-0">
+                  {partnerModalView === "browse" && partnerModalSelectedIds.size > 0 && (<span className="text-xs text-[#0A77FF] shrink-0" style={{ fontWeight: 600 }}>{partnerModalSelectedIds.size} selected</span>)}
+                  <span className="text-xs text-muted-foreground shrink-0" style={{ fontWeight: 500 }}>{pmList.length} {partnerModalView === "browse" ? "available" : "partners"}</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-1.5 overflow-x-auto pt-2.5 pb-2.5">
+                {(["all", "active", "inactive"] as const).map((f) => {
+                  const cnt = f === "all" ? pmList.length : pmList.filter((v) => v.status === f).length;
+                  return (
+                    <button key={f} className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs transition-colors whitespace-nowrap shrink-0 cursor-pointer ${f === "all" ? "border-primary bg-[#EDF4FF] hover:bg-[#D6E8FF]" : "border-border text-muted-foreground hover:bg-muted/60 hover:text-foreground hover:border-muted-foreground/30"}`} style={{ fontWeight: f === "all" ? 500 : 400, color: f === "all" ? "#0A77FF" : undefined }}>
+                      {f === "all" ? "All" : f.charAt(0).toUpperCase() + f.slice(1)}
+                      <span className={`text-[10px] rounded-full px-1.5 py-px min-w-[18px] text-center ${f === "all" ? "bg-primary/10" : "bg-muted"}`} style={{ fontWeight: 600, color: f === "all" ? "#0A77FF" : "#475569" }}>{cnt}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Table */}
+            <div className="flex-1 min-h-0 overflow-auto bg-white">
+              <Table style={{ tableLayout: "fixed", minWidth: partnerModalView === "added" ? 920 : 860 }}>
+                <TableHeader className="sticky top-0 z-20 bg-white">
+                  <TableRow className="bg-[#FAFBFC] hover:bg-[#FAFBFC] [&>th]:h-8">
+                    <TableHead className="sticky left-0 z-20 bg-[#FAFBFC] w-[40px] min-w-[40px] max-w-[40px] !pl-2 !pr-0">
+                      {(() => {
+                        const allSel = pmList.length > 0 && pmList.every((v) => pmSelSet.has(v.id));
+                        const someSel = pmList.some((v) => pmSelSet.has(v.id));
+                        return (<Checkbox checked={allSel ? true : someSel ? "indeterminate" : false} onCheckedChange={() => { pmSetSel((prev) => { const n = new Set(prev); pmList.forEach((v) => allSel ? n.delete(v.id) : n.add(v.id)); return n; }); }} />);
+                      })()}
+                    </TableHead>
+                    <TableHead className="text-[13px] text-foreground !pl-3" style={{ fontWeight: 600, width: 240 }}>Partner</TableHead>
+                    <TableHead className="text-[13px] text-foreground !pl-3" style={{ fontWeight: 600, width: 140 }}>Type</TableHead>
+                    <TableHead className="text-[13px] text-foreground !pl-3" style={{ fontWeight: 600, width: 150 }}>Country</TableHead>
+                    <TableHead className="text-[13px] text-foreground !pl-3 text-right" style={{ fontWeight: 600, width: 130 }}>Credit Limit</TableHead>
+                    <TableHead className="text-[13px] text-foreground !pl-3" style={{ fontWeight: 600, width: 100 }}>Status</TableHead>
+                    {partnerModalView === "added" && (
+                      <TableHead className="sticky right-0 z-20 bg-[#FAFBFC] w-[60px] min-w-[60px] max-w-[60px] !pl-2 !pr-2" style={{ boxShadow: "inset 1px 0 0 0 rgba(0,0,0,0.08)" }} />
+                    )}
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {pmList.length === 0 ? (
+                    <TableRow><TableCell colSpan={partnerModalView === "added" ? 7 : 6} className="text-center py-16 text-muted-foreground"><div className="flex flex-col items-center gap-2"><Users className="w-8 h-8" /><p className="text-sm">{partnerModalView === "browse" ? "No partners available" : "No partners assigned"}</p></div></TableCell></TableRow>
+                  ) : (
+                    pmList.slice(0, 20).map((v) => {
+                      const isSelected = pmSelSet.has(v.id);
+                      const tint = getAvatarTint(v.displayName || v.companyName);
+                      const ini = (v.displayName || v.companyName).split(/[\s&]+/).filter(Boolean).map(w => w[0]).slice(0, 2).join("").toUpperCase();
+                      const pt = v.partnerTypes || [];
+                      const stp = ST_PM[v.status] || ST_PM["active"];
+                      const fmtC = (n: number) => new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
+                      return (
+                        <TableRow key={v.id} className={`cursor-pointer group bg-white hover:bg-[#F0F7FF] [&>td]:py-1 [&>td]:pl-3 [&>td]:pr-2 ${isSelected ? "!bg-[#EDF4FF]/60" : ""}`} onClick={() => pmSetSel((p) => { const n = new Set(p); n.has(v.id) ? n.delete(v.id) : n.add(v.id); return n; })}>
+                          <TableCell className="sticky left-0 z-10 bg-white group-hover:bg-[#F0F7FF] !pl-2 !pr-0" onClick={(e) => e.stopPropagation()}>
+                            <Checkbox checked={isSelected} onCheckedChange={() => pmSetSel((p) => { const n = new Set(p); n.has(v.id) ? n.delete(v.id) : n.add(v.id); return n; })} />
+                          </TableCell>
+                          <TableCell className="bg-white group-hover:bg-[#F0F7FF]">
+                            <div className="flex items-center gap-2.5">
+                              <div className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] shrink-0 border" style={{ backgroundColor: tint.bg, color: tint.fg, borderColor: `${tint.fg}20`, fontWeight: 700 }}>{ini}</div>
+                              <span className="text-sm truncate block max-w-[170px]" style={{ fontWeight: 500 }}>{v.displayName}</span>
+                            </div>
+                          </TableCell>
+                          <TableCell className="bg-white group-hover:bg-[#F0F7FF]">
+                            <div className="flex items-center gap-1.5">
+                              {pt.map((type) => (<span key={type} className="inline-flex items-center px-2 py-0.5 text-xs rounded-md border" style={{ fontWeight: 500, backgroundColor: type === "vendor" ? "#EFF6FF" : "#F5F3FF", color: type === "vendor" ? "#1E40AF" : "#5B21B6", borderColor: type === "vendor" ? "#BFDBFE" : "#DDD6FE" }}>{type === "vendor" ? "Vendor" : "Customer"}</span>))}
+                            </div>
+                          </TableCell>
+                          <TableCell className="bg-white group-hover:bg-[#F0F7FF]">
+                            <div className="flex items-center gap-2"><span className="text-base">{v.countryFlag}</span><span className="text-sm">{v.country}</span></div>
+                          </TableCell>
+                          <TableCell className="bg-white group-hover:bg-[#F0F7FF] text-right">
+                            <span className="text-sm">$ {fmtC(v.creditLimit)}</span>
+                          </TableCell>
+                          <TableCell className="bg-white group-hover:bg-[#F0F7FF]">
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] border" style={{ fontWeight: 600, backgroundColor: stp.bg, color: stp.text, borderColor: stp.border }}>{v.status.charAt(0).toUpperCase() + v.status.slice(1)}</span>
+                          </TableCell>
+                          {partnerModalView === "added" && (
+                            <TableCell className="sticky right-0 z-10 bg-white group-hover:bg-[#F0F7FF] !px-0" style={{ boxShadow: "inset 1px 0 0 0 rgba(0,0,0,0.08)" }} onClick={(e) => e.stopPropagation()}>
+                              <div className="flex items-center justify-center"><button onClick={() => handleRemovePartner(v.id)} className="w-7 h-7 rounded-md flex items-center justify-center text-[#94A3B8] hover:text-[#DC2626] hover:bg-[#FEF2F2] transition-colors cursor-pointer" title="Remove"><Trash2 className="w-3.5 h-3.5" /></button></div>
+                            </TableCell>
+                          )}
+                        </TableRow>
+                      );
+                    })
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+
+            {/* Pagination */}
+            <div className="flex items-center justify-center px-4 py-2.5 border-t border-border shrink-0 bg-white">
+              <div className="flex items-center gap-1">
+                <Button variant="ghost" size="sm" className="h-7 w-7 p-0" disabled><ChevronsLeft className="w-3.5 h-3.5" /></Button>
+                <Button variant="ghost" size="sm" className="h-7 gap-1 text-[13px] text-muted-foreground" disabled><ChevronLeft className="w-3 h-3" />Prev</Button>
+                <Button variant="default" size="sm" className="h-7 w-7 p-0 text-[13px] bg-primary text-primary-foreground">1</Button>
+                <Button variant="ghost" size="sm" className="h-7 gap-1 text-[13px] text-muted-foreground" disabled>Next<ChevronRight className="w-3 h-3" /></Button>
+                <Button variant="ghost" size="sm" className="h-7 w-7 p-0" disabled><ChevronsRight className="w-3.5 h-3.5" /></Button>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="shrink-0 border-t border-[#EEF2F6] bg-white px-3 sm:px-5 py-2.5 flex items-center justify-between sm:rounded-b-2xl">
+              <div className="flex items-center gap-2 text-[12px] text-[#64748B]">
+                <span style={{ fontWeight: 500 }}>{assignedVendors.length} partners assigned</span>
+                {partnerModalView === "browse" && partnerModalSelectedIds.size > 0 && (<><span className="text-[#CBD5E1]">·</span><span className="text-[#0A77FF]" style={{ fontWeight: 600 }}>{partnerModalSelectedIds.size} ready to add</span></>)}
+                {partnerModalView === "added" && partnerModalAddedSelectedIds.size > 0 && (<><span className="text-[#CBD5E1]">·</span><span className="text-[#DC2626]" style={{ fontWeight: 600 }}>{partnerModalAddedSelectedIds.size} selected</span></>)}
+              </div>
+              <div className="flex items-center gap-2">
+                <Button variant="outline" onClick={() => setPartnerModalOpen(false)} className="rounded-lg px-4 text-xs h-9 bg-white border-[#E2E8F0] text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#0F172A]">Cancel</Button>
+                {partnerModalView === "added" && partnerModalAddedSelectedIds.size > 0 && (
+                  <Button onClick={() => setPartnerRemoveConfirmOpen(true)} className="gap-1.5 rounded-lg px-4 text-xs h-9 bg-[#DC2626] text-white hover:bg-[#B91C1C] shadow-sm"><Trash2 className="w-3.5 h-3.5" /> Remove {partnerModalAddedSelectedIds.size} Partner{partnerModalAddedSelectedIds.size !== 1 ? "s" : ""}</Button>
+                )}
+                {partnerModalView === "added" && partnerModalAddedSelectedIds.size === 0 && (
+                  <Button onClick={() => setPartnerModalOpen(false)} className="rounded-lg px-4 text-xs h-9 bg-[#0A77FF] text-white hover:bg-[#0862D0] shadow-sm">Done</Button>
+                )}
+                {partnerModalView === "browse" && (
+                  <Button onClick={handleAddPartners} disabled={partnerModalSelectedIds.size === 0} className="gap-1.5 rounded-lg px-4 text-xs h-9 bg-[#0A77FF] text-white hover:bg-[#0862D0] shadow-sm disabled:opacity-50"><Plus className="w-3.5 h-3.5" /> Add {partnerModalSelectedIds.size > 0 ? `${partnerModalSelectedIds.size} Partner${partnerModalSelectedIds.size !== 1 ? "s" : ""}` : "Partners"}</Button>
+                )}
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+        );
+      })()}
+
+      {/* Bulk remove partners confirmation */}
+      <AlertDialog open={partnerRemoveConfirmOpen} onOpenChange={setPartnerRemoveConfirmOpen}>
+        <AlertDialogContent className="sm:max-w-[420px] p-0 gap-0 overflow-hidden rounded-2xl border-0 shadow-[0_24px_80px_-12px_rgba(0,0,0,0.25)] z-[240]" overlayClassName="z-[235]" onInteractOutside={() => setPartnerRemoveConfirmOpen(false)}>
+          <div className="relative flex flex-col items-center pt-10 pb-6" style={{ background: "linear-gradient(180deg, #FEF2F2 0%, rgba(254,242,242,0.3) 70%, transparent 100%)" }}>
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[180px] h-[80px] rounded-full blur-[50px] opacity-25" style={{ backgroundColor: "#EF4444" }} />
+            <div className="relative w-16 h-16 rounded-2xl flex items-center justify-center" style={{ backgroundColor: "#FEE2E2" }}><Trash2 className="w-8 h-8" style={{ color: "#DC2626" }} /></div>
+            <span className="mt-4 px-3 py-1 rounded-full text-[11px]" style={{ fontWeight: 600, backgroundColor: "#FEF2F2", color: "#991B1B", textTransform: "uppercase" as const, letterSpacing: "0.05em" }}>Remove Partners</span>
+          </div>
+          <div className="flex flex-col items-center text-center px-8 pb-8">
+            <AlertDialogHeader className="p-0 gap-0 text-center"><AlertDialogTitle className="text-[18px] tracking-[-0.02em]" style={{ fontWeight: 600, color: "#0F172A" }}>Remove {partnerModalAddedSelectedIds.size} partner{partnerModalAddedSelectedIds.size !== 1 ? "s" : ""}?</AlertDialogTitle></AlertDialogHeader>
+            <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "#475569", lineHeight: "1.65" }}>These partners will be removed from this pricing rule. You can add them back later.</AlertDialogDescription>
+            <div className="w-full mt-7 flex flex-col gap-2.5">
+              <AlertDialogAction onClick={handleBulkRemovePartners} className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors hover:opacity-90" style={{ fontWeight: 600, backgroundColor: "#DC2626", color: "#fff" }}>Remove {partnerModalAddedSelectedIds.size} Partner{partnerModalAddedSelectedIds.size !== 1 ? "s" : ""}</AlertDialogAction>
+              <AlertDialogCancel className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors" style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#334155" }}>Cancel</AlertDialogCancel>
+            </div>
+          </div>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Single partner remove confirmation */}
+      <AlertDialog open={!!partnerRemoveSingleId} onOpenChange={(o) => { if (!o) setPartnerRemoveSingleId(null); }}>
+        <AlertDialogContent className="sm:max-w-[400px] p-0 gap-0 overflow-hidden rounded-2xl border-0 shadow-[0_24px_80px_-12px_rgba(0,0,0,0.25)] z-[240]" overlayClassName="z-[235]" onInteractOutside={() => setPartnerRemoveSingleId(null)}>
+          {(() => {
+            const pv = partnerRemoveSingleId ? ctxVendors.find((v) => v.id === partnerRemoveSingleId) : null;
+            return (
+              <>
+                <div className="relative flex flex-col items-center pt-10 pb-6" style={{ background: "linear-gradient(180deg, #FEF2F2 0%, rgba(254,242,242,0.3) 70%, transparent 100%)" }}>
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[180px] h-[80px] rounded-full blur-[50px] opacity-25" style={{ backgroundColor: "#EF4444" }} />
+                  <div className="relative w-16 h-16 rounded-2xl flex items-center justify-center" style={{ backgroundColor: "#FEE2E2" }}><AlertTriangle className="w-8 h-8" style={{ color: "#DC2626" }} /></div>
+                  <span className="mt-4 px-3 py-1 rounded-full text-[11px]" style={{ fontWeight: 600, backgroundColor: "#FEF2F2", color: "#991B1B", textTransform: "uppercase" as const, letterSpacing: "0.05em" }}>Caution</span>
+                </div>
+                <div className="flex flex-col items-center text-center px-8 pb-8">
+                  <AlertDialogHeader className="p-0 gap-0 text-center"><AlertDialogTitle className="text-[18px] tracking-[-0.02em]" style={{ fontWeight: 600, color: "#0F172A" }}>Remove this partner?</AlertDialogTitle></AlertDialogHeader>
+                  <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "#475569", lineHeight: "1.65" }}>
+                    {pv && <><span style={{ fontWeight: 600, color: "#1E293B" }}>{pv.displayName}</span> will be removed from this pricing rule.</>}
+                  </AlertDialogDescription>
+                  <div className="w-full mt-7 flex flex-col gap-2.5">
+                    <AlertDialogAction onClick={() => partnerRemoveSingleId && handleRemovePartner(partnerRemoveSingleId)} className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors hover:opacity-90" style={{ fontWeight: 600, backgroundColor: "#DC2626", color: "#fff" }}>Remove Partner</AlertDialogAction>
+                    <AlertDialogCancel className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors" style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#334155" }}>Cancel</AlertDialogCancel>
+                  </div>
+                </div>
+              </>
+            );
+          })()}
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Archive confirmation — red gradient */}
+      <AlertDialog open={archiveConfirmOpen} onOpenChange={setArchiveConfirmOpen}>
+        <AlertDialogContent className="sm:max-w-[400px] p-0 gap-0 overflow-hidden rounded-2xl border-0 shadow-[0_24px_80px_-12px_rgba(0,0,0,0.25)] z-[240]" overlayClassName="z-[235]" onInteractOutside={() => setArchiveConfirmOpen(false)}>
+          <div className="relative flex flex-col items-center pt-10 pb-6" style={{ background: "linear-gradient(180deg, #FEF2F2 0%, rgba(254,242,242,0.3) 70%, transparent 100%)" }}>
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[180px] h-[80px] rounded-full blur-[50px] opacity-25" style={{ backgroundColor: "#EF4444" }} />
+            <div className="relative w-16 h-16 rounded-2xl flex items-center justify-center" style={{ backgroundColor: "#FEE2E2" }}>
+              <Archive className="w-8 h-8" style={{ color: "#DC2626" }} />
+            </div>
+            <span className="mt-4 px-3 py-1 rounded-full text-[11px]" style={{ fontWeight: 600, backgroundColor: "#FEF2F2", color: "#991B1B", textTransform: "uppercase" as const, letterSpacing: "0.05em" }}>Caution</span>
+          </div>
+          <div className="flex flex-col items-center text-center px-8 pb-8">
+            <AlertDialogHeader className="p-0 gap-0 text-center">
+              <AlertDialogTitle className="text-[18px] tracking-[-0.02em]" style={{ fontWeight: 600, color: "#0F172A" }}>Archive this pricing rule?</AlertDialogTitle>
+            </AlertDialogHeader>
+            <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "#475569", lineHeight: "1.65" }}>
+              <span style={{ fontWeight: 600, color: "#1E293B" }}>{rule.name}</span> will be archived and no longer applied to any partners or items. You can restore it later.
+            </AlertDialogDescription>
+            <div className="w-full mt-7 flex flex-col gap-2.5">
+              <AlertDialogAction
+                onClick={() => { setArchiveConfirmOpen(false); toast.success(`"${rule.name}" has been archived`); onClose(); }}
+                className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors hover:opacity-90"
+                style={{ fontWeight: 600, backgroundColor: "#DC2626", color: "#fff" }}
+              >
+                Archive Rule
+              </AlertDialogAction>
+              <AlertDialogCancel className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors" style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#334155" }}>Cancel</AlertDialogCancel>
+            </div>
+          </div>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Disable confirmation — yellow/amber gradient */}
+      <AlertDialog open={disableConfirmOpen} onOpenChange={setDisableConfirmOpen}>
+        <AlertDialogContent className="sm:max-w-[400px] p-0 gap-0 overflow-hidden rounded-2xl border-0 shadow-[0_24px_80px_-12px_rgba(0,0,0,0.25)] z-[240]" overlayClassName="z-[235]" onInteractOutside={() => setDisableConfirmOpen(false)}>
+          <div className="relative flex flex-col items-center pt-10 pb-6" style={{ background: "linear-gradient(180deg, #FEFCE8 0%, rgba(254,252,232,0.3) 70%, transparent 100%)" }}>
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[180px] h-[80px] rounded-full blur-[50px] opacity-25" style={{ backgroundColor: "#EAB308" }} />
+            <div className="relative w-16 h-16 rounded-2xl flex items-center justify-center" style={{ backgroundColor: "#FEF3C7" }}>
+              <AlertTriangle className="w-8 h-8" style={{ color: "#D97706" }} />
+            </div>
+            <span className="mt-4 px-3 py-1 rounded-full text-[11px]" style={{ fontWeight: 600, backgroundColor: "#FEF9C3", color: "#92400E", textTransform: "uppercase" as const, letterSpacing: "0.05em" }}>Warning</span>
+          </div>
+          <div className="flex flex-col items-center text-center px-8 pb-8">
+            <AlertDialogHeader className="p-0 gap-0 text-center">
+              <AlertDialogTitle className="text-[18px] tracking-[-0.02em]" style={{ fontWeight: 600, color: "#0F172A" }}>Disable this pricing rule?</AlertDialogTitle>
+            </AlertDialogHeader>
+            <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "#475569", lineHeight: "1.65" }}>
+              <span style={{ fontWeight: 600, color: "#1E293B" }}>{rule.name}</span> will be disabled and will stop applying to partner transactions. You can re-enable it at any time.
+            </AlertDialogDescription>
+            <div className="w-full mt-7 flex flex-col gap-2.5">
+              <AlertDialogAction
+                onClick={() => {
+                  setDisableConfirmOpen(false);
+                  if (onDisable) onDisable(rule);
+                  toast.success(`"${rule.name}" has been disabled`);
+                  onClose();
+                }}
+                className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors hover:opacity-90"
+                style={{ fontWeight: 600, backgroundColor: "#F97316", color: "#fff" }}
+              >
+                Disable Rule
+              </AlertDialogAction>
+              <AlertDialogCancel className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors" style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#334155" }}>Cancel</AlertDialogCancel>
+            </div>
+          </div>
+        </AlertDialogContent>
+      </AlertDialog>
     </Dialog>
   );
 }
@@ -1484,7 +2471,7 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
 export function presetToPricingRule(preset: import("./partnerConstants").PricingRulePreset): PricingRule {
   const rng = seededRng(preset.id.split("").reduce((a, c) => a + c.charCodeAt(0), 0) * 1000);
   const ic = Math.floor(rng() * 12) + 3;
-  const cc = Math.floor(rng() * 4) + 1;
+  const cc = Math.floor(rng() * 6) + 10;
   const pc = preset.vendorsApplied || Math.floor(rng() * 6) + 1;
   return {
     id: preset.id,
@@ -1582,7 +2569,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
     const mk = (id: string, ruleNo: string, name: string, cat: "discount"|"premium", basis: "value"|"volume", tierType: "single"|"multiple", tiers: TierData[], desc: string, about: string, preset: boolean, by: string, scope: "vendor"|"customer"|"both"): PricingRule => {
       const seed = id.split("").reduce((a, c) => a + c.charCodeAt(0), 0) * 1000;
       const rng = seededRng(seed);
-      const ic = Math.floor(rng() * 12) + 3, cc = Math.floor(rng() * 4) + 1, pc = Math.floor(rng() * 6) + 1;
+      const ic = Math.floor(rng() * 12) + 3, cc = Math.floor(rng() * 6) + 10, pc = Math.floor(rng() * 6) + 1;
       return { id, ruleNo, name, category: cat, basis, tierType, totalTiers: tiers.length, description: desc, aboutText: about, status: "Active", scope, validFrom: "Jan 01, 2026", validTo: "Dec 31, 2026", hasDateLimit: false, durationDays: 365, itemCount: ic, categoryCount: cc, partnerCount: pc, tiers, createdBy: by, createdDate: "Mar 01, 2026", isPreset: preset, items: genItems(rng, ic), categories: genCategories(rng, cc), partners: genPartners(rng, pc) };
     };
     const presetRules = PRICING_RULE_PRESETS.map(p => {
@@ -1650,6 +2637,30 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
     setDetailOpen(true);
   }, []);
 
+  const handleEditRule = useCallback((r: PricingRule) => {
+    // Prefill create form with rule data
+    setCreateName(r.name);
+    setCreateDescription(r.description);
+    setCreateCategory(r.category);
+    setCreateBasis(r.basis);
+    setCreateLimitDate(r.hasDateLimit);
+    setCreateValidFrom(r.validFrom);
+    setCreateValidTo(r.validTo);
+    setCreateStep(1);
+    setCreateItemsTab("items");
+    setCreateTiers(r.tiers.length > 0
+      ? r.tiers.map((t) => ({
+          discount: t.discount,
+          fixRate: t.discount.includes("$"),
+          qtyLimits: !!(t.minQty || t.maxQty),
+          minQty: t.minQty || "",
+          maxQty: t.maxQty || "",
+        }))
+      : [makeTier()]
+    );
+    setCreateModalOpen(true);
+  }, []);
+
   const subTabFiltered = useMemo(() => {
     if (subTab === "vendor") return allRules.filter((r) => r.scope === "vendor" || r.scope === "both");
     return allRules.filter((r) => r.scope === "customer" || r.scope === "both");
@@ -1700,31 +2711,73 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
 
   return (
     <div className="border border-border rounded-xl bg-card overflow-clip flex flex-col" style={{ minHeight: 400 }}>
-      <PricingRuleDetailModal rule={selectedRule} open={detailOpen} onClose={() => setDetailOpen(false)} mode={detailMode} onApply={(r) => { toast.success(`"${r.name}" applied to this partner.`); }} onDuplicate={(r) => toast.info(`Duplicated "${r.name}"`)} onDisable={(r) => toast.success(`"${r.name}" disabled`)} />
+      <PricingRuleDetailModal rule={selectedRule} open={detailOpen} onClose={() => setDetailOpen(false)} mode={detailMode} vendor={vendor} onApply={(r) => { toast.success(`"${r.name}" applied to this partner.`); }} onDuplicate={(r) => toast.info(`Duplicated "${r.name}"`)} onDisable={(r) => toast.success(`"${r.name}" disabled`)} onEdit={handleEditRule} />
 
-      {/* Sub-tabs — modern segmented control */}
-      <div className="px-4 pt-3.5 pb-2 shrink-0">
-        <div className="inline-flex items-center rounded-xl bg-[#F1F5F9] p-1 w-full sm:w-auto">
-        {(["vendor", "customer"] as SubTab[]).map((t) => {
-          const active = subTab === t;
-          return (
-            <button
-              key={t}
-              onClick={() => { setSubTab(t); setCurrentPage(1); setQuickFilter("all"); setCategoryView("discount"); }}
-              className={`flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg text-[13px] transition-all cursor-pointer ${
-                active ? "bg-white shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.04)] text-[#0F172A]" : "text-[#64748B] hover:text-[#334155]"
-              }`}
-              style={{ fontWeight: active ? 600 : 500 }}
-            >
-              {t === "vendor" ? "Vendor" : "Customer"}
+      {/* Header: Sub-tabs + Toolbar — matches items tab layout */}
+      <div className="bg-card shrink-0">
+        {/* Sub-tabs row */}
+        <div className="flex items-center justify-between gap-3 px-4 pt-2.5 pb-2 border-b border-border">
+          <div className="inline-flex items-center rounded-lg bg-[#F1F5F9] p-0.5">
+          {([
+            { key: "vendor" as SubTab, label: "Vendor Pricing", icon: Package, color: "#1E40AF", bg: "#EFF6FF" },
+            { key: "customer" as SubTab, label: "Customer Pricing", icon: ShoppingCart, color: "#5B21B6", bg: "#F5F3FF" },
+          ]).map((t) => {
+            const active = subTab === t.key;
+            return (
+              <button
+                key={t.key}
+                onClick={() => { setSubTab(t.key); setCurrentPage(1); setQuickFilter("all"); setCategoryView("discount"); }}
+                className={`inline-flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-md text-[13px] transition-all cursor-pointer ${
+                  active ? "bg-white shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.04)]" : "text-[#64748B] hover:text-[#334155]"
+                }`}
+                style={{ fontWeight: active ? 600 : 500, color: active ? t.color : undefined }}
+              >
+                <t.icon className="w-3.5 h-3.5" style={{ color: active ? t.color : "#94A3B8" }} />
+                {t.label}
+              </button>
+            );
+          })}
+          </div>
+
+          {/* Right: Count + Templates + Create */}
+          <div className="flex items-center gap-2 shrink-0">
+            <span className="text-sm tabular-nums hidden sm:inline" style={{ fontWeight: 500 }}>
+              {filtered.length !== categoryFiltered.length ? (
+                <>
+                  <span className="text-foreground">{filtered.length}</span>
+                  <span className="text-muted-foreground/60"> of </span>
+                  <span className="text-muted-foreground">{categoryFiltered.length}</span>
+                  <span className="text-muted-foreground/70"> rules</span>
+                </>
+              ) : (
+                <>
+                  <span className="text-foreground">{categoryFiltered.length}</span>
+                  <span className="text-muted-foreground/70"> rules</span>
+                </>
+              )}
+            </span>
+
+            <div className="w-px h-5 bg-border/60 hidden sm:block" />
+
+            <button type="button" onClick={() => { setExplorePresetsOpen(true); setExplorePresetsSidebar("all"); setExploreCategoryTab("discount"); setExplorePresetsSearch(""); }} className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border border-[#DBEAFE] bg-[#EFF6FF] text-[#0A77FF] hover:bg-[#DBEAFE] text-[13px] transition-colors cursor-pointer" style={{ fontWeight: 500 }}>
+              <FileText className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Templates</span>
             </button>
-          );
-        })}
-        </div>
-      </div>
 
-      {/* Row 1: Search + Filters | Count + CTAs */}
-      <div className="flex items-center justify-between gap-3 px-4 pt-3.5 pb-2 shrink-0">
+            <button
+              type="button"
+              onClick={() => { resetCreateForm(); setCreateModalOpen(true); }}
+              className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-[13px] shadow-sm transition-colors cursor-pointer"
+              style={{ fontWeight: 600 }}
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Create New Rule</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Toolbar row: Search + Filters + Category toggle */}
+        <div className="flex items-center justify-between gap-3 px-4 py-2">
         <div className="flex items-center gap-2.5 flex-1 min-w-0">
           <div className="relative flex-1 max-w-xs">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70 pointer-events-none" />
@@ -1775,39 +2828,10 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
             })}
           </div>
         </div>
-
-        <div className="flex items-center gap-1.5 shrink-0">
-          <span className="text-sm tabular-nums mr-1 hidden sm:inline" style={{ fontWeight: 500 }}>
-            {filtered.length !== categoryFiltered.length ? (
-              <>
-                <span className="text-foreground">{filtered.length}</span>
-                <span className="text-muted-foreground/60"> of </span>
-                <span className="text-muted-foreground">{categoryFiltered.length}</span>
-                <span className="text-muted-foreground/70"> rules</span>
-              </>
-            ) : (
-              <>
-                <span className="text-foreground">{categoryFiltered.length}</span>
-                <span className="text-muted-foreground/70"> rules</span>
-              </>
-            )}
-          </span>
-
-          <div className="w-px h-5 bg-border/60 mx-0.5 hidden sm:block" />
-
-          <button type="button" onClick={() => { setExplorePresetsOpen(true); setExplorePresetsSidebar("all"); setExploreCategoryTab("discount"); setExplorePresetsSearch(""); }} className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg border border-[#E2E8F0] bg-white text-[#334155] hover:bg-[#F8FAFC] text-sm transition-colors cursor-pointer" style={{ fontWeight: 600 }}>
-            <FileText className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Templates</span>
-          </button>
-          <button type="button" onClick={() => { resetCreateForm(); setCreateModalOpen(true); }} className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-sm shadow-sm transition-colors cursor-pointer" style={{ fontWeight: 600 }}>
-            <Plus className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Create new</span>
-          </button>
-        </div>
       </div>
 
-      {/* Row 2: Quick Filter Pills */}
-      <div className="flex items-center overflow-x-auto px-4 pb-3 shrink-0">
+      {/* Quick Filter Pills */}
+      <div className="flex items-center gap-1.5 overflow-x-auto px-4 pb-3 shrink-0">
         <FilterPills
           options={QUICK_FILTER_DEFS.map((f) => ({
             key: f.key,
@@ -1818,6 +2842,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
           activeKey={quickFilter}
           onSelect={(k) => { setQuickFilter(k as QuickFilter); setCurrentPage(1); }}
         />
+      </div>
       </div>
 
       {/* Divider */}
