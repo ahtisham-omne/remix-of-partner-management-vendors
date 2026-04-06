@@ -5650,7 +5650,7 @@ function ConfigPageContent({
                           return (
                             <div
                               key={t.id}
-                              onClick={() => { setCreatePtType(t.id as "net" | "prepayment" | "split"); if (t.id === "prepayment" && createPtTrigger === "delivery") setCreatePtTrigger("order_confirmation"); }}
+                              onClick={() => { setCreatePtType(t.id as "net" | "prepayment" | "split"); if (t.id === "net" && createPtTrigger !== "shipping" && createPtTrigger !== "delivery") setCreatePtTrigger("shipping"); if (t.id === "prepayment" && (createPtTrigger === "delivery" || createPtTrigger === "shipping")) setCreatePtTrigger("order_confirmation"); }}
                               className={`group relative rounded-xl overflow-hidden border transition-all duration-200 cursor-pointer ${
                                 isActive
                                   ? `${activeBorderClass} bg-white shadow-[0_1px_4px_rgba(0,0,0,0.06)]`
@@ -5688,8 +5688,8 @@ function ConfigPageContent({
                         <Tooltip><TooltipTrigger asChild><span><Info className="w-3.5 h-3.5 text-[#CBD5E1]" /></span></TooltipTrigger><TooltipContent className="z-[300]"><p className="text-xs">Name and describe this payment term.</p></TooltipContent></Tooltip>
                       </div>
                       <div className="rounded-xl border border-[#E2E8F0] bg-white p-4">
-                        <div className="grid grid-cols-2 gap-3">
-                          {/* Name */}
+                        <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+                          {/* Row 1: Name + (NET only: Trigger) / (others: Description) */}
                           <div>
                             <label className="text-[12px] text-[#0F172A] mb-1.5 block" style={{ fontWeight: 500 }}>
                               {createPtType === "net" ? "NET Term" : createPtType === "prepayment" ? "Prepayment Term" : "Split Term"} Name
@@ -5701,23 +5701,24 @@ function ConfigPageContent({
                               className="rounded-lg border-[#E2E8F0] bg-white h-9 text-[13px] text-[#0F172A] placeholder:text-[#94A3B8]"
                             />
                           </div>
-                          {/* NET: Duration */}
-                          {createPtType === "net" ? (
+                          {/* NET: Trigger next to name */}
+                          {createPtType === "net" && (
                             <div>
-                              <label className="text-[12px] text-[#0F172A] mb-1.5 block" style={{ fontWeight: 500 }}>NET Duration (Days)</label>
-                              <div className="relative">
-                                <Input
-                                  value={createPtCustomDuration || createPtDuration}
-                                  onChange={(e) => { const v = e.target.value.replace(/\D/g, ""); setCreatePtCustomDuration(v); setCreatePtDuration(v || "30"); }}
-                                  placeholder="e.g. 30"
-                                  className="h-9 rounded-lg border-[#E2E8F0] bg-white text-[13px] text-[#0F172A] placeholder:text-[#94A3B8] pr-14"
-                                  inputMode="numeric"
-                                />
-                                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] text-[#94A3B8]" style={{ fontWeight: 500 }}>days</span>
-                              </div>
+                              <label className="text-[12px] text-[#0F172A] mb-1.5 block" style={{ fontWeight: 500 }}>Trigger Event</label>
+                              <Select value={createPtTrigger} onValueChange={setCreatePtTrigger}>
+                                <SelectTrigger className="h-9 rounded-lg border-[#E2E8F0] bg-white text-[13px]">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent className="z-[250] rounded-lg">
+                                  {CREATE_PT_TRIGGERS.filter((t) => t.id === "shipping" || t.id === "delivery").map((t) => (
+                                    <SelectItem key={t.id} value={t.id} className="py-2 px-3 text-sm">{t.label}</SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
                             </div>
-                          ) : (
-                            /* Prepayment/Split: Description next to name */
+                          )}
+                          {/* Prepayment/Split: Description next to name */}
+                          {createPtType !== "net" && (
                             <div>
                               <label className="text-[12px] text-[#0F172A] mb-1.5 block" style={{ fontWeight: 500 }}>Description</label>
                               <div className="relative">
@@ -5732,21 +5733,36 @@ function ConfigPageContent({
                               </div>
                             </div>
                           )}
-                          {/* NET: Description full width below */}
+                          {/* NET Row 2: Duration + Description */}
                           {createPtType === "net" && (
-                            <div className="col-span-2">
-                              <label className="text-[12px] text-[#0F172A] mb-1.5 block" style={{ fontWeight: 500 }}>Description</label>
-                              <div className="relative">
-                                <Textarea
-                                  value={createPtDescription}
-                                  onChange={(e) => { if (e.target.value.length <= 5000) setCreatePtDescription(e.target.value); }}
-                                  placeholder="Brief summary of payment term purpose or context."
-                                  className="rounded-lg border-[#E2E8F0] bg-white min-h-[64px] resize-none text-[13px] placeholder:text-[#94A3B8] pb-5"
-                                  rows={2}
-                                />
-                                <p className="absolute bottom-1.5 right-2.5 text-[11px] text-[#94A3B8] pointer-events-none">{createPtDescription.length}/5000</p>
+                            <>
+                              <div>
+                                <label className="text-[12px] text-[#0F172A] mb-1.5 block" style={{ fontWeight: 500 }}>NET Duration (Days)</label>
+                                <div className="relative">
+                                  <Input
+                                    value={createPtCustomDuration || createPtDuration}
+                                    onChange={(e) => { const v = e.target.value.replace(/\D/g, ""); setCreatePtCustomDuration(v); setCreatePtDuration(v || "30"); }}
+                                    placeholder="e.g. 30"
+                                    className="h-9 rounded-lg border-[#E2E8F0] bg-white text-[13px] text-[#0F172A] placeholder:text-[#94A3B8] pr-14"
+                                    inputMode="numeric"
+                                  />
+                                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] text-[#94A3B8]" style={{ fontWeight: 500 }}>days</span>
+                                </div>
                               </div>
-                            </div>
+                              <div>
+                                <label className="text-[12px] text-[#0F172A] mb-1.5 block" style={{ fontWeight: 500 }}>Description</label>
+                                <div className="relative">
+                                  <Textarea
+                                    value={createPtDescription}
+                                    onChange={(e) => { if (e.target.value.length <= 5000) setCreatePtDescription(e.target.value); }}
+                                    placeholder="Brief summary of payment term purpose or context."
+                                    className="rounded-lg border-[#E2E8F0] bg-white min-h-[36px] resize-none text-[13px] placeholder:text-[#94A3B8] pb-5"
+                                    rows={1}
+                                  />
+                                  <p className="absolute bottom-1.5 right-2.5 text-[11px] text-[#94A3B8] pointer-events-none">{createPtDescription.length}/5000</p>
+                                </div>
+                              </div>
+                            </>
                           )}
                         </div>
                       </div>
@@ -5760,7 +5776,7 @@ function ConfigPageContent({
                         </div>
                         <div className="rounded-xl border border-[#E2E8F0] bg-white p-4">
                           <div className="grid grid-cols-2 gap-x-4 gap-y-2.5">
-                            {/* Value with % / $ toggle — matches tier card field */}
+                            {/* Value with % / $ toggle */}
                             <div>
                               <div className="flex items-center justify-between mb-1.5">
                                 <label className="text-[12px] text-[#0F172A]" style={{ fontWeight: 500 }}>
