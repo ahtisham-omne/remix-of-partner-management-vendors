@@ -93,10 +93,10 @@ export function CreditManagementPage() {
                 const colors = statusColors[partner.status] || statusColors.Good;
                 return (
                   <tr key={partner.id} className="border-b border-border last:border-0 hover:bg-muted/50 transition-colors cursor-pointer">
-                    <td className="px-5 py-3.5 text-foreground" style={{ fontSize: "13px", fontWeight: 500 }}>{partner.name}</td>
-                    <td className="px-5 py-3.5 text-foreground" style={{ fontSize: "13px" }}>{partner.creditLimit}</td>
-                    <td className="px-5 py-3.5 text-foreground" style={{ fontSize: "13px" }}>{partner.utilized}</td>
-                    <td className="px-5 py-3.5 text-foreground" style={{ fontSize: "13px" }}>{partner.available}</td>
+                    <td className="px-5 py-3.5" style={{ fontSize: "13px", fontWeight: 500, color: '#1E293B' }}>{partner.name}</td>
+                    <td className="px-5 py-3.5" style={{ fontSize: "13px", color: '#334155' }}>{partner.creditLimit}</td>
+                    <td className="px-5 py-3.5" style={{ fontSize: "13px", color: '#334155' }}>{partner.utilized}</td>
+                    <td className="px-5 py-3.5" style={{ fontSize: "13px", color: '#334155' }}>{partner.available}</td>
                     <td className="px-5 py-3.5" style={{ fontSize: "13px" }}>
                       <div className="flex items-center gap-2">
                         <div className="w-16 h-1.5 rounded-full bg-muted overflow-hidden">

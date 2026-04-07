@@ -949,7 +949,7 @@ export function ContactsDirectoryPage() {
                 </HoverCardContent>
               </HoverCard>
               <div className="min-w-0">
-                <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate block`} style={{ fontWeight: 500 }}>{contact.name}</span>
+                <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate block`} style={{ fontWeight: 500, color: '#1E293B' }}>{contact.name}</span>
                 {isRelaxed && contact.email && (
                   <span className="text-xs text-muted-foreground/60 truncate block">{contact.email}</span>
                 )}

@@ -648,23 +648,23 @@ function AddItemModal({
             <div className="w-7 h-7 rounded-lg bg-[#F1F5F9] overflow-hidden shrink-0 border border-[#E8ECF1]">
               <img src={item.image} alt="" className="w-full h-full object-cover" />
             </div>
-            <span className="text-sm text-foreground font-mono whitespace-nowrap" style={{ fontWeight: 500 }}>{item.partNo}</span>
+            <span className="text-sm font-mono whitespace-nowrap" style={{ fontWeight: 500, color: '#1E293B' }}>{item.partNo}</span>
           </div>
         </TableCell>
         <TableCell className="bg-white group-hover:bg-[#F0F7FF]">
-          <p className="text-sm text-foreground truncate" style={{ fontWeight: 400 }}>{item.description}</p>
+          <p className="text-sm text-[#334155] truncate" style={{ fontWeight: 400 }}>{item.description}</p>
         </TableCell>
         <TableCell className="bg-white group-hover:bg-[#F0F7FF]"><StockStatusDot status={item.stockStatus} /></TableCell>
-        <TableCell className="bg-white group-hover:bg-[#F0F7FF]"><span className="text-[13px] text-foreground whitespace-nowrap">{item.itemControlType}</span></TableCell>
-        <TableCell className="bg-white group-hover:bg-[#F0F7FF]"><span className="text-[13px] text-foreground whitespace-nowrap">{item.category}</span></TableCell>
+        <TableCell className="bg-white group-hover:bg-[#F0F7FF]"><span className="text-[13px] text-[#334155] whitespace-nowrap">{item.itemControlType}</span></TableCell>
+        <TableCell className="bg-white group-hover:bg-[#F0F7FF]"><span className="text-[13px] text-[#334155] whitespace-nowrap">{item.category}</span></TableCell>
         <TableCell className="bg-white group-hover:bg-[#F0F7FF]"><CategoryPill label={item.additionalCategory} /></TableCell>
         <TableCell className="text-right !pr-3 bg-white group-hover:bg-[#F0F7FF]">
-          <span className="text-[14px] text-foreground tabular-nums" style={{ fontWeight: 600 }}>{item.onHand.toLocaleString()}</span>
+          <span className="text-[14px] text-[#334155] tabular-nums" style={{ fontWeight: 600 }}>{item.onHand.toLocaleString()}</span>
           <p className="text-[10px] text-muted-foreground">{item.onHandUnit}</p>
         </TableCell>
-        <TableCell className="bg-white group-hover:bg-[#F0F7FF]"><span className="text-[13px] text-foreground whitespace-nowrap">{item.altUnits}</span></TableCell>
-        <TableCell className="bg-white group-hover:bg-[#F0F7FF]"><span className="text-[13px] text-foreground truncate block max-w-[140px]">{item.inboundLocation}</span></TableCell>
-        <TableCell className="bg-white group-hover:bg-[#F0F7FF]"><span className="text-[13px] text-foreground truncate block max-w-[140px]">{item.outboundLocation}</span></TableCell>
+        <TableCell className="bg-white group-hover:bg-[#F0F7FF]"><span className="text-[13px] text-[#334155] whitespace-nowrap">{item.altUnits}</span></TableCell>
+        <TableCell className="bg-white group-hover:bg-[#F0F7FF]"><span className="text-[13px] text-[#334155] truncate block max-w-[140px]">{item.inboundLocation}</span></TableCell>
+        <TableCell className="bg-white group-hover:bg-[#F0F7FF]"><span className="text-[13px] text-[#334155] truncate block max-w-[140px]">{item.outboundLocation}</span></TableCell>
         <TableCell className="bg-white group-hover:bg-[#F0F7FF]">
           <div className="flex items-center gap-1 flex-wrap">
             {item.acquisitionMethods.map((m) => <AcqBadge key={m} method={m} />)}
@@ -1546,7 +1546,7 @@ export function PartnerItemsTab({ vendor, hideHeader, compact, contextLabel, con
                 <img src={item.image} alt="" className="w-full h-full object-cover" />
               </div>
               <div className="min-w-0">
-                <span className={`${isComfort ? "text-[13.5px]" : "text-sm"} text-foreground font-mono whitespace-nowrap block`} style={{ fontWeight: 500 }}>
+                <span className={`${isComfort ? "text-[13.5px]" : "text-sm"} font-mono whitespace-nowrap block`} style={{ fontWeight: 500, color: '#1E293B' }}>
                   {highlightText(item.partNo)}
                 </span>
                 {isComfort && <span className="text-xs text-muted-foreground block">{item.manufacturer}</span>}
@@ -1558,7 +1558,7 @@ export function PartnerItemsTab({ vendor, hideHeader, compact, contextLabel, con
         return (
           <TableCell key={colKey}>
             <div className="min-w-0">
-              <p className={`${isComfort ? "text-[13px]" : "text-sm"} text-foreground truncate`} style={{ fontWeight: 400 }}>
+              <p className={`${isComfort ? "text-[13px]" : "text-sm"} text-[#334155] truncate`} style={{ fontWeight: 400 }}>
                 {highlightText(item.description)}
               </p>
               {isComfort && (
@@ -1578,19 +1578,19 @@ export function PartnerItemsTab({ vendor, hideHeader, compact, contextLabel, con
       case "item_type":
         return (
           <TableCell key={colKey}>
-            <span className="text-[13px] text-foreground whitespace-nowrap">{item.itemType}</span>
+            <span className="text-[13px] text-[#334155] whitespace-nowrap">{item.itemType}</span>
           </TableCell>
         );
       case "control_type":
         return (
           <TableCell key={colKey}>
-            <span className="text-[13px] text-foreground whitespace-nowrap">{item.itemControlType}</span>
+            <span className="text-[13px] text-[#334155] whitespace-nowrap">{item.itemControlType}</span>
           </TableCell>
         );
       case "category":
         return (
           <TableCell key={colKey}>
-            <span className="text-[13px] text-foreground whitespace-nowrap">{highlightText(item.category)}</span>
+            <span className="text-[13px] text-[#334155] whitespace-nowrap">{highlightText(item.category)}</span>
           </TableCell>
         );
       case "additional_category":
@@ -1615,7 +1615,7 @@ export function PartnerItemsTab({ vendor, hideHeader, compact, contextLabel, con
         return (
           <TableCell key={colKey} className="text-right !pr-3">
             <div className="text-right">
-              <span className="text-[14px] text-foreground tabular-nums" style={{ fontWeight: 600 }}>
+              <span className="text-[14px] text-[#334155] tabular-nums" style={{ fontWeight: 600 }}>
                 {item.onHand.toLocaleString()}
               </span>
               <p className="text-[10px] text-muted-foreground mt-px" style={{ fontWeight: 400 }}>{item.onHandUnit}</p>
@@ -1625,19 +1625,19 @@ export function PartnerItemsTab({ vendor, hideHeader, compact, contextLabel, con
       case "alt_units":
         return (
           <TableCell key={colKey}>
-            <span className="text-[13px] text-foreground whitespace-nowrap">{item.altUnits}</span>
+            <span className="text-[13px] text-[#334155] whitespace-nowrap">{item.altUnits}</span>
           </TableCell>
         );
       case "inbound_location":
         return (
           <TableCell key={colKey}>
-            <span className="text-[13px] text-foreground truncate block max-w-[180px]">{item.inboundLocation}</span>
+            <span className="text-[13px] text-[#334155] truncate block max-w-[180px]">{item.inboundLocation}</span>
           </TableCell>
         );
       case "outbound_location":
         return (
           <TableCell key={colKey}>
-            <span className="text-[13px] text-foreground truncate block max-w-[180px]">{item.outboundLocation}</span>
+            <span className="text-[13px] text-[#334155] truncate block max-w-[180px]">{item.outboundLocation}</span>
           </TableCell>
         );
       case "acquisition":

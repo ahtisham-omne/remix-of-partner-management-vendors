@@ -1789,7 +1789,7 @@ export function VendorsListPage() {
                                     <div className={`flex items-center ${isRelaxed ? "gap-3" : "gap-2.5"}`}>
                                       <LogoAvatar logoUrl={icon.logoUrl} initials={icon.initials} bg={icon.bg} size={isRelaxed ? "lg" : "md"} />
                                       <div className="min-w-0">
-                                        <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate block max-w-[170px]`} style={{ fontWeight: 500 }}>{highlightText(vendor.displayName)}</span>
+                                        <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate block max-w-[170px]`} style={{ fontWeight: 500, color: '#1E293B' }}>{highlightText(vendor.displayName)}</span>
                                         {isRelaxed && vendor.emailAddress && (
                                           <span className="text-xs text-muted-foreground/60 truncate block max-w-[170px]">{vendor.emailAddress}</span>
                                         )}

@@ -4699,7 +4699,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                                 <img src={loc.image} alt={loc.name} className="w-full h-full object-cover" />
                               </div>
                               <div className="min-w-0">
-                                <span className="text-sm text-foreground truncate block" style={{ fontWeight: 500 }}>{highlightText(loc.name)}</span>
+                                <span className="text-sm truncate block" style={{ fontWeight: 500, color: '#1E293B' }}>{highlightText(loc.name)}</span>
                                 {isComfort && <span className="text-[11px] text-[#94A3B8] truncate block">{loc.city}, {loc.state}</span>}
                               </div>
                             </div>
@@ -4810,7 +4810,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                                 </HoverCardContent>
                               </HoverCard>
                               <div className="min-w-0">
-                                <span className="text-sm text-foreground truncate block max-w-[120px]" style={{ fontWeight: 500 }}>{loc.createdBy.name}</span>
+                                <span className="text-sm truncate block max-w-[120px]" style={{ fontWeight: 500, color: '#1E293B' }}>{loc.createdBy.name}</span>
                                 {isComfort && <span className="text-[10px] text-muted-foreground/50 block">Team Member</span>}
                               </div>
                             </div>
@@ -5501,7 +5501,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                                           {initials}
                                         </div>
                                         <div className="min-w-0">
-                                          <span className={`${isComfort ? "text-[13.5px]" : "text-sm"} truncate block`} style={{ fontWeight: 500 }}>{poc.name}</span>
+                                          <span className={`${isComfort ? "text-[13.5px]" : "text-sm"} truncate block`} style={{ fontWeight: 500, color: '#1E293B' }}>{poc.name}</span>
                                           {isComfort && <span className="text-xs text-muted-foreground/60 truncate block">{poc.email}</span>}
                                         </div>
                                       </div>
@@ -7249,7 +7249,7 @@ function ContactsTab({ vendor, cfg }: { vendor: Vendor; cfg?: VendorConfigData }
                         <div className={`flex items-center ${isCmf ? "gap-3" : "gap-2.5"}`}>
                           <div className={`${isCmf ? "w-9 h-9" : "w-8 h-8"} rounded-lg flex items-center justify-center shrink-0 border border-[#E8ECF1]`} style={{ backgroundColor: at.bg, color: at.text, fontSize: isCmf ? 12 : 11, fontWeight: 700 }}>{getTabInitials(contact.name)}</div>
                           <div className="min-w-0">
-                            <span className={`${isCmf ? "text-[13.5px]" : "text-sm"} truncate block`} style={{ fontWeight: 500 }}>{pocHighlightText(contact.name)}</span>
+                            <span className={`${isCmf ? "text-[13.5px]" : "text-sm"} truncate block`} style={{ fontWeight: 500, color: '#1E293B' }}>{pocHighlightText(contact.name)}</span>
                             {isCmf && <span className="text-xs text-muted-foreground/60 truncate block">{contact.company}</span>}
                           </div>
                         </div>

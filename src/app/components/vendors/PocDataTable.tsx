@@ -240,7 +240,7 @@ export function PocDataTable({
                     <TableCell>
                       <div className={`flex items-center ${isComfort ? "gap-3" : "gap-2.5"}`}>
                         <div className={`${isComfort ? "w-9 h-9" : "w-8 h-8"} rounded-lg flex items-center justify-center shrink-0 border border-[#E8ECF1]`} style={{ backgroundColor: t.bg, color: t.text, fontSize: isComfort ? 12 : 11, fontWeight: 700 }}>{ini(c.name)}</div>
-                        <div className="min-w-0"><span className={`${isComfort ? "text-[13.5px]" : "text-sm"} truncate block`} style={{ fontWeight: 500 }}><Hl text={c.name} q={searchQuery} /></span>{isComfort && <span className="text-xs text-muted-foreground/60 truncate block">{c.company}</span>}</div>
+                        <div className="min-w-0"><span className={`${isComfort ? "text-[13.5px]" : "text-sm"} truncate block`} style={{ fontWeight: 500, color: '#1E293B' }}><Hl text={c.name} q={searchQuery} /></span>{isComfort && <span className="text-xs text-muted-foreground/60 truncate block">{c.company}</span>}</div>
                       </div>
                     </TableCell>
                     <TableCell><span className={`${isComfort ? "text-[13px]" : "text-sm"} text-[#475569]`}>{c.department === "Supply Chain Management" ? "SCM" : c.department}</span></TableCell>

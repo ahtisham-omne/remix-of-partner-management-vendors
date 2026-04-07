@@ -1334,7 +1334,7 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
                               {/* Code */}
                               <TableCell style={{ width: 140, minWidth: 140, maxWidth: 140, overflow: "hidden" }}>
                                 <div className="flex items-center gap-2">
-                                  <span className="font-mono text-sm text-foreground whitespace-nowrap" style={{ fontWeight: 500 }}>{cat.code}</span>
+                                  <span className="font-mono text-sm whitespace-nowrap" style={{ fontWeight: 500, color: '#1E293B' }}>{cat.code}</span>
                                   {cat.isMe && (
                                     <span className="inline-flex items-center px-1.5 py-px rounded text-[9px] border" style={{ fontWeight: 600, backgroundColor: "#EDF4FF", color: "#0A77FF", borderColor: "#BFDBFE" }}>ME</span>
                                   )}
@@ -1342,7 +1342,7 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
                               </TableCell>
                               {/* Description */}
                               <TableCell style={{ width: 220, minWidth: 220, maxWidth: 220, overflow: "hidden" }}>
-                                <p className="text-sm text-foreground truncate" style={{ fontWeight: 400 }}>{cat.description}</p>
+                                <p className="text-sm text-[#334155] truncate" style={{ fontWeight: 400 }}>{cat.description}</p>
                               </TableCell>
                               {/* Tags */}
                               <TableCell style={{ width: 200, minWidth: 200, maxWidth: 200, overflow: "hidden" }}>
@@ -1377,14 +1377,14 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
                                       <div className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] shrink-0 border" style={{ backgroundColor: tint.bg, color: tint.fg, borderColor: `${tint.fg}20`, fontWeight: 700 }}>
                                         {cat.creatorInitials}
                                       </div>
-                                      <span className="text-sm text-foreground truncate block max-w-[120px]">{cat.creatorName}</span>
+                                      <span className="text-sm text-[#334155] truncate block max-w-[120px]">{cat.creatorName}</span>
                                     </div>
                                   );
                                 })()}
                               </TableCell>
                               {/* Created Date */}
                               <TableCell style={{ width: 120, minWidth: 120, maxWidth: 120, overflow: "hidden" }}>
-                                <span className="text-sm text-foreground whitespace-nowrap">{cat.createdDate}</span>
+                                <span className="text-sm whitespace-nowrap" style={{ color: '#475569' }}>{cat.createdDate}</span>
                               </TableCell>
                               {/* Status */}
                               <TableCell style={{ width: 100, minWidth: 100, maxWidth: 100, overflow: "hidden" }}>
@@ -1573,7 +1573,7 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
                                   <div className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] shrink-0 border" style={{ backgroundColor: tint.bg, color: tint.fg, borderColor: `${tint.fg}20`, fontWeight: 700 }}>
                                     {initials}
                                   </div>
-                                  <span className="text-sm truncate block max-w-[170px]" style={{ fontWeight: 500 }}>{v.displayName}</span>
+                                  <span className="text-sm truncate block max-w-[170px]" style={{ fontWeight: 500, color: '#1E293B' }}>{v.displayName}</span>
                                 </div>
                               </TableCell>
                               {/* Partner Type */}
@@ -2035,13 +2035,13 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
                           />
                         </TableCell>
                         <TableCell className="bg-white group-hover:bg-[#F0F7FF]">
-                          <span className="font-mono text-sm text-foreground whitespace-nowrap" style={{ fontWeight: 500 }}>{cat.code}</span>
+                          <span className="font-mono text-sm whitespace-nowrap" style={{ fontWeight: 500, color: '#1E293B' }}>{cat.code}</span>
                         </TableCell>
                         <TableCell className="bg-white group-hover:bg-[#F0F7FF]">
                           <span className="text-sm text-foreground" style={{ fontWeight: 500 }}>{cat.name}</span>
                         </TableCell>
                         <TableCell className="bg-white group-hover:bg-[#F0F7FF]">
-                          <p className="text-sm text-foreground truncate" style={{ fontWeight: 400 }}>{cat.description}</p>
+                          <p className="text-sm text-[#334155] truncate" style={{ fontWeight: 400 }}>{cat.description}</p>
                         </TableCell>
                         <TableCell className="bg-white group-hover:bg-[#F0F7FF]">
                           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] border" style={{ fontWeight: 600, backgroundColor: stc.bg, color: stc.text, borderColor: stc.border }}>{cat.status}</span>
@@ -2282,7 +2282,7 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
                           <TableCell className="bg-white group-hover:bg-[#F0F7FF]">
                             <div className="flex items-center gap-2.5">
                               <div className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] shrink-0 border" style={{ backgroundColor: tint.bg, color: tint.fg, borderColor: `${tint.fg}20`, fontWeight: 700 }}>{ini}</div>
-                              <span className="text-sm truncate block max-w-[170px]" style={{ fontWeight: 500 }}>{v.displayName}</span>
+                              <span className="text-sm truncate block max-w-[170px]" style={{ fontWeight: 500, color: '#1E293B' }}>{v.displayName}</span>
                             </div>
                           </TableCell>
                           <TableCell className="bg-white group-hover:bg-[#F0F7FF]">

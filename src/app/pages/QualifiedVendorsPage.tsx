@@ -85,18 +85,18 @@ export function QualifiedVendorsPage() {
                         <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: "#EDF4FF" }}>
                           <ShieldCheck className="w-4 h-4" style={{ color: "#0A77FF" }} />
                         </div>
-                        <span className="text-foreground" style={{ fontSize: "13px", fontWeight: 500 }}>{vendor.name}</span>
+                        <span style={{ fontSize: "13px", fontWeight: 500, color: '#1E293B' }}>{vendor.name}</span>
                       </div>
                     </td>
-                    <td className="px-5 py-3.5 text-muted-foreground" style={{ fontSize: "13px" }}>{vendor.category}</td>
+                    <td className="px-5 py-3.5" style={{ fontSize: "13px", color: '#334155' }}>{vendor.category}</td>
                     <td className="px-5 py-3.5">
                       <div className="flex items-center gap-1">
                         <Star className="w-3.5 h-3.5" style={{ color: "#F59E0B" }} />
-                        <span className="text-foreground" style={{ fontSize: "13px", fontWeight: 500 }}>{vendor.rating}</span>
+                        <span style={{ fontSize: "13px", fontWeight: 500, color: '#1E293B' }}>{vendor.rating}</span>
                       </div>
                     </td>
                     <td className="px-5 py-3.5">
-                      <div className="flex items-center gap-1.5 text-muted-foreground" style={{ fontSize: "13px" }}>
+                      <div className="flex items-center gap-1.5" style={{ fontSize: "13px", color: '#334155' }}>
                         <Clock className="w-3.5 h-3.5" />
                         {vendor.leadTime}
                       </div>
@@ -109,7 +109,7 @@ export function QualifiedVendorsPage() {
                         {vendor.priority}
                       </span>
                     </td>
-                    <td className="px-5 py-3.5 text-muted-foreground" style={{ fontSize: "13px" }}>{vendor.expiry}</td>
+                    <td className="px-5 py-3.5" style={{ fontSize: "13px", color: '#475569' }}>{vendor.expiry}</td>
                     <td className="px-5 py-3.5">
                       <div className="flex items-center gap-1.5">
                         {vendor.status === "Expiring Soon" && <AlertCircle className="w-3.5 h-3.5" style={{ color: "#EA580C" }} />}

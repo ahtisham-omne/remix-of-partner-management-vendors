@@ -252,7 +252,7 @@ function PaymentTermDetailModal({ term, open, onClose, mode = "create", onDisabl
                                   {vInit}
                                 </div>
                                 <div className="min-w-0">
-                                  <p className="text-[12px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{v.companyName}</p>
+                                  <p className="text-[12px] truncate" style={{ fontWeight: 500, color: '#1E293B' }}>{v.companyName}</p>
                                   <p className="text-[10px] text-[#94A3B8] mt-0.5 font-mono">{v.code}</p>
                                 </div>
                               </div>
