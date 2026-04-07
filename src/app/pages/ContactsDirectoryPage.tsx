@@ -1,4 +1,5 @@
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback, cloneElement, useRef } from "react";
+import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import { ColumnSelector, ColumnSelectorTrigger, type ColumnConfig } from "../components/vendors/ColumnSelector";
 import { Button } from "../components/ui/button";
@@ -69,11 +70,14 @@ import {
   Calendar,
   ToggleLeft,
   ToggleRight,
+  GripVertical,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Checkbox } from "../components/ui/checkbox";
 import { CONTACT_DICTIONARY, type ContactPerson } from "../components/vendors/partnerConstants";
 import { CreatePocModal } from "../components/vendors/PocModals";
+import { OverflowTooltip } from "../components/vendors/OverflowTooltip";
+import { ColumnHeaderMenu, type SortConfig as CMSortConfig } from "../components/vendors/ColumnHeaderMenu";
 import { getAvatarTint } from "../utils/avatarTints";
 
 /* ─── Person Avatar Photos ─── */
@@ -392,6 +396,7 @@ const DEFAULT_COLUMN_WIDTHS: Record<string, number> = Object.fromEntries(
   COLUMN_DEFS.map((c) => [c.key, parseInt(c.minWidth, 10)])
 );
 const CHECKBOX_COL_WIDTH = 40;
+const MIN_COL_WIDTH = 1;
 
 /* ─── Partner name pool for linked partners ─── */
 const PARTNER_NAMES = [
@@ -501,6 +506,32 @@ export function ContactsDirectoryPage() {
   const [insightsDateRange, setInsightsDateRange] = useState("last_30");
   const [insightsPanelOpen, setInsightsPanelOpen] = useState(false);
   const [activeKpiKeys, setActiveKpiKeys] = useState<Set<string>>(new Set(["total", "active", "sales", "supply_chain", "finance", "avg_partners"]));
+
+  /* ─── Frozen columns ─── */
+  const [frozenColumns, setFrozenColumns] = useState<Set<string>>(new Set(["contact_name"]));
+
+  /* ─── Column drag reorder state (custom mouse-event based) ─── */
+  const colDragRef = useRef<{
+    columnKey: string;
+    startX: number;
+    startY: number;
+    isDragging: boolean;
+    lastSwapTime: number;
+  } | null>(null);
+  const suppressNextClickRef = useRef(false);
+  const ghostElRef = useRef<HTMLDivElement>(null);
+
+  /** Only stores the dragged column key (no x/y — positioning is via ref for zero re-renders) */
+  const [draggingColumnKey, setDraggingColumnKey] = useState<string | null>(null);
+
+  /* ─── Column resize refs ─── */
+  const resizeRef = useRef<{
+    columnKey: string;
+    startX: number;
+    startWidth: number;
+  } | null>(null);
+  const [isResizing, setIsResizing] = useState(false);
+  const [resizingColumnKey, setResizingColumnKey] = useState<string | null>(null);
 
   /* ─── Create Contact Modal State ─── */
   const [createModalOpen, setCreateModalOpen] = useState(false);
@@ -702,15 +733,184 @@ export function ContactsDirectoryPage() {
     });
   }, [allPageSelected, paginatedContacts]);
 
-  /* ─── Sort ─── */
-  const handleSort = useCallback((key: string) => {
-    setSortConfig((prev) => {
-      if (!prev || prev.key !== key) return { key, direction: "asc" };
-      if (prev.direction === "asc") return { key, direction: "desc" };
-      return null;
-    });
+  /* ─── Sort (ColumnHeaderMenu compatible signature) ─── */
+  const handleSort = useCallback((key: string, direction?: "asc" | "desc" | null) => {
+    if (direction === undefined) {
+      // Legacy toggle behaviour (cycle asc → desc → clear)
+      setSortConfig((prev) => {
+        if (!prev || prev.key !== key) return { key, direction: "asc" };
+        if (prev.direction === "asc") return { key, direction: "desc" };
+        return null;
+      });
+    } else if (direction === null) {
+      setSortConfig(null);
+    } else {
+      setSortConfig({ key, direction });
+    }
     setCurrentPage(1);
   }, []);
+
+  /* ─── Hide column handler ─── */
+  const handleHideColumn = useCallback((columnKey: string) => {
+    setColumnVisibility((prev) => ({ ...prev, [columnKey]: false }));
+    setSortConfig((prev) => (prev?.key === columnKey ? null : prev));
+    setFrozenColumns((prev) => {
+      if (!prev.has(columnKey)) return prev;
+      const next = new Set(prev);
+      next.delete(columnKey);
+      return next;
+    });
+  }, []);
+
+  /* ─── Freeze column handler ─── */
+  const handleFreezeColumn = useCallback((columnKey: string) => {
+    setFrozenColumns((prev) => {
+      const next = new Set(prev);
+      if (next.has(columnKey) && columnKey !== "contact_name") {
+        next.delete(columnKey);
+      } else {
+        next.add(columnKey);
+      }
+      return next;
+    });
+  }, []);
+
+  /* ─── Custom drag: mousedown on header starts tracking (live-reorder) ─── */
+  const handleHeaderMouseDown = useCallback((e: React.MouseEvent, columnKey: string) => {
+    if (LOCKED_COLUMNS.includes(columnKey)) return;
+    if (isResizing) return;
+    if (e.button !== 0) return;
+
+    const startX = e.clientX;
+    const startY = e.clientY;
+    colDragRef.current = { columnKey, startX, startY, isDragging: false, lastSwapTime: 0 };
+
+    const DRAG_THRESHOLD = 5;
+    const SWAP_SETTLE_MS = 60;
+
+    const onMove = (moveEvt: MouseEvent) => {
+      if (!colDragRef.current) return;
+      const dx = moveEvt.clientX - colDragRef.current.startX;
+      const dy = moveEvt.clientY - colDragRef.current.startY;
+
+      if (!colDragRef.current.isDragging) {
+        if (Math.sqrt(dx * dx + dy * dy) < DRAG_THRESHOLD) return;
+        colDragRef.current.isDragging = true;
+        document.body.style.userSelect = "none";
+        document.body.style.cursor = "grabbing";
+        setDraggingColumnKey(colDragRef.current.columnKey);
+      }
+
+      const ghost = ghostElRef.current;
+      if (ghost) {
+        ghost.style.transform = `translate(${moveEvt.clientX}px, ${moveEvt.clientY}px)`;
+      }
+
+      const now = performance.now();
+      if (now - colDragRef.current.lastSwapTime < SWAP_SETTLE_MS) return;
+
+      const cursorX = moveEvt.clientX;
+      const draggedKey = colDragRef.current.columnKey;
+
+      const draggedTh = document.querySelector<HTMLElement>(`th[data-col-drag-key="${draggedKey}"]`);
+      if (!draggedTh) return;
+      const draggedRect = draggedTh.getBoundingClientRect();
+
+      if (cursorX >= draggedRect.left && cursorX <= draggedRect.right) return;
+
+      const allThs = document.querySelectorAll<HTMLElement>("th[data-col-drag-key]");
+      for (const th of allThs) {
+        const rect = th.getBoundingClientRect();
+        if (cursorX < rect.left || cursorX > rect.right) continue;
+        const k = th.getAttribute("data-col-drag-key");
+        if (!k || k === draggedKey || LOCKED_COLUMNS.includes(k)) break;
+
+        setColumnOrder((prev) => {
+          const srcIdx = prev.indexOf(draggedKey);
+          const tgtIdx = prev.indexOf(k);
+          if (srcIdx === -1 || tgtIdx === -1 || srcIdx === tgtIdx) return prev;
+          const next = [...prev];
+          next.splice(srcIdx, 1);
+          next.splice(tgtIdx, 0, draggedKey);
+          return next;
+        });
+        colDragRef.current.lastSwapTime = now;
+        break;
+      }
+    };
+
+    const onUp = () => {
+      document.removeEventListener("mousemove", onMove);
+      document.removeEventListener("mouseup", onUp);
+      document.body.style.userSelect = "";
+      document.body.style.cursor = "";
+
+      if (colDragRef.current?.isDragging) {
+        suppressNextClickRef.current = true;
+        requestAnimationFrame(() => { suppressNextClickRef.current = false; });
+      }
+
+      colDragRef.current = null;
+      setDraggingColumnKey(null);
+    };
+
+    document.addEventListener("mousemove", onMove);
+    document.addEventListener("mouseup", onUp);
+  }, [isResizing]);
+
+  /* ─── Column resize handlers ─── */
+  const handleResizeStart = useCallback((e: React.MouseEvent, columnKey: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const startWidth = columnWidths[columnKey] ?? parseInt(colDef(columnKey).minWidth, 10);
+    resizeRef.current = { columnKey, startX: e.clientX, startWidth };
+    setIsResizing(true);
+    setResizingColumnKey(columnKey);
+
+    const handleMouseMove = (moveEvent: MouseEvent) => {
+      if (!resizeRef.current) return;
+      const delta = moveEvent.clientX - resizeRef.current.startX;
+      const newWidth = Math.max(MIN_COL_WIDTH, resizeRef.current.startWidth + delta);
+      setColumnWidths((prev) => ({ ...prev, [resizeRef.current!.columnKey]: newWidth }));
+    };
+
+    const handleMouseUp = () => {
+      resizeRef.current = null;
+      setIsResizing(false);
+      setResizingColumnKey(null);
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+    };
+
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
+  }, [columnWidths]);
+
+  /** Cumulative left pixel offsets for frozen columns */
+  const frozenOffsets = useMemo(() => {
+    const offsets: Record<string, number> = {};
+    let cumLeft = CHECKBOX_COL_WIDTH;
+    for (const key of visibleColumns) {
+      if (frozenColumns.has(key)) {
+        offsets[key] = cumLeft;
+        cumLeft += columnWidths[key] ?? parseInt(colDef(key).minWidth, 10);
+      }
+    }
+    return offsets;
+  }, [visibleColumns, frozenColumns, columnWidths]);
+
+  /** Last frozen column key -- gets a subtle right shadow for visual separation */
+  const lastFrozenKey = useMemo(() => {
+    let last = "";
+    for (const key of visibleColumns) {
+      if (frozenColumns.has(key)) last = key;
+    }
+    return last;
+  }, [visibleColumns, frozenColumns]);
 
   /* ─── Render helpers ─── */
   const isRelaxed = density === "comfort";
@@ -775,9 +975,16 @@ export function ContactsDirectoryPage() {
                 {shortDept(depts[0])}
               </span>
               {depts.length > 1 && (
-                <span className="inline-flex items-center px-1.5 py-0.5 rounded-md text-xs border cursor-pointer hover:bg-[#E2E8F0] hover:border-[#CBD5E1] transition-colors" style={{ fontWeight: 600, backgroundColor: "#F1F5F9", color: "#475569", borderColor: "#E2E8F0" }}>
-                  +{depts.length - 1}
-                </span>
+                <OverflowTooltip
+                  category="Departments"
+                  items={depts.slice(1).map((d, i) => ({
+                    id: `${contact.id}-dept-${i}`,
+                    name: d === "Supply Chain Management" ? "Supply Chain" : d,
+                    subtitle: "DEPARTMENT",
+                  }))}
+                >
+                  <span className="inline-flex items-center px-1.5 py-0.5 rounded-md text-xs border cursor-default" style={{ fontWeight: 600, backgroundColor: "#F1F5F9", color: "#475569", borderColor: "#E2E8F0" }}>+{depts.length - 1}</span>
+                </OverflowTooltip>
               )}
             </div>
           </TableCell>
@@ -791,7 +998,16 @@ export function ContactsDirectoryPage() {
             <div className={`flex items-center ${isRelaxed ? "gap-1.5" : "gap-1"}`}>
               <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate block max-w-[120px]`}>{comps[0]}</span>
               {comps.length > 1 && (
-                <span className="text-[11px] shrink-0 cursor-pointer leading-none hover:underline" style={{ fontWeight: 600, color: "#085FCC" }}>+{comps.length - 1} more</span>
+                <OverflowTooltip
+                  category="Companies"
+                  items={comps.slice(1).map((co, i) => ({
+                    id: `${contact.id}-comp-${i}`,
+                    name: co,
+                    subtitle: "COMPANY",
+                  }))}
+                >
+                  <span className="text-[11px] shrink-0 cursor-default leading-none" style={{ fontWeight: 600, color: "#085FCC" }}>+{comps.length - 1} more</span>
+                </OverflowTooltip>
               )}
             </div>
           </TableCell>
@@ -843,7 +1059,16 @@ export function ContactsDirectoryPage() {
             <div className="flex items-center gap-1.5">
               <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate max-w-[90px]`}>{first}</span>
               {extra > 0 && (
-                <span className="text-[11px] shrink-0 cursor-pointer leading-none hover:underline" style={{ fontWeight: 600, color: "#085FCC" }}>+{extra} more</span>
+                <OverflowTooltip
+                  category="Linked Partners"
+                  items={contact.linkedPartners.slice(1).map((p, i) => ({
+                    id: `${contact.id}-lp-${i}`,
+                    name: p,
+                    subtitle: "PARTNER",
+                  }))}
+                >
+                  <span className="text-[11px] shrink-0 cursor-default leading-none" style={{ fontWeight: 600, color: "#085FCC" }}>+{extra} more</span>
+                </OverflowTooltip>
               )}
             </div>
           </TableCell>
@@ -1361,7 +1586,7 @@ export function ContactsDirectoryPage() {
                 </div>
               ) : (
                 /* ─── Table View ─── */
-                <div className="min-h-0 overflow-auto flex-1">
+                <div className={`min-h-0 overflow-auto flex-1 ${isResizing || draggingColumnKey ? "select-none" : ""}`}>
                   <Table style={{ tableLayout: "fixed", width: `${CHECKBOX_COL_WIDTH + visibleColumns.reduce((sum, key) => sum + (columnWidths[key] ?? parseInt(colDef(key).minWidth, 10)), 0) + 60}px` }}>
                     <TableHeader className="sticky top-0 z-20 bg-card">
                       <TableRow className={`bg-muted/30 hover:bg-muted/30 ${
@@ -1375,42 +1600,91 @@ export function ContactsDirectoryPage() {
                             aria-label="Select all rows"
                           />
                         </TableHead>
-                        {/* Dynamic columns */}
+                        {/* Dynamic columns based on visibleColumns order */}
                         {visibleColumns.map((key) => {
                           const def = colDef(key);
+                          const isFrozen = frozenColumns.has(key);
+                          const isLocked = LOCKED_COLUMNS.includes(key);
+                          const isDraggable = !isLocked;
+                          const currentColSort: "asc" | "desc" | null =
+                            sortConfig?.key === key ? sortConfig.direction : null;
                           const width = columnWidths[key] ?? parseInt(def.minWidth, 10);
-                          const currentColSort: "asc" | "desc" | null = sortConfig?.key === key ? sortConfig.direction : null;
-                          const isFirstCol = key === "contact_name";
+                          const isBeingDragged = draggingColumnKey === key;
 
                           return (
                             <TableHead
                               key={key}
-                              className={`whitespace-nowrap relative group/colheader ${isFirstCol ? "sticky left-[40px] bg-[#f8fafc] z-20" : ""}`}
+                              data-col-drag-key={key}
+                              onMouseDown={isDraggable ? (e) => handleHeaderMouseDown(e, key) : undefined}
+                              onClickCapture={isDraggable ? (e) => {
+                                if (suppressNextClickRef.current) {
+                                  e.stopPropagation();
+                                  e.preventDefault();
+                                }
+                              } : undefined}
+                              className={`whitespace-nowrap relative group/colheader ${isFrozen ? "sticky bg-[#f8fafc] z-20" : ""} ${isDraggable ? "cursor-grab" : ""}`}
                               style={{
-                                width: `${width}px`,
-                                minWidth: `${width}px`,
-                                maxWidth: `${width}px`,
+                                width: `${width}px`, minWidth: `${width}px`, maxWidth: `${width}px`,
                                 overflow: "hidden",
-                                ...(isFirstCol ? { boxShadow: "inset -1px 0 0 0 rgba(0,0,0,0.08), 3px 0 6px -2px rgba(0,0,0,0.06)" } : {}),
+                                ...(isFrozen ? { left: `${frozenOffsets[key] ?? 0}px` } : {}),
+                                ...(key === lastFrozenKey && !isBeingDragged ? { boxShadow: "inset -1px 0 0 0 rgba(0,0,0,0.08), 3px 0 6px -2px rgba(0,0,0,0.06)" } : {}),
+                                ...(isBeingDragged ? {
+                                  background: "linear-gradient(180deg, rgba(10,119,255,0.08) 0%, rgba(10,119,255,0.03) 100%)",
+                                } : {}),
                               }}
                             >
+                              {/* Blue accent bar on top edge of dragged column header */}
+                              {isBeingDragged && (
+                                <div className="absolute top-0 left-0 right-0 h-[2px] rounded-b-full" style={{ backgroundColor: "#0A77FF" }} />
+                              )}
+                              {/* Drag grip icon */}
+                              {isDraggable && (
+                                <GripVertical className={`absolute left-1 top-1/2 -translate-y-1/2 w-3 h-3 transition-opacity z-[5] pointer-events-none ${isBeingDragged ? "opacity-100 text-primary" : "opacity-0 group-hover/colheader:opacity-100 text-muted-foreground/40"}`} />
+                              )}
+
                               <div className="flex items-center">
-                                {def.sortable ? (
-                                  <button
-                                    type="button"
-                                    className="inline-flex items-center gap-1 cursor-pointer hover:text-foreground transition-colors"
-                                    onClick={() => handleSort(key)}
-                                  >
+                                <ColumnHeaderMenu
+                                  columnKey={key}
+                                  label={def.label}
+                                  sortable={def.sortable}
+                                  sortConfig={sortConfig as CMSortConfig | null}
+                                  onSort={handleSort}
+                                  onAddFilter={() => {}}
+                                  onHideColumn={handleHideColumn}
+                                  onFreezeColumn={handleFreezeColumn}
+                                  isFrozen={isFrozen}
+                                  isLocked={isLocked}
+                                >
+                                  <div className="inline-flex items-center gap-1">
                                     <span className="text-[13px]" style={currentColSort ? { color: "#0A77FF" } : undefined}>{def.label}</span>
-                                    {currentColSort === "asc" && <ArrowUp className="w-3 h-3 shrink-0" style={{ color: "#0A77FF" }} />}
-                                    {currentColSort === "desc" && <ArrowDown className="w-3 h-3 shrink-0" style={{ color: "#0A77FF" }} />}
-                                    {!currentColSort && (
+                                    {currentColSort === "asc" && (
+                                      <ArrowUp className="w-3 h-3 shrink-0" style={{ color: "#0A77FF" }} />
+                                    )}
+                                    {currentColSort === "desc" && (
+                                      <ArrowDown className="w-3 h-3 shrink-0" style={{ color: "#0A77FF" }} />
+                                    )}
+                                    {!currentColSort && def.sortable && (
                                       <ArrowUpDown className="w-3 h-3 shrink-0 text-muted-foreground opacity-0 group-hover/colheader:opacity-100 transition-opacity" />
                                     )}
-                                  </button>
-                                ) : (
-                                  <span className="text-[13px]">{def.label}</span>
-                                )}
+                                  </div>
+                                </ColumnHeaderMenu>
+                              </div>
+
+                              {/* Resize handle -- right edge */}
+                              <div
+                                onMouseDown={(e) => { e.stopPropagation(); handleResizeStart(e, key); }}
+                                onClick={(e) => e.stopPropagation()}
+                                onDoubleClick={(e) => {
+                                  e.stopPropagation();
+                                  setColumnWidths((prev) => ({
+                                    ...prev,
+                                    [key]: parseInt(def.minWidth, 10),
+                                  }));
+                                }}
+                                className="absolute right-0 top-0 bottom-0 w-[5px] cursor-col-resize z-10 group/resize"
+                                style={{ touchAction: "none" }}
+                              >
+                                <div className={`absolute right-0 top-1 bottom-1 w-[2px] rounded-full transition-colors ${resizingColumnKey === key ? "bg-primary" : "bg-transparent group-hover/resize:bg-primary/40"}`} />
                               </div>
                             </TableHead>
                           );
@@ -1461,133 +1735,28 @@ export function ContactsDirectoryPage() {
                               {visibleColumns.map((key) => {
                                 const cell = renderCell(contact, key);
                                 const w = columnWidths[key] ?? parseInt(colDef(key).minWidth, 10);
+                                const isDraggedCol = draggingColumnKey === key;
                                 const cellWidthStyle: React.CSSProperties = {
                                   width: `${w}px`, minWidth: `${w}px`, maxWidth: `${w}px`, overflow: "hidden", textOverflow: "ellipsis",
+                                  ...(isDraggedCol ? {
+                                    backgroundColor: "rgba(10,119,255,0.035)",
+                                  } : {}),
                                 };
-                                const isFirstCol = key === "contact_name";
-                                if (isFirstCol) {
-                                  return (
-                                    <TableCell
-                                      key={key}
-                                      className="sticky left-[40px] z-10 bg-card group-hover:bg-[#F0F7FF]"
-                                      style={{
-                                        ...cellWidthStyle,
-                                        boxShadow: "inset -1px 0 0 0 rgba(0,0,0,0.08), 3px 0 6px -2px rgba(0,0,0,0.06)",
-                                      }}
-                                    >
-                                      {/* Re-render inside sticky wrapper */}
-                                      {(() => {
-                                        const tint = getAvatarTint(contact.name);
-                                        const initials = getInitials(contact.name);
-                                        return (
-                                          <div className={`flex items-center ${isRelaxed ? "gap-3" : "gap-2.5"}`}>
-                                            <div
-                                              className={`${isRelaxed ? "w-9 h-9" : "w-8 h-8"} rounded-full flex items-center justify-center shrink-0`}
-                                              style={{ backgroundColor: tint.bg }}
-                                            >
-                                              <span className="text-[11px]" style={{ fontWeight: 600, color: tint.fg }}>{initials}</span>
-                                            </div>
-                                            <div className="min-w-0">
-                                              <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate block max-w-[170px]`} style={{ fontWeight: 500 }}>{contact.name}</span>
-                                              {isRelaxed && contact.email && (
-                                                <span className="text-xs text-muted-foreground/60 truncate block max-w-[170px]">{contact.email}</span>
-                                              )}
-                                            </div>
-                                          </div>
-                                        );
-                                      })()}
-                                    </TableCell>
-                                  );
+                                if (frozenColumns.has(key)) {
+                                  return cloneElement(cell, {
+                                    className: `${cell.props.className || ""} sticky z-10 bg-card group-hover:bg-[#F0F7FF]`.trim(),
+                                    style: {
+                                      ...cell.props.style,
+                                      ...cellWidthStyle,
+                                      left: `${frozenOffsets[key] ?? 0}px`,
+                                      ...(key === lastFrozenKey ? { boxShadow: "inset -1px 0 0 0 rgba(0,0,0,0.08), 3px 0 6px -2px rgba(0,0,0,0.06)" } : {}),
+                                    },
+                                  });
                                 }
-                                // For non-first-col, clone cell with width styles
-                                // We already render a <TableCell> from renderCell, so we just wrap style
-                                return (
-                                  <TableCell key={key} style={cellWidthStyle}>
-                                    {(() => {
-                                      // Re-render cell content inline
-                                      switch (key) {
-                                        case "department": {
-                                          const depts = contact.departments || [contact.department];
-                                          const shortD = (d: string) => d === "Supply Chain Management" ? "Supply Chain" : d;
-                                          return (
-                                            <div className={`flex items-center ${isRelaxed ? "gap-1.5" : "gap-1"}`}>
-                                              <span className={`inline-flex items-center ${isRelaxed ? "px-2.5 py-1 text-xs" : "px-2 py-0.5 text-xs"} rounded-md border`} style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#475569", borderColor: "#E2E8F0" }}>
-                                                {shortD(depts[0])}
-                                              </span>
-                                              {depts.length > 1 && (
-                                                <span className="inline-flex items-center px-1.5 py-0.5 rounded-md text-xs border cursor-default" style={{ fontWeight: 600, backgroundColor: "#F1F5F9", color: "#475569", borderColor: "#E2E8F0" }}>+{depts.length - 1}</span>
-                                              )}
-                                            </div>
-                                          );
-                                        }
-                                        case "company": {
-                                          const comps = contact.companies || [contact.company];
-                                          return (
-                                            <div className={`flex items-center ${isRelaxed ? "gap-1.5" : "gap-1"}`}>
-                                              <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate block max-w-[120px]`}>{comps[0]}</span>
-                                              {comps.length > 1 && (
-                                                <span className="text-[11px] shrink-0 cursor-pointer leading-none hover:underline" style={{ fontWeight: 600, color: "#085FCC" }}>+{comps.length - 1} more</span>
-                                              )}
-                                            </div>
-                                          );
-                                        }
-                                        case "email":
-                                          return <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} text-muted-foreground truncate block max-w-[200px]`}>{contact.email}</span>;
-                                        case "phone":
-                                          return (
-                                            <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} tabular-nums`}>
-                                              {contact.phone}
-                                              {contact.phoneExt && <span className="text-muted-foreground ml-1">ext. {contact.phoneExt}</span>}
-                                            </span>
-                                          );
-                                        case "secondary_phone":
-                                          return contact.secondaryPhone ? (
-                                            <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} tabular-nums`}>
-                                              {contact.secondaryPhone}
-                                              {contact.secondaryPhoneExt && <span className="text-muted-foreground ml-1">ext. {contact.secondaryPhoneExt}</span>}
-                                            </span>
-                                          ) : (
-                                            <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} text-muted-foreground`}>{"\u2013"}</span>
-                                          );
-                                        case "linked_partners": {
-                                          const partners = contact.linkedPartners;
-                                          const first = partners[0];
-                                          const extra = partners.length - 1;
-                                          return (
-                                            <div className="flex items-center gap-1.5">
-                                              <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate max-w-[90px]`}>{first}</span>
-                                              {extra > 0 && (
-                                                <span className="text-[11px] shrink-0 cursor-pointer leading-none hover:underline" style={{ fontWeight: 600, color: "#085FCC" }}>+{extra} more</span>
-                                              )}
-                                            </div>
-                                          );
-                                        }
-                                        case "created_by":
-                                          return (
-                                            <div className={`flex items-center ${isRelaxed ? "gap-2.5" : "gap-2"}`}>
-                                              <ContactAvatar name={contact.createdByName} size={isRelaxed ? "lg" : "md"} />
-                                              <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate block max-w-[120px]`} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{contact.createdByName}</span>
-                                            </div>
-                                          );
-                                        case "created_on":
-                                          return <span className={isRelaxed ? "text-[13.5px]" : "text-sm"} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{contact.createdOn}</span>;
-                                        case "status": {
-                                          const sStyle = STATUS_STYLES[contact.status];
-                                          return (
-                                            <span
-                                              className={`inline-flex items-center ${isRelaxed ? "px-2.5 py-1 text-xs" : "px-2 py-0.5 text-xs"} rounded-full border`}
-                                              style={{ fontWeight: 500, backgroundColor: sStyle.bg, color: sStyle.text, borderColor: sStyle.border }}
-                                            >
-                                              {contact.status === "active" ? "Active" : "Inactive"}
-                                            </span>
-                                          );
-                                        }
-                                        default:
-                                          return <span>{"\u2013"}</span>;
-                                      }
-                                    })()}
-                                  </TableCell>
-                                );
+                                return cloneElement(cell, {
+                                  className: `${cell.props.className || ""}`.trim(),
+                                  style: { ...cell.props.style, ...cellWidthStyle },
+                                });
                               })}
                               {/* Actions — sticky right */}
                               <TableCell className="sticky right-0 bg-card group-hover:bg-[#F0F7FF] z-10 !pl-2 !pr-2" style={{ boxShadow: "inset 1px 0 0 0 rgba(0,0,0,0.08)" }}>
@@ -1740,6 +1909,49 @@ export function ContactsDirectoryPage() {
           </div>
         </div>
       </div>
+
+      {/* Column drag ghost — positioned via ref for zero re-renders during mousemove */}
+      {createPortal(
+        <div
+          ref={ghostElRef}
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            zIndex: 9999,
+            pointerEvents: "none",
+            opacity: draggingColumnKey ? 1 : 0,
+            transition: "opacity 80ms ease-out",
+            willChange: "transform",
+          }}
+        >
+          {draggingColumnKey && (() => {
+            const ghostSort = sortConfig?.key === draggingColumnKey ? sortConfig.direction : null;
+            return (
+              <div
+                className="flex items-center gap-1.5 h-[32px] pl-2 pr-3 rounded-md whitespace-nowrap"
+                style={{
+                  marginLeft: 12,
+                  marginTop: -14,
+                  backgroundColor: "rgba(255,255,255,0.92)",
+                  backdropFilter: "blur(12px)",
+                  WebkitBackdropFilter: "blur(12px)",
+                  border: "1px solid rgba(10,119,255,0.3)",
+                  boxShadow: "0 1px 3px rgba(10,119,255,0.08), 0 6px 20px rgba(0,0,0,0.10)",
+                }}
+              >
+                <GripVertical className="w-3 h-3 shrink-0" style={{ color: "#0A77FF" }} />
+                <span className="text-[13px]" style={{ color: "#0A77FF", fontWeight: 500 }}>
+                  {colDef(draggingColumnKey)?.label}
+                </span>
+                {ghostSort === "asc" && <ArrowUp className="w-3 h-3 shrink-0" style={{ color: "#0A77FF" }} />}
+                {ghostSort === "desc" && <ArrowDown className="w-3 h-3 shrink-0" style={{ color: "#0A77FF" }} />}
+              </div>
+            );
+          })()}
+        </div>,
+        document.body
+      )}
 
       {/* KPI Insights Panel — exact match to partner listing KpiInsightsPanel */}
       <ContactInsightsPanel
