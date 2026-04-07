@@ -3987,14 +3987,14 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
 
   // ── Column infrastructure (matches VendorsListPage exactly) ──
   const LOC_COLUMNS: { key: string; label: string; minWidth: string; sortable?: boolean }[] = [
-    { key: "location_name", label: "Location Name", minWidth: "280px", sortable: true },
-    { key: "address", label: "Address", minWidth: "240px" },
-    { key: "city_state", label: "City / State", minWidth: "160px", sortable: true },
-    { key: "poc", label: "Point of Contact", minWidth: "240px" },
-    { key: "service_centers", label: "Service Centers", minWidth: "220px" },
-    { key: "created_by", label: "Created By", minWidth: "200px" },
-    { key: "last_updated", label: "Last Updated", minWidth: "150px", sortable: true },
-    { key: "status", label: "Status", minWidth: "110px", sortable: true },
+    { key: "location_name", label: "Location Name", minWidth: "320px", sortable: true },
+    { key: "address", label: "Address", minWidth: "300px" },
+    { key: "city_state", label: "City / State", minWidth: "200px", sortable: true },
+    { key: "poc", label: "Point of Contact", minWidth: "280px" },
+    { key: "service_centers", label: "Service Centers", minWidth: "260px" },
+    { key: "created_by", label: "Created By", minWidth: "240px" },
+    { key: "last_updated", label: "Last Updated", minWidth: "180px", sortable: true },
+    { key: "status", label: "Status", minWidth: "130px", sortable: true },
   ];
   const LOC_LOCKED_COLUMNS = ["location_name"];
   const LOC_CHECKBOX_W = 40;
@@ -4659,7 +4659,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                         onClickCapture={isDraggable ? (e) => { if (locSuppressClickRef.current) { e.stopPropagation(); e.preventDefault(); } } : undefined}
                         className={`whitespace-nowrap relative group/colheader ${isDraggable ? "cursor-grab" : ""}`}
                         style={{
-                          width: `${w}px`, minWidth: `${w}px`, maxWidth: `${w}px`, overflow: "hidden",
+                          width: `${w}px`, minWidth: `${w}px`, maxWidth: `${w}px`, overflow: "hidden", textOverflow: "ellipsis",
                           ...(isBeingDragged ? { background: "linear-gradient(180deg, rgba(10,119,255,0.08) 0%, rgba(10,119,255,0.03) 100%)" } : {}),
                         }}
                       >

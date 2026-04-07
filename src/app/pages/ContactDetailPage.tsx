@@ -21,6 +21,7 @@ import {
 import { toast } from "sonner";
 import { CONTACT_DICTIONARY, type ContactPerson } from "../components/vendors/partnerConstants";
 import { getAvatarTint } from "../utils/avatarTints";
+import { useVendors } from "../context/VendorContext";
 
 /* ─── Person Avatar Photos ─── */
 const PERSON_AVATARS: Record<string, string> = {
@@ -100,6 +101,19 @@ function enrichContact(c: ContactPerson): EnrichedContact {
   return { ...c, status, linkedPartners };
 }
 
+function enrichContactWithNames(c: ContactPerson, names: string[]): EnrichedContact {
+  let hash = 0;
+  for (let j = 0; j < c.id.length; j++) hash = c.id.charCodeAt(j) + ((hash << 5) - hash);
+  const absHash = Math.abs(hash);
+  const status: "active" | "inactive" = absHash % 5 === 0 ? "inactive" : "active";
+  const partnerCount = 1 + (absHash % 5);
+  const linkedPartners: string[] = [];
+  for (let p = 0; p < partnerCount; p++) {
+    linkedPartners.push(names[(absHash + p * 7) % names.length]);
+  }
+  return { ...c, status, linkedPartners };
+}
+
 /* ─── Dummy data ─── */
 const ACTIVITY_LOG = [
   { id: 1, action: "Contact created", user: "System", date: "2025-11-02T09:15:00Z", icon: "create" },
@@ -157,14 +171,23 @@ function formatDateTime(dateStr: string): string {
 export function ContactDetailPage() {
   const { contactId } = useParams<{ contactId: string }>();
   const navigate = useNavigate();
+  const { vendors } = useVendors();
   const [activeTab, setActiveTab] = useState<TabId>("activity");
   const [imgFailed, setImgFailed] = useState(false);
+
+  // Use real vendor names for linked partners
+  const vendorNames = useMemo(() => vendors.length > 0 ? vendors.map((v) => v.displayName) : PARTNER_NAMES, [vendors]);
+  const partnerNameToId = useMemo(() => {
+    const map: Record<string, string> = {};
+    vendors.forEach((v) => { map[v.displayName] = v.id; map[v.companyName] = v.id; });
+    return map;
+  }, [vendors]);
 
   const contact = useMemo(() => {
     const raw = CONTACT_DICTIONARY.find((c) => c.id === contactId);
     if (!raw) return null;
-    return enrichContact(raw);
-  }, [contactId]);
+    return enrichContactWithNames(raw, vendorNames);
+  }, [contactId, vendorNames]);
 
   if (!contact) {
     return (
@@ -376,15 +399,20 @@ export function ContactDetailPage() {
             {contact.linkedPartners.map((partner, idx) => {
               const pTint = getAvatarTint(partner);
               const pInitials = partner.split(" ").filter(Boolean).map((w) => w[0]).slice(0, 2).join("").toUpperCase();
+              const partnerId = partnerNameToId[partner];
               return (
-                <div key={idx} className="flex items-center gap-3 p-2.5 rounded-lg border border-[#F1F5F9] hover:border-[#E2E8F0] hover:bg-[#FAFBFC] transition-all">
+                <div
+                  key={idx}
+                  className={`flex items-center gap-3 p-2.5 rounded-lg border border-[#F1F5F9] hover:border-[#BFDBFE] hover:bg-[#F0F7FF] transition-all ${partnerId ? "cursor-pointer" : ""}`}
+                  onClick={() => { if (partnerId) window.open(`/vendors/${partnerId}`, "_blank"); }}
+                >
                   <div
                     className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
                     style={{ backgroundColor: pTint.bg }}
                   >
                     <span className="text-[10px]" style={{ fontWeight: 700, color: pTint.fg }}>{pInitials}</span>
                   </div>
-                  <span className="text-[13px] text-[#334155]" style={{ fontWeight: 500 }}>{partner}</span>
+                  <span className={`text-[13px] text-[#334155] ${partnerId ? "hover:text-[#0A77FF] hover:underline" : ""}`} style={{ fontWeight: 500 }}>{partner}</span>
                 </div>
               );
             })}

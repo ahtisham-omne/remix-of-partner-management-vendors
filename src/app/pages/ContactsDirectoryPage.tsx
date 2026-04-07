@@ -374,17 +374,17 @@ const QUICK_FILTER_OPTIONS: { key: QuickFilter; label: string; showCount: boolea
 
 /* ─── Column definitions ─── */
 const COLUMN_DEFS: (ColumnConfig & { minWidth: string; sortable?: boolean })[] = [
-  { key: "contact_name", label: "Contact", minWidth: "260px", sortable: true },
-  { key: "role", label: "Role / Title", minWidth: "200px", sortable: true },
-  { key: "department", label: "Department", minWidth: "200px", sortable: true },
-  { key: "company", label: "Company", minWidth: "220px", sortable: true },
-  { key: "phones", label: "Phone", minWidth: "260px" },
+  { key: "contact_name", label: "Contact", minWidth: "280px", sortable: true },
+  { key: "role", label: "Role / Title", minWidth: "240px", sortable: true },
+  { key: "department", label: "Department", minWidth: "220px", sortable: true },
+  { key: "company", label: "Company", minWidth: "260px", sortable: true },
+  { key: "phones", label: "Phone", minWidth: "280px" },
   { key: "emails", label: "Email", minWidth: "300px" },
   { key: "socials", label: "Social", minWidth: "260px" },
-  { key: "linked_partners", label: "Linked Partners", minWidth: "250px" },
-  { key: "created_by", label: "Created By", minWidth: "200px" },
-  { key: "created_on", label: "Created On", minWidth: "140px" },
-  { key: "status", label: "Status", minWidth: "100px", sortable: true },
+  { key: "linked_partners", label: "Linked Partners", minWidth: "280px" },
+  { key: "created_by", label: "Created By", minWidth: "240px" },
+  { key: "created_on", label: "Created On", minWidth: "160px" },
+  { key: "status", label: "Status", minWidth: "120px", sortable: true },
 ];
 
 const DEFAULT_COLUMN_ORDER = COLUMN_DEFS.map((c) => c.key);

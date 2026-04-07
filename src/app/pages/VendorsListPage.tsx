@@ -163,26 +163,26 @@ const QUICK_FILTER_OPTIONS: { key: QuickFilter; label: string; showCount: boolea
 
 /* ─── Column configuration for the data table ─── */
 const COLUMN_DEFS: (ColumnConfig & { minWidth: string; sortable?: boolean; align?: "left" | "right" })[] = [
-  { key: "partner_name", label: "Partners", minWidth: "240px", sortable: true },
-  { key: "partner_type", label: "Partner Type", minWidth: "140px", sortable: true },
-  { key: "vendor_sub_types", label: "Vendor Sub-Types", minWidth: "170px" },
-  { key: "customer_sub_types", label: "Customer Sub-Types", minWidth: "170px" },
-  { key: "num_items", label: "No. of Items", minWidth: "180px", sortable: true },
-  { key: "partner_locations", label: "Partner Locations", minWidth: "190px", sortable: true },
-  { key: "global_contacts", label: "Points of Contact", minWidth: "200px" },
-  { key: "partner_group", label: "Partner Group", minWidth: "130px" },
-  { key: "net_profit", label: "Net Profit ($)", minWidth: "130px", sortable: true, align: "right" },
-  { key: "credit_limit", label: "Credit Limit ($)", minWidth: "130px", sortable: true, align: "right" },
-  { key: "credit_utilization", label: "Credit Util. ($)", minWidth: "130px", sortable: true, align: "right" },
-  { key: "services", label: "Services", minWidth: "140px" },
-  { key: "carrier_vendor", label: "Carrier (Vendor)", minWidth: "180px" },
-  { key: "carrier_customer", label: "Carrier (Customer)", minWidth: "180px" },
-  { key: "country", label: "Country", minWidth: "150px" },
-  { key: "website", label: "Website", minWidth: "150px" },
-  { key: "email", label: "Email", minWidth: "200px" },
-  { key: "created_by", label: "Created By", minWidth: "170px" },
-  { key: "created_on", label: "Created On", minWidth: "120px" },
-  { key: "status", label: "Status", minWidth: "90px" },
+  { key: "partner_name", label: "Partners", minWidth: "280px", sortable: true },
+  { key: "partner_type", label: "Partner Type", minWidth: "180px", sortable: true },
+  { key: "vendor_sub_types", label: "Vendor Sub-Types", minWidth: "220px" },
+  { key: "customer_sub_types", label: "Customer Sub-Types", minWidth: "220px" },
+  { key: "num_items", label: "No. of Items", minWidth: "240px", sortable: true },
+  { key: "partner_locations", label: "Partner Locations", minWidth: "260px", sortable: true },
+  { key: "global_contacts", label: "Points of Contact", minWidth: "280px" },
+  { key: "partner_group", label: "Partner Group", minWidth: "150px" },
+  { key: "net_profit", label: "Net Profit ($)", minWidth: "150px", sortable: true, align: "right" },
+  { key: "credit_limit", label: "Credit Limit ($)", minWidth: "160px", sortable: true, align: "right" },
+  { key: "credit_utilization", label: "Credit Util. ($)", minWidth: "160px", sortable: true, align: "right" },
+  { key: "services", label: "Services", minWidth: "200px" },
+  { key: "carrier_vendor", label: "Carrier (Vendor)", minWidth: "240px" },
+  { key: "carrier_customer", label: "Carrier (Customer)", minWidth: "240px" },
+  { key: "country", label: "Country", minWidth: "200px" },
+  { key: "website", label: "Website", minWidth: "220px" },
+  { key: "email", label: "Email", minWidth: "280px" },
+  { key: "created_by", label: "Created By", minWidth: "240px" },
+  { key: "created_on", label: "Created On", minWidth: "150px" },
+  { key: "status", label: "Status", minWidth: "110px" },
 ];
 
 const DEFAULT_COLUMN_ORDER = COLUMN_DEFS.map((c) => c.key);
@@ -1792,9 +1792,9 @@ export function VendorsListPage() {
                                     <div className={`flex items-center ${isRelaxed ? "gap-3" : "gap-2.5"}`}>
                                       <LogoAvatar logoUrl={icon.logoUrl} initials={icon.initials} bg={icon.bg} size={isRelaxed ? "lg" : "md"} />
                                       <div className="min-w-0">
-                                        <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate block max-w-[170px]`} style={{ fontWeight: 500, color: '#1E293B' }}>{highlightText(vendor.displayName)}</span>
+                                        <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate block`} style={{ fontWeight: 500, color: '#1E293B' }}>{highlightText(vendor.displayName)}</span>
                                         {isRelaxed && vendor.emailAddress && (
-                                          <span className="text-xs text-muted-foreground/60 truncate block max-w-[170px]">{vendor.emailAddress}</span>
+                                          <span className="text-xs text-muted-foreground/60 truncate block">{vendor.emailAddress}</span>
                                         )}
                                       </div>
                                     </div>
@@ -1905,7 +1905,7 @@ export function VendorsListPage() {
                                         </div>
                                       )}
                                       <div className="min-w-0">
-                                        <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate block max-w-[110px]`} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{highlightText(partnerLocations[0] || "\u2013")}</span>
+                                        <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate block`} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{highlightText(partnerLocations[0] || "\u2013")}</span>
                                         {isRelaxed && <span className="text-[10px] text-muted-foreground/50 block">{partnerLocations.length} location{partnerLocations.length !== 1 ? "s" : ""}</span>}
                                       </div>
                                       {extraLocations > 0 && (
@@ -1959,9 +1959,9 @@ export function VendorsListPage() {
                                           </HoverCard>
                                           ); })()}
                                           <div className="min-w-0">
-                                            <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate block max-w-[90px]`}>{highlightText(globalPointOfContacts[0]?.name)}</span>
+                                            <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate block`}>{highlightText(globalPointOfContacts[0]?.name)}</span>
                                             {isRelaxed && (globalPointOfContacts[0] as any)?.role && (
-                                              <span className="text-xs text-muted-foreground/60 truncate block max-w-[90px]">{(globalPointOfContacts[0] as any)?.role}</span>
+                                              <span className="text-xs text-muted-foreground/60 truncate block">{(globalPointOfContacts[0] as any)?.role}</span>
                                             )}
                                           </div>
                                           {extraContacts > 0 && (
@@ -2032,7 +2032,7 @@ export function VendorsListPage() {
                                         </HoverCardContent>
                                       </HoverCard>
                                       <div className="min-w-0">
-                                        <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate block max-w-[160px]`} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{vendor.defaultCarrierVendor}</span>
+                                        <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate block`} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{vendor.defaultCarrierVendor}</span>
                                         {isRelaxed && <span className="text-[10px] text-muted-foreground/50 block">Vendor Carrier</span>}
                                       </div>
                                     </div>
@@ -2065,7 +2065,7 @@ export function VendorsListPage() {
                                         </HoverCardContent>
                                       </HoverCard>
                                       <div className="min-w-0">
-                                        <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate block max-w-[160px]`} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{vendor.defaultCarrierCustomer}</span>
+                                        <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate block`} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{vendor.defaultCarrierCustomer}</span>
                                         {isRelaxed && <span className="text-[10px] text-muted-foreground/50 block">Customer Carrier</span>}
                                       </div>
                                     </div>
@@ -2077,16 +2077,16 @@ export function VendorsListPage() {
                                     <div className={`flex items-center ${isRelaxed ? "gap-2.5" : "gap-2"}`}>
                                       <span className={isRelaxed ? "text-lg" : "text-base"}>{vendor.countryFlag}</span>
                                       <div className="min-w-0">
-                                        <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} block`} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{highlightText(vendor.country)}</span>
-                                        {isRelaxed && vendor.billingAddress?.city && <span className="text-[10px] text-muted-foreground/50 block truncate max-w-[100px]">{vendor.billingAddress.city}{vendor.billingAddress.state ? `, ${vendor.billingAddress.state}` : ""}</span>}
+                                        <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate block`} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{highlightText(vendor.country)}</span>
+                                        {isRelaxed && vendor.billingAddress?.city && <span className="text-[10px] text-muted-foreground/50 truncate block">{vendor.billingAddress.city}{vendor.billingAddress.state ? `, ${vendor.billingAddress.state}` : ""}</span>}
                                       </div>
                                     </div>
                                   </TableCell>
                                 );
                               case "website":
-                                return (<TableCell key={colKey}><span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} text-muted-foreground truncate block max-w-[140px]`}>{highlightText(vendor.website)}</span></TableCell>);
+                                return (<TableCell key={colKey}><span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} text-muted-foreground block`}>{highlightText(vendor.website)}</span></TableCell>);
                               case "email":
-                                return (<TableCell key={colKey}><span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} text-muted-foreground truncate block max-w-[200px]`}>{highlightText(vendor.emailAddress)}</span></TableCell>);
+                                return (<TableCell key={colKey}><span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} text-muted-foreground block`}>{highlightText(vendor.emailAddress)}</span></TableCell>);
                               case "created_by":
                                 return (
                                   <TableCell key={colKey}>
@@ -2120,8 +2120,8 @@ export function VendorsListPage() {
                                           </HoverCard>
                                           ); })()}
                                           <div className="min-w-0">
-                                            <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate block max-w-[120px]`} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{highlightText(vendor.createdByContact.name)}</span>
-                                            {isRelaxed && <span className="text-[10px] text-muted-foreground/50 block truncate max-w-[120px]">{(vendor.createdByContact as any).role || "Team Member"}</span>}
+                                            <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate block`} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{highlightText(vendor.createdByContact.name)}</span>
+                                            {isRelaxed && <span className="text-[10px] text-muted-foreground/50 truncate block">{(vendor.createdByContact as any).role || "Team Member"}</span>}
                                           </div>
                                         </>
                                       ) : (<span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} text-muted-foreground`}>{"\u2013"}</span>)}
