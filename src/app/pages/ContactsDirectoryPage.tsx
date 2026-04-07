@@ -1043,7 +1043,7 @@ export function ContactsDirectoryPage() {
                   </OverflowTooltip>
                 )}
               </div>
-              <span className="text-[10px] text-muted-foreground/60 block">{firstPhone.type}</span>
+              {isRelaxed && <span className="text-[10px] text-muted-foreground/60 block">{firstPhone.type}</span>}
             </div>
           </TableCell>
         );
@@ -1073,7 +1073,7 @@ export function ContactsDirectoryPage() {
                   </OverflowTooltip>
                 )}
               </div>
-              <span className="text-[10px] text-muted-foreground/60 block">{firstEmail.type}</span>
+              {isRelaxed && <span className="text-[10px] text-muted-foreground/60 block">{firstEmail.type}</span>}
             </div>
           </TableCell>
         );
@@ -1104,7 +1104,7 @@ export function ContactsDirectoryPage() {
                 </OverflowTooltip>
               )}
               </div>
-              <span className="text-[10px] text-muted-foreground/60 block">{firstSocial.type}</span>
+              {isRelaxed && <span className="text-[10px] text-muted-foreground/60 block">{firstSocial.type}</span>}
             </div>
           </TableCell>
         );
