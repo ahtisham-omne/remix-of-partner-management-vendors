@@ -437,12 +437,26 @@ export function CreatePocModal({
   const [deptDropdownOpen, setDeptDropdownOpen] = useState(false);
   const [customDepts, setCustomDepts] = useState<string[]>([]);
 
+  // Reset internal state when modal opens
+  React.useEffect(() => {
+    if (open) {
+      setProfileImage(null);
+      setCompany(contextName || "");
+      setNotes("");
+      setPhoneRows([{ id: "ph-1", type: "Office", code: newPocLandlineCode || "+1", number: "", ext: "" }]);
+      setEmailRows([{ id: "em-1", type: "Work", address: "" }]);
+      setSocialRows([]);
+      setDeptSearch("");
+      setDeptDropdownOpen(false);
+    }
+  }, [open]);
+
   const allDepts = [...DEFAULT_DEPARTMENTS, ...customDepts];
   const filteredDepts = deptSearch ? allDepts.filter((d) => d.toLowerCase().includes(deptSearch.toLowerCase())) : allDepts;
   const canCreateDept = deptSearch.trim() && !allDepts.some((d) => d.toLowerCase() === deptSearch.trim().toLowerCase());
 
   const initials = newPocName.trim() ? getInitials(newPocName.trim()) : "";
-  const deptAvatarColor = DEPT_AVATAR_COLORS[newPocDepartment] || DEPT_AVATAR_COLORS["Sales"];
+  const deptAvatarColor = DEPT_AVATAR_COLORS[newPocDepartment] || { bg: "#F1F5F9", text: "#64748B", ring: "#E2E8F0" };
   const isValid = newPocName.trim().length > 0;
 
   // Sync first phone/email row back to parent props

@@ -531,7 +531,7 @@ export function ContactsDirectoryPage() {
   /* ─── Create Contact Modal State ─── */
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [newPocName, setNewPocName] = useState("");
-  const [newPocDepartment, setNewPocDepartment] = useState("Sales");
+  const [newPocDepartment, setNewPocDepartment] = useState("");
   const [newPocRole, setNewPocRole] = useState("");
   const [newPocLandline, setNewPocLandline] = useState("");
   const [newPocLandlineCode, setNewPocLandlineCode] = useState("+1");
@@ -542,7 +542,7 @@ export function ContactsDirectoryPage() {
   const [saveAndCreateAnother, setSaveAndCreateAnother] = useState(false);
 
   const resetCreateForm = () => {
-    setNewPocName(""); setNewPocDepartment("Sales"); setNewPocRole("");
+    setNewPocName(""); setNewPocDepartment(""); setNewPocRole("");
     setNewPocLandline(""); setNewPocLandlineCode("+1"); setNewPocExt("");
     setNewPocMobile(""); setNewPocMobileCode("+1"); setNewPocEmail("");
   };
@@ -1368,7 +1368,7 @@ export function ContactsDirectoryPage() {
                       </div>
                       {/* Value */}
                       <div className="flex items-baseline gap-1.5">
-                        <p className="text-[15px] text-[#0F172A] tracking-tight whitespace-nowrap" style={{ fontWeight: 600, lineHeight: 1.2 }}>{kpi.value}</p>
+                        <p className="text-[15px] text-[#334155] tracking-tight whitespace-nowrap" style={{ fontWeight: 600, lineHeight: 1.2 }}>{kpi.value}</p>
                       </div>
                     </div>
                   </div>
@@ -1632,7 +1632,7 @@ export function ContactsDirectoryPage() {
                               <div className="flex items-start gap-3">
                                 <ContactAvatar name={contact.name} size="lg" />
                                 <div className="min-w-0 flex-1">
-                                  <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{contact.name}</p>
+                                  <p className="text-[13px] text-[#334155] truncate" style={{ fontWeight: 600 }}>{contact.name}</p>
                                   {contact.role && <p className="text-[11px] text-[#64748B] truncate">{contact.role}</p>}
                                   <p className="text-[11px] text-[#94A3B8] truncate">{(contact.companies || [contact.company])[0]}{(contact.companies || [contact.company]).length > 1 ? ` +${(contact.companies || [contact.company]).length - 1}` : ""}</p>
                                 </div>
@@ -2087,7 +2087,7 @@ export function ContactsDirectoryPage() {
       <CreatePocModal
         open={createModalOpen}
         onOpenChange={setCreateModalOpen}
-        contextName="Contacts Directory"
+        contextName=""
         newPocName={newPocName}
         onNewPocNameChange={setNewPocName}
         newPocDepartment={newPocDepartment}

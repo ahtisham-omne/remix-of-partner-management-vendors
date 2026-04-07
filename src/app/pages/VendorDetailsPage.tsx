@@ -1533,7 +1533,7 @@ function PartnerGroupOverflowPill({ groups }: { groups: { id: string; name: stri
                 >
                   <span className="text-sm shrink-0">{g.countryFlag}</span>
                   <div className="min-w-0 flex-1">
-                    <p className="text-[12px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{g.name}</p>
+                    <p className="text-[12px] text-[#334155] truncate" style={{ fontWeight: 600 }}>{g.name}</p>
                     <p className="text-[10px] text-[#94A3B8]">{g.memberCount} members · {g.country}</p>
                   </div>
                   <ChevronRight className="w-3 h-3 text-[#CBD5E1] shrink-0" />
@@ -1630,7 +1630,7 @@ function StatBox({ label, value, icon: Icon, color }: { label: string; value: st
         <Icon className="w-3 h-3" style={{ color: color || "#94A3B8" }} />
         <span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>{label}</span>
       </div>
-      <p className="text-[14px] text-[#0F172A]" style={{ fontWeight: 700 }}>{value}</p>
+      <p className="text-[14px] text-[#334155]" style={{ fontWeight: 700 }}>{value}</p>
     </div>
   );
 }
@@ -1683,7 +1683,7 @@ function CarrierShippingCard({ carrier }: {
 
         {/* Row 2: Carrier name */}
         <div className="shrink-0 mb-1">
-          <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{carrier.name}</p>
+          <p className="text-[13px] text-[#334155] truncate" style={{ fontWeight: 600 }}>{carrier.name}</p>
         </div>
 
         {/* Row 3: Description */}
@@ -1694,7 +1694,7 @@ function CarrierShippingCard({ carrier }: {
         {/* Row 4: Hero metric + vendor count inline */}
         <div className="flex items-baseline justify-between shrink-0">
           <div className="flex items-baseline gap-2">
-            <span className="text-[22px] text-[#0F172A] tabular-nums leading-none tracking-tight" style={{ fontWeight: 600 }}>
+            <span className="text-[22px] text-[#334155] tabular-nums leading-none tracking-tight" style={{ fontWeight: 600 }}>
               {activeMethod.cost}
             </span>
             <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>/ shipment</span>
@@ -1732,7 +1732,7 @@ function CarrierShippingCard({ carrier }: {
               <Package className="w-3 h-3 text-[#94A3B8] shrink-0" />
               <span className="truncate" style={{ fontWeight: 400 }}>{activeMethod.name}</span>
             </div>
-            <span className="shrink-0 ml-2 text-[#0F172A]" style={{ fontWeight: 600 }}>{activeMethod.cost}</span>
+            <span className="shrink-0 ml-2 text-[#334155]" style={{ fontWeight: 600 }}>{activeMethod.cost}</span>
           </div>
         </div>
       </div>
@@ -2330,12 +2330,12 @@ function DashboardCustomizePanel({ open, onOpenChange, activeKpis, onToggleKpi, 
                               <svg viewBox="0 0 80 24" className="w-[60px] h-[18px]" fill="none">
                                 <path d="M0 20 Q10 14 20 16 T40 10 T60 6 T80 4" stroke={isActive ? "#0A77FF" : "#CBD5E1"} strokeWidth="1.5" fill="none" />
                               </svg>
-                              <span className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>$142K</span>
+                              <span className="text-[13px] text-[#334155]" style={{ fontWeight: 600 }}>$142K</span>
                             </div>
                           ) : sz === "md" ? (
                             <div>
                               <div className="flex items-baseline justify-between mb-2">
-                                <span className="text-[15px] text-[#0F172A]" style={{ fontWeight: 700 }}>$142,800</span>
+                                <span className="text-[15px] text-[#334155]" style={{ fontWeight: 700 }}>$142,800</span>
                                 <span className="text-[10px] text-[#059669]" style={{ fontWeight: 500 }}>+12.3%</span>
                               </div>
                               <svg viewBox="0 0 160 32" className="w-full h-[28px]" fill="none">
@@ -2346,7 +2346,7 @@ function DashboardCustomizePanel({ open, onOpenChange, activeKpis, onToggleKpi, 
                           ) : (
                             <div>
                               <div className="flex items-baseline justify-between mb-1">
-                                <span className="text-[16px] text-[#0F172A]" style={{ fontWeight: 700 }}>$142,800</span>
+                                <span className="text-[16px] text-[#334155]" style={{ fontWeight: 700 }}>$142,800</span>
                                 <span className="text-[10px] text-[#059669]" style={{ fontWeight: 500 }}>+12.3% vs last year</span>
                               </div>
                               <svg viewBox="0 0 160 44" className="w-full h-[40px]" fill="none">
@@ -2370,12 +2370,12 @@ function DashboardCustomizePanel({ open, onOpenChange, activeKpis, onToggleKpi, 
                           {sz === "sm" ? (
                             <div className="flex items-center justify-between">
                               <div className="w-[50px] h-1.5 rounded-full bg-[#F1F5F9] overflow-hidden"><div className="h-full rounded-full" style={{ width: "62%", backgroundColor: isActive ? "#D1FAE5" : "#E2E8F0" }} /></div>
-                              <span className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>62%</span>
+                              <span className="text-[13px] text-[#334155]" style={{ fontWeight: 600 }}>62%</span>
                             </div>
                           ) : (
                             <div>
                               <div className="flex items-baseline justify-between mb-2">
-                                <span className="text-[15px] text-[#0F172A]" style={{ fontWeight: 700 }}>{formatCurrency(vendor.creditUtilization)}</span>
+                                <span className="text-[15px] text-[#334155]" style={{ fontWeight: 700 }}>{formatCurrency(vendor.creditUtilization)}</span>
                                 <span className="text-[10px] text-[#059669]" style={{ fontWeight: 500 }}>Healthy</span>
                               </div>
                               <div className="w-full h-2 rounded-full bg-[#F1F5F9] overflow-hidden"><div className="h-full rounded-full" style={{ width: "62%", backgroundColor: isActive ? "#D1FAE5" : "#E2E8F0" }} /></div>
@@ -2396,7 +2396,7 @@ function DashboardCustomizePanel({ open, onOpenChange, activeKpis, onToggleKpi, 
                               <span className={`text-[9px] ${isActive ? "text-[#0A77FF]" : "text-[#475569]"}`} style={{ fontWeight: 600 }}>{vendor.primaryContact.name.split(" ").map(n => n[0]).join("")}</span>
                             </div>
                             <div className="min-w-0">
-                              <p className="text-[12px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{vendor.primaryContact.name}</p>
+                              <p className="text-[12px] text-[#334155] truncate" style={{ fontWeight: 600 }}>{vendor.primaryContact.name}</p>
                               {sz !== "sm" && <p className="text-[10px] text-[#94A3B8] truncate">{vendor.primaryContact.designation}</p>}
                             </div>
                           </div>
@@ -2563,7 +2563,7 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
             );
             const statRow = (stats: { label: string; value: string; color?: string }[], compact?: boolean) => (
               <div className={`flex items-center ${compact ? "gap-3 mt-1.5 pt-1.5" : "gap-4 mt-2 pt-2"} border-t border-[#F1F5F9]`}>
-                {stats.map((s, i) => (<div key={i}><p className={`${compact ? "text-[9px]" : "text-[10px]"} text-[#94A3B8]`} style={{ fontWeight: 500 }}>{s.label}</p><p className={compact ? "text-[11px]" : "text-[13px]"} style={{ fontWeight: 700, color: s.color || "#0F172A" }}>{s.value}</p></div>))}
+                {stats.map((s, i) => (<div key={i}><p className={`${compact ? "text-[9px]" : "text-[10px]"} text-[#94A3B8]`} style={{ fontWeight: 500 }}>{s.label}</p><p className={compact ? "text-[11px]" : "text-[13px]"} style={{ fontWeight: 700, color: s.color || "#334155" }}>{s.value}</p></div>))}
               </div>
             );
             const ttStyle = { borderRadius: 8, border: "1px solid #E2E8F0", boxShadow: "0 4px 12px rgba(0,0,0,0.08)", fontSize: 12 };
@@ -2652,7 +2652,7 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
                       </Pie>
                     </RePieChart>
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
-                      <span className="text-[11px] text-[#0F172A]" style={{ fontWeight: 700 }}>{formatCurrency(vendor.totalSpent)}</span>
+                      <span className="text-[11px] text-[#334155]" style={{ fontWeight: 700 }}>{formatCurrency(vendor.totalSpent)}</span>
                     </div>
                   </div>
                   <div className="flex-1 min-w-0 space-y-1.5">
@@ -2673,7 +2673,7 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
             icon = Shield; title = "Credit Health"; tip = "Shows how much of the approved credit line is currently in use. Utilization above 80% triggers risk alerts. Includes available balance, current usage, and total limit.";
             content = (
               <>
-                <div className="flex items-center justify-between mb-2"><span className="text-[12px] text-[#475569]" style={{ fontWeight: 500 }}>Credit Utilization</span><span className="text-[13px] text-[#0F172A]" style={{ fontWeight: 700 }}>{creditPct}%</span></div>
+                <div className="flex items-center justify-between mb-2"><span className="text-[12px] text-[#475569]" style={{ fontWeight: 500 }}>Credit Utilization</span><span className="text-[13px] text-[#334155]" style={{ fontWeight: 700 }}>{creditPct}%</span></div>
                 <div className="w-full h-3 rounded-full bg-[#F1F5F9] overflow-hidden"><div className="h-full rounded-full transition-all" style={{ width: `${Math.min(creditPct, 100)}%`, backgroundColor: creditPct > 80 ? "#DC2626" : creditPct > 50 ? "#D97706" : "#059669" }} /></div>
                 <div className="flex items-center justify-between mt-1.5"><span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>$0</span><span className="text-[10px]" style={{ fontWeight: 500, color: creditStatusColor }}>{creditStatusLabel}</span><span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>{formatCurrency(vendor.creditLimit)}</span></div>
                 {sz === "sm" && statRow([
@@ -2768,7 +2768,7 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
                 <div className="flex items-start gap-3">
                   <div className="w-9 h-9 rounded-full bg-[#F1F5F9] flex items-center justify-center shrink-0"><span className="text-xs text-[#475569]" style={{ fontWeight: 600 }}>{vendor.primaryContact.name.split(" ").map((n) => n[0]).join("")}</span></div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>{vendor.primaryContact.name}</p>
+                    <p className="text-[13px] text-[#334155]" style={{ fontWeight: 600 }}>{vendor.primaryContact.name}</p>
                     <p className="text-[11px] text-[#64748B] mt-0.5">{vendor.primaryContact.designation}</p>
                   </div>
                 </div>
@@ -2978,7 +2978,7 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
                     ].map((event, i, arr) => (
                       <div key={i} className="flex items-start gap-2">
                         <div className="flex flex-col items-center mt-0.5"><div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: event.color }} />{i < arr.length - 1 && <div className="w-px h-5 bg-[#E2E8F0] mt-0.5" />}</div>
-                        <div className="min-w-0"><p className="text-[10px] text-[#0F172A]" style={{ fontWeight: 500 }}>{event.action}</p><p className="text-[9px] text-[#94A3B8]">{event.time} · {event.detail}</p></div>
+                        <div className="min-w-0"><p className="text-[10px] text-[#334155]" style={{ fontWeight: 500 }}>{event.action}</p><p className="text-[9px] text-[#94A3B8]">{event.time} · {event.detail}</p></div>
                       </div>
                     ))}
                   </div>
@@ -2993,7 +2993,7 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
                     ].map((event, i, arr) => (
                       <div key={i} className="flex items-start gap-2.5">
                         <div className="flex flex-col items-center mt-0.5"><div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: event.color }} />{i < arr.length - 1 && <div className="w-px h-6 bg-[#E2E8F0] mt-0.5" />}</div>
-                        <div className="min-w-0"><p className="text-[11px] text-[#0F172A]" style={{ fontWeight: 500 }}>{event.action}</p><p className="text-[10px] text-[#94A3B8]">{event.time} · {event.detail}</p></div>
+                        <div className="min-w-0"><p className="text-[11px] text-[#334155]" style={{ fontWeight: 500 }}>{event.action}</p><p className="text-[10px] text-[#94A3B8]">{event.time} · {event.detail}</p></div>
                       </div>
                     ))}
                   </div>
@@ -3065,7 +3065,7 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
           {partnerGroupData && (
             <div className="mb-3">
               <DashInfoLabel>Partner Group</DashInfoLabel>
-              <p className="text-[12.5px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>
+              <p className="text-[12.5px] text-[#334155] truncate" style={{ fontWeight: 600 }}>
                 {partnerGroupData.id} <span className="text-[#64748B]" style={{ fontWeight: 400 }}>•</span> {partnerGroupData.name}
               </p>
               <p className="text-[11px] text-[#64748B] mt-0.5 leading-relaxed line-clamp-2">{partnerGroupData.description}</p>
@@ -3074,7 +3074,7 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
           {!partnerGroupData && vendor.partnerGroup && (
             <div className="mb-3">
               <DashInfoLabel>Partner Group</DashInfoLabel>
-              <p className="text-[12.5px] text-[#0F172A]" style={{ fontWeight: 600 }}>{vendor.partnerGroup}</p>
+              <p className="text-[12.5px] text-[#334155]" style={{ fontWeight: 600 }}>{vendor.partnerGroup}</p>
             </div>
           )}
           <div className="mb-3">
@@ -3169,13 +3169,13 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
           <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 mb-3">
             <div className="min-w-0">
               <DashInfoLabel>Currency</DashInfoLabel>
-              <p className="text-[12.5px] text-[#0F172A]" style={{ fontWeight: 600 }}>USD ($)</p>
+              <p className="text-[12.5px] text-[#334155]" style={{ fontWeight: 600 }}>USD ($)</p>
             </div>
             <div className="min-w-0">
               <DashInfoLabel>Rating</DashInfoLabel>
               <div className="flex items-center gap-1">
                 <Star className="w-3.5 h-3.5 text-[#F59E0B] fill-[#F59E0B] shrink-0" />
-                <span className="text-[12.5px] text-[#0F172A]" style={{ fontWeight: 600 }}>{vendor.rating.toFixed(1)} / 5</span>
+                <span className="text-[12.5px] text-[#334155]" style={{ fontWeight: 600 }}>{vendor.rating.toFixed(1)} / 5</span>
               </div>
             </div>
             <div className="min-w-0">
@@ -3222,7 +3222,7 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
               </DetailRichTooltip>
             </div>
             <div className="flex items-baseline gap-2">
-              <p className="text-[15px] text-[#0F172A]" style={{ fontWeight: 700 }}>{formatCurrency(vendor.outstandingBalance)}</p>
+              <p className="text-[15px] text-[#334155]" style={{ fontWeight: 700 }}>{formatCurrency(vendor.outstandingBalance)}</p>
               <button className="text-[11px] text-[#0A77FF] hover:underline cursor-pointer" style={{ fontWeight: 500 }}>Invoice Details</button>
             </div>
           </div>
@@ -3247,11 +3247,11 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
                   <span className="inline-flex shrink-0"><Info className="w-2.5 h-2.5 text-[#D1D5DB] hover:text-[#94A3B8] transition-colors cursor-help" /></span>
                 </DetailRichTooltip>
               </div>
-              <p className="text-[16px] text-[#0F172A] truncate" style={{ fontWeight: 700 }}>{formatCurrency(vendor.creditLimit)}</p>
+              <p className="text-[16px] text-[#334155] truncate" style={{ fontWeight: 700 }}>{formatCurrency(vendor.creditLimit)}</p>
             </div>
             <div className="min-w-0">
               <DashInfoLabel tooltip="Amount of credit currently in use. Calculated as sum of open orders and pending invoices against the credit limit.">Utilization</DashInfoLabel>
-              <p className="text-[16px] text-[#0F172A] truncate" style={{ fontWeight: 700 }}>{formatCurrency(vendor.creditUtilization)}</p>
+              <p className="text-[16px] text-[#334155] truncate" style={{ fontWeight: 700 }}>{formatCurrency(vendor.creditUtilization)}</p>
             </div>
           </div>
           <div className="w-full h-3 rounded-full overflow-hidden flex" style={{ backgroundColor: "#F1F5F9" }}>
@@ -3313,7 +3313,7 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
                   <Truck className="w-4 h-4 text-[#0A77FF]" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-[12px] text-[#0F172A]" style={{ fontWeight: 600 }}>{vendor.defaultCarrierVendor || "—"}</p>
+                  <p className="text-[12px] text-[#334155]" style={{ fontWeight: 600 }}>{vendor.defaultCarrierVendor || "—"}</p>
                   <p className="text-[10.5px] text-[#64748B]">For fastest delivery</p>
                 </div>
                 <span className="text-[10px] px-2 py-0.5 rounded-md border border-[#BFDBFE] bg-[#EFF6FF] text-[#1E40AF] shrink-0" style={{ fontWeight: 600 }}>Primary</span>
@@ -3326,7 +3326,7 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
                   <Truck className="w-4 h-4 text-[#7C3AED]" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-[12px] text-[#0F172A]" style={{ fontWeight: 600 }}>{vendor.defaultCarrierCustomer || "—"}</p>
+                  <p className="text-[12px] text-[#334155]" style={{ fontWeight: 600 }}>{vendor.defaultCarrierCustomer || "—"}</p>
                   <p className="text-[10.5px] text-[#64748B]">For customer shipments</p>
                 </div>
                 <span className="text-[10px] px-2 py-0.5 rounded-md border border-[#BFDBFE] bg-[#EFF6FF] text-[#1E40AF] shrink-0" style={{ fontWeight: 600 }}>Primary</span>
@@ -3416,15 +3416,15 @@ function DetailRichTooltip({ data, children }: { data: DetailTooltipData; childr
             <div className="w-5 h-5 rounded-md bg-[#EDF4FF] flex items-center justify-center shrink-0">
               <Info className="w-3 h-3 text-[#0A77FF]" />
             </div>
-            <span className="text-[11px] text-[#0F172A] tracking-wide" style={{ fontWeight: 700 }}>{data.title}</span>
+            <span className="text-[11px] text-[#334155] tracking-wide" style={{ fontWeight: 700 }}>{data.title}</span>
           </div>
           <p className="text-[11px] text-[#64748B] leading-[1.6] mb-3">{data.description}</p>
           <div className="border-t border-[#F1F5F9] mb-2.5" />
           <div className="space-y-1">
             {data.breakdown.map((row, i) => (
               <div key={i} className={`flex items-center justify-between px-2.5 py-1.5 rounded-md text-[11px] ${row.isResult ? "bg-[#F0FDF4] border border-[#D1FAE5]" : ""}`}>
-                <span className={row.isResult ? "text-[#0F172A]" : "text-[#64748B]"} style={{ fontWeight: row.isResult ? 600 : 400 }}>{row.label}</span>
-                <span className={row.isResult ? "text-[#16A34A]" : "text-[#0F172A]"} style={{ fontWeight: row.isResult ? 700 : 500 }}>{row.value}</span>
+                <span className={row.isResult ? "text-[#334155]" : "text-[#64748B]"} style={{ fontWeight: row.isResult ? 600 : 400 }}>{row.label}</span>
+                <span className={row.isResult ? "text-[#16A34A]" : "text-[#334155]"} style={{ fontWeight: row.isResult ? 700 : 500 }}>{row.value}</span>
               </div>
             ))}
           </div>
@@ -3464,7 +3464,7 @@ function DashInfoCard({ title, icon: Icon, count, tooltip: cardTooltip, children
             <Icon className="w-3 h-3 text-[#0A77FF]" />
           </div>
         )}
-        <span className="text-[12px] text-[#0F172A] text-left" style={{ fontWeight: 600 }}>{title}</span>
+        <span className="text-[12px] text-[#334155] text-left" style={{ fontWeight: 600 }}>{title}</span>
         {cardTooltip && (
           <Tooltip>
             <TooltipTrigger asChild>
@@ -3728,7 +3728,7 @@ function DraggableKpiCard({ index, kpiKey, label, value, subtitle, iconName, too
           {change && (
             <span className="text-[10px] shrink-0" style={{ fontWeight: 500, color: changeColor || "#059669" }}>{change}</span>
           )}
-          <p className="text-[15px] text-[#0F172A] tracking-tight whitespace-nowrap" style={{ fontWeight: 600, lineHeight: 1.2 }}>{value}</p>
+          <p className="text-[15px] text-[#334155] tracking-tight whitespace-nowrap" style={{ fontWeight: 600, lineHeight: 1.2 }}>{value}</p>
         </div>
       </div>
       {/* Remove button — bottom-right on hover */}
@@ -4549,7 +4549,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
 
                       {/* Title + Address */}
                       <div className="px-3.5 pt-1.5 pb-0">
-                        <p className="text-[14px] text-[#0F172A] truncate" style={{ fontWeight: 600, lineHeight: '20px' }}>{highlightText(loc.name)}</p>
+                        <p className="text-[14px] text-[#334155] truncate" style={{ fontWeight: 600, lineHeight: '20px' }}>{highlightText(loc.name)}</p>
                         <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${loc.address}, ${loc.city}, ${loc.state}, ${loc.country}`)}`} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-[12px] text-[#64748B] hover:text-[#0A77FF] hover:underline truncate block mt-0.5 transition-colors" style={{ lineHeight: '18px' }}>
                           {loc.address}, {loc.city}, {loc.state}
                         </a>
@@ -5185,7 +5185,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                           <div className="w-8 h-8 rounded-lg flex items-center justify-center transition-transform duration-200 group-hover/metric:scale-110" style={{ background: s.bg }}>
                             <s.icon className="w-3.5 h-3.5" style={{ color: s.color }} />
                           </div>
-                          <p className="text-[15px] text-[#0F172A] tabular-nums" style={{ fontWeight: 700 }}>{s.value}</p>
+                          <p className="text-[15px] text-[#334155] tabular-nums" style={{ fontWeight: 700 }}>{s.value}</p>
                           <p className="text-[9px] text-[#94A3B8] uppercase tracking-wider" style={{ fontWeight: 600 }}>{s.label}</p>
                         </div>
                       ))}
@@ -5267,7 +5267,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                             <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-[#10B981] border-2 border-white" />
                           </div>
                           <div className="min-w-0 flex-1">
-                            <p className="text-[12px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>Issac Archer</p>
+                            <p className="text-[12px] text-[#334155] truncate" style={{ fontWeight: 600 }}>Issac Archer</p>
                             <p className="text-[10px] text-[#64748B] mt-0.5">Sales Department</p>
                           </div>
                         </div>
@@ -5301,7 +5301,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                       <div className="p-3">
                         <div className="flex items-baseline justify-between mb-3">
                           <div>
-                            <p className="text-[17px] text-[#0F172A] tabular-nums" style={{ fontWeight: 700 }}>${creditUsed.toLocaleString()}</p>
+                            <p className="text-[17px] text-[#334155] tabular-nums" style={{ fontWeight: 700 }}>${creditUsed.toLocaleString()}</p>
                             <p className="text-[10px] text-[#94A3B8] mt-0.5" style={{ fontWeight: 400 }}>of ${creditLimit.toLocaleString()} limit</p>
                           </div>
                           <p className="text-[20px] tabular-nums" style={{ fontWeight: 800, color: creditPctLoc > 80 ? "#EF4444" : creditPctLoc > 50 ? "#F59E0B" : "#10B981" }}>{creditPctLoc}%</p>
@@ -5459,7 +5459,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                                         {initials}
                                       </div>
                                       <div className="min-w-0 flex-1">
-                                        <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{poc.name}</p>
+                                        <p className="text-[13px] text-[#334155] truncate" style={{ fontWeight: 600 }}>{poc.name}</p>
                                         <p className="text-[11px] text-[#334155] truncate" style={{ fontWeight: 500 }}>{poc.dept} <span className="text-[#CBD5E1]">·</span> <span className="text-[#94A3B8]" style={{ fontWeight: 400 }}>{loc.name}</span></p>
                                       </div>
                                       <span className="inline-flex items-center text-[10px] px-2 py-[2px] rounded-full border shrink-0" style={{ fontWeight: 500, backgroundColor: "#ECFDF5", color: "#065F46", borderColor: "#A7F3D0" }}>Active</span>
@@ -5866,7 +5866,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                                               );
                                             })()}
                                             <div className="flex-1 min-w-0">
-                                              <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{carrier.name}</p>
+                                              <p className="text-[13px] text-[#334155] truncate" style={{ fontWeight: 600 }}>{carrier.name}</p>
                                               <p className="text-[11px] text-[#64748B] line-clamp-2 leading-relaxed mt-0.5" style={{ fontWeight: 400 }}>{carrier.desc}</p>
                                             </div>
                                             <div className="flex items-center gap-1.5 shrink-0 mt-0.5">
@@ -5893,7 +5893,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                                           {/* Row 2: Price + delivery */}
                                           <div className="flex items-baseline justify-between shrink-0">
                                             <div className="flex items-baseline gap-2">
-                                              <span className="text-[22px] text-[#0F172A] tabular-nums leading-none tracking-tight" style={{ fontWeight: 600 }}>{activeMethod.cost}</span>
+                                              <span className="text-[22px] text-[#334155] tabular-nums leading-none tracking-tight" style={{ fontWeight: 600 }}>{activeMethod.cost}</span>
                                               <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>/ shipment</span>
                                             </div>
                                             <span className="inline-flex items-center gap-1 text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>
@@ -6035,7 +6035,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                                 </div>
 
                                 {/* Row 2: Name */}
-                                <p className="text-[13px] text-[#0F172A] truncate shrink-0 mb-1" style={{ fontWeight: 600 }}>{rule.name}</p>
+                                <p className="text-[13px] text-[#334155] truncate shrink-0 mb-1" style={{ fontWeight: 600 }}>{rule.name}</p>
 
                                 {/* Row 3: Description */}
                                 <div className="h-[32px] shrink-0 mb-2">
@@ -6044,7 +6044,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
 
                                 {/* Row 4: Hero value */}
                                 <div className="flex items-baseline gap-2 shrink-0">
-                                  <span className="text-[22px] text-[#0F172A] tabular-nums leading-none tracking-tight" style={{ fontWeight: 600 }}>
+                                  <span className="text-[22px] text-[#334155] tabular-nums leading-none tracking-tight" style={{ fontWeight: 600 }}>
                                     {rule.discount}
                                   </span>
                                   <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>off</span>
@@ -6058,7 +6058,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                                       <span className="text-[#CBD5E1]">–</span>
                                       <span style={{ fontWeight: 400 }}>{rule.maxQty}</span>
                                     </div>
-                                    <span className="shrink-0 ml-2 text-[#0F172A]" style={{ fontWeight: 600 }}>{rule.discount}</span>
+                                    <span className="shrink-0 ml-2 text-[#334155]" style={{ fontWeight: 600 }}>{rule.discount}</span>
                                   </div>
                                 </div>
                               </div>
@@ -6170,7 +6170,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                                 </td>
                                 <td className="px-4 py-2.5 text-[12px] text-[#475569]">{po.date}</td>
                                 <td className="px-4 py-2.5 text-[12px] text-[#334155] tabular-nums" style={{ fontWeight: 500 }}>{po.items} items</td>
-                                <td className="px-4 py-2.5 text-right text-[12px] text-[#0F172A] tabular-nums" style={{ fontWeight: 600 }}>{po.total}</td>
+                                <td className="px-4 py-2.5 text-right text-[12px] text-[#334155] tabular-nums" style={{ fontWeight: 600 }}>{po.total}</td>
                                 <td className="px-4 py-2.5">
                                   <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px]" style={{ fontWeight: 600, backgroundColor: po.statusBg, color: po.statusColor, border: `1px solid ${po.statusBorder}` }}>
                                     <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: po.statusColor }} />
@@ -6183,7 +6183,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                         </table>
                       </div>
                       <div className="flex items-center justify-between px-4 py-2 border-t border-[#E8ECF1] shrink-0 bg-[#FAFBFC]">
-                        <span className="text-[11px] text-[#94A3B8]">Showing <span className="text-[#0F172A]" style={{ fontWeight: 600 }}>5</span> of <span className="text-[#0F172A]" style={{ fontWeight: 600 }}>5</span> orders</span>
+                        <span className="text-[11px] text-[#94A3B8]">Showing <span className="text-[#334155]" style={{ fontWeight: 600 }}>5</span> of <span className="text-[#334155]" style={{ fontWeight: 600 }}>5</span> orders</span>
                         <span className="text-[11px] text-[#94A3B8]">Records per page <select className="h-6 px-1.5 rounded border border-[#E2E8F0] text-[11px] cursor-pointer outline-none ml-1"><option>20</option><option>50</option></select></span>
                       </div>
                     </div>
@@ -6237,7 +6237,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                                 </td>
                                 <td className="px-4 py-2.5 text-[12px] text-[#475569]">{qt.date}</td>
                                 <td className="px-4 py-2.5 text-[12px] text-[#475569]">{qt.valid}</td>
-                                <td className="px-4 py-2.5 text-right text-[12px] text-[#0F172A] tabular-nums" style={{ fontWeight: 600 }}>{qt.amount}</td>
+                                <td className="px-4 py-2.5 text-right text-[12px] text-[#334155] tabular-nums" style={{ fontWeight: 600 }}>{qt.amount}</td>
                                 <td className="px-4 py-2.5">
                                   <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px]" style={{ fontWeight: 600, backgroundColor: qt.statusBg, color: qt.statusColor, border: `1px solid ${qt.statusBorder}` }}>
                                     <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: qt.statusColor }} />
@@ -6250,7 +6250,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                         </table>
                       </div>
                       <div className="flex items-center justify-between px-4 py-2 border-t border-[#E8ECF1] shrink-0 bg-[#FAFBFC]">
-                        <span className="text-[11px] text-[#94A3B8]">Showing <span className="text-[#0F172A]" style={{ fontWeight: 600 }}>3</span> of <span className="text-[#0F172A]" style={{ fontWeight: 600 }}>3</span> quotes</span>
+                        <span className="text-[11px] text-[#94A3B8]">Showing <span className="text-[#334155]" style={{ fontWeight: 600 }}>3</span> of <span className="text-[#334155]" style={{ fontWeight: 600 }}>3</span> quotes</span>
                         <span className="text-[11px] text-[#94A3B8]">Records per page <select className="h-6 px-1.5 rounded border border-[#E2E8F0] text-[11px] cursor-pointer outline-none ml-1"><option>20</option><option>50</option></select></span>
                       </div>
                     </div>
@@ -6305,7 +6305,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                                 </td>
                                 <td className="px-4 py-2.5 text-[12px] text-[#475569]">{so.date}</td>
                                 <td className="px-4 py-2.5 text-[12px] text-[#334155]" style={{ fontWeight: 500 }}>{so.customer}</td>
-                                <td className="px-4 py-2.5 text-right text-[12px] text-[#0F172A] tabular-nums" style={{ fontWeight: 600 }}>{so.total}</td>
+                                <td className="px-4 py-2.5 text-right text-[12px] text-[#334155] tabular-nums" style={{ fontWeight: 600 }}>{so.total}</td>
                                 <td className="px-4 py-2.5">
                                   <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px]" style={{ fontWeight: 600, backgroundColor: so.statusBg, color: so.statusColor, border: `1px solid ${so.statusBorder}` }}>
                                     <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: so.statusColor }} />
@@ -6318,7 +6318,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                         </table>
                       </div>
                       <div className="flex items-center justify-between px-4 py-2 border-t border-[#E8ECF1] shrink-0 bg-[#FAFBFC]">
-                        <span className="text-[11px] text-[#94A3B8]">Showing <span className="text-[#0F172A]" style={{ fontWeight: 600 }}>4</span> of <span className="text-[#0F172A]" style={{ fontWeight: 600 }}>4</span> orders</span>
+                        <span className="text-[11px] text-[#94A3B8]">Showing <span className="text-[#334155]" style={{ fontWeight: 600 }}>4</span> of <span className="text-[#334155]" style={{ fontWeight: 600 }}>4</span> orders</span>
                         <span className="text-[11px] text-[#94A3B8]">Records per page <select className="h-6 px-1.5 rounded border border-[#E2E8F0] text-[11px] cursor-pointer outline-none ml-1"><option>20</option><option>50</option></select></span>
                       </div>
                     </div>
@@ -6475,7 +6475,7 @@ function BillingShippingTab({ vendor, cfg }: { vendor: Vendor; cfg?: VendorConfi
                     <div key={idx} className="rounded-md border border-[#E2E8F0] p-2.5 flex items-center justify-between">
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="text-[12px] text-[#0F172A]" style={{ fontWeight: 600 }}>{cs.name}</span>
+                          <span className="text-[12px] text-[#334155]" style={{ fontWeight: 600 }}>{cs.name}</span>
                           {cs.isDefault && (
                             <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#EDF4FF] text-[#0A77FF]" style={{ fontWeight: 600 }}>Primary</span>
                           )}
@@ -6497,7 +6497,7 @@ function BillingShippingTab({ vendor, cfg }: { vendor: Vendor; cfg?: VendorConfi
                   {cfg!.shippingConfig!.vendorPreferences.filter((vp) => vp.carrier).map((vp, idx) => (
                     <div key={idx} className="rounded-md border border-[#E2E8F0] p-2.5 flex items-center justify-between">
                       <div>
-                        <span className="text-[12px] text-[#0F172A]" style={{ fontWeight: 600 }}>{vp.carrier}</span>
+                        <span className="text-[12px] text-[#334155]" style={{ fontWeight: 600 }}>{vp.carrier}</span>
                         {vp.methods.length > 0 && (
                           <p className="text-[12px] text-[#64748B] mt-0.5">{vp.methods.join(", ")}</p>
                         )}
@@ -6611,7 +6611,7 @@ function PaymentTermsTab({ vendor, cfg }: { vendor: Vendor; cfg?: VendorConfigDa
               <CreditCard className="w-3.5 h-3.5 text-[#94A3B8]" />
               <span className="text-[#64748B]">Payment Terms</span>
             </div>
-            <span className="text-[12px] text-[#0F172A]" style={{ fontWeight: 600 }}>{PAYMENT_TERMS_LABELS[vendor.paymentTerms]}</span>
+            <span className="text-[12px] text-[#334155]" style={{ fontWeight: 600 }}>{PAYMENT_TERMS_LABELS[vendor.paymentTerms]}</span>
           </div>
           <Separator />
           <div className="flex items-center justify-between py-2">
@@ -6619,7 +6619,7 @@ function PaymentTermsTab({ vendor, cfg }: { vendor: Vendor; cfg?: VendorConfigDa
               <DollarSign className="w-3.5 h-3.5 text-[#94A3B8]" />
               <span className="text-[#64748B]">Credit Limit</span>
             </div>
-            <span className="text-[12px] text-[#0F172A]" style={{ fontWeight: 600 }}>
+            <span className="text-[12px] text-[#334155]" style={{ fontWeight: 600 }}>
               {vendor.creditLimit > 0 ? `$${vendor.creditLimit.toLocaleString()}` : "Not set"}
             </span>
           </div>
@@ -6639,7 +6639,7 @@ function PaymentTermsTab({ vendor, cfg }: { vendor: Vendor; cfg?: VendorConfigDa
                   }}
                 />
               </div>
-              <span className="text-[12px] text-[#0F172A]" style={{ fontWeight: 600 }}>
+              <span className="text-[12px] text-[#334155]" style={{ fontWeight: 600 }}>
                 {getCreditUtilizationPct(vendor)}%
               </span>
             </div>
@@ -6703,7 +6703,7 @@ function PricingRulesTab({ cfg }: { cfg?: VendorConfigData }) {
                     {rule.basis}
                   </span>
                 </div>
-                <p className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>{rule.name}</p>
+                <p className="text-[13px] text-[#334155]" style={{ fontWeight: 600 }}>{rule.name}</p>
                 <p className="text-[11px] text-[#64748B] leading-relaxed">{rule.description}</p>
                 {rule.tiers && rule.tiers.length > 0 && (
                   <div className="mt-2 pt-2.5 border-t border-[#F1F5F9]">
@@ -6712,7 +6712,7 @@ function PricingRulesTab({ cfg }: { cfg?: VendorConfigData }) {
                       {rule.tiers.map((tier, idx) => (
                         <div key={idx} className="flex items-center justify-between text-[11px]">
                           <span className="text-[#64748B]">{tier.from}���{tier.to === Infinity ? "∞" : tier.to}</span>
-                          <span className="text-[#0F172A]" style={{ fontWeight: 600 }}>{tier.discount}%</span>
+                          <span className="text-[#334155]" style={{ fontWeight: 600 }}>{tier.discount}%</span>
                         </div>
                       ))}
                     </div>
@@ -7210,7 +7210,7 @@ function ContactsTab({ vendor, cfg }: { vendor: Vendor; cfg?: VendorConfigData }
                       <div className="flex items-center gap-3 pr-6">
                         <div className="w-9 h-9 rounded-xl flex items-center justify-center text-[10px] shrink-0" style={{ backgroundColor: at.bg, color: at.text, fontWeight: 700 }}>{getTabInitials(contact.name)}</div>
                         <div className="min-w-0 flex-1">
-                          <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{pocHighlightText(contact.name)}</p>
+                          <p className="text-[13px] text-[#334155] truncate" style={{ fontWeight: 600 }}>{pocHighlightText(contact.name)}</p>
                           <p className="text-[11px] text-[#334155] truncate" style={{ fontWeight: 500 }}>{contact.department === "Supply Chain Management" ? "Supply Chain" : contact.department} <span className="text-[#CBD5E1]">·</span> <span className="text-[#94A3B8]" style={{ fontWeight: 400 }}>{contact.company}</span></p>
                         </div>
                         <span className="inline-flex items-center text-[10px] px-2 py-[2px] rounded-full border shrink-0" style={{ fontWeight: 500, backgroundColor: "#ECFDF5", color: "#065F46", borderColor: "#A7F3D0" }}>Active</span>

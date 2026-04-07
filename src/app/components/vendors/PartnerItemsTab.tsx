@@ -1093,7 +1093,7 @@ function AddItemModal({
                     return item ? (
                       <div key={id} className="flex items-center gap-2 px-3 py-1.5 border-b border-[#F1F5F9] last:border-0">
                         <Package className="w-3 h-3 text-[#94A3B8] shrink-0" />
-                        <span className="text-[12px] text-[#0F172A] font-mono truncate" style={{ fontWeight: 500 }}>{item.partNo}</span>
+                        <span className="text-[12px] text-[#334155] font-mono truncate" style={{ fontWeight: 500 }}>{item.partNo}</span>
                         <span className="text-[11px] text-[#64748B] truncate">{item.description}</span>
                       </div>
                     ) : null;
@@ -1944,7 +1944,7 @@ export function PartnerItemsTab({ vendor, hideHeader, compact, contextLabel, con
                         <div className="flex flex-col flex-1">
                           {/* Title + Manufacturer */}
                           <div className="px-3.5 pt-2.5 pb-0">
-                            <p className="text-[14px] text-[#0F172A] truncate" style={{ fontWeight: 600, lineHeight: "20px" }}>{item.description}</p>
+                            <p className="text-[14px] text-[#334155] truncate" style={{ fontWeight: 600, lineHeight: "20px" }}>{item.description}</p>
                             <p className="text-[12px] text-[#64748B] truncate mt-0.5" style={{ lineHeight: "18px" }}>
                               <span className="text-[#0A77FF] font-mono" style={{ fontWeight: 600 }}>{item.partNo}</span>
                               <span className="text-[#CBD5E1] mx-1.5">·</span>

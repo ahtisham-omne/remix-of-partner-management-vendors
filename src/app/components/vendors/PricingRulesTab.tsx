@@ -763,7 +763,7 @@ function PricingRuleCard({ rule, onClick }: { rule: PricingRule; onClick: () => 
 
         {/* Row 2: Name */}
         <div className="shrink-0 mb-1">
-          <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{rule.name}</p>
+          <p className="text-[13px] text-[#334155] truncate" style={{ fontWeight: 600 }}>{rule.name}</p>
         </div>
 
         {/* Row 3: Description — fixed 2-line height */}
@@ -773,7 +773,7 @@ function PricingRuleCard({ rule, onClick }: { rule: PricingRule; onClick: () => 
 
         {/* Row 4: Hero value */}
         <div className="flex items-baseline gap-2 shrink-0">
-          <span className="text-[22px] text-[#0F172A] tabular-nums leading-none tracking-tight" style={{ fontWeight: 600 }}>
+          <span className="text-[22px] text-[#334155] tabular-nums leading-none tracking-tight" style={{ fontWeight: 600 }}>
             {t0?.discount ?? "—"}
           </span>
           <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>
@@ -828,7 +828,7 @@ function PricingRuleCard({ rule, onClick }: { rule: PricingRule; onClick: () => 
               <span className="text-[#CBD5E1]">–</span>
               <span style={{ fontWeight: 400 }}>{shownTier?.maxQty}</span>
             </div>
-            <span className="shrink-0 ml-2 text-[#0F172A]" style={{ fontWeight: 600 }}>{shownTier?.discount}</span>
+            <span className="shrink-0 ml-2 text-[#334155]" style={{ fontWeight: 600 }}>{shownTier?.discount}</span>
           </div>
         </div>
       </div>
@@ -1668,7 +1668,7 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
                     <div className="flex items-center gap-2.5 mb-2">
                       <div className="w-7 h-7 rounded-full flex items-center justify-center text-[9px] text-white shrink-0" style={{ fontWeight: 700, backgroundColor: note.color }}>{note.initials}</div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-[12px] text-[#0F172A]" style={{ fontWeight: 600 }}>{note.author}</p>
+                        <p className="text-[12px] text-[#334155]" style={{ fontWeight: 600 }}>{note.author}</p>
                         <p className="text-[10px] text-[#94A3B8]">{note.date}</p>
                       </div>
                     </div>
@@ -1685,7 +1685,7 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
                   <div key={file.id} className="flex items-center gap-3 rounded-lg border border-[#F1F5F9] bg-white px-3.5 py-3 hover:bg-[#F8FAFC] transition-colors cursor-pointer">
                     <div className="w-9 h-9 rounded-lg bg-[#F1F5F9] border border-[#E2E8F0] flex items-center justify-center text-base shrink-0">{file.icon}</div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-[12px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{file.name}</p>
+                      <p className="text-[12px] text-[#334155] truncate" style={{ fontWeight: 500 }}>{file.name}</p>
                       <p className="text-[10px] text-[#94A3B8] mt-0.5">{file.size} · {file.type} · {file.date}</p>
                     </div>
                     <ExternalLink className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" />
@@ -1704,7 +1704,7 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
                       <div key={act.id} className="relative">
                         <div className={`absolute -left-5 top-1 w-3.5 h-3.5 rounded-full border-2 border-white ${act.type === "create" ? "bg-[#22C55E]" : act.type === "edit" ? "bg-[#0A77FF]" : "bg-[#F59E0B]"}`} />
                         <div>
-                          <p className="text-[12px] text-[#0F172A]" style={{ fontWeight: 600 }}>{act.action}</p>
+                          <p className="text-[12px] text-[#334155]" style={{ fontWeight: 500 }}>{act.action}</p>
                           {act.target && <p className="text-[11px] text-[#64748B] mt-0.5">{act.target}</p>}
                           <p className="text-[10px] text-[#94A3B8] mt-1">{act.user} · {act.date}</p>
                         </div>
@@ -1725,14 +1725,14 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
                   <div className="w-6 h-6 rounded-md flex items-center justify-center shrink-0" style={{ backgroundColor: theme.pillBg }}>
                     <ChartColumn className="w-3 h-3" style={{ color: theme.text }} />
                   </div>
-                  <span className="text-[12px] text-[#0F172A]" style={{ fontWeight: 600 }}>Rule Overview</span>
+                  <span className="text-[12px] text-[#334155]" style={{ fontWeight: 600 }}>Rule Overview</span>
                 </div>
 
                 <div className="px-3.5 py-3 space-y-3">
                   {/* Rule Name */}
                   <div>
                     <p className="text-[10px] text-[#94A3B8] mb-px" style={{ fontWeight: 500 }}>Rule Name</p>
-                    <p className="text-[12.5px] text-[#0F172A]" style={{ fontWeight: 600 }}>{rule.name}</p>
+                    <p className="text-[12.5px] text-[#334155]" style={{ fontWeight: 600 }}>{rule.name}</p>
                     <p className="text-[11px] text-[#64748B] mt-0.5 leading-relaxed">{rule.description}</p>
                   </div>
 
@@ -1763,11 +1763,11 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
                   <div className="grid grid-cols-2 gap-x-4 gap-y-2.5">
                     <div className="min-w-0">
                       <p className="text-[10px] text-[#94A3B8] mb-px" style={{ fontWeight: 500 }}>{isDis ? "Discount" : "Premium"}</p>
-                      <p className="text-[16px] text-[#0F172A] tabular-nums" style={{ fontWeight: 600 }}>{rule.tiers[0]?.discount || "—"}</p>
+                      <p className="text-[16px] text-[#334155] tabular-nums" style={{ fontWeight: 600 }}>{rule.tiers[0]?.discount || "—"}</p>
                     </div>
                     <div className="min-w-0">
                       <p className="text-[10px] text-[#94A3B8] mb-px" style={{ fontWeight: 500 }}>Tiers</p>
-                      <p className="text-[12.5px] text-[#0F172A]" style={{ fontWeight: 600 }}>{rule.tiers.length} {rule.tiers.length === 1 ? "tier" : "tiers"}</p>
+                      <p className="text-[12.5px] text-[#334155]" style={{ fontWeight: 500 }}>{rule.tiers.length} {rule.tiers.length === 1 ? "tier" : "tiers"}</p>
                     </div>
                   </div>
 
@@ -1810,7 +1810,7 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
                           <span className="text-[#CBD5E1]">–</span>
                           <span>{tier.maxQty}</span>
                         </div>
-                        <span className="text-[#0F172A]" style={{ fontWeight: 600 }}>{tier.discount}</span>
+                        <span className="text-[#334155]" style={{ fontWeight: 600 }}>{tier.discount}</span>
                       </div>
                     ))}
                   </div>
@@ -1840,7 +1840,7 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
         {/* ─── Footer ─── */}
         <div className="shrink-0 border-t border-[#E2E8F0] bg-white rounded-b-none sm:rounded-b-2xl">
           <div className="px-5 py-2.5 flex items-center justify-between">
-            <span className="text-[11px] text-[#64748B]">Reviewing: <span className="text-[#0F172A]" style={{ fontWeight: 600 }}>{rule.name}</span></span>
+            <span className="text-[11px] text-[#64748B]">Reviewing: <span className="text-[#334155]" style={{ fontWeight: 600 }}>{rule.name}</span></span>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => {
@@ -3382,7 +3382,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                       {createCategory === "discount" ? <TrendingDown className="w-4.5 h-4.5 text-[#15803D]" /> : <TrendingUp className="w-4.5 h-4.5 text-[#7C3AED]" />}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{createName || "Untitled Rule"}</p>
+                      <p className="text-[13px] text-[#334155] truncate" style={{ fontWeight: 600 }}>{createName || "Untitled Rule"}</p>
                       <p className="text-[11px] text-[#64748B] truncate">{createCategory === "discount" ? "Discount" : "Premium"} · {createBasis === "volume" ? "Volume-Based" : "Value-Based"} · {createTiers.length} tier{createTiers.length !== 1 ? "s" : ""}{createTiers[0]?.discount ? ` · ${createTiers[0].discount}${createTiers[0].fixRate ? "$" : "%"}` : ""}</p>
                     </div>
                     <button
@@ -3805,13 +3805,13 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                           </div>
 
                           {/* Row 2: Name */}
-                          <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{card.name}</p>
+                          <p className="text-[13px] text-[#334155] truncate" style={{ fontWeight: 600 }}>{card.name}</p>
                           <p className="text-[11px] text-[#64748B] mt-1 line-clamp-2 leading-relaxed" style={{ fontWeight: 400 }}>{card.description}</p>
 
                           {/* Row 3: Hero value — neutral */}
                           {t0 && (
                             <div className="flex items-baseline gap-2 mt-3">
-                              <span className="text-[22px] text-[#0F172A] tabular-nums leading-none tracking-tight" style={{ fontWeight: 600 }}>
+                              <span className="text-[22px] text-[#334155] tabular-nums leading-none tracking-tight" style={{ fontWeight: 600 }}>
                                 {t0.discount}
                               </span>
                               <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>
@@ -3853,7 +3853,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                                       <span className="text-[#CBD5E1]">–</span>
                                       <span style={{ fontWeight: 400 }}>{shownTier.maxQty}</span>
                                     </div>
-                                    <span className="shrink-0 ml-2 text-[#0F172A]" style={{ fontWeight: 600 }}>{shownTier.discount}</span>
+                                    <span className="shrink-0 ml-2 text-[#334155]" style={{ fontWeight: 600 }}>{shownTier.discount}</span>
                                   </div>
                                 </div>
                               ) : (
@@ -3863,7 +3863,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                                     <span className="text-[#CBD5E1]">–</span>
                                     <span style={{ fontWeight: 400 }}>{shownTier.maxQty}</span>
                                   </div>
-                                  <span className="shrink-0 ml-2 text-[#0F172A]" style={{ fontWeight: 600 }}>{shownTier.discount}</span>
+                                  <span className="shrink-0 ml-2 text-[#334155]" style={{ fontWeight: 600 }}>{shownTier.discount}</span>
                                 </div>
                               )}
                             </div>

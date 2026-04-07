@@ -2022,8 +2022,8 @@ export function VendorsListPage() {
                                             </div>
                                           </div>
                                           <div className="bg-white px-3.5 py-3 space-y-2">
-                                            <div className="flex items-center justify-between text-[12px]"><span className="text-[#64748B]">Service Type</span><span className="text-[#0F172A]" style={{ fontWeight: 500 }}>Ground & Express</span></div>
-                                            <div className="flex items-center justify-between text-[12px]"><span className="text-[#64748B]">Avg. Delivery</span><span className="text-[#0F172A]" style={{ fontWeight: 500 }}>3–5 business days</span></div>
+                                            <div className="flex items-center justify-between text-[12px]"><span className="text-[#64748B]">Service Type</span><span className="text-[#334155]" style={{ fontWeight: 500 }}>Ground & Express</span></div>
+                                            <div className="flex items-center justify-between text-[12px]"><span className="text-[#64748B]">Avg. Delivery</span><span className="text-[#334155]" style={{ fontWeight: 500 }}>3–5 business days</span></div>
                                             <div className="flex items-center justify-between text-[12px]"><span className="text-[#64748B]">Tracking</span><span className="text-[#059669]" style={{ fontWeight: 500 }}>Available</span></div>
                                           </div>
                                         </HoverCardContent>
@@ -2055,8 +2055,8 @@ export function VendorsListPage() {
                                             </div>
                                           </div>
                                           <div className="bg-white px-3.5 py-3 space-y-2">
-                                            <div className="flex items-center justify-between text-[12px]"><span className="text-[#64748B]">Service Type</span><span className="text-[#0F172A]" style={{ fontWeight: 500 }}>Standard & Priority</span></div>
-                                            <div className="flex items-center justify-between text-[12px]"><span className="text-[#64748B]">Avg. Delivery</span><span className="text-[#0F172A]" style={{ fontWeight: 500 }}>2–7 business days</span></div>
+                                            <div className="flex items-center justify-between text-[12px]"><span className="text-[#64748B]">Service Type</span><span className="text-[#334155]" style={{ fontWeight: 500 }}>Standard & Priority</span></div>
+                                            <div className="flex items-center justify-between text-[12px]"><span className="text-[#64748B]">Avg. Delivery</span><span className="text-[#334155]" style={{ fontWeight: 500 }}>2–7 business days</span></div>
                                             <div className="flex items-center justify-between text-[12px]"><span className="text-[#64748B]">Tracking</span><span className="text-[#059669]" style={{ fontWeight: 500 }}>Available</span></div>
                                           </div>
                                         </HoverCardContent>
@@ -2737,7 +2737,7 @@ function KpiRichTooltip({ data, children }: { data?: KpiTooltipData; children: R
             <div className="w-5 h-5 rounded-md bg-[#EDF4FF] flex items-center justify-center shrink-0">
               <Info className="w-3 h-3 text-[#0A77FF]" />
             </div>
-            <span className="text-[11px] text-[#0F172A] tracking-wide" style={{ fontWeight: 700 }}>{data.title}</span>
+            <span className="text-[11px] text-[#334155] tracking-wide" style={{ fontWeight: 700 }}>{data.title}</span>
           </div>
           {/* Description */}
           <p className="text-[11px] text-[#64748B] leading-[1.6] mb-3">{data.description}</p>
@@ -2752,8 +2752,8 @@ function KpiRichTooltip({ data, children }: { data?: KpiTooltipData; children: R
                   row.isResult ? "bg-[#F0FDF4] border border-[#D1FAE5]" : ""
                 }`}
               >
-                <span className={row.isResult ? "text-[#0F172A]" : "text-[#64748B]"} style={{ fontWeight: row.isResult ? 600 : 400 }}>{row.label}</span>
-                <span className={row.isResult ? "text-[#16A34A]" : "text-[#0F172A]"} style={{ fontWeight: row.isResult ? 700 : 500 }}>{row.value}</span>
+                <span className={row.isResult ? "text-[#334155]" : "text-[#64748B]"} style={{ fontWeight: row.isResult ? 600 : 400 }}>{row.label}</span>
+                <span className={row.isResult ? "text-[#16A34A]" : "text-[#334155]"} style={{ fontWeight: row.isResult ? 700 : 500 }}>{row.value}</span>
               </div>
             ))}
           </div>
@@ -2928,7 +2928,7 @@ function DraggableListKpiCard({ index, kpiKey, label, value, iconName, tooltip, 
         </div>
         {/* Value */}
         <div className="flex items-baseline gap-1.5">
-          <p className="text-[15px] text-[#0F172A] tracking-tight whitespace-nowrap" style={{ fontWeight: 600, lineHeight: 1.2 }}>{value}</p>
+          <p className="text-[15px] text-[#334155] tracking-tight whitespace-nowrap" style={{ fontWeight: 600, lineHeight: 1.2 }}>{value}</p>
         </div>
       </div>
       {/* Remove button — bottom-right on hover */}
