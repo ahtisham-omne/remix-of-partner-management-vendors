@@ -6281,6 +6281,10 @@ function ConfigPageContent({
             toast.info(`Duplicated "${r.name}"`);
             setPrDetailOpen(false);
           }}
+          onDisable={(r) => {
+            toast.success(`"${r.name}" has been disabled`);
+            setPrDetailOpen(false);
+          }}
         />
       </div>
     );
@@ -7406,6 +7410,10 @@ function ConfigPageContent({
           }}
           onDuplicate={(r) => {
             toast.info(`Duplicated "${r.name}"`);
+            setPrDetailOpen(false);
+          }}
+          onDisable={(r) => {
+            toast.success(`"${r.name}" has been disabled`);
             setPrDetailOpen(false);
           }}
         />

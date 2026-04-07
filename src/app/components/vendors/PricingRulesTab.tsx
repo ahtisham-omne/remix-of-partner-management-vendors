@@ -1019,6 +1019,9 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
     ? { text: "#047857", pillBg: "#ECFDF5", pillBorder: "#D1FAE5" }
     : { text: "#6D28D9", pillBg: "#F5F3FF", pillBorder: "#EDE9FE" };
 
+  // Use provided vendor or fallback to first vendor from context
+  const effectiveVendor = vendor || ctxVendors[0] || null;
+
   // All categories = rule's original + user-added
   const allCats = [...addedCats, ...rule.categories];
   const allCatIds = new Set(allCats.map((c) => c.id));
@@ -1135,33 +1138,30 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
               <h2 className="text-sm text-[#0F172A] truncate" style={{ fontWeight: 600 }}>Pricing Rule Details</h2>
             </div>
             <div className="flex items-center gap-1.5 shrink-0">
-              {mode === "view" && (
-                <>
-                  <button
-                    onClick={() => { if (!isPreset && onEdit && rule) { onEdit(rule); onClose(); } }}
-                    disabled={isPreset}
-                    className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#334155] hover:bg-[#F8FAFC] transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white"
-                    style={{ fontWeight: 500 }}
-                  >
-                    <Pencil className="w-3.5 h-3.5" /> Edit
-                  </button>
-                  <button
-                    onClick={() => !isPreset && setArchiveConfirmOpen(true)}
-                    disabled={isPreset}
-                    className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#FECACA] bg-[#FEF2F2] text-xs text-[#DC2626] hover:bg-[#FEE2E2] hover:border-[#FCA5A5] transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#FEF2F2]"
-                    style={{ fontWeight: 500 }}
-                  >
-                    <Archive className="w-3.5 h-3.5" /> Archive
-                  </button>
-                  <button
-                    onClick={() => setDisableConfirmOpen(true)}
-                    className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#FDE68A] bg-[#FFFBEB] text-xs text-[#92400E] hover:bg-[#FEF3C7] hover:border-[#FCD34D] transition-colors cursor-pointer"
-                    style={{ fontWeight: 500 }}
-                  >
-                    <CircleSlash className="w-3.5 h-3.5" /> Disable
-                  </button>
-                </>
-              )}
+              {/* Edit — disabled for presets */}
+              <button
+                onClick={() => { if (!isPreset && onEdit && rule) { onEdit(rule); onClose(); } }}
+                disabled={isPreset}
+                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#334155] hover:bg-[#F8FAFC] transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white"
+                style={{ fontWeight: 500 }}
+              >
+                <Pencil className="w-3.5 h-3.5" /> Edit
+              </button>
+              <button
+                onClick={() => !isPreset && setArchiveConfirmOpen(true)}
+                disabled={isPreset}
+                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#FECACA] bg-[#FEF2F2] text-xs text-[#DC2626] hover:bg-[#FEE2E2] hover:border-[#FCA5A5] transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#FEF2F2]"
+                style={{ fontWeight: 500 }}
+              >
+                <Archive className="w-3.5 h-3.5" /> Archive
+              </button>
+              <button
+                onClick={() => setDisableConfirmOpen(true)}
+                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#FDE68A] bg-[#FFFBEB] text-xs text-[#92400E] hover:bg-[#FEF3C7] hover:border-[#FCD34D] transition-colors cursor-pointer"
+                style={{ fontWeight: 500 }}
+              >
+                <CircleSlash className="w-3.5 h-3.5" /> Disable
+              </button>
               <button onClick={() => setIsFullscreen(!isFullscreen)} className="w-8 h-8 rounded-lg border border-[#E2E8F0] bg-white flex items-center justify-center text-[#64748B] hover:text-[#334155] hover:bg-[#F8FAFC] transition-all cursor-pointer">
                 {isFullscreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
               </button>
@@ -1202,13 +1202,13 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
               })}
             </div>
 
-            {/* Items Tab — uses the shared PartnerItemsTab component */}
-            {tab === "items" && vendor && (
+            {/* Items Tab — uses the shared PartnerItemsTab component everywhere */}
+            {tab === "items" && effectiveVendor && (
               <div className="flex-1 flex flex-col overflow-hidden">
-                <PartnerItemsTab vendor={vendor} hideHeader compact contextLabel={rule.name} contextType={rule.category === "discount" ? "discount" : "premium"} />
+                <PartnerItemsTab vendor={effectiveVendor} hideHeader compact contextLabel={rule.name} contextType={rule.category === "discount" ? "discount" : "premium"} />
               </div>
             )}
-            {tab === "items" && !vendor && (
+            {tab === "items" && !effectiveVendor && (
               <div className="flex-1 flex items-center justify-center text-muted-foreground">
                 <div className="text-center">
                   <Package className="w-8 h-8 mx-auto mb-2" />
