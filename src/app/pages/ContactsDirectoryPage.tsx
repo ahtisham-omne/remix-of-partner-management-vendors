@@ -71,10 +71,11 @@ import {
   ToggleLeft,
   ToggleRight,
   GripVertical,
+  Globe,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Checkbox } from "../components/ui/checkbox";
-import { CONTACT_DICTIONARY, type ContactPerson } from "../components/vendors/partnerConstants";
+import { CONTACT_DICTIONARY, type ContactPerson, type ContactPhone, type ContactEmail, type ContactSocial } from "../components/vendors/partnerConstants";
 import { CreatePocModal } from "../components/vendors/PocModals";
 import { OverflowTooltip } from "../components/vendors/OverflowTooltip";
 import { ColumnHeaderMenu, type SortConfig as CMSortConfig } from "../components/vendors/ColumnHeaderMenu";
@@ -343,8 +344,6 @@ interface SortConfig {
 interface EnrichedContact extends ContactPerson {
   status: "active" | "inactive";
   linkedPartners: string[];
-  departments: string[];
-  companies: string[];
   createdByName: string;
   createdByInitials: string;
   createdOn: string;
@@ -375,11 +374,12 @@ const QUICK_FILTER_OPTIONS: { key: QuickFilter; label: string; showCount: boolea
 /* ─── Column definitions ─── */
 const COLUMN_DEFS: (ColumnConfig & { minWidth: string; sortable?: boolean })[] = [
   { key: "contact_name", label: "Contact", minWidth: "240px", sortable: true },
+  { key: "role", label: "Role", minWidth: "140px", sortable: true },
   { key: "department", label: "Department", minWidth: "180px", sortable: true },
   { key: "company", label: "Company", minWidth: "200px", sortable: true },
-  { key: "email", label: "Email", minWidth: "220px" },
-  { key: "phone", label: "Phone", minWidth: "160px" },
-  { key: "secondary_phone", label: "Secondary Phone", minWidth: "160px" },
+  { key: "phones", label: "Phones", minWidth: "200px" },
+  { key: "emails", label: "Emails", minWidth: "220px" },
+  { key: "socials", label: "Socials", minWidth: "160px" },
   { key: "linked_partners", label: "Linked Partners", minWidth: "180px" },
   { key: "created_by", label: "Created By", minWidth: "170px" },
   { key: "created_on", label: "Created On", minWidth: "120px" },
@@ -407,11 +407,8 @@ const PARTNER_NAMES = [
 ];
 
 /* ─── Deterministic enrichment of contacts ─── */
-const ALL_DEPTS = ["Sales", "Supply Chain Management", "Finance", "Operations", "Procurement", "Logistics"];
-const ALL_COMPANIES = ["Toyota International", "Ford Motor Company", "Tesla, Inc.", "General Motors (GM)", "BMW Group", "Honda Motor Co.", "Rivian Automotive", "Lucid Motors", "Volvo Cars", "Hyundai Motor", "Nissan Motor", "Stellantis NV"];
-
 function enrichContacts(contacts: ContactPerson[]): EnrichedContact[] {
-  return contacts.map((c, i) => {
+  return contacts.map((c) => {
     // Deterministic hash from id
     let hash = 0;
     for (let j = 0; j < c.id.length; j++) hash = c.id.charCodeAt(j) + ((hash << 5) - hash);
@@ -427,22 +424,6 @@ function enrichContacts(contacts: ContactPerson[]): EnrichedContact[] {
       linkedPartners.push(PARTNER_NAMES[(absHash + p * 7) % PARTNER_NAMES.length]);
     }
 
-    // 1-3 departments, deterministic
-    const deptCount = 1 + (absHash % 3);
-    const departments: string[] = [c.department];
-    for (let d = 1; d < deptCount; d++) {
-      const dept = ALL_DEPTS[(absHash + d * 11) % ALL_DEPTS.length];
-      if (!departments.includes(dept)) departments.push(dept);
-    }
-
-    // 1-3 companies, deterministic
-    const compCount = 1 + (absHash % 3);
-    const companies: string[] = [c.company];
-    for (let co = 1; co < compCount; co++) {
-      const comp = ALL_COMPANIES[(absHash + co * 13) % ALL_COMPANIES.length];
-      if (!companies.includes(comp)) companies.push(comp);
-    }
-
     // Created by — deterministic
     const CREATORS = ["Ahtisham Ahmad", "Sarah Johnson", "David Kim", "Emily Chen", "Marcus Obi", "Elena Volkov"];
     const createdByName = CREATORS[absHash % CREATORS.length];
@@ -454,7 +435,7 @@ function enrichContacts(contacts: ContactPerson[]): EnrichedContact[] {
     const year = absHash % 3 === 0 ? 2025 : 2026;
     const createdOn = new Date(year, month - 1, day).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 
-    return { ...c, status, linkedPartners, departments, companies, createdByName, createdByInitials, createdOn };
+    return { ...c, status, linkedPartners, createdByName, createdByInitials, createdOn };
   });
 }
 
@@ -613,6 +594,7 @@ export function ContactsDirectoryPage() {
         let bVal = "";
         switch (key) {
           case "contact_name": aVal = a.name; bVal = b.name; break;
+          case "role": aVal = a.role || ""; bVal = b.role || ""; break;
           case "department": aVal = a.department; bVal = b.department; break;
           case "company": aVal = a.company; bVal = b.company; break;
           case "created_by": aVal = a.createdByName; bVal = b.createdByName; break;
@@ -991,6 +973,13 @@ export function ContactsDirectoryPage() {
         );
       }
 
+      case "role":
+        return (
+          <TableCell key={colKey}>
+            <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} text-foreground`}>{contact.role || "\u2014"}</span>
+          </TableCell>
+        );
+
       case "company": {
         const comps = contact.companies || [contact.company];
         return (
@@ -1013,42 +1002,97 @@ export function ContactsDirectoryPage() {
           </TableCell>
         );
       }
-        return (
-          <TableCell key={colKey}>
-            <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate block max-w-[160px]`}>{contact.company}</span>
-          </TableCell>
-        );
 
-      case "email":
+      case "phones": {
+        const phoneList = contact.phones && contact.phones.length > 0
+          ? contact.phones
+          : [{ id: `${contact.id}-ph-fb`, type: "Office" as const, code: "+1", number: contact.phone, ext: contact.phoneExt || "" }];
+        const firstPhone = phoneList[0];
+        const extra = phoneList.length - 1;
         return (
           <TableCell key={colKey}>
-            <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} text-muted-foreground truncate block max-w-[200px]`}>{contact.email}</span>
-          </TableCell>
-        );
-
-      case "phone":
-        return (
-          <TableCell key={colKey}>
-            <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} tabular-nums`}>
-              {contact.phone}
-              {contact.phoneExt && <span className="text-muted-foreground ml-1">ext. {contact.phoneExt}</span>}
-            </span>
-          </TableCell>
-        );
-
-      case "secondary_phone":
-        return (
-          <TableCell key={colKey}>
-            {contact.secondaryPhone ? (
-              <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} tabular-nums`}>
-                {contact.secondaryPhone}
-                {contact.secondaryPhoneExt && <span className="text-muted-foreground ml-1">ext. {contact.secondaryPhoneExt}</span>}
+            <div className="flex items-center gap-1.5">
+              <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} tabular-nums truncate`}>
+                <span className="text-muted-foreground">{firstPhone.type}:</span>{" "}
+                {firstPhone.code} {firstPhone.number}
+                {firstPhone.ext && <span className="text-muted-foreground ml-1">ext. {firstPhone.ext}</span>}
               </span>
-            ) : (
-              <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} text-muted-foreground`}>{"\u2013"}</span>
-            )}
+              {extra > 0 && (
+                <OverflowTooltip
+                  category="Phones"
+                  items={phoneList.slice(1).map((ph) => ({
+                    id: ph.id,
+                    name: `${ph.code} ${ph.number}${ph.ext ? ` ext. ${ph.ext}` : ""}`,
+                    subtitle: ph.type.toUpperCase(),
+                  }))}
+                >
+                  <span className="text-[11px] shrink-0 cursor-default leading-none" style={{ fontWeight: 600, color: "#085FCC" }}>+{extra} more</span>
+                </OverflowTooltip>
+              )}
+            </div>
           </TableCell>
         );
+      }
+
+      case "emails": {
+        const emailList = contact.emails && contact.emails.length > 0
+          ? contact.emails
+          : [{ id: `${contact.id}-em-fb`, type: "Work" as const, address: contact.email }];
+        const firstEmail = emailList[0];
+        const extra = emailList.length - 1;
+        return (
+          <TableCell key={colKey}>
+            <div className="flex items-center gap-1.5">
+              <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} text-muted-foreground truncate max-w-[160px]`}>{firstEmail.address}</span>
+              {extra > 0 && (
+                <OverflowTooltip
+                  category="Emails"
+                  items={emailList.slice(1).map((em) => ({
+                    id: em.id,
+                    name: em.address,
+                    subtitle: em.type.toUpperCase(),
+                  }))}
+                >
+                  <span className="text-[11px] shrink-0 cursor-default leading-none" style={{ fontWeight: 600, color: "#085FCC" }}>+{extra} more</span>
+                </OverflowTooltip>
+              )}
+            </div>
+          </TableCell>
+        );
+      }
+
+      case "socials": {
+        const socialList = contact.socials || [];
+        if (socialList.length === 0) {
+          return <TableCell key={colKey}><span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} text-muted-foreground`}>{"\u2014"}</span></TableCell>;
+        }
+        const firstSocial = socialList[0];
+        const extra = socialList.length - 1;
+        return (
+          <TableCell key={colKey}>
+            <div className="flex items-center gap-1.5">
+              <span
+                className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] border"
+                style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#475569", borderColor: "#E2E8F0" }}
+              >
+                {firstSocial.type}
+              </span>
+              {extra > 0 && (
+                <OverflowTooltip
+                  category="Social Profiles"
+                  items={socialList.slice(1).map((s) => ({
+                    id: s.id,
+                    name: s.url,
+                    subtitle: s.type.toUpperCase(),
+                  }))}
+                >
+                  <span className="text-[11px] shrink-0 cursor-default leading-none" style={{ fontWeight: 600, color: "#085FCC" }}>+{extra} more</span>
+                </OverflowTooltip>
+              )}
+            </div>
+          </TableCell>
+        );
+      }
 
       case "linked_partners": {
         const partners = contact.linkedPartners;
@@ -1536,36 +1580,65 @@ export function ContactsDirectoryPage() {
                             </div>
 
                             <div className={`${cardSize === "large" ? "p-4" : cardSize === "small" ? "p-3" : "p-3.5"}`}>
-                              {/* Avatar + Name + Company */}
+                              {/* Avatar + Name + Role + Company */}
                               <div className="flex items-start gap-3">
                                 <ContactAvatar name={contact.name} size="lg" />
                                 <div className="min-w-0 flex-1">
                                   <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{contact.name}</p>
-                                  <p className="text-[11px] text-[#94A3B8] truncate">{contact.companies[0]}{contact.companies.length > 1 ? ` +${contact.companies.length - 1}` : ""}</p>
+                                  {contact.role && <p className="text-[11px] text-[#64748B] truncate">{contact.role}</p>}
+                                  <p className="text-[11px] text-[#94A3B8] truncate">{(contact.companies || [contact.company])[0]}{(contact.companies || [contact.company]).length > 1 ? ` +${(contact.companies || [contact.company]).length - 1}` : ""}</p>
                                 </div>
                               </div>
 
-                              {/* Contact details — matches creation form card */}
+                              {/* Contact details */}
                               <div className="mt-2.5 space-y-1.5">
-                                <div className="flex items-center gap-2 text-[11px] text-[#64748B]">
-                                  <Phone className="w-3 h-3 text-[#94A3B8] shrink-0" />
-                                  <span className="truncate tabular-nums">{contact.phone}</span>
-                                  <span className="ml-auto inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] shrink-0 border" style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#475569", borderColor: "#E2E8F0" }}>
-                                    {contact.departments[0] === "Supply Chain Management" ? "Supply Chain" : contact.departments[0]}
-                                  </span>
-                                  {contact.departments.length > 1 && (
-                                    <span className="inline-flex items-center px-1 py-0.5 rounded-md text-[9px] border shrink-0" style={{ fontWeight: 600, backgroundColor: "#F1F5F9", color: "#475569", borderColor: "#E2E8F0" }}>+{contact.departments.length - 1}</span>
-                                  )}
-                                </div>
-                                <div className="flex items-center gap-2 text-[11px] text-[#64748B]">
-                                  <PhoneCall className="w-3 h-3 text-[#94A3B8] shrink-0" />
-                                  <span className="truncate tabular-nums">{contact.secondaryPhone || "—"}</span>
-                                  {contact.secondaryPhoneExt && <span className="text-[#94A3B8]">Ext. {contact.secondaryPhoneExt}</span>}
-                                </div>
-                                <div className="flex items-center gap-2 text-[11px] text-[#64748B]">
-                                  <Mail className="w-3 h-3 text-[#94A3B8] shrink-0" />
-                                  <span className="truncate">{contact.email}</span>
-                                </div>
+                                {/* Primary phone */}
+                                {(() => {
+                                  const phoneList = contact.phones && contact.phones.length > 0 ? contact.phones : [{ id: "fb", type: "Office" as const, code: "+1", number: contact.phone, ext: contact.phoneExt || "" }];
+                                  const first = phoneList[0];
+                                  return (
+                                    <div className="flex items-center gap-2 text-[11px] text-[#64748B]">
+                                      <Phone className="w-3 h-3 text-[#94A3B8] shrink-0" />
+                                      <span className="truncate tabular-nums">{first.code} {first.number}</span>
+                                      {phoneList.length > 1 && <span className="text-[10px] shrink-0" style={{ fontWeight: 600, color: "#085FCC" }}>+{phoneList.length - 1} more</span>}
+                                      <span className="ml-auto inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] shrink-0 border" style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#475569", borderColor: "#E2E8F0" }}>
+                                        {(contact.departments || [contact.department])[0] === "Supply Chain Management" ? "Supply Chain" : (contact.departments || [contact.department])[0]}
+                                      </span>
+                                      {(contact.departments || [contact.department]).length > 1 && (
+                                        <span className="inline-flex items-center px-1 py-0.5 rounded-md text-[9px] border shrink-0" style={{ fontWeight: 600, backgroundColor: "#F1F5F9", color: "#475569", borderColor: "#E2E8F0" }}>+{(contact.departments || [contact.department]).length - 1}</span>
+                                      )}
+                                    </div>
+                                  );
+                                })()}
+
+                                {/* Primary email */}
+                                {(() => {
+                                  const emailList = contact.emails && contact.emails.length > 0 ? contact.emails : [{ id: "fb", type: "Work" as const, address: contact.email }];
+                                  const first = emailList[0];
+                                  return (
+                                    <div className="flex items-center gap-2 text-[11px] text-[#64748B]">
+                                      <Mail className="w-3 h-3 text-[#94A3B8] shrink-0" />
+                                      <span className="truncate">{first.address}</span>
+                                      {emailList.length > 1 && <span className="text-[10px] shrink-0" style={{ fontWeight: 600, color: "#085FCC" }}>+{emailList.length - 1} more</span>}
+                                    </div>
+                                  );
+                                })()}
+
+                                {/* Socials as platform pills */}
+                                {contact.socials && contact.socials.length > 0 && (
+                                  <div className="flex items-center gap-1.5 flex-wrap">
+                                    <Globe className="w-3 h-3 text-[#94A3B8] shrink-0" />
+                                    {contact.socials.map((s) => (
+                                      <span
+                                        key={s.id}
+                                        className="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] border"
+                                        style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#475569", borderColor: "#E2E8F0" }}
+                                      >
+                                        {s.type}
+                                      </span>
+                                    ))}
+                                  </div>
+                                )}
                               </div>
 
                               {/* Status pill at bottom */}
