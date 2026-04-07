@@ -65,6 +65,10 @@ import {
   DollarSign,
   Link2,
   ChevronUp,
+  ChartColumn,
+  Calendar,
+  ToggleLeft,
+  ToggleRight,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Checkbox } from "../components/ui/checkbox";
@@ -113,7 +117,14 @@ const PERSON_AVATARS: Record<string, string> = {
 
 function getPersonPhoto(name: string): string | undefined {
   const firstName = name.split(" ")[0];
-  return PERSON_AVATARS[firstName];
+  if (PERSON_AVATARS[firstName]) return PERSON_AVATARS[firstName];
+  // Deterministic fallback: use hash to pick from randomuser.me pool
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  const absHash = Math.abs(hash);
+  const gender = absHash % 2 === 0 ? "men" : "women";
+  const id = (absHash % 99) + 1;
+  return `https://randomuser.me/api/portraits/${gender}/${id}.jpg`;
 }
 
 function ContactAvatar({ name, size = "md" }: { name: string; size?: "sm" | "md" | "lg" }) {
@@ -125,13 +136,191 @@ function ContactAvatar({ name, size = "md" }: { name: string; size?: "sm" | "md"
   const textSize = size === "lg" ? "text-[11px]" : size === "sm" ? "text-[9px]" : "text-[10px]";
   const showImg = photo && !imgFailed;
   return (
-    <div className={`${sizeClass} rounded-full flex items-center justify-center shrink-0 overflow-hidden border border-[#E8ECF1]`} style={{ backgroundColor: showImg ? "transparent" : tint.bg }}>
+    <div className={`${sizeClass} rounded-lg flex items-center justify-center shrink-0 overflow-hidden border border-[#E8ECF1]`} style={{ backgroundColor: showImg ? "transparent" : tint.bg }}>
       {showImg ? (
         <img src={photo} alt="" className="w-full h-full object-cover" onError={() => setImgFailed(true)} />
       ) : (
         <span className={`${textSize}`} style={{ fontWeight: 700, color: tint.fg }}>{initials}</span>
       )}
     </div>
+  );
+}
+
+/* ─── Contact Insights Panel — matches KpiInsightsPanel exactly ─── */
+interface ContactKpi {
+  key: string;
+  label: string;
+  value: string;
+  icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>;
+  color: string;
+  bg: string;
+  tooltip: string;
+}
+
+function ContactInsightsPanel({ open, onOpenChange, allKpis, activeKeys, onToggle }: {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  allKpis: ContactKpi[];
+  activeKeys: Set<string>;
+  onToggle: (key: string) => void;
+}) {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [mounted, setMounted] = useState(false);
+  const [visible, setVisible] = useState(false);
+
+  React.useEffect(() => {
+    if (open) {
+      setMounted(true);
+      requestAnimationFrame(() => { requestAnimationFrame(() => setVisible(true)); });
+    } else {
+      setVisible(false);
+      const t = setTimeout(() => setMounted(false), 280);
+      return () => clearTimeout(t);
+    }
+  }, [open]);
+
+  if (!mounted) return null;
+
+  const filtered = searchQuery.trim()
+    ? allKpis.filter((k) => k.label.toLowerCase().includes(searchQuery.toLowerCase()))
+    : allKpis;
+
+  const allActive = allKpis.every((k) => activeKeys.has(k.key));
+  const noneActive = activeKeys.size === 0;
+
+  return (
+    <>
+      {/* Backdrop */}
+      <div
+        className="fixed inset-0 z-[200] transition-opacity duration-[250ms] ease-in-out"
+        style={{ backgroundColor: visible ? "rgba(0,0,0,0.25)" : "rgba(0,0,0,0)", pointerEvents: visible ? "auto" : "none" }}
+        onClick={() => onOpenChange(false)}
+      />
+
+      {/* Drawer */}
+      <div
+        className="fixed right-0 top-0 bottom-0 z-[200] w-full max-w-[400px] bg-white flex flex-col shadow-2xl transition-transform duration-[280ms] ease-[cubic-bezier(0.32,0.72,0,1)]"
+        style={{ transform: visible ? "translateX(0)" : "translateX(100%)" }}
+      >
+        {/* Header */}
+        <div className="px-5 pt-5 pb-0 shrink-0">
+          <div className="flex items-start justify-between">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ backgroundColor: "#EDF4FF" }}>
+                <ChartColumn className="w-5 h-5" style={{ color: "#0A77FF" }} />
+              </div>
+              <div>
+                <h2 className="text-base text-foreground" style={{ fontWeight: 600 }}>Add Insights</h2>
+                <p className="text-[13px] text-muted-foreground mt-0.5">Customize your dashboard with relevant metrics.</p>
+              </div>
+            </div>
+            <button onClick={() => onOpenChange(false)} className="p-1.5 rounded-md hover:bg-muted/50 transition-colors cursor-pointer -mt-0.5 -mr-1">
+              <X className="w-4 h-4 text-muted-foreground" />
+            </button>
+          </div>
+          {/* Toggle all */}
+          <div className="flex items-center justify-between mt-4 px-1">
+            <span className="text-[12px] text-muted-foreground" style={{ fontWeight: 500 }}>
+              {activeKeys.size} of {allKpis.length} insights active
+            </span>
+            <button
+              onClick={() => {
+                if (allActive) {
+                  allKpis.forEach((k) => { if (activeKeys.has(k.key)) onToggle(k.key); });
+                } else {
+                  allKpis.forEach((k) => { if (!activeKeys.has(k.key)) onToggle(k.key); });
+                }
+              }}
+              className={`flex items-center gap-1.5 text-[12px] px-3 py-1.5 rounded-full border transition-all duration-200 cursor-pointer ${
+                allActive
+                  ? "bg-[#EBF3FF] border-[#0A77FF]/25 text-[#0A77FF] hover:bg-[#DCEAFF] shadow-sm shadow-[#0A77FF]/10"
+                  : noneActive
+                  ? "bg-[#F8FAFC] border-[#E2E8F0] text-[#94A3B8] hover:bg-[#F1F5F9] hover:text-[#64748B]"
+                  : "bg-[#F8FAFC] border-[#E2E8F0] text-[#64748B] hover:bg-[#EBF3FF] hover:border-[#0A77FF]/25 hover:text-[#0A77FF]"
+              }`}
+              style={{ fontWeight: 600 }}
+            >
+              {allActive ? (
+                <><ToggleRight className="w-4 h-4 text-[#0A77FF]" /><span>All On</span></>
+              ) : noneActive ? (
+                <><ToggleLeft className="w-4 h-4" /><span>All Off</span></>
+              ) : (
+                <><ToggleLeft className="w-4 h-4" /><span>Enable All</span></>
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* Search */}
+        <div className="px-5 pt-3.5 pb-1 shrink-0">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50 pointer-events-none" />
+            <input
+              placeholder="Search metrics..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full h-10 pl-10 pr-3 rounded-lg border border-border bg-white text-sm text-foreground placeholder:text-muted-foreground/50 outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-colors"
+            />
+          </div>
+        </div>
+
+        {/* Scrollable Content — 2-column card grid */}
+        <div className="flex-1 overflow-y-auto px-4 pb-4 scrollbar-hide">
+          {filtered.length === 0 ? (
+            <div className="flex flex-col items-center py-12 text-muted-foreground">
+              <Search className="w-5 h-5 mb-2 opacity-40" />
+              <p className="text-xs text-muted-foreground/60">No metrics found</p>
+            </div>
+          ) : (
+            <div className="mt-4">
+              <div className="flex items-center gap-1.5 mb-2">
+                <Users className="w-3.5 h-3.5 text-[#94A3B8]" />
+                <span className="text-[12px] text-muted-foreground/70 uppercase tracking-wide" style={{ fontWeight: 600 }}>Contact Metrics</span>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                {filtered.map((kpi) => {
+                  const Icon = kpi.icon;
+                  const isActive = activeKeys.has(kpi.key);
+                  return (
+                    <button
+                      key={kpi.key}
+                      onClick={() => onToggle(kpi.key)}
+                      className={`relative text-left rounded-lg border px-3 py-2.5 transition-all duration-150 cursor-pointer group ${
+                        isActive
+                          ? "border-[#0A77FF]/25 bg-[#0A77FF]/[0.04] shadow-[0_0_0_1px_rgba(10,119,255,0.08)]"
+                          : "border-border/60 bg-white hover:border-border hover:bg-muted/20 hover:shadow-sm"
+                      }`}
+                    >
+                      {/* Top row: label + toggle icon */}
+                      <div className="flex items-center justify-between gap-1">
+                        <span
+                          className={`text-[11.5px] truncate transition-colors ${isActive ? "text-[#0A77FF]" : "text-muted-foreground/70"}`}
+                          style={{ fontWeight: 500 }}
+                          title={kpi.label}
+                        >
+                          {kpi.label}
+                        </span>
+                        <div className="shrink-0">
+                          {isActive ? (
+                            <Check className="w-3.5 h-3.5" style={{ color: "#0A77FF" }} />
+                          ) : (
+                            <Plus className="w-3.5 h-3.5 text-muted-foreground/25 group-hover:text-muted-foreground/50 transition-colors" />
+                          )}
+                        </div>
+                      </div>
+                      {/* Value */}
+                      <p className={`text-[15px] mt-1 transition-colors ${isActive ? "text-foreground" : "text-foreground/80"}`} style={{ fontWeight: 550 }}>
+                        {kpi.value}
+                      </p>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </>
   );
 }
 
@@ -150,6 +339,11 @@ interface SortConfig {
 interface EnrichedContact extends ContactPerson {
   status: "active" | "inactive";
   linkedPartners: string[];
+  departments: string[];
+  companies: string[];
+  createdByName: string;
+  createdByInitials: string;
+  createdOn: string;
 }
 
 /* ─── Density config ─── */
@@ -177,12 +371,14 @@ const QUICK_FILTER_OPTIONS: { key: QuickFilter; label: string; showCount: boolea
 /* ─── Column definitions ─── */
 const COLUMN_DEFS: (ColumnConfig & { minWidth: string; sortable?: boolean })[] = [
   { key: "contact_name", label: "Contact", minWidth: "240px", sortable: true },
-  { key: "department", label: "Department", minWidth: "160px", sortable: true },
-  { key: "company", label: "Company", minWidth: "180px", sortable: true },
+  { key: "department", label: "Department", minWidth: "180px", sortable: true },
+  { key: "company", label: "Company", minWidth: "200px", sortable: true },
   { key: "email", label: "Email", minWidth: "220px" },
   { key: "phone", label: "Phone", minWidth: "160px" },
   { key: "secondary_phone", label: "Secondary Phone", minWidth: "160px" },
-  { key: "linked_partners", label: "Linked Partners", minWidth: "160px" },
+  { key: "linked_partners", label: "Linked Partners", minWidth: "180px" },
+  { key: "created_by", label: "Created By", minWidth: "170px" },
+  { key: "created_on", label: "Created On", minWidth: "120px" },
   { key: "status", label: "Status", minWidth: "100px", sortable: true },
 ];
 
@@ -206,6 +402,9 @@ const PARTNER_NAMES = [
 ];
 
 /* ─── Deterministic enrichment of contacts ─── */
+const ALL_DEPTS = ["Sales", "Supply Chain Management", "Finance", "Operations", "Procurement", "Logistics"];
+const ALL_COMPANIES = ["Toyota International", "Ford Motor Company", "Tesla, Inc.", "General Motors (GM)", "BMW Group", "Honda Motor Co.", "Rivian Automotive", "Lucid Motors", "Volvo Cars", "Hyundai Motor", "Nissan Motor", "Stellantis NV"];
+
 function enrichContacts(contacts: ContactPerson[]): EnrichedContact[] {
   return contacts.map((c, i) => {
     // Deterministic hash from id
@@ -223,7 +422,34 @@ function enrichContacts(contacts: ContactPerson[]): EnrichedContact[] {
       linkedPartners.push(PARTNER_NAMES[(absHash + p * 7) % PARTNER_NAMES.length]);
     }
 
-    return { ...c, status, linkedPartners };
+    // 1-3 departments, deterministic
+    const deptCount = 1 + (absHash % 3);
+    const departments: string[] = [c.department];
+    for (let d = 1; d < deptCount; d++) {
+      const dept = ALL_DEPTS[(absHash + d * 11) % ALL_DEPTS.length];
+      if (!departments.includes(dept)) departments.push(dept);
+    }
+
+    // 1-3 companies, deterministic
+    const compCount = 1 + (absHash % 3);
+    const companies: string[] = [c.company];
+    for (let co = 1; co < compCount; co++) {
+      const comp = ALL_COMPANIES[(absHash + co * 13) % ALL_COMPANIES.length];
+      if (!companies.includes(comp)) companies.push(comp);
+    }
+
+    // Created by — deterministic
+    const CREATORS = ["Ahtisham Ahmad", "Sarah Johnson", "David Kim", "Emily Chen", "Marcus Obi", "Elena Volkov"];
+    const createdByName = CREATORS[absHash % CREATORS.length];
+    const createdByInitials = createdByName.split(" ").map(w => w[0]).join("").toUpperCase();
+
+    // Created on — deterministic date in 2025-2026
+    const month = (absHash % 12) + 1;
+    const day = (absHash % 28) + 1;
+    const year = absHash % 3 === 0 ? 2025 : 2026;
+    const createdOn = new Date(year, month - 1, day).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+
+    return { ...c, status, linkedPartners, departments, companies, createdByName, createdByInitials, createdOn };
   });
 }
 
@@ -272,6 +498,9 @@ export function ContactsDirectoryPage() {
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
   const [sortConfig, setSortConfig] = useState<SortConfig | null>(null);
   const [showInsights, setShowInsights] = useState(true);
+  const [insightsDateRange, setInsightsDateRange] = useState("last_30");
+  const [insightsPanelOpen, setInsightsPanelOpen] = useState(false);
+  const [activeKpiKeys, setActiveKpiKeys] = useState<Set<string>>(new Set(["total", "active", "sales", "supply_chain", "finance", "avg_partners"]));
 
   /* ─── Create Contact Modal State ─── */
   const [createModalOpen, setCreateModalOpen] = useState(false);
@@ -355,6 +584,8 @@ export function ContactsDirectoryPage() {
           case "contact_name": aVal = a.name; bVal = b.name; break;
           case "department": aVal = a.department; bVal = b.department; break;
           case "company": aVal = a.company; bVal = b.company; break;
+          case "created_by": aVal = a.createdByName; bVal = b.createdByName; break;
+          case "created_on": aVal = new Date(a.createdOn).getTime(); bVal = new Date(b.createdOn).getTime(); return (Number(aVal) - Number(bVal)) * dir;
           case "status": aVal = a.status; bVal = b.status; break;
           default: return 0;
         }
@@ -390,22 +621,37 @@ export function ContactsDirectoryPage() {
   }, [allContacts, searchQuery]);
 
   /* ─── KPI Insights ─── */
-  const kpiData = useMemo(() => {
+  const allKpiData = useMemo(() => {
     const total = allContacts.length;
     const active = allContacts.filter((c) => c.status === "active").length;
+    const inactive = allContacts.filter((c) => c.status === "inactive").length;
     const sales = allContacts.filter((c) => c.department === "Sales").length;
     const supplyChain = allContacts.filter((c) => c.department === "Supply Chain Management").length;
     const finance = allContacts.filter((c) => c.department === "Finance").length;
     const avgPartners = total > 0 ? (allContacts.reduce((sum, c) => sum + c.linkedPartners.length, 0) / total).toFixed(1) : "0";
+    const totalPartners = allContacts.reduce((sum, c) => sum + c.linkedPartners.length, 0);
     return [
-      { key: "total", label: "Total Contacts", value: total, icon: Users, color: "#0A77FF", bg: "#EDF4FF" },
-      { key: "active", label: "Active Contacts", value: active, icon: UserCheck, color: "#059669", bg: "#ECFDF5" },
-      { key: "sales", label: "Sales Department", value: sales, icon: Briefcase, color: "#7C3AED", bg: "#F5F3FF" },
-      { key: "supply_chain", label: "Supply Chain", value: supplyChain, icon: Truck, color: "#D97706", bg: "#FFFBEB" },
-      { key: "finance", label: "Finance Department", value: finance, icon: DollarSign, color: "#0891B2", bg: "#ECFEFF" },
-      { key: "avg_partners", label: "Avg. Partners/Contact", value: avgPartners, icon: Link2, color: "#DC2626", bg: "#FEF2F2" },
+      { key: "total", label: "Total Contacts", value: String(total), icon: Users, color: "#0A77FF", bg: "#EDF4FF", tooltip: "Total number of contacts in the directory" },
+      { key: "active", label: "Active Contacts", value: String(active), icon: UserCheck, color: "#059669", bg: "#ECFDF5", tooltip: "Contacts currently marked as active" },
+      { key: "inactive", label: "Inactive Contacts", value: String(inactive), icon: CircleSlash, color: "#D97706", bg: "#FFFBEB", tooltip: "Contacts currently marked as inactive" },
+      { key: "sales", label: "Sales Department", value: String(sales), icon: Briefcase, color: "#7C3AED", bg: "#F5F3FF", tooltip: "Contacts in the Sales department" },
+      { key: "supply_chain", label: "Supply Chain", value: String(supplyChain), icon: Truck, color: "#D97706", bg: "#FFFBEB", tooltip: "Contacts in Supply Chain Management" },
+      { key: "finance", label: "Finance Department", value: String(finance), icon: DollarSign, color: "#0891B2", bg: "#ECFEFF", tooltip: "Contacts in the Finance department" },
+      { key: "avg_partners", label: "Avg. Partners/Contact", value: avgPartners, icon: Link2, color: "#DC2626", bg: "#FEF2F2", tooltip: "Average number of linked partners per contact" },
+      { key: "total_partners", label: "Total Partner Links", value: String(totalPartners), icon: Users, color: "#0A77FF", bg: "#EDF4FF", tooltip: "Sum of all partner links across contacts" },
     ];
   }, [allContacts]);
+
+  const kpiData = useMemo(() => allKpiData.filter((k) => activeKpiKeys.has(k.key)), [allKpiData, activeKpiKeys]);
+
+  const handleToggleKpi = useCallback((key: string) => {
+    setActiveKpiKeys((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  }, []);
 
   /* ─── Pagination ─── */
   const totalPages = Math.max(1, Math.ceil(filteredContacts.length / recordsPerPage));
@@ -517,21 +763,40 @@ export function ContactsDirectoryPage() {
         );
 
       case "department": {
-        const dStyle = DEPT_STYLES[contact.department] || DEPT_STYLES.Sales;
-        const shortDept = contact.department === "Supply Chain Management" ? "Supply Chain" : contact.department;
+        const depts = contact.departments || [contact.department];
+        const shortDept = (d: string) => d === "Supply Chain Management" ? "Supply Chain" : d;
         return (
           <TableCell key={colKey}>
-            <span
-              className={`inline-flex items-center ${isRelaxed ? "px-2.5 py-1 text-xs" : "px-2 py-0.5 text-xs"} rounded-full border`}
-              style={{ fontWeight: 500, backgroundColor: dStyle.bg, color: dStyle.text, borderColor: dStyle.border }}
-            >
-              {shortDept}
-            </span>
+            <div className={`flex items-center ${isRelaxed ? "gap-1.5" : "gap-1"}`}>
+              <span
+                className={`inline-flex items-center ${isRelaxed ? "px-2.5 py-1 text-xs" : "px-2 py-0.5 text-xs"} rounded-md border`}
+                style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#475569", borderColor: "#E2E8F0" }}
+              >
+                {shortDept(depts[0])}
+              </span>
+              {depts.length > 1 && (
+                <span className="inline-flex items-center px-1.5 py-0.5 rounded-md text-xs border cursor-pointer hover:bg-[#E2E8F0] hover:border-[#CBD5E1] transition-colors" style={{ fontWeight: 600, backgroundColor: "#F1F5F9", color: "#475569", borderColor: "#E2E8F0" }}>
+                  +{depts.length - 1}
+                </span>
+              )}
+            </div>
           </TableCell>
         );
       }
 
-      case "company":
+      case "company": {
+        const comps = contact.companies || [contact.company];
+        return (
+          <TableCell key={colKey}>
+            <div className={`flex items-center ${isRelaxed ? "gap-1.5" : "gap-1"}`}>
+              <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate block max-w-[120px]`}>{comps[0]}</span>
+              {comps.length > 1 && (
+                <span className="text-[11px] shrink-0 cursor-pointer leading-none hover:underline" style={{ fontWeight: 600, color: "#085FCC" }}>+{comps.length - 1} more</span>
+              )}
+            </div>
+          </TableCell>
+        );
+      }
         return (
           <TableCell key={colKey}>
             <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate block max-w-[160px]`}>{contact.company}</span>
@@ -578,12 +843,61 @@ export function ContactsDirectoryPage() {
             <div className="flex items-center gap-1.5">
               <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate max-w-[90px]`}>{first}</span>
               {extra > 0 && (
-                <span className="text-[11px] shrink-0 cursor-default leading-none" style={{ fontWeight: 600, color: "#085FCC" }}>+{extra} more</span>
+                <span className="text-[11px] shrink-0 cursor-pointer leading-none hover:underline" style={{ fontWeight: 600, color: "#085FCC" }}>+{extra} more</span>
               )}
             </div>
           </TableCell>
         );
       }
+
+      case "created_by": {
+        const cbTint = getAvatarTint(contact.createdByName);
+        return (
+          <TableCell key={colKey}>
+            <div className={`flex items-center ${isRelaxed ? "gap-2.5" : "gap-2"}`}>
+              <HoverCard>
+                <HoverCardTrigger asChild onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+                  <div className="cursor-pointer">
+                    <ContactAvatar name={contact.createdByName} size={isRelaxed ? "lg" : "md"} />
+                  </div>
+                </HoverCardTrigger>
+                <HoverCardContent side="bottom" align="start" className="w-[260px] p-0 rounded-xl border-0 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+                  <div className="bg-gradient-to-br from-[#1E293B] to-[#334155] px-4 py-3 relative overflow-hidden">
+                    <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-white/[0.04]" />
+                    <div className="flex items-center gap-3 relative">
+                      <div className="w-10 h-10 rounded-xl overflow-hidden border-2 border-white/20 shrink-0" style={{ backgroundColor: getPersonPhoto(contact.createdByName) ? "transparent" : cbTint.bg }}>
+                        {getPersonPhoto(contact.createdByName) ? <img src={getPersonPhoto(contact.createdByName)} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-[12px] text-white" style={{ fontWeight: 700 }}>{contact.createdByInitials}</div>}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-[13px] text-white truncate" style={{ fontWeight: 600 }}>{contact.createdByName}</p>
+                        <p className="text-[10px] text-[#94A3B8]">Team Member</p>
+                      </div>
+                    </div>
+                  </div>
+                </HoverCardContent>
+              </HoverCard>
+              <div className="min-w-0">
+                <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate block max-w-[120px]`} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{contact.createdByName}</span>
+                {isRelaxed && <span className="text-[10px] text-muted-foreground/50 block truncate max-w-[120px]">Team Member</span>}
+              </div>
+            </div>
+          </TableCell>
+        );
+      }
+
+      case "created_on":
+        return (
+          <TableCell key={colKey}>
+            <div>
+              <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"}`} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{contact.createdOn}</span>
+              {isRelaxed && (
+                <span className="text-[10px] text-muted-foreground/50 block">
+                  {(() => { const d = Math.floor((Date.now() - new Date(contact.createdOn).getTime()) / 86400000); return d < 30 ? `${d}d ago` : d < 365 ? `${Math.floor(d / 30)}mo ago` : `${Math.floor(d / 365)}y ago`; })()}
+                </span>
+              )}
+            </div>
+          </TableCell>
+        );
 
       case "status": {
         const sStyle = STATUS_STYLES[contact.status];
@@ -664,43 +978,88 @@ export function ContactsDirectoryPage() {
             </Button>
           </div>
 
-          {/* KPI Performance Insights */}
-          <div className="mb-3 shrink-0">
-            <button
-              onClick={() => setShowInsights((v) => !v)}
-              className="flex items-center gap-1.5 mb-2 text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-              style={{ fontWeight: 500 }}
-            >
-              <span>Performance Insights</span>
-              {showInsights ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-            </button>
-            {showInsights && (
-              <div className="grid gap-2.5" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))" }}>
-                {kpiData.map((kpi) => {
-                  const Icon = kpi.icon;
-                  return (
-                    <div
-                      key={kpi.key}
-                      className="rounded-xl border border-border bg-card px-4 py-3.5 hover:shadow-md transition-shadow"
-                    >
-                      <div className="flex items-start gap-3">
-                        <div
-                          className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
-                          style={{ backgroundColor: kpi.bg }}
-                        >
-                          <Icon className="w-4 h-4" style={{ color: kpi.color }} />
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-[22px] leading-tight" style={{ fontWeight: 600 }}>{kpi.value}</p>
-                          <p className="text-[11px] text-muted-foreground mt-0.5" style={{ fontWeight: 500 }}>{kpi.label}</p>
-                        </div>
+          {/* KPI Performance Insights — exact match to partner listing page */}
+          {showInsights && kpiData.length > 0 && (
+          <div className="mb-4 shrink-0">
+            {/* Header row */}
+            <div className="flex items-center justify-between mb-2.5">
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground" style={{ fontWeight: 500 }}>
+                  Performance Insights
+                </span>
+                {/* Date Range Filter */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] text-muted-foreground hover:bg-muted/50 hover:text-foreground transition-colors cursor-pointer">
+                      <Calendar className="w-3 h-3" />
+                      <span style={{ fontWeight: 500 }}>
+                        {insightsDateRange === "last_7" && "Last 7 days"}
+                        {insightsDateRange === "last_30" && "Last 30 days"}
+                        {insightsDateRange === "last_90" && "Last 90 days"}
+                        {insightsDateRange === "last_365" && "Last 12 months"}
+                        {insightsDateRange === "all_time" && "All time"}
+                      </span>
+                      <ChevronDown className="w-2.5 h-2.5" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="w-[170px]">
+                    {[
+                      { key: "last_7", label: "Last 7 days" },
+                      { key: "last_30", label: "Last 30 days" },
+                      { key: "last_90", label: "Last 90 days" },
+                      { key: "last_365", label: "Last 12 months" },
+                      { key: "all_time", label: "All time" },
+                    ].map((opt) => (
+                      <DropdownMenuItem
+                        key={opt.key}
+                        className="flex items-center justify-between cursor-pointer"
+                        onClick={() => setInsightsDateRange(opt.key)}
+                      >
+                        <span className="text-sm">{opt.label}</span>
+                        {insightsDateRange === opt.key && (
+                          <Check className="w-3.5 h-3.5" style={{ color: "#0A77FF" }} />
+                        )}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+              <button
+                onClick={() => setInsightsPanelOpen(true)}
+                className="inline-flex items-center gap-1 text-[11px] hover:bg-muted/50 px-2 py-0.5 rounded-md transition-colors cursor-pointer"
+                style={{ fontWeight: 500, color: "#0A77FF" }}
+              >
+                <Plus className="w-3 h-3" />
+                Add Insights
+              </button>
+            </div>
+
+            {/* KPI Cards — same card design as partner listing */}
+            <div className="grid gap-2.5" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(210px, 1fr))" }}>
+              {kpiData.map((kpi) => {
+                const Icon = kpi.icon;
+                return (
+                  <div
+                    key={kpi.key}
+                    className="border rounded-lg bg-white group relative min-w-0 transition-all duration-200 overflow-hidden border-[#E2E8F0] hover:-translate-y-[1px] hover:border-[#93B8F7] hover:shadow-[0_2px_8px_-3px_rgba(10,119,255,0.06)]"
+                  >
+                    <div className="px-3 py-2">
+                      {/* Label row: label + icon */}
+                      <div className="flex items-center justify-between gap-1 mb-1">
+                        <p className="text-[10.5px] text-[#64748B] whitespace-nowrap" style={{ fontWeight: 500 }}>{kpi.label}</p>
+                        <Icon className="w-3.5 h-3.5 shrink-0" style={{ color: "#94A3B8" }} />
+                      </div>
+                      {/* Value */}
+                      <div className="flex items-baseline gap-1.5">
+                        <p className="text-[15px] text-[#0F172A] tracking-tight whitespace-nowrap" style={{ fontWeight: 600, lineHeight: 1.2 }}>{kpi.value}</p>
                       </div>
                     </div>
-                  );
-                })}
-              </div>
-            )}
+                  </div>
+                );
+              })}
+            </div>
           </div>
+          )}
 
           {/* Data Table Container */}
           <div className="border border-border rounded-xl bg-card overflow-clip flex flex-1 min-h-0">
@@ -758,6 +1117,33 @@ export function ContactsDirectoryPage() {
                   </span>
 
                   <div className="w-px h-5 bg-border/60 mx-1 hidden sm:block" />
+
+                  {/* Insights toggle button */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (!showInsights) setShowInsights(true);
+                      setInsightsPanelOpen(true);
+                    }}
+                    className={`inline-flex items-center justify-center h-9 gap-2 px-3 rounded-lg border shadow-sm transition-colors cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-ring/50 ${
+                      insightsPanelOpen
+                        ? "border-primary/30 bg-primary/[0.04] text-foreground"
+                        : "border-border bg-white text-foreground hover:bg-muted/40"
+                    }`}
+                  >
+                    <ChartColumn className="w-[18px] h-[18px] text-muted-foreground/80" />
+                    <span className="text-sm hidden md:inline" style={{ fontWeight: 500 }}>
+                      Insights
+                    </span>
+                    {kpiData.length > 0 && (
+                      <span
+                        className="inline-flex items-center justify-center h-5 px-1.5 rounded-full text-[11px]"
+                        style={{ backgroundColor: "#EDF4FF", color: "#0A77FF", fontWeight: 600 }}
+                      >
+                        {kpiData.length}
+                      </span>
+                    )}
+                  </button>
 
                   {/* Density Dropdown */}
                   <DropdownMenu>
@@ -930,7 +1316,7 @@ export function ContactsDirectoryPage() {
                                 <ContactAvatar name={contact.name} size="lg" />
                                 <div className="min-w-0 flex-1">
                                   <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{contact.name}</p>
-                                  <p className="text-[11px] text-[#94A3B8] truncate">{contact.company}</p>
+                                  <p className="text-[11px] text-[#94A3B8] truncate">{contact.companies[0]}{contact.companies.length > 1 ? ` +${contact.companies.length - 1}` : ""}</p>
                                 </div>
                               </div>
 
@@ -939,9 +1325,12 @@ export function ContactsDirectoryPage() {
                                 <div className="flex items-center gap-2 text-[11px] text-[#64748B]">
                                   <Phone className="w-3 h-3 text-[#94A3B8] shrink-0" />
                                   <span className="truncate tabular-nums">{contact.phone}</span>
-                                  <span className="ml-auto inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] shrink-0 border" style={{ fontWeight: 500, backgroundColor: dStyle.bg, color: dStyle.text, borderColor: dStyle.border }}>
-                                    {shortDept}
+                                  <span className="ml-auto inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] shrink-0 border" style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#475569", borderColor: "#E2E8F0" }}>
+                                    {contact.departments[0] === "Supply Chain Management" ? "Supply Chain" : contact.departments[0]}
                                   </span>
+                                  {contact.departments.length > 1 && (
+                                    <span className="inline-flex items-center px-1 py-0.5 rounded-md text-[9px] border shrink-0" style={{ fontWeight: 600, backgroundColor: "#F1F5F9", color: "#475569", borderColor: "#E2E8F0" }}>+{contact.departments.length - 1}</span>
+                                  )}
                                 </div>
                                 <div className="flex items-center gap-2 text-[11px] text-[#64748B]">
                                   <PhoneCall className="w-3 h-3 text-[#94A3B8] shrink-0" />
@@ -1118,19 +1507,30 @@ export function ContactsDirectoryPage() {
                                       // Re-render cell content inline
                                       switch (key) {
                                         case "department": {
-                                          const dStyle = DEPT_STYLES[contact.department] || DEPT_STYLES.Sales;
-                                          const shortDept = contact.department === "Supply Chain Management" ? "Supply Chain" : contact.department;
+                                          const depts = contact.departments || [contact.department];
+                                          const shortD = (d: string) => d === "Supply Chain Management" ? "Supply Chain" : d;
                                           return (
-                                            <span
-                                              className={`inline-flex items-center ${isRelaxed ? "px-2.5 py-1 text-xs" : "px-2 py-0.5 text-xs"} rounded-full border`}
-                                              style={{ fontWeight: 500, backgroundColor: dStyle.bg, color: dStyle.text, borderColor: dStyle.border }}
-                                            >
-                                              {shortDept}
-                                            </span>
+                                            <div className={`flex items-center ${isRelaxed ? "gap-1.5" : "gap-1"}`}>
+                                              <span className={`inline-flex items-center ${isRelaxed ? "px-2.5 py-1 text-xs" : "px-2 py-0.5 text-xs"} rounded-md border`} style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#475569", borderColor: "#E2E8F0" }}>
+                                                {shortD(depts[0])}
+                                              </span>
+                                              {depts.length > 1 && (
+                                                <span className="inline-flex items-center px-1.5 py-0.5 rounded-md text-xs border cursor-default" style={{ fontWeight: 600, backgroundColor: "#F1F5F9", color: "#475569", borderColor: "#E2E8F0" }}>+{depts.length - 1}</span>
+                                              )}
+                                            </div>
                                           );
                                         }
-                                        case "company":
-                                          return <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate block max-w-[160px]`}>{contact.company}</span>;
+                                        case "company": {
+                                          const comps = contact.companies || [contact.company];
+                                          return (
+                                            <div className={`flex items-center ${isRelaxed ? "gap-1.5" : "gap-1"}`}>
+                                              <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate block max-w-[120px]`}>{comps[0]}</span>
+                                              {comps.length > 1 && (
+                                                <span className="text-[11px] shrink-0 cursor-pointer leading-none hover:underline" style={{ fontWeight: 600, color: "#085FCC" }}>+{comps.length - 1} more</span>
+                                              )}
+                                            </div>
+                                          );
+                                        }
                                         case "email":
                                           return <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} text-muted-foreground truncate block max-w-[200px]`}>{contact.email}</span>;
                                         case "phone":
@@ -1157,11 +1557,20 @@ export function ContactsDirectoryPage() {
                                             <div className="flex items-center gap-1.5">
                                               <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate max-w-[90px]`}>{first}</span>
                                               {extra > 0 && (
-                                                <span className="text-[11px] shrink-0 cursor-default leading-none" style={{ fontWeight: 600, color: "#085FCC" }}>+{extra} more</span>
+                                                <span className="text-[11px] shrink-0 cursor-pointer leading-none hover:underline" style={{ fontWeight: 600, color: "#085FCC" }}>+{extra} more</span>
                                               )}
                                             </div>
                                           );
                                         }
+                                        case "created_by":
+                                          return (
+                                            <div className={`flex items-center ${isRelaxed ? "gap-2.5" : "gap-2"}`}>
+                                              <ContactAvatar name={contact.createdByName} size={isRelaxed ? "lg" : "md"} />
+                                              <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate block max-w-[120px]`} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{contact.createdByName}</span>
+                                            </div>
+                                          );
+                                        case "created_on":
+                                          return <span className={isRelaxed ? "text-[13.5px]" : "text-sm"} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{contact.createdOn}</span>;
                                         case "status": {
                                           const sStyle = STATUS_STYLES[contact.status];
                                           return (
@@ -1331,6 +1740,15 @@ export function ContactsDirectoryPage() {
           </div>
         </div>
       </div>
+
+      {/* KPI Insights Panel — exact match to partner listing KpiInsightsPanel */}
+      <ContactInsightsPanel
+        open={insightsPanelOpen}
+        onOpenChange={setInsightsPanelOpen}
+        allKpis={allKpiData}
+        activeKeys={activeKpiKeys}
+        onToggle={handleToggleKpi}
+      />
 
       {/* Create Contact Modal — same as partner creation form */}
       <CreatePocModal
