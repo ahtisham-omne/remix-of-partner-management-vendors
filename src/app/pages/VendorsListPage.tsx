@@ -1395,7 +1395,10 @@ export function VendorsListPage() {
                         <DropdownMenuItem
                           key={opt.key}
                           className="flex items-center gap-3 py-2.5 px-3 cursor-pointer rounded-md"
-                          onSelect={() => setDensity(opt.key)}
+                          onSelect={(e) => {
+                            if (opt.key === "card") e.preventDefault();
+                            setDensity(opt.key);
+                          }}
                         >
                           {opt.icon === "align-justify" && <AlignJustify className="w-5 h-5 text-muted-foreground shrink-0" />}
                           {opt.icon === "list" && <List className="w-5 h-5 text-muted-foreground shrink-0" />}

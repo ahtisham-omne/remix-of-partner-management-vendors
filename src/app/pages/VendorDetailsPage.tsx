@@ -3972,13 +3972,16 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
   const [locSaveAndCreate, setLocSaveAndCreate] = useState(false);
 
   type LocDensity = "condensed" | "comfort" | "card";
+  type LocCardSize = "large" | "medium" | "small";
   const LOC_DENSITY_CONFIG: { key: LocDensity; label: string; description: string; icon: "align-justify" | "list" | "layout-grid" }[] = [
     { key: "condensed", label: "Condensed", description: "Compact view", icon: "align-justify" },
     { key: "comfort", label: "Comfort", description: "Spacious view", icon: "list" },
     { key: "card", label: "Card View", description: "Grid layout", icon: "layout-grid" },
   ];
   const [density, setDensity] = useState<LocDensity>("card");
+  const [locCardSize, setLocCardSize] = useState<LocCardSize>("medium");
   const [locPocDensity, setLocPocDensity] = useState<LocDensity>("card");
+  const [locPocCardSize, setLocPocCardSize] = useState<LocCardSize>("medium");
   const [currentPage, setCurrentPage] = useState(1);
   const [recordsPerPage, setRecordsPerPage] = useState(20);
 
@@ -4386,7 +4389,10 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                   <DropdownMenuItem
                     key={opt.key}
                     className="flex items-center gap-3 py-2.5 px-3 cursor-pointer rounded-md"
-                    onSelect={() => setDensity(opt.key)}
+                    onSelect={(e) => {
+                      if (opt.key === "card") e.preventDefault();
+                      setDensity(opt.key);
+                    }}
                   >
                     {opt.icon === "align-justify" && <AlignJustify className="w-5 h-5 text-muted-foreground shrink-0" />}
                     {opt.icon === "list" && <ListIcon className="w-5 h-5 text-muted-foreground shrink-0" />}
@@ -4398,6 +4404,31 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                     {density === opt.key && <Check className="w-4 h-4 text-primary shrink-0" />}
                   </DropdownMenuItem>
                 ))}
+                {/* Card size options — only when card view is active */}
+                {density === "card" && (
+                  <>
+                    <div className="mx-2 my-1.5 border-t border-[#F1F5F9]" />
+                    <div className="px-3 py-1.5">
+                      <p className="text-[10px] text-[#94A3B8] uppercase tracking-wide mb-2" style={{ fontWeight: 600 }}>Card Size</p>
+                      <div className="flex items-center gap-1.5">
+                        {(["large", "medium", "small"] as const).map((size) => (
+                          <button
+                            key={size}
+                            onClick={() => setLocCardSize(size)}
+                            className={`flex-1 py-1.5 rounded-md text-[11px] text-center transition-all cursor-pointer ${
+                              locCardSize === size
+                                ? "bg-[#0A77FF] text-white shadow-sm"
+                                : "bg-[#F1F5F9] text-[#64748B] hover:bg-[#E2E8F0]"
+                            }`}
+                            style={{ fontWeight: locCardSize === size ? 600 : 500 }}
+                          >
+                            {size === "large" ? "Large" : size === "medium" ? "Medium" : "Small"}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
 
@@ -4461,7 +4492,11 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                 )}
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
+              <div className={`grid gap-4 ${
+                locCardSize === "large" ? "grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2" :
+                locCardSize === "small" ? "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5" :
+                "grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4"
+              }`}>
                 {paginated.map((loc) => {
                   const isHighlighted = highlightedLocationId === loc.id;
                   return (
@@ -5402,12 +5437,15 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                                 <ChevronDown className="w-3.5 h-3.5 text-muted-foreground/60" />
                               </button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-[200px] p-1.5 z-[350]">
+                            <DropdownMenuContent align="end" className="w-[230px] p-1.5 z-[350]">
                               {LOC_DENSITY_CONFIG.map((opt) => (
                                 <DropdownMenuItem
                                   key={opt.key}
                                   className="flex items-center gap-2.5 py-2 px-2.5 cursor-pointer rounded-md"
-                                  onSelect={() => setLocPocDensity(opt.key)}
+                                  onSelect={(e) => {
+                                    if (opt.key === "card") e.preventDefault();
+                                    setLocPocDensity(opt.key);
+                                  }}
                                 >
                                   {opt.icon === "align-justify" && <AlignJustify className="w-4 h-4 text-[#94A3B8] shrink-0" />}
                                   {opt.icon === "list" && <ListIcon className="w-4 h-4 text-[#94A3B8] shrink-0" />}
@@ -5419,6 +5457,31 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                                   {locPocDensity === opt.key && <Check className="w-3.5 h-3.5 text-[#0A77FF] shrink-0" />}
                                 </DropdownMenuItem>
                               ))}
+                              {/* Card size options — only when card view is active */}
+                              {locPocDensity === "card" && (
+                                <>
+                                  <div className="mx-2 my-1.5 border-t border-[#F1F5F9]" />
+                                  <div className="px-3 py-1.5">
+                                    <p className="text-[10px] text-[#94A3B8] uppercase tracking-wide mb-2" style={{ fontWeight: 600 }}>Card Size</p>
+                                    <div className="flex items-center gap-1.5">
+                                      {(["large", "medium", "small"] as const).map((size) => (
+                                        <button
+                                          key={size}
+                                          onClick={() => setLocPocCardSize(size)}
+                                          className={`flex-1 py-1.5 rounded-md text-[11px] text-center transition-all cursor-pointer ${
+                                            locPocCardSize === size
+                                              ? "bg-[#0A77FF] text-white shadow-sm"
+                                              : "bg-[#F1F5F9] text-[#64748B] hover:bg-[#E2E8F0]"
+                                          }`}
+                                          style={{ fontWeight: locPocCardSize === size ? 600 : 500 }}
+                                        >
+                                          {size === "large" ? "Large" : size === "medium" ? "Medium" : "Small"}
+                                        </button>
+                                      ))}
+                                    </div>
+                                  </div>
+                                </>
+                              )}
                             </DropdownMenuContent>
                           </DropdownMenu>
                           <div className="w-px h-5 bg-[#E8ECF1] mx-0.5 hidden sm:block" />
@@ -5447,13 +5510,17 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                       </div>
                       {locPocDensity === "card" ? (
                         <div className="flex-1 min-h-0 overflow-y-auto scrollbar-hide px-4 py-3 border-t border-border">
-                          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+                          <div className={`grid gap-3 ${
+                            locPocCardSize === "large" ? "grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2" :
+                            locPocCardSize === "small" ? "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5" :
+                            "grid-cols-1 sm:grid-cols-2 xl:grid-cols-3"
+                          }`}>
                             {LOC_POC_DATA.map((poc) => {
                               const initials = poc.name.split(" ").map(w => w[0]).join("");
                               const tint = getPocAvatarTint(poc.bgColor);
                               return (
                                 <div key={poc.id} className="rounded-xl border border-[#E8ECF1] bg-white hover:border-[#BFDBFE] hover:shadow-[0_4px_16px_-4px_rgba(10,119,255,0.12)] transition-all duration-200 cursor-pointer group/poc">
-                                  <div className="p-3.5">
+                                  <div className={`${locPocCardSize === "large" ? "p-4" : locPocCardSize === "small" ? "p-3" : "p-3.5"}`}>
                                     <div className="flex items-center gap-3">
                                       <div className="w-9 h-9 rounded-xl flex items-center justify-center text-[10px] shrink-0" style={{ fontWeight: 700, backgroundColor: tint.bg, color: tint.text }}>
                                         {initials}
@@ -6788,6 +6855,7 @@ function ContactsTab({ vendor, cfg }: { vendor: Vendor; cfg?: VendorConfigData }
   const [tabDeptFilter, setTabDeptFilter] = useState<"all" | "Sales" | "Supply Chain Management" | "Finance">("all");
   const [tabPage, setTabPage] = useState(1);
   const [globalPocDensity, setGlobalPocDensity] = useState<"condensed" | "comfort" | "card">("card");
+  const [globalPocCardSize, setGlobalPocCardSize] = useState<"large" | "medium" | "small">("medium");
   const GLOBAL_POC_DENSITY_CONFIG: { key: "condensed" | "comfort" | "card"; label: string; description: string; icon: "align-justify" | "list" | "layout-grid" }[] = [
     { key: "condensed", label: "Condensed", description: "Compact view", icon: "align-justify" },
     { key: "comfort", label: "Comfort", description: "Spacious view", icon: "list" },
@@ -7054,7 +7122,10 @@ function ContactsTab({ vendor, cfg }: { vendor: Vendor; cfg?: VendorConfigData }
                   <DropdownMenuItem
                     key={opt.key}
                     className="flex items-center gap-3 py-2.5 px-3 cursor-pointer rounded-md"
-                    onSelect={() => setGlobalPocDensity(opt.key)}
+                    onSelect={(e) => {
+                      if (opt.key === "card") e.preventDefault();
+                      setGlobalPocDensity(opt.key);
+                    }}
                   >
                     {opt.icon === "align-justify" && <AlignJustify className="w-5 h-5 text-muted-foreground shrink-0" />}
                     {opt.icon === "list" && <ListIcon className="w-5 h-5 text-muted-foreground shrink-0" />}
@@ -7066,6 +7137,31 @@ function ContactsTab({ vendor, cfg }: { vendor: Vendor; cfg?: VendorConfigData }
                     {globalPocDensity === opt.key && <Check className="w-4 h-4 text-primary shrink-0" />}
                   </DropdownMenuItem>
                 ))}
+                {/* Card size options — only when card view is active */}
+                {globalPocDensity === "card" && (
+                  <>
+                    <div className="mx-2 my-1.5 border-t border-[#F1F5F9]" />
+                    <div className="px-3 py-1.5">
+                      <p className="text-[10px] text-[#94A3B8] uppercase tracking-wide mb-2" style={{ fontWeight: 600 }}>Card Size</p>
+                      <div className="flex items-center gap-1.5">
+                        {(["large", "medium", "small"] as const).map((size) => (
+                          <button
+                            key={size}
+                            onClick={() => setGlobalPocCardSize(size)}
+                            className={`flex-1 py-1.5 rounded-md text-[11px] text-center transition-all cursor-pointer ${
+                              globalPocCardSize === size
+                                ? "bg-[#0A77FF] text-white shadow-sm"
+                                : "bg-[#F1F5F9] text-[#64748B] hover:bg-[#E2E8F0]"
+                            }`}
+                            style={{ fontWeight: globalPocCardSize === size ? 600 : 500 }}
+                          >
+                            {size === "large" ? "Large" : size === "medium" ? "Medium" : "Small"}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
             <div className="w-px h-5 bg-border/60 mx-0.5 hidden sm:block" />
@@ -7200,13 +7296,17 @@ function ContactsTab({ vendor, cfg }: { vendor: Vendor; cfg?: VendorConfigData }
           </div>
         ) : globalPocDensity === "card" ? (
           <div className="p-4 min-h-0 overflow-y-auto flex-1">
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+            <div className={`grid gap-3 ${
+              globalPocCardSize === "large" ? "grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2" :
+              globalPocCardSize === "small" ? "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5" :
+              "grid-cols-1 sm:grid-cols-2 xl:grid-cols-3"
+            }`}>
               {tabPaginated.map((contact) => {
                 const at = getTabAvatarTint(contact.avatarColor);
                 return (
                   <div key={contact.id} className="group relative rounded-xl border border-[#E8ECF1] bg-white transition-all duration-200 hover:border-[#BFDBFE] hover:shadow-[0_4px_16px_-4px_rgba(10,119,255,0.10)] overflow-hidden">
                     <button onClick={() => handleRemovePoc(contact.id)} className="absolute top-3 right-3 w-6 h-6 rounded-full bg-white border border-[#F1F5F9] text-[#94A3B8] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-[#FEF2F2] hover:text-[#EF4444] hover:border-[#FECACA] shadow-sm cursor-pointer z-10"><X className="w-3 h-3" /></button>
-                    <div className="p-3.5">
+                    <div className={`${globalPocCardSize === "large" ? "p-4" : globalPocCardSize === "small" ? "p-3" : "p-3.5"}`}>
                       <div className="flex items-center gap-3 pr-6">
                         <div className="w-9 h-9 rounded-xl flex items-center justify-center text-[10px] shrink-0" style={{ backgroundColor: at.bg, color: at.text, fontWeight: 700 }}>{getTabInitials(contact.name)}</div>
                         <div className="min-w-0 flex-1">

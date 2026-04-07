@@ -1483,7 +1483,10 @@ export function ContactsDirectoryPage() {
                         <DropdownMenuItem
                           key={opt.key}
                           className="flex items-center gap-3 py-2.5 px-3 cursor-pointer rounded-md"
-                          onSelect={() => setDensity(opt.key)}
+                          onSelect={(e) => {
+                            if (opt.key === "card") e.preventDefault();
+                            setDensity(opt.key);
+                          }}
                         >
                           {opt.icon === "align-justify" && <AlignJustify className="w-5 h-5 text-muted-foreground shrink-0" />}
                           {opt.icon === "list" && <List className="w-5 h-5 text-muted-foreground shrink-0" />}
@@ -1598,6 +1601,7 @@ export function ContactsDirectoryPage() {
                         const dStyle = DEPT_STYLES[contact.department] || DEPT_STYLES.Sales;
                         const sStyle = STATUS_STYLES[contact.status];
                         const shortDept = contact.department === "Supply Chain Management" ? "Supply Chain" : contact.department;
+                        const tint = getAvatarTint(contact.name);
 
                         return (
                           <div
@@ -1627,76 +1631,30 @@ export function ContactsDirectoryPage() {
                               </DropdownMenu>
                             </div>
 
-                            <div className={`${cardSize === "large" ? "p-4" : cardSize === "small" ? "p-3" : "p-3.5"}`}>
-                              {/* Avatar + Name + Role + Company */}
-                              <div className="flex items-start gap-3">
-                                <ContactAvatar name={contact.name} size="lg" />
-                                <div className="min-w-0 flex-1">
-                                  <p className="text-[13px] text-[#334155] truncate" style={{ fontWeight: 600 }}>{contact.name}</p>
-                                  {contact.role && <p className="text-[11px] text-[#64748B] truncate">{contact.role}</p>}
-                                  <p className="text-[11px] text-[#94A3B8] truncate">{(contact.companies || [contact.company])[0]}{(contact.companies || [contact.company]).length > 1 ? ` +${(contact.companies || [contact.company]).length - 1}` : ""}</p>
+                            <div className="p-3.5">
+                              {/* Avatar + Name + Dept · Company + Status badge */}
+                              <div className="flex items-center gap-3 pr-6">
+                                <div className="w-9 h-9 rounded-xl flex items-center justify-center text-[10px] shrink-0" style={{ backgroundColor: tint.bg, color: tint.fg, fontWeight: 700 }}>
+                                  {contact.name.split(" ").filter(Boolean).map(w => w[0]).slice(0, 2).join("").toUpperCase()}
                                 </div>
-                              </div>
-
-                              {/* Contact details */}
-                              <div className="mt-2.5 space-y-1.5">
-                                {/* Primary phone */}
-                                {(() => {
-                                  const phoneList = contact.phones && contact.phones.length > 0 ? contact.phones : [{ id: "fb", type: "Office" as const, code: "+1", number: contact.phone, ext: contact.phoneExt || "" }];
-                                  const first = phoneList[0];
-                                  return (
-                                    <div className="flex items-center gap-2 text-[11px] text-[#64748B]">
-                                      <Phone className="w-3 h-3 text-[#94A3B8] shrink-0" />
-                                      <span className="truncate tabular-nums">{first.code} {first.number}</span>
-                                      {phoneList.length > 1 && <span className="text-[10px] shrink-0" style={{ fontWeight: 600, color: "#085FCC" }}>+{phoneList.length - 1} more</span>}
-                                      <span className="ml-auto inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] shrink-0 border" style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#475569", borderColor: "#E2E8F0" }}>
-                                        {(contact.departments || [contact.department])[0] === "Supply Chain Management" ? "Supply Chain" : (contact.departments || [contact.department])[0]}
-                                      </span>
-                                      {(contact.departments || [contact.department]).length > 1 && (
-                                        <span className="inline-flex items-center px-1 py-0.5 rounded-md text-[9px] border shrink-0" style={{ fontWeight: 600, backgroundColor: "#F1F5F9", color: "#475569", borderColor: "#E2E8F0" }}>+{(contact.departments || [contact.department]).length - 1}</span>
-                                      )}
-                                    </div>
-                                  );
-                                })()}
-
-                                {/* Primary email */}
-                                {(() => {
-                                  const emailList = contact.emails && contact.emails.length > 0 ? contact.emails : [{ id: "fb", type: "Work" as const, address: contact.email }];
-                                  const first = emailList[0];
-                                  return (
-                                    <div className="flex items-center gap-2 text-[11px] text-[#64748B]">
-                                      <Mail className="w-3 h-3 text-[#94A3B8] shrink-0" />
-                                      <span className="truncate">{first.address}</span>
-                                      {emailList.length > 1 && <span className="text-[10px] shrink-0" style={{ fontWeight: 600, color: "#085FCC" }}>+{emailList.length - 1} more</span>}
-                                    </div>
-                                  );
-                                })()}
-
-                                {/* Socials as platform pills */}
-                                {contact.socials && contact.socials.length > 0 && (
-                                  <div className="flex items-center gap-1.5 flex-wrap">
-                                    <Globe className="w-3 h-3 text-[#94A3B8] shrink-0" />
-                                    {contact.socials.map((s) => (
-                                      <span
-                                        key={s.id}
-                                        className="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] border"
-                                        style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#475569", borderColor: "#E2E8F0" }}
-                                      >
-                                        {s.type}
-                                      </span>
-                                    ))}
-                                  </div>
-                                )}
-                              </div>
-
-                              {/* Status pill at bottom */}
-                              <div className="mt-3 pt-2.5 border-t border-[#F1F5F9] flex items-center justify-between">
-                                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] border" style={{ fontWeight: 600, backgroundColor: sStyle.bg, color: sStyle.text, borderColor: sStyle.border }}>
+                                <div className="min-w-0 flex-1">
+                                  <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{contact.name}</p>
+                                  <p className="text-[11px] text-[#334155] truncate" style={{ fontWeight: 500 }}>{shortDept} <span className="text-[#CBD5E1]">·</span> <span className="text-[#94A3B8]" style={{ fontWeight: 400 }}>{(contact.companies || [contact.company])[0]}{(contact.companies || [contact.company]).length > 1 ? ` +${(contact.companies || [contact.company]).length - 1}` : ""}</span></p>
+                                </div>
+                                <span className="inline-flex items-center text-[10px] px-2 py-[2px] rounded-full border shrink-0" style={{ fontWeight: 500, backgroundColor: sStyle.bg, color: sStyle.text, borderColor: sStyle.border }}>
                                   {contact.status === "active" ? "Active" : "Inactive"}
                                 </span>
-                                <span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>
-                                  {contact.linkedPartners.length} partner{contact.linkedPartners.length !== 1 ? "s" : ""}
-                                </span>
+                              </div>
+                              {/* Contact details */}
+                              <div className="mt-2.5 pt-2.5 border-t border-[#F1F5F9] space-y-1">
+                                <div className="flex items-center gap-2 text-[11px] text-[#475569]">
+                                  <Mail className="w-3 h-3 text-[#94A3B8] shrink-0" />
+                                  <span className="truncate">{(contact.emails && contact.emails.length > 0 ? contact.emails : [{ id: "fb", type: "Work" as const, address: contact.email }])[0].address}</span>
+                                </div>
+                                <div className="flex items-center gap-2 text-[11px] text-[#475569]">
+                                  <Phone className="w-3 h-3 text-[#94A3B8] shrink-0" />
+                                  <span>{(() => { const phoneList = contact.phones && contact.phones.length > 0 ? contact.phones : [{ id: "fb", type: "Office" as const, code: "+1", number: contact.phone, ext: contact.phoneExt || "" }]; return `${phoneList[0].code} ${phoneList[0].number}`; })()}</span>
+                                </div>
                               </div>
                             </div>
                           </div>
