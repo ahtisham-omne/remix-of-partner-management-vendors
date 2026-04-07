@@ -54,11 +54,11 @@ function getMaxVisible(): number {
 }
 
 function getTipWidth(): number {
-  if (typeof window === "undefined") return 240;
+  if (typeof window === "undefined") return 280;
   const w = window.innerWidth;
-  if (w < 640) return 200;
-  if (w < 1024) return 220;
-  return 240;
+  if (w < 640) return 220;
+  if (w < 1024) return 250;
+  return 280;
 }
 
 /* ─── Component ─── */
@@ -75,7 +75,7 @@ export function OverflowTooltip({ items, category, children, onItemClick }: Over
     if (!triggerRef.current) return;
     const r = triggerRef.current.getBoundingClientRect();
     const w = getTipWidth();
-    const rowH = 36;
+    const rowH = 44;
     const estH = Math.min(items.length, getMaxVisible()) * rowH + 40;
     const vH = window.innerHeight;
     const vW = window.innerWidth;
@@ -156,7 +156,7 @@ export function OverflowTooltip({ items, category, children, onItemClick }: Over
             </div>
 
             {/* Items */}
-            <div className={`px-1.5 pb-1.5 ${scrollable ? "overflow-y-auto scrollbar-hide" : ""}`} style={{ maxHeight: scrollable ? max * 36 : undefined }}>
+            <div className={`px-1.5 pb-1.5 ${scrollable ? "overflow-y-auto scrollbar-hide" : ""}`} style={{ maxHeight: scrollable ? max * 44 : undefined }}>
               {items.map((item) => (
                 <button
                   key={item.id}
@@ -166,7 +166,7 @@ export function OverflowTooltip({ items, category, children, onItemClick }: Over
                     setOpen(false);
                     onItemClick?.(item);
                   }}
-                  className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md transition-colors hover:bg-primary/[0.04] cursor-pointer text-left"
+                  className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md transition-colors hover:bg-primary/[0.04] cursor-pointer text-left"
                 >
                   {item.initials ? (
                     <div
@@ -183,7 +183,12 @@ export function OverflowTooltip({ items, category, children, onItemClick }: Over
                       {item.icon || getCategoryIcon(category)}
                     </div>
                   )}
-                  <span className="text-[12px] truncate text-foreground" style={{ fontWeight: 500 }}>{item.name}</span>
+                  <div className="min-w-0 flex-1">
+                    <span className="text-[12px] truncate block text-foreground" style={{ fontWeight: 500 }}>{item.name}</span>
+                    {item.subtitle && (
+                      <span className="text-[10px] text-muted-foreground/60 block truncate">{item.subtitle}</span>
+                    )}
+                  </div>
                 </button>
               ))}
             </div>

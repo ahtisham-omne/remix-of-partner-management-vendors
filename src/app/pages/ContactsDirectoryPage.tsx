@@ -78,6 +78,7 @@ import { Checkbox } from "../components/ui/checkbox";
 import { CONTACT_DICTIONARY, type ContactPerson, type ContactPhone, type ContactEmail, type ContactSocial } from "../components/vendors/partnerConstants";
 import { CreatePocModal } from "../components/vendors/PocModals";
 import { OverflowTooltip } from "../components/vendors/OverflowTooltip";
+import { useVendors } from "../context/VendorContext";
 import { ColumnHeaderMenu, type SortConfig as CMSortConfig } from "../components/vendors/ColumnHeaderMenu";
 import { getAvatarTint } from "../utils/avatarTints";
 
@@ -373,16 +374,16 @@ const QUICK_FILTER_OPTIONS: { key: QuickFilter; label: string; showCount: boolea
 
 /* ─── Column definitions ─── */
 const COLUMN_DEFS: (ColumnConfig & { minWidth: string; sortable?: boolean })[] = [
-  { key: "contact_name", label: "Contact", minWidth: "240px", sortable: true },
-  { key: "role", label: "Role", minWidth: "140px", sortable: true },
-  { key: "department", label: "Department", minWidth: "180px", sortable: true },
-  { key: "company", label: "Company", minWidth: "200px", sortable: true },
-  { key: "phones", label: "Phones", minWidth: "200px" },
-  { key: "emails", label: "Emails", minWidth: "220px" },
-  { key: "socials", label: "Socials", minWidth: "160px" },
-  { key: "linked_partners", label: "Linked Partners", minWidth: "180px" },
-  { key: "created_by", label: "Created By", minWidth: "170px" },
-  { key: "created_on", label: "Created On", minWidth: "120px" },
+  { key: "contact_name", label: "Contact", minWidth: "260px", sortable: true },
+  { key: "role", label: "Role / Title", minWidth: "200px", sortable: true },
+  { key: "department", label: "Department", minWidth: "200px", sortable: true },
+  { key: "company", label: "Company", minWidth: "220px", sortable: true },
+  { key: "phones", label: "Phone", minWidth: "260px" },
+  { key: "emails", label: "Email", minWidth: "300px" },
+  { key: "socials", label: "Social", minWidth: "260px" },
+  { key: "linked_partners", label: "Linked Partners", minWidth: "250px" },
+  { key: "created_by", label: "Created By", minWidth: "200px" },
+  { key: "created_on", label: "Created On", minWidth: "140px" },
   { key: "status", label: "Status", minWidth: "100px", sortable: true },
 ];
 
@@ -399,7 +400,8 @@ const CHECKBOX_COL_WIDTH = 40;
 const MIN_COL_WIDTH = 1;
 
 /* ─── Partner name pool for linked partners ─── */
-const PARTNER_NAMES = [
+// Will be populated from vendor context at runtime
+let PARTNER_NAMES = [
   "Acme Corp", "TechVault", "NexGen Solutions", "Apex Industries", "Summit Group",
   "Vertex Labs", "Pioneer Systems", "Atlas Logistics", "Beacon Analytics", "Cascade Networks",
   "Delta Manufacturing", "Echo Enterprises", "Falcon Dynamics", "Granite Holdings", "Horizon Partners",
@@ -407,7 +409,8 @@ const PARTNER_NAMES = [
 ];
 
 /* ─── Deterministic enrichment of contacts ─── */
-function enrichContacts(contacts: ContactPerson[]): EnrichedContact[] {
+function enrichContacts(contacts: ContactPerson[], partnerNames: string[]): EnrichedContact[] {
+  const pNames = partnerNames.length > 0 ? partnerNames : PARTNER_NAMES;
   return contacts.map((c) => {
     // Deterministic hash from id
     let hash = 0;
@@ -421,7 +424,7 @@ function enrichContacts(contacts: ContactPerson[]): EnrichedContact[] {
     const partnerCount = 1 + (absHash % 5);
     const linkedPartners: string[] = [];
     for (let p = 0; p < partnerCount; p++) {
-      linkedPartners.push(PARTNER_NAMES[(absHash + p * 7) % PARTNER_NAMES.length]);
+      linkedPartners.push(pNames[(absHash + p * 7) % pNames.length]);
     }
 
     // Created by — deterministic
@@ -466,9 +469,20 @@ function colDef(key: string) {
 
 export function ContactsDirectoryPage() {
   const navigate = useNavigate();
+  const { vendors } = useVendors();
+
+  // Map partner display names to vendor IDs for navigation
+  const partnerNameToId = useMemo(() => {
+    const map: Record<string, string> = {};
+    vendors.forEach((v) => { map[v.displayName] = v.id; map[v.companyName] = v.id; });
+    return map;
+  }, [vendors]);
+
+  // Use real vendor names for linked partners
+  const vendorNames = useMemo(() => vendors.length > 0 ? vendors.map((v) => v.displayName) : PARTNER_NAMES, [vendors]);
 
   /* ─── Data ─── */
-  const allContacts = useMemo(() => enrichContacts(CONTACT_DICTIONARY), []);
+  const allContacts = useMemo(() => enrichContacts(CONTACT_DICTIONARY, vendorNames), [vendorNames]);
 
   /* ─── State ─── */
   const [searchQuery, setSearchQuery] = useState("");
@@ -935,9 +949,9 @@ export function ContactsDirectoryPage() {
                 </HoverCardContent>
               </HoverCard>
               <div className="min-w-0">
-                <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate block max-w-[170px]`} style={{ fontWeight: 500 }}>{contact.name}</span>
+                <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate block`} style={{ fontWeight: 500 }}>{contact.name}</span>
                 {isRelaxed && contact.email && (
-                  <span className="text-xs text-muted-foreground/60 truncate block max-w-[170px]">{contact.email}</span>
+                  <span className="text-xs text-muted-foreground/60 truncate block">{contact.email}</span>
                 )}
               </div>
             </div>
@@ -962,7 +976,7 @@ export function ContactsDirectoryPage() {
                   items={depts.slice(1).map((d, i) => ({
                     id: `${contact.id}-dept-${i}`,
                     name: d === "Supply Chain Management" ? "Supply Chain" : d,
-                    subtitle: "DEPARTMENT",
+                    subtitle: "",
                   }))}
                 >
                   <span className="inline-flex items-center px-1.5 py-0.5 rounded-md text-xs border cursor-default" style={{ fontWeight: 600, backgroundColor: "#F1F5F9", color: "#475569", borderColor: "#E2E8F0" }}>+{depts.length - 1}</span>
@@ -985,14 +999,14 @@ export function ContactsDirectoryPage() {
         return (
           <TableCell key={colKey}>
             <div className={`flex items-center ${isRelaxed ? "gap-1.5" : "gap-1"}`}>
-              <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate block max-w-[120px]`}>{comps[0]}</span>
+              <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate block`}>{comps[0]}</span>
               {comps.length > 1 && (
                 <OverflowTooltip
                   category="Companies"
                   items={comps.slice(1).map((co, i) => ({
                     id: `${contact.id}-comp-${i}`,
                     name: co,
-                    subtitle: "COMPANY",
+                    subtitle: "",
                   }))}
                 >
                   <span className="text-[11px] shrink-0 cursor-default leading-none" style={{ fontWeight: 600, color: "#085FCC" }}>+{comps.length - 1} more</span>
@@ -1008,27 +1022,28 @@ export function ContactsDirectoryPage() {
           ? contact.phones
           : [{ id: `${contact.id}-ph-fb`, type: "Office" as const, code: "+1", number: contact.phone, ext: contact.phoneExt || "" }];
         const firstPhone = phoneList[0];
-        const extra = phoneList.length - 1;
+        const phoneExtra = phoneList.length - 1;
         return (
           <TableCell key={colKey}>
-            <div className="flex items-center gap-1.5">
-              <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} tabular-nums truncate`}>
-                <span className="text-muted-foreground">{firstPhone.type}:</span>{" "}
-                {firstPhone.code} {firstPhone.number}
-                {firstPhone.ext && <span className="text-muted-foreground ml-1">ext. {firstPhone.ext}</span>}
-              </span>
-              {extra > 0 && (
-                <OverflowTooltip
-                  category="Phones"
-                  items={phoneList.slice(1).map((ph) => ({
-                    id: ph.id,
-                    name: `${ph.code} ${ph.number}${ph.ext ? ` ext. ${ph.ext}` : ""}`,
-                    subtitle: ph.type.toUpperCase(),
-                  }))}
-                >
-                  <span className="text-[11px] shrink-0 cursor-default leading-none" style={{ fontWeight: 600, color: "#085FCC" }}>+{extra} more</span>
-                </OverflowTooltip>
-              )}
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5">
+                <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} tabular-nums truncate`} style={{ fontWeight: 500 }}>
+                  {firstPhone.code} {firstPhone.number}{firstPhone.ext ? ` ext. ${firstPhone.ext}` : ""}
+                </span>
+                {phoneExtra > 0 && (
+                  <OverflowTooltip
+                    category="Phone Numbers"
+                    items={phoneList.slice(1).map((ph) => ({
+                      id: ph.id,
+                      name: `${ph.code} ${ph.number}${ph.ext ? ` ext. ${ph.ext}` : ""}`,
+                      subtitle: ph.type,
+                    }))}
+                  >
+                    <span className="text-[11px] shrink-0 cursor-default leading-none" style={{ fontWeight: 600, color: "#085FCC" }}>+{phoneExtra} more</span>
+                  </OverflowTooltip>
+                )}
+              </div>
+              <span className="text-[10px] text-muted-foreground/60 block">{firstPhone.type}</span>
             </div>
           </TableCell>
         );
@@ -1039,23 +1054,26 @@ export function ContactsDirectoryPage() {
           ? contact.emails
           : [{ id: `${contact.id}-em-fb`, type: "Work" as const, address: contact.email }];
         const firstEmail = emailList[0];
-        const extra = emailList.length - 1;
+        const emailExtra = emailList.length - 1;
         return (
           <TableCell key={colKey}>
-            <div className="flex items-center gap-1.5">
-              <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} text-muted-foreground truncate max-w-[160px]`}>{firstEmail.address}</span>
-              {extra > 0 && (
-                <OverflowTooltip
-                  category="Emails"
-                  items={emailList.slice(1).map((em) => ({
-                    id: em.id,
-                    name: em.address,
-                    subtitle: em.type.toUpperCase(),
-                  }))}
-                >
-                  <span className="text-[11px] shrink-0 cursor-default leading-none" style={{ fontWeight: 600, color: "#085FCC" }}>+{extra} more</span>
-                </OverflowTooltip>
-              )}
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5">
+                <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} text-foreground truncate`}>{firstEmail.address}</span>
+                {emailExtra > 0 && (
+                  <OverflowTooltip
+                    category="Email Addresses"
+                    items={emailList.slice(1).map((em) => ({
+                      id: em.id,
+                      name: em.address,
+                      subtitle: em.type,
+                    }))}
+                  >
+                    <span className="text-[11px] shrink-0 cursor-default leading-none" style={{ fontWeight: 600, color: "#085FCC" }}>+{emailExtra} more</span>
+                  </OverflowTooltip>
+                )}
+              </div>
+              <span className="text-[10px] text-muted-foreground/60 block">{firstEmail.type}</span>
             </div>
           </TableCell>
         );
@@ -1067,28 +1085,26 @@ export function ContactsDirectoryPage() {
           return <TableCell key={colKey}><span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} text-muted-foreground`}>{"\u2014"}</span></TableCell>;
         }
         const firstSocial = socialList[0];
-        const extra = socialList.length - 1;
+        const socialExtra = socialList.length - 1;
         return (
           <TableCell key={colKey}>
-            <div className="flex items-center gap-1.5">
-              <span
-                className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] border"
-                style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#475569", borderColor: "#E2E8F0" }}
-              >
-                {firstSocial.type}
-              </span>
-              {extra > 0 && (
-                <OverflowTooltip
-                  category="Social Profiles"
-                  items={socialList.slice(1).map((s) => ({
-                    id: s.id,
-                    name: s.url,
-                    subtitle: s.type.toUpperCase(),
-                  }))}
-                >
-                  <span className="text-[11px] shrink-0 cursor-default leading-none" style={{ fontWeight: 600, color: "#085FCC" }}>+{extra} more</span>
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5">
+                <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} text-foreground truncate cursor-pointer hover:text-[#0A77FF] hover:underline transition-colors`} style={{ fontWeight: 500 }}>{firstSocial.url}</span>
+                {socialExtra > 0 && (
+                  <OverflowTooltip
+                    category="Social Profiles"
+                    items={socialList.slice(1).map((s) => ({
+                      id: s.id,
+                      name: s.url,
+                      subtitle: s.type,
+                    }))}
+                  >
+                    <span className="text-[11px] shrink-0 cursor-default leading-none" style={{ fontWeight: 600, color: "#085FCC" }}>+{socialExtra} more</span>
                 </OverflowTooltip>
               )}
+              </div>
+              <span className="text-[10px] text-muted-foreground/60 block">{firstSocial.type}</span>
             </div>
           </TableCell>
         );
@@ -1097,23 +1113,37 @@ export function ContactsDirectoryPage() {
       case "linked_partners": {
         const partners = contact.linkedPartners;
         const first = partners[0];
+        const firstId = partnerNameToId[first];
         const extra = partners.length - 1;
         return (
           <TableCell key={colKey}>
-            <div className="flex items-center gap-1.5">
-              <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate max-w-[90px]`}>{first}</span>
-              {extra > 0 && (
-                <OverflowTooltip
-                  category="Linked Partners"
-                  items={contact.linkedPartners.slice(1).map((p, i) => ({
-                    id: `${contact.id}-lp-${i}`,
-                    name: p,
-                    subtitle: "PARTNER",
-                  }))}
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5">
+                <span
+                  className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} text-foreground cursor-pointer hover:text-[#0A77FF] hover:underline transition-colors truncate`}
+                  style={{ fontWeight: 500 }}
+                  onClick={(e) => { e.stopPropagation(); if (firstId) window.open(`/vendors/${firstId}`, "_blank"); else toast.info("Partner details — coming soon"); }}
                 >
-                  <span className="text-[11px] shrink-0 cursor-default leading-none" style={{ fontWeight: 600, color: "#085FCC" }}>+{extra} more</span>
+                  {first}
+                </span>
+                {extra > 0 && (
+                  <OverflowTooltip
+                    category="Linked Partners"
+                    items={partners.slice(1).map((p, i) => ({
+                      id: `${contact.id}-lp-${i}`,
+                      name: p,
+                      subtitle: "",
+                    }))}
+                    onItemClick={(item) => {
+                      const vid = partnerNameToId[item.name];
+                      if (vid) window.open(`/vendors/${vid}`, "_blank");
+                    }}
+                  >
+                    <span className="text-[11px] shrink-0 cursor-default leading-none" style={{ fontWeight: 600, color: "#085FCC" }}>+{extra} more</span>
                 </OverflowTooltip>
               )}
+              </div>
+              {isRelaxed && <span className="text-[10px] text-muted-foreground/50 block">{partners.length} partner{partners.length !== 1 ? "s" : ""}</span>}
             </div>
           </TableCell>
         );
@@ -1121,6 +1151,17 @@ export function ContactsDirectoryPage() {
 
       case "created_by": {
         const cbTint = getAvatarTint(contact.createdByName);
+        const cbPhoto = getPersonPhoto(contact.createdByName);
+        // Generate deterministic contact details from name
+        const cbHash = contact.createdByName.split("").reduce((a: number, c: string) => a + c.charCodeAt(0), 0);
+        const cbDepts = ["Procurement", "Supply Chain", "Finance", "Operations", "Sales", "Logistics", "Engineering", "Quality Assurance"];
+        const cbRoles = ["Manager", "Director", "Lead", "Specialist", "Coordinator", "Analyst", "Supervisor", "Associate"];
+        const cbDept = cbDepts[cbHash % cbDepts.length];
+        const cbRole = `${cbDept} ${cbRoles[(cbHash * 7) % cbRoles.length]}`;
+        const cbFirst = contact.createdByName.split(" ")[0]?.toLowerCase() || "user";
+        const cbLast = contact.createdByName.split(" ")[1]?.toLowerCase() || "name";
+        const cbEmail = `${cbFirst}.${cbLast}@company.com`;
+        const cbPhone = `(${300 + (cbHash % 700)}) ${100 + (cbHash % 900)}-${1000 + (cbHash % 9000)}`;
         return (
           <TableCell key={colKey}>
             <div className={`flex items-center ${isRelaxed ? "gap-2.5" : "gap-2"}`}>
@@ -1130,24 +1171,31 @@ export function ContactsDirectoryPage() {
                     <ContactAvatar name={contact.createdByName} size={isRelaxed ? "lg" : "md"} />
                   </div>
                 </HoverCardTrigger>
-                <HoverCardContent side="bottom" align="start" className="w-[260px] p-0 rounded-xl border-0 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+                <HoverCardContent side="bottom" align="start" className="w-[280px] p-0 rounded-xl border-0 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+                  {/* Header with gradient */}
                   <div className="bg-gradient-to-br from-[#1E293B] to-[#334155] px-4 py-3 relative overflow-hidden">
                     <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-white/[0.04]" />
                     <div className="flex items-center gap-3 relative">
-                      <div className="w-10 h-10 rounded-xl overflow-hidden border-2 border-white/20 shrink-0" style={{ backgroundColor: getPersonPhoto(contact.createdByName) ? "transparent" : cbTint.bg }}>
-                        {getPersonPhoto(contact.createdByName) ? <img src={getPersonPhoto(contact.createdByName)} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-[12px] text-white" style={{ fontWeight: 700 }}>{contact.createdByInitials}</div>}
+                      <div className="w-11 h-11 rounded-xl overflow-hidden border-2 border-white/20 shrink-0" style={{ backgroundColor: cbPhoto ? "transparent" : cbTint.bg }}>
+                        {cbPhoto ? <img src={cbPhoto} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-[13px] text-white" style={{ fontWeight: 700 }}>{contact.createdByInitials}</div>}
                       </div>
                       <div className="min-w-0">
-                        <p className="text-[13px] text-white truncate" style={{ fontWeight: 600 }}>{contact.createdByName}</p>
-                        <p className="text-[10px] text-[#94A3B8]">Team Member</p>
+                        <p className="text-[14px] text-white truncate" style={{ fontWeight: 600 }}>{contact.createdByName}</p>
+                        <p className="text-[11px] text-[#94A3B8] truncate">{cbRole}</p>
                       </div>
                     </div>
+                  </div>
+                  {/* Body */}
+                  <div className="bg-white px-4 py-3 space-y-2">
+                    <div className="flex items-center gap-2.5 text-[12px] text-[#334155]"><Mail className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" /><span className="truncate">{cbEmail}</span></div>
+                    <div className="flex items-center gap-2.5 text-[12px] text-[#334155]"><Building2 className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" /><span>{cbDept}</span></div>
+                    <div className="flex items-center gap-2.5 text-[12px] text-[#334155]"><Phone className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" /><span>{cbPhone}</span></div>
                   </div>
                 </HoverCardContent>
               </HoverCard>
               <div className="min-w-0">
-                <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate block max-w-[120px]`} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{contact.createdByName}</span>
-                {isRelaxed && <span className="text-[10px] text-muted-foreground/50 block truncate max-w-[120px]">Team Member</span>}
+                <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate block`} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{contact.createdByName}</span>
+                {isRelaxed && <span className="text-[10px] text-muted-foreground/50 block truncate">{cbRole}</span>}
               </div>
             </div>
           </TableCell>
