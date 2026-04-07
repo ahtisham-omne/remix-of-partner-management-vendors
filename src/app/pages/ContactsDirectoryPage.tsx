@@ -59,6 +59,12 @@ import {
   CircleSlash,
   PhoneCall,
   UserPlus,
+  UserCheck,
+  Briefcase,
+  Truck,
+  DollarSign,
+  Link2,
+  ChevronUp,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Checkbox } from "../components/ui/checkbox";
@@ -265,6 +271,7 @@ export function ContactsDirectoryPage() {
   const [columnDrawerOpen, setColumnDrawerOpen] = useState(false);
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
   const [sortConfig, setSortConfig] = useState<SortConfig | null>(null);
+  const [showInsights, setShowInsights] = useState(true);
 
   /* ─── Create Contact Modal State ─── */
   const [createModalOpen, setCreateModalOpen] = useState(false);
@@ -381,6 +388,24 @@ export function ContactsDirectoryPage() {
       inactive: base.filter((c) => c.status === "inactive").length,
     };
   }, [allContacts, searchQuery]);
+
+  /* ─── KPI Insights ─── */
+  const kpiData = useMemo(() => {
+    const total = allContacts.length;
+    const active = allContacts.filter((c) => c.status === "active").length;
+    const sales = allContacts.filter((c) => c.department === "Sales").length;
+    const supplyChain = allContacts.filter((c) => c.department === "Supply Chain Management").length;
+    const finance = allContacts.filter((c) => c.department === "Finance").length;
+    const avgPartners = total > 0 ? (allContacts.reduce((sum, c) => sum + c.linkedPartners.length, 0) / total).toFixed(1) : "0";
+    return [
+      { key: "total", label: "Total Contacts", value: total, icon: Users, color: "#0A77FF", bg: "#EDF4FF" },
+      { key: "active", label: "Active Contacts", value: active, icon: UserCheck, color: "#059669", bg: "#ECFDF5" },
+      { key: "sales", label: "Sales Department", value: sales, icon: Briefcase, color: "#7C3AED", bg: "#F5F3FF" },
+      { key: "supply_chain", label: "Supply Chain", value: supplyChain, icon: Truck, color: "#D97706", bg: "#FFFBEB" },
+      { key: "finance", label: "Finance Department", value: finance, icon: DollarSign, color: "#0891B2", bg: "#ECFEFF" },
+      { key: "avg_partners", label: "Avg. Partners/Contact", value: avgPartners, icon: Link2, color: "#DC2626", bg: "#FEF2F2" },
+    ];
+  }, [allContacts]);
 
   /* ─── Pagination ─── */
   const totalPages = Math.max(1, Math.ceil(filteredContacts.length / recordsPerPage));
@@ -637,6 +662,44 @@ export function ContactsDirectoryPage() {
               <Plus className="w-4 h-4 mr-1.5" />
               Create New Contact
             </Button>
+          </div>
+
+          {/* KPI Performance Insights */}
+          <div className="mb-3 shrink-0">
+            <button
+              onClick={() => setShowInsights((v) => !v)}
+              className="flex items-center gap-1.5 mb-2 text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+              style={{ fontWeight: 500 }}
+            >
+              <span>Performance Insights</span>
+              {showInsights ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+            </button>
+            {showInsights && (
+              <div className="grid gap-2.5" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))" }}>
+                {kpiData.map((kpi) => {
+                  const Icon = kpi.icon;
+                  return (
+                    <div
+                      key={kpi.key}
+                      className="rounded-xl border border-border bg-card px-4 py-3.5 hover:shadow-md transition-shadow"
+                    >
+                      <div className="flex items-start gap-3">
+                        <div
+                          className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                          style={{ backgroundColor: kpi.bg }}
+                        >
+                          <Icon className="w-4 h-4" style={{ color: kpi.color }} />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-[22px] leading-tight" style={{ fontWeight: 600 }}>{kpi.value}</p>
+                          <p className="text-[11px] text-muted-foreground mt-0.5" style={{ fontWeight: 500 }}>{kpi.label}</p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           {/* Data Table Container */}

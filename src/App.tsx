@@ -11,6 +11,7 @@ const VendorDetailsPage = lazy(() => import("./app/pages/VendorDetailsPage").the
 const VendorEditPage = lazy(() => import("./app/pages/VendorEditPage").then(m => ({ default: m.VendorEditPage })));
 const PartnerGroupsPage = lazy(() => import("./app/pages/PartnerGroupsPage").then(m => ({ default: m.PartnerGroupsPage })));
 const ContactsDirectoryPage = lazy(() => import("./app/pages/ContactsDirectoryPage").then(m => ({ default: m.ContactsDirectoryPage })));
+const ContactDetailPage = lazy(() => import("./app/pages/ContactDetailPage").then(m => ({ default: m.ContactDetailPage })));
 const CreditManagementPage = lazy(() => import("./app/pages/CreditManagementPage").then(m => ({ default: m.CreditManagementPage })));
 const CarrierManagementPage = lazy(() => import("./app/pages/CarrierManagementPage").then(m => ({ default: m.CarrierManagementPage })));
 const PartnerLocationsPage = lazy(() => import("./app/pages/PartnerLocationsPage").then(m => ({ default: m.PartnerLocationsPage })));
@@ -30,6 +31,7 @@ const App = () => (
               <Route path="/partners" element={<PartnersHomePage />} />
               <Route path="/partners/groups" element={<PartnerGroupsPage />} />
               <Route path="/partners/contacts" element={<ContactsDirectoryPage />} />
+              <Route path="/partners/contacts/:contactId" element={<ContactDetailPage />} />
               <Route path="/partners/credit" element={<CreditManagementPage />} />
               <Route path="/partners/carriers" element={<CarrierManagementPage />} />
               <Route path="/partners/locations" element={<PartnerLocationsPage />} />
