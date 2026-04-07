@@ -193,6 +193,86 @@ interface CreatePartnerModalProps {
   editVendor?: Record<string, unknown> | null;
 }
 
+/* ─── Expandable Textarea ─── */
+function ExpandableTextarea({
+  value,
+  onChange,
+  placeholder,
+  maxLength = 5000,
+  label,
+}: {
+  value: string;
+  onChange: (val: string) => void;
+  placeholder?: string;
+  maxLength?: number;
+  label?: string;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    if (expanded && textareaRef.current) {
+      textareaRef.current.focus();
+      const len = textareaRef.current.value.length;
+      textareaRef.current.setSelectionRange(len, len);
+    }
+  }, [expanded]);
+
+  return (
+    <div>
+      {label && <label className="text-[12px] text-[#0F172A] mb-1.5 block" style={{ fontWeight: 500 }}>{label}</label>}
+      {/* Container keeps collapsed height — textarea is always absolute inside */}
+      <div className="relative" style={{ height: 72 }}>
+        {/* Click-away backdrop when expanded */}
+        {expanded && <div className="fixed inset-0 z-[99]" onClick={() => setExpanded(false)} />}
+        {/* Always absolute — transitions margin + height smoothly */}
+        <div
+          className="absolute top-0 right-0 z-[100]"
+          style={{
+            left: expanded ? "-80%" : 0,
+            marginLeft: expanded ? -12 : 0,
+            marginRight: expanded ? -12 : 0,
+            marginTop: expanded ? -32 : 0,
+            transition: "left 300ms cubic-bezier(0.16, 1, 0.3, 1), margin 300ms cubic-bezier(0.16, 1, 0.3, 1)",
+          }}
+        >
+          <textarea
+            ref={textareaRef}
+            value={value}
+            onChange={(e) => { if (e.target.value.length <= maxLength) onChange(e.target.value); }}
+            onDoubleClick={() => { if (!expanded) setExpanded(true); }}
+            placeholder={placeholder}
+            className={`w-full rounded-lg bg-white resize-none text-[13px] text-[#0F172A] placeholder:text-[#94A3B8] px-3 py-2 pb-6 border outline-none ${
+              expanded
+                ? "border-[#0A77FF] ring-2 ring-[#0A77FF]/15"
+                : "border-[#E2E8F0] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
+            }`}
+            style={{
+              height: expanded ? 190 : 72,
+              boxShadow: expanded ? "0 12px 40px -8px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.03)" : "none",
+              transition: "height 300ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 300ms cubic-bezier(0.16, 1, 0.3, 1), border-color 200ms ease",
+            }}
+          />
+          <p className="absolute bottom-1.5 right-2.5 text-[11px] text-[#94A3B8] pointer-events-none">{value.length}/{maxLength}</p>
+          <button
+            type="button"
+            onClick={() => setExpanded(!expanded)}
+            className={`absolute top-2 right-2 w-6 h-6 rounded-md flex items-center justify-center cursor-pointer ${
+              expanded
+                ? "text-[#0A77FF] hover:bg-[#EDF4FF]"
+                : "text-[#94A3B8] hover:text-[#0A77FF] hover:bg-[#EDF4FF]"
+            }`}
+            style={{ transition: "color 200ms ease, background-color 200ms ease" }}
+            title={expanded ? "Collapse" : "Expand"}
+          >
+            {expanded ? <Minimize2 className="w-3 h-3" /> : <Maximize2 className="w-3 h-3" />}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function CreatePartnerModal({ open, onOpenChange, onPartnerCreated, initialProfile, editMode = false, editVendor }: CreatePartnerModalProps) {
   // Steps: 1 = Partner Group Selection, 2 = Partner Form, 3 = Configuration Sub-page
   const [step, setStep] = useState<1 | 2 | 3>(1);
@@ -5719,19 +5799,12 @@ function ConfigPageContent({
                           )}
                           {/* Prepayment/Split: Description next to name */}
                           {createPtType !== "net" && (
-                            <div>
-                              <label className="text-[12px] text-[#0F172A] mb-1.5 block" style={{ fontWeight: 500 }}>Description</label>
-                              <div className="relative">
-                                <Textarea
-                                  value={createPtDescription}
-                                  onChange={(e) => { if (e.target.value.length <= 5000) setCreatePtDescription(e.target.value); }}
-                                  placeholder="Brief summary of payment term purpose or context."
-                                  className="rounded-lg border-[#E2E8F0] bg-white min-h-[36px] resize-none text-[13px] placeholder:text-[#94A3B8] pb-5"
-                                  rows={1}
-                                />
-                                <p className="absolute bottom-1.5 right-2.5 text-[11px] text-[#94A3B8] pointer-events-none">{createPtDescription.length}/5000</p>
-                              </div>
-                            </div>
+                            <ExpandableTextarea
+                              label="Description"
+                              value={createPtDescription}
+                              onChange={setCreatePtDescription}
+                              placeholder="Brief summary of payment term purpose or context."
+                            />
                           )}
                           {/* NET Row 2: Duration + Description */}
                           {createPtType === "net" && (
@@ -5749,19 +5822,12 @@ function ConfigPageContent({
                                   <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] text-[#94A3B8]" style={{ fontWeight: 500 }}>days</span>
                                 </div>
                               </div>
-                              <div>
-                                <label className="text-[12px] text-[#0F172A] mb-1.5 block" style={{ fontWeight: 500 }}>Description</label>
-                                <div className="relative">
-                                  <Textarea
-                                    value={createPtDescription}
-                                    onChange={(e) => { if (e.target.value.length <= 5000) setCreatePtDescription(e.target.value); }}
-                                    placeholder="Brief summary of payment term purpose or context."
-                                    className="rounded-lg border-[#E2E8F0] bg-white min-h-[36px] resize-none text-[13px] placeholder:text-[#94A3B8] pb-5"
-                                    rows={1}
-                                  />
-                                  <p className="absolute bottom-1.5 right-2.5 text-[11px] text-[#94A3B8] pointer-events-none">{createPtDescription.length}/5000</p>
-                                </div>
-                              </div>
+                              <ExpandableTextarea
+                                label="Description"
+                                value={createPtDescription}
+                                onChange={setCreatePtDescription}
+                                placeholder="Brief summary of payment term purpose or context."
+                              />
                             </>
                           )}
                         </div>
@@ -6897,11 +6963,12 @@ function ConfigPageContent({
                           <Input value={createPrName} onChange={(e) => setCreatePrName(e.target.value)} placeholder={`e.g. ${createPrCategory === "discount" ? "Volume Discount for Q4" : "Premium Markup for VIP"}`} className="rounded-lg border-[#E2E8F0] bg-white text-[13px] text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
                         </div>
                         <div>
-                          <label className="text-[12px] text-[#0F172A] mb-1.5 block" style={{ fontWeight: 600 }}>Description</label>
-                          <div className="relative">
-                            <Textarea value={createPrDescription} onChange={(e) => { if (e.target.value.length <= 5000) setCreatePrDescription(e.target.value); }} placeholder="Brief summary of pricing rule purpose or context." className="rounded-lg border-[#E2E8F0] bg-white min-h-[64px] resize-none text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 pb-5" rows={2} />
-                            <p className="absolute bottom-1.5 right-2.5 text-[11px] text-[#94A3B8] pointer-events-none">{createPrDescription.length}/5000</p>
-                          </div>
+                          <ExpandableTextarea
+                            label="Description"
+                            value={createPrDescription}
+                            onChange={setCreatePrDescription}
+                            placeholder="Brief summary of pricing rule purpose or context."
+                          />
                         </div>
                       </div>
                       {/* Date range toggle + fields */}

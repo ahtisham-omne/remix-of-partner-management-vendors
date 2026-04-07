@@ -1791,8 +1791,8 @@ export function VendorsListPage() {
                                   <TableCell key={colKey}>
                                     <div className={`flex items-center ${isRelaxed ? "gap-3" : "gap-2.5"}`}>
                                       <LogoAvatar logoUrl={icon.logoUrl} initials={icon.initials} bg={icon.bg} size={isRelaxed ? "lg" : "md"} />
-                                      <div className="min-w-0">
-                                        <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate block`} style={{ fontWeight: 500, color: '#1E293B' }}>{highlightText(vendor.displayName)}</span>
+                                      <div className="min-w-0 flex-1">
+                                        <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} block truncate`} style={{ fontWeight: 500, color: '#1E293B' }}>{highlightText(vendor.displayName)}</span>
                                         {isRelaxed && vendor.emailAddress && (
                                           <span className="text-xs text-muted-foreground/60 truncate block">{vendor.emailAddress}</span>
                                         )}
@@ -1876,7 +1876,7 @@ export function VendorsListPage() {
                                         </div>
                                       )}
                                       <div className="min-w-0">
-                                        <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate block`} style={{ fontWeight: 500 }}>{itemCodes[0] || "\u2013"}</span>
+                                        <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} block truncate`} style={{ fontWeight: 500 }}>{itemCodes[0] || "\u2013"}</span>
                                         {isRelaxed && <span className="text-[10px] text-muted-foreground/50 block">{itemCodes.length} item{itemCodes.length !== 1 ? "s" : ""} total</span>}
                                       </div>
                                       {extraItems > 0 && (
@@ -1905,7 +1905,7 @@ export function VendorsListPage() {
                                         </div>
                                       )}
                                       <div className="min-w-0">
-                                        <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate block`} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{highlightText(partnerLocations[0] || "\u2013")}</span>
+                                        <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} block truncate`} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{highlightText(partnerLocations[0] || "\u2013")}</span>
                                         {isRelaxed && <span className="text-[10px] text-muted-foreground/50 block">{partnerLocations.length} location{partnerLocations.length !== 1 ? "s" : ""}</span>}
                                       </div>
                                       {extraLocations > 0 && (
@@ -1959,7 +1959,7 @@ export function VendorsListPage() {
                                           </HoverCard>
                                           ); })()}
                                           <div className="min-w-0">
-                                            <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate block`}>{highlightText(globalPointOfContacts[0]?.name)}</span>
+                                            <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} block truncate`}>{highlightText(globalPointOfContacts[0]?.name)}</span>
                                             {isRelaxed && (globalPointOfContacts[0] as any)?.role && (
                                               <span className="text-xs text-muted-foreground/60 truncate block">{(globalPointOfContacts[0] as any)?.role}</span>
                                             )}
@@ -2031,8 +2031,8 @@ export function VendorsListPage() {
                                           </div>
                                         </HoverCardContent>
                                       </HoverCard>
-                                      <div className="min-w-0">
-                                        <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate block`} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{vendor.defaultCarrierVendor}</span>
+                                      <div className="min-w-0 flex-1">
+                                        <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} block truncate`} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{vendor.defaultCarrierVendor}</span>
                                         {isRelaxed && <span className="text-[10px] text-muted-foreground/50 block">Vendor Carrier</span>}
                                       </div>
                                     </div>
@@ -2064,8 +2064,8 @@ export function VendorsListPage() {
                                           </div>
                                         </HoverCardContent>
                                       </HoverCard>
-                                      <div className="min-w-0">
-                                        <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate block`} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{vendor.defaultCarrierCustomer}</span>
+                                      <div className="min-w-0 flex-1">
+                                        <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} block truncate`} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{vendor.defaultCarrierCustomer}</span>
                                         {isRelaxed && <span className="text-[10px] text-muted-foreground/50 block">Customer Carrier</span>}
                                       </div>
                                     </div>
@@ -2076,8 +2076,8 @@ export function VendorsListPage() {
                                   <TableCell key={colKey}>
                                     <div className={`flex items-center ${isRelaxed ? "gap-2.5" : "gap-2"}`}>
                                       <span className={isRelaxed ? "text-lg" : "text-base"}>{vendor.countryFlag}</span>
-                                      <div className="min-w-0">
-                                        <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate block`} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{highlightText(vendor.country)}</span>
+                                      <div className="min-w-0 flex-1">
+                                        <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} block truncate`} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{highlightText(vendor.country)}</span>
                                         {isRelaxed && vendor.billingAddress?.city && <span className="text-[10px] text-muted-foreground/50 truncate block">{vendor.billingAddress.city}{vendor.billingAddress.state ? `, ${vendor.billingAddress.state}` : ""}</span>}
                                       </div>
                                     </div>
@@ -2119,8 +2119,8 @@ export function VendorsListPage() {
                                             </HoverCardContent>
                                           </HoverCard>
                                           ); })()}
-                                          <div className="min-w-0">
-                                            <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} truncate block`} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{highlightText(vendor.createdByContact.name)}</span>
+                                          <div className="min-w-0 flex-1">
+                                            <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} block truncate`} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{highlightText(vendor.createdByContact.name)}</span>
                                             {isRelaxed && <span className="text-[10px] text-muted-foreground/50 truncate block">{(vendor.createdByContact as any).role || "Team Member"}</span>}
                                           </div>
                                         </>
