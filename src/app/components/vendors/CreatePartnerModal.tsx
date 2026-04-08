@@ -5627,7 +5627,12 @@ function ConfigPageContent({
                     <div>
                       <div className="flex items-center gap-1.5 mb-3">
                         <span className="text-sm text-[#0F172A]" style={{ fontWeight: 600 }}>Payment Term Type</span>
-                        <Tooltip><TooltipTrigger asChild><span><Info className="w-3.5 h-3.5 text-[#CBD5E1]" /></span></TooltipTrigger><TooltipContent className="z-[300]"><p className="text-xs">Choose how payment will be structured for this term.</p></TooltipContent></Tooltip>
+                        <Tooltip>
+                          <TooltipTrigger asChild><span><Info className="w-3.5 h-3.5 text-[#CBD5E1] cursor-help" /></span></TooltipTrigger>
+                          <TooltipContent side="bottom" sideOffset={6} className="max-w-[260px] text-[11px] leading-[1.5] z-[300]">
+                            <p className="text-[#64748B]">Select a payment structure. Hover each card for details.</p>
+                          </TooltipContent>
+                        </Tooltip>
                       </div>
 
                       <div className="grid grid-cols-3 gap-3">
@@ -5636,6 +5641,11 @@ function ConfigPageContent({
                           const icon = t.id === "net" ? <Clock className="w-[18px] h-[18px]" /> : t.id === "prepayment" ? <Banknote className="w-[18px] h-[18px]" /> : <ArrowUpDown className="w-[18px] h-[18px]" />;
                           const shortLabel = t.id === "net" ? "NET Terms" : t.id === "prepayment" ? "Prepayment" : "Split Payment";
                           const shortDesc = t.id === "net" ? "Pay after X days" : t.id === "prepayment" ? "Pay before delivery" : "Multiple installments";
+                          const typeTooltip = t.id === "net"
+                            ? { desc: "Full payment due after a set number of days from a trigger event.", example: "Net 30", exampleDesc: "— pay in full within 30 days of shipment." }
+                            : t.id === "prepayment"
+                            ? { desc: "Collect partial or full payment upfront before goods ship.", example: "50% Upfront", exampleDesc: "— half paid before dispatch." }
+                            : { desc: "Split the total across multiple events, each with its own percentage.", example: "40/30/30", exampleDesc: "— order, shipment, delivery." };
                           const accentColor = t.id === "net" ? "#0A77FF" : t.id === "prepayment" ? "#7C3AED" : "#D97706";
                           const accentBg = t.id === "net" ? "#EFF6FF" : t.id === "prepayment" ? "#F5F3FF" : "#FFFBEB";
                           const accentBorder = t.id === "net" ? "#93C5FD" : t.id === "prepayment" ? "#C4B5FD" : "#FCD34D";
@@ -5645,33 +5655,43 @@ function ConfigPageContent({
                           const circleActiveShadow = t.id === "net" ? "rgba(59,130,246,0.15)" : t.id === "prepayment" ? "rgba(139,92,246,0.15)" : "rgba(245,158,11,0.15)";
                           const hoverCircleBorder = t.id === "net" ? "group-hover:border-[#93C5FD]" : t.id === "prepayment" ? "group-hover:border-[#C4B5FD]" : "group-hover:border-[#FCD34D]";
                           return (
-                            <div
-                              key={t.id}
-                              onClick={() => { setCreatePtType(t.id as "net" | "prepayment" | "split"); if (t.id === "net" && createPtTrigger !== "shipping" && createPtTrigger !== "delivery") setCreatePtTrigger("shipping"); if (t.id === "prepayment" && (createPtTrigger === "delivery" || createPtTrigger === "shipping")) setCreatePtTrigger("order_confirmation"); }}
-                              className={`group relative rounded-xl overflow-hidden border transition-all duration-200 cursor-pointer ${
-                                isActive
-                                  ? `${activeBorderClass} bg-white shadow-[0_1px_4px_rgba(0,0,0,0.06)]`
-                                  : `border-[#E2E8F0] bg-white ${hoverBorderClass} hover:shadow-[0_4px_16px_-4px_rgba(0,0,0,0.08)]`
-                              }`}
-                            >
-                              <div className={`absolute inset-0 transition-all duration-300 pointer-events-none ${isActive ? "opacity-100" : "opacity-0 group-hover:opacity-60"}`} style={{ background: `linear-gradient(135deg, ${accentBg}80 0%, transparent 70%)` }} />
-                              <div className="relative flex items-center gap-3 pl-3.5 pr-3 py-3">
-                                <div className={`w-9 h-9 rounded-[10px] flex items-center justify-center shrink-0 transition-all duration-200 ${isActive ? "" : "group-hover:scale-105"}`} style={{ background: `linear-gradient(135deg, ${accentBg}, ${accentBorder}40)`, color: accentColor }}>
-                                  {icon}
+                            <Tooltip key={t.id}>
+                              <TooltipTrigger asChild>
+                                <div
+                                  onClick={() => { setCreatePtType(t.id as "net" | "prepayment" | "split"); if (t.id === "net" && createPtTrigger !== "shipping" && createPtTrigger !== "delivery") setCreatePtTrigger("shipping"); if (t.id === "prepayment" && (createPtTrigger === "delivery" || createPtTrigger === "shipping")) setCreatePtTrigger("order_confirmation"); }}
+                                  className={`group relative rounded-xl overflow-hidden border transition-all duration-200 cursor-pointer ${
+                                    isActive
+                                      ? `${activeBorderClass} bg-white shadow-[0_1px_4px_rgba(0,0,0,0.06)]`
+                                      : `border-[#E2E8F0] bg-white ${hoverBorderClass} hover:shadow-[0_4px_16px_-4px_rgba(0,0,0,0.08)]`
+                                  }`}
+                                >
+                                  <div className={`absolute inset-0 transition-all duration-300 pointer-events-none ${isActive ? "opacity-100" : "opacity-0 group-hover:opacity-60"}`} style={{ background: `linear-gradient(135deg, ${accentBg}80 0%, transparent 70%)` }} />
+                                  <div className="relative flex items-center gap-3 pl-3.5 pr-3 py-3">
+                                    <div className={`w-9 h-9 rounded-[10px] flex items-center justify-center shrink-0 transition-all duration-200 ${isActive ? "" : "group-hover:scale-105"}`} style={{ background: `linear-gradient(135deg, ${accentBg}, ${accentBorder}40)`, color: accentColor }}>
+                                      {icon}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                      <p className={`text-[13px] transition-colors duration-150 ${isActive ? "" : "text-[#0F172A] group-hover:text-[#1E293B]"}`} style={{ fontWeight: 600, color: isActive ? accentColor : undefined }}>{shortLabel}</p>
+                                      <p className={`text-[11px] mt-0.5 truncate transition-colors duration-150`} style={{ color: isActive ? accentColor : "#94A3B8" }}>{shortDesc}</p>
+                                    </div>
+                                    <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-all duration-200 shrink-0 ${
+                                      isActive
+                                        ? ""
+                                        : `border-[1.5px] border-[#D1D5DB] bg-white ${hoverCircleBorder}`
+                                    }`} style={isActive ? { backgroundColor: circleActiveBg, boxShadow: `0 0 0 2px ${circleActiveShadow}` } : {}}>
+                                      {isActive && <Check className="w-3 h-3 text-white" strokeWidth={2.5} />}
+                                    </div>
+                                  </div>
                                 </div>
-                                <div className="flex-1 min-w-0">
-                                  <p className={`text-[13px] transition-colors duration-150 ${isActive ? "" : "text-[#0F172A] group-hover:text-[#1E293B]"}`} style={{ fontWeight: 600, color: isActive ? accentColor : undefined }}>{shortLabel}</p>
-                                  <p className={`text-[11px] mt-0.5 truncate transition-colors duration-150`} style={{ color: isActive ? accentColor : "#94A3B8" }}>{shortDesc}</p>
+                              </TooltipTrigger>
+                              <TooltipContent side="bottom" sideOffset={8} className="max-w-[260px] text-[11px] leading-[1.5] z-[300]">
+                                <p className="text-[#64748B]">{typeTooltip.desc}</p>
+                                <div className="mt-2 px-2.5 py-2 rounded-lg bg-[#F8FAFC] border border-[#F1F5F9]">
+                                  <p className="text-[10px] text-[#94A3B8] tracking-wide" style={{ fontWeight: 600 }}>EXAMPLE</p>
+                                  <p className="text-[11px] text-[#334155] mt-1"><span style={{ fontWeight: 600, color: accentColor }}>{typeTooltip.example}</span> {typeTooltip.exampleDesc}</p>
                                 </div>
-                                <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-all duration-200 shrink-0 ${
-                                  isActive
-                                    ? ""
-                                    : `border-[1.5px] border-[#D1D5DB] bg-white ${hoverCircleBorder}`
-                                }`} style={isActive ? { backgroundColor: circleActiveBg, boxShadow: `0 0 0 2px ${circleActiveShadow}` } : {}}>
-                                  {isActive && <Check className="w-3 h-3 text-white" strokeWidth={2.5} />}
-                                </div>
-                              </div>
-                            </div>
+                              </TooltipContent>
+                            </Tooltip>
                           );
                         })}
                       </div>
@@ -5682,7 +5702,16 @@ function ConfigPageContent({
                     <div>
                       <div className="flex items-center gap-1.5 mb-3">
                         <span className="text-sm text-[#0F172A]" style={{ fontWeight: 600 }}>Payment Term Details</span>
-                        <Tooltip><TooltipTrigger asChild><span><Info className="w-3.5 h-3.5 text-[#CBD5E1]" /></span></TooltipTrigger><TooltipContent className="z-[300]"><p className="text-xs">Name and describe this payment term.</p></TooltipContent></Tooltip>
+                        <Tooltip>
+                          <TooltipTrigger asChild><span><Info className="w-3.5 h-3.5 text-[#CBD5E1] cursor-help" /></span></TooltipTrigger>
+                          <TooltipContent side="bottom" sideOffset={6} className="max-w-[260px] text-[11px] leading-[1.5] z-[300]">
+                            <p className="text-[#64748B]">Name, duration, and trigger shown on POs and invoices.</p>
+                            <div className="mt-2 px-2.5 py-2 rounded-lg bg-[#F8FAFC] border border-[#F1F5F9]">
+                              <p className="text-[10px] text-[#94A3B8] tracking-wide" style={{ fontWeight: 600 }}>TIP</p>
+                              <p className="text-[11px] text-[#334155] mt-1">Use clear names like <span className="text-[#0A77FF]" style={{ fontWeight: 600 }}>Net 30 Standard</span> or <span className="text-[#0A77FF]" style={{ fontWeight: 600 }}>50% Upfront</span>.</p>
+                            </div>
+                          </TooltipContent>
+                        </Tooltip>
                       </div>
                       <div className="rounded-xl border border-[#E2E8F0] bg-white p-4">
                         <div className="grid grid-cols-2 gap-x-4 gap-y-3">
@@ -5701,7 +5730,19 @@ function ConfigPageContent({
                           {/* NET: Trigger next to name */}
                           {createPtType === "net" && (
                             <div>
-                              <label className="text-[12px] text-[#0F172A] mb-1.5 block" style={{ fontWeight: 500 }}>Trigger Event</label>
+                              <div className="flex items-center gap-1 mb-1.5">
+                                <label className="text-[12px] text-[#0F172A]" style={{ fontWeight: 500 }}>Trigger Event</label>
+                                <Tooltip>
+                                  <TooltipTrigger asChild><span><Info className="w-3 h-3 text-[#CBD5E1] cursor-help" /></span></TooltipTrigger>
+                                  <TooltipContent side="bottom" sideOffset={6} className="max-w-[260px] text-[11px] leading-[1.5] z-[300]">
+                                    <p className="text-[#64748B]">Event that starts the payment countdown.</p>
+                                    <div className="mt-2 px-2.5 py-2 rounded-lg bg-[#F8FAFC] border border-[#F1F5F9]">
+                                      <p className="text-[10px] text-[#94A3B8] tracking-wide" style={{ fontWeight: 600 }}>EXAMPLE</p>
+                                      <p className="text-[11px] text-[#334155] mt-1"><span className="text-[#0A77FF]" style={{ fontWeight: 600 }}>Shipping Date</span> — due 30 days after shipment.</p>
+                                    </div>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </div>
                               <Select value={createPtTrigger} onValueChange={setCreatePtTrigger}>
                                 <SelectTrigger className="h-9 rounded-lg border-[#E2E8F0] bg-white text-[13px]">
                                   <SelectValue />
@@ -5727,7 +5768,19 @@ function ConfigPageContent({
                           {createPtType === "net" && (
                             <>
                               <div>
-                                <label className="text-[12px] text-[#0F172A] mb-1.5 block" style={{ fontWeight: 500 }}>NET Duration (Days)</label>
+                                <div className="flex items-center gap-1 mb-1.5">
+                                  <label className="text-[12px] text-[#0F172A]" style={{ fontWeight: 500 }}>NET Duration (Days)</label>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild><span><Info className="w-3 h-3 text-[#CBD5E1] cursor-help" /></span></TooltipTrigger>
+                                    <TooltipContent side="bottom" sideOffset={6} className="max-w-[260px] text-[11px] leading-[1.5] z-[300]">
+                                      <p className="text-[#64748B]">Calendar days allowed after trigger. Common: 15, 30, 45, 60, or 90.</p>
+                                      <div className="mt-2 px-2.5 py-2 rounded-lg bg-[#F8FAFC] border border-[#F1F5F9]">
+                                        <p className="text-[10px] text-[#94A3B8] tracking-wide" style={{ fontWeight: 600 }}>EXAMPLE</p>
+                                        <p className="text-[11px] text-[#334155] mt-1"><span className="text-[#0A77FF]" style={{ fontWeight: 600 }}>Net 30</span> — pay in full within 30 days.</p>
+                                      </div>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </div>
                                 <div className="relative">
                                   <Input
                                     value={createPtCustomDuration || createPtDuration}
@@ -5756,6 +5809,12 @@ function ConfigPageContent({
                       <div>
                         <div className="flex items-center gap-1.5 mb-3">
                           <span className="text-sm text-[#0F172A]" style={{ fontWeight: 600 }}>Prepayment Configuration</span>
+                          <Tooltip>
+                            <TooltipTrigger asChild><span><Info className="w-3.5 h-3.5 text-[#CBD5E1] cursor-help" /></span></TooltipTrigger>
+                            <TooltipContent side="bottom" sideOffset={6} className="max-w-[260px] text-[11px] leading-[1.5] z-[300]">
+                              <p className="text-[#64748B]">Upfront payment before shipment — percentage or fixed amount.</p>
+                            </TooltipContent>
+                          </Tooltip>
                         </div>
                         <div className="rounded-xl border border-[#E2E8F0] bg-white p-4">
                           <div className="grid grid-cols-2 gap-x-4 gap-y-2.5">
@@ -5927,14 +5986,24 @@ function ConfigPageContent({
                       <div className="flex items-center gap-1.5 mb-3">
                         <span className="text-sm text-[#0F172A]" style={{ fontWeight: 600 }}>Early Payment Discount</span>
                         <span className="text-[11px] text-[#94A3B8] bg-[#F1F5F9] px-1.5 py-0.5 rounded" style={{ fontWeight: 600 }}>Optional</span>
+                        <Tooltip>
+                          <TooltipTrigger asChild><span><Info className="w-3.5 h-3.5 text-[#CBD5E1] cursor-help" /></span></TooltipTrigger>
+                          <TooltipContent side="bottom" sideOffset={6} className="max-w-[260px] text-[11px] leading-[1.5] z-[300]">
+                            <p className="text-[#64748B]">Encourage faster payment with an auto-applied discount within an eligible window.</p>
+                            <div className="mt-2 px-2.5 py-2 rounded-lg bg-[#F8FAFC] border border-[#F1F5F9]">
+                              <p className="text-[10px] text-[#94A3B8] tracking-wide" style={{ fontWeight: 600 }}>EXAMPLE</p>
+                              <p className="text-[11px] text-[#334155] mt-1"><span className="text-[#0A77FF]" style={{ fontWeight: 600 }}>2/10 Net 30</span> — 2% off if paid in 10 days, else full in 30.</p>
+                            </div>
+                          </TooltipContent>
+                        </Tooltip>
                       </div>
 
-                      <div className={`rounded-xl border p-4 transition-all ${createPtApplyDiscount ? "border-[#0A77FF]/25 bg-white shadow-sm" : "border-[#E2E8F0] bg-white"}`}>
+                      <div className={`rounded-xl border p-4 transition-all duration-200 ${createPtApplyDiscount ? "border-[#0A77FF]/25 bg-white shadow-sm" : "border-[#E2E8F0] bg-white"}`}>
                         <div className="flex items-center gap-3">
                           <Switch checked={createPtApplyDiscount} onCheckedChange={(v) => setCreatePtApplyDiscount(v === true)} />
                           <div className="flex-1 min-w-0">
                             <h5 className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Apply Early Payment Discount</h5>
-                            <p className="text-[11px] text-[#64748B] mt-0.5">Enable early payment discounts based on the selected terms.</p>
+                            <p className="text-[11px] text-[#64748B] mt-0.5">Incentivize faster payments by offering a percentage or fixed discount within a defined window.</p>
                           </div>
                         </div>
 
@@ -5942,7 +6011,15 @@ function ConfigPageContent({
                           <div className="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-[#F1F5F9] items-end">
                             <div>
                               <div className="flex items-center justify-between">
-                                <Label className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>Discount</Label>
+                                <div className="flex items-center gap-1">
+                                  <Label className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>Discount</Label>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild><span><Info className="w-3 h-3 text-[#CBD5E1] cursor-help" /></span></TooltipTrigger>
+                                    <TooltipContent side="bottom" sideOffset={6} className="max-w-[260px] text-[11px] leading-[1.5] z-[300]">
+                                      <p className="text-[#64748B]">Amount deducted when paid within the eligible window. Choose % or fixed $.</p>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </div>
                                 <div className="inline-flex items-center h-[22px] rounded-full bg-[#F1F5F9] p-0.5">
                                   <button
                                     type="button"
@@ -5982,7 +6059,7 @@ function ConfigPageContent({
                                 <Label className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>Eligible Payment Period</Label>
                                 <Tooltip>
                                   <TooltipTrigger asChild><span><Info className="w-3 h-3 text-[#CBD5E1] cursor-help" /></span></TooltipTrigger>
-                                  <TooltipContent side="bottom" sideOffset={6} className="max-w-[260px] text-[11px] leading-[1.6] z-[300]">
+                                  <TooltipContent side="bottom" sideOffset={6} className="max-w-[260px] text-[11px] leading-[1.5] z-[300]">
                                     <p className="text-[#64748B]">If paid within this window, the discount will be applied to the invoice total.</p>
                                     <div className="mt-2 px-2.5 py-2 rounded-lg bg-[#F8FAFC] border border-[#F1F5F9]">
                                       <p className="text-[10px] text-[#94A3B8] tracking-wide" style={{ fontWeight: 600 }}>EXAMPLE</p>
@@ -6788,82 +6865,90 @@ function ConfigPageContent({
                   <div className={isPresetReadOnly ? "opacity-60 pointer-events-none" : ""}>
                     <div className="flex items-center gap-1.5 mb-3">
                       <span className="text-sm text-[#0F172A]" style={{ fontWeight: 600 }}>Pricing Rule Type</span>
-                      <Tooltip><TooltipTrigger asChild><span><Info className="w-3.5 h-3.5 text-[#CBD5E1]" /></span></TooltipTrigger><TooltipContent className="z-[300]"><p className="text-xs">Choose whether this rule decreases or increases prices.</p></TooltipContent></Tooltip>
+                      <Tooltip>
+                        <TooltipTrigger asChild><span><Info className="w-3.5 h-3.5 text-[#CBD5E1] cursor-help" /></span></TooltipTrigger>
+                        <TooltipContent side="bottom" sideOffset={6} className="max-w-[260px] text-[11px] leading-[1.5] z-[300]">
+                          <p className="text-[#64748B]">Discount lowers prices, Premium adds markup. Hover each card for details.</p>
+                        </TooltipContent>
+                      </Tooltip>
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       {/* Discount card — green */}
-                      <div
-                        onClick={() => setCreatePrCategory("discount")}
-                        className={`group relative rounded-xl overflow-hidden border transition-all duration-200 cursor-pointer ${
-                          createPrCategory === "discount"
-                            ? "border-[#86EFAC]/70 bg-white shadow-[0_1px_4px_rgba(4,120,87,0.06)]"
-                            : "border-[#E2E8F0] bg-white hover:border-[#BBF7D0] hover:shadow-[0_4px_16px_-4px_rgba(4,120,87,0.10)]"
-                        }`}
-                      >
-                        <div className={`absolute inset-0 transition-all duration-300 pointer-events-none ${
-                          createPrCategory === "discount" ? "bg-gradient-to-br from-[#F0FDF4]/50 to-transparent" : "bg-gradient-to-br from-[#F0FDF4]/0 to-[#F0FDF4]/0 group-hover:from-[#F0FDF4]/60 group-hover:to-transparent"
-                        }`} />
-                        <div className="relative flex items-center gap-3 pl-3.5 pr-3 py-3">
-                          <div className={`w-9 h-9 rounded-[10px] flex items-center justify-center shrink-0 transition-all duration-200 ${
-                            createPrCategory === "discount" ? "bg-gradient-to-br from-[#DCFCE7] to-[#BBF7D0] text-[#15803D]" : "bg-gradient-to-br from-[#F0FDF4] to-[#DCFCE7] text-[#16A34A] group-hover:scale-105"
-                          }`}>
-                            <TrendingDown className="w-[18px] h-[18px]" />
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div
+                            onClick={() => setCreatePrCategory("discount")}
+                            className={`group relative rounded-xl overflow-hidden border transition-all duration-200 cursor-pointer ${
+                              createPrCategory === "discount"
+                                ? "border-[#86EFAC]/70 bg-white shadow-[0_1px_4px_rgba(4,120,87,0.06)]"
+                                : "border-[#E2E8F0] bg-white hover:border-[#BBF7D0] hover:shadow-[0_4px_16px_-4px_rgba(4,120,87,0.10)]"
+                            }`}
+                          >
+                            <div className={`absolute inset-0 transition-all duration-300 pointer-events-none ${
+                              createPrCategory === "discount" ? "bg-gradient-to-br from-[#F0FDF4]/50 to-transparent" : "bg-gradient-to-br from-[#F0FDF4]/0 to-[#F0FDF4]/0 group-hover:from-[#F0FDF4]/60 group-hover:to-transparent"
+                            }`} />
+                            <div className="relative flex items-center gap-3 pl-3.5 pr-3 py-3">
+                              <div className={`w-9 h-9 rounded-[10px] flex items-center justify-center shrink-0 transition-all duration-200 ${
+                                createPrCategory === "discount" ? "bg-gradient-to-br from-[#DCFCE7] to-[#BBF7D0] text-[#15803D]" : "bg-gradient-to-br from-[#F0FDF4] to-[#DCFCE7] text-[#16A34A] group-hover:scale-105"
+                              }`}>
+                                <TrendingDown className="w-[18px] h-[18px]" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className={`text-[13px] transition-colors duration-150 ${createPrCategory === "discount" ? "text-[#166534]" : "text-[#0F172A] group-hover:text-[#1E293B]"}`} style={{ fontWeight: 600 }}>Discount</p>
+                                <p className={`text-[11px] mt-0.5 truncate transition-colors duration-150 ${createPrCategory === "discount" ? "text-[#22C55E]" : "text-[#94A3B8]"}`}>Lower price adjustment</p>
+                              </div>
+                              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-200 shrink-0 ${createPrCategory === "discount" ? "border-[#16A34A] bg-[#16A34A]" : "border-[#CBD5E1] group-hover:border-[#86EFAC]"}`}>
+                                {createPrCategory === "discount" && <Check className="w-3 h-3 text-white" />}
+                              </div>
+                            </div>
                           </div>
-                          <div className="flex-1 min-w-0">
-                            <p className={`text-[13px] transition-colors duration-150 ${createPrCategory === "discount" ? "text-[#166534]" : "text-[#0F172A] group-hover:text-[#1E293B]"}`} style={{ fontWeight: 600 }}>Discount</p>
-                            <p className={`text-[11px] mt-0.5 truncate transition-colors duration-150 ${createPrCategory === "discount" ? "text-[#22C55E]" : "text-[#94A3B8]"}`}>Lower price adjustment</p>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom" sideOffset={8} className="max-w-[260px] text-[11px] leading-[1.5] z-[300]">
+                          <p className="text-[#64748B]">Reduce unit price when quantity or value thresholds are met.</p>
+                          <div className="mt-2 px-2.5 py-2 rounded-lg bg-[#F8FAFC] border border-[#F1F5F9]">
+                            <p className="text-[10px] text-[#94A3B8] tracking-wide" style={{ fontWeight: 600 }}>EXAMPLE</p>
+                            <p className="text-[11px] text-[#334155] mt-1"><span className="text-[#16A34A]" style={{ fontWeight: 600 }}>10% off</span> — orders over 500 units.</p>
                           </div>
-                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-200 shrink-0 ${createPrCategory === "discount" ? "border-[#16A34A] bg-[#16A34A]" : "border-[#CBD5E1] group-hover:border-[#86EFAC]"}`}>
-                            {createPrCategory === "discount" && <Check className="w-3 h-3 text-white" />}
-                          </div>
-                        </div>
-                      </div>
+                        </TooltipContent>
+                      </Tooltip>
                       {/* Premium card — purple */}
-                      <div
-                        onClick={() => setCreatePrCategory("premium")}
-                        className={`group relative rounded-xl overflow-hidden border transition-all duration-200 cursor-pointer ${
-                          createPrCategory === "premium"
-                            ? "border-[#C4B5FD]/70 bg-white shadow-[0_1px_4px_rgba(124,58,237,0.06)]"
-                            : "border-[#E2E8F0] bg-white hover:border-[#DDD6FE] hover:shadow-[0_4px_16px_-4px_rgba(124,58,237,0.10)]"
-                        }`}
-                      >
-                        <div className={`absolute inset-0 transition-all duration-300 pointer-events-none ${
-                          createPrCategory === "premium" ? "bg-gradient-to-br from-[#F5F3FF]/50 to-transparent" : "bg-gradient-to-br from-[#F5F3FF]/0 to-[#F5F3FF]/0 group-hover:from-[#F5F3FF]/60 group-hover:to-transparent"
-                        }`} />
-                        <div className="relative flex items-center gap-3 pl-3.5 pr-3 py-3">
-                          <div className={`w-9 h-9 rounded-[10px] flex items-center justify-center shrink-0 transition-all duration-200 ${
-                            createPrCategory === "premium" ? "bg-gradient-to-br from-[#EDE9FE] to-[#DDD6FE] text-[#7C3AED]" : "bg-gradient-to-br from-[#F5F3FF] to-[#EDE9FE] text-[#8B5CF6] group-hover:scale-105"
-                          }`}>
-                            <TrendingUp className="w-[18px] h-[18px]" />
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div
+                            onClick={() => setCreatePrCategory("premium")}
+                            className={`group relative rounded-xl overflow-hidden border transition-all duration-200 cursor-pointer ${
+                              createPrCategory === "premium"
+                                ? "border-[#C4B5FD]/70 bg-white shadow-[0_1px_4px_rgba(124,58,237,0.06)]"
+                                : "border-[#E2E8F0] bg-white hover:border-[#DDD6FE] hover:shadow-[0_4px_16px_-4px_rgba(124,58,237,0.10)]"
+                            }`}
+                          >
+                            <div className={`absolute inset-0 transition-all duration-300 pointer-events-none ${
+                              createPrCategory === "premium" ? "bg-gradient-to-br from-[#F5F3FF]/50 to-transparent" : "bg-gradient-to-br from-[#F5F3FF]/0 to-[#F5F3FF]/0 group-hover:from-[#F5F3FF]/60 group-hover:to-transparent"
+                            }`} />
+                            <div className="relative flex items-center gap-3 pl-3.5 pr-3 py-3">
+                              <div className={`w-9 h-9 rounded-[10px] flex items-center justify-center shrink-0 transition-all duration-200 ${
+                                createPrCategory === "premium" ? "bg-gradient-to-br from-[#EDE9FE] to-[#DDD6FE] text-[#7C3AED]" : "bg-gradient-to-br from-[#F5F3FF] to-[#EDE9FE] text-[#8B5CF6] group-hover:scale-105"
+                              }`}>
+                                <TrendingUp className="w-[18px] h-[18px]" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className={`text-[13px] transition-colors duration-150 ${createPrCategory === "premium" ? "text-[#5B21B6]" : "text-[#0F172A] group-hover:text-[#1E293B]"}`} style={{ fontWeight: 600 }}>Premium</p>
+                                <p className={`text-[11px] mt-0.5 truncate transition-colors duration-150 ${createPrCategory === "premium" ? "text-[#8B5CF6]" : "text-[#94A3B8]"}`}>Higher price adjustment</p>
+                              </div>
+                              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-200 shrink-0 ${createPrCategory === "premium" ? "border-[#7C3AED] bg-[#7C3AED]" : "border-[#CBD5E1] group-hover:border-[#C4B5FD]"}`}>
+                                {createPrCategory === "premium" && <Check className="w-3 h-3 text-white" />}
+                              </div>
+                            </div>
                           </div>
-                          <div className="flex-1 min-w-0">
-                            <p className={`text-[13px] transition-colors duration-150 ${createPrCategory === "premium" ? "text-[#5B21B6]" : "text-[#0F172A] group-hover:text-[#1E293B]"}`} style={{ fontWeight: 600 }}>Premium</p>
-                            <p className={`text-[11px] mt-0.5 truncate transition-colors duration-150 ${createPrCategory === "premium" ? "text-[#8B5CF6]" : "text-[#94A3B8]"}`}>Higher price adjustment</p>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom" sideOffset={8} className="max-w-[260px] text-[11px] leading-[1.5] z-[300]">
+                          <p className="text-[#64748B]">Markup on base price for express or value-added services.</p>
+                          <div className="mt-2 px-2.5 py-2 rounded-lg bg-[#F8FAFC] border border-[#F1F5F9]">
+                            <p className="text-[10px] text-[#94A3B8] tracking-wide" style={{ fontWeight: 600 }}>EXAMPLE</p>
+                            <p className="text-[11px] text-[#334155] mt-1"><span className="text-[#7C3AED]" style={{ fontWeight: 600 }}>15% markup</span> — expedited + priority shipping.</p>
                           </div>
-                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-200 shrink-0 ${createPrCategory === "premium" ? "border-[#7C3AED] bg-[#7C3AED]" : "border-[#CBD5E1] group-hover:border-[#C4B5FD]"}`}>
-                            {createPrCategory === "premium" && <Check className="w-3 h-3 text-white" />}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    {/* Basis selector pills */}
-                    <div className="flex items-center gap-2 mt-3">
-                      <span className="text-[12px] text-[#64748B] mr-1" style={{ fontWeight: 500 }}>Basis:</span>
-                      {(["volume", "value"] as const).map((b) => (
-                        <button
-                          key={b}
-                          onClick={() => setCreatePrBasis(b)}
-                          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[12px] transition-all cursor-pointer ${
-                            createPrBasis === b
-                              ? createPrCategory === "discount" ? "border-[#16A34A]/30 bg-[#F0FDF4] text-[#15803D]" : "border-[#7C3AED]/30 bg-[#F5F3FF] text-[#6D28D9]"
-                              : "border-[#E2E8F0] bg-white text-[#64748B] hover:border-[#CBD5E1] hover:bg-[#F8FAFC]"
-                          }`}
-                          style={{ fontWeight: createPrBasis === b ? 600 : 500 }}
-                        >
-                          {b === "volume" ? <ChartColumn className="w-3.5 h-3.5" /> : <DollarSign className="w-3.5 h-3.5" />}
-                          {b === "volume" ? "Volume-Based" : "Value-Based"}
-                        </button>
-                      ))}
+                        </TooltipContent>
+                      </Tooltip>
                     </div>
                   </div>
 
@@ -6871,15 +6956,58 @@ function ConfigPageContent({
                   <div className={isPresetReadOnly ? "opacity-60 pointer-events-none" : ""}>
                     <div className="flex items-center gap-1.5 mb-3">
                       <span className="text-sm text-[#0F172A]" style={{ fontWeight: 600 }}>Pricing Rule Details</span>
-                      <Tooltip><TooltipTrigger asChild><span><Info className="w-3.5 h-3.5 text-[#CBD5E1]" /></span></TooltipTrigger><TooltipContent className="z-[300]"><p className="text-xs">Name and describe this pricing rule.</p></TooltipContent></Tooltip>
+                      <Tooltip>
+                        <TooltipTrigger asChild><span><Info className="w-3.5 h-3.5 text-[#CBD5E1] cursor-help" /></span></TooltipTrigger>
+                        <TooltipContent side="bottom" sideOffset={6} className="max-w-[260px] text-[11px] leading-[1.5] z-[300]">
+                          <p className="text-[#64748B]">Name and basis shown on POs and invoices.</p>
+                          <div className="mt-2 px-2.5 py-2 rounded-lg bg-[#F8FAFC] border border-[#F1F5F9]">
+                            <p className="text-[10px] text-[#94A3B8] tracking-wide" style={{ fontWeight: 600 }}>TIP</p>
+                            <p className="text-[11px] text-[#334155] mt-1">Use clear names like <span className="text-[#0A77FF]" style={{ fontWeight: 600 }}>Q4 Volume Discount</span> or <span className="text-[#0A77FF]" style={{ fontWeight: 600 }}>VIP Premium</span>.</p>
+                          </div>
+                        </TooltipContent>
+                      </Tooltip>
                     </div>
-                    <div className="rounded-xl border border-[#E2E8F0] bg-white p-4 space-y-4">
-                      <div className="grid grid-cols-2 gap-4">
+                    <div className="rounded-xl border border-[#E2E8F0] bg-white p-4">
+                      <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+                        {/* Row 1: Name + Basis */}
                         <div>
-                          <label className="text-[12px] text-[#0F172A] mb-1.5 block" style={{ fontWeight: 600 }}>{createPrCategory === "discount" ? "Discount" : "Premium"} Name</label>
-                          <Input value={createPrName} onChange={(e) => setCreatePrName(e.target.value)} placeholder={`e.g. ${createPrCategory === "discount" ? "Volume Discount for Q4" : "Premium Markup for VIP"}`} className="rounded-lg border-[#E2E8F0] bg-white text-[13px] text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+                          <label className="text-[12px] text-[#0F172A] mb-1.5 block" style={{ fontWeight: 500 }}>{createPrCategory === "discount" ? "Discount" : "Premium"} Name</label>
+                          <Input value={createPrName} onChange={(e) => setCreatePrName(e.target.value)} placeholder={`e.g. ${createPrCategory === "discount" ? "Volume Discount for Q4" : "Premium Markup for VIP"}`} className="h-9 rounded-lg border-[#E2E8F0] bg-white text-[13px] text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
                         </div>
                         <div>
+                          <div className="flex items-center gap-1 mb-1.5">
+                            <label className="text-[12px] text-[#0F172A]" style={{ fontWeight: 500 }}>Calculation Basis</label>
+                            <Tooltip>
+                              <TooltipTrigger asChild><span><Info className="w-3 h-3 text-[#CBD5E1] cursor-help" /></span></TooltipTrigger>
+                              <TooltipContent side="bottom" sideOffset={6} className="max-w-[260px] text-[11px] leading-[1.5] z-[300]">
+                                <p className="text-[#64748B]">Measure thresholds by units ordered or order value.</p>
+                                <div className="mt-2 px-2.5 py-2 rounded-lg bg-[#F8FAFC] border border-[#F1F5F9]">
+                                  <p className="text-[10px] text-[#94A3B8] tracking-wide" style={{ fontWeight: 600 }}>EXAMPLE</p>
+                                  <p className="text-[11px] text-[#334155] mt-1"><span className="text-[#0A77FF]" style={{ fontWeight: 600 }}>Volume</span> — 500+ units. <span className="text-[#0A77FF]" style={{ fontWeight: 600 }}>Value</span> — orders over $10K.</p>
+                                </div>
+                              </TooltipContent>
+                            </Tooltip>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {(["volume", "value"] as const).map((b) => (
+                              <button
+                                key={b}
+                                onClick={() => setCreatePrBasis(b)}
+                                className={`inline-flex items-center gap-1.5 flex-1 justify-center h-9 rounded-lg border text-[12px] transition-all cursor-pointer ${
+                                  createPrBasis === b
+                                    ? createPrCategory === "discount" ? "border-[#16A34A]/30 bg-[#F0FDF4] text-[#15803D]" : "border-[#7C3AED]/30 bg-[#F5F3FF] text-[#6D28D9]"
+                                    : "border-[#E2E8F0] bg-white text-[#64748B] hover:border-[#CBD5E1] hover:bg-[#F8FAFC]"
+                                }`}
+                                style={{ fontWeight: createPrBasis === b ? 600 : 500 }}
+                              >
+                                {b === "volume" ? <ChartColumn className="w-3.5 h-3.5" /> : <DollarSign className="w-3.5 h-3.5" />}
+                                {b === "volume" ? "Volume-Based" : "Value-Based"}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                        {/* Row 2: Description (full width) */}
+                        <div className="col-span-2">
                           <ExpandableTextarea
                             label="Description"
                             value={createPrDescription}
@@ -6888,27 +7016,44 @@ function ConfigPageContent({
                           />
                         </div>
                       </div>
-                      {/* Date range toggle + fields */}
-                      <div>
+                      {/* Validity Period — inline toggle that expands within the card */}
+                      <div className="mt-3">
                         <div className="flex items-center gap-2.5">
                           <Switch checked={createPrLimitDateRange} onCheckedChange={setCreatePrLimitDateRange} />
-                          <span className="text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>Limit Rule to Date Range</span>
+                          <span className="text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>Set Validity Period</span>
+                          <span className="text-[11px] text-[#94A3B8] bg-[#F1F5F9] px-1.5 py-0.5 rounded" style={{ fontWeight: 600 }}>Optional</span>
+                          <Tooltip>
+                            <TooltipTrigger asChild><span><Info className="w-3 h-3 text-[#CBD5E1] cursor-help" /></span></TooltipTrigger>
+                            <TooltipContent side="bottom" sideOffset={6} className="max-w-[260px] text-[11px] leading-[1.5] z-[300]">
+                              <p className="text-[#64748B]">Set a date range. If off, rule applies indefinitely.</p>
+                            </TooltipContent>
+                          </Tooltip>
                         </div>
                         {createPrLimitDateRange && (
-                          <div className="grid grid-cols-2 gap-4 mt-3 pt-3 border-t border-[#F1F5F9]">
+                          <div className="grid grid-cols-2 gap-4 mt-3">
                             <div>
                               <div className="flex items-center gap-1 mb-1.5">
-                                <label className="text-[12px] text-[#0F172A]" style={{ fontWeight: 600 }}>Valid From</label>
-                                <Tooltip><TooltipTrigger asChild><span><Info className="w-3 h-3 text-[#CBD5E1]" /></span></TooltipTrigger><TooltipContent className="z-[300]"><p className="text-xs">Start date for this rule.</p></TooltipContent></Tooltip>
+                                <label className="text-[12px] text-[#0F172A]" style={{ fontWeight: 500 }}>Valid From</label>
+                                <Tooltip>
+                                  <TooltipTrigger asChild><span><Info className="w-3 h-3 text-[#CBD5E1] cursor-help" /></span></TooltipTrigger>
+                                  <TooltipContent side="bottom" sideOffset={6} className="max-w-[260px] text-[11px] leading-[1.5] z-[300]">
+                                    <p className="text-[#64748B]">Rule starts applying from this date.</p>
+                                  </TooltipContent>
+                                </Tooltip>
                               </div>
-                              <Input type="date" value={createPrValidFrom} onChange={(e) => setCreatePrValidFrom(e.target.value)} className="rounded-lg border-[#E2E8F0] bg-white text-[13px] text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+                              <Input type="date" value={createPrValidFrom} onChange={(e) => setCreatePrValidFrom(e.target.value)} className="h-9 rounded-lg border-[#E2E8F0] bg-white text-[13px] text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
                             </div>
                             <div>
                               <div className="flex items-center gap-1 mb-1.5">
-                                <label className="text-[12px] text-[#0F172A]" style={{ fontWeight: 600 }}>Valid To</label>
-                                <Tooltip><TooltipTrigger asChild><span><Info className="w-3 h-3 text-[#CBD5E1]" /></span></TooltipTrigger><TooltipContent className="z-[300]"><p className="text-xs">End date for this rule.</p></TooltipContent></Tooltip>
+                                <label className="text-[12px] text-[#0F172A]" style={{ fontWeight: 500 }}>Valid To</label>
+                                <Tooltip>
+                                  <TooltipTrigger asChild><span><Info className="w-3 h-3 text-[#CBD5E1] cursor-help" /></span></TooltipTrigger>
+                                  <TooltipContent side="bottom" sideOffset={6} className="max-w-[260px] text-[11px] leading-[1.5] z-[300]">
+                                    <p className="text-[#64748B]">Rule auto-deactivates after this date.</p>
+                                  </TooltipContent>
+                                </Tooltip>
                               </div>
-                              <Input type="date" value={createPrValidTo} onChange={(e) => setCreatePrValidTo(e.target.value)} className="rounded-lg border-[#E2E8F0] bg-white text-[13px] text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+                              <Input type="date" value={createPrValidTo} onChange={(e) => setCreatePrValidTo(e.target.value)} className="h-9 rounded-lg border-[#E2E8F0] bg-white text-[13px] text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
                             </div>
                           </div>
                         )}
