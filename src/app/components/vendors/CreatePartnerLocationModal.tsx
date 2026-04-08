@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useCallback, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
+import { ExpandableTextarea } from "./ExpandableTextarea";
 import {
   Dialog,
   DialogContent,
@@ -847,16 +848,12 @@ export function CreatePartnerLocationModal({
                       <AddressAutocomplete id="loc-address" value={address} onChange={setAddress} />
 
                       {/* Row 3 Right: Description */}
-                      <div className="relative">
-                        <Label className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>Description</Label>
-                        <textarea
-                          placeholder="Brief summary of this location."
-                          value={description}
-                          onChange={(e) => setDescription(e.target.value)}
-                          className="mt-1 w-full h-[64px] sm:h-[72px] rounded-lg border border-[#E2E8F0] bg-white px-3 py-2 pb-5 text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 focus:outline-none resize-none transition-colors"
-                        />
-                        <p className="absolute bottom-1.5 right-2.5 text-[11px] text-[#94A3B8] pointer-events-none">{description.length}/5000</p>
-                      </div>
+                      <ExpandableTextarea
+                        label="Description"
+                        value={description}
+                        onChange={setDescription}
+                        placeholder="Brief summary of this location."
+                      />
                     </div>
                   </div>
                 </div>

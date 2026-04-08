@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useCallback } from "react";
+import { ExpandableTextarea } from "./ExpandableTextarea";
 import { PartnerItemsTab } from "./PartnerItemsTab";
 import { FilterPills } from "./FilterPills";
 import { Input } from "../ui/input";
@@ -3190,17 +3191,12 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                           />
                         </div>
                         <div>
-                          <label className="text-[12px] text-[#0F172A] mb-1.5 block" style={{ fontWeight: 600 }}>Description</label>
-                          <div className="relative">
-                            <Textarea
-                              value={createDescription}
-                              onChange={(e) => { if (e.target.value.length <= 5000) setCreateDescription(e.target.value); }}
-                              placeholder="Brief summary of pricing rule purpose or context."
-                              className="rounded-lg border-[#E2E8F0] bg-white min-h-[64px] resize-none text-sm placeholder:text-[#94A3B8] pb-5"
-                              rows={2}
-                            />
-                            <p className="absolute bottom-1.5 right-2.5 text-[11px] text-[#94A3B8] pointer-events-none">{createDescription.length}/5000</p>
-                          </div>
+                          <ExpandableTextarea
+                            label="Description"
+                            value={createDescription}
+                            onChange={setCreateDescription}
+                            placeholder="Brief summary of pricing rule purpose or context."
+                          />
                         </div>
                       </div>
 

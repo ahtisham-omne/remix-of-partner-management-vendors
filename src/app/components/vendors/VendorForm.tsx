@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ExpandableTextarea } from "./ExpandableTextarea";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
@@ -519,17 +520,12 @@ export function VendorForm({ initialData, onSubmit, isEdit = false }: VendorForm
               />
               {renderFieldError("creditLimit")}
             </div>
-            <div>
-              <Label htmlFor="notes">Notes</Label>
-              <Textarea
-                id="notes"
-                value={formData.notes}
-                onChange={(e) => updateField("notes", e.target.value)}
-                placeholder="Any additional notes about this partner..."
-                rows={3}
-                className="mt-1.5"
-              />
-            </div>
+            <ExpandableTextarea
+              label="Notes"
+              value={formData.notes}
+              onChange={(val) => updateField("notes", val)}
+              placeholder="Any additional notes about this partner..."
+            />
           </div>
         )}
 

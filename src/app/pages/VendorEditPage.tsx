@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { ExpandableTextarea } from "../components/vendors/ExpandableTextarea";
 import { useVendors } from "../context/VendorContext";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -323,10 +324,12 @@ export function VendorEditPage() {
                   <Label htmlFor="services" className="text-[13px]" style={{ fontWeight: 600, color: "#0F172A" }}>Services</Label>
                   <Input id="services" value={services} onChange={(e) => setServices(e.target.value)} className="mt-1.5 bg-white" placeholder="e.g. Laser cutting" />
                 </div>
-                <div>
-                  <Label htmlFor="notes" className="text-[13px]" style={{ fontWeight: 600, color: "#0F172A" }}>Notes</Label>
-                  <Textarea id="notes" value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} className="mt-1.5 bg-white" placeholder="Any additional notes..." />
-                </div>
+                <ExpandableTextarea
+                  label="Notes"
+                  value={notes}
+                  onChange={setNotes}
+                  placeholder="Any additional notes..."
+                />
               </div>
             </Card>
           )}

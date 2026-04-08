@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { ExpandableTextarea } from "./ExpandableTextarea";
 import {
   Plus, X, CreditCard, ChevronLeft, Check, Pencil, Trash2, Star, Archive,
   ArrowUpDown, ExternalLink, ChevronDown, MoreHorizontal, Eye, EyeOff,
@@ -445,15 +446,12 @@ function PaymentFormFields({
             <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Method Name</Label>
             <Input value={e.methodName} onChange={(ev) => updateEntry(e.id, { methodName: ev.target.value })} placeholder="e.g. Barter, Trade Credit" className={inputCls} />
           </div>
-          <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Description</Label>
-            <Textarea
-              value={e.description}
-              onChange={(ev) => updateEntry(e.id, { description: ev.target.value })}
-              placeholder="Describe this payment arrangement..."
-              className="mt-1.5 rounded-lg border-[#E2E8F0] bg-white text-sm text-[#0F172A] placeholder:text-[#CBD5E1] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 min-h-[80px]"
-            />
-          </div>
+          <ExpandableTextarea
+            label="Description"
+            value={e.description}
+            onChange={(val) => updateEntry(e.id, { description: val })}
+            placeholder="Describe this payment arrangement..."
+          />
           <div>
             <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Document Attachment Link</Label>
             <Input value={e.documentLink} onChange={(ev) => updateEntry(e.id, { documentLink: ev.target.value })} placeholder="Paste link to supporting document" className={inputCls} />
