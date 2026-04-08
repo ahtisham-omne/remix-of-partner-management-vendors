@@ -73,6 +73,13 @@ import {
   GripVertical,
   Globe,
 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogCancel,
+} from "../components/ui/alert-dialog";
 import { toast } from "sonner";
 import { Checkbox } from "../components/ui/checkbox";
 import { CONTACT_DICTIONARY, type ContactPerson, type ContactPhone, type ContactEmail, type ContactSocial } from "../components/vendors/partnerConstants";
@@ -528,8 +535,10 @@ export function ContactsDirectoryPage() {
   const [isResizing, setIsResizing] = useState(false);
   const [resizingColumnKey, setResizingColumnKey] = useState<string | null>(null);
 
-  /* ─── Create Contact Modal State ─── */
+  /* ─── Create / Edit Contact Modal State ─── */
   const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+  const [editContactId, setEditContactId] = useState<string | null>(null);
   const [newPocName, setNewPocName] = useState("");
   const [newPocDepartment, setNewPocDepartment] = useState("");
   const [newPocRole, setNewPocRole] = useState("");
@@ -540,6 +549,8 @@ export function ContactsDirectoryPage() {
   const [newPocMobileCode, setNewPocMobileCode] = useState("+1");
   const [newPocEmail, setNewPocEmail] = useState("");
   const [saveAndCreateAnother, setSaveAndCreateAnother] = useState(false);
+  const [archiveContactId, setArchiveContactId] = useState<string | null>(null);
+  const [deactivateContactId, setDeactivateContactId] = useState<string | null>(null);
 
   const resetCreateForm = () => {
     setNewPocName(""); setNewPocDepartment(""); setNewPocRole("");
@@ -549,13 +560,36 @@ export function ContactsDirectoryPage() {
 
   const handleSaveContact = () => {
     if (!newPocName.trim()) { toast.error("Please enter a contact name"); return; }
-    toast.success(`Contact "${newPocName}" created successfully`);
-    if (saveAndCreateAnother) {
+    if (editMode) {
+      toast.success(`Contact "${newPocName}" updated successfully`);
+      setCreateModalOpen(false);
+      setEditMode(false);
+      setEditContactId(null);
       resetCreateForm();
     } else {
-      setCreateModalOpen(false);
-      resetCreateForm();
+      toast.success(`Contact "${newPocName}" created successfully`);
+      if (saveAndCreateAnother) {
+        resetCreateForm();
+      } else {
+        setCreateModalOpen(false);
+        resetCreateForm();
+      }
     }
+  };
+
+  const handleEditContact = (contact: typeof allContacts[0]) => {
+    setEditMode(true);
+    setEditContactId(contact.id);
+    setNewPocName(contact.name);
+    setNewPocDepartment(contact.department);
+    setNewPocRole(contact.role || "");
+    setNewPocEmail(contact.email);
+    setNewPocLandline(contact.phone);
+    setNewPocLandlineCode("+1");
+    setNewPocExt(contact.phoneExt || "");
+    setNewPocMobile(contact.secondaryPhone || "");
+    setNewPocMobileCode("+1");
+    setCreateModalOpen(true);
   };
 
   /* ─── Visible columns ─── */
@@ -1617,14 +1651,23 @@ export function ContactsDirectoryPage() {
                                   </button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
-                                  <DropdownMenuItem onClick={() => toast.info("View Details — coming soon")}>
+                                  <DropdownMenuItem onClick={() => navigate(`/partners/contacts/${contact.id}`)}>
                                     <Eye className="w-4 h-4 mr-2" /> View Details
                                   </DropdownMenuItem>
-                                  <DropdownMenuItem onClick={() => toast.info("Edit — coming soon")}>
+                                  <DropdownMenuItem onClick={() => handleEditContact(contact)}>
                                     <Pencil className="w-4 h-4 mr-2" /> Edit
                                   </DropdownMenuItem>
                                   <DropdownMenuSeparator />
-                                  <DropdownMenuItem className="text-[#DC2626] focus:text-[#DC2626] focus:bg-[#FEF2F2]" onClick={() => toast.info("Archive — coming soon")}>
+                                  {contact.status === "active" ? (
+                                    <DropdownMenuItem className="text-[#92400E] focus:text-[#92400E] focus:bg-[#FFFBEB]" onClick={() => setDeactivateContactId(contact.id)}>
+                                      <CircleSlash className="w-4 h-4 mr-2 text-[#92400E]" /> Deactivate
+                                    </DropdownMenuItem>
+                                  ) : (
+                                    <DropdownMenuItem onClick={() => toast.success("Contact activated")}>
+                                      <CircleCheck className="w-4 h-4 mr-2" /> Activate
+                                    </DropdownMenuItem>
+                                  )}
+                                  <DropdownMenuItem className="text-[#DC2626] focus:text-[#DC2626] focus:bg-[#FEF2F2]" onClick={() => setArchiveContactId(contact.id)}>
                                     <Archive className="w-4 h-4 mr-2 text-[#DC2626]" /> Archive
                                   </DropdownMenuItem>
                                 </DropdownMenuContent>
@@ -1849,27 +1892,27 @@ export function ContactsDirectoryPage() {
                                     </button>
                                   </DropdownMenuTrigger>
                                   <DropdownMenuContent align="end" className="w-[220px]" onClick={(e) => e.stopPropagation()}>
-                                    <DropdownMenuItem onClick={() => toast.info("View Details — coming soon")}>
+                                    <DropdownMenuItem onClick={() => navigate(`/partners/contacts/${contact.id}`)}>
                                       <Eye className="w-4 h-4 mr-2" />
                                       View Details
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem onClick={() => toast.info("Edit — coming soon")}>
+                                    <DropdownMenuItem onClick={() => handleEditContact(contact)}>
                                       <Pencil className="w-4 h-4 mr-2" />
                                       Edit
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
                                     {contact.status === "active" ? (
-                                      <DropdownMenuItem onClick={() => toast.info("Deactivate — coming soon")}>
-                                        <CircleSlash className="w-4 h-4 mr-2" />
+                                      <DropdownMenuItem className="text-[#92400E] focus:text-[#92400E] focus:bg-[#FFFBEB]" onClick={() => setDeactivateContactId(contact.id)}>
+                                        <CircleSlash className="w-4 h-4 mr-2 text-[#92400E]" />
                                         Deactivate
                                       </DropdownMenuItem>
                                     ) : (
-                                      <DropdownMenuItem onClick={() => toast.info("Activate — coming soon")}>
+                                      <DropdownMenuItem onClick={() => toast.success("Contact activated")}>
                                         <CircleCheck className="w-4 h-4 mr-2" />
                                         Activate
                                       </DropdownMenuItem>
                                     )}
-                                    <DropdownMenuItem variant="destructive" onClick={() => toast.info("Archive — coming soon")}>
+                                    <DropdownMenuItem className="text-[#DC2626] focus:text-[#DC2626] focus:bg-[#FEF2F2]" onClick={() => setArchiveContactId(contact.id)}>
                                       <Archive className="w-4 h-4 mr-2 text-[#DC2626]" />
                                       Archive
                                     </DropdownMenuItem>
@@ -2041,11 +2084,13 @@ export function ContactsDirectoryPage() {
         onToggle={handleToggleKpi}
       />
 
-      {/* Create Contact Modal — same as partner creation form */}
+      {/* Create / Edit Contact Modal */}
       <CreatePocModal
         open={createModalOpen}
-        onOpenChange={setCreateModalOpen}
+        onOpenChange={(open) => { setCreateModalOpen(open); if (!open) { setEditMode(false); setEditContactId(null); resetCreateForm(); } }}
         contextName=""
+        editMode={editMode}
+        editContactName={editMode ? allContacts.find(c => c.id === editContactId)?.name : undefined}
         newPocName={newPocName}
         onNewPocNameChange={setNewPocName}
         newPocDepartment={newPocDepartment}
@@ -2068,6 +2113,56 @@ export function ContactsDirectoryPage() {
         onSaveAndCreateAnotherChange={setSaveAndCreateAnother}
         onSave={handleSaveContact}
       />
+
+      {/* Archive Confirmation Modal */}
+      <AlertDialog open={!!archiveContactId} onOpenChange={(open) => { if (!open) setArchiveContactId(null); }}>
+        <AlertDialogContent className="sm:max-w-[400px] p-0 gap-0 overflow-hidden rounded-2xl border-0 shadow-[0_24px_80px_-12px_rgba(0,0,0,0.25)]">
+          <div className="flex flex-col items-center text-center px-6 pt-8 pb-6">
+            <div className="w-14 h-14 rounded-2xl bg-[#FEF2F2] flex items-center justify-center mb-4">
+              <Archive className="w-6 h-6 text-[#DC2626]" />
+            </div>
+            <AlertDialogTitle className="text-[16px] text-[#0F172A]" style={{ fontWeight: 700 }}>
+              Archive Contact
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "#475569", lineHeight: "1.65" }}>
+              Are you sure you want to archive <strong>{allContacts.find(c => c.id === archiveContactId)?.name}</strong>? This contact will be removed from active listings but records will be preserved.
+            </AlertDialogDescription>
+          </div>
+          <div className="px-6 pb-6 flex flex-col gap-2">
+            <button onClick={() => { toast.success("Contact archived"); setArchiveContactId(null); }} className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors hover:opacity-90" style={{ fontWeight: 600, backgroundColor: "#DC2626", color: "#fff" }}>
+              Archive Contact
+            </button>
+            <AlertDialogCancel className="w-full h-11 text-[14px] rounded-xl border border-[#E2E8F0] bg-white text-[#334155] hover:bg-[#F8FAFC] cursor-pointer" style={{ fontWeight: 500 }}>
+              Cancel
+            </AlertDialogCancel>
+          </div>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Deactivate Confirmation Modal */}
+      <AlertDialog open={!!deactivateContactId} onOpenChange={(open) => { if (!open) setDeactivateContactId(null); }}>
+        <AlertDialogContent className="sm:max-w-[400px] p-0 gap-0 overflow-hidden rounded-2xl border-0 shadow-[0_24px_80px_-12px_rgba(0,0,0,0.25)]">
+          <div className="flex flex-col items-center text-center px-6 pt-8 pb-6">
+            <div className="w-14 h-14 rounded-2xl bg-[#FFFBEB] flex items-center justify-center mb-4">
+              <CircleSlash className="w-6 h-6 text-[#F97316]" />
+            </div>
+            <AlertDialogTitle className="text-[16px] text-[#0F172A]" style={{ fontWeight: 700 }}>
+              Deactivate Contact
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "#475569", lineHeight: "1.65" }}>
+              Are you sure you want to deactivate <strong>{allContacts.find(c => c.id === deactivateContactId)?.name}</strong>? This contact will be marked as inactive and excluded from new assignments.
+            </AlertDialogDescription>
+          </div>
+          <div className="px-6 pb-6 flex flex-col gap-2">
+            <button onClick={() => { toast.success("Contact deactivated"); setDeactivateContactId(null); }} className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors hover:opacity-90" style={{ fontWeight: 600, backgroundColor: "#F97316", color: "#FFFFFF" }}>
+              Deactivate Contact
+            </button>
+            <AlertDialogCancel className="w-full h-11 text-[14px] rounded-xl border border-[#E2E8F0] bg-white text-[#334155] hover:bg-[#F8FAFC] cursor-pointer" style={{ fontWeight: 500 }}>
+              Cancel
+            </AlertDialogCancel>
+          </div>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

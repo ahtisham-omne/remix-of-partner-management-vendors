@@ -150,10 +150,10 @@ function PaymentTermDetailModal({ term, open, onClose, mode = "create", onDisabl
               <button
                 onClick={() => isCustom && toast.info("Archive coming soon")}
                 disabled={isPreset}
-                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#334155] hover:bg-[#F8FAFC] transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white"
+                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#FECACA] bg-[#FEF2F2] text-xs text-[#DC2626] hover:bg-[#FEE2E2] hover:border-[#FCA5A5] transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#FEF2F2]"
                 style={{ fontWeight: 500 }}
               >
-                <Archive className="w-3.5 h-3.5 text-[#DC2626]" /> Archive
+                <Archive className="w-3.5 h-3.5" /> Archive
               </button>
               <button
                 onClick={() => {
@@ -165,7 +165,7 @@ function PaymentTermDetailModal({ term, open, onClose, mode = "create", onDisabl
                     toast.info("Disable coming soon");
                   }
                 }}
-                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#334155] hover:bg-[#F8FAFC] transition-colors cursor-pointer"
+                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#FDE68A] bg-[#FFFBEB] text-xs text-[#92400E] hover:bg-[#FEF3C7] hover:border-[#FCD34D] transition-colors cursor-pointer"
                 style={{ fontWeight: 500 }}
               >
                 <Ban className="w-3.5 h-3.5" /> Disable

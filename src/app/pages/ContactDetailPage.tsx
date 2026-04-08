@@ -22,6 +22,14 @@ import { toast } from "sonner";
 import { CONTACT_DICTIONARY, type ContactPerson } from "../components/vendors/partnerConstants";
 import { getAvatarTint } from "../utils/avatarTints";
 import { useVendors } from "../context/VendorContext";
+import { CreatePocModal } from "../components/vendors/PocModals";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogCancel,
+} from "../components/ui/alert-dialog";
 
 /* ─── Person Avatar Photos ─── */
 const PERSON_AVATARS: Record<string, string> = {
@@ -175,6 +183,23 @@ export function ContactDetailPage() {
   const [activeTab, setActiveTab] = useState<TabId>("activity");
   const [imgFailed, setImgFailed] = useState(false);
 
+  // Edit modal state
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editPocName, setEditPocName] = useState("");
+  const [editPocDepartment, setEditPocDepartment] = useState("");
+  const [editPocRole, setEditPocRole] = useState("");
+  const [editPocLandline, setEditPocLandline] = useState("");
+  const [editPocLandlineCode, setEditPocLandlineCode] = useState("+1");
+  const [editPocExt, setEditPocExt] = useState("");
+  const [editPocMobile, setEditPocMobile] = useState("");
+  const [editPocMobileCode, setEditPocMobileCode] = useState("+1");
+  const [editPocEmail, setEditPocEmail] = useState("");
+  const [editSaveAnother, setEditSaveAnother] = useState(false);
+
+  // Confirmation modals
+  const [showArchiveModal, setShowArchiveModal] = useState(false);
+  const [showDeactivateModal, setShowDeactivateModal] = useState(false);
+
   // Use real vendor names for linked partners
   const vendorNames = useMemo(() => vendors.length > 0 ? vendors.map((v) => v.displayName) : PARTNER_NAMES, [vendors]);
   const partnerNameToId = useMemo(() => {
@@ -188,6 +213,25 @@ export function ContactDetailPage() {
     if (!raw) return null;
     return enrichContactWithNames(raw, vendorNames);
   }, [contactId, vendorNames]);
+
+  const handleOpenEdit = () => {
+    if (!contact) return;
+    setEditPocName(contact.name);
+    setEditPocDepartment(contact.department);
+    setEditPocRole("");
+    setEditPocEmail(contact.email);
+    setEditPocLandline(contact.phone);
+    setEditPocLandlineCode("+1");
+    setEditPocExt(contact.phoneExt || "");
+    setEditPocMobile(contact.secondaryPhone || "");
+    setEditPocMobileCode("+1");
+    setEditModalOpen(true);
+  };
+
+  const handleSaveEdit = () => {
+    toast.success(`Contact "${editPocName}" updated successfully`);
+    setEditModalOpen(false);
+  };
 
   if (!contact) {
     return (
@@ -282,7 +326,7 @@ export function ContactDetailPage() {
             {/* Action buttons */}
             <div className="flex items-center gap-2">
               <button
-                onClick={() => toast.info("Edit contact coming soon")}
+                onClick={handleOpenEdit}
                 className="h-9 px-3.5 rounded-lg border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] text-[#334155] inline-flex items-center gap-1.5 text-[13px] transition-all duration-200 cursor-pointer shadow-sm"
                 style={{ fontWeight: 500 }}
               >
@@ -290,16 +334,16 @@ export function ContactDetailPage() {
                 Edit
               </button>
               <button
-                onClick={() => toast.info("Deactivate contact coming soon")}
-                className="h-9 px-3.5 rounded-lg border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] text-[#334155] inline-flex items-center gap-1.5 text-[13px] transition-all duration-200 cursor-pointer shadow-sm"
+                onClick={() => setShowDeactivateModal(true)}
+                className="h-9 px-3.5 rounded-lg border border-[#FDE68A] bg-[#FFFBEB] hover:bg-[#FEF3C7] hover:border-[#FCD34D] text-[#92400E] inline-flex items-center gap-1.5 text-[13px] transition-all duration-200 cursor-pointer shadow-sm"
                 style={{ fontWeight: 500 }}
               >
                 <CircleSlash className="w-3.5 h-3.5" />
                 Deactivate
               </button>
               <button
-                onClick={() => toast.info("Archive contact coming soon")}
-                className="h-9 px-3.5 rounded-lg border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] text-[#334155] inline-flex items-center gap-1.5 text-[13px] transition-all duration-200 cursor-pointer shadow-sm"
+                onClick={() => setShowArchiveModal(true)}
+                className="h-9 px-3.5 rounded-lg border border-[#FECACA] bg-[#FEF2F2] hover:bg-[#FEE2E2] hover:border-[#FCA5A5] text-[#DC2626] inline-flex items-center gap-1.5 text-[13px] transition-all duration-200 cursor-pointer shadow-sm"
                 style={{ fontWeight: 500 }}
               >
                 <Archive className="w-3.5 h-3.5" />
@@ -454,6 +498,85 @@ export function ContactDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* Edit Contact Modal */}
+      <CreatePocModal
+        open={editModalOpen}
+        onOpenChange={setEditModalOpen}
+        editMode
+        editContactName={contact.name}
+        newPocName={editPocName}
+        onNewPocNameChange={setEditPocName}
+        newPocDepartment={editPocDepartment}
+        onNewPocDepartmentChange={setEditPocDepartment}
+        newPocRole={editPocRole}
+        onNewPocRoleChange={setEditPocRole}
+        newPocLandline={editPocLandline}
+        onNewPocLandlineChange={setEditPocLandline}
+        newPocLandlineCode={editPocLandlineCode}
+        onNewPocLandlineCodeChange={setEditPocLandlineCode}
+        newPocExt={editPocExt}
+        onNewPocExtChange={setEditPocExt}
+        newPocMobile={editPocMobile}
+        onNewPocMobileChange={setEditPocMobile}
+        newPocMobileCode={editPocMobileCode}
+        onNewPocMobileCodeChange={setEditPocMobileCode}
+        newPocEmail={editPocEmail}
+        onNewPocEmailChange={setEditPocEmail}
+        saveAndCreateAnother={editSaveAnother}
+        onSaveAndCreateAnotherChange={setEditSaveAnother}
+        onSave={handleSaveEdit}
+      />
+
+      {/* Archive Confirmation Modal */}
+      <AlertDialog open={showArchiveModal} onOpenChange={setShowArchiveModal}>
+        <AlertDialogContent className="sm:max-w-[400px] p-0 gap-0 overflow-hidden rounded-2xl border-0 shadow-[0_24px_80px_-12px_rgba(0,0,0,0.25)]">
+          <div className="flex flex-col items-center text-center px-6 pt-8 pb-6">
+            <div className="w-14 h-14 rounded-2xl bg-[#FEF2F2] flex items-center justify-center mb-4">
+              <Archive className="w-6 h-6 text-[#DC2626]" />
+            </div>
+            <AlertDialogTitle className="text-[16px] text-[#0F172A]" style={{ fontWeight: 700 }}>
+              Archive Contact
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "#475569", lineHeight: "1.65" }}>
+              Are you sure you want to archive <strong>{contact.name}</strong>? This contact will be removed from active listings but records will be preserved.
+            </AlertDialogDescription>
+          </div>
+          <div className="px-6 pb-6 flex flex-col gap-2">
+            <button onClick={() => { toast.success("Contact archived"); setShowArchiveModal(false); navigate("/partners/contacts"); }} className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors hover:opacity-90" style={{ fontWeight: 600, backgroundColor: "#DC2626", color: "#fff" }}>
+              Archive Contact
+            </button>
+            <AlertDialogCancel className="w-full h-11 text-[14px] rounded-xl border border-[#E2E8F0] bg-white text-[#334155] hover:bg-[#F8FAFC] cursor-pointer" style={{ fontWeight: 500 }}>
+              Cancel
+            </AlertDialogCancel>
+          </div>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Deactivate Confirmation Modal */}
+      <AlertDialog open={showDeactivateModal} onOpenChange={setShowDeactivateModal}>
+        <AlertDialogContent className="sm:max-w-[400px] p-0 gap-0 overflow-hidden rounded-2xl border-0 shadow-[0_24px_80px_-12px_rgba(0,0,0,0.25)]">
+          <div className="flex flex-col items-center text-center px-6 pt-8 pb-6">
+            <div className="w-14 h-14 rounded-2xl bg-[#FFFBEB] flex items-center justify-center mb-4">
+              <CircleSlash className="w-6 h-6 text-[#F97316]" />
+            </div>
+            <AlertDialogTitle className="text-[16px] text-[#0F172A]" style={{ fontWeight: 700 }}>
+              Deactivate Contact
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "#475569", lineHeight: "1.65" }}>
+              Are you sure you want to deactivate <strong>{contact.name}</strong>? This contact will be marked as inactive and excluded from new assignments.
+            </AlertDialogDescription>
+          </div>
+          <div className="px-6 pb-6 flex flex-col gap-2">
+            <button onClick={() => { toast.success("Contact deactivated"); setShowDeactivateModal(false); }} className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors hover:opacity-90" style={{ fontWeight: 600, backgroundColor: "#F97316", color: "#FFFFFF" }}>
+              Deactivate Contact
+            </button>
+            <AlertDialogCancel className="w-full h-11 text-[14px] rounded-xl border border-[#E2E8F0] bg-white text-[#334155] hover:bg-[#F8FAFC] cursor-pointer" style={{ fontWeight: 500 }}>
+              Cancel
+            </AlertDialogCancel>
+          </div>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

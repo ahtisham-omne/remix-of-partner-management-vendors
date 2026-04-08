@@ -393,6 +393,8 @@ interface CreatePocModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   contextName?: string;
+  editMode?: boolean;
+  editContactName?: string;
   newPocName: string;
   onNewPocNameChange: (val: string) => void;
   newPocDepartment: string;
@@ -417,7 +419,7 @@ interface CreatePocModalProps {
 }
 
 export function CreatePocModal({
-  open, onOpenChange, contextName,
+  open, onOpenChange, contextName, editMode, editContactName,
   newPocName, onNewPocNameChange, newPocDepartment, onNewPocDepartmentChange,
   newPocRole, onNewPocRoleChange,
   newPocLandline, onNewPocLandlineChange, newPocLandlineCode, onNewPocLandlineCodeChange,
@@ -503,8 +505,8 @@ export function CreatePocModal({
                 {initials || <UserPlus className="w-4.5 h-4.5" />}
               </div>
               <div className="min-w-0">
-                <h2 className="text-[15px] sm:text-[17px] text-[#0F172A]" style={{ fontWeight: 700 }}>Create New Contact</h2>
-                <p className="text-[12px] text-[#64748B] mt-0.5">{contextName ? <>For <span className="text-[#0F172A]" style={{ fontWeight: 500 }}>{contextName}</span></> : "Add a new point of contact to the directory."}</p>
+                <h2 className="text-[15px] sm:text-[17px] text-[#0F172A]" style={{ fontWeight: 700 }}>{editMode ? "Edit Contact" : "Create New Contact"}</h2>
+                <p className="text-[12px] text-[#64748B] mt-0.5">{editMode ? <>Editing <span className="text-[#0F172A]" style={{ fontWeight: 500 }}>{editContactName || newPocName}</span></> : contextName ? <>For <span className="text-[#0F172A]" style={{ fontWeight: 500 }}>{contextName}</span></> : "Add a new point of contact to the directory."}</p>
               </div>
             </div>
             <button onClick={() => onOpenChange(false)} className="p-1.5 rounded-lg hover:bg-[#F1F5F9] transition-colors cursor-pointer shrink-0"><X className="w-4 h-4 text-[#94A3B8]" /></button>
@@ -719,19 +721,21 @@ export function CreatePocModal({
         </div>
 
         {/* Footer */}
-        <div className="shrink-0 border-t border-border bg-white px-5 py-3 flex items-center justify-between sm:rounded-b-2xl">
-          <button onClick={() => onSaveAndCreateAnotherChange(!saveAndCreateAnother)} className="flex items-center gap-2 cursor-pointer select-none group/check">
-            <div className={`w-[18px] h-[18px] rounded-[5px] border-[1.5px] flex items-center justify-center transition-all duration-150 ${saveAndCreateAnother ? "bg-[#0A77FF] border-[#0A77FF]" : "border-[#CBD5E1] bg-white group-hover/check:border-[#94A3B8]"}`}>
-              {saveAndCreateAnother && <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />}
-            </div>
-            <span className="text-[13px] text-[#475569] group-hover/check:text-[#334155] transition-colors" style={{ fontWeight: 500 }}>Save and create another</span>
-          </button>
+        <div className={`shrink-0 border-t border-border bg-white px-5 py-3 flex items-center ${editMode ? "justify-end" : "justify-between"} sm:rounded-b-2xl`}>
+          {!editMode && (
+            <button onClick={() => onSaveAndCreateAnotherChange(!saveAndCreateAnother)} className="flex items-center gap-2 cursor-pointer select-none group/check">
+              <div className={`w-[18px] h-[18px] rounded-[5px] border-[1.5px] flex items-center justify-center transition-all duration-150 ${saveAndCreateAnother ? "bg-[#0A77FF] border-[#0A77FF]" : "border-[#CBD5E1] bg-white group-hover/check:border-[#94A3B8]"}`}>
+                {saveAndCreateAnother && <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />}
+              </div>
+              <span className="text-[13px] text-[#475569] group-hover/check:text-[#334155] transition-colors" style={{ fontWeight: 500 }}>Save and create another</span>
+            </button>
+          )}
           <div className="flex items-center gap-2.5">
-            <button onClick={() => onOpenChange(false)} className="px-4 py-2 rounded-lg border border-[#E2E8F0] bg-white text-[13px] text-[#334155] hover:bg-[#F8FAFC] transition-colors cursor-pointer" style={{ fontWeight: 500 }}>Discard</button>
+            <button onClick={() => onOpenChange(false)} className="px-4 py-2 rounded-lg border border-[#E2E8F0] bg-white text-[13px] text-[#334155] hover:bg-[#F8FAFC] transition-colors cursor-pointer" style={{ fontWeight: 500 }}>{editMode ? "Cancel" : "Discard"}</button>
             <button onClick={onSave} disabled={!isValid}
               className={`px-5 py-2 rounded-lg text-[13px] text-white transition-all shadow-sm cursor-pointer inline-flex items-center gap-1.5 ${isValid ? "bg-[#0A77FF] hover:bg-[#0960D9]" : "bg-[#0A77FF]/40 cursor-not-allowed"}`}
               style={{ fontWeight: 600 }}>
-              Save Contact
+              {editMode ? "Save Changes" : "Save Contact"}
             </button>
           </div>
         </div>
