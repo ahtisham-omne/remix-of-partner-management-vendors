@@ -42,6 +42,8 @@ import {
   Twitter,
   Trash2,
   Sparkles,
+  Paperclip,
+  Upload,
 } from "lucide-react";
 import { Textarea } from "../ui/textarea";
 import type { ContactPerson } from "./partnerConstants";
@@ -395,6 +397,7 @@ interface CreatePocModalProps {
   contextName?: string;
   editMode?: boolean;
   editContactName?: string;
+  editContact?: ContactPerson | null;
   newPocName: string;
   onNewPocNameChange: (val: string) => void;
   newPocDepartment: string;
@@ -419,7 +422,7 @@ interface CreatePocModalProps {
 }
 
 export function CreatePocModal({
-  open, onOpenChange, contextName, editMode, editContactName,
+  open, onOpenChange, contextName, editMode, editContactName, editContact,
   newPocName, onNewPocNameChange, newPocDepartment, onNewPocDepartmentChange,
   newPocRole, onNewPocRoleChange,
   newPocLandline, onNewPocLandlineChange, newPocLandlineCode, onNewPocLandlineCodeChange,
@@ -438,18 +441,54 @@ export function CreatePocModal({
   const [deptSearch, setDeptSearch] = useState("");
   const [deptDropdownOpen, setDeptDropdownOpen] = useState(false);
   const [customDepts, setCustomDepts] = useState<string[]>([]);
+  const [attachedFiles, setAttachedFiles] = useState<{ id: string; name: string; size: string; type: string }[]>([]);
+  const [dragActive, setDragActive] = useState(false);
+  const fileInputRef2 = useRef<HTMLInputElement>(null);
+  const formatFileSize = (bytes: number) => bytes < 1024 ? `${bytes} B` : bytes < 1048576 ? `${(bytes / 1024).toFixed(1)} KB` : `${(bytes / 1048576).toFixed(1)} MB`;
+  const handleFiles = (fileList: FileList | null) => { if (!fileList) return; setAttachedFiles((prev) => [...prev, ...Array.from(fileList).map((f) => ({ id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, name: f.name, size: formatFileSize(f.size), type: f.type }))]); };
+  const getFileIcon = (type: string) => type.startsWith("image/") ? "🖼️" : type.includes("pdf") ? "📄" : type.includes("spreadsheet") || type.includes("excel") ? "📊" : type.includes("word") ? "📝" : "📎";
 
-  // Reset internal state when modal opens
+  // Reset/populate internal state when modal opens
   React.useEffect(() => {
     if (open) {
-      setProfileImage(null);
-      setCompany(contextName || "");
-      setNotes("");
-      setPhoneRows([{ id: "ph-1", type: "Office", code: newPocLandlineCode || "+1", number: "", ext: "" }]);
-      setEmailRows([{ id: "em-1", type: "Work", address: "" }]);
-      setSocialRows([]);
       setDeptSearch("");
       setDeptDropdownOpen(false);
+      setAttachedFiles([]);
+
+      if (editMode && editContact) {
+        // Populate from contact data
+        setProfileImage(editContact.profileImage || null);
+        setCompany(editContact.company || "");
+        setNotes("");
+        // Phones
+        if (editContact.phones && editContact.phones.length > 0) {
+          setPhoneRows(editContact.phones.map((p, i) => ({ id: `ph-${i + 1}`, type: p.type, code: p.code, number: p.number, ext: p.ext })));
+        } else {
+          setPhoneRows([{ id: "ph-1", type: "Office", code: "+1", number: editContact.phone || "", ext: editContact.phoneExt || "" },
+            ...(editContact.secondaryPhone ? [{ id: "ph-2", type: "Mobile" as const, code: "+1", number: editContact.secondaryPhone, ext: editContact.secondaryPhoneExt || "" }] : [])
+          ]);
+        }
+        // Emails
+        if (editContact.emails && editContact.emails.length > 0) {
+          setEmailRows(editContact.emails.map((e, i) => ({ id: `em-${i + 1}`, type: e.type, address: e.address })));
+        } else {
+          setEmailRows([{ id: "em-1", type: "Work", address: editContact.email || "" }]);
+        }
+        // Socials
+        if (editContact.socials && editContact.socials.length > 0) {
+          setSocialRows(editContact.socials.map((s, i) => ({ id: `sc-${i + 1}`, type: s.type, url: s.url })));
+        } else {
+          setSocialRows([{ id: "sc-1", type: "LinkedIn", url: "" }]);
+        }
+      } else {
+        // Create mode — empty defaults
+        setProfileImage(null);
+        setCompany(contextName || "");
+        setNotes("");
+        setPhoneRows([{ id: "ph-1", type: "Office", code: newPocLandlineCode || "+1", number: "", ext: "" }]);
+        setEmailRows([{ id: "em-1", type: "Work", address: "" }]);
+        setSocialRows([{ id: "sc-1", type: "LinkedIn", url: "" }]);
+      }
     }
   }, [open]);
 
@@ -717,6 +756,57 @@ export function CreatePocModal({
                 </div>
               ))}
             </div>
+          </div>
+
+          {/* ── Attachments — same as partner creation form ── */}
+          <div>
+            <div className="flex items-center gap-2 mb-2.5">
+              <div className="w-6 h-6 rounded-md bg-[#0A77FF]/8 flex items-center justify-center shrink-0">
+                <Paperclip className="w-3.5 h-3.5 text-[#0A77FF]" />
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Attachments</span>
+                {attachedFiles.length > 0 && (
+                  <span className="text-[10px] text-[#64748B] bg-[#F1F5F9] px-1.5 py-0.5 rounded-full" style={{ fontWeight: 500 }}>{attachedFiles.length}</span>
+                )}
+              </div>
+            </div>
+            <div
+              onDragOver={(e) => { e.preventDefault(); setDragActive(true); }}
+              onDragLeave={() => setDragActive(false)}
+              onDrop={(e) => { e.preventDefault(); setDragActive(false); handleFiles(e.dataTransfer.files); }}
+              onClick={() => fileInputRef2.current?.click()}
+              className={`rounded-lg border-2 border-dashed p-3 sm:p-4 text-center cursor-pointer transition-all ${
+                dragActive ? "border-[#0A77FF] bg-[#EDF4FF]/30" : "border-[#E2E8F0] bg-white hover:border-[#CBD5E1] hover:bg-[#FAFBFC]"
+              }`}
+            >
+              <input ref={fileInputRef2} type="file" multiple onChange={(e) => handleFiles(e.target.files)} className="hidden" />
+              <div className="flex flex-col items-center gap-2">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${dragActive ? "bg-[#D6E8FF] text-[#0A77FF]" : "bg-[#F1F5F9] text-[#94A3B8]"}`}>
+                  <Upload className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-xs sm:text-sm text-[#0F172A]" style={{ fontWeight: 500 }}><span className="text-[#0A77FF]">Click to upload</span><span className="hidden sm:inline"> or drag and drop</span></p>
+                  <p className="text-[10px] sm:text-xs text-[#94A3B8] mt-0.5">PDF, DOC, XLS, PNG, JPG up to 10MB</p>
+                </div>
+              </div>
+            </div>
+            {attachedFiles.length > 0 && (
+              <div className="mt-2.5 space-y-1.5">
+                {attachedFiles.map((file) => (
+                  <div key={file.id} className="flex items-center gap-2.5 px-3 py-2 rounded-md border border-[#E2E8F0] bg-white hover:bg-[#FAFBFC] transition-colors group">
+                    <span className="text-base">{getFileIcon(file.type)}</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-[#0F172A] truncate" style={{ fontWeight: 500 }}>{file.name}</p>
+                      <p className="text-[11px] text-[#94A3B8]">{file.size}</p>
+                    </div>
+                    <button type="button" onClick={(e) => { e.stopPropagation(); setAttachedFiles((prev) => prev.filter((f) => f.id !== file.id)); }} className="w-7 h-7 rounded-md flex items-center justify-center text-[#94A3B8] hover:text-[#EF4444] hover:bg-[#FEF2F2] transition-colors sm:opacity-0 sm:group-hover:opacity-100 cursor-pointer">
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 

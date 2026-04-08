@@ -583,12 +583,18 @@ export function ContactsDirectoryPage() {
     setNewPocName(contact.name);
     setNewPocDepartment(contact.department);
     setNewPocRole(contact.role || "");
-    setNewPocEmail(contact.email);
-    setNewPocLandline(contact.phone);
-    setNewPocLandlineCode("+1");
-    setNewPocExt(contact.phoneExt || "");
-    setNewPocMobile(contact.secondaryPhone || "");
-    setNewPocMobileCode("+1");
+    setNewPocEmail(contact.emails && contact.emails.length > 0 ? contact.emails[0].address : contact.email);
+    const phoneList = contact.phones && contact.phones.length > 0 ? contact.phones : [{ id: "fb", type: "Office" as const, code: "+1", number: contact.phone, ext: contact.phoneExt || "" }];
+    setNewPocLandline(phoneList[0].number);
+    setNewPocLandlineCode(phoneList[0].code || "+1");
+    setNewPocExt(phoneList[0].ext || "");
+    if (phoneList.length > 1) {
+      setNewPocMobile(phoneList[1].number);
+      setNewPocMobileCode(phoneList[1].code || "+1");
+    } else {
+      setNewPocMobile(contact.secondaryPhone || "");
+      setNewPocMobileCode("+1");
+    }
     setCreateModalOpen(true);
   };
 
@@ -2091,6 +2097,7 @@ export function ContactsDirectoryPage() {
         contextName=""
         editMode={editMode}
         editContactName={editMode ? allContacts.find(c => c.id === editContactId)?.name : undefined}
+        editContact={editMode ? (CONTACT_DICTIONARY.find(c => c.id === editContactId) || null) : null}
         newPocName={newPocName}
         onNewPocNameChange={setNewPocName}
         newPocDepartment={newPocDepartment}
