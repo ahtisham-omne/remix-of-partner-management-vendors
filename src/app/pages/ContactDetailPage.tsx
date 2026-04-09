@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import {
@@ -17,6 +17,20 @@ import {
   Clock,
   Download,
   User,
+  ChevronLeft,
+  ChevronRight,
+  ChevronDown,
+  MoreHorizontal,
+  Globe,
+  ExternalLink,
+  Calendar,
+  CircleCheck,
+  Link2,
+  MessageSquare,
+  Briefcase,
+  ShoppingCart,
+  Receipt,
+  ClipboardList,
 } from "lucide-react";
 import { toast } from "sonner";
 import { CONTACT_DICTIONARY, type ContactPerson } from "../components/vendors/partnerConstants";
@@ -30,6 +44,13 @@ import {
   AlertDialogDescription,
   AlertDialogCancel,
 } from "../components/ui/alert-dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../components/ui/dropdown-menu";
 
 /* ─── Person Avatar Photos ─── */
 const PERSON_AVATARS: Record<string, string> = {
@@ -147,9 +168,15 @@ const ATTACHMENTS_DATA = [
 
 /* ─── Tab definitions ─── */
 const TABS = [
-  { id: "activity", label: "Activity", icon: Activity },
+  { id: "overview", label: "Overview", icon: User },
+  { id: "linked_partners", label: "Linked Partners", icon: Link2 },
+  { id: "communications", label: "Communications", icon: MessageSquare },
+  { id: "purchase_orders", label: "Purchase Orders", icon: ShoppingCart },
+  { id: "sales_orders", label: "Sales Orders", icon: Receipt },
+  { id: "quotes", label: "Quotes", icon: ClipboardList },
   { id: "notes", label: "Notes", icon: StickyNote },
   { id: "attachments", label: "Attachments", icon: Paperclip },
+  { id: "activity", label: "Activity History", icon: Activity },
 ] as const;
 
 type TabId = (typeof TABS)[number]["id"];
@@ -180,8 +207,21 @@ export function ContactDetailPage() {
   const { contactId } = useParams<{ contactId: string }>();
   const navigate = useNavigate();
   const { vendors } = useVendors();
-  const [activeTab, setActiveTab] = useState<TabId>("activity");
+  const [activeTab, setActiveTab] = useState<TabId>("overview");
   const [imgFailed, setImgFailed] = useState(false);
+  const [isCompact, setIsCompact] = useState(false);
+  const sentinelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsCompact(!entry.isIntersecting),
+      { threshold: 0, rootMargin: "-1px 0px 0px 0px" }
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, []);
 
   // Edit modal state
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -256,252 +296,296 @@ export function ContactDetailPage() {
 
   const tint = getAvatarTint(contact.name);
   const photo = getPersonPhoto(contact.name);
-  const showImg = photo && !imgFailed;
   const initials = contact.name.split(" ").filter(Boolean).map((w) => w[0]).slice(0, 2).join("").toUpperCase();
-
-  const statusStyles = contact.status === "active"
-    ? { bg: "#ECFDF5", text: "#065F46", border: "#A7F3D0", label: "Active" }
-    : { bg: "#FFFBEB", text: "#92400E", border: "#FDE68A", label: "Inactive" };
-
   const deptStyle = DEPT_STYLES[contact.department] || DEPT_STYLES.Sales;
+  const shortDept = contact.department === "Supply Chain Management" ? "Supply Chain" : contact.department;
+  const sStyle = contact.status === "active" ? { bg: "#ECFDF5", text: "#065F46", border: "#A7F3D0" } : { bg: "#FFFBEB", text: "#92400E", border: "#FDE68A" };
 
   return (
-    <div className="flex-1 flex flex-col overflow-auto bg-[#F8FAFC]">
-      {/* ── Breadcrumb Bar ── */}
-      <div className="px-6 pt-4 pb-2 flex items-center gap-2 text-[12px] text-[#94A3B8]" style={{ fontWeight: 500 }}>
-        <span className="hover:text-[#64748B] cursor-pointer transition-colors" onClick={() => navigate("/partners")}>Partners Management</span>
-        <span>/</span>
-        <span className="hover:text-[#64748B] cursor-pointer transition-colors" onClick={() => navigate("/partners/contacts")}>Contacts Directory</span>
-        <span>/</span>
-        <span className="text-[#334155]">{contact.name}</span>
-      </div>
+    <div className="flex-1 flex flex-col min-h-0 bg-[#F8FAFC]">
+      {/* Sentinel for scroll detection */}
+      <div ref={sentinelRef} className="h-0 w-full" />
 
-      {/* ── Back button ── */}
-      <div className="px-6 pb-3">
-        <button
-          onClick={() => navigate("/partners/contacts")}
-          className="inline-flex items-center gap-1.5 text-[13px] text-[#64748B] hover:text-[#334155] transition-colors cursor-pointer"
-          style={{ fontWeight: 500 }}
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Back to Contacts
-        </button>
-      </div>
+      {/* Sticky Header Card */}
+      <div className="sticky top-0 z-30 bg-white border-b border-[#E2E8F0] shadow-sm transition-all duration-200">
+        <div className="max-w-[1440px] mx-auto px-4 lg:px-6 xl:px-8">
+          {/* Breadcrumb row */}
+          <div className="flex items-center gap-1.5 text-[12px] text-[#64748B] py-2 border-b border-[#F1F5F9]">
+            <span className="hover:text-[#334155] cursor-pointer" onClick={() => navigate("/partners")}>Partners Management</span>
+            <span>/</span>
+            <span className="hover:text-[#334155] cursor-pointer" onClick={() => navigate("/partners/contacts")}>Contacts Directory</span>
+            <span>/</span>
+            <span className="text-[#0F172A]" style={{ fontWeight: 500 }}>{contact.name}</span>
+          </div>
 
-      {/* ── Header Section ── */}
-      <div className="px-6 pb-5">
-        <div className="bg-white border border-[#E2E8F0] rounded-xl p-5">
-          <div className="flex items-start justify-between">
-            <div className="flex items-center gap-4">
-              {/* Avatar */}
-              <div
-                className="w-16 h-16 rounded-2xl flex items-center justify-center shrink-0 overflow-hidden border border-[#E8ECF1]"
-                style={{ backgroundColor: showImg ? "transparent" : tint.bg }}
-              >
-                {showImg ? (
-                  <img src={photo} alt="" className="w-full h-full object-cover" onError={() => setImgFailed(true)} />
-                ) : (
-                  <span className="text-xl" style={{ fontWeight: 700, color: tint.fg }}>{initials}</span>
-                )}
-              </div>
+          {/* Main header row */}
+          <div className={`flex items-center gap-3 transition-all duration-200 ${isCompact ? "py-2" : "py-4"}`}>
+            {/* Back button */}
+            <button onClick={() => navigate("/partners/contacts")} className={`${isCompact ? "w-8 h-8" : "w-10 h-10"} rounded-xl border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] flex items-center justify-center transition-all cursor-pointer shadow-sm shrink-0`}>
+              <ChevronLeft className={`${isCompact ? "w-4 h-4" : "w-5 h-5"} text-[#64748B]`} />
+            </button>
 
-              {/* Name + pills */}
-              <div className="flex flex-col gap-1.5">
-                <div className="flex items-center gap-3">
-                  <h1 className="text-xl text-[#0F172A]" style={{ fontWeight: 700 }}>{contact.name}</h1>
-                  <span
-                    className="px-2.5 py-0.5 rounded-full text-[11px] border"
-                    style={{ fontWeight: 600, backgroundColor: deptStyle.bg, color: deptStyle.text, borderColor: deptStyle.border }}
-                  >
-                    {contact.department}
-                  </span>
-                  <span
-                    className="px-2.5 py-0.5 rounded-full text-[11px] border"
-                    style={{ fontWeight: 600, backgroundColor: statusStyles.bg, color: statusStyles.text, borderColor: statusStyles.border }}
-                  >
-                    {statusStyles.label}
-                  </span>
-                </div>
-                <div className="flex items-center gap-1.5 text-[13px] text-[#64748B]">
-                  <Building2 className="w-3.5 h-3.5" />
-                  <span>{contact.company}</span>
-                </div>
-              </div>
+            {/* Avatar */}
+            <div className={`${isCompact ? "w-8 h-8" : "w-11 h-11"} rounded-xl flex items-center justify-center shrink-0 transition-all duration-200`} style={{ backgroundColor: tint.bg }}>
+              {photo && !imgFailed ? (
+                <img src={photo} alt="" className="w-full h-full object-cover rounded-xl" onError={() => setImgFailed(true)} />
+              ) : (
+                <span className={`${isCompact ? "text-[10px]" : "text-[13px]"}`} style={{ fontWeight: 700, color: tint.fg }}>{initials}</span>
+              )}
             </div>
 
-            {/* Action buttons */}
-            <div className="flex items-center gap-2">
-              <button
-                onClick={handleOpenEdit}
-                className="h-9 px-3.5 rounded-lg border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] text-[#334155] inline-flex items-center gap-1.5 text-[13px] transition-all duration-200 cursor-pointer shadow-sm"
-                style={{ fontWeight: 500 }}
-              >
-                <Pencil className="w-3.5 h-3.5" />
-                Edit
-              </button>
-              <button
-                onClick={() => setShowDeactivateModal(true)}
-                className="h-9 px-3.5 rounded-lg border border-[#FDE68A] bg-[#FFFBEB] hover:bg-[#FEF3C7] hover:border-[#FCD34D] text-[#92400E] inline-flex items-center gap-1.5 text-[13px] transition-all duration-200 cursor-pointer shadow-sm"
-                style={{ fontWeight: 500 }}
-              >
-                <CircleSlash className="w-3.5 h-3.5" />
-                Deactivate
-              </button>
-              <button
-                onClick={() => setShowArchiveModal(true)}
-                className="h-9 px-3.5 rounded-lg border border-[#FECACA] bg-[#FEF2F2] hover:bg-[#FEE2E2] hover:border-[#FCA5A5] text-[#DC2626] inline-flex items-center gap-1.5 text-[13px] transition-all duration-200 cursor-pointer shadow-sm"
-                style={{ fontWeight: 500 }}
-              >
-                <Archive className="w-3.5 h-3.5" />
-                Archive
+            {/* Name + pills */}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className={`${isCompact ? "text-[14px]" : "text-[18px]"} text-[#0F172A] truncate transition-all duration-200`} style={{ fontWeight: isCompact ? 600 : 700 }}>{contact.name}</h1>
+                {deptStyle && <span className={`inline-flex items-center ${isCompact ? "px-2 py-0.5 text-[10px]" : "px-2.5 py-0.5 text-[11px]"} rounded-full border`} style={{ fontWeight: 600, backgroundColor: deptStyle.bg, color: deptStyle.text, borderColor: deptStyle.border }}>{shortDept}</span>}
+                <span className={`inline-flex items-center ${isCompact ? "px-2 py-0.5 text-[10px]" : "px-2.5 py-0.5 text-[11px]"} rounded-full border`} style={{ fontWeight: 500, backgroundColor: sStyle.bg, color: sStyle.text, borderColor: sStyle.border }}>{contact.status === "active" ? "Active" : "Inactive"}</span>
+              </div>
+              {!isCompact && (
+                <div className="flex items-center gap-3 mt-1 text-[12px] text-[#64748B]">
+                  {contact.role && <span className="flex items-center gap-1"><Briefcase className="w-3 h-3" />{contact.role}</span>}
+                  <span className="flex items-center gap-1"><Building2 className="w-3 h-3" />{(contact.companies || [contact.company])[0]}</span>
+                </div>
+              )}
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center gap-2 shrink-0">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="h-9 px-3 rounded-lg border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] text-[13px] text-[#334155] inline-flex items-center gap-1.5 transition-all cursor-pointer shadow-sm" style={{ fontWeight: 500 }}>
+                    Actions <ChevronDown className="w-3.5 h-3.5 text-[#94A3B8]" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-[200px]">
+                  <DropdownMenuItem onClick={() => { navigator.clipboard.writeText(window.location.href); toast.success("Link copied"); }}>
+                    <Link2 className="w-4 h-4 mr-2" /> Copy Link
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="text-[#92400E] focus:text-[#92400E] focus:bg-[#FFFBEB]" onClick={() => setShowDeactivateModal(true)}>
+                    <CircleSlash className="w-4 h-4 mr-2 text-[#92400E]" /> {contact.status === "active" ? "Deactivate" : "Activate"}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="text-[#DC2626] focus:text-[#DC2626] focus:bg-[#FEF2F2]" onClick={() => setShowArchiveModal(true)}>
+                    <Archive className="w-4 h-4 mr-2 text-[#DC2626]" /> Archive
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <button onClick={handleOpenEdit} className="h-9 px-4 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-[13px] inline-flex items-center gap-1.5 shadow-sm transition-colors cursor-pointer" style={{ fontWeight: 600 }}>
+                <Pencil className="w-3.5 h-3.5" /> Edit Contact
               </button>
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* ── Info Cards (2 columns) ── */}
-      <div className="px-6 pb-5 grid grid-cols-2 gap-5">
-        {/* Contact Information Card */}
-        <div className="bg-white border border-[#E2E8F0] rounded-xl p-5">
-          <h3 className="text-[13px] text-[#0F172A] mb-4" style={{ fontWeight: 600 }}>Contact Information</h3>
-          <div className="space-y-3.5">
-            {/* Primary Phone */}
-            <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-lg bg-[#F1F5F9] flex items-center justify-center shrink-0">
-                <Phone className="w-4 h-4 text-[#64748B]" />
-              </div>
-              <div>
-                <p className="text-[11px] text-[#94A3B8] mb-0.5" style={{ fontWeight: 500 }}>Primary Phone</p>
-                <p className="text-[13px] text-[#334155]" style={{ fontWeight: 500 }}>
-                  {contact.phone}
-                  {contact.phoneExt && <span className="text-[#94A3B8] ml-1.5">ext. {contact.phoneExt}</span>}
-                </p>
-              </div>
-            </div>
-            {/* Secondary Phone */}
-            <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-lg bg-[#F1F5F9] flex items-center justify-center shrink-0">
-                <Phone className="w-4 h-4 text-[#64748B]" />
-              </div>
-              <div>
-                <p className="text-[11px] text-[#94A3B8] mb-0.5" style={{ fontWeight: 500 }}>Secondary Phone</p>
-                <p className="text-[13px] text-[#334155]" style={{ fontWeight: 500 }}>
-                  {contact.secondaryPhone}
-                  {contact.secondaryPhoneExt && <span className="text-[#94A3B8] ml-1.5">ext. {contact.secondaryPhoneExt}</span>}
-                </p>
-              </div>
-            </div>
-            {/* Email */}
-            <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-lg bg-[#F1F5F9] flex items-center justify-center shrink-0">
-                <Mail className="w-4 h-4 text-[#64748B]" />
-              </div>
-              <div>
-                <p className="text-[11px] text-[#94A3B8] mb-0.5" style={{ fontWeight: 500 }}>Email</p>
-                <a href={`mailto:${contact.email}`} className="text-[13px] text-[#0A77FF] hover:underline" style={{ fontWeight: 500 }}>
-                  {contact.email}
-                </a>
-              </div>
-            </div>
-            {/* Department */}
-            <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-lg bg-[#F1F5F9] flex items-center justify-center shrink-0">
-                <Users className="w-4 h-4 text-[#64748B]" />
-              </div>
-              <div>
-                <p className="text-[11px] text-[#94A3B8] mb-0.5" style={{ fontWeight: 500 }}>Department</p>
-                <p className="text-[13px] text-[#334155]" style={{ fontWeight: 500 }}>{contact.department}</p>
-              </div>
-            </div>
-            {/* Role / Title */}
-            <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-lg bg-[#F1F5F9] flex items-center justify-center shrink-0">
-                <User className="w-4 h-4 text-[#64748B]" />
-              </div>
-              <div>
-                <p className="text-[11px] text-[#94A3B8] mb-0.5" style={{ fontWeight: 500 }}>Role / Title</p>
-                <p className="text-[13px] text-[#334155]" style={{ fontWeight: 500 }}>{contact.department} Representative</p>
-              </div>
-            </div>
-            {/* Company */}
-            <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-lg bg-[#F1F5F9] flex items-center justify-center shrink-0">
-                <Building2 className="w-4 h-4 text-[#64748B]" />
-              </div>
-              <div>
-                <p className="text-[11px] text-[#94A3B8] mb-0.5" style={{ fontWeight: 500 }}>Company</p>
-                <p className="text-[13px] text-[#334155]" style={{ fontWeight: 500 }}>{contact.company}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Partner Information Card */}
-        <div className="bg-white border border-[#E2E8F0] rounded-xl p-5">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Partner Information</h3>
-            <span className="text-[11px] text-[#94A3B8] bg-[#F1F5F9] rounded-full px-2.5 py-0.5" style={{ fontWeight: 600 }}>
-              {contact.linkedPartners.length} linked
-            </span>
-          </div>
-          <div className="space-y-2.5">
-            {contact.linkedPartners.map((partner, idx) => {
-              const pTint = getAvatarTint(partner);
-              const pInitials = partner.split(" ").filter(Boolean).map((w) => w[0]).slice(0, 2).join("").toUpperCase();
-              const partnerId = partnerNameToId[partner];
-              return (
-                <div
-                  key={idx}
-                  className={`flex items-center gap-3 p-2.5 rounded-lg border border-[#F1F5F9] hover:border-[#BFDBFE] hover:bg-[#F0F7FF] transition-all ${partnerId ? "cursor-pointer" : ""}`}
-                  onClick={() => { if (partnerId) window.open(`/vendors/${partnerId}`, "_blank"); }}
-                >
-                  <div
-                    className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
-                    style={{ backgroundColor: pTint.bg }}
-                  >
-                    <span className="text-[10px]" style={{ fontWeight: 700, color: pTint.fg }}>{pInitials}</span>
-                  </div>
-                  <span className={`text-[13px] text-[#334155] ${partnerId ? "hover:text-[#0A77FF] hover:underline" : ""}`} style={{ fontWeight: 500 }}>{partner}</span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-
-      {/* ── Tabs Section ── */}
-      <div className="px-6 pb-6">
-        <div className="border border-[#E2E8F0] rounded-xl bg-white overflow-hidden">
           {/* Tab bar */}
-          <div className="flex border-b border-[#E2E8F0]">
+          <div className="flex items-center gap-0 -mb-px overflow-x-auto scrollbar-hide">
             {TABS.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
               return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`px-4 py-3 text-[13px] inline-flex items-center gap-1.5 border-b-2 transition-all cursor-pointer ${
-                    isActive
-                      ? "border-[#0A77FF] text-[#0A77FF]"
-                      : "border-transparent text-[#64748B] hover:text-[#334155]"
-                  }`}
-                  style={{ fontWeight: isActive ? 600 : 500 }}
-                >
+                <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`px-4 py-2.5 text-[13px] inline-flex items-center gap-1.5 border-b-2 transition-all cursor-pointer whitespace-nowrap ${isActive ? "border-[#0A77FF] text-[#0A77FF]" : "border-transparent text-[#64748B] hover:text-[#334155] hover:border-[#CBD5E1]"}`} style={{ fontWeight: isActive ? 600 : 500 }}>
                   <Icon className="w-3.5 h-3.5" />
                   {tab.label}
                 </button>
               );
             })}
           </div>
+        </div>
+      </div>
 
-          {/* Tab content */}
-          <div className="p-5">
-            {activeTab === "activity" && <ActivityTab />}
-            {activeTab === "notes" && <NotesTab />}
-            {activeTab === "attachments" && <AttachmentsTab />}
-          </div>
+      {/* Tab Content */}
+      <div className="flex-1 overflow-y-auto">
+        <div className="max-w-[1440px] mx-auto px-4 lg:px-6 xl:px-8 py-6">
+          {activeTab === "overview" && (
+            <div className="grid grid-cols-2 gap-5">
+              {/* Contact Information Card */}
+              <div className="bg-white border border-[#E2E8F0] rounded-xl p-5">
+                <h3 className="text-[13px] text-[#0F172A] mb-4" style={{ fontWeight: 600 }}>Contact Information</h3>
+                <div className="space-y-3.5">
+                  {/* Primary Phone */}
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-[#F1F5F9] flex items-center justify-center shrink-0">
+                      <Phone className="w-4 h-4 text-[#64748B]" />
+                    </div>
+                    <div>
+                      <p className="text-[11px] text-[#94A3B8] mb-0.5" style={{ fontWeight: 500 }}>Primary Phone</p>
+                      <p className="text-[13px] text-[#334155]" style={{ fontWeight: 500 }}>
+                        {contact.phone}
+                        {contact.phoneExt && <span className="text-[#94A3B8] ml-1.5">ext. {contact.phoneExt}</span>}
+                      </p>
+                    </div>
+                  </div>
+                  {/* Secondary Phone */}
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-[#F1F5F9] flex items-center justify-center shrink-0">
+                      <Phone className="w-4 h-4 text-[#64748B]" />
+                    </div>
+                    <div>
+                      <p className="text-[11px] text-[#94A3B8] mb-0.5" style={{ fontWeight: 500 }}>Secondary Phone</p>
+                      <p className="text-[13px] text-[#334155]" style={{ fontWeight: 500 }}>
+                        {contact.secondaryPhone}
+                        {contact.secondaryPhoneExt && <span className="text-[#94A3B8] ml-1.5">ext. {contact.secondaryPhoneExt}</span>}
+                      </p>
+                    </div>
+                  </div>
+                  {/* Email */}
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-[#F1F5F9] flex items-center justify-center shrink-0">
+                      <Mail className="w-4 h-4 text-[#64748B]" />
+                    </div>
+                    <div>
+                      <p className="text-[11px] text-[#94A3B8] mb-0.5" style={{ fontWeight: 500 }}>Email</p>
+                      <a href={`mailto:${contact.email}`} className="text-[13px] text-[#0A77FF] hover:underline" style={{ fontWeight: 500 }}>
+                        {contact.email}
+                      </a>
+                    </div>
+                  </div>
+                  {/* Department */}
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-[#F1F5F9] flex items-center justify-center shrink-0">
+                      <Users className="w-4 h-4 text-[#64748B]" />
+                    </div>
+                    <div>
+                      <p className="text-[11px] text-[#94A3B8] mb-0.5" style={{ fontWeight: 500 }}>Department</p>
+                      <p className="text-[13px] text-[#334155]" style={{ fontWeight: 500 }}>{contact.department}</p>
+                    </div>
+                  </div>
+                  {/* Role / Title */}
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-[#F1F5F9] flex items-center justify-center shrink-0">
+                      <User className="w-4 h-4 text-[#64748B]" />
+                    </div>
+                    <div>
+                      <p className="text-[11px] text-[#94A3B8] mb-0.5" style={{ fontWeight: 500 }}>Role / Title</p>
+                      <p className="text-[13px] text-[#334155]" style={{ fontWeight: 500 }}>{contact.role || `${contact.department} Representative`}</p>
+                    </div>
+                  </div>
+                  {/* Company */}
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-[#F1F5F9] flex items-center justify-center shrink-0">
+                      <Building2 className="w-4 h-4 text-[#64748B]" />
+                    </div>
+                    <div>
+                      <p className="text-[11px] text-[#94A3B8] mb-0.5" style={{ fontWeight: 500 }}>Company</p>
+                      <p className="text-[13px] text-[#334155]" style={{ fontWeight: 500 }}>{contact.company}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Partner Information Card */}
+              <div className="bg-white border border-[#E2E8F0] rounded-xl p-5">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Partner Information</h3>
+                  <span className="text-[11px] text-[#94A3B8] bg-[#F1F5F9] rounded-full px-2.5 py-0.5" style={{ fontWeight: 600 }}>
+                    {contact.linkedPartners.length} linked
+                  </span>
+                </div>
+                <div className="space-y-2.5">
+                  {contact.linkedPartners.map((partner, idx) => {
+                    const pTint = getAvatarTint(partner);
+                    const pInitials = partner.split(" ").filter(Boolean).map((w) => w[0]).slice(0, 2).join("").toUpperCase();
+                    const partnerId = partnerNameToId[partner];
+                    return (
+                      <div
+                        key={idx}
+                        className={`flex items-center gap-3 p-2.5 rounded-lg border border-[#F1F5F9] hover:border-[#BFDBFE] hover:bg-[#F0F7FF] transition-all ${partnerId ? "cursor-pointer" : ""}`}
+                        onClick={() => { if (partnerId) window.open(`/vendors/${partnerId}`, "_blank"); }}
+                      >
+                        <div
+                          className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
+                          style={{ backgroundColor: pTint.bg }}
+                        >
+                          <span className="text-[10px]" style={{ fontWeight: 700, color: pTint.fg }}>{pInitials}</span>
+                        </div>
+                        <span className={`text-[13px] text-[#334155] ${partnerId ? "hover:text-[#0A77FF] hover:underline" : ""}`} style={{ fontWeight: 500 }}>{partner}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === "linked_partners" && (
+            <div className="bg-white border border-[#E2E8F0] rounded-xl overflow-hidden">
+              <div className="px-5 py-4 border-b border-[#F1F5F9] flex items-center justify-between">
+                <h3 className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Linked Partners</h3>
+                <span className="text-[11px] text-[#94A3B8] bg-[#F1F5F9] rounded-full px-2.5 py-0.5" style={{ fontWeight: 600 }}>
+                  {contact.linkedPartners.length} partner{contact.linkedPartners.length !== 1 ? "s" : ""}
+                </span>
+              </div>
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-[#F1F5F9]">
+                    <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2.5" style={{ fontWeight: 600 }}>Partner Name</th>
+                    <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2.5" style={{ fontWeight: 600 }}>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {contact.linkedPartners.map((partner, idx) => {
+                    const pTint = getAvatarTint(partner);
+                    const pInitials = partner.split(" ").filter(Boolean).map((w) => w[0]).slice(0, 2).join("").toUpperCase();
+                    const partnerId = partnerNameToId[partner];
+                    return (
+                      <tr
+                        key={idx}
+                        className={`border-b border-[#F1F5F9] last:border-b-0 hover:bg-[#F8FAFC] transition-colors ${partnerId ? "cursor-pointer" : ""}`}
+                        onClick={() => { if (partnerId) navigate(`/vendors/${partnerId}`); }}
+                      >
+                        <td className="px-5 py-3">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ backgroundColor: pTint.bg }}>
+                              <span className="text-[10px]" style={{ fontWeight: 700, color: pTint.fg }}>{pInitials}</span>
+                            </div>
+                            <span className={`text-[13px] text-[#334155] ${partnerId ? "hover:text-[#0A77FF]" : ""}`} style={{ fontWeight: 500 }}>{partner}</span>
+                          </div>
+                        </td>
+                        <td className="px-5 py-3">
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] border" style={{ fontWeight: 500, backgroundColor: "#ECFDF5", color: "#065F46", borderColor: "#A7F3D0" }}>Active</span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {activeTab === "communications" && (
+            <div className="flex flex-col items-center gap-3 py-16 text-[#94A3B8]">
+              <MessageSquare className="w-10 h-10" />
+              <p className="text-sm" style={{ fontWeight: 500 }}>Communications</p>
+              <p className="text-xs text-center max-w-[300px]">Track and manage communications with this contact. This feature is coming soon.</p>
+            </div>
+          )}
+
+          {activeTab === "purchase_orders" && (
+            <div className="flex flex-col items-center gap-3 py-16 text-[#94A3B8]">
+              <ShoppingCart className="w-10 h-10" />
+              <p className="text-sm" style={{ fontWeight: 500 }}>Purchase Orders</p>
+              <p className="text-xs text-center max-w-[300px]">View purchase orders associated with this contact. This feature is coming soon.</p>
+            </div>
+          )}
+
+          {activeTab === "sales_orders" && (
+            <div className="flex flex-col items-center gap-3 py-16 text-[#94A3B8]">
+              <Receipt className="w-10 h-10" />
+              <p className="text-sm" style={{ fontWeight: 500 }}>Sales Orders</p>
+              <p className="text-xs text-center max-w-[300px]">View sales orders associated with this contact. This feature is coming soon.</p>
+            </div>
+          )}
+
+          {activeTab === "quotes" && (
+            <div className="flex flex-col items-center gap-3 py-16 text-[#94A3B8]">
+              <ClipboardList className="w-10 h-10" />
+              <p className="text-sm" style={{ fontWeight: 500 }}>Quotes</p>
+              <p className="text-xs text-center max-w-[300px]">View quotes associated with this contact. This feature is coming soon.</p>
+            </div>
+          )}
+
+          {activeTab === "notes" && <NotesTab />}
+          {activeTab === "attachments" && <AttachmentsTab />}
+          {activeTab === "activity" && <ActivityTab />}
         </div>
       </div>
 
