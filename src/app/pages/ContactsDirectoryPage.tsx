@@ -494,7 +494,7 @@ export function ContactsDirectoryPage() {
   /* ─── State ─── */
   const [searchQuery, setSearchQuery] = useState("");
   const [quickFilter, setQuickFilter] = useState<QuickFilter>("all");
-  const [density, setDensity] = useState<DensityOption>("comfort");
+  const [density, setDensity] = useState<DensityOption>("condensed");
   const [cardSize, setCardSize] = useState<CardSize>("medium");
   const [currentPage, setCurrentPage] = useState(1);
   const [recordsPerPage, setRecordsPerPage] = useState(20);
@@ -1684,9 +1684,7 @@ export function ContactsDirectoryPage() {
                             <div className="p-3.5">
                               {/* Avatar + Name + Dept · Company + Status badge */}
                               <div className="flex items-center gap-3 pr-6">
-                                <div className="w-9 h-9 rounded-xl flex items-center justify-center text-[10px] shrink-0" style={{ backgroundColor: tint.bg, color: tint.fg, fontWeight: 700 }}>
-                                  {contact.name.split(" ").filter(Boolean).map(w => w[0]).slice(0, 2).join("").toUpperCase()}
-                                </div>
+                                <ContactAvatar name={contact.name} size="lg" />
                                 <div className="min-w-0 flex-1">
                                   <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{contact.name}</p>
                                   <p className="text-[11px] text-[#334155] truncate" style={{ fontWeight: 500 }}>{shortDept} <span className="text-[#CBD5E1]">·</span> <span className="text-[#94A3B8]" style={{ fontWeight: 400 }}>{(contact.companies || [contact.company])[0]}{(contact.companies || [contact.company]).length > 1 ? ` +${(contact.companies || [contact.company]).length - 1}` : ""}</span></p>

@@ -1064,8 +1064,8 @@ export function ContactDetailPage() {
       </div>
 
       {/* Tab Content */}
-      <div className="flex-1 overflow-y-auto">
-        <div className="max-w-[1440px] mx-auto px-4 lg:px-6 xl:px-8 py-6">
+      <div className="flex-1">
+        <div className={`mx-auto px-4 lg:px-6 xl:px-8 pt-3 pb-5 space-y-4 transition-all duration-300 ${isFullscreen ? "max-w-full" : "max-w-[1440px] 2xl:max-w-[1600px]"}`}>
           {activeTab === "overview" && (
             <ContactOverviewTab
               contact={contact}
