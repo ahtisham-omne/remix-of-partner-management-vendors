@@ -1646,6 +1646,7 @@ export function ContactsDirectoryPage() {
                         return (
                           <div
                             key={contact.id}
+                            onClick={() => navigate(`/partners/contacts/${contact.id}`)}
                             className="rounded-xl border border-[#E8ECF1] bg-white relative group hover:border-[#BFDBFE] hover:shadow-[0_4px_16px_-4px_rgba(10,119,255,0.10)] transition-all shadow-[0_1px_2px_rgba(0,0,0,0.04)] cursor-pointer"
                           >
                             {/* 3-dot menu */}
@@ -1843,6 +1844,7 @@ export function ContactsDirectoryPage() {
                           return (
                             <TableRow
                               key={contact.id}
+                              onClick={() => navigate(`/partners/contacts/${contact.id}`)}
                               className={`cursor-pointer group hover:bg-[#F0F7FF] ${
                                 density === "condensed"
                                   ? "[&>td]:py-1 [&>td]:pl-4 [&>td]:pr-2"

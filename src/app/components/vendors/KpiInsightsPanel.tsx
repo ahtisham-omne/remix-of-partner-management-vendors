@@ -23,6 +23,7 @@ import {
   Globe,
   ToggleLeft,
   ToggleRight,
+  Sliders,
 } from "lucide-react";
 import type { Vendor } from "../../data/vendors";
 
@@ -366,14 +367,14 @@ export function KpiInsightsPanel({
                 className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
                 style={{ backgroundColor: "#EDF4FF" }}
               >
-                <ChartColumn className="w-5 h-5" style={{ color: "#0A77FF" }} />
+                <Sliders className="w-5 h-5" style={{ color: "#0A77FF" }} />
               </div>
               <div>
                 <h2 className="text-base text-foreground" style={{ fontWeight: 600 }}>
-                  Add Insights
+                  Customize Widgets
                 </h2>
                 <p className="text-[13px] text-muted-foreground mt-0.5">
-                  Customize your dashboard with relevant metrics.
+                  Manage your dashboard KPI widgets.
                 </p>
               </div>
             </div>
@@ -384,10 +385,10 @@ export function KpiInsightsPanel({
               <X className="w-4 h-4 text-muted-foreground" />
             </button>
           </div>
-          {/* Toggle all insights */}
+          {/* Toggle all widgets */}
           <div className="flex items-center justify-between mt-4 px-1">
             <span className="text-[12px] text-muted-foreground" style={{ fontWeight: 500 }}>
-              {activeCount} of {ALL_KPI_DEFINITIONS.length} insights active
+              {activeCount} of {ALL_KPI_DEFINITIONS.length} widgets active
             </span>
             <button
               onClick={() => {
@@ -431,7 +432,7 @@ export function KpiInsightsPanel({
         </div>
 
         {/* Search */}
-        <div className="px-5 pt-3.5 pb-1 shrink-0">
+        <div className="px-5 pt-3.5 pb-0 shrink-0">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50 pointer-events-none" />
             <input
@@ -442,6 +443,9 @@ export function KpiInsightsPanel({
             />
           </div>
         </div>
+
+        {/* Separator — matches DashboardCustomizePanel tab bar bottom border */}
+        <div className="border-b border-[#F1F5F9] mt-3 shrink-0" />
 
         {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto px-4 pb-4 scrollbar-hide">

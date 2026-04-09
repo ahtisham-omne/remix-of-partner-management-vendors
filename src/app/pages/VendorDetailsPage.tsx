@@ -1772,18 +1772,20 @@ function ContentCard({ title, icon: Icon, count, children, action, currentSize, 
   dragRef?: React.Ref<HTMLDivElement>;
   isDragging?: boolean;
 }) {
+  const [hovered, setHovered] = useState(false);
   return (
     <div
-      style={{ opacity: isDragging ? 0.4 : 1 }}
-      className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04)] transition-all duration-200 hover:shadow-[0_2px_8px_-2px_rgba(0,0,0,0.06)] h-full flex flex-col"
+      className={`rounded-xl border bg-white overflow-hidden h-full flex flex-col transition-[box-shadow,border-color] duration-300 ${
+        isDragging
+          ? "border-[#E2E8F0] shadow-[0_1px_3px_rgba(0,0,0,0.04)]"
+          : "border-[#E2E8F0] shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-[0_2px_8px_-2px_rgba(0,0,0,0.06)]"
+      }`}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
     >
-      <div className="px-4 py-2.5 border-b border-[#F1F5F9] flex items-center justify-between shrink-0">
-        <div className="flex items-center gap-2">
-          {dragRef && (
-            <div ref={dragRef} className="cursor-grab active:cursor-grabbing p-0.5 -ml-1 rounded hover:bg-[#F1F5F9] transition-colors">
-              <GripVertical className="w-3.5 h-3.5 text-[#CBD5E1]" />
-            </div>
-          )}
+      {/* Header — entire bar is the drag handle */}
+      <div ref={dragRef} className="px-4 py-2.5 border-b border-[#F1F5F9] flex items-center justify-between shrink-0 cursor-grab active:cursor-grabbing select-none">
+        <div className="flex items-center gap-2 pointer-events-none">
           {Icon && (
             <div className="w-7 h-7 rounded-lg bg-[#EDF4FF] flex items-center justify-center shrink-0">
               <Icon className="w-3.5 h-3.5 text-[#0A77FF]" />
@@ -1791,46 +1793,53 @@ function ContentCard({ title, icon: Icon, count, children, action, currentSize, 
           )}
           <span className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>{title}</span>
           {tooltip && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button type="button" className="inline-flex" tabIndex={-1} onClick={(e) => e.stopPropagation()}>
-                  <Info className="w-3 h-3 text-muted-foreground/30 hover:text-muted-foreground/60 transition-colors" />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent
-                side="bottom"
-                sideOffset={6}
-                className="z-[300] max-w-[260px] rounded-xl bg-white/95 backdrop-blur-md text-[#334155] border border-[#E2E8F0]/80 px-3.5 py-2.5 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.12),0_4px_12px_-4px_rgba(0,0,0,0.05)]"
-              >
-                <p className="text-[11px] leading-relaxed">{tooltip}</p>
-              </TooltipContent>
-            </Tooltip>
+            <span className="pointer-events-auto">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button type="button" className="inline-flex" tabIndex={-1} onClick={(e) => e.stopPropagation()}>
+                    <Info className="w-3 h-3 text-muted-foreground/30 hover:text-muted-foreground/60 transition-colors" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent
+                  side="bottom"
+                  sideOffset={6}
+                  className="z-[300] max-w-[260px] rounded-xl bg-white/95 backdrop-blur-md text-[#334155] border border-[#E2E8F0]/80 px-3.5 py-2.5 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.12),0_4px_12px_-4px_rgba(0,0,0,0.05)]"
+                >
+                  <p className="text-[11px] leading-relaxed">{tooltip}</p>
+                </TooltipContent>
+              </Tooltip>
+            </span>
           )}
           {count != null && (
             <span className="text-[10px] text-[#0A77FF] px-1.5 py-0.5 rounded-md bg-[#EDF4FF]" style={{ fontWeight: 600 }}>{count}</span>
           )}
         </div>
-        <div className="flex items-center gap-2">
-          {onSizeChange && currentSize && (
-            <div className="flex items-center gap-px p-0.5 rounded-md bg-[#F1F5F9]">
-              {(["sm", "md", "lg"] as const).map((s) => (
-                <button
-                  key={s}
-                  onClick={() => onSizeChange(s)}
-                  className={`px-1.5 py-0.5 rounded text-[9px] transition-all duration-100 cursor-pointer ${
-                    currentSize === s ? "bg-white text-[#0F172A] shadow-sm" : "text-[#94A3B8] hover:text-[#64748B]"
-                  }`}
-                  style={{ fontWeight: currentSize === s ? 600 : 500 }}
-                >
-                  {s === "sm" ? "S" : s === "md" ? "M" : "L"}
-                </button>
-              ))}
-            </div>
-          )}
-          {action}
+        <div className="flex items-center gap-2 pointer-events-auto">
+          {/* Size toggle — slides in from right on hover */}
+          <div className={`flex items-center transition-all duration-200 ease-out ${hovered && onSizeChange ? "opacity-100 translate-x-0" : "opacity-0 translate-x-2 pointer-events-none"}`}>
+            {onSizeChange && currentSize && (
+              <div className="flex items-center h-7 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-0.5 gap-0.5">
+                {(["sm", "md", "lg"] as const).map((s) => (
+                  <button
+                    key={s}
+                    onClick={(e) => { e.stopPropagation(); onSizeChange(s); }}
+                    className={`h-6 px-2.5 rounded-md text-[11px] cursor-pointer transition-all duration-150 ${
+                      currentSize === s
+                        ? "bg-white text-[#0A77FF] shadow-sm border border-[#E2E8F0]"
+                        : "text-[#94A3B8] hover:text-[#334155] hover:bg-white/60 border border-transparent"
+                    }`}
+                    style={{ fontWeight: currentSize === s ? 600 : 500 }}
+                  >
+                    {s === "sm" ? "Small" : s === "md" ? "Medium" : "Large"}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          <span className="pointer-events-auto">{action}</span>
         </div>
       </div>
-      <div className={`flex-1 flex flex-col justify-between ${currentSize === "sm" ? "p-3" : "p-4"}`}>{children}</div>
+      <div className={`flex-1 flex flex-col justify-between ${currentSize === "sm" ? "p-3" : currentSize === "lg" ? "p-5" : "p-4"}`}>{children}</div>
     </div>
   );
 }
@@ -1864,8 +1873,8 @@ function DraggableWidgetCard({ widgetKey, index, moveWidget, children }: {
   return (
     <div
       ref={ref}
-      style={{ opacity: isDragging ? 0.35 : 1 }}
-      className={`transition-all duration-150 rounded-xl h-full ${isOver && !isDragging ? "ring-2 ring-[#0A77FF]/20 ring-offset-2" : ""}`}
+      className={`transition-all duration-300 ease-out rounded-xl h-full ${isOver && !isDragging ? "ring-2 ring-[#0A77FF]/20 ring-offset-2 scale-[1.005]" : ""}`}
+      style={{ opacity: isDragging ? 0.3 : 1, transform: isDragging ? "scale(0.97) rotate(-0.5deg)" : undefined }}
     >
       {children((node) => { drag(node); }, isDragging)}
     </div>
@@ -2302,17 +2311,19 @@ function DashboardCustomizePanel({ open, onOpenChange, activeKpis, onToggleKpi, 
                       <span className={`text-[12px] transition-colors ${isActive ? "text-[#0A77FF]" : "text-[#0F172A]"}`} style={{ fontWeight: 600 }}>{w.label}</span>
                       <div className="flex items-center gap-1.5">
                         {/* Per-card size toggle */}
-                        <div className="flex items-center gap-px p-px rounded-md bg-[#F1F5F9]" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center h-7 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-0.5 gap-0.5" onClick={(e) => e.stopPropagation()}>
                           {(["sm", "md", "lg"] as const).map((s) => (
                             <button
                               key={s}
                               onClick={() => onWidgetSizeChange(w.key, s)}
-                              className={`px-1.5 py-0.5 rounded text-[9px] transition-all duration-100 cursor-pointer ${
-                                sz === s ? "bg-white text-[#0F172A] shadow-sm" : "text-[#94A3B8] hover:text-[#64748B]"
+                              className={`h-6 px-2 rounded-md text-[10px] transition-all duration-150 cursor-pointer ${
+                                sz === s
+                                  ? "bg-white text-[#0A77FF] shadow-sm border border-[#E2E8F0]"
+                                  : "text-[#94A3B8] hover:text-[#334155] hover:bg-white/60 border border-transparent"
                               }`}
                               style={{ fontWeight: sz === s ? 600 : 500 }}
                             >
-                              {s === "sm" ? "S" : s === "md" ? "M" : "L"}
+                              {s === "sm" ? "Small" : s === "md" ? "Medium" : "Large"}
                             </button>
                           ))}
                         </div>
@@ -2525,7 +2536,7 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
 
       {/* ═══ LEFT COLUMN — Charts & Widgets (dynamic from activeWidgets) ═══ */}
       <DndProvider backend={HTML5Backend}>
-      <div className="space-y-3 min-w-0">
+      <div className="flex flex-wrap gap-3 items-stretch min-w-0">
         {(() => {
           // Default spans per widget — overridden by size:
           // Small → always "half" (2 per row), Medium → default, Large → always "full"
@@ -2539,7 +2550,7 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
             notes: "full",
           };
 
-          type WidgetNode = { key: string; idx: number; span: "full" | "half"; node: React.ReactNode };
+          type WidgetNode = { key: string; idx: number; span: "full" | "half"; width: string; node: React.ReactNode };
           const nodes: WidgetNode[] = [];
 
           // Standardized chart heights per size — same for EVERY widget
@@ -3004,12 +3015,14 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
 
           if (!content) return;
 
-            // Small → always half (2-per-row), Large → always full, Medium → use default
+            // Small → always half, Large → always full, Medium → use default
             const span = sz === "sm" ? "half" : sz === "lg" ? "full" : (DEFAULT_SPANS[wKey] || "half");
+            const widthVal = span === "full" ? "100%" : "calc(50% - 6px)";
             nodes.push({
               key: wKey,
               idx: wIdx,
               span,
+              width: widthVal,
               node: (
                 <DraggableWidgetCard key={wKey} widgetKey={wKey} index={wIdx} moveWidget={moveWidget}>
                   {(dragRef, dragging) => (
@@ -3022,36 +3035,11 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
             });
           });
 
-          // Group nodes: full-width render alone, consecutive halves render in 2-col grid
-          const output: React.ReactNode[] = [];
-          let halfBuf: WidgetNode[] = [];
-
-          const flushHalves = () => {
-            if (halfBuf.length === 0) return;
-            if (halfBuf.length === 1) {
-              output.push(halfBuf[0].node);
-            } else {
-              output.push(
-                <div key={`grid-${halfBuf[0].key}`} className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                  {halfBuf.map((h) => h.node)}
-                </div>
-              );
-            }
-            halfBuf = [];
-          };
-
-          for (const n of nodes) {
-            if (n.span === "full") {
-              flushHalves();
-              output.push(n.node);
-            } else {
-              halfBuf.push(n);
-              if (halfBuf.length === 2) flushHalves();
-            }
-          }
-          flushHalves();
-
-          return output;
+          return nodes.map((n) => (
+            <div key={n.key} style={{ width: n.width }} className="transition-[width] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]">
+              {n.node}
+            </div>
+          ));
         })()}
       </div>
       </DndProvider>
