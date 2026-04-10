@@ -210,6 +210,41 @@ const NOTES_DATA = [
   { id: 3, author: "Admin", date: "2026-01-10T11:15:00Z", text: "Verified contact details during quarterly data cleanup. All information current and accurate." },
 ];
 
+const PURCHASE_ORDERS_DATA = [
+  { id: "PO-3021", vendor: "Acme Corp", amount: "$18,500", status: "Approved", date: "2026-03-28T09:00:00Z" },
+  { id: "PO-2984", vendor: "TechVault", amount: "$7,200", status: "Pending", date: "2026-03-22T14:00:00Z" },
+  { id: "PO-2951", vendor: "NexGen Solutions", amount: "$34,800", status: "Delivered", date: "2026-03-15T10:30:00Z" },
+  { id: "PO-2913", vendor: "Apex Industries", amount: "$12,100", status: "Delivered", date: "2026-03-08T11:00:00Z" },
+  { id: "PO-2887", vendor: "Summit Group", amount: "$5,600", status: "Approved", date: "2026-02-28T16:00:00Z" },
+  { id: "PO-2845", vendor: "Vertex Labs", amount: "$22,400", status: "Delivered", date: "2026-02-20T09:30:00Z" },
+];
+
+const SALES_ORDERS_DATA = [
+  { id: "SO-1102", customer: "Acme Corp", amount: "$9,800", status: "Fulfilled", date: "2026-03-26T10:00:00Z" },
+  { id: "SO-1089", customer: "Pioneer Systems", amount: "$15,300", status: "Processing", date: "2026-03-20T14:30:00Z" },
+  { id: "SO-1074", customer: "Atlas Logistics", amount: "$6,400", status: "Fulfilled", date: "2026-03-14T09:00:00Z" },
+  { id: "SO-1058", customer: "Beacon Analytics", amount: "$28,700", status: "Shipped", date: "2026-03-08T11:00:00Z" },
+  { id: "SO-1041", customer: "Cascade Networks", amount: "$11,200", status: "Fulfilled", date: "2026-02-28T16:30:00Z" },
+  { id: "SO-1029", customer: "Delta Manufacturing", amount: "$4,500", status: "Fulfilled", date: "2026-02-22T10:00:00Z" },
+];
+
+const QUOTES_DATA = [
+  { id: "QT-4501", partner: "Acme Corp", amount: "$24,000", status: "Accepted", validUntil: "2026-04-30T00:00:00Z", date: "2026-03-25T09:00:00Z" },
+  { id: "QT-4487", partner: "TechVault", amount: "$8,900", status: "Pending", validUntil: "2026-04-15T00:00:00Z", date: "2026-03-18T14:00:00Z" },
+  { id: "QT-4472", partner: "NexGen Solutions", amount: "$41,200", status: "Expired", validUntil: "2026-03-01T00:00:00Z", date: "2026-02-15T10:00:00Z" },
+  { id: "QT-4458", partner: "Summit Group", amount: "$6,750", status: "Accepted", validUntil: "2026-05-01T00:00:00Z", date: "2026-03-10T11:30:00Z" },
+  { id: "QT-4441", partner: "Vertex Labs", amount: "$19,300", status: "Rejected", validUntil: "2026-03-20T00:00:00Z", date: "2026-02-28T09:00:00Z" },
+];
+
+const COMMUNICATIONS_DATA = [
+  { id: 1, type: "Email", subject: "Q1 Review Meeting Follow-up", from: "Sarah Johnson", date: "2026-03-28T10:15:00Z", status: "Sent" },
+  { id: 2, type: "Call", subject: "Pricing Discussion", from: "Contact", date: "2026-03-25T14:00:00Z", status: "Completed" },
+  { id: 3, type: "Email", subject: "Updated Contract Terms", from: "Michael Lee", date: "2026-03-20T09:30:00Z", status: "Sent" },
+  { id: 4, type: "Email", subject: "Invoice #INV-2026-0342", from: "System", date: "2026-03-15T08:00:00Z", status: "Sent" },
+  { id: 5, type: "Call", subject: "Onboarding Walkthrough", from: "Sarah Johnson", date: "2026-03-10T11:00:00Z", status: "Missed" },
+  { id: 6, type: "Email", subject: "Partnership Renewal Notice", from: "Admin", date: "2026-03-01T09:00:00Z", status: "Sent" },
+];
+
 const ATTACHMENTS_DATA = [
   { id: 1, name: "NDA_Agreement_2026.pdf", size: "1.2 MB", date: "2026-03-10T09:00:00Z", type: "pdf" },
   { id: 2, name: "Contact_Onboarding_Form.docx", size: "340 KB", date: "2026-01-15T14:20:00Z", type: "doc" },
@@ -995,19 +1030,19 @@ export function ContactDetailPage() {
           <div className={`mx-auto px-4 lg:px-6 xl:px-8 transition-all duration-300 ${isFullscreen ? "max-w-full" : "max-w-[1440px] 2xl:max-w-[1600px]"}`}>
             <div className={`bg-white border border-[#E2E8F0] rounded-xl overflow-hidden transition-shadow duration-250 ${isCompact ? "shadow-[0_1px_3px_0_rgba(0,0,0,0.04),0_4px_12px_-4px_rgba(0,0,0,0.05)]" : "shadow-sm"}`}>
               {/* Main header row */}
-              <div className="flex items-center justify-between gap-4 px-4 lg:px-5 transition-all duration-250 ease-in-out" style={{ padding: isCompact ? "6px 16px" : "14px 16px" }}>
-                <div className="flex items-center min-w-0 transition-all duration-250" style={{ gap: isCompact ? 10 : 16 }}>
-                  <button onClick={() => navigate("/partners/contacts")} className="rounded-lg border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] flex items-center justify-center shrink-0 cursor-pointer shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition-all duration-250" style={{ width: isCompact ? 30 : 36, height: isCompact ? 30 : 36 }}>
-                    <ChevronLeft className="text-[#94A3B8] transition-all duration-250" style={{ width: isCompact ? 14 : 16, height: isCompact ? 14 : 16 }} />
+              <div className="flex items-start justify-between gap-4 transition-all duration-250 ease-in-out" style={{ padding: isCompact ? "8px 16px" : "18px 20px" }}>
+                <div className="flex items-start min-w-0 transition-all duration-250" style={{ gap: isCompact ? 10 : 16 }}>
+                  <button onClick={() => navigate("/partners/contacts")} className="rounded-xl border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] flex items-center justify-center shrink-0 cursor-pointer shadow-[0_1px_3px_0_rgba(0,0,0,0.04),0_1px_2px_-1px_rgba(0,0,0,0.03)] transition-all duration-250" style={{ width: isCompact ? 32 : 44, height: isCompact ? 32 : 44 }}>
+                    <ChevronLeft className="text-[#94A3B8] transition-all duration-250" style={{ width: isCompact ? 16 : 20, height: isCompact ? 16 : 20 }} />
                   </button>
-                  {/* Avatar — 72px expanded, 36px compact */}
-                  <div className="rounded-2xl flex items-center justify-center shrink-0 overflow-hidden border-2 border-white shadow-[0_3px_12px_-3px_rgba(0,0,0,0.15),0_0_0_1px_rgba(0,0,0,0.04)] transition-all duration-250" style={{ width: isCompact ? 36 : 72, height: isCompact ? 36 : 72, backgroundColor: tint.bg }}>
-                    {photo && !imgFailed ? (<img src={photo} alt="" className="w-full h-full object-cover" onError={() => setImgFailed(true)} />) : (<span className="transition-all duration-250" style={{ fontSize: isCompact ? 12 : 24, fontWeight: 700, color: tint.fg }}>{initials}</span>)}
+                  {/* Avatar — 88px expanded, 38px compact */}
+                  <div className="rounded-2xl flex items-center justify-center shrink-0 overflow-hidden border-[3px] border-white shadow-[0_4px_16px_-4px_rgba(0,0,0,0.18),0_0_0_1px_rgba(0,0,0,0.04)] transition-all duration-250" style={{ width: isCompact ? 38 : 88, height: isCompact ? 38 : 88, backgroundColor: tint.bg }}>
+                    {photo && !imgFailed ? (<img src={photo} alt="" className="w-full h-full object-cover" onError={() => setImgFailed(true)} />) : (<span className="transition-all duration-250" style={{ fontSize: isCompact ? 13 : 30, fontWeight: 700, color: tint.fg }}>{initials}</span>)}
                   </div>
                   <div className="min-w-0 flex-1">
                     {/* Row 1: Name + Status dropdown + Department badges */}
                     <div className="flex items-center flex-wrap transition-all duration-250" style={{ gap: isCompact ? 6 : 8 }}>
-                      <h1 className="text-[#0F172A] truncate transition-all duration-250" style={{ fontSize: isCompact ? 14 : 17, fontWeight: 700, lineHeight: 1.3 }}>{contact.name}</h1>
+                      <h1 className="text-[#0F172A] truncate transition-all duration-250" style={{ fontSize: isCompact ? 14 : 19, fontWeight: 700, lineHeight: 1.3 }}>{contact.name}</h1>
                       {/* Status pill — clickable dropdown to change status */}
                       <Popover open={statusDropdownOpen} onOpenChange={setStatusDropdownOpen}>
                         <PopoverTrigger asChild>
@@ -1086,18 +1121,18 @@ export function ContactDetailPage() {
                       })()}
                     </div>
                     {/* Row 2: Role · Company — always visible */}
-                    <p className="text-[#64748B] truncate transition-all duration-250" style={{ fontSize: isCompact ? 11 : 12.5, marginTop: isCompact ? 1 : 3 }}>
-                      {contact.role || "Contact"} <span className="text-[#CBD5E1]">·</span> {(contact.companies || [contact.company])[0]}
+                    <p className="text-[#64748B] truncate transition-all duration-250" style={{ fontSize: isCompact ? 11 : 13.5, marginTop: isCompact ? 1 : 4, fontWeight: 400 }}>
+                      {contact.role || "Contact"} <span className="text-[#CBD5E1] mx-0.5">·</span> {(contact.companies || [contact.company])[0]}
                     </p>
-                    {/* Row 3: Multi-emails, multi-phones, socials, partners — collapses on scroll */}
-                    <div className="overflow-hidden transition-all duration-250 ease-in-out" style={{ maxHeight: isCompact ? 0 : 22, opacity: isCompact ? 0 : 1, marginTop: isCompact ? 0 : 5 }}>
-                      <div className="flex items-center gap-2.5 flex-wrap">
-                        {/* Emails — hover opens compose box */}
+                    {/* Row 3: Contact data — collapses on scroll */}
+                    <div className="overflow-hidden transition-all duration-250 ease-in-out" style={{ maxHeight: isCompact ? 0 : 24, opacity: isCompact ? 0 : 1, marginTop: isCompact ? 0 : 8 }}>
+                      <div className="flex items-center gap-3 flex-wrap">
+                        {/* Email */}
                         <div className="flex items-center gap-1.5">
-                          <Mail className="w-3 h-3 text-[#94A3B8] shrink-0" />
+                          <Mail className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" />
                           <button
                             onClick={() => { setComposeTo(emailList[0].address); setComposeSubject(""); setComposeBody(""); setComposeOpen(true); setComposeMinimized(false); }}
-                            className="text-[11.5px] text-[#475569] hover:text-[#0A77FF] hover:underline transition-colors cursor-pointer bg-transparent border-0 p-0"
+                            className="text-[11.5px] text-[#334155] hover:text-[#0A77FF] hover:underline transition-colors cursor-pointer bg-transparent border-0 p-0"
                             style={{ fontWeight: 500 }}
                           >
                             {emailList[0].address}
@@ -1105,16 +1140,12 @@ export function ContactDetailPage() {
                           {emailList.length > 1 && (
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <span className="text-[10px] text-[#0A77FF] cursor-default" style={{ fontWeight: 600 }}>+{emailList.length - 1} more</span>
+                                <span className="text-[11px] shrink-0 cursor-default leading-none" style={{ fontWeight: 600, color: "#085FCC" }}>+{emailList.length - 1} more</span>
                               </TooltipTrigger>
-                              <TooltipContent side="bottom" className="z-[300] max-w-[280px]">
-                                <div className="space-y-1">
+                              <TooltipContent side="bottom" className="z-[300] max-w-[300px]">
+                                <div className="space-y-1.5">
                                   {emailList.map((e) => (
-                                    <button
-                                      key={e.id}
-                                      onClick={() => { setComposeTo(e.address); setComposeSubject(""); setComposeBody(""); setComposeOpen(true); setComposeMinimized(false); }}
-                                      className="w-full flex items-center gap-2 text-left hover:bg-[#F8FAFC] rounded px-1 py-0.5 transition-colors cursor-pointer bg-transparent border-0"
-                                    >
+                                    <button key={e.id} onClick={() => { setComposeTo(e.address); setComposeSubject(""); setComposeBody(""); setComposeOpen(true); setComposeMinimized(false); }} className="w-full flex items-center gap-2 text-left hover:bg-[#F8FAFC] rounded px-1 py-0.5 transition-colors cursor-pointer bg-transparent border-0">
                                       <span className="text-[10px] text-[#94A3B8] shrink-0" style={{ fontWeight: 500 }}>{e.type}</span>
                                       <span className="text-[11px] hover:text-[#0A77FF] hover:underline transition-colors">{e.address}</span>
                                     </button>
@@ -1124,22 +1155,22 @@ export function ContactDetailPage() {
                             </Tooltip>
                           )}
                         </div>
-                        <div className="w-px h-3 bg-[#E2E8F0]" />
-                        {/* Phones */}
+                        <div className="w-px h-3.5 bg-[#E2E8F0]" />
+                        {/* Phone */}
                         <div className="flex items-center gap-1.5">
-                          <Phone className="w-3 h-3 text-[#94A3B8] shrink-0" />
-                          <span className="text-[11.5px] text-[#475569]" style={{ fontWeight: 500 }}>{phoneList[0].code} {phoneList[0].number}{phoneList[0].ext ? ` ext. ${phoneList[0].ext}` : ""}</span>
+                          <Phone className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" />
+                          <span className="text-[11.5px] text-[#334155]" style={{ fontWeight: 500 }}>{phoneList[0].code} {phoneList[0].number}{phoneList[0].ext ? ` ext. ${phoneList[0].ext}` : ""}</span>
                           {phoneList.length > 1 && (
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <span className="text-[10px] text-[#0A77FF] cursor-default" style={{ fontWeight: 600 }}>+{phoneList.length - 1} more</span>
+                                <span className="text-[11px] shrink-0 cursor-default leading-none" style={{ fontWeight: 600, color: "#085FCC" }}>+{phoneList.length - 1} more</span>
                               </TooltipTrigger>
-                              <TooltipContent side="bottom" className="z-[300] max-w-[280px]">
-                                <div className="space-y-1">
+                              <TooltipContent side="bottom" className="z-[300] max-w-[300px]">
+                                <div className="space-y-1.5">
                                   {phoneList.slice(1).map((p) => (
                                     <div key={p.id} className="flex items-center gap-2">
                                       <span className="text-[10px] text-[#94A3B8] shrink-0" style={{ fontWeight: 500 }}>{p.type}</span>
-                                      <span className="text-[11px]">{p.code} {p.number}{p.ext ? ` ext. ${p.ext}` : ""}</span>
+                                      <span className="text-[11px] text-[#334155]">{p.code} {p.number}{p.ext ? ` ext. ${p.ext}` : ""}</span>
                                     </div>
                                   ))}
                                 </div>
@@ -1150,8 +1181,8 @@ export function ContactDetailPage() {
                         {/* Socials — grey icons, brand color on hover */}
                         {socialList.length > 0 && (
                           <>
-                            <div className="w-px h-3 bg-[#E2E8F0]" />
-                            <div className="flex items-center gap-2">
+                            <div className="w-px h-3.5 bg-[#E2E8F0]" />
+                            <div className="flex items-center gap-1.5">
                               {socialList.map((s) => {
                                 const socialMeta: Record<string, { icon: React.ElementType; color: string; label: string }> = {
                                   "LinkedIn": { icon: Linkedin, color: "#0A66C2", label: "LinkedIn" },
@@ -1166,19 +1197,12 @@ export function ContactDetailPage() {
                                 return (
                                   <Tooltip key={s.id}>
                                     <TooltipTrigger asChild>
-                                      <a
-                                        href={s.url}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="group/social relative w-5 h-5 rounded flex items-center justify-center transition-all duration-150 hover:bg-[#F1F5F9]"
-                                      >
+                                      <a href={s.url} target="_blank" rel="noopener noreferrer" className="group/social relative w-5 h-5 rounded flex items-center justify-center transition-all duration-150 hover:bg-[#F1F5F9]">
                                         <SIcon className="w-3.5 h-3.5 text-[#94A3B8] group-hover/social:opacity-0 transition-opacity duration-150" />
                                         <SIcon className="w-3.5 h-3.5 absolute opacity-0 group-hover/social:opacity-100 transition-opacity duration-150" style={{ color: meta.color }} />
                                       </a>
                                     </TooltipTrigger>
-                                    <TooltipContent side="bottom" className="z-[300]">
-                                      <span className="text-[11px]">{meta.label}</span>
-                                    </TooltipContent>
+                                    <TooltipContent side="bottom" className="z-[300]"><span className="text-[11px]">{meta.label}</span></TooltipContent>
                                   </Tooltip>
                                 );
                               })}
@@ -1196,12 +1220,12 @@ export function ContactDetailPage() {
                       <button
                         onClick={() => setIsFullscreen(!isFullscreen)}
                         className="rounded-lg border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] flex items-center justify-center cursor-pointer shadow-sm transition-all duration-250"
-                        style={{ width: isCompact ? 30 : 34, height: isCompact ? 30 : 34 }}
+                        style={{ width: isCompact ? 32 : 36, height: isCompact ? 32 : 36 }}
                       >
                         {isFullscreen ? (
-                          <Minimize2 className="text-[#64748B]" style={{ width: 14, height: 14 }} />
+                          <Minimize2 className="text-[#64748B] transition-all duration-250" style={{ width: isCompact ? 14 : 16, height: isCompact ? 14 : 16 }} />
                         ) : (
-                          <Maximize2 className="text-[#64748B]" style={{ width: 14, height: 14 }} />
+                          <Maximize2 className="text-[#64748B] transition-all duration-250" style={{ width: isCompact ? 14 : 16, height: isCompact ? 14 : 16 }} />
                         )}
                       </button>
                     </TooltipTrigger>
@@ -1209,7 +1233,7 @@ export function ContactDetailPage() {
                   </Tooltip>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <button className="rounded-lg border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] inline-flex items-center gap-1.5 cursor-pointer shadow-sm transition-all duration-250 text-[#334155]" style={{ height: isCompact ? 30 : 34, padding: isCompact ? "0 10px" : "0 12px", fontSize: isCompact ? 12 : 13, fontWeight: 500 }}>Actions <ChevronDown style={{ width: 12, height: 12 }} className="text-[#94A3B8]" /></button>
+                      <button className={`rounded-lg border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] text-[#334155] inline-flex items-center gap-1.5 transition-all duration-200 cursor-pointer shadow-sm ${isCompact ? "h-8 px-3 text-[12px]" : "h-9 px-3.5 text-[13px]"}`} style={{ fontWeight: 500 }}>Actions <ChevronDown className="w-3.5 h-3.5 text-[#94A3B8]" /></button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-[200px]">
                       <DropdownMenuItem onClick={() => { navigator.clipboard.writeText(window.location.href); toast.success("Link copied"); }}><Link2 className="w-4 h-4 mr-2" /> Copy Link</DropdownMenuItem>
@@ -1218,7 +1242,7 @@ export function ContactDetailPage() {
                       <DropdownMenuItem className="text-[#DC2626] focus:text-[#DC2626] focus:bg-[#FEF2F2]" onClick={() => setShowArchiveModal(true)}><Archive className="w-4 h-4 mr-2 text-[#DC2626]" /> Archive</DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
-                  <button onClick={handleOpenEdit} className="rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white inline-flex items-center gap-1.5 shadow-sm transition-all duration-250 cursor-pointer" style={{ height: isCompact ? 30 : 34, padding: isCompact ? "0 12px" : "0 14px", fontSize: isCompact ? 12 : 13, fontWeight: 600 }}><Pencil style={{ width: 13, height: 13 }} /> Edit</button>
+                  <button onClick={handleOpenEdit} className={`rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white inline-flex items-center gap-1.5 transition-all duration-200 cursor-pointer shadow-sm ${isCompact ? "h-8 px-3.5 text-[12px]" : "h-9 px-4 text-[13px]"}`} style={{ fontWeight: 600 }}><Pencil className={isCompact ? "w-3 h-3" : "w-3.5 h-3.5"} /> Edit Contact</button>
                 </div>
               </div>
 
@@ -1387,17 +1411,17 @@ export function ContactDetailPage() {
 
           {activeTab === "linked_partners" && (
             <div className="bg-white border border-[#E2E8F0] rounded-xl overflow-hidden">
-              <div className="px-5 py-4 border-b border-[#F1F5F9] flex items-center justify-between">
+              <div className="px-5 py-3 border-b border-[#F1F5F9] flex items-center justify-between">
                 <h3 className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Linked Partners</h3>
-                <span className="text-[11px] text-[#94A3B8] bg-[#F1F5F9] rounded-full px-2.5 py-0.5" style={{ fontWeight: 600 }}>
-                  {contact.linkedPartners.length} partner{contact.linkedPartners.length !== 1 ? "s" : ""}
-                </span>
+                <span className="text-[11px] shrink-0" style={{ fontWeight: 600, color: "#085FCC" }}>{contact.linkedPartners.length} partner{contact.linkedPartners.length !== 1 ? "s" : ""}</span>
               </div>
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-[#F1F5F9]">
-                    <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2.5" style={{ fontWeight: 600 }}>Partner Name</th>
-                    <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2.5" style={{ fontWeight: 600 }}>Status</th>
+                    <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>Partner Name</th>
+                    <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>Type</th>
+                    <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>Linked Since</th>
+                    <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>Status</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1405,22 +1429,35 @@ export function ContactDetailPage() {
                     const pTint = getAvatarTint(partner);
                     const pInitials = partner.split(" ").filter(Boolean).map((w) => w[0]).slice(0, 2).join("").toUpperCase();
                     const partnerId = partnerNameToId[partner];
+                    let hash = 0; for (let i = 0; i < partner.length; i++) hash = partner.charCodeAt(i) + ((hash << 5) - hash);
+                    const absH = Math.abs(hash);
+                    const linkedMonth = (absH % 12) + 1;
+                    const linkedDay = (absH % 28) + 1;
+                    const linkedDate = new Date(2025, linkedMonth - 1, linkedDay).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+                    const partnerType = absH % 3 === 0 ? "Customer" : "Vendor";
                     return (
                       <tr
                         key={idx}
                         className={`border-b border-[#F1F5F9] last:border-b-0 hover:bg-[#F8FAFC] transition-colors ${partnerId ? "cursor-pointer" : ""}`}
                         onClick={() => { if (partnerId) navigate(`/vendors/${partnerId}`); }}
                       >
-                        <td className="px-5 py-3">
-                          <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ backgroundColor: pTint.bg }}>
-                              <span className="text-[10px]" style={{ fontWeight: 700, color: pTint.fg }}>{pInitials}</span>
+                        <td className="px-5 py-2.5">
+                          <div className="flex items-center gap-2.5">
+                            <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" style={{ backgroundColor: pTint.bg }}>
+                              <span className="text-[9px]" style={{ fontWeight: 700, color: pTint.fg }}>{pInitials}</span>
                             </div>
-                            <span className={`text-[13px] text-[#334155] ${partnerId ? "hover:text-[#0A77FF]" : ""}`} style={{ fontWeight: 500 }}>{partner}</span>
+                            <div>
+                              <span className={`text-[12px] text-[#334155] block ${partnerId ? "hover:text-[#0A77FF]" : ""}`} style={{ fontWeight: 500 }}>{partner}</span>
+                              {idx === 0 && <span className="text-[9px]" style={{ fontWeight: 600, color: "#085FCC" }}>PRIMARY</span>}
+                            </div>
                           </div>
                         </td>
-                        <td className="px-5 py-3">
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] border" style={{ fontWeight: 500, backgroundColor: "#ECFDF5", color: "#065F46", borderColor: "#A7F3D0" }}>Active</span>
+                        <td className="px-5 py-2.5">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] border" style={{ fontWeight: 500, ...(partnerType === "Vendor" ? { backgroundColor: "#DBEAFE", color: "#2563EB", borderColor: "#BFDBFE" } : { backgroundColor: "#EDE9FE", color: "#7C3AED", borderColor: "#C4B5FD" }) }}>{partnerType}</span>
+                        </td>
+                        <td className="px-5 py-2.5"><span className="text-[12px] text-[#64748B]">{linkedDate}</span></td>
+                        <td className="px-5 py-2.5">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] border" style={{ fontWeight: 500, backgroundColor: "#ECFDF5", color: "#065F46", borderColor: "#A7F3D0" }}>Active</span>
                         </td>
                       </tr>
                     );
@@ -1431,34 +1468,141 @@ export function ContactDetailPage() {
           )}
 
           {activeTab === "communications" && (
-            <div className="flex flex-col items-center gap-3 py-16 text-[#94A3B8]">
-              <MessageSquare className="w-10 h-10" />
-              <p className="text-sm" style={{ fontWeight: 500 }}>Communications</p>
-              <p className="text-xs text-center max-w-[300px]">Track and manage communications with this contact. This feature is coming soon.</p>
+            <div className="bg-white border border-[#E2E8F0] rounded-xl overflow-hidden">
+              <div className="px-5 py-3 border-b border-[#F1F5F9] flex items-center justify-between">
+                <h3 className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Communications</h3>
+                <span className="text-[11px] shrink-0" style={{ fontWeight: 600, color: "#085FCC" }}>{COMMUNICATIONS_DATA.length} records</span>
+              </div>
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-[#F1F5F9]">
+                    <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>Type</th>
+                    <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>Subject</th>
+                    <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>From</th>
+                    <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>Date</th>
+                    <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {COMMUNICATIONS_DATA.map((item) => (
+                    <tr key={item.id} className="border-b border-[#F1F5F9] last:border-b-0 hover:bg-[#F8FAFC] transition-colors cursor-pointer">
+                      <td className="px-5 py-2.5">
+                        <div className="flex items-center gap-1.5">
+                          {item.type === "Email" ? <Mail className="w-3.5 h-3.5 text-[#94A3B8]" /> : <Phone className="w-3.5 h-3.5 text-[#94A3B8]" />}
+                          <span className="text-[12px] text-[#334155]" style={{ fontWeight: 500 }}>{item.type}</span>
+                        </div>
+                      </td>
+                      <td className="px-5 py-2.5"><span className="text-[12px] text-[#334155]" style={{ fontWeight: 500 }}>{item.subject}</span></td>
+                      <td className="px-5 py-2.5"><span className="text-[12px] text-[#64748B]">{item.from}</span></td>
+                      <td className="px-5 py-2.5"><span className="text-[12px] text-[#64748B]">{formatDate(item.date)}</span></td>
+                      <td className="px-5 py-2.5">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] border" style={{ fontWeight: 500, ...(item.status === "Sent" ? { backgroundColor: "#EFF6FF", color: "#1E40AF", borderColor: "#BFDBFE" } : item.status === "Completed" ? { backgroundColor: "#ECFDF5", color: "#065F46", borderColor: "#A7F3D0" } : { backgroundColor: "#FFFBEB", color: "#92400E", borderColor: "#FDE68A" }) }}>{item.status}</span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
 
           {activeTab === "purchase_orders" && (
-            <div className="flex flex-col items-center gap-3 py-16 text-[#94A3B8]">
-              <ShoppingCart className="w-10 h-10" />
-              <p className="text-sm" style={{ fontWeight: 500 }}>Purchase Orders</p>
-              <p className="text-xs text-center max-w-[300px]">View purchase orders associated with this contact. This feature is coming soon.</p>
+            <div className="bg-white border border-[#E2E8F0] rounded-xl overflow-hidden">
+              <div className="px-5 py-3 border-b border-[#F1F5F9] flex items-center justify-between">
+                <h3 className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Purchase Orders</h3>
+                <span className="text-[11px] shrink-0" style={{ fontWeight: 600, color: "#085FCC" }}>{PURCHASE_ORDERS_DATA.length} orders</span>
+              </div>
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-[#F1F5F9]">
+                    <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>PO #</th>
+                    <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>Vendor</th>
+                    <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>Amount</th>
+                    <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>Date</th>
+                    <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {PURCHASE_ORDERS_DATA.map((po) => (
+                    <tr key={po.id} className="border-b border-[#F1F5F9] last:border-b-0 hover:bg-[#F8FAFC] transition-colors cursor-pointer">
+                      <td className="px-5 py-2.5"><span className="text-[12px] text-[#0A77FF]" style={{ fontWeight: 600 }}>{po.id}</span></td>
+                      <td className="px-5 py-2.5"><span className="text-[12px] text-[#334155]" style={{ fontWeight: 500 }}>{po.vendor}</span></td>
+                      <td className="px-5 py-2.5"><span className="text-[12px] text-[#334155]" style={{ fontWeight: 600 }}>{po.amount}</span></td>
+                      <td className="px-5 py-2.5"><span className="text-[12px] text-[#64748B]">{formatDate(po.date)}</span></td>
+                      <td className="px-5 py-2.5">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] border" style={{ fontWeight: 500, ...(po.status === "Approved" ? { backgroundColor: "#EFF6FF", color: "#1E40AF", borderColor: "#BFDBFE" } : po.status === "Delivered" ? { backgroundColor: "#ECFDF5", color: "#065F46", borderColor: "#A7F3D0" } : { backgroundColor: "#FFFBEB", color: "#92400E", borderColor: "#FDE68A" }) }}>{po.status}</span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
 
           {activeTab === "sales_orders" && (
-            <div className="flex flex-col items-center gap-3 py-16 text-[#94A3B8]">
-              <Receipt className="w-10 h-10" />
-              <p className="text-sm" style={{ fontWeight: 500 }}>Sales Orders</p>
-              <p className="text-xs text-center max-w-[300px]">View sales orders associated with this contact. This feature is coming soon.</p>
+            <div className="bg-white border border-[#E2E8F0] rounded-xl overflow-hidden">
+              <div className="px-5 py-3 border-b border-[#F1F5F9] flex items-center justify-between">
+                <h3 className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Sales Orders</h3>
+                <span className="text-[11px] shrink-0" style={{ fontWeight: 600, color: "#085FCC" }}>{SALES_ORDERS_DATA.length} orders</span>
+              </div>
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-[#F1F5F9]">
+                    <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>SO #</th>
+                    <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>Customer</th>
+                    <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>Amount</th>
+                    <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>Date</th>
+                    <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {SALES_ORDERS_DATA.map((so) => (
+                    <tr key={so.id} className="border-b border-[#F1F5F9] last:border-b-0 hover:bg-[#F8FAFC] transition-colors cursor-pointer">
+                      <td className="px-5 py-2.5"><span className="text-[12px] text-[#0A77FF]" style={{ fontWeight: 600 }}>{so.id}</span></td>
+                      <td className="px-5 py-2.5"><span className="text-[12px] text-[#334155]" style={{ fontWeight: 500 }}>{so.customer}</span></td>
+                      <td className="px-5 py-2.5"><span className="text-[12px] text-[#334155]" style={{ fontWeight: 600 }}>{so.amount}</span></td>
+                      <td className="px-5 py-2.5"><span className="text-[12px] text-[#64748B]">{formatDate(so.date)}</span></td>
+                      <td className="px-5 py-2.5">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] border" style={{ fontWeight: 500, ...(so.status === "Fulfilled" ? { backgroundColor: "#ECFDF5", color: "#065F46", borderColor: "#A7F3D0" } : so.status === "Shipped" ? { backgroundColor: "#EFF6FF", color: "#1E40AF", borderColor: "#BFDBFE" } : { backgroundColor: "#FFFBEB", color: "#92400E", borderColor: "#FDE68A" }) }}>{so.status}</span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
 
           {activeTab === "quotes" && (
-            <div className="flex flex-col items-center gap-3 py-16 text-[#94A3B8]">
-              <ClipboardList className="w-10 h-10" />
-              <p className="text-sm" style={{ fontWeight: 500 }}>Quotes</p>
-              <p className="text-xs text-center max-w-[300px]">View quotes associated with this contact. This feature is coming soon.</p>
+            <div className="bg-white border border-[#E2E8F0] rounded-xl overflow-hidden">
+              <div className="px-5 py-3 border-b border-[#F1F5F9] flex items-center justify-between">
+                <h3 className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Quotes</h3>
+                <span className="text-[11px] shrink-0" style={{ fontWeight: 600, color: "#085FCC" }}>{QUOTES_DATA.length} quotes</span>
+              </div>
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-[#F1F5F9]">
+                    <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>Quote #</th>
+                    <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>Partner</th>
+                    <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>Amount</th>
+                    <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>Date</th>
+                    <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>Valid Until</th>
+                    <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {QUOTES_DATA.map((qt) => (
+                    <tr key={qt.id} className="border-b border-[#F1F5F9] last:border-b-0 hover:bg-[#F8FAFC] transition-colors cursor-pointer">
+                      <td className="px-5 py-2.5"><span className="text-[12px] text-[#0A77FF]" style={{ fontWeight: 600 }}>{qt.id}</span></td>
+                      <td className="px-5 py-2.5"><span className="text-[12px] text-[#334155]" style={{ fontWeight: 500 }}>{qt.partner}</span></td>
+                      <td className="px-5 py-2.5"><span className="text-[12px] text-[#334155]" style={{ fontWeight: 600 }}>{qt.amount}</span></td>
+                      <td className="px-5 py-2.5"><span className="text-[12px] text-[#64748B]">{formatDate(qt.date)}</span></td>
+                      <td className="px-5 py-2.5"><span className="text-[12px] text-[#64748B]">{formatDate(qt.validUntil)}</span></td>
+                      <td className="px-5 py-2.5">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] border" style={{ fontWeight: 500, ...(qt.status === "Accepted" ? { backgroundColor: "#ECFDF5", color: "#065F46", borderColor: "#A7F3D0" } : qt.status === "Pending" ? { backgroundColor: "#FFFBEB", color: "#92400E", borderColor: "#FDE68A" } : qt.status === "Expired" ? { backgroundColor: "#F1F5F9", color: "#475569", borderColor: "#CBD5E1" } : { backgroundColor: "#FEF2F2", color: "#DC2626", borderColor: "#FECACA" }) }}>{qt.status}</span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
 
