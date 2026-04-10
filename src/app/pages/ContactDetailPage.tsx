@@ -53,13 +53,17 @@ import {
   Shield,
   Maximize2,
   Minimize2,
+  Linkedin,
+  Twitter,
+  Send,
+  MessageCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
   BarChart, Bar, AreaChart, Area, XAxis, YAxis, CartesianGrid,
   ResponsiveContainer, Tooltip as ReTooltip,
 } from "recharts";
-import { CONTACT_DICTIONARY, type ContactPerson } from "../components/vendors/partnerConstants";
+import { CONTACT_DICTIONARY, type ContactPerson, type ContactPhone, type ContactEmail, type ContactSocial } from "../components/vendors/partnerConstants";
 import { getAvatarTint } from "../utils/avatarTints";
 import { useVendors } from "../context/VendorContext";
 import { ALL_KPI_DEFINITIONS, DEFAULT_ACTIVE_KPIS, computeKpiValue } from "../components/vendors/KpiInsightsPanel";
@@ -76,6 +80,11 @@ import {
   TooltipTrigger,
   TooltipContent,
 } from "../components/ui/tooltip";
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "../components/ui/popover";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -858,6 +867,16 @@ export function ContactDetailPage() {
   const [showArchiveModal, setShowArchiveModal] = useState(false);
   const [showDeactivateModal, setShowDeactivateModal] = useState(false);
 
+  // Status dropdown state (matches VendorDetailsPage)
+  const [statusDropdownOpen, setStatusDropdownOpen] = useState(false);
+
+  // Email compose box
+  const [composeOpen, setComposeOpen] = useState(false);
+  const [composeMinimized, setComposeMinimized] = useState(false);
+  const [composeTo, setComposeTo] = useState("");
+  const [composeSubject, setComposeSubject] = useState("");
+  const [composeBody, setComposeBody] = useState("");
+
   // Use real vendor names for linked partners
   const vendorNames = useMemo(() => vendors.length > 0 ? vendors.map((v) => v.displayName) : PARTNER_NAMES, [vendors]);
   const partnerNameToId = useMemo(() => {
@@ -916,8 +935,26 @@ export function ContactDetailPage() {
   const photo = getPersonPhoto(contact.name);
   const initials = contact.name.split(" ").filter(Boolean).map((w) => w[0]).slice(0, 2).join("").toUpperCase();
   const deptStyle = DEPT_STYLES[contact.department] || DEPT_STYLES.Sales;
-  const shortDept = contact.department === "Supply Chain Management" ? "Supply Chain" : contact.department;
+  const shortDept = (d: string) => d === "Supply Chain Management" ? "Supply Chain" : d;
+  const departments = contact.departments || [contact.department];
+  const primaryDept = departments[0];
+  const extraDepts = departments.slice(1);
+  const primaryDeptStyle = DEPT_STYLES[primaryDept] || DEPT_STYLES.Sales;
+  const statusConfig: Record<string, { color: string; bg: string; border: string; label: string }> = {
+    active: { color: "#065F46", bg: "#ECFDF5", border: "#A7F3D0", label: "Active" },
+    inactive: { color: "#92400E", bg: "#FFFBEB", border: "#FDE68A", label: "Inactive" },
+  };
+  const currentStatus = statusConfig[contact.status] || statusConfig.active;
   const sStyle = contact.status === "active" ? { bg: "#ECFDF5", text: "#065F46", border: "#A7F3D0" } : { bg: "#FFFBEB", text: "#92400E", border: "#FDE68A" };
+
+  // Multi-field data
+  const phoneList: ContactPhone[] = contact.phones && contact.phones.length > 0
+    ? contact.phones
+    : [{ id: "p1", type: "Office" as const, code: "+1", number: contact.phone, ext: contact.phoneExt || "" }, ...(contact.secondaryPhone ? [{ id: "p2", type: "Mobile" as const, code: "+1", number: contact.secondaryPhone, ext: contact.secondaryPhoneExt || "" }] : [])];
+  const emailList: ContactEmail[] = contact.emails && contact.emails.length > 0
+    ? contact.emails
+    : [{ id: "e1", type: "Work" as const, address: contact.email }];
+  const socialList: ContactSocial[] = contact.socials || [];
 
   return (
     <div className="flex-1 flex flex-col min-h-0 bg-[#F8FAFC] overflow-y-auto">
@@ -958,24 +995,197 @@ export function ContactDetailPage() {
           <div className={`mx-auto px-4 lg:px-6 xl:px-8 transition-all duration-300 ${isFullscreen ? "max-w-full" : "max-w-[1440px] 2xl:max-w-[1600px]"}`}>
             <div className={`bg-white border border-[#E2E8F0] rounded-xl overflow-hidden transition-shadow duration-250 ${isCompact ? "shadow-[0_1px_3px_0_rgba(0,0,0,0.04),0_4px_12px_-4px_rgba(0,0,0,0.05)]" : "shadow-sm"}`}>
               {/* Main header row */}
-              <div className="flex items-center justify-between gap-4 px-4 lg:px-5 transition-all duration-250 ease-in-out" style={{ padding: isCompact ? "6px 16px" : "12px 16px" }}>
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <button onClick={() => navigate("/partners/contacts")} className="rounded-xl border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] flex items-center justify-center shrink-0 cursor-pointer shadow-[0_1px_3px_0_rgba(0,0,0,0.04)] transition-all duration-250" style={{ width: isCompact ? 32 : 44, height: isCompact ? 32 : 44 }}>
-                    <ChevronLeft className="text-[#94A3B8] transition-all duration-250" style={{ width: isCompact ? 16 : 20, height: isCompact ? 16 : 20 }} />
+              <div className="flex items-center justify-between gap-4 px-4 lg:px-5 transition-all duration-250 ease-in-out" style={{ padding: isCompact ? "6px 16px" : "14px 16px" }}>
+                <div className="flex items-center min-w-0 transition-all duration-250" style={{ gap: isCompact ? 10 : 16 }}>
+                  <button onClick={() => navigate("/partners/contacts")} className="rounded-lg border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] flex items-center justify-center shrink-0 cursor-pointer shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition-all duration-250" style={{ width: isCompact ? 30 : 36, height: isCompact ? 30 : 36 }}>
+                    <ChevronLeft className="text-[#94A3B8] transition-all duration-250" style={{ width: isCompact ? 14 : 16, height: isCompact ? 14 : 16 }} />
                   </button>
-                  <div className="rounded-xl flex items-center justify-center shrink-0 overflow-hidden border border-white shadow-[0_1px_3px_0_rgba(0,0,0,0.06),0_0_0_2px_rgba(10,119,255,0.10)] transition-all duration-250" style={{ width: isCompact ? 32 : 44, height: isCompact ? 32 : 44, backgroundColor: tint.bg }}>
-                    {photo && !imgFailed ? (<img src={photo} alt="" className="w-full h-full object-cover" onError={() => setImgFailed(true)} />) : (<span className="text-white transition-all duration-250" style={{ fontSize: isCompact ? 10 : 14, fontWeight: 700, color: tint.fg }}>{initials}</span>)}
+                  {/* Avatar — 72px expanded, 36px compact */}
+                  <div className="rounded-2xl flex items-center justify-center shrink-0 overflow-hidden border-2 border-white shadow-[0_3px_12px_-3px_rgba(0,0,0,0.15),0_0_0_1px_rgba(0,0,0,0.04)] transition-all duration-250" style={{ width: isCompact ? 36 : 72, height: isCompact ? 36 : 72, backgroundColor: tint.bg }}>
+                    {photo && !imgFailed ? (<img src={photo} alt="" className="w-full h-full object-cover" onError={() => setImgFailed(true)} />) : (<span className="transition-all duration-250" style={{ fontSize: isCompact ? 12 : 24, fontWeight: 700, color: tint.fg }}>{initials}</span>)}
                   </div>
                   <div className="min-w-0 flex-1">
+                    {/* Row 1: Name + Status dropdown + Department badges */}
                     <div className="flex items-center flex-wrap transition-all duration-250" style={{ gap: isCompact ? 6 : 8 }}>
-                      <h1 className="text-[#0F172A] truncate transition-all duration-250" style={{ fontSize: isCompact ? 13 : 16, fontWeight: isCompact ? 600 : 700, lineHeight: isCompact ? "18px" : "22px" }}>{contact.name}</h1>
-                      <span className="inline-flex items-center rounded-md border transition-all duration-250" style={{ padding: isCompact ? "1px 6px" : "2px 8px", fontSize: isCompact ? 10 : 11, fontWeight: 500, backgroundColor: sStyle.bg, color: sStyle.text, borderColor: sStyle.border }}>{contact.status === "active" ? "Active" : "Inactive"}</span>
-                      {deptStyle && <span className="inline-flex items-center rounded-md border transition-all duration-250" style={{ padding: isCompact ? "1px 6px" : "2px 8px", fontSize: isCompact ? 10 : 11, fontWeight: 600, backgroundColor: deptStyle.bg, color: deptStyle.text, borderColor: deptStyle.border }}>{shortDept}</span>}
-                      {!isCompact && <span className="inline-flex items-center gap-1 rounded-md border border-[#E2E8F0] bg-[#F8FAFC] text-[#475569] transition-all duration-250" style={{ padding: "2px 8px", fontSize: 11, fontWeight: 500 }}><Building2 style={{ width: 12, height: 12 }} />{(contact.companies || [contact.company])[0]}</span>}
-                      {!isCompact && <span className="inline-flex items-center gap-1 rounded-md border border-[#E2E8F0] bg-[#F8FAFC] text-[#475569] transition-all duration-250" style={{ padding: "2px 8px", fontSize: 11, fontWeight: 500 }}><Briefcase style={{ width: 12, height: 12 }} />{contact.role || "Contact"}</span>}
+                      <h1 className="text-[#0F172A] truncate transition-all duration-250" style={{ fontSize: isCompact ? 14 : 17, fontWeight: 700, lineHeight: 1.3 }}>{contact.name}</h1>
+                      {/* Status pill — clickable dropdown to change status */}
+                      <Popover open={statusDropdownOpen} onOpenChange={setStatusDropdownOpen}>
+                        <PopoverTrigger asChild>
+                          <button
+                            className={`inline-flex items-center rounded-full border cursor-pointer transition-all duration-150 hover:ring-2 hover:ring-offset-1 hover:ring-[#E2E8F0] ${isCompact ? "px-1.5 py-px text-[10px] gap-0.5" : "px-2 py-0.5 text-[11px] gap-1"}`}
+                            style={{ fontWeight: 500, backgroundColor: currentStatus.bg, color: currentStatus.color, borderColor: currentStatus.border }}
+                          >
+                            {currentStatus.label}
+                            <ChevronDown className={isCompact ? "w-2.5 h-2.5" : "w-3 h-3"} />
+                          </button>
+                        </PopoverTrigger>
+                        <PopoverContent side="bottom" align="start" sideOffset={6} className="w-[170px] p-1.5 z-[300]" onOpenAutoFocus={(e) => e.preventDefault()}>
+                          <div className="space-y-1">
+                            {(["active", "inactive"] as const).map((s) => {
+                              const sc = statusConfig[s];
+                              const isCurrent = s === contact.status;
+                              return (
+                                <button
+                                  key={s}
+                                  onClick={() => {
+                                    if (!isCurrent) {
+                                      if (s === "inactive") { setShowDeactivateModal(true); }
+                                      else { toast.success("Contact activated"); }
+                                      setStatusDropdownOpen(false);
+                                    }
+                                  }}
+                                  className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg transition-colors cursor-pointer ${isCurrent ? "bg-[#F8FAFC]" : "hover:bg-[#F8FAFC]"}`}
+                                >
+                                  <span className="inline-flex items-center rounded-full border px-2 py-0.5 text-[10px]" style={{ fontWeight: 500, backgroundColor: sc.bg, color: sc.color, borderColor: sc.border }}>{sc.label}</span>
+                                  {isCurrent && <Check className="w-3.5 h-3.5 ml-auto text-[#0A77FF]" />}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+                      {/* Primary department */}
+                      {primaryDeptStyle && <span className="inline-flex items-center rounded-md border transition-all duration-250" style={{ padding: isCompact ? "1px 6px" : "2px 8px", fontSize: isCompact ? 10 : 11, fontWeight: 600, backgroundColor: primaryDeptStyle.bg, color: primaryDeptStyle.text, borderColor: primaryDeptStyle.border }}>{shortDept(primaryDept)}</span>}
+                      {/* Extra departments — +X more with hover */}
+                      {extraDepts.length > 0 && (() => {
+                        const [deptHover, setDeptHover] = React.useState(false);
+                        const deptTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+                        const handleEnter = () => { if (deptTimer.current) clearTimeout(deptTimer.current); setDeptHover(true); };
+                        const handleLeave = () => { deptTimer.current = setTimeout(() => setDeptHover(false), 200); };
+                        return (
+                          <Popover open={deptHover} onOpenChange={(o) => { if (!o) setDeptHover(false); }}>
+                            <PopoverTrigger
+                              onMouseEnter={handleEnter}
+                              onMouseLeave={handleLeave}
+                              className="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] border border-[#E2E8F0] bg-[#F1F5F9] text-[#0A77FF] cursor-default transition-colors hover:bg-[#E2E8F0]"
+                              style={{ fontWeight: 600 }}
+                            >
+                              +{extraDepts.length} more
+                            </PopoverTrigger>
+                            <PopoverContent
+                              side="bottom"
+                              align="start"
+                              sideOffset={6}
+                              className="w-[200px] p-2 z-[300]"
+                              onOpenAutoFocus={(e) => e.preventDefault()}
+                              onMouseEnter={handleEnter}
+                              onMouseLeave={handleLeave}
+                            >
+                              <p className="text-[10px] text-[#94A3B8] mb-2" style={{ fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em" }}>Additional Departments</p>
+                              <div className="space-y-1.5">
+                                {extraDepts.map((d, i) => {
+                                  const ds = DEPT_STYLES[d] || DEPT_STYLES.Sales;
+                                  return (
+                                    <span key={i} className="inline-flex items-center rounded-md border px-2 py-0.5 text-[11px] mr-1.5" style={{ fontWeight: 600, backgroundColor: ds.bg, color: ds.text, borderColor: ds.border }}>{shortDept(d)}</span>
+                                  );
+                                })}
+                              </div>
+                            </PopoverContent>
+                          </Popover>
+                        );
+                      })()}
                     </div>
-                    <div className="overflow-hidden transition-all duration-250 ease-in-out max-w-3xl" style={{ maxHeight: isCompact ? 0 : 20, opacity: isCompact ? 0 : 1, marginTop: isCompact ? 0 : 6 }}>
-                      <p className="text-[12px] text-[#64748B] leading-[1.6]">{contact.role || "Contact"} at {(contact.companies || [contact.company])[0]}. {shortDept} department point of contact for partner communications and coordination.</p>
+                    {/* Row 2: Role · Company — always visible */}
+                    <p className="text-[#64748B] truncate transition-all duration-250" style={{ fontSize: isCompact ? 11 : 12.5, marginTop: isCompact ? 1 : 3 }}>
+                      {contact.role || "Contact"} <span className="text-[#CBD5E1]">·</span> {(contact.companies || [contact.company])[0]}
+                    </p>
+                    {/* Row 3: Multi-emails, multi-phones, socials, partners — collapses on scroll */}
+                    <div className="overflow-hidden transition-all duration-250 ease-in-out" style={{ maxHeight: isCompact ? 0 : 22, opacity: isCompact ? 0 : 1, marginTop: isCompact ? 0 : 5 }}>
+                      <div className="flex items-center gap-2.5 flex-wrap">
+                        {/* Emails — hover opens compose box */}
+                        <div className="flex items-center gap-1.5">
+                          <Mail className="w-3 h-3 text-[#94A3B8] shrink-0" />
+                          <button
+                            onClick={() => { setComposeTo(emailList[0].address); setComposeSubject(""); setComposeBody(""); setComposeOpen(true); setComposeMinimized(false); }}
+                            className="text-[11.5px] text-[#475569] hover:text-[#0A77FF] hover:underline transition-colors cursor-pointer bg-transparent border-0 p-0"
+                            style={{ fontWeight: 500 }}
+                          >
+                            {emailList[0].address}
+                          </button>
+                          {emailList.length > 1 && (
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <span className="text-[10px] text-[#0A77FF] cursor-default" style={{ fontWeight: 600 }}>+{emailList.length - 1} more</span>
+                              </TooltipTrigger>
+                              <TooltipContent side="bottom" className="z-[300] max-w-[280px]">
+                                <div className="space-y-1">
+                                  {emailList.map((e) => (
+                                    <button
+                                      key={e.id}
+                                      onClick={() => { setComposeTo(e.address); setComposeSubject(""); setComposeBody(""); setComposeOpen(true); setComposeMinimized(false); }}
+                                      className="w-full flex items-center gap-2 text-left hover:bg-[#F8FAFC] rounded px-1 py-0.5 transition-colors cursor-pointer bg-transparent border-0"
+                                    >
+                                      <span className="text-[10px] text-[#94A3B8] shrink-0" style={{ fontWeight: 500 }}>{e.type}</span>
+                                      <span className="text-[11px] hover:text-[#0A77FF] hover:underline transition-colors">{e.address}</span>
+                                    </button>
+                                  ))}
+                                </div>
+                              </TooltipContent>
+                            </Tooltip>
+                          )}
+                        </div>
+                        <div className="w-px h-3 bg-[#E2E8F0]" />
+                        {/* Phones */}
+                        <div className="flex items-center gap-1.5">
+                          <Phone className="w-3 h-3 text-[#94A3B8] shrink-0" />
+                          <span className="text-[11.5px] text-[#475569]" style={{ fontWeight: 500 }}>{phoneList[0].code} {phoneList[0].number}{phoneList[0].ext ? ` ext. ${phoneList[0].ext}` : ""}</span>
+                          {phoneList.length > 1 && (
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <span className="text-[10px] text-[#0A77FF] cursor-default" style={{ fontWeight: 600 }}>+{phoneList.length - 1} more</span>
+                              </TooltipTrigger>
+                              <TooltipContent side="bottom" className="z-[300] max-w-[280px]">
+                                <div className="space-y-1">
+                                  {phoneList.slice(1).map((p) => (
+                                    <div key={p.id} className="flex items-center gap-2">
+                                      <span className="text-[10px] text-[#94A3B8] shrink-0" style={{ fontWeight: 500 }}>{p.type}</span>
+                                      <span className="text-[11px]">{p.code} {p.number}{p.ext ? ` ext. ${p.ext}` : ""}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </TooltipContent>
+                            </Tooltip>
+                          )}
+                        </div>
+                        {/* Socials — grey icons, brand color on hover */}
+                        {socialList.length > 0 && (
+                          <>
+                            <div className="w-px h-3 bg-[#E2E8F0]" />
+                            <div className="flex items-center gap-2">
+                              {socialList.map((s) => {
+                                const socialMeta: Record<string, { icon: React.ElementType; color: string; label: string }> = {
+                                  "LinkedIn": { icon: Linkedin, color: "#0A66C2", label: "LinkedIn" },
+                                  "Twitter / X": { icon: Twitter, color: "#000000", label: "X (Twitter)" },
+                                  "Website": { icon: Globe, color: "#0A77FF", label: "Website" },
+                                  "Skype": { icon: MessageCircle, color: "#00AFF0", label: "Skype" },
+                                  "WhatsApp": { icon: MessageCircle, color: "#25D366", label: "WhatsApp" },
+                                  "Other": { icon: ExternalLink, color: "#64748B", label: "Link" },
+                                };
+                                const meta = socialMeta[s.type] || socialMeta.Other;
+                                const SIcon = meta.icon;
+                                return (
+                                  <Tooltip key={s.id}>
+                                    <TooltipTrigger asChild>
+                                      <a
+                                        href={s.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="group/social relative w-5 h-5 rounded flex items-center justify-center transition-all duration-150 hover:bg-[#F1F5F9]"
+                                      >
+                                        <SIcon className="w-3.5 h-3.5 text-[#94A3B8] group-hover/social:opacity-0 transition-opacity duration-150" />
+                                        <SIcon className="w-3.5 h-3.5 absolute opacity-0 group-hover/social:opacity-100 transition-opacity duration-150" style={{ color: meta.color }} />
+                                      </a>
+                                    </TooltipTrigger>
+                                    <TooltipContent side="bottom" className="z-[300]">
+                                      <span className="text-[11px]">{meta.label}</span>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                );
+                              })}
+                            </div>
+                          </>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -986,12 +1196,12 @@ export function ContactDetailPage() {
                       <button
                         onClick={() => setIsFullscreen(!isFullscreen)}
                         className="rounded-lg border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] flex items-center justify-center cursor-pointer shadow-sm transition-all duration-250"
-                        style={{ width: isCompact ? 32 : 36, height: isCompact ? 32 : 36 }}
+                        style={{ width: isCompact ? 30 : 34, height: isCompact ? 30 : 34 }}
                       >
                         {isFullscreen ? (
-                          <Minimize2 className="text-[#64748B] transition-all duration-250" style={{ width: isCompact ? 14 : 16, height: isCompact ? 14 : 16 }} />
+                          <Minimize2 className="text-[#64748B]" style={{ width: 14, height: 14 }} />
                         ) : (
-                          <Maximize2 className="text-[#64748B] transition-all duration-250" style={{ width: isCompact ? 14 : 16, height: isCompact ? 14 : 16 }} />
+                          <Maximize2 className="text-[#64748B]" style={{ width: 14, height: 14 }} />
                         )}
                       </button>
                     </TooltipTrigger>
@@ -999,7 +1209,7 @@ export function ContactDetailPage() {
                   </Tooltip>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <button className="rounded-lg border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] inline-flex items-center gap-1.5 cursor-pointer shadow-sm transition-all duration-250 text-[#334155]" style={{ height: isCompact ? 32 : 36, padding: isCompact ? "0 10px" : "0 12px", fontSize: isCompact ? 12 : 13, fontWeight: 500 }}>Actions <ChevronDown style={{ width: isCompact ? 12 : 14, height: isCompact ? 12 : 14 }} className="text-[#94A3B8]" /></button>
+                      <button className="rounded-lg border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] inline-flex items-center gap-1.5 cursor-pointer shadow-sm transition-all duration-250 text-[#334155]" style={{ height: isCompact ? 30 : 34, padding: isCompact ? "0 10px" : "0 12px", fontSize: isCompact ? 12 : 13, fontWeight: 500 }}>Actions <ChevronDown style={{ width: 12, height: 12 }} className="text-[#94A3B8]" /></button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-[200px]">
                       <DropdownMenuItem onClick={() => { navigator.clipboard.writeText(window.location.href); toast.success("Link copied"); }}><Link2 className="w-4 h-4 mr-2" /> Copy Link</DropdownMenuItem>
@@ -1008,54 +1218,34 @@ export function ContactDetailPage() {
                       <DropdownMenuItem className="text-[#DC2626] focus:text-[#DC2626] focus:bg-[#FEF2F2]" onClick={() => setShowArchiveModal(true)}><Archive className="w-4 h-4 mr-2 text-[#DC2626]" /> Archive</DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
-                  <button onClick={handleOpenEdit} className="rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white inline-flex items-center gap-1.5 shadow-sm transition-all duration-250 cursor-pointer" style={{ height: isCompact ? 32 : 36, padding: isCompact ? "0 12px" : "0 16px", fontSize: isCompact ? 12 : 13, fontWeight: 600 }}><Pencil style={{ width: isCompact ? 12 : 14, height: isCompact ? 12 : 14 }} /> Edit Contact</button>
+                  <button onClick={handleOpenEdit} className="rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white inline-flex items-center gap-1.5 shadow-sm transition-all duration-250 cursor-pointer" style={{ height: isCompact ? 30 : 34, padding: isCompact ? "0 12px" : "0 14px", fontSize: isCompact ? 12 : 13, fontWeight: 600 }}><Pencil style={{ width: 13, height: 13 }} /> Edit</button>
                 </div>
               </div>
 
-              {/* Meta data row — hidden when compact */}
-              <div
-                className="overflow-hidden transition-all duration-250 ease-in-out"
-                style={{ maxHeight: isCompact ? 0 : 44, opacity: isCompact ? 0 : 1 }}
-              >
-                <div className="flex items-center gap-4 px-4 lg:px-5 py-2 border-t border-[#F1F5F9] flex-wrap">
-                  {/* Phone */}
-                  <div className="flex items-center gap-1.5">
-                    <Phone className="w-3.5 h-3.5 text-[#94A3B8]" />
-                    <span className="text-[11.5px] text-[#475569]" style={{ fontWeight: 500 }}>{contact.phone}</span>
-                    {contact.phoneExt && <span className="text-[10px] text-[#94A3B8]">ext. {contact.phoneExt}</span>}
-                  </div>
-                  <div className="w-px h-3.5 bg-[#E2E8F0]" />
-                  {/* Email */}
-                  <div className="flex items-center gap-1.5">
-                    <Mail className="w-3.5 h-3.5 text-[#94A3B8]" />
-                    <a href={`mailto:${contact.email}`} className="text-[11.5px] text-[#0A77FF] hover:underline" style={{ fontWeight: 500 }}>{contact.email}</a>
-                  </div>
-                  <div className="w-px h-3.5 bg-[#E2E8F0]" />
-                  {/* Linked Partners */}
-                  <div className="flex items-center gap-1.5">
-                    <Link2 className="w-3.5 h-3.5 text-[#94A3B8]" />
-                    <span className="text-[11.5px] text-[#475569]" style={{ fontWeight: 500 }}>{contact.linkedPartners.length} Linked Partner{contact.linkedPartners.length !== 1 ? "s" : ""}</span>
-                  </div>
-                  <div className="w-px h-3.5 bg-[#E2E8F0]" />
-                  {/* Created By */}
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-4.5 h-4.5 rounded-full flex items-center justify-center" style={{ width: 18, height: 18, backgroundColor: "#0A77FF" }}>
-                      <span className="text-[8px] text-white" style={{ fontWeight: 700 }}>{contact.createdByInitials}</span>
-                    </div>
-                    <span className="text-[11.5px] text-[#475569]" style={{ fontWeight: 500 }}>{contact.createdByName}</span>
-                  </div>
-                  <div className="w-px h-3.5 bg-[#E2E8F0]" />
-                  {/* Created On */}
-                  <div className="flex items-center gap-1.5">
-                    <Calendar className="w-3.5 h-3.5 text-[#94A3B8]" />
-                    <span className="text-[11.5px] text-[#475569]" style={{ fontWeight: 500 }}>{contact.createdOn}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Tab bar */}
+              {/* Tab bar — icons + labels */}
               <div className="flex items-center gap-0 overflow-x-auto scrollbar-hide border-t border-[#F1F5F9] px-4 lg:px-5">
-                {TABS.map((tab) => { const isActive = activeTab === tab.id; return (<button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center border-b-2 transition-all duration-200 whitespace-nowrap cursor-pointer ${isActive ? "border-[#0A77FF] text-[#0A77FF]" : "border-transparent text-[#64748B] hover:text-[#334155] hover:border-[#CBD5E1]"}`} style={{ padding: isCompact ? "8px 14px" : "10px 14px", fontSize: isCompact ? 12 : 13, fontWeight: isActive ? 600 : 400, transition: "padding 250ms ease, font-size 250ms ease" }}>{tab.label}</button>); })}
+                {TABS.map((tab) => {
+                  const isActive = activeTab === tab.id;
+                  return (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`border-b-2 transition-all duration-200 whitespace-nowrap cursor-pointer ${
+                        isActive
+                          ? "border-[#0A77FF] text-[#0A77FF]"
+                          : "border-transparent text-[#64748B] hover:text-[#334155] hover:border-[#CBD5E1]"
+                      }`}
+                      style={{
+                        padding: isCompact ? "7px 12px" : "9px 12px",
+                        fontSize: isCompact ? 12 : 12.5,
+                        fontWeight: isActive ? 600 : 500,
+                        transition: "padding 250ms ease, font-size 250ms ease",
+                      }}
+                    >
+                      {tab.label}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -1372,6 +1562,99 @@ export function ContactDetailPage() {
           </div>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* ── Gmail-style Compose Email Box ── */}
+      {composeOpen && (
+        <div
+          className="fixed z-[400] transition-all duration-200 ease-out"
+          style={{
+            bottom: 0,
+            right: 24,
+            width: composeMinimized ? 280 : 420,
+            boxShadow: "0 -4px 24px -6px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.06)",
+            borderRadius: "12px 12px 0 0",
+            overflow: "hidden",
+          }}
+        >
+          {/* Header bar */}
+          <div
+            className="flex items-center justify-between px-4 h-10 cursor-pointer select-none"
+            style={{ backgroundColor: "#1E293B" }}
+            onClick={() => setComposeMinimized(!composeMinimized)}
+          >
+            <div className="flex items-center gap-2 min-w-0">
+              <Mail className="w-3.5 h-3.5 text-white/70 shrink-0" />
+              <span className="text-[13px] text-white truncate" style={{ fontWeight: 600 }}>
+                {composeMinimized ? `To: ${composeTo}` : "New Message"}
+              </span>
+            </div>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={(e) => { e.stopPropagation(); setComposeMinimized(!composeMinimized); }}
+                className="w-6 h-6 rounded flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+              >
+                {composeMinimized ? <Maximize2 className="w-3 h-3" /> : <Minimize2 className="w-3 h-3" />}
+              </button>
+              <button
+                onClick={(e) => { e.stopPropagation(); setComposeOpen(false); }}
+                className="w-6 h-6 rounded flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+          {/* Body — hidden when minimized */}
+          <div
+            className="bg-white overflow-hidden transition-all duration-200 ease-out"
+            style={{ maxHeight: composeMinimized ? 0 : 340, opacity: composeMinimized ? 0 : 1 }}
+          >
+            {/* To */}
+            <div className="flex items-center border-b border-[#F1F5F9] px-4 h-9">
+              <span className="text-[12px] text-[#94A3B8] shrink-0 w-8" style={{ fontWeight: 500 }}>To</span>
+              <input
+                value={composeTo}
+                onChange={(e) => setComposeTo(e.target.value)}
+                className="flex-1 text-[13px] text-[#334155] bg-transparent border-0 outline-none placeholder:text-[#CBD5E1]"
+                placeholder="recipient@email.com"
+              />
+            </div>
+            {/* Subject */}
+            <div className="flex items-center border-b border-[#F1F5F9] px-4 h-9">
+              <span className="text-[12px] text-[#94A3B8] shrink-0 w-8" style={{ fontWeight: 500 }}>Sub</span>
+              <input
+                value={composeSubject}
+                onChange={(e) => setComposeSubject(e.target.value)}
+                className="flex-1 text-[13px] text-[#334155] bg-transparent border-0 outline-none placeholder:text-[#CBD5E1]"
+                placeholder="Subject"
+              />
+            </div>
+            {/* Body */}
+            <textarea
+              value={composeBody}
+              onChange={(e) => setComposeBody(e.target.value)}
+              className="w-full h-[180px] px-4 py-3 text-[13px] text-[#334155] bg-transparent border-0 outline-none resize-none placeholder:text-[#CBD5E1]"
+              placeholder="Write your message..."
+            />
+            {/* Footer */}
+            <div className="flex items-center justify-between px-4 py-2 border-t border-[#F1F5F9]">
+              <button
+                onClick={() => { toast.success(`Email sent to ${composeTo}`); setComposeOpen(false); }}
+                className="inline-flex items-center gap-1.5 h-8 px-4 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-[13px] transition-colors cursor-pointer"
+                style={{ fontWeight: 600 }}
+              >
+                <Send className="w-3.5 h-3.5" />
+                Send
+              </button>
+              <button
+                onClick={() => setComposeOpen(false)}
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-[#94A3B8] hover:text-[#DC2626] hover:bg-[#FEF2F2] transition-colors cursor-pointer"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -1782,8 +2065,17 @@ function ContactOverviewTab({ contact, sStyle, partnerNameToId, kpiOrder, hidden
                   <span className="text-[12px] text-[#334155]" style={{ fontWeight: 500 }}>Mar 01, 2026</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Created</span>
-                  <span className="text-[12px] text-[#334155]" style={{ fontWeight: 500 }}>Nov 02, 2025</span>
+                  <span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Created On</span>
+                  <span className="text-[12px] text-[#334155]" style={{ fontWeight: 500 }}>{contact.createdOn}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Created By</span>
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-5 h-5 rounded-full flex items-center justify-center text-white text-[8px] shrink-0" style={{ backgroundColor: "#0A77FF", fontWeight: 600 }}>
+                      {contact.createdByInitials}
+                    </div>
+                    <span className="text-[12px] text-[#334155]" style={{ fontWeight: 500 }}>{contact.createdByName}</span>
+                  </div>
                 </div>
               </div>
             </div>
