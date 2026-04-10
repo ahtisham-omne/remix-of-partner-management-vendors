@@ -67,6 +67,7 @@ import { CONTACT_DICTIONARY, type ContactPerson, type ContactPhone, type Contact
 import { PurchaseOrdersTable } from "../components/vendors/PurchaseOrdersTable";
 import { SalesOrdersTable } from "../components/vendors/SalesOrdersTable";
 import { QuotesTable } from "../components/vendors/QuotesTable";
+import { LinkedPartnersTable } from "../components/vendors/LinkedPartnersTable";
 import { getAvatarTint } from "../utils/avatarTints";
 import { useVendors } from "../context/VendorContext";
 import { ALL_KPI_DEFINITIONS, DEFAULT_ACTIVE_KPIS, computeKpiValue } from "../components/vendors/KpiInsightsPanel";
@@ -1417,63 +1418,16 @@ export function ContactDetailPage() {
             </div>
           )}
 
-          {activeTab === "linked_partners" && (
-            <div className="bg-white border border-[#E2E8F0] rounded-xl overflow-hidden">
-              <div className="px-5 py-3 border-b border-[#F1F5F9] flex items-center justify-between">
-                <h3 className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Linked Partners</h3>
-                <span className="text-[11px] shrink-0" style={{ fontWeight: 600, color: "#085FCC" }}>{contact.linkedPartners.length} partner{contact.linkedPartners.length !== 1 ? "s" : ""}</span>
-              </div>
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-[#F1F5F9]">
-                    <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>Partner Name</th>
-                    <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>Type</th>
-                    <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>Linked Since</th>
-                    <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {contact.linkedPartners.map((partner, idx) => {
-                    const pTint = getAvatarTint(partner);
-                    const pInitials = partner.split(" ").filter(Boolean).map((w) => w[0]).slice(0, 2).join("").toUpperCase();
-                    const partnerId = partnerNameToId[partner];
-                    let hash = 0; for (let i = 0; i < partner.length; i++) hash = partner.charCodeAt(i) + ((hash << 5) - hash);
-                    const absH = Math.abs(hash);
-                    const linkedMonth = (absH % 12) + 1;
-                    const linkedDay = (absH % 28) + 1;
-                    const linkedDate = new Date(2025, linkedMonth - 1, linkedDay).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-                    const partnerType = absH % 3 === 0 ? "Customer" : "Vendor";
-                    return (
-                      <tr
-                        key={idx}
-                        className={`border-b border-[#F1F5F9] last:border-b-0 hover:bg-[#F8FAFC] transition-colors ${partnerId ? "cursor-pointer" : ""}`}
-                        onClick={() => { if (partnerId) navigate(`/vendors/${partnerId}`); }}
-                      >
-                        <td className="px-5 py-2.5">
-                          <div className="flex items-center gap-2.5">
-                            <div className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" style={{ backgroundColor: pTint.bg }}>
-                              <span className="text-[9px]" style={{ fontWeight: 700, color: pTint.fg }}>{pInitials}</span>
-                            </div>
-                            <div>
-                              <span className={`text-[12px] text-[#334155] block ${partnerId ? "hover:text-[#0A77FF]" : ""}`} style={{ fontWeight: 500 }}>{partner}</span>
-                              {idx === 0 && <span className="text-[9px]" style={{ fontWeight: 600, color: "#085FCC" }}>PRIMARY</span>}
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-5 py-2.5">
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] border" style={{ fontWeight: 500, ...(partnerType === "Vendor" ? { backgroundColor: "#DBEAFE", color: "#2563EB", borderColor: "#BFDBFE" } : { backgroundColor: "#EDE9FE", color: "#7C3AED", borderColor: "#C4B5FD" }) }}>{partnerType}</span>
-                        </td>
-                        <td className="px-5 py-2.5"><span className="text-[12px] text-[#64748B]">{linkedDate}</span></td>
-                        <td className="px-5 py-2.5">
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] border" style={{ fontWeight: 500, backgroundColor: "#ECFDF5", color: "#065F46", borderColor: "#A7F3D0" }}>Active</span>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
+          {activeTab === "linked_partners" && (() => {
+            const partnerRows = contact.linkedPartners.map((partner) => {
+              let h = 0; for (let i = 0; i < partner.length; i++) h = partner.charCodeAt(i) + ((h << 5) - h); const a = Math.abs(h);
+              const linkedDate = new Date(2025, (a % 12), (a % 28) + 1).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+              const pId = partnerNameToId[partner];
+              const domain = partner.toLowerCase().replace(/[^a-z]/g, "").slice(0, 8);
+              return { name: partner, type: a % 3 === 0 ? "Customer" : "Vendor", email: `contact@${domain}.com`, phone: `(${String(100 + a % 900)}) ${String(100 + (a * 3) % 900)}-${String(1000 + (a * 7) % 9000)}`, location: ["New York, NY", "Los Angeles, CA", "Chicago, IL", "Houston, TX", "Phoenix, AZ"][a % 5], linkedSince: linkedDate, status: a % 7 === 0 ? "Inactive" : "Active", partnerId: pId };
+            });
+            return <LinkedPartnersTable partners={partnerRows} onNavigate={(id) => navigate(`/vendors/${id}`)} />;
+          })()}
 
           {activeTab === "communications" && (
             <div className="bg-white border border-[#E2E8F0] rounded-xl overflow-hidden">

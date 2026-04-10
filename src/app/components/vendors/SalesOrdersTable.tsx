@@ -17,7 +17,7 @@ const COLUMN_DEFS: ColDef[] = [
   { key: "quote_no", label: "Quote #", defaultWidth: 150, minWidth: 100 },
   { key: "customer", label: "Customer Name", defaultWidth: 230, minWidth: 160 },
   { key: "status", label: "Order Status", defaultWidth: 165, minWidth: 120 },
-  { key: "poc", label: "POC", defaultWidth: 160, minWidth: 120 },
+  { key: "poc", label: "Point of Contact", defaultWidth: 175, minWidth: 130 },
   { key: "sales_rep", label: "Sales Rep", defaultWidth: 170, minWidth: 130 },
   { key: "order_value", label: "Order Value", defaultWidth: 130, minWidth: 100, align: "right" },
   { key: "invoiced", label: "Invoiced Amount", defaultWidth: 145, minWidth: 100, align: "right" },
@@ -92,7 +92,18 @@ export function SalesOrdersTable() {
       case "quote_no": return <span className={`${sz} text-[#64748B]`}>{so.quoteNo}</span>;
       case "customer": return (<div className={`flex items-center ${isRelaxed ? "gap-3" : "gap-2.5"}`}><div className={`${isRelaxed ? "w-8 h-8" : "w-7 h-7"} rounded-lg flex items-center justify-center shrink-0 text-[9px]`} style={{ backgroundColor: tint.bg, color: tint.fg, fontWeight: 700 }}>{so.customerCode}</div><span className={`${sz} truncate`} style={{ fontWeight: 500, color: "#1E293B" }}>{so.customer}</span></div>);
       case "status": { const ss = STATUS_STYLES[so.status] || STATUS_STYLES.Draft; return <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs whitespace-nowrap" style={{ fontWeight: 500, backgroundColor: ss.bg, color: ss.text, borderColor: ss.border }}>{so.status}</span>; }
-      case "poc": return (<PersonHoverCard name={so.poc} role={so.pocRole} email={so.pocEmail} dept={so.pocDept} phone={so.pocPhone}><div className={`flex items-center gap-1 cursor-pointer`}><span className={`${sz} text-[#334155]`}>{so.poc}</span>{so.pocExtra > 0 && <OverflowTooltip category="Contacts" items={[{ id: `${so.id}-poc-extra`, name: `${so.poc} (additional)`, subtitle: "Point of Contact" }]}><span className="text-[11px] shrink-0 cursor-default leading-none" style={{ fontWeight: 600, color: "#085FCC" }}>+{so.pocExtra} more</span></OverflowTooltip>}</div></PersonHoverCard>);
+      case "poc": return (
+        <div className="flex items-center gap-1">
+          <PersonHoverCard name={so.poc} role={so.pocRole} email={so.pocEmail} dept={so.pocDept} phone={so.pocPhone}>
+            <span className={`${sz} text-[#334155] cursor-pointer hover:text-[#0A77FF] transition-colors`}>{so.poc}</span>
+          </PersonHoverCard>
+          {so.pocExtra > 0 && (
+            <OverflowTooltip category="Contacts" items={[{ id: `${so.id}-poc-extra`, name: `${so.poc} (additional)`, subtitle: "Point of Contact" }]}>
+              <span className="text-[11px] shrink-0 cursor-default leading-none" style={{ fontWeight: 600, color: "#085FCC" }}>+{so.pocExtra} more</span>
+            </OverflowTooltip>
+          )}
+        </div>
+      );
       case "sales_rep": return (<PersonHoverCard name={so.salesRep} role={so.srRole} email={so.srEmail} dept={so.srDept} phone={so.srPhone}><div className={`flex items-center ${isRelaxed ? "gap-2.5" : "gap-2"} cursor-pointer`}><div className={`${isRelaxed ? "w-7 h-7" : "w-6 h-6"} rounded-lg shrink-0 overflow-hidden`} style={{ backgroundColor: getAvatarTint(so.salesRep).bg }}><img src={getPhoto(so.salesRep)} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} /></div><span className={`${sz} text-[#334155] truncate`}>{so.salesRep}</span></div></PersonHoverCard>);
       case "order_value": return <span className={sz} style={{ fontWeight: 500 }}>{fmt(so.orderValue)}</span>;
       case "invoiced": return <span className={`${sz} text-[#64748B]`}>{fmt(so.invoiced)}</span>;
