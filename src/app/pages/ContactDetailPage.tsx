@@ -64,6 +64,9 @@ import {
   ResponsiveContainer, Tooltip as ReTooltip,
 } from "recharts";
 import { CONTACT_DICTIONARY, type ContactPerson, type ContactPhone, type ContactEmail, type ContactSocial } from "../components/vendors/partnerConstants";
+import { PurchaseOrdersTable } from "../components/vendors/PurchaseOrdersTable";
+import { SalesOrdersTable } from "../components/vendors/SalesOrdersTable";
+import { QuotesTable } from "../components/vendors/QuotesTable";
 import { getAvatarTint } from "../utils/avatarTints";
 import { useVendors } from "../context/VendorContext";
 import { ALL_KPI_DEFINITIONS, DEFAULT_ACTIVE_KPIS, computeKpiValue } from "../components/vendors/KpiInsightsPanel";
@@ -196,12 +199,16 @@ function enrichContactWithNames(c: ContactPerson, names: string[]): EnrichedCont
 
 /* ─── Dummy data ─── */
 const ACTIVITY_LOG = [
-  { id: 1, action: "Contact created", user: "System", date: "2025-11-02T09:15:00Z", icon: "create" },
-  { id: 2, action: "Linked to Acme Corp", user: "Sarah Johnson", date: "2025-11-05T14:22:00Z", icon: "link" },
-  { id: 3, action: "Phone number updated", user: "Admin", date: "2025-12-10T10:05:00Z", icon: "edit" },
-  { id: 4, action: "Linked to TechVault", user: "Sarah Johnson", date: "2026-01-08T16:33:00Z", icon: "link" },
-  { id: 5, action: "Email address updated", user: "Admin", date: "2026-02-14T11:45:00Z", icon: "edit" },
-  { id: 6, action: "Department changed to current", user: "Michael Lee", date: "2026-03-01T08:20:00Z", icon: "edit" },
+  { id: 1, action: "Purchase Order PO-3021 was approved", user: "Sarah Johnson", date: "2026-03-28T10:15:00Z", icon: "create" },
+  { id: 2, action: "Email sent to issacarcher@toyota.technical.com", user: "System", date: "2026-03-25T14:00:00Z", icon: "email" },
+  { id: 3, action: "Quote QT-4501 accepted", user: "Issac Archer", date: "2026-03-25T09:30:00Z", icon: "create" },
+  { id: 4, action: "Sales Order SO-1102 fulfilled", user: "System", date: "2026-03-26T11:00:00Z", icon: "create" },
+  { id: 5, action: "Phone number updated", user: "Admin", date: "2026-03-20T10:05:00Z", icon: "edit" },
+  { id: 6, action: "Linked to NexGen Solutions", user: "Sarah Johnson", date: "2026-03-15T16:33:00Z", icon: "link" },
+  { id: 7, action: "Quote QT-4487 sent for review", user: "Michael Lee", date: "2026-03-18T14:30:00Z", icon: "create" },
+  { id: 8, action: "Email address updated", user: "Admin", date: "2026-02-14T11:45:00Z", icon: "edit" },
+  { id: 9, action: "Linked to Acme Corp", user: "Sarah Johnson", date: "2026-01-08T16:33:00Z", icon: "link" },
+  { id: 10, action: "Contact created", user: "System", date: "2025-11-02T09:15:00Z", icon: "create" },
 ];
 
 const NOTES_DATA = [
@@ -246,10 +253,11 @@ const COMMUNICATIONS_DATA = [
 ];
 
 const ATTACHMENTS_DATA = [
-  { id: 1, name: "NDA_Agreement_2026.pdf", size: "1.2 MB", date: "2026-03-10T09:00:00Z", type: "pdf" },
-  { id: 2, name: "Contact_Onboarding_Form.docx", size: "340 KB", date: "2026-01-15T14:20:00Z", type: "doc" },
-  { id: 3, name: "ID_Verification.png", size: "2.8 MB", date: "2025-12-05T10:45:00Z", type: "img" },
-  { id: 4, name: "Meeting_Notes_Q1.pdf", size: "520 KB", date: "2026-03-28T16:00:00Z", type: "pdf" },
+  { id: 1, name: "NDA_Agreement_2026.pdf", size: "1.2 MB", date: "2026-03-10T09:00:00Z", type: "pdf", uploadedBy: "Sarah Johnson" },
+  { id: 2, name: "Contact_Onboarding_Form.docx", size: "340 KB", date: "2026-01-15T14:20:00Z", type: "doc", uploadedBy: "Admin" },
+  { id: 3, name: "ID_Verification.png", size: "2.8 MB", date: "2025-12-05T10:45:00Z", type: "img", uploadedBy: "Michael Lee" },
+  { id: 4, name: "Meeting_Notes_Q1.pdf", size: "520 KB", date: "2026-03-28T16:00:00Z", type: "pdf", uploadedBy: "Sarah Johnson" },
+  { id: 5, name: "Vendor_Agreement_v2.xlsx", size: "890 KB", date: "2026-02-20T11:30:00Z", type: "doc", uploadedBy: "Elena Volkov" },
 ];
 
 /* ─── Tab definitions ─── */
@@ -1505,106 +1513,11 @@ export function ContactDetailPage() {
             </div>
           )}
 
-          {activeTab === "purchase_orders" && (
-            <div className="bg-white border border-[#E2E8F0] rounded-xl overflow-hidden">
-              <div className="px-5 py-3 border-b border-[#F1F5F9] flex items-center justify-between">
-                <h3 className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Purchase Orders</h3>
-                <span className="text-[11px] shrink-0" style={{ fontWeight: 600, color: "#085FCC" }}>{PURCHASE_ORDERS_DATA.length} orders</span>
-              </div>
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-[#F1F5F9]">
-                    <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>PO #</th>
-                    <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>Vendor</th>
-                    <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>Amount</th>
-                    <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>Date</th>
-                    <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {PURCHASE_ORDERS_DATA.map((po) => (
-                    <tr key={po.id} className="border-b border-[#F1F5F9] last:border-b-0 hover:bg-[#F8FAFC] transition-colors cursor-pointer">
-                      <td className="px-5 py-2.5"><span className="text-[12px] text-[#0A77FF]" style={{ fontWeight: 600 }}>{po.id}</span></td>
-                      <td className="px-5 py-2.5"><span className="text-[12px] text-[#334155]" style={{ fontWeight: 500 }}>{po.vendor}</span></td>
-                      <td className="px-5 py-2.5"><span className="text-[12px] text-[#334155]" style={{ fontWeight: 600 }}>{po.amount}</span></td>
-                      <td className="px-5 py-2.5"><span className="text-[12px] text-[#64748B]">{formatDate(po.date)}</span></td>
-                      <td className="px-5 py-2.5">
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] border" style={{ fontWeight: 500, ...(po.status === "Approved" ? { backgroundColor: "#EFF6FF", color: "#1E40AF", borderColor: "#BFDBFE" } : po.status === "Delivered" ? { backgroundColor: "#ECFDF5", color: "#065F46", borderColor: "#A7F3D0" } : { backgroundColor: "#FFFBEB", color: "#92400E", borderColor: "#FDE68A" }) }}>{po.status}</span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+          {activeTab === "purchase_orders" && <PurchaseOrdersTable />}
 
-          {activeTab === "sales_orders" && (
-            <div className="bg-white border border-[#E2E8F0] rounded-xl overflow-hidden">
-              <div className="px-5 py-3 border-b border-[#F1F5F9] flex items-center justify-between">
-                <h3 className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Sales Orders</h3>
-                <span className="text-[11px] shrink-0" style={{ fontWeight: 600, color: "#085FCC" }}>{SALES_ORDERS_DATA.length} orders</span>
-              </div>
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-[#F1F5F9]">
-                    <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>SO #</th>
-                    <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>Customer</th>
-                    <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>Amount</th>
-                    <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>Date</th>
-                    <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {SALES_ORDERS_DATA.map((so) => (
-                    <tr key={so.id} className="border-b border-[#F1F5F9] last:border-b-0 hover:bg-[#F8FAFC] transition-colors cursor-pointer">
-                      <td className="px-5 py-2.5"><span className="text-[12px] text-[#0A77FF]" style={{ fontWeight: 600 }}>{so.id}</span></td>
-                      <td className="px-5 py-2.5"><span className="text-[12px] text-[#334155]" style={{ fontWeight: 500 }}>{so.customer}</span></td>
-                      <td className="px-5 py-2.5"><span className="text-[12px] text-[#334155]" style={{ fontWeight: 600 }}>{so.amount}</span></td>
-                      <td className="px-5 py-2.5"><span className="text-[12px] text-[#64748B]">{formatDate(so.date)}</span></td>
-                      <td className="px-5 py-2.5">
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] border" style={{ fontWeight: 500, ...(so.status === "Fulfilled" ? { backgroundColor: "#ECFDF5", color: "#065F46", borderColor: "#A7F3D0" } : so.status === "Shipped" ? { backgroundColor: "#EFF6FF", color: "#1E40AF", borderColor: "#BFDBFE" } : { backgroundColor: "#FFFBEB", color: "#92400E", borderColor: "#FDE68A" }) }}>{so.status}</span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+          {activeTab === "sales_orders" && <SalesOrdersTable />}
 
-          {activeTab === "quotes" && (
-            <div className="bg-white border border-[#E2E8F0] rounded-xl overflow-hidden">
-              <div className="px-5 py-3 border-b border-[#F1F5F9] flex items-center justify-between">
-                <h3 className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Quotes</h3>
-                <span className="text-[11px] shrink-0" style={{ fontWeight: 600, color: "#085FCC" }}>{QUOTES_DATA.length} quotes</span>
-              </div>
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-[#F1F5F9]">
-                    <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>Quote #</th>
-                    <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>Partner</th>
-                    <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>Amount</th>
-                    <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>Date</th>
-                    <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>Valid Until</th>
-                    <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {QUOTES_DATA.map((qt) => (
-                    <tr key={qt.id} className="border-b border-[#F1F5F9] last:border-b-0 hover:bg-[#F8FAFC] transition-colors cursor-pointer">
-                      <td className="px-5 py-2.5"><span className="text-[12px] text-[#0A77FF]" style={{ fontWeight: 600 }}>{qt.id}</span></td>
-                      <td className="px-5 py-2.5"><span className="text-[12px] text-[#334155]" style={{ fontWeight: 500 }}>{qt.partner}</span></td>
-                      <td className="px-5 py-2.5"><span className="text-[12px] text-[#334155]" style={{ fontWeight: 600 }}>{qt.amount}</span></td>
-                      <td className="px-5 py-2.5"><span className="text-[12px] text-[#64748B]">{formatDate(qt.date)}</span></td>
-                      <td className="px-5 py-2.5"><span className="text-[12px] text-[#64748B]">{formatDate(qt.validUntil)}</span></td>
-                      <td className="px-5 py-2.5">
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] border" style={{ fontWeight: 500, ...(qt.status === "Accepted" ? { backgroundColor: "#ECFDF5", color: "#065F46", borderColor: "#A7F3D0" } : qt.status === "Pending" ? { backgroundColor: "#FFFBEB", color: "#92400E", borderColor: "#FDE68A" } : qt.status === "Expired" ? { backgroundColor: "#F1F5F9", color: "#475569", borderColor: "#CBD5E1" } : { backgroundColor: "#FEF2F2", color: "#DC2626", borderColor: "#FECACA" }) }}>{qt.status}</span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+          {activeTab === "quotes" && <QuotesTable />}
 
           {activeTab === "notes" && <NotesTab />}
           {activeTab === "attachments" && <AttachmentsTab />}
@@ -2269,80 +2182,140 @@ function ContactOverviewTab({ contact, sStyle, partnerNameToId, kpiOrder, hidden
 
 /* ─── Activity Tab ─── */
 function ActivityTab() {
+  const iconMap: Record<string, React.ElementType> = { create: CircleCheck, link: Link2, edit: Pencil, email: Mail };
+  const colorMap: Record<string, { bg: string; fg: string }> = { create: { bg: "#ECFDF5", fg: "#059669" }, link: { bg: "#EFF6FF", fg: "#2563EB" }, edit: { bg: "#FFFBEB", fg: "#D97706" }, email: { bg: "#EDF4FF", fg: "#0A77FF" } };
   return (
-    <div className="space-y-0">
-      {ACTIVITY_LOG.map((item, idx) => (
-        <div key={item.id} className="flex items-start gap-3 py-3 border-b border-[#F1F5F9] last:border-b-0">
-          <div className="w-8 h-8 rounded-lg bg-[#F1F5F9] flex items-center justify-center shrink-0 mt-0.5">
-            <Activity className="w-4 h-4 text-[#64748B]" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-[13px] text-[#334155]" style={{ fontWeight: 500 }}>{item.action}</p>
-            <div className="flex items-center gap-2 mt-0.5">
-              <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>{item.user}</span>
-              <span className="text-[11px] text-[#CBD5E1]">|</span>
-              <span className="text-[11px] text-[#94A3B8]">{formatDateTime(item.date)}</span>
+    <div className="bg-white border border-[#E2E8F0] rounded-xl overflow-hidden">
+      <div className="px-5 py-3 border-b border-[#F1F5F9] flex items-center justify-between">
+        <h3 className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Activity History</h3>
+        <span className="text-[11px] shrink-0" style={{ fontWeight: 600, color: "#085FCC" }}>{ACTIVITY_LOG.length} events</span>
+      </div>
+      <div className="px-5 py-2">
+        {ACTIVITY_LOG.map((item, idx) => {
+          const Icon = iconMap[item.icon] || Activity;
+          const color = colorMap[item.icon] || colorMap.edit;
+          return (
+            <div key={item.id} className="flex items-start gap-3 relative" style={{ paddingBottom: idx === ACTIVITY_LOG.length - 1 ? 8 : 0 }}>
+              {/* Timeline line */}
+              {idx < ACTIVITY_LOG.length - 1 && <div className="absolute left-[15px] top-[32px] bottom-0 w-px bg-[#E2E8F0]" />}
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-2.5 z-10" style={{ backgroundColor: color.bg }}>
+                <Icon className="w-3.5 h-3.5" style={{ color: color.fg }} />
+              </div>
+              <div className="flex-1 min-w-0 py-2.5 border-b border-[#F1F5F9] last:border-b-0" style={{ borderBottom: idx === ACTIVITY_LOG.length - 1 ? "none" : undefined }}>
+                <p className="text-[12px] text-[#334155]" style={{ fontWeight: 500 }}>{item.action}</p>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>{item.user}</span>
+                  <span className="text-[11px] text-[#CBD5E1]">·</span>
+                  <span className="text-[11px] text-[#94A3B8]">{formatDateTime(item.date)}</span>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      ))}
+          );
+        })}
+      </div>
     </div>
   );
 }
 
 /* ─── Notes Tab ─── */
 function NotesTab() {
+  const [newNote, setNewNote] = useState("");
   return (
-    <div className="space-y-3">
-      {NOTES_DATA.map((note) => (
-        <div key={note.id} className="p-4 rounded-lg border border-[#F1F5F9] hover:border-[#E2E8F0] transition-all">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-6 h-6 rounded-full bg-[#F1F5F9] flex items-center justify-center">
-              <User className="w-3 h-3 text-[#64748B]" />
-            </div>
-            <span className="text-[12px] text-[#334155]" style={{ fontWeight: 600 }}>{note.author}</span>
-            <span className="text-[11px] text-[#94A3B8]">{formatDate(note.date)}</span>
-          </div>
-          <p className="text-[13px] text-[#64748B] leading-relaxed">{note.text}</p>
+    <div className="space-y-4">
+      {/* Add note input */}
+      <div className="bg-white border border-[#E2E8F0] rounded-xl overflow-hidden">
+        <div className="px-5 py-3 border-b border-[#F1F5F9]">
+          <h3 className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Add a Note</h3>
         </div>
-      ))}
+        <div className="p-4">
+          <textarea
+            value={newNote}
+            onChange={(e) => setNewNote(e.target.value)}
+            placeholder="Write a note..."
+            className="w-full h-[80px] px-3 py-2.5 text-[13px] text-[#334155] bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg outline-none resize-none placeholder:text-[#94A3B8] focus:border-[#0A77FF]/40 focus:ring-2 focus:ring-[#0A77FF]/10 transition-colors"
+          />
+          <div className="flex justify-end mt-2">
+            <button
+              onClick={() => { if (newNote.trim()) { toast.success("Note added"); setNewNote(""); } }}
+              className="h-8 px-4 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-[12px] cursor-pointer transition-colors"
+              style={{ fontWeight: 600 }}
+            >
+              Add Note
+            </button>
+          </div>
+        </div>
+      </div>
+      {/* Existing notes */}
+      <div className="bg-white border border-[#E2E8F0] rounded-xl overflow-hidden">
+        <div className="px-5 py-3 border-b border-[#F1F5F9] flex items-center justify-between">
+          <h3 className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Notes</h3>
+          <span className="text-[11px] shrink-0" style={{ fontWeight: 600, color: "#085FCC" }}>{NOTES_DATA.length} notes</span>
+        </div>
+        <div className="divide-y divide-[#F1F5F9]">
+          {NOTES_DATA.map((note) => {
+            const noteInitials = note.author.split(" ").map(w => w[0]).join("").toUpperCase();
+            return (
+              <div key={note.id} className="px-5 py-3.5 hover:bg-[#F8FAFC] transition-colors">
+                <div className="flex items-center gap-2.5 mb-2">
+                  <div className="w-6 h-6 rounded-full flex items-center justify-center text-[8px] text-white shrink-0" style={{ backgroundColor: "#0A77FF", fontWeight: 700 }}>{noteInitials}</div>
+                  <span className="text-[12px] text-[#334155]" style={{ fontWeight: 600 }}>{note.author}</span>
+                  <span className="text-[11px] text-[#94A3B8]">{formatDate(note.date)}</span>
+                </div>
+                <p className="text-[12px] text-[#64748B] leading-relaxed pl-[34px]">{note.text}</p>
+              </div>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 }
 
 /* ─── Attachments Tab ─── */
 function AttachmentsTab() {
-  const fileIcons: Record<string, typeof FileText> = {
-    pdf: FileText,
-    doc: FileText,
-    img: FileText,
-  };
   return (
-    <div className="space-y-0">
-      {ATTACHMENTS_DATA.map((file) => {
-        const Icon = fileIcons[file.type] || FileText;
-        return (
-          <div key={file.id} className="flex items-center gap-3 py-3 border-b border-[#F1F5F9] last:border-b-0">
-            <div className="w-8 h-8 rounded-lg bg-[#F1F5F9] flex items-center justify-center shrink-0">
-              <Icon className="w-4 h-4 text-[#64748B]" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-[13px] text-[#334155] truncate" style={{ fontWeight: 500 }}>{file.name}</p>
-              <div className="flex items-center gap-2 mt-0.5">
-                <span className="text-[11px] text-[#94A3B8]">{file.size}</span>
-                <span className="text-[11px] text-[#CBD5E1]">|</span>
-                <span className="text-[11px] text-[#94A3B8]">{formatDate(file.date)}</span>
-              </div>
-            </div>
-            <button
-              onClick={() => toast.info("Download coming soon")}
-              className="w-8 h-8 rounded-lg border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] flex items-center justify-center cursor-pointer transition-all"
-            >
-              <Download className="w-3.5 h-3.5 text-[#64748B]" />
-            </button>
-          </div>
-        );
-      })}
+    <div className="bg-white border border-[#E2E8F0] rounded-xl overflow-hidden">
+      <div className="px-5 py-3 border-b border-[#F1F5F9] flex items-center justify-between">
+        <h3 className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Attachments</h3>
+        <span className="text-[11px] shrink-0" style={{ fontWeight: 600, color: "#085FCC" }}>{ATTACHMENTS_DATA.length} files</span>
+      </div>
+      <table className="w-full">
+        <thead>
+          <tr className="border-b border-[#F1F5F9]">
+            <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>File Name</th>
+            <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>Size</th>
+            <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>Uploaded By</th>
+            <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>Upload Date</th>
+            <th className="text-right text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {ATTACHMENTS_DATA.map((file) => {
+            const ext = file.name.split(".").pop()?.toLowerCase() || "";
+            const typeColor = ext === "pdf" ? "#DC2626" : ext === "png" || ext === "jpg" ? "#7C3AED" : ext === "xlsx" ? "#059669" : "#2563EB";
+            return (
+              <tr key={file.id} className="border-b border-[#F1F5F9] last:border-b-0 hover:bg-[#F8FAFC] transition-colors">
+                <td className="px-5 py-2.5">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-7 h-7 rounded-md flex items-center justify-center shrink-0" style={{ backgroundColor: typeColor + "10" }}>
+                      <FileText className="w-3.5 h-3.5" style={{ color: typeColor }} />
+                    </div>
+                    <span className="text-[12px] text-[#334155] truncate" style={{ fontWeight: 500 }}>{file.name}</span>
+                  </div>
+                </td>
+                <td className="px-5 py-2.5"><span className="text-[12px] text-[#64748B]">{file.size}</span></td>
+                <td className="px-5 py-2.5"><span className="text-[12px] text-[#64748B]">{file.uploadedBy}</span></td>
+                <td className="px-5 py-2.5"><span className="text-[12px] text-[#64748B]">{formatDate(file.date)}</span></td>
+                <td className="px-5 py-2.5 text-right">
+                  <button onClick={() => toast.info("Download coming soon")} className="inline-flex items-center gap-1 h-7 px-2.5 rounded-md border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] text-[11px] text-[#64748B] cursor-pointer transition-all" style={{ fontWeight: 500 }}>
+                    <Download className="w-3 h-3" /> Download
+                  </button>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
     </div>
   );
 }
