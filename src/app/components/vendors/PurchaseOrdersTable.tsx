@@ -97,7 +97,7 @@ function PersonHoverCard({ name, role, email, dept, phone, children }: { name: s
         <div className="bg-gradient-to-br from-[#1E293B] to-[#334155] px-4 py-3 relative overflow-hidden">
           <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-white/[0.04]" />
           <div className="flex items-center gap-3 relative">
-            <div className="w-11 h-11 rounded-xl overflow-hidden border-2 border-white/20 shrink-0" style={{ backgroundColor: tint.bg }}>
+            <div className="w-11 h-11 rounded-full overflow-hidden border-2 border-white/20 shrink-0" style={{ backgroundColor: tint.bg }}>
               <img src={photo} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
             </div>
             <div className="min-w-0">
@@ -212,7 +212,7 @@ export function PurchaseOrdersTable() {
       case "poc": return (
         <PersonHoverCard name={po.poc} role={po.pocRole} email={po.pocEmail} dept={po.pocDept} phone={po.pocPhone}>
           <div className={`flex items-center ${isRelaxed ? "gap-2.5" : "gap-2"} cursor-pointer`}>
-            <div className={`${isRelaxed ? "w-7 h-7" : "w-6 h-6"} rounded-lg shrink-0 overflow-hidden`} style={{ backgroundColor: getAvatarTint(po.poc).bg }}>
+            <div className={`${isRelaxed ? "w-7 h-7" : "w-6 h-6"} rounded-full shrink-0 overflow-hidden`} style={{ backgroundColor: getAvatarTint(po.poc).bg }}>
               <img src={getPhoto(po.poc)} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
             </div>
             <span className={`${sz} text-[#334155] truncate`} style={{ fontWeight: 500 }}>{po.poc}</span>
@@ -225,7 +225,7 @@ export function PurchaseOrdersTable() {
         return (
           <PersonHoverCard name={po.createdBy} role={po.cbRole} email={po.cbEmail} dept={po.cbDept} phone={po.cbPhone}>
             <div className={`flex items-center ${isRelaxed ? "gap-2.5" : "gap-2"} cursor-pointer`}>
-              <div className={`${isRelaxed ? "w-7 h-7" : "w-6 h-6"} rounded-lg shrink-0 overflow-hidden`} style={{ backgroundColor: getAvatarTint(po.createdBy).bg }}>
+              <div className={`${isRelaxed ? "w-7 h-7" : "w-6 h-6"} rounded-full shrink-0 overflow-hidden`} style={{ backgroundColor: getAvatarTint(po.createdBy).bg }}>
                 <img src={getPhoto(po.createdBy)} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
               </div>
               <span className={`${sz} text-[#334155] truncate`} style={{ fontWeight: 500 }}>{po.createdBy}</span>

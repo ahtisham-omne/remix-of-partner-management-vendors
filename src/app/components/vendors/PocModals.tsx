@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useRef } from "react";
-import { PocDataTable } from "./PocDataTable";
+import { ContactsDirectoryPage } from "../../pages/ContactsDirectoryPage";
 import {
   Dialog,
   DialogContent,
@@ -242,15 +242,6 @@ export function SelectPocDictionaryModal({
   open,
   onOpenChange,
   contactDictionary,
-  pocSearch,
-  onPocSearchChange,
-  pocCategoryFilter,
-  onPocCategoryFilterChange,
-  pocDepartmentCounts,
-  pocPagedContacts,
-  pocPage,
-  pocTotalPages,
-  onPocPageChange,
   pocTempSelected,
   onTogglePocTemp,
   onConfirm,
@@ -259,13 +250,13 @@ export function SelectPocDictionaryModal({
 }: SelectPocDictionaryModalProps) {
   const [isFullScreen, setIsFullScreen] = useState(false);
 
-  const handleSelectAll = useCallback((ids: string[]) => {
-    const allSelected = ids.every((id) => pocTempSelected.has(id));
-    if (allSelected) {
-      ids.forEach((id) => onTogglePocTemp(id));
-    } else {
-      ids.filter((id) => !pocTempSelected.has(id)).forEach((id) => onTogglePocTemp(id));
-    }
+  /** Bridge: the embedded directory exposes selection as a Set<string>; convert
+   *  the new set into per-id toggle calls so the existing parent state stays in sync. */
+  const handleSelectionChange = useCallback((nextIds: Set<string>) => {
+    const removed = [...pocTempSelected].filter((id) => !nextIds.has(id));
+    const added = [...nextIds].filter((id) => !pocTempSelected.has(id));
+    removed.forEach(onTogglePocTemp);
+    added.forEach(onTogglePocTemp);
   }, [pocTempSelected, onTogglePocTemp]);
 
   const modalBaseClass =
@@ -312,24 +303,25 @@ export function SelectPocDictionaryModal({
           </div>
         </div>
 
-        {/* PocDataTable — full-width edge-to-edge */}
-        <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
-          <PocDataTable
-            contacts={pocPagedContacts}
-            selectedIds={pocTempSelected}
-            onToggleSelect={onTogglePocTemp}
-            onSelectAll={handleSelectAll}
-            searchQuery={pocSearch}
-            onSearchChange={onPocSearchChange}
-            categoryFilter={pocCategoryFilter}
-            onCategoryFilterChange={onPocCategoryFilterChange}
-            page={pocPage}
-            totalPages={pocTotalPages}
-            onPageChange={onPocPageChange}
-            totalCount={contactDictionary.length}
-            perPage={POC_PER_PAGE}
-            onCreateNew={onOpenCreatePoc}
+        {/* Contacts Directory — embedded, full-width edge-to-edge */}
+        <div className="flex-1 min-h-0 overflow-y-auto flex flex-col">
+          <ContactsDirectoryPage
+            embedded
+            embeddedContacts={contactDictionary}
             selectable
+            selectedIds={pocTempSelected}
+            onSelectionChange={handleSelectionChange}
+            embeddedToolbarRight={
+              <button
+                type="button"
+                onClick={onOpenCreatePoc}
+                className="inline-flex items-center justify-center h-9 gap-1.5 px-3 rounded-lg bg-[#0A77FF] text-white shadow-sm hover:bg-[#0960D9] transition-colors cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
+                style={{ fontWeight: 500 }}
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span className="text-sm">Create New</span>
+              </button>
+            }
           />
         </div>
 

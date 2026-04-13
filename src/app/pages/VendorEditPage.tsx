@@ -377,7 +377,7 @@ export function VendorEditPage() {
                           return (
                             <div key={poc.id} className="flex items-center gap-2.5 rounded-lg border border-[#E2E8F0] px-3 py-2">
                               <div
-                                className="w-7 h-7 rounded-md flex items-center justify-center text-white text-[10px] shrink-0"
+                                className="w-7 h-7 rounded-full flex items-center justify-center text-white text-[10px] shrink-0"
                                 style={{ backgroundColor: toAAAColor(poc.avatarColor), fontWeight: 600 }}
                               >
                                 {initials}

@@ -140,7 +140,7 @@ function getPersonPhoto(name: string): string | undefined {
   return `https://randomuser.me/api/portraits/${gender}/${id}.jpg`;
 }
 
-function ContactAvatar({ name, size = "md" }: { name: string; size?: "sm" | "md" | "lg" }) {
+function ContactAvatar({ name, size = "md", circle = false }: { name: string; size?: "sm" | "md" | "lg"; circle?: boolean }) {
   const [imgFailed, setImgFailed] = useState(false);
   const photo = getPersonPhoto(name);
   const tint = getAvatarTint(name);
@@ -149,7 +149,7 @@ function ContactAvatar({ name, size = "md" }: { name: string; size?: "sm" | "md"
   const textSize = size === "lg" ? "text-[11px]" : size === "sm" ? "text-[9px]" : "text-[10px]";
   const showImg = photo && !imgFailed;
   return (
-    <div className={`${sizeClass} rounded-lg flex items-center justify-center shrink-0 overflow-hidden border border-[#E8ECF1]`} style={{ backgroundColor: showImg ? "transparent" : tint.bg }}>
+    <div className={`${sizeClass} ${circle ? "rounded-full" : "rounded-lg"} flex items-center justify-center shrink-0 overflow-hidden border border-[#E8ECF1]`} style={{ backgroundColor: showImg ? "transparent" : tint.bg }}>
       {showImg ? (
         <img src={photo} alt="" className="w-full h-full object-cover" onError={() => setImgFailed(true)} />
       ) : (
@@ -474,7 +474,27 @@ function colDef(key: string) {
   return COLUMN_DEFS.find((c) => c.key === key) || COLUMN_DEFS[0];
 }
 
-export function ContactsDirectoryPage() {
+export interface ContactsDirectoryPageProps {
+  /** When true, hides the top breadcrumb bar, page header and KPI insights panel. Used when embedding the directory inside another surface (POC tab, modal, etc). */
+  embedded?: boolean;
+  /** Optional contact subset to render instead of the full CONTACT_DICTIONARY. */
+  embeddedContacts?: ContactPerson[];
+  /** Optional toolbar slot rendered to the right of the density/column controls (e.g. "+ Create New Contact"). Embedded only. */
+  embeddedToolbarRight?: React.ReactNode;
+  /** When true, the table's checkbox column becomes the primary selection mechanism and selection state is controlled via `selectedIds` / `onSelectionChange`. */
+  selectable?: boolean;
+  selectedIds?: Set<string>;
+  onSelectionChange?: (ids: Set<string>) => void;
+}
+
+export function ContactsDirectoryPage({
+  embedded = false,
+  embeddedContacts,
+  embeddedToolbarRight,
+  selectable = false,
+  selectedIds: controlledSelectedIds,
+  onSelectionChange,
+}: ContactsDirectoryPageProps = {}) {
   const navigate = useNavigate();
   const { vendors } = useVendors();
 
@@ -489,7 +509,8 @@ export function ContactsDirectoryPage() {
   const vendorNames = useMemo(() => vendors.length > 0 ? vendors.map((v) => v.displayName) : PARTNER_NAMES, [vendors]);
 
   /* ─── Data ─── */
-  const allContacts = useMemo(() => enrichContacts(CONTACT_DICTIONARY, vendorNames), [vendorNames]);
+  const sourceContacts = embeddedContacts ?? CONTACT_DICTIONARY;
+  const allContacts = useMemo(() => enrichContacts(sourceContacts, vendorNames), [sourceContacts, vendorNames]);
 
   /* ─── State ─── */
   const [searchQuery, setSearchQuery] = useState("");
@@ -502,7 +523,16 @@ export function ContactsDirectoryPage() {
   const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>(DEFAULT_COLUMN_VISIBILITY);
   const [columnWidths, setColumnWidths] = useState<Record<string, number>>(DEFAULT_COLUMN_WIDTHS);
   const [columnDrawerOpen, setColumnDrawerOpen] = useState(false);
-  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
+  const [internalSelectedRows, setInternalSelectedRows] = useState<Set<string>>(new Set());
+  const selectedRows = selectable && controlledSelectedIds ? controlledSelectedIds : internalSelectedRows;
+  const setSelectedRows = useCallback((updater: Set<string> | ((prev: Set<string>) => Set<string>)) => {
+    if (selectable && onSelectionChange) {
+      const next = typeof updater === "function" ? updater(controlledSelectedIds ?? new Set()) : updater;
+      onSelectionChange(next);
+    } else {
+      setInternalSelectedRows(updater as React.SetStateAction<Set<string>>);
+    }
+  }, [selectable, onSelectionChange, controlledSelectedIds]);
   const [sortConfig, setSortConfig] = useState<SortConfig | null>(null);
   const [showInsights, setShowInsights] = useState(true);
   const [insightsDateRange, setInsightsDateRange] = useState("last_30");
@@ -1208,7 +1238,7 @@ export function ContactsDirectoryPage() {
               <HoverCard>
                 <HoverCardTrigger asChild onClick={(e: React.MouseEvent) => e.stopPropagation()}>
                   <div className="cursor-pointer">
-                    <ContactAvatar name={contact.createdByName} size={isRelaxed ? "lg" : "md"} />
+                    <ContactAvatar name={contact.createdByName} size={isRelaxed ? "lg" : "md"} circle />
                   </div>
                 </HoverCardTrigger>
                 <HoverCardContent side="bottom" align="start" className="w-[280px] p-0 rounded-xl border-0 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
@@ -1216,7 +1246,7 @@ export function ContactsDirectoryPage() {
                   <div className="bg-gradient-to-br from-[#1E293B] to-[#334155] px-4 py-3 relative overflow-hidden">
                     <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-white/[0.04]" />
                     <div className="flex items-center gap-3 relative">
-                      <div className="w-11 h-11 rounded-xl overflow-hidden border-2 border-white/20 shrink-0" style={{ backgroundColor: cbPhoto ? "transparent" : cbTint.bg }}>
+                      <div className="w-11 h-11 rounded-full overflow-hidden border-2 border-white/20 shrink-0" style={{ backgroundColor: cbPhoto ? "transparent" : cbTint.bg }}>
                         {cbPhoto ? <img src={cbPhoto} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-[13px] text-white" style={{ fontWeight: 700 }}>{contact.createdByInitials}</div>}
                       </div>
                       <div className="min-w-0">
@@ -1276,8 +1306,9 @@ export function ContactsDirectoryPage() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#F8FAFC]">
-      {/* Top Bar */}
+    <div className={embedded ? "flex flex-col bg-transparent" : "flex flex-col h-full bg-[#F8FAFC]"}>
+      {/* Top Bar — hidden when embedded */}
+      {!embedded && (
       <div className="flex items-center justify-between px-6 lg:px-8 h-12 border-b border-border bg-card shrink-0">
         <div className="flex items-center gap-2 text-[13px] text-muted-foreground">
           <button
@@ -1309,11 +1340,13 @@ export function ContactsDirectoryPage() {
           </div>
         </div>
       </div>
+      )}
 
       {/* Content */}
-      <div className="flex-1 overflow-hidden flex flex-col min-h-0">
-        <div className="px-6 lg:px-8 py-6 flex-1 min-h-0 flex flex-col">
-          {/* Page Header */}
+      <div className={embedded ? "flex flex-col" : "flex-1 overflow-hidden flex flex-col min-h-0"}>
+        <div className={embedded ? "flex flex-col" : "px-6 lg:px-8 py-6 flex-1 min-h-0 flex flex-col"}>
+          {/* Page Header — hidden when embedded */}
+          {!embedded && (
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 -mx-6 lg:-mx-8 -mt-6 px-6 lg:px-8 pt-3.5 pb-3.5 bg-white border-b border-border shrink-0">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: "#EDF4FF" }}>
@@ -1334,9 +1367,10 @@ export function ContactsDirectoryPage() {
               Create New Contact
             </Button>
           </div>
+          )}
 
           {/* KPI Performance Insights — exact match to partner listing page */}
-          {showInsights && kpiData.length > 0 && (
+          {!embedded && showInsights && kpiData.length > 0 && (
           <div className="mb-4 shrink-0">
             {/* Header row */}
             <div className="flex items-center justify-between mb-2.5">
@@ -1419,8 +1453,8 @@ export function ContactsDirectoryPage() {
           )}
 
           {/* Data Table Container */}
-          <div className="border border-border rounded-xl bg-card overflow-clip flex flex-1 min-h-0">
-            <div className="flex-1 min-w-0 overflow-clip flex flex-col">
+          <div className={`border border-border rounded-xl bg-card flex ${embedded ? "" : "flex-1 min-h-0 overflow-clip"}`}>
+            <div className={`flex-1 min-w-0 flex flex-col ${embedded ? "" : "overflow-clip"}`}>
               {/* Row 1: Search + Filters | Count + Density + Column Selector */}
               <div className="flex items-center justify-between gap-3 px-4 pt-3.5 pb-2 shrink-0">
                 <div className="flex items-center gap-2.5 flex-1 min-w-0">
@@ -1475,7 +1509,8 @@ export function ContactsDirectoryPage() {
 
                   <div className="w-px h-5 bg-border/60 mx-1 hidden sm:block" />
 
-                  {/* Insights toggle button */}
+                  {/* Insights toggle button — hidden when embedded */}
+                  {!embedded && (
                   <button
                     type="button"
                     onClick={() => {
@@ -1501,6 +1536,7 @@ export function ContactsDirectoryPage() {
                       </span>
                     )}
                   </button>
+                  )}
 
                   {/* Density Dropdown */}
                   <DropdownMenu>
@@ -1571,6 +1607,8 @@ export function ContactsDirectoryPage() {
                     active={columnDrawerOpen}
                     onClick={() => setColumnDrawerOpen(!columnDrawerOpen)}
                   />
+
+                  {embeddedToolbarRight}
                 </div>
               </div>
 
@@ -1620,7 +1658,7 @@ export function ContactsDirectoryPage() {
 
               {density === "card" ? (
                 /* ─── Card View ─── */
-                <div className="p-4 min-h-0 overflow-y-auto flex-1">
+                <div className={embedded ? "p-4" : "p-4 min-h-0 overflow-y-auto flex-1"}>
                   {paginatedContacts.length === 0 ? (
                     <div className="flex flex-col items-center gap-2 py-16 text-muted-foreground">
                       <Users className="w-8 h-8" />
@@ -1713,7 +1751,7 @@ export function ContactsDirectoryPage() {
                 </div>
               ) : (
                 /* ─── Table View ─── */
-                <div className={`min-h-0 overflow-auto flex-1 ${isResizing || draggingColumnKey ? "select-none" : ""}`}>
+                <div className={`${embedded ? "overflow-x-auto" : "min-h-0 overflow-auto flex-1"} ${isResizing || draggingColumnKey ? "select-none" : ""}`}>
                   <Table style={{ tableLayout: "fixed", width: `${CHECKBOX_COL_WIDTH + visibleColumns.reduce((sum, key) => sum + (columnWidths[key] ?? parseInt(colDef(key).minWidth, 10)), 0) + 60}px` }}>
                     <TableHeader className="sticky top-0 z-20 bg-card">
                       <TableRow className={`bg-muted/30 hover:bg-muted/30 ${
@@ -1936,7 +1974,7 @@ export function ContactsDirectoryPage() {
 
               {/* Pagination */}
               {filteredContacts.length > 0 && (
-                <div className="flex flex-col sm:flex-row items-center justify-center px-4 py-3 border-t border-border gap-3 shrink-0">
+                <div className={`flex flex-col sm:flex-row items-center justify-center px-4 py-3 border-t border-border gap-3 shrink-0 ${embedded ? "mt-auto" : ""}`}>
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <span>Records per page</span>
                     <Select

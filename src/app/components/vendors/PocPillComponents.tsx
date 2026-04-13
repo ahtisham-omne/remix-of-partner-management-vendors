@@ -56,7 +56,7 @@ export function PocQuickViewCard({ contact }: { contact: ContactPerson }) {
         <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-white/[0.04]" />
         <div className="flex items-center gap-2.5 relative">
           <div
-            className="w-8 h-8 rounded-lg flex items-center justify-center text-[11px] shrink-0"
+            className="w-8 h-8 rounded-full flex items-center justify-center text-[11px] shrink-0"
             style={{ backgroundColor: at.bg, color: at.text, fontWeight: 700 }}
           >
             {initials}

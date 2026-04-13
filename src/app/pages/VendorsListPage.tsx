@@ -1962,7 +1962,7 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                                               <div className="bg-gradient-to-br from-[#1E293B] to-[#334155] px-4 py-3 relative overflow-hidden">
                                                 <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-white/[0.04]" />
                                                 <div className="flex items-center gap-3 relative">
-                                                  <div className="w-11 h-11 rounded-xl overflow-hidden border-2 border-white/20 shrink-0" style={{ backgroundColor: photoUrl ? "transparent" : poc?.bgColor || t.bg }}>
+                                                  <div className="w-11 h-11 rounded-full overflow-hidden border-2 border-white/20 shrink-0" style={{ backgroundColor: photoUrl ? "transparent" : poc?.bgColor || t.bg }}>
                                                     {photoUrl ? <img src={photoUrl} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-[13px] text-white" style={{ fontWeight: 700 }}>{poc?.initials}</div>}
                                                   </div>
                                                   <div className="min-w-0">
@@ -2124,7 +2124,7 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                                               <div className="bg-gradient-to-br from-[#1E293B] to-[#334155] px-4 py-3 relative overflow-hidden">
                                                 <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-white/[0.04]" />
                                                 <div className="flex items-center gap-3 relative">
-                                                  <div className="w-11 h-11 rounded-xl overflow-hidden border-2 border-white/20 shrink-0" style={{ backgroundColor: photoUrl ? "transparent" : cb.bgColor || t.bg }}>
+                                                  <div className="w-11 h-11 rounded-full overflow-hidden border-2 border-white/20 shrink-0" style={{ backgroundColor: photoUrl ? "transparent" : cb.bgColor || t.bg }}>
                                                     {photoUrl ? <img src={photoUrl} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-[13px] text-white" style={{ fontWeight: 700 }}>{cb.initials}</div>}
                                                   </div>
                                                   <div className="min-w-0">
@@ -2801,7 +2801,7 @@ function LogoAvatar({ logoUrl, initials, bg, size = "md", type = "logo" }: { log
   const showImg = logoUrl && !imgFailed;
   const isPerson = type === "person";
   return (
-    <div className={`${sizeClass} rounded-lg flex items-center justify-center shrink-0 overflow-hidden border border-[#E8ECF1]`} style={{ backgroundColor: showImg ? (isPerson ? "transparent" : "#FFFFFF") : bg }}>
+    <div className={`${sizeClass} ${isPerson ? "rounded-full" : "rounded-lg"} flex items-center justify-center shrink-0 overflow-hidden border border-[#E8ECF1]`} style={{ backgroundColor: showImg ? (isPerson ? "transparent" : "#FFFFFF") : bg }}>
       {showImg ? (
         <img src={logoUrl} alt="" className={`w-full h-full ${isPerson ? "object-cover" : "object-contain p-1.5"}`} onError={() => setImgFailed(true)} />
       ) : (

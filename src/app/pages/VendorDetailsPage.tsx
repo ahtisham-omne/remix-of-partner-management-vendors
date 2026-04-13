@@ -31,6 +31,7 @@ import { PaymentTermDetailModal } from "../components/vendors/PaymentTermDetailM
 import { PaymentTermCard } from "../components/vendors/PaymentTermCard";
 import { PAYMENT_TERM_PRESETS, type PaymentTermPreset } from "../components/vendors/partnerConstants";
 import { PocSectionContent, SelectPocDictionaryModal, CreatePocModal } from "../components/vendors/PocModals";
+import { ContactsDirectoryPage } from "./ContactsDirectoryPage";
 import { PurchaseOrdersTable } from "../components/vendors/PurchaseOrdersTable";
 import { SalesOrdersTable } from "../components/vendors/SalesOrdersTable";
 import { QuotesTable } from "../components/vendors/QuotesTable";
@@ -199,6 +200,9 @@ import {
   RadialBarChart,
   RadialBar,
 } from "recharts";
+
+// ── External module URLs (open in new browser tab) ──
+const PARTNER_COMM_MODULE_URL = "https://sales-charm-flow.lovable.app/vendors";
 
 // ── Tab definitions ──
 const TABS = [
@@ -857,11 +861,18 @@ export function VendorDetailsPage() {
               <div className="flex items-center gap-0 overflow-x-auto scrollbar-hide border-t border-[#F1F5F9] px-4 lg:px-5">
                 {TABS.map((tab) => {
                   const isActive = activeTab === tab.id;
+                  const isExternal = tab.id === "partner_communication";
                   return (
                     <button
                       key={tab.id}
-                      onClick={() => setActiveTab(tab.id)}
-                      className={`flex items-center px-3.5 border-b-2 transition-all duration-200 whitespace-nowrap cursor-pointer ${
+                      onClick={() => {
+                        if (isExternal) {
+                          window.open(`${PARTNER_COMM_MODULE_URL}/${id}`, "_blank", "noopener");
+                          return;
+                        }
+                        setActiveTab(tab.id);
+                      }}
+                      className={`flex items-center gap-1.5 px-3.5 border-b-2 transition-all duration-200 whitespace-nowrap cursor-pointer ${
                         isActive
                           ? "border-[#0A77FF] text-[#0A77FF]"
                           : "border-transparent text-[#64748B] hover:text-[#334155] hover:border-[#CBD5E1]"
@@ -874,6 +885,7 @@ export function VendorDetailsPage() {
                       }}
                     >
                       {tab.label}
+                      {isExternal && <ExternalLink className="w-3 h-3 opacity-70" />}
                     </button>
                   );
                 })}
@@ -4705,7 +4717,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                     const avatarCls = isComfort ? "w-8 h-8" : "w-7 h-7";
                     const avatarTxt = isComfort ? "text-[10px]" : "text-[9px]";
                     const LocAvatar = ({ person }: { person: { initials: string; bgColor: string; fgColor?: string; photo?: string } }) => (
-                      <div className={`${avatarCls} rounded-lg flex items-center justify-center shrink-0 overflow-hidden border border-[#E8ECF1]`} style={{ backgroundColor: person.photo ? "transparent" : person.bgColor }}>
+                      <div className={`${avatarCls} rounded-full flex items-center justify-center shrink-0 overflow-hidden border border-[#E8ECF1]`} style={{ backgroundColor: person.photo ? "transparent" : person.bgColor }}>
                         {person.photo ? <img src={person.photo} alt="" className="w-full h-full object-cover" /> : <span className={avatarTxt} style={{ fontWeight: 700, color: person.fgColor || "#334155" }}>{person.initials}</span>}
                       </div>
                     );
@@ -4739,7 +4751,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                                     <div className="bg-gradient-to-br from-[#1E293B] to-[#334155] px-4 py-3 relative overflow-hidden">
                                       <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-white/[0.04]" />
                                       <div className="flex items-center gap-3 relative">
-                                        <div className="w-11 h-11 rounded-xl overflow-hidden border-2 border-white/20 shrink-0" style={{ backgroundColor: loc.pocNames[0].photo ? "transparent" : loc.pocNames[0].bgColor }}>
+                                        <div className="w-11 h-11 rounded-full overflow-hidden border-2 border-white/20 shrink-0" style={{ backgroundColor: loc.pocNames[0].photo ? "transparent" : loc.pocNames[0].bgColor }}>
                                           {loc.pocNames[0].photo ? <img src={loc.pocNames[0].photo} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-[13px] text-white" style={{ fontWeight: 700 }}>{loc.pocNames[0].initials}</div>}
                                         </div>
                                         <div className="min-w-0">
@@ -4812,7 +4824,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                                   <div className="bg-gradient-to-br from-[#1E293B] to-[#334155] px-4 py-3 relative overflow-hidden">
                                     <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-white/[0.04]" />
                                     <div className="flex items-center gap-3 relative">
-                                      <div className="w-11 h-11 rounded-xl overflow-hidden border-2 border-white/20 shrink-0" style={{ backgroundColor: loc.createdBy.photo ? "transparent" : loc.createdBy.bgColor }}>
+                                      <div className="w-11 h-11 rounded-full overflow-hidden border-2 border-white/20 shrink-0" style={{ backgroundColor: loc.createdBy.photo ? "transparent" : loc.createdBy.bgColor }}>
                                         {loc.createdBy.photo ? <img src={loc.createdBy.photo} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-[13px] text-white" style={{ fontWeight: 700 }}>{loc.createdBy.initials}</div>}
                                       </div>
                                       <div className="min-w-0">
@@ -7046,356 +7058,33 @@ function ContactsTab({ vendor, cfg }: { vendor: Vendor; cfg?: VendorConfigData }
   return (
     <div className="space-y-4">
       {/* Full-width POC container — matches Partner Locations layout */}
-      <div className="border border-border rounded-xl bg-card overflow-clip flex flex-col" style={{ minHeight: 400 }}>
-        {/* Row 1: Search + Count + Select Directory + Create */}
-        <div className="flex items-center justify-between gap-3 px-4 pt-3.5 pb-2 shrink-0">
-          <div className="flex items-center gap-2.5 flex-1 min-w-0">
-            <div className="relative flex-1 max-w-xs">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70 pointer-events-none" />
-              <Input
-                placeholder="Search point of contact"
-                value={tabSearch}
-                onChange={(e) => { setTabSearch(e.target.value); setTabPage(1); }}
-                className="pl-9 pr-8 h-9 text-sm bg-white border-border/80 shadow-sm placeholder:text-muted-foreground/50 focus-visible:border-primary focus-visible:ring-primary/20"
-              />
-              {tabSearch && (
-                <button
-                  onClick={() => { setTabSearch(""); setTabPage(1); }}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded-full hover:bg-muted/60 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              )}
-            </div>
-          </div>
-          <div className="flex items-center gap-1.5 shrink-0">
-            <span className="text-sm tabular-nums mr-1 hidden sm:inline" style={{ fontWeight: 500 }}>
-              {filteredSelected.length !== selectedContacts.length ? (
-                <>
-                  <span className="text-foreground">{filteredSelected.length}</span>
-                  <span className="text-muted-foreground/60"> of </span>
-                  <span className="text-muted-foreground">{selectedContacts.length}</span>
-                  <span className="text-muted-foreground/70"> contacts</span>
-                </>
-              ) : (
-                <>
-                  <span className="text-foreground">{selectedContacts.length}</span>
-                  <span className="text-muted-foreground/70"> contacts</span>
-                </>
-              )}
-            </span>
-            <div className="w-px h-5 bg-border/60 mx-0.5 hidden sm:block" />
-            {/* Density dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button
-                  type="button"
-                  className="inline-flex items-center justify-center h-9 gap-2 px-3 rounded-lg border border-border bg-white text-foreground shadow-sm hover:bg-muted/40 transition-colors cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
-                >
-                  {globalPocDensity === "condensed" && <AlignJustify className="w-[18px] h-[18px] text-muted-foreground/80" />}
-                  {globalPocDensity === "comfort" && <ListIcon className="w-[18px] h-[18px] text-muted-foreground/80" />}
-                  {globalPocDensity === "card" && <LayoutGrid className="w-[18px] h-[18px] text-muted-foreground/80" />}
-                  <span className="text-sm hidden md:inline" style={{ fontWeight: 500 }}>
-                    {GLOBAL_POC_DENSITY_CONFIG.find((d) => d.key === globalPocDensity)?.label}
-                  </span>
-                  <ChevronDown className="w-3.5 h-3.5 text-muted-foreground/60" />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-[230px] p-1.5 z-[200]">
-                {GLOBAL_POC_DENSITY_CONFIG.map((opt) => (
-                  <DropdownMenuItem
-                    key={opt.key}
-                    className="flex items-center gap-3 py-2.5 px-3 cursor-pointer rounded-md"
-                    onSelect={(e) => {
-                      if (opt.key === "card") e.preventDefault();
-                      setGlobalPocDensity(opt.key);
-                    }}
-                  >
-                    {opt.icon === "align-justify" && <AlignJustify className="w-5 h-5 text-muted-foreground shrink-0" />}
-                    {opt.icon === "list" && <ListIcon className="w-5 h-5 text-muted-foreground shrink-0" />}
-                    {opt.icon === "layout-grid" && <LayoutGrid className="w-5 h-5 text-muted-foreground shrink-0" />}
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm" style={{ fontWeight: 500 }}>{opt.label}</p>
-                      <p className="text-xs text-muted-foreground">{opt.description}</p>
-                    </div>
-                    {globalPocDensity === opt.key && <Check className="w-4 h-4 text-primary shrink-0" />}
-                  </DropdownMenuItem>
-                ))}
-                {/* Card size options — only when card view is active */}
-                {globalPocDensity === "card" && (
-                  <>
-                    <div className="mx-2 my-1.5 border-t border-[#F1F5F9]" />
-                    <div className="px-3 py-1.5">
-                      <p className="text-[10px] text-[#94A3B8] uppercase tracking-wide mb-2" style={{ fontWeight: 600 }}>Card Size</p>
-                      <div className="flex items-center gap-1.5">
-                        {(["large", "medium", "small"] as const).map((size) => (
-                          <button
-                            key={size}
-                            onClick={() => setGlobalPocCardSize(size)}
-                            className={`flex-1 py-1.5 rounded-md text-[11px] text-center transition-all cursor-pointer ${
-                              globalPocCardSize === size
-                                ? "bg-[#0A77FF] text-white shadow-sm"
-                                : "bg-[#F1F5F9] text-[#64748B] hover:bg-[#E2E8F0]"
-                            }`}
-                            style={{ fontWeight: globalPocCardSize === size ? 600 : 500 }}
-                          >
-                            {size === "large" ? "Large" : size === "medium" ? "Medium" : "Small"}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <div className="w-px h-5 bg-border/60 mx-0.5 hidden sm:block" />
+      <ContactsDirectoryPage
+        embedded
+        embeddedContacts={selectedContacts}
+        embeddedToolbarRight={
+          <>
             <button
+              type="button"
               onClick={handleOpenSelect}
-              className="inline-flex items-center gap-1.5 h-9 px-3 rounded-lg border border-border/80 bg-white shadow-sm hover:bg-muted/50 transition-colors cursor-pointer text-foreground"
+              className="inline-flex items-center justify-center h-9 gap-1.5 px-3 rounded-lg border border-border/80 bg-white shadow-sm hover:bg-muted/50 transition-colors cursor-pointer text-foreground"
               style={{ fontWeight: 500 }}
             >
               <Users className="w-3.5 h-3.5 text-muted-foreground" />
               <span className="text-sm hidden md:inline">Contact Directory</span>
             </button>
-            <div className="w-px h-5 bg-border/60 mx-0.5 hidden sm:block" />
             <button
+              type="button"
               onClick={handleOpenCreate}
-              className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-sm shadow-sm transition-colors cursor-pointer"
+              className="inline-flex items-center justify-center h-9 gap-1.5 px-3.5 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-sm shadow-sm transition-colors cursor-pointer"
               style={{ fontWeight: 600 }}
             >
               <Plus className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Create New Contact</span>
               <span className="sm:hidden">New</span>
             </button>
-          </div>
-        </div>
-
-        {/* Row 2: Scope + Department Filter Pills */}
-        <div className="flex items-center gap-1.5 overflow-x-auto px-4 pb-3 shrink-0">
-          {/* Scope filter: All / Global / Location */}
-          {SCOPE_FILTERS.map((f) => {
-            const isActive = scopeFilter === f.key;
-            return (
-              <button
-                key={f.key}
-                onClick={() => { setScopeFilter(f.key); setTabPage(1); }}
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                  isActive
-                    ? "border-primary bg-[#EDF4FF] hover:bg-[#D6E8FF]"
-                    : "border-border text-muted-foreground hover:bg-muted/60 hover:text-foreground hover:border-muted-foreground/30"
-                }`}
-                style={{ fontWeight: isActive ? 500 : 400, color: isActive ? "#0A77FF" : undefined }}
-              >
-                {f.label}
-                <span className={`text-[10px] rounded-full px-1.5 py-px min-w-[18px] text-center ${isActive ? "bg-primary/10" : "bg-muted"}`}
-                  style={{ fontWeight: 600, color: isActive ? "#0A77FF" : "#475569" }}>{f.count}</span>
-              </button>
-            );
-          })}
-          <span className="w-px h-5 bg-border/60 shrink-0" />
-          {/* Department filters */}
-          {QUICK_DEPT_FILTERS.map((f) => {
-            const isActive = tabDeptFilter === f.key;
-            return (
-              <button
-                key={f.key}
-                onClick={() => { setTabDeptFilter(f.key); setTabPage(1); }}
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
-                  isActive
-                    ? "border-primary bg-[#EDF4FF] hover:bg-[#D6E8FF] active:bg-[#ADD1FF]"
-                    : "border-border text-muted-foreground hover:bg-muted/60 hover:text-foreground hover:border-muted-foreground/30 active:bg-muted"
-                }`}
-                style={{ fontWeight: isActive ? 500 : 400, color: isActive ? "#0A77FF" : undefined }}
-              >
-                {f.label}
-                <span
-                  className={`text-[10px] rounded-full px-1.5 py-px min-w-[18px] text-center ${isActive ? "bg-primary/10" : "bg-muted"}`}
-                  style={{ fontWeight: 600, color: isActive ? "#0A77FF" : "#475569" }}
-                >
-                  {f.count}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Divider */}
-        <div className="border-t border-border shrink-0" />
-
-        {/* Content area — density-aware */}
-        {selectedContacts.length === 0 ? (
-          <div className="p-4 min-h-0 overflow-y-auto flex-1">
-            {/* Empty state with two CTA cards */}
-            <div className="flex flex-col items-center gap-4 py-12">
-              <div className="w-14 h-14 rounded-2xl bg-[#F1F5F9] flex items-center justify-center">
-                <Users className="w-7 h-7 text-[#94A3B8]" />
-              </div>
-              <div className="text-center">
-                <p className="text-sm text-[#334155]" style={{ fontWeight: 600 }}>No contacts assigned</p>
-                <p className="text-xs text-[#94A3B8] mt-1 max-w-[320px]">Select from the contact directory or create a new contact to assign to this partner.</p>
-              </div>
-              <div className="grid grid-cols-1 min-[480px]:grid-cols-2 gap-3 w-full max-w-lg mt-2">
-                <button
-                  onClick={handleOpenSelect}
-                  className="group relative rounded-xl border border-[#E2E8F0] bg-white p-4 text-left transition-all duration-200 hover:border-[#BFDBFE] hover:shadow-[0_4px_16px_-4px_rgba(10,119,255,0.15)] cursor-pointer overflow-hidden"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-br from-[#EDF4FF]/0 to-[#EDF4FF]/0 group-hover:from-[#EDF4FF]/60 group-hover:to-transparent transition-all duration-300 pointer-events-none" />
-                  <div className="relative">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#EDF4FF] to-[#DBEAFE] flex items-center justify-center mb-3 group-hover:scale-105 transition-transform duration-200">
-                      <Users className="w-5 h-5 text-[#0A77FF]" />
-                    </div>
-                    <p className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Select from Contact Directory</p>
-                    <p className="text-[11px] text-[#94A3B8] mt-1 leading-relaxed">Browse and pick from your saved contacts with search and filters.</p>
-                  </div>
-                </button>
-                <button
-                  onClick={handleOpenCreate}
-                  className="group relative rounded-xl border border-[#E2E8F0] bg-white p-4 text-left transition-all duration-200 hover:border-[#D5D3EC] hover:shadow-[0_4px_16px_-4px_rgba(124,58,237,0.12)] cursor-pointer overflow-hidden"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-br from-[#F5F3FF]/0 to-[#F5F3FF]/0 group-hover:from-[#F5F3FF]/60 group-hover:to-transparent transition-all duration-300 pointer-events-none" />
-                  <div className="relative">
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#F5F3FF] to-[#EDE9FE] flex items-center justify-center mb-3 group-hover:scale-105 transition-transform duration-200">
-                      <UserPlus className="w-5 h-5 text-[#7C3AED]" />
-                    </div>
-                    <p className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Create new contact</p>
-                    <p className="text-[11px] text-[#94A3B8] mt-1 leading-relaxed">Add a brand-new point of contact directly from here.</p>
-                  </div>
-                </button>
-              </div>
-            </div>
-          </div>
-        ) : tabPaginated.length === 0 ? (
-          <div className="p-4 min-h-0 overflow-y-auto flex-1">
-            <div className="flex flex-col items-center gap-2 py-16 text-muted-foreground">
-              <Search className="w-8 h-8" />
-              <p className="text-sm" style={{ fontWeight: 500 }}>No contacts found</p>
-              <button
-                onClick={() => { setTabSearch(""); setTabDeptFilter("all"); setTabPage(1); }}
-                className="text-xs text-[#0A77FF] hover:underline cursor-pointer mt-1"
-                style={{ fontWeight: 500 }}
-              >
-                Clear filters
-              </button>
-            </div>
-          </div>
-        ) : globalPocDensity === "card" ? (
-          <div className="p-4 min-h-0 overflow-y-auto flex-1">
-            <div className={`grid gap-3 ${
-              globalPocCardSize === "large" ? "grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2" :
-              globalPocCardSize === "small" ? "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5" :
-              "grid-cols-1 sm:grid-cols-2 xl:grid-cols-3"
-            }`}>
-              {tabPaginated.map((contact) => {
-                const at = getTabAvatarTint(contact.avatarColor);
-                return (
-                  <div key={contact.id} className="group relative rounded-xl border border-[#E8ECF1] bg-white transition-all duration-200 hover:border-[#BFDBFE] hover:shadow-[0_4px_16px_-4px_rgba(10,119,255,0.10)] overflow-hidden">
-                    <button onClick={() => handleRemovePoc(contact.id)} className="absolute top-3 right-3 w-6 h-6 rounded-full bg-white border border-[#F1F5F9] text-[#94A3B8] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-[#FEF2F2] hover:text-[#EF4444] hover:border-[#FECACA] shadow-sm cursor-pointer z-10"><X className="w-3 h-3" /></button>
-                    <div className={`${globalPocCardSize === "large" ? "p-4" : globalPocCardSize === "small" ? "p-3" : "p-3.5"}`}>
-                      <div className="flex items-center gap-3 pr-6">
-                        <div className="w-9 h-9 rounded-xl flex items-center justify-center text-[10px] shrink-0" style={{ backgroundColor: at.bg, color: at.text, fontWeight: 700 }}>{getTabInitials(contact.name)}</div>
-                        <div className="min-w-0 flex-1">
-                          <p className="text-[13px] text-[#334155] truncate" style={{ fontWeight: 600 }}>{pocHighlightText(contact.name)}</p>
-                          <p className="text-[11px] text-[#334155] truncate" style={{ fontWeight: 500 }}>{contact.department === "Supply Chain Management" ? "Supply Chain" : contact.department} <span className="text-[#CBD5E1]">·</span> <span className="text-[#94A3B8]" style={{ fontWeight: 400 }}>{contact.company}</span></p>
-                        </div>
-                        <span className="inline-flex items-center text-[10px] px-2 py-[2px] rounded-full border shrink-0" style={{ fontWeight: 500, backgroundColor: "#ECFDF5", color: "#065F46", borderColor: "#A7F3D0" }}>Active</span>
-                      </div>
-                      <div className="mt-2.5 pt-2.5 border-t border-[#F1F5F9] space-y-1">
-                        <div className="flex items-center gap-2 text-[11px] text-[#475569]"><Mail className="w-3 h-3 text-[#94A3B8] shrink-0" /><span className="truncate">{pocHighlightText(contact.email)}</span></div>
-                        <div className="flex items-center gap-2 text-[11px] text-[#475569]"><Phone className="w-3 h-3 text-[#94A3B8] shrink-0" /><span>{contact.phone}</span></div>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        ) : (
-          /* Table view for condensed/comfort — matches listing page */
-          <div className="min-h-0 overflow-auto scrollbar-hide flex-1 border-t border-border">
-            <Table>
-              <TableHeader className="sticky top-0 z-10 bg-white">
-                <TableRow className={`bg-muted/30 hover:bg-muted/30 ${globalPocDensity === "condensed" ? "[&>th]:h-8" : "[&>th]:h-10"}`}>
-                  <TableHead className="min-w-[200px]">Name</TableHead>
-                  <TableHead className="w-[120px]">Department</TableHead>
-                  <TableHead className="w-[200px]">Email</TableHead>
-                  <TableHead className="w-[130px]">Phone</TableHead>
-                  <TableHead className="w-[80px]">Status</TableHead>
-                  <TableHead className="w-[60px]" />
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {tabPaginated.map((contact) => {
-                  const at = getTabAvatarTint(contact.avatarColor);
-                  const isCmf = globalPocDensity === "comfort";
-                  return (
-                    <TableRow key={contact.id} className={`group ${isCmf ? "[&>td]:py-3 [&>td]:pl-4 [&>td]:pr-2" : "[&>td]:py-1 [&>td]:pl-4 [&>td]:pr-2"}`}>
-                      <TableCell>
-                        <div className={`flex items-center ${isCmf ? "gap-3" : "gap-2.5"}`}>
-                          <div className={`${isCmf ? "w-9 h-9" : "w-8 h-8"} rounded-lg flex items-center justify-center shrink-0 border border-[#E8ECF1]`} style={{ backgroundColor: at.bg, color: at.text, fontSize: isCmf ? 12 : 11, fontWeight: 700 }}>{getTabInitials(contact.name)}</div>
-                          <div className="min-w-0">
-                            <span className={`${isCmf ? "text-[13.5px]" : "text-sm"} truncate block`} style={{ fontWeight: 500, color: '#1E293B' }}>{pocHighlightText(contact.name)}</span>
-                            {isCmf && <span className="text-xs text-muted-foreground/60 truncate block">{contact.company}</span>}
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell><span className={`${isCmf ? "text-[13px]" : "text-sm"} text-[#475569]`}>{contact.department === "Supply Chain Management" ? "SCM" : contact.department}</span></TableCell>
-                      <TableCell><span className={`${isCmf ? "text-[13px]" : "text-sm"} text-muted-foreground truncate block max-w-[180px]`}>{pocHighlightText(contact.email)}</span></TableCell>
-                      <TableCell><span className={`${isCmf ? "text-[13px]" : "text-sm"} text-muted-foreground`}>{contact.phone}</span>{isCmf && contact.phoneExt && <span className="text-xs text-muted-foreground/50 ml-1">ext. {contact.phoneExt}</span>}</TableCell>
-                      <TableCell><span className="inline-flex items-center text-[11px] px-2 py-0.5 rounded-full border" style={{ fontWeight: 500, backgroundColor: "#ECFDF5", color: "#065F46", borderColor: "#A7F3D0" }}>Active</span></TableCell>
-                      <TableCell>
-                        <button onClick={() => handleRemovePoc(contact.id)} className="w-6 h-6 rounded flex items-center justify-center text-[#94A3B8] hover:text-[#EF4444] hover:bg-[#FEF2F2] cursor-pointer transition-colors opacity-0 group-hover:opacity-100"><X className="w-3.5 h-3.5" /></button>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </div>
-        )}
-
-        {/* Pagination footer */}
-        {selectedContacts.length > 0 && (
-          <>
-            <div className="border-t border-border shrink-0" />
-            <div className="px-4 py-2.5 flex items-center justify-between shrink-0 bg-white">
-              <div className="flex items-center gap-2 text-xs text-[#64748B]">
-                <span>Records per page</span>
-                <span className="px-2 py-1 rounded border border-[#E2E8F0] text-xs text-[#0F172A]" style={{ fontWeight: 500 }}>{TAB_PER_PAGE}</span>
-              </div>
-              <div className="flex items-center gap-0.5">
-                <button onClick={() => setTabPage(1)} disabled={tabPage === 1} className="w-7 h-7 rounded-md flex items-center justify-center hover:bg-[#F1F5F9] disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer">
-                  <ChevronsLeft className="w-3.5 h-3.5 text-[#64748B]" />
-                </button>
-                <button onClick={() => setTabPage(Math.max(1, tabPage - 1))} disabled={tabPage === 1} className="w-7 h-7 rounded-md flex items-center justify-center hover:bg-[#F1F5F9] disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer">
-                  <ChevronLeft className="w-3.5 h-3.5 text-[#64748B]" />
-                </button>
-                {getTabPageNumbers().map((p, i) =>
-                  p === "..." ? (
-                    <span key={`dots-${i}`} className="w-7 h-7 flex items-center justify-center text-xs text-[#94A3B8]">…</span>
-                  ) : (
-                    <button
-                      key={p}
-                      onClick={() => setTabPage(p)}
-                      className={`w-7 h-7 rounded-md flex items-center justify-center text-xs transition-colors cursor-pointer ${
-                        tabPage === p ? "bg-[#0A77FF] text-white" : "text-[#64748B] hover:bg-[#F1F5F9]"
-                      }`}
-                      style={{ fontWeight: tabPage === p ? 600 : 400 }}
-                    >
-                      {p}
-                    </button>
-                  )
-                )}
-                <button onClick={() => setTabPage(Math.min(tabTotalPages, tabPage + 1))} disabled={tabPage === tabTotalPages} className="w-7 h-7 rounded-md flex items-center justify-center hover:bg-[#F1F5F9] disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer">
-                  <ChevronRight className="w-3.5 h-3.5 text-[#64748B]" />
-                </button>
-                <button onClick={() => setTabPage(tabTotalPages)} disabled={tabPage === tabTotalPages} className="w-7 h-7 rounded-md flex items-center justify-center hover:bg-[#F1F5F9] disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer">
-                  <ChevronsRight className="w-3.5 h-3.5 text-[#64748B]" />
-                </button>
-              </div>
-            </div>
           </>
-        )}
-      </div>
+        }
+      />
 
       {/* Select from Directory Modal */}
       <SelectPocDictionaryModal
