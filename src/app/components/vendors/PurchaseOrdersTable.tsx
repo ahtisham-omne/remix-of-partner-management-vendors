@@ -16,7 +16,7 @@ import { ColumnSelector, ColumnSelectorTrigger } from "./ColumnSelector";
 import {
   Search, X, SlidersHorizontal, MoreHorizontal, Eye, Copy, Printer, FileDown,
   ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, AlignJustify, List, Check, ChevronDown, GripVertical,
-  Mail, Phone, Building2,
+  Mail, Phone, Building2, Plus,
 } from "lucide-react";
 import { getAvatarTint } from "../../utils/avatarTints";
 
@@ -250,6 +250,15 @@ export function PurchaseOrdersTable() {
         <span className="text-sm tabular-nums ml-auto" style={{ fontWeight: 500 }}><span className="text-foreground">{filtered.length}</span><span className="text-muted-foreground/70"> records</span></span>
         <DropdownMenu><DropdownMenuTrigger asChild><button className="inline-flex items-center justify-center h-9 gap-2 px-3 rounded-lg border border-border bg-white shadow-sm hover:bg-muted/40 transition-colors cursor-pointer">{density === "condensed" ? <AlignJustify className="w-[18px] h-[18px] text-muted-foreground/80" /> : <List className="w-[18px] h-[18px] text-muted-foreground/80" />}<span className="text-sm hidden md:inline" style={{ fontWeight: 500 }}>{density === "condensed" ? "Condensed" : "Comfort"}</span><ChevronDown className="w-3.5 h-3.5 text-muted-foreground/60" /></button></DropdownMenuTrigger><DropdownMenuContent align="end" className="w-[200px] p-1.5">{(["condensed", "comfort"] as const).map(d => (<DropdownMenuItem key={d} className="flex items-center gap-3 py-2.5 px-3 cursor-pointer rounded-md" onSelect={() => setDensity(d)}>{d === "condensed" ? <AlignJustify className="w-5 h-5 text-muted-foreground shrink-0" /> : <List className="w-5 h-5 text-muted-foreground shrink-0" />}<span className="text-sm flex-1" style={{ fontWeight: 500 }}>{d === "condensed" ? "Condensed" : "Comfort"}</span>{density === d && <Check className="w-4 h-4 shrink-0" style={{ color: "#0A77FF" }} />}</DropdownMenuItem>))}</DropdownMenuContent></DropdownMenu>
         <ColumnSelectorTrigger visibleCount={visibleColumns.length} active={columnDrawerOpen} onClick={() => setColumnDrawerOpen(!columnDrawerOpen)} />
+        <button
+          type="button"
+          onClick={() => window.open(`${PO_MODULE_URL}?action=create`, "_blank", "noopener")}
+          className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-sm shadow-sm transition-colors cursor-pointer"
+          style={{ fontWeight: 600 }}
+        >
+          <Plus className="w-3.5 h-3.5" />
+          <span className="hidden sm:inline">Create New PO</span>
+        </button>
       </div>
       {/* Status tabs */}
       <div className="px-4 py-2 flex items-center gap-2 overflow-x-auto scrollbar-hide">

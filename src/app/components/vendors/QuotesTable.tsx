@@ -6,7 +6,7 @@ import { Checkbox } from "../ui/checkbox";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import { HoverCard, HoverCardTrigger, HoverCardContent } from "../ui/hover-card";
 import { ColumnSelector, ColumnSelectorTrigger } from "./ColumnSelector";
-import { Search, X, SlidersHorizontal, MoreHorizontal, Eye, Pencil, Trash2, Copy, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, AlignJustify, List, Check, ChevronDown, GripVertical, Mail, Phone, Building2 } from "lucide-react";
+import { Search, X, SlidersHorizontal, MoreHorizontal, Eye, Pencil, Trash2, Copy, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, AlignJustify, List, Check, ChevronDown, GripVertical, Mail, Phone, Building2, Plus } from "lucide-react";
 import { getAvatarTint } from "../../utils/avatarTints";
 
 /* ─── External module URL (fixed) ─── */
@@ -114,6 +114,15 @@ export function QuotesTable() {
         <span className="text-sm tabular-nums ml-auto" style={{ fontWeight: 500 }}><span className="text-foreground">{filtered.length}</span><span className="text-muted-foreground/70"> quotes</span></span>
         <DropdownMenu><DropdownMenuTrigger asChild><button className="inline-flex items-center justify-center h-9 gap-2 px-3 rounded-lg border border-border bg-white shadow-sm hover:bg-muted/40 transition-colors cursor-pointer">{density === "condensed" ? <AlignJustify className="w-[18px] h-[18px] text-muted-foreground/80" /> : <List className="w-[18px] h-[18px] text-muted-foreground/80" />}<span className="text-sm hidden md:inline" style={{ fontWeight: 500 }}>{density === "condensed" ? "Condensed" : "Comfort"}</span><ChevronDown className="w-3.5 h-3.5 text-muted-foreground/60" /></button></DropdownMenuTrigger><DropdownMenuContent align="end" className="w-[200px] p-1.5">{(["condensed", "comfort"] as const).map(d => (<DropdownMenuItem key={d} className="flex items-center gap-3 py-2.5 px-3 cursor-pointer rounded-md" onSelect={() => setDensity(d)}>{d === "condensed" ? <AlignJustify className="w-5 h-5 text-muted-foreground shrink-0" /> : <List className="w-5 h-5 text-muted-foreground shrink-0" />}<span className="text-sm flex-1" style={{ fontWeight: 500 }}>{d === "condensed" ? "Condensed" : "Comfort"}</span>{density === d && <Check className="w-4 h-4 shrink-0" style={{ color: "#0A77FF" }} />}</DropdownMenuItem>))}</DropdownMenuContent></DropdownMenu>
         <ColumnSelectorTrigger visibleCount={visibleColumns.length} active={columnDrawerOpen} onClick={() => setColumnDrawerOpen(!columnDrawerOpen)} />
+        <button
+          type="button"
+          onClick={() => window.open(`${QUOTE_MODULE_URL}?action=create`, "_blank", "noopener")}
+          className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-sm shadow-sm transition-colors cursor-pointer"
+          style={{ fontWeight: 600 }}
+        >
+          <Plus className="w-3.5 h-3.5" />
+          <span className="hidden sm:inline">Create New Quote</span>
+        </button>
       </div>
       <div className="px-4 py-2 flex items-center gap-2 overflow-x-auto scrollbar-hide">
         {FILTER_TABS.map(tab => { const a = statusFilter === tab.key; const c = filterCounts[tab.key] || 0; return (<button key={tab.key} onClick={() => setStatusFilter(tab.key)} className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs transition-colors whitespace-nowrap shrink-0 cursor-pointer ${a ? "border-primary bg-[#EDF4FF]" : "border-border text-muted-foreground hover:bg-muted/60 hover:text-foreground"}`} style={{ fontWeight: a ? 500 : 400, color: a ? "#0A77FF" : undefined }}>{tab.label}<span className={`text-[10px] rounded-full px-1.5 py-px min-w-[18px] text-center ${a ? "bg-primary/10" : "bg-muted"}`} style={{ fontWeight: 600, color: a ? "#0A77FF" : "#475569" }}>{c}</span></button>); })}

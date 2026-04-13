@@ -4094,6 +4094,8 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
   type CarrierSubTab = "vendor" | "customer";
   type CarrierFilter = "all" | "active" | "default" | "Air" | "Sea" | "Ground" | "Freight";
   const [carrierSubTab, setCarrierSubTab] = useState<CarrierSubTab>("vendor");
+  // ── Pricing Rules sub-tab state (Vendor / Customer) ──
+  const [locPricingSubTab, setLocPricingSubTab] = useState<"vendor" | "customer">("vendor");
   const [carrierSearch, setCarrierSearch] = useState("");
   const [carrierFilter, setCarrierFilter] = useState<CarrierFilter>("all");
   const [addCarrierModalOpen, setAddCarrierModalOpen] = useState(false);
@@ -5056,8 +5058,8 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
               { id: "quotes", label: "Quotes", icon: StickyNote },
               { id: "sales_orders", label: "Sales Orders", icon: FileText },
               { id: "notes", label: "Notes", icon: FileText },
-              { id: "attachments", label: "Files", icon: Paperclip },
-              { id: "activity", label: "Activity", icon: ChartColumn },
+              { id: "attachments", label: "Attachments", icon: Paperclip },
+              { id: "activity", label: "Recent Activity", icon: ChartColumn },
             ];
 
             const LOC_POC_DATA = [
@@ -5387,7 +5389,6 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                             }`}
                             style={{ fontWeight: active ? 600 : 500 }}
                           >
-                            <t.icon className="w-3.5 h-3.5" />
                             {t.label}
                             {count > 0 && (
                               <span className={`text-[9px] rounded-full px-1.5 py-px min-w-[16px] text-center ${active ? "bg-[#0A77FF]/10 text-[#0A77FF]" : "bg-[#F1F5F9] text-[#94A3B8]"}`} style={{ fontWeight: 700 }}>
@@ -5403,206 +5404,41 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                   {/* Overview tab removed — POC is now default */}
 
                   {/* ── Point of Contacts tab ── */}
-                  {locDetailTab === "poc" && (
-                    <div className="flex-1 flex flex-col overflow-hidden">
-                      <div className="flex items-center justify-between gap-3 px-4 pt-3.5 pb-2 shrink-0">
-                        <div className="flex items-center gap-2.5 flex-1 min-w-0">
-                          <div className="relative flex-1 max-w-xs">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70 pointer-events-none" />
-                            <Input placeholder="Search by name, email, or phone..." className="pl-9 pr-8 h-9 text-sm bg-white border-border/80 shadow-sm placeholder:text-muted-foreground/50 focus-visible:border-primary focus-visible:ring-primary/20" />
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-1.5 shrink-0">
-                          <span className="text-sm tabular-nums mr-1 hidden sm:inline" style={{ fontWeight: 500 }}>
-                            <span className="text-foreground">{LOC_POC_DATA.length}</span>
-                            <span className="text-muted-foreground/70"> contacts</span>
-                          </span>
-                          <div className="w-px h-5 bg-border/60 mx-0.5 hidden sm:block" />
-                          {/* Density dropdown */}
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
+                  {/* ── Point of Contacts tab — embedded Contacts Directory scoped to this location ── */}
+                  {locDetailTab === "poc" && (() => {
+                    const locSelectedContacts = locContactDictionary.filter((c) => locSelectedPocIds.has(c.id));
+                    return (
+                      <div className="flex-1 flex flex-col overflow-hidden p-4">
+                        <ContactsDirectoryPage
+                          embedded
+                          embeddedContacts={locSelectedContacts}
+                          embeddedToolbarRight={
+                            <>
                               <button
                                 type="button"
-                                className="inline-flex items-center justify-center h-9 gap-2 px-3 rounded-lg border border-border bg-white shadow-sm hover:bg-muted/40 transition-colors cursor-pointer"
+                                onClick={handleLocOpenSelectModal}
+                                className="inline-flex items-center justify-center h-9 gap-1.5 px-3 rounded-lg border border-border/80 bg-white shadow-sm hover:bg-muted/50 transition-colors cursor-pointer text-foreground"
+                                style={{ fontWeight: 500 }}
                               >
-                                {locPocDensity === "condensed" && <AlignJustify className="w-[18px] h-[18px] text-muted-foreground/80" />}
-                                {locPocDensity === "comfort" && <ListIcon className="w-[18px] h-[18px] text-muted-foreground/80" />}
-                                {locPocDensity === "card" && <LayoutGrid className="w-[18px] h-[18px] text-muted-foreground/80" />}
-                                <span className="text-sm hidden md:inline" style={{ fontWeight: 500 }}>
-                                  {locPocDensity === "card" ? "Card" : locPocDensity === "comfort" ? "Comfort" : "Condensed"}
-                                </span>
-                                <ChevronDown className="w-3.5 h-3.5 text-muted-foreground/60" />
+                                <Users className="w-3.5 h-3.5 text-muted-foreground" />
+                                <span className="text-sm hidden md:inline">Contact Directory</span>
                               </button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-[230px] p-1.5 z-[350]">
-                              {LOC_DENSITY_CONFIG.map((opt) => (
-                                <DropdownMenuItem
-                                  key={opt.key}
-                                  className="flex items-center gap-2.5 py-2 px-2.5 cursor-pointer rounded-md"
-                                  onSelect={(e) => {
-                                    if (opt.key === "card") e.preventDefault();
-                                    setLocPocDensity(opt.key);
-                                  }}
-                                >
-                                  {opt.icon === "align-justify" && <AlignJustify className="w-4 h-4 text-[#94A3B8] shrink-0" />}
-                                  {opt.icon === "list" && <ListIcon className="w-4 h-4 text-[#94A3B8] shrink-0" />}
-                                  {opt.icon === "layout-grid" && <LayoutGrid className="w-4 h-4 text-[#94A3B8] shrink-0" />}
-                                  <div className="flex-1 min-w-0">
-                                    <p className="text-[12px]" style={{ fontWeight: 500 }}>{opt.label}</p>
-                                    <p className="text-[10px] text-[#94A3B8]">{opt.description}</p>
-                                  </div>
-                                  {locPocDensity === opt.key && <Check className="w-3.5 h-3.5 text-[#0A77FF] shrink-0" />}
-                                </DropdownMenuItem>
-                              ))}
-                              {/* Card size options — only when card view is active */}
-                              {locPocDensity === "card" && (
-                                <>
-                                  <div className="mx-2 my-1.5 border-t border-[#F1F5F9]" />
-                                  <div className="px-3 py-1.5">
-                                    <p className="text-[10px] text-[#94A3B8] uppercase tracking-wide mb-2" style={{ fontWeight: 600 }}>Card Size</p>
-                                    <div className="flex items-center gap-1.5">
-                                      {(["large", "medium", "small"] as const).map((size) => (
-                                        <button
-                                          key={size}
-                                          onClick={() => setLocPocCardSize(size)}
-                                          className={`flex-1 py-1.5 rounded-md text-[11px] text-center transition-all cursor-pointer ${
-                                            locPocCardSize === size
-                                              ? "bg-[#0A77FF] text-white shadow-sm"
-                                              : "bg-[#F1F5F9] text-[#64748B] hover:bg-[#E2E8F0]"
-                                          }`}
-                                          style={{ fontWeight: locPocCardSize === size ? 600 : 500 }}
-                                        >
-                                          {size === "large" ? "Large" : size === "medium" ? "Medium" : "Small"}
-                                        </button>
-                                      ))}
-                                    </div>
-                                  </div>
-                                </>
-                              )}
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                          <div className="w-px h-5 bg-[#E8ECF1] mx-0.5 hidden sm:block" />
-                          <button onClick={handleLocOpenSelectModal} className="inline-flex items-center gap-1.5 h-9 px-3 rounded-lg border border-border bg-white shadow-sm hover:bg-muted/40 text-sm text-foreground cursor-pointer transition-colors" style={{ fontWeight: 500 }}>
-                            <Users className="w-3.5 h-3.5 text-muted-foreground" /> Contact Directory
-                          </button>
-                          <div className="w-px h-5 bg-border/60 mx-0.5 hidden sm:block" />
-                          <button onClick={handleLocOpenCreate} className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-sm shadow-sm cursor-pointer transition-colors" style={{ fontWeight: 600 }}>
-                            <Plus className="w-3.5 h-3.5" /><span className="hidden sm:inline">Create New</span>
-                          </button>
-                        </div>
+                              <button
+                                type="button"
+                                onClick={handleLocOpenCreate}
+                                className="inline-flex items-center justify-center h-9 gap-1.5 px-3.5 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-sm shadow-sm transition-colors cursor-pointer"
+                                style={{ fontWeight: 600 }}
+                              >
+                                <Plus className="w-3.5 h-3.5" />
+                                <span className="hidden sm:inline">Create New Contact</span>
+                                <span className="sm:hidden">New</span>
+                              </button>
+                            </>
+                          }
+                        />
                       </div>
-                      {/* Status pills + Department filter */}
-                      <div className="flex items-center gap-1.5 overflow-x-auto px-4 pb-2.5 shrink-0 scrollbar-hide">
-                        {[
-                          { label: "All", count: LOC_POC_DATA.length, active: true },
-                          { label: "Sales", count: LOC_POC_DATA.filter(p => p.dept === "Sales").length, active: false },
-                          { label: "Procurement", count: LOC_POC_DATA.filter(p => p.dept === "Procurement").length, active: false },
-                          { label: "Finance", count: LOC_POC_DATA.filter(p => p.dept === "Finance").length, active: false },
-                        ].filter(f => f.count > 0).map((chip) => (
-                          <button key={chip.label} className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs transition-colors whitespace-nowrap shrink-0 cursor-pointer ${chip.active ? "border-primary bg-[#EDF4FF] hover:bg-[#D6E8FF] active:bg-[#ADD1FF]" : "border-border text-muted-foreground hover:bg-muted/60 hover:text-foreground hover:border-muted-foreground/30 active:bg-muted"}`} style={{ fontWeight: chip.active ? 500 : 400, color: chip.active ? "#0A77FF" : undefined }}>
-                            {chip.label}
-                            <span className={`text-[10px] rounded-full px-1.5 py-px min-w-[18px] text-center ${chip.active ? "bg-primary/10" : "bg-muted"}`} style={{ fontWeight: 600, color: chip.active ? "#0A77FF" : "#475569" }}>{chip.count}</span>
-                          </button>
-                        ))}
-                      </div>
-                      {locPocDensity === "card" ? (
-                        <div className="flex-1 min-h-0 overflow-y-auto scrollbar-hide px-4 py-3 border-t border-border">
-                          <div className={`grid gap-3 ${
-                            locPocCardSize === "large" ? "grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-2" :
-                            locPocCardSize === "small" ? "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5" :
-                            "grid-cols-1 sm:grid-cols-2 xl:grid-cols-3"
-                          }`}>
-                            {LOC_POC_DATA.map((poc) => {
-                              const initials = poc.name.split(" ").map(w => w[0]).join("");
-                              const tint = getPocAvatarTint(poc.bgColor);
-                              return (
-                                <div key={poc.id} className="rounded-xl border border-[#E8ECF1] bg-white hover:border-[#BFDBFE] hover:shadow-[0_4px_16px_-4px_rgba(10,119,255,0.12)] transition-all duration-200 cursor-pointer group/poc">
-                                  <div className={`${locPocCardSize === "large" ? "p-4" : locPocCardSize === "small" ? "p-3" : "p-3.5"}`}>
-                                    <div className="flex items-center gap-3">
-                                      <div className="w-9 h-9 rounded-xl flex items-center justify-center text-[10px] shrink-0" style={{ fontWeight: 700, backgroundColor: tint.bg, color: tint.text }}>
-                                        {initials}
-                                      </div>
-                                      <div className="min-w-0 flex-1">
-                                        <p className="text-[13px] text-[#334155] truncate" style={{ fontWeight: 600 }}>{poc.name}</p>
-                                        <p className="text-[11px] text-[#334155] truncate" style={{ fontWeight: 500 }}>{poc.dept} <span className="text-[#CBD5E1]">·</span> <span className="text-[#94A3B8]" style={{ fontWeight: 400 }}>{loc.name}</span></p>
-                                      </div>
-                                      <span className="inline-flex items-center text-[10px] px-2 py-[2px] rounded-full border shrink-0" style={{ fontWeight: 500, backgroundColor: "#ECFDF5", color: "#065F46", borderColor: "#A7F3D0" }}>Active</span>
-                                    </div>
-                                    {/* Contact info */}
-                                    <div className="mt-2.5 pt-2.5 border-t border-[#F1F5F9] space-y-1">
-                                      <div className="flex items-center gap-2 text-[11px] text-[#475569]"><Mail className="w-3 h-3 text-[#94A3B8] shrink-0" /><span className="truncate">{poc.email}</span></div>
-                                      <div className="flex items-center gap-2 text-[11px] text-[#475569]"><Phone className="w-3 h-3 text-[#94A3B8] shrink-0" /><span>{poc.phone}</span></div>
-                                    </div>
-                                  </div>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="flex-1 min-h-0 overflow-auto scrollbar-hide border-t border-border">
-                          <Table>
-                            <TableHeader className="sticky top-0 z-10 bg-white">
-                              <TableRow className={`bg-muted/30 hover:bg-muted/30 ${locPocDensity === "comfort" ? "[&>th]:h-10" : "[&>th]:h-8"}`}>
-                                <TableHead className="min-w-[200px]">Name</TableHead>
-                                <TableHead className="w-[120px]">Department</TableHead>
-                                <TableHead className="w-[200px]">Email</TableHead>
-                                <TableHead className="w-[130px]">Phone</TableHead>
-                                <TableHead className="w-[130px]">Landline</TableHead>
-                                <TableHead className="w-[80px]">Status</TableHead>
-                              </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                              {LOC_POC_DATA.map((poc) => {
-                                const initials = poc.name.split(" ").map(w => w[0]).join("");
-                                const tint = getPocAvatarTint(poc.bgColor);
-                                const isComfort = locPocDensity === "comfort";
-                                return (
-                                  <TableRow key={poc.id} className={`hover:bg-[#F0F7FF] ${isComfort ? "[&>td]:py-3 [&>td]:pl-4 [&>td]:pr-2" : "[&>td]:py-1 [&>td]:pl-4 [&>td]:pr-2"}`}>
-                                    <TableCell>
-                                      <div className={`flex items-center ${isComfort ? "gap-3" : "gap-2.5"}`}>
-                                        <div className={`${isComfort ? "w-9 h-9" : "w-8 h-8"} rounded-xl flex items-center justify-center shrink-0 border border-[#E8ECF1]`} style={{ backgroundColor: tint.bg, color: tint.text, fontSize: isComfort ? 12 : 11, fontWeight: 700 }}>
-                                          {initials}
-                                        </div>
-                                        <div className="min-w-0">
-                                          <span className={`${isComfort ? "text-[13.5px]" : "text-sm"} truncate block`} style={{ fontWeight: 500, color: '#1E293B' }}>{poc.name}</span>
-                                          {isComfort && <span className="text-xs text-muted-foreground/60 truncate block">{poc.email}</span>}
-                                        </div>
-                                      </div>
-                                    </TableCell>
-                                    <TableCell><span className={`${isComfort ? "text-[13px]" : "text-sm"} text-[#475569]`}>{poc.dept}</span></TableCell>
-                                    <TableCell><span className={`${isComfort ? "text-[13px]" : "text-sm"} text-muted-foreground truncate block max-w-[180px]`}>{poc.email}</span></TableCell>
-                                    <TableCell><span className={`${isComfort ? "text-[13px]" : "text-sm"} text-muted-foreground tabular-nums`}>{poc.phone}</span></TableCell>
-                                    <TableCell><span className={`${isComfort ? "text-[13px]" : "text-sm"} text-muted-foreground tabular-nums`}>{poc.landline}{poc.ext ? ` ext.${poc.ext}` : ""}</span></TableCell>
-                                    <TableCell><span className="inline-flex items-center text-[11px] px-2 py-0.5 rounded-full border" style={{ fontWeight: 500, backgroundColor: "#ECFDF5", color: "#065F46", borderColor: "#A7F3D0" }}>Active</span></TableCell>
-                                  </TableRow>
-                                );
-                              })}
-                            </TableBody>
-                          </Table>
-                        </div>
-                      )}
-                      {/* Pagination — matches PocDataTable */}
-                      <div className="flex flex-col sm:flex-row items-center justify-center px-4 py-3 border-t border-border gap-3 shrink-0">
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <span>Records per page</span>
-                          <Select value="20" onValueChange={() => {}}>
-                            <SelectTrigger className="w-[70px] h-8"><SelectValue /></SelectTrigger>
-                            <SelectContent className="z-[350]">
-                              <SelectItem value="10">10</SelectItem>
-                              <SelectItem value="20">20</SelectItem>
-                              <SelectItem value="50">50</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <button className="h-8 px-2.5 rounded-md text-sm text-muted-foreground hover:bg-muted/60 transition-colors cursor-pointer disabled:opacity-40" disabled>Prev</button>
-                          <button className="h-8 w-8 rounded-md text-sm bg-[#0A77FF] text-white" style={{ fontWeight: 600 }}>1</button>
-                          <button className="h-8 px-2.5 rounded-md text-sm text-muted-foreground hover:bg-muted/60 transition-colors cursor-pointer disabled:opacity-40" disabled>Next</button>
-                        </div>
-                      </div>
-                    </div>
-                  )}
+                    );
+                  })()}
 
                   {/* ── Items tab ── */}
                   {locDetailTab === "items" && (
@@ -5646,30 +5482,53 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
 
                     return (
                     <div className="flex-1 flex flex-col overflow-hidden">
-                      {/* Sub-tabs — modern segmented control */}
-                      <div className="px-4 pt-3.5 pb-2 shrink-0">
-                        <div className="inline-flex items-center rounded-xl bg-[#F1F5F9] p-1 w-full sm:w-auto">
+                      {/* Row 1: Sub-tabs + primary CTA (matches Items tab) */}
+                      <div className="flex items-center justify-between gap-3 px-4 pt-2.5 pb-2 border-b border-border shrink-0">
+                        <div className="inline-flex items-center rounded-lg bg-[#F1F5F9] p-0.5">
                         {CARRIER_SUB_TABS.map((t) => {
                           const isActive = carrierSubTab === t.key;
+                          const tint = t.key === "vendor"
+                            ? { color: "#1E40AF", bg: "#EFF6FF", border: "#BFDBFE", hoverBg: "#DBEAFE" }
+                            : { color: "#5B21B6", bg: "#F5F3FF", border: "#DDD6FE", hoverBg: "#EDE9FE" };
                           return (
                             <button
                               key={t.key}
                               onClick={() => { setCarrierSubTab(t.key); setCarrierFilter("all"); setCarrierSearch(""); }}
-                              className={`flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg text-[13px] transition-all cursor-pointer ${
-                                isActive ? "bg-white shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.04)] text-[#0F172A]" : "text-[#64748B] hover:text-[#334155]"
+                              className={`inline-flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-md text-[13px] transition-all cursor-pointer ${
+                                isActive ? "bg-white shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.04)]" : "text-[#64748B] hover:text-[#334155]"
                               }`}
-                              style={{ fontWeight: isActive ? 600 : 500 }}
+                              style={{ fontWeight: isActive ? 600 : 500, color: isActive ? tint.color : undefined }}
                             >
-                              <Truck className={`w-4 h-4 ${isActive ? "text-[#0A77FF]" : "text-[#94A3B8]"}`} />
+                              <Truck className="w-3.5 h-3.5" style={{ color: isActive ? tint.color : "#94A3B8" }} />
                               {t.label}
                             </button>
                           );
                         })}
                         </div>
+
+                        {/* Add Carrier CTA — tinted to match active sub-tab (matches Items tab) */}
+                        {(() => {
+                          const tint = carrierSubTab === "vendor"
+                            ? { color: "#1E40AF", bg: "#EFF6FF", border: "#BFDBFE", hoverBg: "#DBEAFE" }
+                            : { color: "#5B21B6", bg: "#F5F3FF", border: "#DDD6FE", hoverBg: "#EDE9FE" };
+                          return (
+                            <button
+                              type="button"
+                              onClick={() => setAddCarrierModalOpen(true)}
+                              className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border text-[13px] transition-colors cursor-pointer"
+                              style={{ fontWeight: 600, backgroundColor: tint.bg, borderColor: tint.border, color: tint.color }}
+                              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = tint.hoverBg; }}
+                              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = tint.bg; }}
+                            >
+                              <Plus className="w-3.5 h-3.5" />
+                              <span className="hidden sm:inline">{carrierSubTab === "vendor" ? "Add Vendor Carrier" : "Add Customer Carrier"}</span>
+                            </button>
+                          );
+                        })()}
                       </div>
 
                       {/* Toolbar — matching Items tab */}
-                      <div className="flex items-center justify-between gap-3 px-4 pt-3.5 pb-2 shrink-0">
+                      <div className="flex items-center justify-between gap-3 px-4 pt-3 pb-2 shrink-0">
                         <div className="flex items-center gap-2.5 flex-1 min-w-0">
                           <div className="relative flex-1 max-w-xs">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70 pointer-events-none" />
@@ -5715,18 +5574,6 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                             )}
                           </span>
 
-                          <div className="w-px h-5 bg-border/60 mx-0.5 hidden sm:block" />
-
-                          {/* Add carrier button */}
-                          <button
-                            type="button"
-                            onClick={() => setAddCarrierModalOpen(true)}
-                            className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-sm shadow-sm transition-colors cursor-pointer"
-                            style={{ fontWeight: 600 }}
-                          >
-                            <Plus className="w-3.5 h-3.5" />
-                            <span className="hidden sm:inline">Add new carrier</span>
-                          </button>
                         </div>
                       </div>
 
@@ -6035,39 +5882,83 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                   {/* ── Pricing Rules tab ── */}
                   {locDetailTab === "pricing_rules" && (
                     <div className="flex-1 flex flex-col overflow-hidden">
+                      {/* Row 1: Vendor/Customer pill toggle + primary CTAs (matches Items tab) */}
+                      <div className="flex items-center justify-between gap-3 px-4 pt-2.5 pb-2 border-b border-border shrink-0">
+                        <div className="inline-flex items-center rounded-lg bg-[#F1F5F9] p-0.5">
+                          {([
+                            { key: "vendor" as const,   label: "Vendor Pricing",   icon: Package,       color: "#1E40AF" },
+                            { key: "customer" as const, label: "Customer Pricing", icon: ShoppingCart,  color: "#5B21B6" },
+                          ]).map((t) => {
+                            const isActive = locPricingSubTab === t.key;
+                            return (
+                              <button
+                                key={t.key}
+                                type="button"
+                                onClick={() => setLocPricingSubTab(t.key)}
+                                className={`inline-flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-md text-[13px] transition-all cursor-pointer ${
+                                  isActive ? "bg-white shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.04)]" : "text-[#64748B] hover:text-[#334155]"
+                                }`}
+                                style={{ fontWeight: isActive ? 600 : 500, color: isActive ? t.color : undefined }}
+                              >
+                                <t.icon className="w-3.5 h-3.5" style={{ color: isActive ? t.color : "#94A3B8" }} />
+                                {t.label}
+                              </button>
+                            );
+                          })}
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                          {(() => {
+                            const tint = locPricingSubTab === "vendor"
+                              ? { color: "#1E40AF", bg: "#EFF6FF", border: "#BFDBFE", hoverBg: "#DBEAFE" }
+                              : { color: "#5B21B6", bg: "#F5F3FF", border: "#DDD6FE", hoverBg: "#EDE9FE" };
+                            return (
+                              <button
+                                type="button"
+                                onClick={() => toast.info("Add pricing rule coming soon")}
+                                className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border text-[13px] transition-colors cursor-pointer"
+                                style={{ fontWeight: 600, backgroundColor: tint.bg, borderColor: tint.border, color: tint.color }}
+                                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = tint.hoverBg; }}
+                                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = tint.bg; }}
+                              >
+                                <Plus className="w-3.5 h-3.5" />
+                                <span className="hidden sm:inline">Add Pricing Rule</span>
+                              </button>
+                            );
+                          })()}
+                          <button
+                            type="button"
+                            onClick={() => toast.info("Templates coming soon")}
+                            className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-[13px] shadow-sm transition-colors cursor-pointer"
+                            style={{ fontWeight: 600 }}
+                          >
+                            <Sparkles className="w-3.5 h-3.5" />
+                            <span className="hidden sm:inline">Templates</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Toolbar — Search + Filters */}
                       <div className="flex items-center justify-between gap-3 px-4 pt-3 pb-2 shrink-0">
                         <div className="flex items-center gap-2 flex-1 min-w-0">
                           <div className="relative flex-1 max-w-[220px]">
                             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8] pointer-events-none" />
-                            <input type="text" placeholder="Search pricing rules..." className="w-full pl-8 h-8 text-[12px] bg-white border border-[#E2E8F0] rounded-lg px-3 py-1.5 focus:outline-none focus:border-[#0A77FF] transition-colors" />
+                            <input type="text" placeholder="Search pricing rules..." className="w-full pl-8 h-9 text-[13px] bg-white border border-[#E2E8F0] rounded-lg px-3 py-1.5 focus:outline-none focus:border-[#0A77FF] transition-colors" />
                           </div>
-                          <button className="h-8 px-2.5 rounded-lg border border-[#E2E8F0] bg-white text-[12px] text-[#475569] hover:bg-[#F8FAFC] cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 500 }}>
+                          <button className="h-9 px-3 rounded-lg border border-[#E2E8F0] bg-white text-[13px] text-[#475569] hover:bg-[#F8FAFC] cursor-pointer transition-colors inline-flex items-center gap-1.5 shrink-0" style={{ fontWeight: 500 }}>
                             <SlidersHorizontal className="w-3.5 h-3.5" /> Filters
                           </button>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <button onClick={() => toast.info("Add pricing rule coming soon")} className="h-8 px-3 rounded-lg border border-[#DC2626] bg-white text-[#DC2626] text-[12px] cursor-pointer transition-colors inline-flex items-center gap-1.5 hover:bg-[#FEF2F2]" style={{ fontWeight: 600 }}>
-                            <Plus className="w-3.5 h-3.5" /> Add New Pricing Rule
-                          </button>
-                          <button onClick={() => toast.info("Templates coming soon")} className="h-8 px-3 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-[12px] shadow-sm cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 600 }}>
-                            <Sparkles className="w-3.5 h-3.5" /> Templates
-                          </button>
-                        </div>
                       </div>
-                      {/* Vendor / Customer toggle */}
-                      <div className="flex items-center mx-4 mb-2 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] overflow-hidden">
-                        <button className="flex-1 py-2 text-[12px] text-white bg-[#0A77FF] text-center" style={{ fontWeight: 600 }}>Vendor</button>
-                        <button className="flex-1 py-2 text-[12px] text-[#64748B] bg-white text-center hover:bg-[#F8FAFC] cursor-pointer transition-colors" style={{ fontWeight: 500 }}>Customer</button>
-                      </div>
+
                       {/* Filter chips */}
-                      <div className="flex items-center gap-1.5 px-4 pb-2">
+                      <div className="flex items-center gap-1.5 px-4 pb-3 overflow-x-auto scrollbar-hide">
                         {["Me mode", "Discount", "Premium Plus Rules", "Active", "Inactive"].map((chip) => (
-                          <span key={chip} className="text-[11px] px-2.5 py-1 rounded-full cursor-pointer transition-colors bg-[#F8FAFC] text-[#64748B] border border-[#E2E8F0] hover:bg-[#F1F5F9]" style={{ fontWeight: 500 }}>
+                          <span key={chip} className="text-[11px] px-2.5 py-1 rounded-full cursor-pointer transition-colors bg-[#F8FAFC] text-[#64748B] border border-[#E2E8F0] hover:bg-[#F1F5F9] whitespace-nowrap shrink-0" style={{ fontWeight: 500 }}>
                             {chip}
                           </span>
                         ))}
                       </div>
-                      <div className="h-px bg-[#E8ECF1] mx-4 shrink-0" />
+                      <div className="h-px bg-[#E8ECF1] shrink-0" />
                       <div className="flex-1 overflow-auto p-4">
                         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3">
                           {LOC_PRICING_DATA.map((rule) => (
@@ -6205,8 +6096,22 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                     </div>
                   )}
 
-                  {/* ── Generic placeholder for Notes, Attachments, Activity ── */}
-                  {!["poc", "items", "carrier_shipping", "pricing_rules", "service_centers", "partner_communication", "purchase_orders", "quotes", "sales_orders"].includes(locDetailTab) && (
+                  {/* ── Attachments tab — reuses the shared AttachmentsTab card grid ── */}
+                  {locDetailTab === "attachments" && (
+                    <div className="flex-1 flex flex-col overflow-hidden p-4">
+                      <AttachmentsTab />
+                    </div>
+                  )}
+
+                  {/* ── Recent Activity tab — reuses the shared ActivityTab timeline ── */}
+                  {locDetailTab === "activity" && (
+                    <div className="flex-1 flex flex-col overflow-hidden p-4">
+                      <ActivityTab vendor={vendor} formatDate={formatDate} />
+                    </div>
+                  )}
+
+                  {/* ── Generic placeholder for tabs that are still WIP (e.g. Notes) ── */}
+                  {!["poc", "items", "carrier_shipping", "pricing_rules", "service_centers", "partner_communication", "purchase_orders", "quotes", "sales_orders", "attachments", "activity"].includes(locDetailTab) && (
                     <div className="flex-1 flex items-center justify-center">
                       <div className="text-center">
                         <div className="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3 bg-[#EDF4FF] border border-[#0A77FF]/15">
