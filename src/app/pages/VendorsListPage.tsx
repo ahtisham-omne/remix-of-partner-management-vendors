@@ -202,14 +202,28 @@ const CHECKBOX_COL_WIDTH = 40; // width of the checkbox column in px
 import { getAvatarTint } from "../utils/avatarTints";
 
 /* Partners listing — lazy loaded via routes.ts */
-export function VendorsListPage() {
+export interface VendorsListPageProps {
+  /** When true, hides page chrome (top bar, page header, KPI section, Create button) for embedding inside another page (e.g., Contact Detail's Linked Partners tab) */
+  embedded?: boolean;
+  /** Override the vendors data source (e.g., a filtered subset for Linked Partners). When omitted, uses the full list from context. */
+  embeddedVendors?: ReturnType<typeof useVendors>["vendors"];
+  /** Initial column visibility map for embedded mode (e.g., a trimmed default set for sub-tab use). All columns remain available via the column selector. */
+  embeddedDefaultColumnVisibility?: Record<string, boolean>;
+  /** Initial density for embedded mode. Defaults to "condensed". */
+  embeddedDefaultDensity?: DensityOption;
+}
+
+export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColumnVisibility, embeddedDefaultDensity }: VendorsListPageProps = {}) {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { vendors, getVendor, addVendor, updateVendor, archiveVendor, restoreVendor, deleteVendor } = useVendors();
+  const ctx = useVendors();
+  const { getVendor, addVendor, updateVendor, archiveVendor, restoreVendor, deleteVendor } = ctx;
+  // When embedded, prefer the supplied vendors subset; otherwise use the full context list.
+  const vendors = embeddedVendors ?? ctx.vendors;
 
   const [searchQuery, setSearchQuery] = useState("");
   const [quickFilter, setQuickFilter] = useState<QuickFilter>("all");
-  const [density, setDensity] = useState<DensityOption>("condensed");
+  const [density, setDensity] = useState<DensityOption>(embeddedDefaultDensity ?? "condensed");
   const [cardSize, setCardSize] = useState<CardSize>("medium");
   const [archiveDialogOpen, setArchiveDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -480,9 +494,11 @@ export function VendorsListPage() {
 
   /* ─── Column visibility & order state ─── */
   const [columnOrder, setColumnOrder] = useState<string[]>([...DEFAULT_COLUMN_ORDER]);
-  const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({
-    ...DEFAULT_COLUMN_VISIBILITY,
-  });
+  const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>(
+    embeddedDefaultColumnVisibility
+      ? { ...DEFAULT_COLUMN_VISIBILITY, ...embeddedDefaultColumnVisibility }
+      : { ...DEFAULT_COLUMN_VISIBILITY }
+  );
 
   /* ─── Column widths (for resize) ─── */
   const [columnWidths, setColumnWidths] = useState<Record<string, number>>({ ...DEFAULT_COLUMN_WIDTHS });
@@ -1104,8 +1120,9 @@ export function VendorsListPage() {
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#F8FAFC]">
-      {/* Top Bar */}
+    <div className={embedded ? "flex flex-col flex-1 min-h-[calc(100vh-260px)] bg-transparent" : "flex flex-col h-full bg-[#F8FAFC]"}>
+      {/* Top Bar — hidden when embedded */}
+      {!embedded && (
       <div className="flex items-center justify-between px-6 lg:px-8 h-12 border-b border-border bg-card shrink-0">
         <div className="flex items-center gap-2 text-[13px] text-muted-foreground">
           <button
@@ -1137,11 +1154,13 @@ export function VendorsListPage() {
           </div>
         </div>
       </div>
+      )}
 
       {/* Content */}
-      <div className="flex-1 overflow-hidden flex flex-col min-h-0">
-        <div className="px-6 lg:px-8 py-6 flex-1 min-h-0 flex flex-col">
-          {/* Page Header */}
+      <div className={embedded ? "flex-1 flex flex-col min-h-0" : "flex-1 overflow-hidden flex flex-col min-h-0"}>
+        <div className={embedded ? "flex-1 min-h-0 flex flex-col" : "px-6 lg:px-8 py-6 flex-1 min-h-0 flex flex-col"}>
+          {/* Page Header — hidden when embedded */}
+          {!embedded && (
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 -mx-6 lg:-mx-8 -mt-6 px-6 lg:px-8 pt-3.5 pb-3.5 bg-white border-b border-border shrink-0">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#EDF4FF' }}>
@@ -1162,9 +1181,10 @@ export function VendorsListPage() {
               Create New Partner
             </Button>
           </div>
+          )}
 
-          {/* KPI Insights -- collapsible section */}
-          {showInsights && activeKpiDefs.length > 0 && (
+          {/* KPI Insights -- collapsible section (hidden when embedded) */}
+          {!embedded && showInsights && activeKpiDefs.length > 0 && (
           <div className="mb-4 shrink-0">
             {/* Header row */}
             <div className="flex items-center justify-between mb-2.5">
@@ -1268,7 +1288,8 @@ export function VendorsListPage() {
           </div>
           )}
 
-          {/* KPI Insights Panel */}
+          {/* KPI Insights Panel — hidden when embedded */}
+          {!embedded && (
           <KpiInsightsPanel
             open={insightsPanelOpen}
             onOpenChange={setInsightsPanelOpen}
@@ -1276,6 +1297,7 @@ export function VendorsListPage() {
             onToggleKpi={handleToggleKpi}
             vendors={vendors}
           />
+          )}
 
           {/* Unified Table Container with Search, Filters & Data */}
           <div className="border border-border rounded-xl bg-card overflow-clip flex flex-1 min-h-0">

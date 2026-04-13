@@ -74,8 +74,8 @@ import { CONTACT_DICTIONARY, type ContactPerson, type ContactPhone, type Contact
 import { PurchaseOrdersTable } from "../components/vendors/PurchaseOrdersTable";
 import { SalesOrdersTable } from "../components/vendors/SalesOrdersTable";
 import { QuotesTable } from "../components/vendors/QuotesTable";
-import { LinkedPartnersTable } from "../components/vendors/LinkedPartnersTable";
 import { AttachmentsTab } from "../components/vendors/AttachmentsTab";
+import { VendorsListPage } from "./VendorsListPage";
 import { getAvatarTint } from "../utils/avatarTints";
 import { useVendors } from "../context/VendorContext";
 import { ALL_KPI_DEFINITIONS, DEFAULT_ACTIVE_KPIS, computeKpiValue } from "../components/vendors/KpiInsightsPanel";
@@ -1430,14 +1430,43 @@ export function ContactDetailPage() {
           )}
 
           {activeTab === "linked_partners" && (() => {
-            const partnerRows = contact.linkedPartners.map((partner) => {
-              let h = 0; for (let i = 0; i < partner.length; i++) h = partner.charCodeAt(i) + ((h << 5) - h); const a = Math.abs(h);
-              const linkedDate = new Date(2025, (a % 12), (a % 28) + 1).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-              const pId = partnerNameToId[partner];
-              const domain = partner.toLowerCase().replace(/[^a-z]/g, "").slice(0, 8);
-              return { name: partner, type: a % 3 === 0 ? "Customer" : "Vendor", email: `contact@${domain}.com`, phone: `(${String(100 + a % 900)}) ${String(100 + (a * 3) % 900)}-${String(1000 + (a * 7) % 9000)}`, location: ["New York, NY", "Los Angeles, CA", "Chicago, IL", "Houston, TX", "Phoenix, AZ"][a % 5], linkedSince: linkedDate, status: a % 7 === 0 ? "Inactive" : "Active", partnerId: pId };
-            });
-            return <LinkedPartnersTable partners={partnerRows} onNavigate={(id) => navigate(`/vendors/${id}`)} />;
+            // Filter the full vendors list down to those linked to this contact (case-insensitive name match against displayName / companyName)
+            const linkedNames = new Set(contact.linkedPartners.map(n => n.trim().toLowerCase()));
+            const linkedVendors = vendors.filter(v =>
+              linkedNames.has(v.displayName.trim().toLowerCase()) ||
+              linkedNames.has(v.companyName.trim().toLowerCase())
+            );
+            // Trimmed default column visibility for the sub-tab — all columns remain available via the column selector
+            const linkedPartnersDefaultVisibility: Record<string, boolean> = {
+              partner_name: true,
+              partner_type: true,
+              vendor_sub_types: true,
+              customer_sub_types: true,
+              num_items: false,
+              partner_locations: false,
+              global_contacts: true,
+              partner_group: true,
+              net_profit: false,
+              credit_limit: false,
+              credit_utilization: false,
+              services: false,
+              carrier_vendor: false,
+              carrier_customer: false,
+              country: true,
+              website: false,
+              email: true,
+              created_by: false,
+              created_on: false,
+              status: true,
+            };
+            return (
+              <VendorsListPage
+                embedded
+                embeddedVendors={linkedVendors}
+                embeddedDefaultColumnVisibility={linkedPartnersDefaultVisibility}
+                embeddedDefaultDensity="condensed"
+              />
+            );
           })()}
 
           {activeTab === "communications" && (
