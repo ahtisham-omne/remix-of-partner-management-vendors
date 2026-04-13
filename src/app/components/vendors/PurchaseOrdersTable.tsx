@@ -20,6 +20,9 @@ import {
 } from "lucide-react";
 import { getAvatarTint } from "../../utils/avatarTints";
 
+/* ─── External module URL (fixed) ─── */
+const PO_MODULE_URL = "https://pleasant-flow.lovable.app/purchase-orders";
+
 /* ─── Column config ─── */
 type ColKey = "po_no" | "vendor" | "status" | "items" | "poc" | "location" | "created_by" | "due_date" | "order_date";
 
@@ -117,7 +120,7 @@ export function PurchaseOrdersTable() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [density, setDensity] = useState<"condensed" | "comfort">("condensed");
-  const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({});
+  const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>(() => { const v: Record<string, boolean> = {}; COLUMN_DEFS.forEach(c => { v[c.key] = true; }); return v; });
   const [columnOrder, setColumnOrder] = useState<ColKey[]>(COLUMN_DEFS.map(c => c.key));
   const [columnWidths, setColumnWidths] = useState<Record<string, number>>({});
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
@@ -237,7 +240,7 @@ export function PurchaseOrdersTable() {
   };
 
   return (
-    <div className="border border-border rounded-xl bg-card overflow-clip flex flex-col">
+    <div className="border border-border rounded-xl bg-card overflow-clip flex flex-col flex-1 min-h-[calc(100vh-260px)]">
       {/* Toolbar */}
       <div className="px-4 py-3 flex items-center gap-3 border-b border-[#F1F5F9] flex-wrap">
         <div className="relative flex-1 max-w-xs"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70 pointer-events-none" /><Input placeholder="Search by PO, partner, item..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9 pr-8 h-9 text-sm bg-white border-border/80 shadow-sm placeholder:text-muted-foreground/50" />{search && <button onClick={() => setSearch("")} className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded-full hover:bg-muted/60 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"><X className="w-3.5 h-3.5" /></button>}</div>
@@ -247,7 +250,7 @@ export function PurchaseOrdersTable() {
         <ColumnSelectorTrigger visibleCount={visibleColumns.length} active={columnDrawerOpen} onClick={() => setColumnDrawerOpen(!columnDrawerOpen)} />
       </div>
       {/* Status tabs */}
-      <div className="px-4 py-2 flex items-center gap-2 border-b border-[#F1F5F9] overflow-x-auto scrollbar-hide">
+      <div className="px-4 py-2 flex items-center gap-2 overflow-x-auto scrollbar-hide">
         {FILTER_TABS.map(tab => { const a = statusFilter === tab.key; const c = filterCounts[tab.key] || 0; return (<button key={tab.key} onClick={() => setStatusFilter(tab.key)} className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs transition-colors whitespace-nowrap shrink-0 cursor-pointer ${a ? "border-primary bg-[#EDF4FF]" : "border-border text-muted-foreground hover:bg-muted/60 hover:text-foreground"}`} style={{ fontWeight: a ? 500 : 400, color: a ? "#0A77FF" : undefined }}>{tab.label}<span className={`text-[10px] rounded-full px-1.5 py-px min-w-[18px] text-center ${a ? "bg-primary/10" : "bg-muted"}`} style={{ fontWeight: 600, color: a ? "#0A77FF" : "#475569" }}>{c}</span></button>); })}
       </div>
       {/* Table */}
@@ -270,7 +273,7 @@ export function PurchaseOrdersTable() {
           </TableHeader>
           <TableBody>
             {filtered.length === 0 ? (<TableRow><TableCell colSpan={visibleColumns.length + 2} className="text-center py-12 text-muted-foreground">No purchase orders found.</TableCell></TableRow>) : filtered.map(po => (
-              <TableRow key={po.id + po.version} className={`cursor-pointer group hover:bg-[#F0F7FF] ${density === "condensed" ? "[&>td]:py-1 [&>td]:pl-4 [&>td]:pr-2" : "[&>td]:py-2 [&>td]:pl-4 [&>td]:pr-2"}`}>
+              <TableRow key={po.id + po.version} onClick={(e) => { if ((e.target as HTMLElement).closest('button, [role="menuitem"], a, input, [data-radix-popper-content-wrapper]')) return; window.open(`${PO_MODULE_URL}?po=${encodeURIComponent(po.id)}`, "_blank", "noopener"); }} className={`cursor-pointer group hover:bg-[#F0F7FF] ${density === "condensed" ? "[&>td]:py-1 [&>td]:pl-4 [&>td]:pr-2" : "[&>td]:py-2 [&>td]:pl-4 [&>td]:pr-2"}`}>
                 <TableCell className="sticky left-0 z-10 bg-card group-hover:bg-[#F0F7FF]" style={{ width: CHECKBOX_W, minWidth: CHECKBOX_W, maxWidth: CHECKBOX_W, paddingLeft: 8, paddingRight: 0 }}><Checkbox checked={selectedRows.has(po.id)} onCheckedChange={() => setSelectedRows(prev => { const n = new Set(prev); if (n.has(po.id)) n.delete(po.id); else n.add(po.id); return n; })} onClick={(e) => e.stopPropagation()} /></TableCell>
                 {visibleColumns.map(key => { const def = cDef(key); const w = getWidth(key); const isS = def.sticky === "left"; const isLS = key === lastStickyKey; const isD = draggingColumnKey === key; return (
                   <TableCell key={key} className={`${isS ? "sticky z-10 bg-card group-hover:bg-[#F0F7FF]" : ""} ${def.align === "right" ? "text-right tabular-nums" : ""}`} style={{ width: w, minWidth: w, maxWidth: w, overflow: "hidden", textOverflow: "ellipsis", ...(isS ? { left: stickyOffsets[key], ...(!isD && isLS ? { boxShadow: "inset -1px 0 0 0 rgba(0,0,0,0.08), 3px 0 6px -2px rgba(0,0,0,0.06)" } : {}) } : {}), ...(isD ? { backgroundColor: "rgba(10,119,255,0.035)" } : {}) }}>{renderCell(po, key)}</TableCell>

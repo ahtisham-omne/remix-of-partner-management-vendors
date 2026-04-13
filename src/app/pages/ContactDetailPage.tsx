@@ -57,6 +57,13 @@ import {
   Twitter,
   Send,
   MessageCircle,
+  Upload,
+  LayoutGrid,
+  List,
+  AlignJustify,
+  MoreVertical,
+  Image as ImageIcon,
+  FileSpreadsheet,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -68,6 +75,7 @@ import { PurchaseOrdersTable } from "../components/vendors/PurchaseOrdersTable";
 import { SalesOrdersTable } from "../components/vendors/SalesOrdersTable";
 import { QuotesTable } from "../components/vendors/QuotesTable";
 import { LinkedPartnersTable } from "../components/vendors/LinkedPartnersTable";
+import { AttachmentsTab } from "../components/vendors/AttachmentsTab";
 import { getAvatarTint } from "../utils/avatarTints";
 import { useVendors } from "../context/VendorContext";
 import { ALL_KPI_DEFINITIONS, DEFAULT_ACTIVE_KPIS, computeKpiValue } from "../components/vendors/KpiInsightsPanel";
@@ -258,7 +266,10 @@ const ATTACHMENTS_DATA = [
   { id: 2, name: "Contact_Onboarding_Form.docx", size: "340 KB", date: "2026-01-15T14:20:00Z", type: "doc", uploadedBy: "Admin" },
   { id: 3, name: "ID_Verification.png", size: "2.8 MB", date: "2025-12-05T10:45:00Z", type: "img", uploadedBy: "Michael Lee" },
   { id: 4, name: "Meeting_Notes_Q1.pdf", size: "520 KB", date: "2026-03-28T16:00:00Z", type: "pdf", uploadedBy: "Sarah Johnson" },
-  { id: 5, name: "Vendor_Agreement_v2.xlsx", size: "890 KB", date: "2026-02-20T11:30:00Z", type: "doc", uploadedBy: "Elena Volkov" },
+  { id: 5, name: "Vendor_Agreement_v2.xlsx", size: "890 KB", date: "2026-02-20T11:30:00Z", type: "xlsx", uploadedBy: "Elena Volkov" },
+  { id: 6, name: "Partnership_Contract.pdf", size: "3.4 MB", date: "2026-01-05T08:30:00Z", type: "pdf", uploadedBy: "Daniel Adams" },
+  { id: 7, name: "Company_Logo.jpg", size: "1.8 MB", date: "2025-11-20T15:00:00Z", type: "img", uploadedBy: "Alex Morgan" },
+  { id: 8, name: "Financial_Report_Q4.xlsx", size: "2.1 MB", date: "2026-02-10T09:45:00Z", type: "xlsx", uploadedBy: "Lisa Park" },
 ];
 
 /* ─── Tab definitions ─── */
@@ -1287,8 +1298,8 @@ export function ContactDetailPage() {
       </div>
 
       {/* Tab Content */}
-      <div className="flex-1">
-        <div className={`mx-auto px-4 lg:px-6 xl:px-8 pt-3 pb-5 space-y-4 transition-all duration-300 ${isFullscreen ? "max-w-full" : "max-w-[1440px] 2xl:max-w-[1600px]"}`}>
+      <div className="flex-1 flex flex-col min-h-0">
+        <div className={`mx-auto w-full px-4 lg:px-6 xl:px-8 pt-3 pb-5 flex-1 flex flex-col min-h-0 transition-all duration-300 ${isFullscreen ? "max-w-full" : "max-w-[1440px] 2xl:max-w-[1600px]"}`}>
           {activeTab === "overview" && (
             <ContactOverviewTab
               contact={contact}
@@ -2225,51 +2236,3 @@ function NotesTab() {
   );
 }
 
-/* ─── Attachments Tab ─── */
-function AttachmentsTab() {
-  return (
-    <div className="bg-white border border-[#E2E8F0] rounded-xl overflow-hidden">
-      <div className="px-5 py-3 border-b border-[#F1F5F9] flex items-center justify-between">
-        <h3 className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Attachments</h3>
-        <span className="text-[11px] shrink-0" style={{ fontWeight: 600, color: "#085FCC" }}>{ATTACHMENTS_DATA.length} files</span>
-      </div>
-      <table className="w-full">
-        <thead>
-          <tr className="border-b border-[#F1F5F9]">
-            <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>File Name</th>
-            <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>Size</th>
-            <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>Uploaded By</th>
-            <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>Upload Date</th>
-            <th className="text-right text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {ATTACHMENTS_DATA.map((file) => {
-            const ext = file.name.split(".").pop()?.toLowerCase() || "";
-            const typeColor = ext === "pdf" ? "#DC2626" : ext === "png" || ext === "jpg" ? "#7C3AED" : ext === "xlsx" ? "#059669" : "#2563EB";
-            return (
-              <tr key={file.id} className="border-b border-[#F1F5F9] last:border-b-0 hover:bg-[#F8FAFC] transition-colors">
-                <td className="px-5 py-2.5">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-7 h-7 rounded-md flex items-center justify-center shrink-0" style={{ backgroundColor: typeColor + "10" }}>
-                      <FileText className="w-3.5 h-3.5" style={{ color: typeColor }} />
-                    </div>
-                    <span className="text-[12px] text-[#334155] truncate" style={{ fontWeight: 500 }}>{file.name}</span>
-                  </div>
-                </td>
-                <td className="px-5 py-2.5"><span className="text-[12px] text-[#64748B]">{file.size}</span></td>
-                <td className="px-5 py-2.5"><span className="text-[12px] text-[#64748B]">{file.uploadedBy}</span></td>
-                <td className="px-5 py-2.5"><span className="text-[12px] text-[#64748B]">{formatDate(file.date)}</span></td>
-                <td className="px-5 py-2.5 text-right">
-                  <button onClick={() => toast.info("Download coming soon")} className="inline-flex items-center gap-1 h-7 px-2.5 rounded-md border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] text-[11px] text-[#64748B] cursor-pointer transition-all" style={{ fontWeight: 500 }}>
-                    <Download className="w-3 h-3" /> Download
-                  </button>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
-  );
-}

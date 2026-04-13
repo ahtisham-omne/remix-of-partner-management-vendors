@@ -9,6 +9,9 @@ import { ColumnSelector, ColumnSelectorTrigger } from "./ColumnSelector";
 import { Search, X, SlidersHorizontal, MoreHorizontal, Eye, Pencil, Trash2, Copy, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, AlignJustify, List, Check, ChevronDown, GripVertical, Mail, Phone, Building2 } from "lucide-react";
 import { getAvatarTint } from "../../utils/avatarTints";
 
+/* ─── External module URL (fixed) ─── */
+const QUOTE_MODULE_URL = "https://quote-craft-hub-82.lovable.app/";
+
 type ColKey = "quote_no" | "customer" | "poc" | "status" | "value" | "location" | "requested" | "created" | "respond_by" | "expires" | "confirmed" | "sales_rep" | "priority";
 interface ColDef { key: ColKey; label: string; defaultWidth: number; minWidth: number; sticky?: "left"; align?: "right"; locked?: boolean }
 
@@ -103,7 +106,7 @@ export function QuotesTable() {
   };
 
   return (
-    <div className="border border-border rounded-xl bg-card overflow-clip flex flex-col">
+    <div className="border border-border rounded-xl bg-card overflow-clip flex flex-col flex-1 min-h-[calc(100vh-260px)]">
       <div className="px-4 py-3 flex items-center gap-3 border-b border-[#F1F5F9] flex-wrap">
         <div className="relative flex-1 max-w-xs"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70 pointer-events-none" /><Input placeholder="Search by quote no, customer, or rep..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9 pr-8 h-9 text-sm bg-white border-border/80 shadow-sm placeholder:text-muted-foreground/50" />{search && <button onClick={() => setSearch("")} className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded-full hover:bg-muted/60 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"><X className="w-3.5 h-3.5" /></button>}</div>
         <button className="inline-flex items-center justify-center h-9 gap-1.5 px-3 rounded-lg border border-border/80 bg-white shadow-sm hover:bg-muted/50 transition-colors text-foreground cursor-pointer"><SlidersHorizontal className="w-3.5 h-3.5" /><span className="text-sm" style={{ fontWeight: 500 }}>Filters</span></button>
@@ -111,7 +114,7 @@ export function QuotesTable() {
         <DropdownMenu><DropdownMenuTrigger asChild><button className="inline-flex items-center justify-center h-9 gap-2 px-3 rounded-lg border border-border bg-white shadow-sm hover:bg-muted/40 transition-colors cursor-pointer">{density === "condensed" ? <AlignJustify className="w-[18px] h-[18px] text-muted-foreground/80" /> : <List className="w-[18px] h-[18px] text-muted-foreground/80" />}<span className="text-sm hidden md:inline" style={{ fontWeight: 500 }}>{density === "condensed" ? "Condensed" : "Comfort"}</span><ChevronDown className="w-3.5 h-3.5 text-muted-foreground/60" /></button></DropdownMenuTrigger><DropdownMenuContent align="end" className="w-[200px] p-1.5">{(["condensed", "comfort"] as const).map(d => (<DropdownMenuItem key={d} className="flex items-center gap-3 py-2.5 px-3 cursor-pointer rounded-md" onSelect={() => setDensity(d)}>{d === "condensed" ? <AlignJustify className="w-5 h-5 text-muted-foreground shrink-0" /> : <List className="w-5 h-5 text-muted-foreground shrink-0" />}<span className="text-sm flex-1" style={{ fontWeight: 500 }}>{d === "condensed" ? "Condensed" : "Comfort"}</span>{density === d && <Check className="w-4 h-4 shrink-0" style={{ color: "#0A77FF" }} />}</DropdownMenuItem>))}</DropdownMenuContent></DropdownMenu>
         <ColumnSelectorTrigger visibleCount={visibleColumns.length} active={columnDrawerOpen} onClick={() => setColumnDrawerOpen(!columnDrawerOpen)} />
       </div>
-      <div className="px-4 py-2 flex items-center gap-2 border-b border-[#F1F5F9] overflow-x-auto scrollbar-hide">
+      <div className="px-4 py-2 flex items-center gap-2 overflow-x-auto scrollbar-hide">
         {FILTER_TABS.map(tab => { const a = statusFilter === tab.key; const c = filterCounts[tab.key] || 0; return (<button key={tab.key} onClick={() => setStatusFilter(tab.key)} className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs transition-colors whitespace-nowrap shrink-0 cursor-pointer ${a ? "border-primary bg-[#EDF4FF]" : "border-border text-muted-foreground hover:bg-muted/60 hover:text-foreground"}`} style={{ fontWeight: a ? 500 : 400, color: a ? "#0A77FF" : undefined }}>{tab.label}<span className={`text-[10px] rounded-full px-1.5 py-px min-w-[18px] text-center ${a ? "bg-primary/10" : "bg-muted"}`} style={{ fontWeight: 600, color: a ? "#0A77FF" : "#475569" }}>{c}</span></button>); })}
       </div>
       <div className="flex flex-1 min-h-0">
@@ -131,7 +134,7 @@ export function QuotesTable() {
           </TableRow></TableHeader>
           <TableBody>
             {filtered.length === 0 ? (<TableRow><TableCell colSpan={visibleColumns.length + 2} className="text-center py-12 text-muted-foreground">No quotes found.</TableCell></TableRow>) : filtered.map(qt => (
-              <TableRow key={qt.id} className={`cursor-pointer group hover:bg-[#F0F7FF] ${density === "condensed" ? "[&>td]:py-1 [&>td]:pl-4 [&>td]:pr-2" : "[&>td]:py-2 [&>td]:pl-4 [&>td]:pr-2"}`}>
+              <TableRow key={qt.id} onClick={(e) => { if ((e.target as HTMLElement).closest('button, [role="menuitem"], a, input, [data-radix-popper-content-wrapper]')) return; window.open(`${QUOTE_MODULE_URL}?quote=${encodeURIComponent(qt.id)}`, "_blank", "noopener"); }} className={`cursor-pointer group hover:bg-[#F0F7FF] ${density === "condensed" ? "[&>td]:py-1 [&>td]:pl-4 [&>td]:pr-2" : "[&>td]:py-2 [&>td]:pl-4 [&>td]:pr-2"}`}>
                 <TableCell className="sticky left-0 z-10 bg-card group-hover:bg-[#F0F7FF]" style={{ width: CHECKBOX_W, minWidth: CHECKBOX_W, maxWidth: CHECKBOX_W, paddingLeft: 8, paddingRight: 0 }}><Checkbox checked={selectedRows.has(qt.id)} onCheckedChange={() => setSelectedRows(p => { const n = new Set(p); if (n.has(qt.id)) n.delete(qt.id); else n.add(qt.id); return n; })} onClick={(e) => e.stopPropagation()} /></TableCell>
                 {visibleColumns.map(key => { const def = cDef(key); const w = getWidth(key); const isS = def.sticky === "left"; const isLS = key === lastStickyKey; const isD = draggingColumnKey === key; return (
                   <TableCell key={key} className={`${isS ? "sticky z-10 bg-card group-hover:bg-[#F0F7FF]" : ""} ${def.align === "right" ? "text-right tabular-nums" : ""}`} style={{ width: w, minWidth: w, maxWidth: w, overflow: "hidden", textOverflow: "ellipsis", ...(isS ? { left: stickyOffsets[key], ...(!isD && isLS ? { boxShadow: "inset -1px 0 0 0 rgba(0,0,0,0.08), 3px 0 6px -2px rgba(0,0,0,0.06)" } : {}) } : {}), ...(isD ? { backgroundColor: "rgba(10,119,255,0.035)" } : {}) }}>{renderCell(qt, key)}</TableCell>

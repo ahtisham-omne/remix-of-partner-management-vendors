@@ -31,6 +31,10 @@ import { PaymentTermDetailModal } from "../components/vendors/PaymentTermDetailM
 import { PaymentTermCard } from "../components/vendors/PaymentTermCard";
 import { PAYMENT_TERM_PRESETS, type PaymentTermPreset } from "../components/vendors/partnerConstants";
 import { PocSectionContent, SelectPocDictionaryModal, CreatePocModal } from "../components/vendors/PocModals";
+import { PurchaseOrdersTable } from "../components/vendors/PurchaseOrdersTable";
+import { SalesOrdersTable } from "../components/vendors/SalesOrdersTable";
+import { QuotesTable } from "../components/vendors/QuotesTable";
+import { AttachmentsTab } from "../components/vendors/AttachmentsTab";
 import {
   ColumnHeaderMenu,
   isFilterActive,
@@ -1070,21 +1074,13 @@ export function VendorDetailsPage() {
               {activeTab === "payment_methods" && (
                 <PaymentMethodsTab cfg={cfg} PAYMENT_TYPE_ICONS={PAYMENT_TYPE_ICONS} />
               )}
-              {activeTab === "purchase_orders" && (
-                <PlaceholderTab label="Purchase Orders" description="View and manage purchase orders placed with this partner." icon={Package} />
-              )}
-              {activeTab === "quotes" && (
-                <PlaceholderTab label="Quotes" description="View and manage quotes received from or sent to this partner." icon={ClipboardList} />
-              )}
-              {activeTab === "sales_orders" && (
-                <PlaceholderTab label="Sales Orders" description="View and manage sales orders associated with this partner." icon={Receipt} />
-              )}
+              {activeTab === "purchase_orders" && <PurchaseOrdersTable />}
+              {activeTab === "quotes" && <QuotesTable />}
+              {activeTab === "sales_orders" && <SalesOrdersTable />}
               {activeTab === "notes" && (
                 <NotesTab vendor={vendor} cfg={cfg} />
               )}
-              {activeTab === "attachments" && (
-                <DocumentsTab />
-              )}
+              {activeTab === "attachments" && <AttachmentsTab />}
               {activeTab === "recent_activity" && (
                 <ActivityTab vendor={vendor} formatDate={formatDate} />
               )}

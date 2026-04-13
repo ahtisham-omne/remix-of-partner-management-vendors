@@ -418,16 +418,14 @@ export function ColumnSelector({
                 key={col.key}
                 className="flex items-center gap-2 px-3.5 py-[7px] mx-1.5 rounded-md select-none"
               >
-                <div className="w-[18px] h-[18px] rounded flex items-center justify-center bg-muted/50 shrink-0">
-                  <Lock className="w-2.5 h-2.5 text-muted-foreground/40" />
-                </div>
+                <Lock className="w-3.5 h-3.5 text-muted-foreground/35 shrink-0" />
                 <span
                   className="flex-1 text-[12.5px] text-muted-foreground/60 truncate"
                   style={{ fontWeight: 450 }}
                 >
                   {col.label}
                 </span>
-                <Eye className="w-3.5 h-3.5 text-muted-foreground/25 shrink-0" />
+                <Eye className="w-3.5 h-3.5 text-muted-foreground/50 shrink-0" />
               </div>
             ))}
             <div className="my-1 border-t border-border/30 mx-3.5" />
@@ -489,27 +487,21 @@ export function ColumnSelector({
                   <GripVertical className="w-3.5 h-3.5 text-muted-foreground/40" />
                 </div>
 
-                {/* Visibility toggle */}
+                {/* Visibility dot */}
                 <button
                   type="button"
                   onClick={() => toggleVisibility(col.key)}
-                  className={`shrink-0 w-[18px] h-[18px] rounded flex items-center justify-center transition-colors cursor-pointer ${
+                  className={`shrink-0 w-2 h-2 rounded-full transition-colors cursor-pointer ${
                     isVisible
-                      ? "bg-[#D6E8FF] text-[#3D95FF]"
-                      : "bg-muted/40 text-muted-foreground/25 hover:bg-muted/60 hover:text-muted-foreground/40"
+                      ? "bg-[#3D95FF]"
+                      : "bg-muted-foreground/20 hover:bg-muted-foreground/30"
                   }`}
-                >
-                  {isVisible ? (
-                    <Eye className="w-2.5 h-2.5" />
-                  ) : (
-                    <EyeOff className="w-2.5 h-2.5" />
-                  )}
-                </button>
+                />
 
                 {/* Label */}
                 <span
                   className={`flex-1 text-[12.5px] truncate transition-colors duration-100 ${
-                    isVisible ? "text-foreground" : "text-muted-foreground/40 line-through decoration-muted-foreground/20"
+                    isVisible ? "text-foreground" : "text-muted-foreground/40"
                   }`}
                   style={{ fontWeight: isVisible ? 450 : 400 }}
                 >

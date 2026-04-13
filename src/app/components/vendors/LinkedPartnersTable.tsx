@@ -28,7 +28,7 @@ const CHECKBOX_W = 40; const ACTIONS_W = 60; const MIN_COL_W = 80;
 
 export function LinkedPartnersTable({ partners, onNavigate }: { partners: PartnerRow[]; onNavigate?: (id: string) => void }) {
   const [search, setSearch] = useState(""); const [density, setDensity] = useState<"condensed" | "comfort">("condensed");
-  const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({}); const [columnOrder, setColumnOrder] = useState<ColKey[]>(COLUMN_DEFS.map(c => c.key)); const [columnWidths, setColumnWidths] = useState<Record<string, number>>({});
+  const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>(() => { const v: Record<string, boolean> = {}; COLUMN_DEFS.forEach(c => { v[c.key] = true; }); return v; }); const [columnOrder, setColumnOrder] = useState<ColKey[]>(COLUMN_DEFS.map(c => c.key)); const [columnWidths, setColumnWidths] = useState<Record<string, number>>({});
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set()); const [isResizing, setIsResizing] = useState(false); const [resizingColumnKey, setResizingColumnKey] = useState<string | null>(null); const [draggingColumnKey, setDraggingColumnKey] = useState<string | null>(null); const [columnDrawerOpen, setColumnDrawerOpen] = useState(false);
   const resizeRef = useRef<{ columnKey: string; startX: number; startWidth: number } | null>(null); const colDragRef = useRef<{ columnKey: string; startX: number; startY: number; isDragging: boolean; lastSwapTime: number } | null>(null); const suppressNextClickRef = useRef(false); const ghostElRef = useRef<HTMLDivElement>(null);
 
@@ -61,7 +61,7 @@ export function LinkedPartnersTable({ partners, onNavigate }: { partners: Partne
   };
 
   return (
-    <div className="border border-border rounded-xl bg-card overflow-clip flex flex-col">
+    <div className="border border-border rounded-xl bg-card overflow-clip flex flex-col flex-1 min-h-[calc(100vh-260px)]">
       <div className="px-4 py-3 flex items-center gap-3 border-b border-[#F1F5F9] flex-wrap">
         <div className="relative flex-1 max-w-xs"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70 pointer-events-none" /><Input placeholder="Search partners..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9 pr-8 h-9 text-sm bg-white border-border/80 shadow-sm placeholder:text-muted-foreground/50" />{search && <button onClick={() => setSearch("")} className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded-full hover:bg-muted/60 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"><X className="w-3.5 h-3.5" /></button>}</div>
         <button className="inline-flex items-center justify-center h-9 gap-1.5 px-3 rounded-lg border border-border/80 bg-white shadow-sm hover:bg-muted/50 transition-colors text-foreground cursor-pointer"><SlidersHorizontal className="w-3.5 h-3.5" /><span className="text-sm" style={{ fontWeight: 500 }}>Filters</span></button>
