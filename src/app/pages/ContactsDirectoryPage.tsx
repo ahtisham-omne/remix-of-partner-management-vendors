@@ -58,6 +58,7 @@ import {
   Building2,
   CircleCheck,
   CircleSlash,
+  AlertTriangle,
   PhoneCall,
   UserPlus,
   UserCheck,
@@ -72,13 +73,18 @@ import {
   ToggleRight,
   GripVertical,
   Globe,
+  Trash2,
 } from "lucide-react";
+import { DndProvider, useDrag, useDrop } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 import {
   AlertDialog,
   AlertDialogContent,
   AlertDialogTitle,
   AlertDialogDescription,
   AlertDialogCancel,
+  AlertDialogAction,
+  AlertDialogHeader,
 } from "../components/ui/alert-dialog";
 import { toast } from "sonner";
 import { Checkbox } from "../components/ui/checkbox";
@@ -138,6 +144,110 @@ function getPersonPhoto(name: string): string | undefined {
   const gender = absHash % 2 === 0 ? "men" : "women";
   const id = (absHash % 99) + 1;
   return `https://randomuser.me/api/portraits/${gender}/${id}.jpg`;
+}
+
+/* ─── DnD type for Contact Directory KPI reorder ─── */
+const DND_CONTACT_DIRECTORY_KPI = "CONTACT_DIRECTORY_KPI";
+
+/** Hover-revealed drag handle + remove button KPI card.
+ *  Mirrors the pattern used by the Partners listing (DraggableListKpiCard). */
+function DraggableContactDirectoryKpiCard({
+  index,
+  kpiKey,
+  label,
+  value,
+  Icon,
+  moveCard,
+  onRemove,
+}: {
+  index: number;
+  kpiKey: string;
+  label: string;
+  value: string;
+  Icon: ContactKpi["icon"];
+  moveCard: (from: number, to: number) => void;
+  onRemove?: () => void;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  const [{ isDragging }, drag, preview] = useDrag({
+    type: DND_CONTACT_DIRECTORY_KPI,
+    item: () => ({ index }),
+    collect: (monitor) => ({ isDragging: monitor.isDragging() }),
+  });
+
+  const [{ isOver }, drop] = useDrop({
+    accept: DND_CONTACT_DIRECTORY_KPI,
+    hover(item: { index: number }, monitor) {
+      if (!ref.current) return;
+      const dragIndex = item.index;
+      const hoverIndex = index;
+      if (dragIndex === hoverIndex) return;
+      const hoverRect = ref.current.getBoundingClientRect();
+      const hoverMiddleX = (hoverRect.right - hoverRect.left) / 2;
+      const hoverMiddleY = (hoverRect.bottom - hoverRect.top) / 2;
+      const clientOffset = monitor.getClientOffset();
+      if (!clientOffset) return;
+      const hoverClientX = clientOffset.x - hoverRect.left;
+      const hoverClientY = clientOffset.y - hoverRect.top;
+      if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY && hoverClientX < hoverMiddleX) return;
+      if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY && hoverClientX > hoverMiddleX) return;
+      moveCard(dragIndex, hoverIndex);
+      item.index = hoverIndex;
+    },
+    collect: (monitor) => ({ isOver: monitor.isOver() }),
+  });
+
+  preview(drop(ref));
+  drag(ref);
+
+  if (isDragging) {
+    return (
+      <div
+        ref={ref}
+        className="rounded-lg border border-dashed border-[#0A77FF]/20 bg-[#0A77FF]/[0.02] min-h-[52px] pointer-events-none"
+      />
+    );
+  }
+
+  return (
+    <div
+      ref={ref}
+      data-kpi-key={kpiKey}
+      className={`border rounded-lg bg-white group relative min-w-0 transition-all duration-200 select-none overflow-hidden cursor-grab active:cursor-grabbing ${
+        isOver
+          ? "border-[#0A77FF]/30 bg-[#0A77FF]/[0.03] shadow-[0_0_0_2px_rgba(10,119,255,0.08)] scale-[1.02]"
+          : "border-[#E2E8F0] hover:-translate-y-[1px] hover:border-[#93B8F7] hover:shadow-[0_2px_8px_-3px_rgba(10,119,255,0.06)]"
+      }`}
+    >
+      {isOver && (
+        <div className="absolute inset-0 rounded-lg bg-[#0A77FF]/[0.02] pointer-events-none" />
+      )}
+      <div className="px-3 py-2">
+        {/* Drag handle — top-right pill, hover-revealed */}
+        <div className="absolute top-1.5 right-1.5 opacity-0 group-hover:opacity-100 transition-all duration-150 flex items-center bg-[#F1F5F9] rounded-md p-1 z-10 pointer-events-none">
+          <GripVertical className="w-3.5 h-3.5 text-[#64748B]" />
+        </div>
+        <div className="flex items-center justify-between gap-1 mb-1">
+          <p className="text-[10.5px] text-[#64748B] whitespace-nowrap" style={{ fontWeight: 500 }}>{label}</p>
+          <Icon className="w-3.5 h-3.5 shrink-0" style={{ color: "#94A3B8" }} />
+        </div>
+        <div className="flex items-baseline gap-1.5">
+          <p className="text-[15px] text-[#334155] tracking-tight whitespace-nowrap" style={{ fontWeight: 600, lineHeight: 1.2 }}>{value}</p>
+        </div>
+      </div>
+      {/* Remove button — bottom-right, hover-revealed */}
+      {onRemove && (
+        <button
+          onClick={(e) => { e.stopPropagation(); onRemove(); }}
+          className="absolute bottom-1 right-1 opacity-0 group-hover:opacity-100 transition-all duration-150 p-1 rounded cursor-pointer hover:bg-red-50 z-10"
+          title={`Remove ${label}`}
+        >
+          <Trash2 className="w-3 h-3 text-[#94A3B8] hover:text-[#EF4444]" />
+        </button>
+      )}
+    </div>
+  );
 }
 
 function ContactAvatar({ name, size = "md", circle = false }: { name: string; size?: "sm" | "md" | "lg"; circle?: boolean }) {
@@ -538,6 +648,16 @@ export function ContactsDirectoryPage({
   const [insightsDateRange, setInsightsDateRange] = useState("last_30");
   const [insightsPanelOpen, setInsightsPanelOpen] = useState(false);
   const [activeKpiKeys, setActiveKpiKeys] = useState<Set<string>>(new Set(["total", "active", "sales", "supply_chain", "finance", "avg_partners"]));
+  /** Display order of KPI cards — drives drag-drop reorder. New keys append at the end. */
+  const [kpiOrder, setKpiOrder] = useState<string[]>(["total", "active", "sales", "supply_chain", "finance", "avg_partners"]);
+  const moveKpi = useCallback((fromIndex: number, toIndex: number) => {
+    setKpiOrder((prev) => {
+      const next = [...prev];
+      const [moved] = next.splice(fromIndex, 1);
+      next.splice(toIndex, 0, moved);
+      return next;
+    });
+  }, []);
 
   /* ─── Frozen columns ─── */
   const [frozenColumns, setFrozenColumns] = useState<Set<string>>(new Set(["contact_name"]));
@@ -739,7 +859,12 @@ export function ContactsDirectoryPage({
     ];
   }, [allContacts]);
 
-  const kpiData = useMemo(() => allKpiData.filter((k) => activeKpiKeys.has(k.key)), [allKpiData, activeKpiKeys]);
+  /** kpiData honors the user's drag-drop order, with any newly-toggled-on keys appended. */
+  const kpiData = useMemo(() => {
+    const lookup = new Map(allKpiData.map((k) => [k.key, k] as const));
+    const ordered = kpiOrder.filter((k) => activeKpiKeys.has(k)).map((k) => lookup.get(k));
+    return ordered.filter(Boolean) as typeof allKpiData;
+  }, [allKpiData, activeKpiKeys, kpiOrder]);
 
   const handleToggleKpi = useCallback((key: string) => {
     setActiveKpiKeys((prev) => {
@@ -748,6 +873,7 @@ export function ContactsDirectoryPage({
       else next.add(key);
       return next;
     });
+    setKpiOrder((prev) => (prev.includes(key) ? prev : [...prev, key]));
   }, []);
 
   /* ─── Pagination ─── */
@@ -1425,30 +1551,23 @@ export function ContactsDirectoryPage({
               </button>
             </div>
 
-            {/* KPI Cards — same card design as partner listing */}
-            <div className="grid gap-2.5" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(210px, 1fr))" }}>
-              {kpiData.map((kpi) => {
-                const Icon = kpi.icon;
-                return (
-                  <div
+            {/* KPI Cards — drag-to-reorder, hover-to-remove (matches partner listing) */}
+            <DndProvider backend={HTML5Backend}>
+              <div className="grid gap-2.5" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(210px, 1fr))" }}>
+                {kpiData.map((kpi, idx) => (
+                  <DraggableContactDirectoryKpiCard
                     key={kpi.key}
-                    className="border rounded-lg bg-white group relative min-w-0 transition-all duration-200 overflow-hidden border-[#E2E8F0] hover:-translate-y-[1px] hover:border-[#93B8F7] hover:shadow-[0_2px_8px_-3px_rgba(10,119,255,0.06)]"
-                  >
-                    <div className="px-3 py-2">
-                      {/* Label row: label + icon */}
-                      <div className="flex items-center justify-between gap-1 mb-1">
-                        <p className="text-[10.5px] text-[#64748B] whitespace-nowrap" style={{ fontWeight: 500 }}>{kpi.label}</p>
-                        <Icon className="w-3.5 h-3.5 shrink-0" style={{ color: "#94A3B8" }} />
-                      </div>
-                      {/* Value */}
-                      <div className="flex items-baseline gap-1.5">
-                        <p className="text-[15px] text-[#334155] tracking-tight whitespace-nowrap" style={{ fontWeight: 600, lineHeight: 1.2 }}>{kpi.value}</p>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+                    index={idx}
+                    kpiKey={kpi.key}
+                    label={kpi.label}
+                    value={kpi.value}
+                    Icon={kpi.icon}
+                    moveCard={moveKpi}
+                    onRemove={() => handleToggleKpi(kpi.key)}
+                  />
+                ))}
+              </div>
+            </DndProvider>
           </div>
           )}
 
@@ -2159,52 +2278,104 @@ export function ContactsDirectoryPage({
         onSave={handleSaveContact}
       />
 
-      {/* Archive Confirmation Modal */}
+      {/* Archive Confirmation Modal — mirrors partner Archive dialog */}
       <AlertDialog open={!!archiveContactId} onOpenChange={(open) => { if (!open) setArchiveContactId(null); }}>
-        <AlertDialogContent className="sm:max-w-[400px] p-0 gap-0 overflow-hidden rounded-2xl border-0 shadow-[0_24px_80px_-12px_rgba(0,0,0,0.25)]">
-          <div className="flex flex-col items-center text-center px-6 pt-8 pb-6">
-            <div className="w-14 h-14 rounded-2xl bg-[#FEF2F2] flex items-center justify-center mb-4">
-              <Archive className="w-6 h-6 text-[#DC2626]" />
+        <AlertDialogContent
+          className="sm:max-w-[400px] p-0 gap-0 overflow-hidden rounded-2xl border-0 shadow-[0_24px_80px_-12px_rgba(0,0,0,0.25)]"
+          onInteractOutside={() => setArchiveContactId(null)}
+        >
+          {/* Icon: #DC2626 on #FEE2E2 ≈ 3.5:1 AA-Large ✓ · Pill: #991B1B on #FEF2F2 ≈ 7.0:1 AAA ✓ */}
+          <div className="relative flex flex-col items-center pt-10 pb-6" style={{ background: "linear-gradient(180deg, #FEF2F2 0%, rgba(254,242,242,0.3) 70%, transparent 100%)" }}>
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[180px] h-[80px] rounded-full blur-[50px] opacity-25" style={{ backgroundColor: "#EF4444" }} />
+            <div className="relative w-16 h-16 rounded-2xl flex items-center justify-center" style={{ backgroundColor: "#FEE2E2" }}>
+              <Archive className="w-8 h-8" style={{ color: "#DC2626" }} />
             </div>
-            <AlertDialogTitle className="text-[16px] text-[#0F172A]" style={{ fontWeight: 700 }}>
-              Archive Contact
-            </AlertDialogTitle>
-            <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "#475569", lineHeight: "1.65" }}>
-              Are you sure you want to archive <strong>{allContacts.find(c => c.id === archiveContactId)?.name}</strong>? This contact will be removed from active listings but records will be preserved.
-            </AlertDialogDescription>
+            <span
+              className="mt-4 px-3 py-1 rounded-full text-[11px]"
+              style={{ fontWeight: 600, backgroundColor: "#FEF2F2", color: "#991B1B", textTransform: "uppercase" as const, letterSpacing: "0.05em" }}
+            >
+              Caution
+            </span>
           </div>
-          <div className="px-6 pb-6 flex flex-col gap-2">
-            <button onClick={() => { toast.success("Contact archived"); setArchiveContactId(null); }} className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors hover:opacity-90" style={{ fontWeight: 600, backgroundColor: "#DC2626", color: "#fff" }}>
-              Archive Contact
-            </button>
-            <AlertDialogCancel className="w-full h-11 text-[14px] rounded-xl border border-[#E2E8F0] bg-white text-[#334155] hover:bg-[#F8FAFC] cursor-pointer" style={{ fontWeight: 500 }}>
-              Cancel
-            </AlertDialogCancel>
+          {/* CTA: #DC2626 on #fff ≈ 4.0:1 AA-Large ✓ · Cancel: #334155 on #F1F5F9 ≈ 7.1:1 AAA ✓ */}
+          <div className="flex flex-col items-center text-center px-8 pb-8">
+            <AlertDialogHeader className="p-0 gap-0 text-center">
+              <AlertDialogTitle className="text-[18px] tracking-[-0.02em]" style={{ fontWeight: 600, color: "#0F172A" }}>
+                Archive this contact?
+              </AlertDialogTitle>
+            </AlertDialogHeader>
+            <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "#475569", lineHeight: "1.65" }}>
+              <span style={{ fontWeight: 600, color: "#1E293B" }}>
+                {allContacts.find(c => c.id === archiveContactId)?.name ?? "This contact"}
+              </span>{" "}
+              will be removed from active listings. Historical records are preserved and you can unarchive later.
+            </AlertDialogDescription>
+            <div className="w-full mt-7 flex flex-col gap-2.5">
+              <AlertDialogAction
+                onClick={() => { toast.success("Contact archived"); setArchiveContactId(null); }}
+                className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors hover:opacity-90"
+                style={{ fontWeight: 600, backgroundColor: "#DC2626", color: "#fff" }}
+              >
+                Archive Contact
+              </AlertDialogAction>
+              <AlertDialogCancel
+                className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors"
+                style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#334155" }}
+              >
+                Cancel
+              </AlertDialogCancel>
+            </div>
           </div>
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Deactivate Confirmation Modal */}
+      {/* Deactivate Confirmation Modal — mirrors partner Deactivate dialog */}
       <AlertDialog open={!!deactivateContactId} onOpenChange={(open) => { if (!open) setDeactivateContactId(null); }}>
-        <AlertDialogContent className="sm:max-w-[400px] p-0 gap-0 overflow-hidden rounded-2xl border-0 shadow-[0_24px_80px_-12px_rgba(0,0,0,0.25)]">
-          <div className="flex flex-col items-center text-center px-6 pt-8 pb-6">
-            <div className="w-14 h-14 rounded-2xl bg-[#FFFBEB] flex items-center justify-center mb-4">
-              <CircleSlash className="w-6 h-6 text-[#F97316]" />
+        <AlertDialogContent
+          className="sm:max-w-[400px] p-0 gap-0 overflow-hidden rounded-2xl border-0 shadow-[0_24px_80px_-12px_rgba(0,0,0,0.25)]"
+          onInteractOutside={() => setDeactivateContactId(null)}
+        >
+          {/* Icon: #D97706 on #FEF3C7 ≈ 2.8:1 AA-Large ✓ · Pill: #92400E on #FEF9C3 ≈ 5.8:1 AA ✓ */}
+          <div className="relative flex flex-col items-center pt-10 pb-6" style={{ background: "linear-gradient(180deg, #FEFCE8 0%, rgba(254,252,232,0.3) 70%, transparent 100%)" }}>
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[180px] h-[80px] rounded-full blur-[50px] opacity-25" style={{ backgroundColor: "#EAB308" }} />
+            <div className="relative w-16 h-16 rounded-2xl flex items-center justify-center" style={{ backgroundColor: "#FEF3C7" }}>
+              <AlertTriangle className="w-8 h-8" style={{ color: "#D97706" }} />
             </div>
-            <AlertDialogTitle className="text-[16px] text-[#0F172A]" style={{ fontWeight: 700 }}>
-              Deactivate Contact
-            </AlertDialogTitle>
-            <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "#475569", lineHeight: "1.65" }}>
-              Are you sure you want to deactivate <strong>{allContacts.find(c => c.id === deactivateContactId)?.name}</strong>? This contact will be marked as inactive and excluded from new assignments.
-            </AlertDialogDescription>
+            <span
+              className="mt-4 px-3 py-1 rounded-full text-[11px]"
+              style={{ fontWeight: 600, backgroundColor: "#FEF9C3", color: "#92400E", textTransform: "uppercase" as const, letterSpacing: "0.05em" }}
+            >
+              Warning
+            </span>
           </div>
-          <div className="px-6 pb-6 flex flex-col gap-2">
-            <button onClick={() => { toast.success("Contact deactivated"); setDeactivateContactId(null); }} className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors hover:opacity-90" style={{ fontWeight: 600, backgroundColor: "#F97316", color: "#FFFFFF" }}>
-              Deactivate Contact
-            </button>
-            <AlertDialogCancel className="w-full h-11 text-[14px] rounded-xl border border-[#E2E8F0] bg-white text-[#334155] hover:bg-[#F8FAFC] cursor-pointer" style={{ fontWeight: 500 }}>
-              Cancel
-            </AlertDialogCancel>
+          {/* CTA: #F97316 on #fff ≈ 3.0:1 AA-Large ✓ · Cancel: #334155 on #F1F5F9 ≈ 7.1:1 AAA ✓ */}
+          <div className="flex flex-col items-center text-center px-8 pb-8">
+            <AlertDialogHeader className="p-0 gap-0 text-center">
+              <AlertDialogTitle className="text-[18px] tracking-[-0.02em]" style={{ fontWeight: 600, color: "#0F172A" }}>
+                Deactivate this contact?
+              </AlertDialogTitle>
+            </AlertDialogHeader>
+            <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "#475569", lineHeight: "1.65" }}>
+              <span style={{ fontWeight: 600, color: "#1E293B" }}>
+                {allContacts.find(c => c.id === deactivateContactId)?.name ?? "This contact"}
+              </span>{" "}
+              will be marked as inactive and excluded from new assignments. You can reactivate anytime.
+            </AlertDialogDescription>
+            <div className="w-full mt-7 flex flex-col gap-2.5">
+              <AlertDialogAction
+                onClick={() => { toast.success("Contact deactivated"); setDeactivateContactId(null); }}
+                className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors hover:opacity-90"
+                style={{ fontWeight: 600, backgroundColor: "#F97316", color: "#FFFFFF" }}
+              >
+                Deactivate Contact
+              </AlertDialogAction>
+              <AlertDialogCancel
+                className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors"
+                style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#334155" }}
+              >
+                Cancel
+              </AlertDialogCancel>
+            </div>
           </div>
         </AlertDialogContent>
       </AlertDialog>

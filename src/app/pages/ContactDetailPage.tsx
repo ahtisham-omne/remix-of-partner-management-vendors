@@ -312,8 +312,8 @@ function formatDateTime(dateStr: string): string {
 /* ─── DnD KPI Card ─── */
 const DND_CONTACT_KPI = "CONTACT_KPI";
 
-function DraggableContactKpi({ index, kpiKey, label, value, icon: Icon, change, moveCard }: {
-  index: number; kpiKey: string; label: string; value: string; icon: React.ElementType; change: string | null; moveCard: (from: number, to: number) => void;
+function DraggableContactKpi({ index, kpiKey, label, value, icon: Icon, change, moveCard, onRemove }: {
+  index: number; kpiKey: string; label: string; value: string; icon: React.ElementType; change: string | null; moveCard: (from: number, to: number) => void; onRemove?: () => void;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [{ isDragging }, drag, preview] = useDrag({ type: DND_CONTACT_KPI, item: () => ({ index }), collect: (m) => ({ isDragging: m.isDragging() }) });
@@ -354,6 +354,16 @@ function DraggableContactKpi({ index, kpiKey, label, value, icon: Icon, change, 
           <p className="text-[15px] text-[#334155] tracking-tight whitespace-nowrap" style={{ fontWeight: 600, lineHeight: 1.2 }}>{value}</p>
         </div>
       </div>
+      {/* Remove button — bottom-right, hover-revealed (mirrors partner KPI card) */}
+      {onRemove && (
+        <button
+          onClick={(e) => { e.stopPropagation(); onRemove(); }}
+          className="absolute bottom-1 right-1 opacity-0 group-hover:opacity-100 transition-all duration-150 p-1 rounded cursor-pointer hover:bg-red-50 z-10"
+          title={`Remove ${label}`}
+        >
+          <Trash2 className="w-3 h-3 text-[#94A3B8] hover:text-[#EF4444]" />
+        </button>
+      )}
     </div>
   );
 }
@@ -362,19 +372,23 @@ function DraggableContactKpi({ index, kpiKey, label, value, icon: Icon, change, 
 interface ContactWidgetDef {
   key: string;
   label: string;
-  type: "chart" | "list" | "gauge" | "contact" | "text";
+  type: "chart" | "list" | "gauge" | "contact" | "text" | "donut" | "bars" | "line";
+  description: string;
+  category: "Performance" | "Activity" | "Orders" | "Notes";
 }
 
 const CONTACT_WIDGET_DEFS: ContactWidgetDef[] = [
-  { key: "interaction_activity", label: "Interaction Activity", type: "chart" },
-  { key: "communication_trend", label: "Communication Trend", type: "chart" },
-  { key: "recent_communications", label: "Recent Communications", type: "list" },
-  { key: "order_summary", label: "Order Summary", type: "list" },
-  { key: "purchase_orders", label: "Purchase Orders", type: "list" },
-  { key: "sales_orders", label: "Sales Orders", type: "list" },
-  { key: "activity_timeline", label: "Activity Timeline", type: "list" },
-  { key: "notes", label: "Notes", type: "text" },
+  { key: "interaction_activity", label: "Interaction Activity", type: "chart", description: "Daily call & email volume by weekday", category: "Performance" },
+  { key: "communication_trend", label: "Communication Trend", type: "line", description: "Yearly communication trend (line chart)", category: "Performance" },
+  { key: "recent_communications", label: "Recent Communications", type: "list", description: "Latest emails, calls and messages", category: "Activity" },
+  { key: "order_summary", label: "Order Summary", type: "bars", description: "Aggregated stats across all orders", category: "Orders" },
+  { key: "purchase_orders", label: "Purchase Orders", type: "list", description: "POs linked to this contact", category: "Orders" },
+  { key: "sales_orders", label: "Sales Orders", type: "list", description: "SOs linked to this contact", category: "Orders" },
+  { key: "activity_timeline", label: "Activity Timeline", type: "list", description: "Chronological event history", category: "Activity" },
+  { key: "notes", label: "Notes", type: "text", description: "Internal notes & comments on this contact", category: "Notes" },
 ];
+
+const CONTACT_WIDGET_CATEGORY_ORDER: ContactWidgetDef["category"][] = ["Performance", "Activity", "Orders", "Notes"];
 
 const DEFAULT_CONTACT_WIDGETS = [
   "interaction_activity", "communication_trend",
@@ -581,16 +595,138 @@ function DraggableContactWidget({ widgetKey, index, moveWidget, children }: {
 }
 
 /* ─── Contact Customize Panel (KPIs + Widgets tabs) ─── */
-function ContactCustomizePanel({ open, onOpenChange, activeKpis, onToggleKpi, activeWidgets, onToggleWidget, widgetSizes, onWidgetSizeChange, vendors }: {
+/** Visual preview for a widget by type. Uses light Tailwind 200/300-equivalent
+ *  tints (e.g. blue-300, orange-200, green-300) so the preview feels airy and
+ *  matches the soft pastel palette of the dashboard previews. Inactive cards
+ *  fall back to a neutral slate. */
+function WidgetTypeVisual({ type, isActive }: { type: ContactWidgetDef["type"]; isActive: boolean }) {
+  // Light pastel tints (Tailwind 200/300 family) used when active
+  const C = {
+    blue:    isActive ? "#93C5FD" : "#E2E8F0",  // blue-300 / slate-200
+    orange:  isActive ? "#FDBA74" : "#E2E8F0",  // orange-300 / slate-200
+    purple:  isActive ? "#C4B5FD" : "#E2E8F0",  // purple-300 / slate-200
+    green:   isActive ? "#86EFAC" : "#E2E8F0",  // green-300 / slate-200
+    red:     isActive ? "#FCA5A5" : "#E2E8F0",  // red-300 / slate-200
+    slate:   isActive ? "#CBD5E1" : "#E2E8F0",  // slate-300 / slate-200
+    needle:  isActive ? "#64748B" : "#94A3B8",  // slate-500 / slate-400 — gauge needle
+    lineFg:  isActive ? "#93C5FD" : "#CBD5E1",  // line stroke
+  };
+  if (type === "chart") {
+    const data: { h: number; c: string }[] = [
+      { h: 14, c: C.blue },
+      { h: 24, c: C.blue },
+      { h: 18, c: C.orange },
+      { h: 28, c: C.blue },
+      { h: 16, c: C.orange },
+      { h: 22, c: C.blue },
+    ];
+    return (
+      <div className="flex items-end gap-[3px] h-full w-full px-3 pb-2">
+        {data.map((d, i) => (
+          <div key={i} className="flex-1 rounded-t-[2px]" style={{ height: d.h, backgroundColor: d.c }} />
+        ))}
+      </div>
+    );
+  }
+  if (type === "list") {
+    const dots = [C.blue, C.orange, C.green];
+    return (
+      <div className="flex flex-col gap-1.5 w-full px-3.5">
+        {[82, 64, 72].map((w, i) => (
+          <div key={i} className="flex items-center gap-2">
+            <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: dots[i] }} />
+            <div className="h-1.5 rounded-sm" style={{ width: `${w}%`, backgroundColor: C.slate }} />
+          </div>
+        ))}
+      </div>
+    );
+  }
+  if (type === "donut") {
+    return (
+      <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+        <circle cx="22" cy="22" r="16" stroke={C.orange} strokeWidth="6" strokeDasharray="30 100" transform="rotate(-90 22 22)" />
+        <circle cx="22" cy="22" r="16" stroke={C.purple} strokeWidth="6" strokeDasharray="25 100" strokeDashoffset="-30" transform="rotate(-90 22 22)" />
+        <circle cx="22" cy="22" r="16" stroke={C.green} strokeWidth="6" strokeDasharray="25 100" strokeDashoffset="-55" transform="rotate(-90 22 22)" />
+        <circle cx="22" cy="22" r="16" stroke={C.blue} strokeWidth="6" strokeDasharray="20 100" strokeDashoffset="-80" transform="rotate(-90 22 22)" />
+      </svg>
+    );
+  }
+  if (type === "gauge") {
+    return (
+      <svg width="64" height="36" viewBox="0 0 64 36" fill="none">
+        <path d="M6 30 A 26 26 0 0 1 22 8" stroke={C.red} strokeWidth="5" strokeLinecap="round" />
+        <path d="M22 8 A 26 26 0 0 1 42 8" stroke={C.orange} strokeWidth="5" strokeLinecap="round" />
+        <path d="M42 8 A 26 26 0 0 1 58 30" stroke={C.green} strokeWidth="5" strokeLinecap="round" />
+        <line x1="32" y1="30" x2="40" y2="14" stroke={C.needle} strokeWidth="1.5" strokeLinecap="round" />
+        <circle cx="32" cy="30" r="2" fill={C.needle} />
+      </svg>
+    );
+  }
+  if (type === "bars") {
+    const rows = [
+      [{ w: 50, c: C.orange }, { w: 25, c: C.green }, { w: 15, c: C.purple }],
+      [{ w: 35, c: C.orange }, { w: 30, c: C.green }, { w: 20, c: C.purple }],
+      [{ w: 45, c: C.orange }, { w: 20, c: C.green }, { w: 25, c: C.purple }],
+    ];
+    return (
+      <div className="flex flex-col gap-1.5 w-full px-3">
+        {rows.map((row, i) => (
+          <div key={i} className="flex h-1.5 gap-px">
+            {row.map((seg, j) => (
+              <div key={j} className="rounded-sm" style={{ width: `${seg.w}%`, backgroundColor: seg.c }} />
+            ))}
+          </div>
+        ))}
+      </div>
+    );
+  }
+  if (type === "contact") {
+    return (
+      <div className="flex items-center gap-2 w-full px-3">
+        <div className="w-7 h-7 rounded-full shrink-0" style={{ backgroundColor: C.blue }} />
+        <div className="flex flex-col gap-1 flex-1">
+          <div className="h-1.5 rounded-sm" style={{ width: "70%", backgroundColor: C.slate }} />
+          <div className="h-1.5 rounded-sm" style={{ width: "50%", backgroundColor: C.slate, opacity: 0.7 }} />
+        </div>
+      </div>
+    );
+  }
+  if (type === "line") {
+    return (
+      <svg width="80%" height="34" viewBox="0 0 80 32" fill="none" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="g-line" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={C.lineFg} stopOpacity="0.45" />
+            <stop offset="100%" stopColor={C.lineFg} stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        <path d="M2 26 L 12 22 L 22 24 L 32 18 L 42 14 L 52 16 L 62 10 L 72 8 L 78 6 L 78 30 L 2 30 Z" fill="url(#g-line)" />
+        <path d="M2 26 L 12 22 L 22 24 L 32 18 L 42 14 L 52 16 L 62 10 L 72 8 L 78 6" stroke={C.lineFg} strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    );
+  }
+  // text — sticky-note style for the Notes widget
+  return (
+    <div className="flex flex-col gap-1.5 w-full px-4">
+      {[92, 78, 86, 60].map((w, i) => (
+        <div key={i} className="h-1.5 rounded-sm" style={{ width: `${w}%`, backgroundColor: C.slate, opacity: i === 0 ? 1 : 0.65 }} />
+      ))}
+    </div>
+  );
+}
+
+function ContactCustomizePanel({ open, onOpenChange, contactKpis, hiddenKpis, onToggleKpi, activeWidgets, onToggleWidget, widgetSizes, onWidgetSizeChange }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  activeKpis: string[];
+  /** All possible contact KPIs — the same definitions rendered in the strip. */
+  contactKpis: { key: string; label: string; value: string; icon: React.ElementType; description: string }[];
+  /** Keys the user has hidden from the strip; "active" = NOT in this set. */
+  hiddenKpis: Set<string>;
   onToggleKpi: (key: string) => void;
   activeWidgets: string[];
   onToggleWidget: (key: string) => void;
   widgetSizes: Record<string, "sm" | "md" | "lg">;
   onWidgetSizeChange: (key: string, size: "sm" | "md" | "lg") => void;
-  vendors: any[];
 }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [panelTab, setPanelTab] = useState<"kpis" | "widgets">("kpis");
@@ -612,24 +748,19 @@ function ContactCustomizePanel({ open, onOpenChange, activeKpis, onToggleKpi, ac
     return () => { if (timeoutRef.current) clearTimeout(timeoutRef.current); };
   }, [open]);
 
-  const kpiCategories = useMemo(() => {
-    const catMap = new Map<string, typeof ALL_KPI_DEFINITIONS>();
-    for (const kpi of ALL_KPI_DEFINITIONS) {
-      if (!searchQuery || kpi.label.toLowerCase().includes(searchQuery.toLowerCase()) || kpi.category.toLowerCase().includes(searchQuery.toLowerCase())) {
-        if (!catMap.has(kpi.category)) catMap.set(kpi.category, []);
-        catMap.get(kpi.category)!.push(kpi);
-      }
-    }
-    return Array.from(catMap, ([name, kpis]) => ({ name, kpis }));
-  }, [searchQuery]);
+  const filteredKpis = useMemo(() => {
+    if (!searchQuery) return contactKpis;
+    return contactKpis.filter((k) => k.label.toLowerCase().includes(searchQuery.toLowerCase()));
+  }, [searchQuery, contactKpis]);
 
   const filteredWidgets = useMemo(() => {
     if (!searchQuery) return CONTACT_WIDGET_DEFS;
     return CONTACT_WIDGET_DEFS.filter(w => w.label.toLowerCase().includes(searchQuery.toLowerCase()));
   }, [searchQuery]);
 
-  const allItems = panelTab === "kpis" ? ALL_KPI_DEFINITIONS : CONTACT_WIDGET_DEFS;
-  const activeItems = panelTab === "kpis" ? activeKpis : activeWidgets;
+  const allItems = panelTab === "kpis" ? contactKpis : CONTACT_WIDGET_DEFS;
+  const activeKpiCount = contactKpis.filter((k) => !hiddenKpis.has(k.key)).length;
+  const activeItemsCount = panelTab === "kpis" ? activeKpiCount : activeWidgets.length;
 
   if (!mounted) return null;
 
@@ -663,34 +794,35 @@ function ContactCustomizePanel({ open, onOpenChange, activeKpis, onToggleKpi, ac
           {/* Toggle all */}
           <div className="flex items-center justify-between mt-4 px-1">
             <span className="text-[12px] text-muted-foreground" style={{ fontWeight: 500 }}>
-              {activeItems.length} of {allItems.length} {panelTab === "kpis" ? "widgets" : "widgets"} active
+              {activeItemsCount} of {allItems.length} {panelTab === "kpis" ? "KPIs" : "widgets"} active
             </span>
             <button
               onClick={() => {
                 if (panelTab === "kpis") {
-                  const allKeys = ALL_KPI_DEFINITIONS.map(k => k.key);
-                  const allActive = allKeys.every(k => activeKpis.includes(k));
-                  if (allActive) activeKpis.forEach(k => onToggleKpi(k));
-                  else allKeys.filter(k => !activeKpis.includes(k)).forEach(k => onToggleKpi(k));
+                  const hidden = contactKpis.filter((k) => hiddenKpis.has(k.key));
+                  const visible = contactKpis.filter((k) => !hiddenKpis.has(k.key));
+                  // If everything visible → hide all; otherwise show all hidden
+                  if (hidden.length === 0) visible.forEach((k) => onToggleKpi(k.key));
+                  else hidden.forEach((k) => onToggleKpi(k.key));
                 } else {
-                  const allKeys = CONTACT_WIDGET_DEFS.map(k => k.key);
-                  const allActive = allKeys.every(k => activeWidgets.includes(k));
-                  if (allActive) activeWidgets.forEach(k => onToggleWidget(k));
-                  else allKeys.filter(k => !activeWidgets.includes(k)).forEach(k => onToggleWidget(k));
+                  const allKeys = CONTACT_WIDGET_DEFS.map((k) => k.key);
+                  const allActive = allKeys.every((k) => activeWidgets.includes(k));
+                  if (allActive) activeWidgets.forEach((k) => onToggleWidget(k));
+                  else allKeys.filter((k) => !activeWidgets.includes(k)).forEach((k) => onToggleWidget(k));
                 }
               }}
               className={`flex items-center gap-1.5 text-[12px] px-3 py-1.5 rounded-full border transition-all duration-200 cursor-pointer ${
-                allItems.every(k => activeItems.includes(k.key))
+                activeItemsCount === allItems.length
                   ? "bg-[#EBF3FF] border-[#0A77FF]/25 text-[#0A77FF] hover:bg-[#DCEAFF] hover:border-[#0A77FF]/40 shadow-sm shadow-[#0A77FF]/10"
-                  : activeItems.length === 0
+                  : activeItemsCount === 0
                   ? "bg-[#F8FAFC] border-[#E2E8F0] text-[#94A3B8] hover:bg-[#F1F5F9] hover:border-[#CBD5E1] hover:text-[#64748B]"
                   : "bg-[#F8FAFC] border-[#E2E8F0] text-[#64748B] hover:bg-[#EBF3FF] hover:border-[#0A77FF]/25 hover:text-[#0A77FF]"
               }`}
               style={{ fontWeight: 600 }}
             >
-              {allItems.every(k => activeItems.includes(k.key)) ? (
+              {activeItemsCount === allItems.length ? (
                 <><ToggleRight className="w-4 h-4 text-[#0A77FF]" /><span>All On</span></>
-              ) : activeItems.length === 0 ? (
+              ) : activeItemsCount === 0 ? (
                 <><ToggleLeft className="w-4 h-4" /><span>All Off</span></>
               ) : (
                 <><ToggleLeft className="w-4 h-4" /><span>Enable All</span></>
@@ -734,21 +866,20 @@ function ContactCustomizePanel({ open, onOpenChange, activeKpis, onToggleKpi, ac
         <div className="flex-1 overflow-y-auto px-4 pb-4 scrollbar-hide">
           {panelTab === "kpis" ? (
             <>
-              {kpiCategories.length === 0 && (
+              {filteredKpis.length === 0 && (
                 <div className="flex flex-col items-center py-12 text-muted-foreground">
                   <Search className="w-5 h-5 mb-2 opacity-40" />
                   <p className="text-xs text-muted-foreground/60">No metrics found</p>
                 </div>
               )}
-              {kpiCategories.map((cat) => (
-                <div key={cat.name} className="mt-5 first:mt-4">
+              {filteredKpis.length > 0 && (
+                <div className="mt-4">
                   <div className="flex items-center gap-1.5 mb-2">
-                    <span className="text-[12px] text-muted-foreground/70 uppercase tracking-wide" style={{ fontWeight: 600 }}>{cat.name}</span>
+                    <span className="text-[12px] text-muted-foreground/70 uppercase tracking-wide" style={{ fontWeight: 600 }}>Contact Insights</span>
                   </div>
                   <div className="grid grid-cols-2 gap-2">
-                    {cat.kpis.map((kpi) => {
-                      const isActive = activeKpis.includes(kpi.key);
-                      const value = computeKpiValue(kpi.key, vendors);
+                    {filteredKpis.map((kpi) => {
+                      const isActive = !hiddenKpis.has(kpi.key);
                       return (
                         <button
                           key={kpi.key}
@@ -765,79 +896,85 @@ function ContactCustomizePanel({ open, onOpenChange, activeKpis, onToggleKpi, ac
                               {isActive ? <Check className="w-3.5 h-3.5" style={{ color: "#0A77FF" }} /> : <Plus className="w-3.5 h-3.5 text-muted-foreground/25 group-hover:text-muted-foreground/50 transition-colors" />}
                             </div>
                           </div>
-                          <p className={`text-[15px] mt-1 transition-colors ${isActive ? "text-foreground" : "text-foreground/80"}`} style={{ fontWeight: 550 }}>{value}</p>
+                          <p className={`text-[15px] mt-1 transition-colors ${isActive ? "text-foreground" : "text-foreground/80"}`} style={{ fontWeight: 550 }}>{kpi.value}</p>
                         </button>
                       );
                     })}
                   </div>
                 </div>
-              ))}
+              )}
             </>
           ) : (
-            <div className="space-y-2 mt-4">
+            <div className="mt-2">
               {filteredWidgets.length === 0 && (
                 <div className="flex flex-col items-center py-12 text-muted-foreground">
                   <Search className="w-5 h-5 mb-2 opacity-40" />
                   <p className="text-xs text-muted-foreground/60">No widgets found</p>
                 </div>
               )}
-              {filteredWidgets.map((w) => {
-                const isActive = activeWidgets.includes(w.key);
-                const sz = widgetSizes[w.key] || "md";
+              {filteredWidgets.length > 0 && CONTACT_WIDGET_CATEGORY_ORDER.map((cat) => {
+                const inCat = filteredWidgets.filter((w) => w.category === cat);
+                if (inCat.length === 0) return null;
+                const CatIcon = cat === "Performance" ? Activity : cat === "Activity" ? Clock : cat === "Orders" ? Package : Sliders;
                 return (
-                  <button
-                    key={w.key}
-                    onClick={() => onToggleWidget(w.key)}
-                    className={`relative w-full text-left rounded-lg border px-3.5 py-3 transition-all duration-150 cursor-pointer group ${
-                      isActive
-                        ? "border-[#0A77FF]/25 bg-[#0A77FF]/[0.02] shadow-[0_0_0_1px_rgba(10,119,255,0.08)]"
-                        : "border-[#E2E8F0] bg-white hover:border-[#CBD5E1] hover:shadow-sm"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <div className="shrink-0">
-                          {isActive ? <Check className="w-4 h-4" style={{ color: "#0A77FF" }} /> : <Plus className="w-4 h-4 text-muted-foreground/25 group-hover:text-muted-foreground/50 transition-colors" />}
-                        </div>
-                        <div className="min-w-0">
-                          <p className={`text-[13px] truncate transition-colors ${isActive ? "text-[#0A77FF]" : "text-[#334155]"}`} style={{ fontWeight: 500 }}>{w.label}</p>
-                          <p className="text-[11px] text-[#94A3B8] mt-0.5 capitalize">{w.type}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2 shrink-0">
-                        {/* Size toggle */}
-                        <div className="flex items-center h-7 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-0.5 gap-0.5" onClick={(e) => e.stopPropagation()}>
-                          {(["sm", "md", "lg"] as const).map((s) => (
-                            <button
-                              key={s}
-                              onClick={() => onWidgetSizeChange(w.key, s)}
-                              className={`h-6 px-2 rounded-md text-[10px] transition-all duration-150 cursor-pointer ${
-                                sz === s
-                                  ? "bg-white text-[#0A77FF] shadow-sm border border-[#E2E8F0]"
-                                  : "text-[#94A3B8] hover:text-[#334155] hover:bg-white/60 border border-transparent"
-                              }`}
-                              style={{ fontWeight: sz === s ? 600 : 500 }}
-                            >
-                              {s === "sm" ? "Small" : s === "md" ? "Medium" : "Large"}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
+                  <div key={cat} className="mt-5 first:mt-4">
+                    <div className="flex items-center gap-1.5 mb-2">
+                      <CatIcon className="w-3.5 h-3.5 text-muted-foreground/70" />
+                      <span className="text-[12px] text-muted-foreground/70 uppercase tracking-wide" style={{ fontWeight: 600 }}>{cat}</span>
                     </div>
-                    {/* Mini preview bar */}
-                    <div className="mt-2.5 flex gap-1">
-                      {[...Array(6)].map((_, i) => (
-                        <div
-                          key={i}
-                          className="flex-1 rounded-sm"
-                          style={{
-                            height: [12, 20, 16, 24, 14, 18][i],
-                            backgroundColor: isActive ? `rgba(10,119,255,${0.08 + i * 0.04})` : `rgba(148,163,184,${0.06 + i * 0.03})`,
-                          }}
-                        />
-                      ))}
+                    <div className="grid grid-cols-2 gap-2.5">
+                      {inCat.map((w) => {
+                        const isActive = activeWidgets.includes(w.key);
+                        const sz = widgetSizes[w.key] || "md";
+                        return (
+                          <button
+                            key={w.key}
+                            onClick={() => onToggleWidget(w.key)}
+                            className={`relative text-left rounded-xl border overflow-hidden transition-all duration-150 cursor-pointer group ${
+                              isActive
+                                ? "border-[#0A77FF]/30 bg-white shadow-[0_0_0_1px_rgba(10,119,255,0.08)]"
+                                : "border-border/60 bg-white hover:border-border hover:shadow-sm"
+                            }`}
+                          >
+                            <div className={`h-[68px] flex items-center justify-center transition-colors ${isActive ? "bg-[#F8FAFF]" : "bg-[#F8FAFC]"}`}>
+                              <WidgetTypeVisual type={w.type} isActive={isActive} />
+                            </div>
+                            <div className="absolute top-1.5 right-1.5">
+                              {isActive ? (
+                                <div className="w-5 h-5 rounded-full bg-[#0A77FF] flex items-center justify-center shadow-sm">
+                                  <Check className="w-3 h-3 text-white" strokeWidth={3} />
+                                </div>
+                              ) : (
+                                <div className="w-5 h-5 rounded-full bg-white border border-[#E2E8F0] flex items-center justify-center group-hover:border-[#CBD5E1] transition-colors">
+                                  <Plus className="w-3 h-3 text-[#94A3B8]" />
+                                </div>
+                              )}
+                            </div>
+                            <div className="px-3 py-2.5 border-t border-[#F1F5F9]">
+                              <p className="text-[12.5px] text-[#0F172A] truncate" style={{ fontWeight: 600 }} title={w.label}>{w.label}</p>
+                              <p className="text-[11px] text-[#64748B] mt-0.5 line-clamp-2 leading-snug" title={w.description}>{w.description}</p>
+                              {isActive && (
+                                <div className="mt-2 flex items-center h-6 rounded-md border border-[#E2E8F0] bg-[#F8FAFC] p-0.5 gap-0.5" onClick={(e) => e.stopPropagation()}>
+                                  {(["sm", "md", "lg"] as const).map((s) => (
+                                    <button
+                                      key={s}
+                                      onClick={(e) => { e.stopPropagation(); onWidgetSizeChange(w.key, s); }}
+                                      className={`flex-1 h-5 rounded text-[9.5px] transition-all duration-150 cursor-pointer ${
+                                        sz === s ? "bg-white text-[#0A77FF] shadow-sm" : "text-[#94A3B8] hover:text-[#334155]"
+                                      }`}
+                                      style={{ fontWeight: sz === s ? 600 : 500 }}
+                                    >
+                                      {s.toUpperCase()}
+                                    </button>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          </button>
+                        );
+                      })}
                     </div>
-                  </button>
+                  </div>
                 );
               })}
             </div>
@@ -856,20 +993,16 @@ export function ContactDetailPage() {
 
   // KPI drag-drop state
   const CONTACT_KPIS = [
-    { key: "linked_partners", label: "Linked Partners", value: "0", icon: Link2, change: null },
-    { key: "total_orders", label: "Total Orders", value: "24", icon: Package, change: "\u2191 12%" },
-    { key: "email_interactions", label: "Email Interactions", value: "156", icon: Mail, change: "\u2191 8%" },
-    { key: "last_active", label: "Last Active", value: "Mar 01, 2026", icon: Clock, change: null },
-    { key: "avg_response", label: "Avg. Response", value: "4.2 hrs", icon: Activity, change: "\u2193 15%" },
-    { key: "satisfaction", label: "Satisfaction", value: "4.8 / 5", icon: Star, change: null },
+    { key: "linked_partners", label: "Linked Partners", value: "0", icon: Link2, change: null, description: "Companies linked to this contact" },
+    { key: "total_orders", label: "Total Orders", value: "24", icon: Package, change: "\u2191 12%", description: "All purchase & sales orders" },
+    { key: "email_interactions", label: "Email Interactions", value: "156", icon: Mail, change: "\u2191 8%", description: "Total email volume sent & received" },
+    { key: "last_active", label: "Last Active", value: "Mar 01, 2026", icon: Clock, change: null, description: "Date of most recent interaction" },
+    { key: "avg_response", label: "Avg. Response", value: "4.2 hrs", icon: Activity, change: "\u2193 15%", description: "Mean reply time across channels" },
+    { key: "satisfaction", label: "Satisfaction", value: "4.8 / 5", icon: Star, change: null, description: "Customer satisfaction (CSAT) score" },
   ];
   const [kpiOrder, setKpiOrder] = useState<string[]>(CONTACT_KPIS.map(k => k.key));
   const [hiddenKpis, setHiddenKpis] = useState<Set<string>>(new Set());
   const [customizeOpen, setCustomizeOpen] = useState(false);
-  const [insightKpis, setInsightKpis] = useState<string[]>([...DEFAULT_ACTIVE_KPIS]);
-  const handleToggleInsight = useCallback((key: string) => {
-    setInsightKpis((prev) => prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]);
-  }, []);
   const moveKpi = useCallback((from: number, to: number) => {
     setKpiOrder((prev) => { const next = [...prev]; const [moved] = next.splice(from, 1); next.splice(to, 0, moved); return next; });
   }, []);
@@ -1308,6 +1441,7 @@ export function ContactDetailPage() {
               kpiOrder={kpiOrder}
               hiddenKpis={hiddenKpis}
               moveKpi={moveKpi}
+              toggleKpi={toggleKpi}
               CONTACT_KPIS={CONTACT_KPIS}
               activeWidgets={activeWidgets}
               widgetSizes={widgetSizes}
@@ -1554,13 +1688,19 @@ export function ContactDetailPage() {
         <ContactCustomizePanel
           open={customizeOpen}
           onOpenChange={setCustomizeOpen}
-          activeKpis={insightKpis}
-          onToggleKpi={handleToggleInsight}
+          contactKpis={CONTACT_KPIS.map((k) => ({
+            key: k.key,
+            label: k.label,
+            value: k.key === "linked_partners" ? String(contact.linkedPartners.length) : k.value,
+            icon: k.icon,
+            description: k.description,
+          }))}
+          hiddenKpis={hiddenKpis}
+          onToggleKpi={toggleKpi}
           activeWidgets={activeWidgets}
           onToggleWidget={handleToggleWidget}
           widgetSizes={widgetSizes}
           onWidgetSizeChange={handleWidgetSizeChange}
-          vendors={vendors}
         />
       )}
 
@@ -1711,13 +1851,14 @@ export function ContactDetailPage() {
 }
 
 /* ─── Contact Overview Tab (with draggable, resizable widgets) ─── */
-function ContactOverviewTab({ contact, sStyle, partnerNameToId, kpiOrder, hiddenKpis, moveKpi, CONTACT_KPIS, activeWidgets, widgetSizes, onWidgetSizeChange, moveWidget, setCustomizeOpen }: {
+function ContactOverviewTab({ contact, sStyle, partnerNameToId, kpiOrder, hiddenKpis, moveKpi, toggleKpi, CONTACT_KPIS, activeWidgets, widgetSizes, onWidgetSizeChange, moveWidget, setCustomizeOpen }: {
   contact: EnrichedContact;
   sStyle: { bg: string; text: string; border: string };
   partnerNameToId: Record<string, string>;
   kpiOrder: string[];
   hiddenKpis: Set<string>;
   moveKpi: (from: number, to: number) => void;
+  toggleKpi: (key: string) => void;
   CONTACT_KPIS: { key: string; label: string; value: string; icon: React.ElementType; change: string | null }[];
   activeWidgets: string[];
   widgetSizes: Record<string, "sm" | "md" | "lg">;
@@ -2053,7 +2194,7 @@ function ContactOverviewTab({ contact, sStyle, partnerNameToId, kpiOrder, hidden
             const kpi = CONTACT_KPIS.find(k => k.key === key);
             if (!kpi) return null;
             const v = kpi.key === "linked_partners" ? String(contact.linkedPartners.length) : kpi.value;
-            return <DraggableContactKpi key={kpi.key} index={idx} kpiKey={kpi.key} label={kpi.label} value={v} icon={kpi.icon} change={kpi.change} moveCard={moveKpi} />;
+            return <DraggableContactKpi key={kpi.key} index={idx} kpiKey={kpi.key} label={kpi.label} value={v} icon={kpi.icon} change={kpi.change} moveCard={moveKpi} onRemove={() => toggleKpi(kpi.key)} />;
           })}
         </div>
       </DndProvider>

@@ -1564,7 +1564,10 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                             className={`bg-card border border-border rounded-xl cursor-pointer hover:shadow-md hover:border-primary/20 transition-all ${newlyCreatedId === vendor.id ? "animate-row-flash" : ""} ${
                               cardSize === "large" ? "p-5" : cardSize === "small" ? "p-3" : "p-4"
                             }`}
-                            onClick={() => navigate(`/vendors/${vendor.id}`)}
+                            onClick={() => {
+                              if (embedded) window.open(`/vendors/${vendor.id}`, "_blank", "noopener");
+                              else navigate(`/vendors/${vendor.id}`);
+                            }}
                           >
                             <div className="flex items-start justify-between mb-3">
                               <div className="flex items-center gap-3 min-w-0">
@@ -2176,7 +2179,11 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                                   ? "[&>td]:py-2 [&>td]:pl-4 [&>td]:pr-2"
                                   : ""
                               } ${newlyCreatedId === vendor.id ? "animate-row-flash" : ""}`}
-                              onClick={() => navigate(`/vendors/${vendor.id}`)}
+                              onClick={() => {
+                                /* In embedded mode (e.g. Linked Partners tab on Contact Detail), open in a new browser tab — matches PO/SO/Quotes row behaviour. Standalone listing keeps in-app navigation. */
+                                if (embedded) window.open(`/vendors/${vendor.id}`, "_blank", "noopener");
+                                else navigate(`/vendors/${vendor.id}`);
+                              }}
                             >
                               {/* Checkbox cell — sticky leftmost */}
                               <TableCell

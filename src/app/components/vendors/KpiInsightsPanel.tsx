@@ -469,7 +469,7 @@ export function KpiInsightsPanel({
                 </span>
               </div>
 
-              {/* KPI Cards Grid - 2 columns */}
+              {/* KPI Cards Grid - 2 columns (compact text-only design) */}
               <div className="grid grid-cols-2 gap-2">
                 {cat.kpis.map((kpi) => {
                   const isActive = activeKpis.includes(kpi.key);

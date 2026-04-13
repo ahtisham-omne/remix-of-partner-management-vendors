@@ -2076,6 +2076,145 @@ function DashKpiIcon({ name, className, style }: { name: string; className?: str
   }
 }
 
+// ----- Partner widget catalog: type + description + category for the customize drawer -----
+type PartnerWidgetVisualType = "chart" | "list" | "gauge" | "contact" | "text" | "donut" | "bars" | "line";
+interface PartnerWidgetDef {
+  key: string;
+  label: string;
+  type: PartnerWidgetVisualType;
+  description: string;
+  category: "Performance" | "Financial" | "Operational" | "People & Docs" | "Notes";
+}
+const PARTNER_WIDGET_DEFS: PartnerWidgetDef[] = [
+  { key: "spend_trend",       label: "Spend Trend",            type: "line",    description: "Yearly spend curve with area fill",            category: "Performance" },
+  { key: "order_activity",    label: "Order Activity",         type: "chart",   description: "Orders vs returns by weekday",                 category: "Performance" },
+  { key: "spend_by_category", label: "Spend by Category",      type: "donut",   description: "Donut breakdown of spend per category",        category: "Performance" },
+  { key: "credit_health",     label: "Credit Health",          type: "gauge",   description: "Credit utilization vs available limit",        category: "Financial" },
+  { key: "payment_history",   label: "Payment History",        type: "line",    description: "Recent payment volume sparkline",              category: "Financial" },
+  { key: "invoice_aging",     label: "Invoice Aging",          type: "bars",    description: "Outstanding invoices grouped by age bucket",   category: "Financial" },
+  { key: "delivery_perf",     label: "Delivery Performance",   type: "line",    description: "On-time delivery rate over time",              category: "Operational" },
+  { key: "return_rate",       label: "Return Rate",            type: "bars",    description: "Returns volume by month",                      category: "Operational" },
+  { key: "top_items",         label: "Top Items",              type: "bars",    description: "Highest-spend items stacked by tier",          category: "Operational" },
+  { key: "recent_orders",     label: "Recent Orders",          type: "list",    description: "Latest orders with status colour dots",        category: "Operational" },
+  { key: "primary_contact",   label: "Primary Contact",        type: "contact", description: "Main point-of-contact card with activity",    category: "People & Docs" },
+  { key: "compliance_docs",   label: "Compliance & Documents", type: "donut",   description: "Valid vs missing compliance documents",        category: "People & Docs" },
+  { key: "notes",             label: "Notes",                  type: "text",    description: "Internal notes & comments on this partner",    category: "Notes" },
+];
+const PARTNER_WIDGET_CATEGORY_ORDER: PartnerWidgetDef["category"][] = ["Performance", "Financial", "Operational", "People & Docs", "Notes"];
+
+/** Visual preview for a partner widget. Light pastel tints (Tailwind 200/300
+ *  family) give the drawer an airy feel; inactive cards desaturate to slate. */
+function PartnerWidgetVisual({ type, isActive }: { type: PartnerWidgetVisualType; isActive: boolean }) {
+  const C = {
+    blue:    isActive ? "#93C5FD" : "#E2E8F0",
+    orange:  isActive ? "#FDBA74" : "#E2E8F0",
+    purple:  isActive ? "#C4B5FD" : "#E2E8F0",
+    green:   isActive ? "#86EFAC" : "#E2E8F0",
+    red:     isActive ? "#FCA5A5" : "#E2E8F0",
+    slate:   isActive ? "#CBD5E1" : "#E2E8F0",
+    needle:  isActive ? "#64748B" : "#94A3B8",
+    lineFg:  isActive ? "#93C5FD" : "#CBD5E1",
+  };
+  if (type === "chart") {
+    const data = [
+      { h: 14, c: C.blue }, { h: 24, c: C.blue }, { h: 18, c: C.orange },
+      { h: 28, c: C.blue }, { h: 16, c: C.orange }, { h: 22, c: C.blue },
+    ];
+    return (
+      <div className="flex items-end gap-[3px] h-full w-full px-3 pb-2">
+        {data.map((d, i) => (
+          <div key={i} className="flex-1 rounded-t-[2px]" style={{ height: d.h, backgroundColor: d.c }} />
+        ))}
+      </div>
+    );
+  }
+  if (type === "list") {
+    const dots = [C.blue, C.orange, C.green];
+    return (
+      <div className="flex flex-col gap-1.5 w-full px-3.5">
+        {[82, 64, 72].map((w, i) => (
+          <div key={i} className="flex items-center gap-2">
+            <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: dots[i] }} />
+            <div className="h-1.5 rounded-sm" style={{ width: `${w}%`, backgroundColor: C.slate }} />
+          </div>
+        ))}
+      </div>
+    );
+  }
+  if (type === "donut") {
+    return (
+      <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+        <circle cx="22" cy="22" r="16" stroke={C.orange} strokeWidth="6" strokeDasharray="30 100" transform="rotate(-90 22 22)" />
+        <circle cx="22" cy="22" r="16" stroke={C.purple} strokeWidth="6" strokeDasharray="25 100" strokeDashoffset="-30" transform="rotate(-90 22 22)" />
+        <circle cx="22" cy="22" r="16" stroke={C.green} strokeWidth="6" strokeDasharray="25 100" strokeDashoffset="-55" transform="rotate(-90 22 22)" />
+        <circle cx="22" cy="22" r="16" stroke={C.blue} strokeWidth="6" strokeDasharray="20 100" strokeDashoffset="-80" transform="rotate(-90 22 22)" />
+      </svg>
+    );
+  }
+  if (type === "gauge") {
+    return (
+      <svg width="64" height="36" viewBox="0 0 64 36" fill="none">
+        <path d="M6 30 A 26 26 0 0 1 22 8" stroke={C.red} strokeWidth="5" strokeLinecap="round" />
+        <path d="M22 8 A 26 26 0 0 1 42 8" stroke={C.orange} strokeWidth="5" strokeLinecap="round" />
+        <path d="M42 8 A 26 26 0 0 1 58 30" stroke={C.green} strokeWidth="5" strokeLinecap="round" />
+        <line x1="32" y1="30" x2="40" y2="14" stroke={C.needle} strokeWidth="1.5" strokeLinecap="round" />
+        <circle cx="32" cy="30" r="2" fill={C.needle} />
+      </svg>
+    );
+  }
+  if (type === "bars") {
+    const rows = [
+      [{ w: 50, c: C.orange }, { w: 25, c: C.green }, { w: 15, c: C.purple }],
+      [{ w: 35, c: C.orange }, { w: 30, c: C.green }, { w: 20, c: C.purple }],
+      [{ w: 45, c: C.orange }, { w: 20, c: C.green }, { w: 25, c: C.purple }],
+    ];
+    return (
+      <div className="flex flex-col gap-1.5 w-full px-3">
+        {rows.map((row, i) => (
+          <div key={i} className="flex h-1.5 gap-px">
+            {row.map((seg, j) => (
+              <div key={j} className="rounded-sm" style={{ width: `${seg.w}%`, backgroundColor: seg.c }} />
+            ))}
+          </div>
+        ))}
+      </div>
+    );
+  }
+  if (type === "contact") {
+    return (
+      <div className="flex items-center gap-2 w-full px-3">
+        <div className="w-7 h-7 rounded-full shrink-0" style={{ backgroundColor: C.blue }} />
+        <div className="flex flex-col gap-1 flex-1">
+          <div className="h-1.5 rounded-sm" style={{ width: "70%", backgroundColor: C.slate }} />
+          <div className="h-1.5 rounded-sm" style={{ width: "50%", backgroundColor: C.slate, opacity: 0.7 }} />
+        </div>
+      </div>
+    );
+  }
+  if (type === "line") {
+    return (
+      <svg width="80%" height="34" viewBox="0 0 80 32" fill="none" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="g-line-partner" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor={C.lineFg} stopOpacity="0.45" />
+            <stop offset="100%" stopColor={C.lineFg} stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        <path d="M2 26 L 12 22 L 22 24 L 32 18 L 42 14 L 52 16 L 62 10 L 72 8 L 78 6 L 78 30 L 2 30 Z" fill="url(#g-line-partner)" />
+        <path d="M2 26 L 12 22 L 22 24 L 32 18 L 42 14 L 52 16 L 62 10 L 72 8 L 78 6" stroke={C.lineFg} strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    );
+  }
+  // text
+  return (
+    <div className="flex flex-col gap-1.5 w-full px-4">
+      {[92, 78, 86, 60].map((w, i) => (
+        <div key={i} className="h-1.5 rounded-sm" style={{ width: `${w}%`, backgroundColor: C.slate, opacity: i === 0 ? 1 : 0.65 }} />
+      ))}
+    </div>
+  );
+}
+
 // ----- Dashboard Customize Widget Panel -----
 function DashboardCustomizePanel({ open, onOpenChange, activeKpis, onToggleKpi, activeWidgets, onToggleWidget, widgetSizes, onWidgetSizeChange, vendor, formatCurrency, formatDate }: {
   open: boolean;
@@ -2285,217 +2424,79 @@ function DashboardCustomizePanel({ open, onOpenChange, activeKpis, onToggleKpi, 
               ))}
             </>
           ) : (
-            /* ── Widgets tab — preview cards with click-to-toggle ── */
-            <div className="mt-4 space-y-3">
-              {([
-                { key: "spend_trend", label: "Spend Trend", type: "chart" as const },
-                { key: "order_activity", label: "Order Activity", type: "chart" as const },
-                { key: "spend_by_category", label: "Spend by Category", type: "chart" as const },
-                { key: "credit_health", label: "Credit Health", type: "gauge" as const },
-                { key: "primary_contact", label: "Primary Contact", type: "contact" as const },
-                { key: "top_items", label: "Top Items", type: "list" as const },
-                { key: "recent_orders", label: "Recent Orders", type: "list" as const },
-                { key: "payment_history", label: "Payment History", type: "list" as const },
-                { key: "compliance_docs", label: "Compliance & Documents", type: "list" as const },
-                { key: "delivery_perf", label: "Delivery Performance", type: "chart" as const },
-                { key: "return_rate", label: "Return Rate", type: "chart" as const },
-                { key: "invoice_aging", label: "Invoice Aging", type: "list" as const },
-                { key: "notes", label: "Notes", type: "text" as const },
-              ] as const).map((w) => {
-                const sz = widgetSizes[w.key] || "md";
-                const isActive = activeWidgets.includes(w.key);
+            /* ── Widgets tab — pastel visual-card grid grouped by category ── */
+            <div className="mt-2">
+              {PARTNER_WIDGET_CATEGORY_ORDER.map((cat) => {
+                const inCat = PARTNER_WIDGET_DEFS.filter((w) =>
+                  w.category === cat &&
+                  (!searchQuery || w.label.toLowerCase().includes(searchQuery.toLowerCase()) || w.description.toLowerCase().includes(searchQuery.toLowerCase()))
+                );
+                if (inCat.length === 0) return null;
+                const CatIcon =
+                  cat === "Performance"   ? ChartColumn :
+                  cat === "Financial"     ? DollarSign :
+                  cat === "Operational"   ? Activity :
+                  cat === "People & Docs" ? FileText :
+                  Sliders;
                 return (
-                  <div
-                    key={w.key}
-                    onClick={() => onToggleWidget(w.key)}
-                    className={`rounded-xl overflow-hidden transition-all duration-150 cursor-pointer ${
-                      isActive
-                        ? "border border-[#0A77FF]/25 bg-[#0A77FF]/[0.02] shadow-[0_0_0_1px_rgba(10,119,255,0.08)]"
-                        : "border border-[#E2E8F0] bg-white hover:border-[#CBD5E1] hover:shadow-sm"
-                    }`}
-                  >
-                    {/* Header */}
-                    <div className="flex items-center justify-between px-3 py-2 border-b border-[#F8FAFC]">
-                      <span className={`text-[12px] transition-colors ${isActive ? "text-[#0A77FF]" : "text-[#0F172A]"}`} style={{ fontWeight: 600 }}>{w.label}</span>
-                      <div className="flex items-center gap-1.5">
-                        {/* Per-card size toggle */}
-                        <div className="flex items-center h-7 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-0.5 gap-0.5" onClick={(e) => e.stopPropagation()}>
-                          {(["sm", "md", "lg"] as const).map((s) => (
-                            <button
-                              key={s}
-                              onClick={() => onWidgetSizeChange(w.key, s)}
-                              className={`h-6 px-2 rounded-md text-[10px] transition-all duration-150 cursor-pointer ${
-                                sz === s
-                                  ? "bg-white text-[#0A77FF] shadow-sm border border-[#E2E8F0]"
-                                  : "text-[#94A3B8] hover:text-[#334155] hover:bg-white/60 border border-transparent"
-                              }`}
-                              style={{ fontWeight: sz === s ? 600 : 500 }}
-                            >
-                              {s === "sm" ? "Small" : s === "md" ? "Medium" : "Large"}
-                            </button>
-                          ))}
-                        </div>
-                        {/* Active indicator */}
-                        {isActive ? <Check className="w-3.5 h-3.5 text-[#0A77FF]" /> : <Plus className="w-3.5 h-3.5 text-[#94A3B8]" />}
-                      </div>
+                  <div key={cat} className="mt-5 first:mt-4">
+                    <div className="flex items-center gap-1.5 mb-2">
+                      <CatIcon className="w-3.5 h-3.5 text-muted-foreground/70" />
+                      <span className="text-[12px] text-muted-foreground/70 uppercase tracking-wide" style={{ fontWeight: 600 }}>{cat}</span>
                     </div>
-
-                    {/* Preview body — changes with size */}
-                    <div className="px-3" style={{ paddingTop: 8, paddingBottom: sz === "sm" ? 8 : 10 }}>
-                      {w.type === "chart" && (
-                        <div>
-                          {sz === "sm" ? (
-                            <div className="flex items-center justify-between">
-                              <svg viewBox="0 0 80 24" className="w-[60px] h-[18px]" fill="none">
-                                <path d="M0 20 Q10 14 20 16 T40 10 T60 6 T80 4" stroke={isActive ? "#0A77FF" : "#CBD5E1"} strokeWidth="1.5" fill="none" />
-                              </svg>
-                              <span className="text-[13px] text-[#334155]" style={{ fontWeight: 600 }}>$142K</span>
+                    <div className="grid grid-cols-2 gap-2.5">
+                      {inCat.map((w) => {
+                        const isActive = activeWidgets.includes(w.key);
+                        const sz = widgetSizes[w.key] || "md";
+                        return (
+                          <button
+                            key={w.key}
+                            type="button"
+                            onClick={() => onToggleWidget(w.key)}
+                            className={`relative text-left rounded-xl border overflow-hidden transition-all duration-150 cursor-pointer group ${
+                              isActive
+                                ? "border-[#0A77FF]/30 bg-white shadow-[0_0_0_1px_rgba(10,119,255,0.08)]"
+                                : "border-border/60 bg-white hover:border-border hover:shadow-sm"
+                            }`}
+                          >
+                            <div className={`h-[68px] flex items-center justify-center transition-colors ${isActive ? "bg-[#F8FAFF]" : "bg-[#F8FAFC]"}`}>
+                              <PartnerWidgetVisual type={w.type} isActive={isActive} />
                             </div>
-                          ) : sz === "md" ? (
-                            <div>
-                              <div className="flex items-baseline justify-between mb-2">
-                                <span className="text-[15px] text-[#334155]" style={{ fontWeight: 700 }}>$142,800</span>
-                                <span className="text-[10px] text-[#059669]" style={{ fontWeight: 500 }}>+12.3%</span>
-                              </div>
-                              <svg viewBox="0 0 160 32" className="w-full h-[28px]" fill="none">
-                                <path d="M0 28 Q20 22 40 20 T80 14 T120 8 T160 4 V32 H0Z" fill={isActive ? "#0A77FF" : "#94A3B8"} fillOpacity="0.06" />
-                                <path d="M0 28 Q20 22 40 20 T80 14 T120 8 T160 4" stroke={isActive ? "#0A77FF" : "#CBD5E1"} strokeWidth="1.5" fill="none" />
-                              </svg>
-                            </div>
-                          ) : (
-                            <div>
-                              <div className="flex items-baseline justify-between mb-1">
-                                <span className="text-[16px] text-[#334155]" style={{ fontWeight: 700 }}>$142,800</span>
-                                <span className="text-[10px] text-[#059669]" style={{ fontWeight: 500 }}>+12.3% vs last year</span>
-                              </div>
-                              <svg viewBox="0 0 160 44" className="w-full h-[40px]" fill="none">
-                                <path d="M0 38 Q20 30 40 28 T80 20 T120 12 T160 6 V44 H0Z" fill={isActive ? "#0A77FF" : "#94A3B8"} fillOpacity="0.06" />
-                                <path d="M0 38 Q20 30 40 28 T80 20 T120 12 T160 6" stroke={isActive ? "#0A77FF" : "#CBD5E1"} strokeWidth="1.5" fill="none" />
-                                {[0, 40, 80, 120, 160].map((x, i) => (
-                                  <text key={i} x={x} y="44" fill="#94A3B8" fontSize="6" textAnchor="middle">{["Jan", "Mar", "Jun", "Sep", "Dec"][i]}</text>
-                                ))}
-                              </svg>
-                              <div className="flex items-center gap-3 mt-1.5">
-                                <span className="text-[10px] text-[#94A3B8]">High: <span className="text-[#334155]" style={{ fontWeight: 500 }}>$28.4K</span></span>
-                                <span className="text-[10px] text-[#94A3B8]">Low: <span className="text-[#334155]" style={{ fontWeight: 500 }}>$8.2K</span></span>
-                                <span className="text-[10px] text-[#94A3B8]">Avg: <span className="text-[#334155]" style={{ fontWeight: 500 }}>$17.9K</span></span>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      )}
-                      {w.type === "gauge" && (
-                        <div>
-                          {sz === "sm" ? (
-                            <div className="flex items-center justify-between">
-                              <div className="w-[50px] h-1.5 rounded-full bg-[#F1F5F9] overflow-hidden"><div className="h-full rounded-full" style={{ width: "62%", backgroundColor: isActive ? "#D1FAE5" : "#E2E8F0" }} /></div>
-                              <span className="text-[13px] text-[#334155]" style={{ fontWeight: 600 }}>62%</span>
-                            </div>
-                          ) : (
-                            <div>
-                              <div className="flex items-baseline justify-between mb-2">
-                                <span className="text-[15px] text-[#334155]" style={{ fontWeight: 700 }}>{formatCurrency(vendor.creditUtilization)}</span>
-                                <span className="text-[10px] text-[#059669]" style={{ fontWeight: 500 }}>Healthy</span>
-                              </div>
-                              <div className="w-full h-2 rounded-full bg-[#F1F5F9] overflow-hidden"><div className="h-full rounded-full" style={{ width: "62%", backgroundColor: isActive ? "#D1FAE5" : "#E2E8F0" }} /></div>
-                              {sz === "lg" && (
-                                <div className="flex items-center justify-between mt-1.5 text-[10px] text-[#94A3B8]">
-                                  <span>Limit: <span className="text-[#334155]" style={{ fontWeight: 500 }}>{formatCurrency(vendor.creditLimit)}</span></span>
-                                  <span>Available: <span className="text-[#059669]" style={{ fontWeight: 500 }}>{formatCurrency(vendor.creditLimit - vendor.creditUtilization)}</span></span>
+                            <div className="absolute top-1.5 right-1.5">
+                              {isActive ? (
+                                <div className="w-5 h-5 rounded-full bg-[#0A77FF] flex items-center justify-center shadow-sm">
+                                  <Check className="w-3 h-3 text-white" strokeWidth={3} />
+                                </div>
+                              ) : (
+                                <div className="w-5 h-5 rounded-full bg-white border border-[#E2E8F0] flex items-center justify-center group-hover:border-[#CBD5E1] transition-colors">
+                                  <Plus className="w-3 h-3 text-[#94A3B8]" />
                                 </div>
                               )}
                             </div>
-                          )}
-                        </div>
-                      )}
-                      {w.type === "contact" && (
-                        <div>
-                          <div className="flex items-center gap-2.5 mb-2">
-                            <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${isActive ? "bg-[#EDF4FF]" : "bg-[#F1F5F9]"}`}>
-                              <span className={`text-[9px] ${isActive ? "text-[#0A77FF]" : "text-[#475569]"}`} style={{ fontWeight: 600 }}>{vendor.primaryContact.name.split(" ").map(n => n[0]).join("")}</span>
-                            </div>
-                            <div className="min-w-0">
-                              <p className="text-[12px] text-[#334155] truncate" style={{ fontWeight: 600 }}>{vendor.primaryContact.name}</p>
-                              {sz !== "sm" && <p className="text-[10px] text-[#94A3B8] truncate">{vendor.primaryContact.designation}</p>}
-                            </div>
-                          </div>
-                          {sz !== "sm" && (
-                            <svg viewBox="0 0 160 28" className="w-full h-[22px]" fill="none">
-                              <path d="M0 24 Q15 18 30 20 T60 14 T90 10 T120 12 T150 6" stroke="#7C3AED" strokeWidth="1.5" fill="none" />
-                              {[0, 30, 60, 90, 120, 150].map((x, i) => (<circle key={i} cx={x} cy={[24, 20, 14, 10, 12, 6][i]} r="2" fill="#7C3AED" />))}
-                            </svg>
-                          )}
-                        </div>
-                      )}
-                      {w.type === "list" && (
-                        <div>
-                          {/* Mini bar chart for list-type widgets */}
-                          {(w.key === "top_items" || w.key === "invoice_aging") ? (
-                            <div>
-                              <svg viewBox="0 0 160 40" className="w-full" style={{ height: sz === "sm" ? 24 : sz === "md" ? 32 : 40 }} fill="none">
-                                {(w.key === "top_items" ? [30, 24, 18, 14, 10] : [35, 22, 18, 12]).map((h, i, arr) => {
-                                  const bw = 160 / arr.length - 4;
-                                  const colors = w.key === "top_items" ? ["#0A77FF", "#7C3AED", "#059669", "#94A3B8", "#CBD5E1"] : ["#0A77FF", "#3B82F6", "#D97706", "#DC2626"];
-                                  return <rect key={i} x={i * (bw + 4) + 2} y={40 - h} width={bw} height={h} rx="3" fill={isActive ? colors[i] : "#E2E8F0"} />;
-                                })}
-                              </svg>
-                              {sz === "lg" && (
-                                <div className="flex items-center gap-2 mt-1.5">
-                                  {(w.key === "top_items" ? ["$25.6K", "$15.7K", "$12.3K"] : ["0-30d", "31-60d", "61-90d"]).map((l, i) => (
-                                    <span key={i} className="text-[9px] text-[#94A3B8]" style={{ fontWeight: 500 }}>{l}</span>
+                            <div className="px-3 py-2.5 border-t border-[#F1F5F9]">
+                              <p className="text-[12.5px] text-[#0F172A] truncate" style={{ fontWeight: 600 }} title={w.label}>{w.label}</p>
+                              <p className="text-[11px] text-[#64748B] mt-0.5 line-clamp-2 leading-snug" title={w.description}>{w.description}</p>
+                              {isActive && (
+                                <div className="mt-2 flex items-center h-6 rounded-md border border-[#E2E8F0] bg-[#F8FAFC] p-0.5 gap-0.5" onClick={(e) => e.stopPropagation()}>
+                                  {(["sm", "md", "lg"] as const).map((s) => (
+                                    <button
+                                      key={s}
+                                      type="button"
+                                      onClick={(e) => { e.stopPropagation(); onWidgetSizeChange(w.key, s); }}
+                                      className={`flex-1 h-5 rounded text-[9.5px] transition-all duration-150 cursor-pointer ${
+                                        sz === s ? "bg-white text-[#0A77FF] shadow-sm" : "text-[#94A3B8] hover:text-[#334155]"
+                                      }`}
+                                      style={{ fontWeight: sz === s ? 600 : 500 }}
+                                    >
+                                      {s.toUpperCase()}
+                                    </button>
                                   ))}
                                 </div>
                               )}
                             </div>
-                          ) : (w.key === "recent_orders" || w.key === "payment_history") ? (
-                            <div>
-                              <svg viewBox="0 0 160 40" className="w-full" style={{ height: sz === "sm" ? 24 : sz === "md" ? 32 : 40 }} fill="none">
-                                {w.key === "recent_orders" ? (
-                                  <>
-                                    <path d="M0 32 Q20 28 40 24 T80 16 T120 12 T160 8" stroke={isActive ? "#059669" : "#CBD5E1"} strokeWidth="1.5" fill="none" />
-                                    {[0, 40, 80, 120, 160].map((x, i) => (<circle key={i} cx={x} cy={[32, 24, 16, 12, 8][i]} r="2.5" fill={["#D97706", "#059669", "#059669", "#0A77FF", "#059669"][i]} />))}
-                                  </>
-                                ) : (
-                                  <>
-                                    <path d="M0 30 Q20 26 40 20 T80 14 T120 18 T160 10 V40 H0Z" fill={isActive ? "#059669" : "#94A3B8"} fillOpacity="0.08" />
-                                    <path d="M0 30 Q20 26 40 20 T80 14 T120 18 T160 10" stroke={isActive ? "#059669" : "#CBD5E1"} strokeWidth="1.5" fill="none" />
-                                  </>
-                                )}
-                              </svg>
-                            </div>
-                          ) : (
-                            <div>
-                              {/* Compliance donut */}
-                              <div className="flex items-center gap-3">
-                                <svg viewBox="0 0 40 40" style={{ width: sz === "sm" ? 28 : 36, height: sz === "sm" ? 28 : 36 }}>
-                                  <circle cx="20" cy="20" r="16" fill="none" stroke="#F1F5F9" strokeWidth="5" />
-                                  <circle cx="20" cy="20" r="16" fill="none" stroke={isActive ? "#059669" : "#CBD5E1"} strokeWidth="5" strokeDasharray="75 100" strokeDashoffset="25" />
-                                </svg>
-                                <div className="min-w-0">
-                                  <span className="text-[13px] text-[#059669]" style={{ fontWeight: 700 }}>75%</span>
-                                  {sz !== "sm" && <p className="text-[9px] text-[#94A3B8]">3/4 valid</p>}
-                                </div>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      )}
-                      {w.type === "text" && (
-                        <div>
-                          {/* Activity timeline dots */}
-                          <div className="flex items-center gap-1.5 mb-1.5">
-                            {["#059669", "#0A77FF", "#7C3AED", "#F59E0B"].map((c, i) => (
-                              <div key={i} className="flex items-center gap-1">
-                                <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: isActive ? c : "#E2E8F0" }} />
-                                {i < 3 && <div className="w-3 h-px" style={{ backgroundColor: "#E2E8F0" }} />}
-                              </div>
-                            ))}
-                          </div>
-                          <p className={`text-[10px] text-[#475569] leading-relaxed ${sz === "sm" ? "line-clamp-1" : "line-clamp-2"}`}>
-                            Recent: Payment received, Order delivered, Note added
-                          </p>
-                        </div>
-                      )}
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
                 );

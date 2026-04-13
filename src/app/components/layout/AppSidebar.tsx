@@ -327,31 +327,41 @@ export function AppSidebar() {
                         className="ml-[19px] mt-0.5 space-y-px border-l-[1.5px] pl-2.5 py-0.5"
                         style={{ borderColor: "#D6E8FF" }}
                       >
-                        {item.children!.map((child) => (
-                          <NavLink
-                            key={child.path}
-                            to={child.path}
-                            end={
-                              child.path === "/vendors" ||
-                              child.path === "/partners"
-                            }
-                            className={({ isActive: linkActive }) =>
-                              `block px-2.5 py-1 rounded-md text-[13px] transition-all duration-150 ${
+                        {item.children!.map((child) => {
+                          /** Child item active when on its own page or any subpage of it.
+                           *  - `/vendors` matches `/vendors` and `/vendors/:id` (Partner Details)
+                           *  - `/partners` is exact (its subpaths belong to other sibling items)
+                           *  - Everything else matches its own path and any deeper detail page
+                           */
+                          const path = location.pathname;
+                          const linkActive =
+                            child.path === "/partners"
+                              ? path === "/partners"
+                              : path === child.path || path.startsWith(child.path + "/");
+                          return (
+                            <NavLink
+                              key={child.path}
+                              to={child.path}
+                              end={
+                                child.path === "/vendors" ||
+                                child.path === "/partners"
+                              }
+                              className={`block px-2.5 py-1 rounded-md text-[13px] transition-all duration-150 ${
                                 linkActive
                                   ? "text-[#0A77FF]"
                                   : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                              }`
-                            }
-                            style={({ isActive: linkActive }) => ({
-                              fontWeight: linkActive ? 500 : 400,
-                              backgroundColor: linkActive
-                                ? "rgba(10, 119, 255, 0.05)"
-                                : undefined,
-                            })}
-                          >
-                            {child.label}
-                          </NavLink>
-                        ))}
+                              }`}
+                              style={{
+                                fontWeight: linkActive ? 500 : 400,
+                                backgroundColor: linkActive
+                                  ? "rgba(10, 119, 255, 0.05)"
+                                  : undefined,
+                              }}
+                            >
+                              {child.label}
+                            </NavLink>
+                          );
+                        })}
                       </div>
                     )}
                   </div>
