@@ -416,16 +416,22 @@ export function ColumnSelector({
             {pinnedColumns.map((col) => (
               <div
                 key={col.key}
-                className="flex items-center gap-2 px-3.5 py-[7px] mx-1.5 rounded-md select-none"
+                className="flex items-center gap-2 px-2 py-[7px] mx-1.5 rounded-md select-none"
               >
-                <Lock className="w-3.5 h-3.5 text-muted-foreground/35 shrink-0" />
+                {/* Eye badge — pinned columns are always visible (cannot be hidden) */}
+                <div
+                  title="Pinned column — always visible"
+                  className="shrink-0 w-6 h-6 rounded-md flex items-center justify-center bg-[#EDF4FF]"
+                >
+                  <Eye className="w-3.5 h-3.5" style={{ color: "#0A77FF" }} />
+                </div>
                 <span
-                  className="flex-1 text-[12.5px] text-muted-foreground/60 truncate"
+                  className="flex-1 text-[12.5px] text-foreground truncate"
                   style={{ fontWeight: 450 }}
                 >
                   {col.label}
                 </span>
-                <Eye className="w-3.5 h-3.5 text-muted-foreground/50 shrink-0" />
+                <Lock className="w-3.5 h-3.5 text-muted-foreground/40 shrink-0" />
               </div>
             ))}
             <div className="my-1 border-t border-border/30 mx-3.5" />
@@ -487,16 +493,23 @@ export function ColumnSelector({
                   <GripVertical className="w-3.5 h-3.5 text-muted-foreground/40" />
                 </div>
 
-                {/* Visibility dot */}
+                {/* Visibility toggle — eye icon in a light blue rounded square */}
                 <button
                   type="button"
                   onClick={() => toggleVisibility(col.key)}
-                  className={`shrink-0 w-2 h-2 rounded-full transition-colors cursor-pointer ${
+                  title={isVisible ? "Hide column" : "Show column"}
+                  className={`shrink-0 w-6 h-6 rounded-md flex items-center justify-center transition-colors cursor-pointer ${
                     isVisible
-                      ? "bg-[#3D95FF]"
-                      : "bg-muted-foreground/20 hover:bg-muted-foreground/30"
+                      ? "bg-[#EDF4FF] hover:bg-[#DBEAFE]"
+                      : "bg-muted/40 hover:bg-muted/60"
                   }`}
-                />
+                >
+                  {isVisible ? (
+                    <Eye className="w-3.5 h-3.5" style={{ color: "#0A77FF" }} />
+                  ) : (
+                    <EyeOff className="w-3.5 h-3.5 text-muted-foreground/50" />
+                  )}
+                </button>
 
                 {/* Label */}
                 <span

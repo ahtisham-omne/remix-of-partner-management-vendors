@@ -435,7 +435,7 @@ export function VendorDetailsPage() {
   const statusConfig: Record<string, { color: string; bg: string; border: string; label: string }> = {
     active: { color: "#065F46", bg: "#ECFDF5", border: "#A7F3D0", label: "Active" },
     inactive: { color: "#92400E", bg: "#FFFBEB", border: "#FDE68A", label: "Inactive" },
-    archived: { color: "#334155", bg: "#F1F5F9", border: "#CBD5E1", label: "Archived" },
+    archived: { color: "#991B1B", bg: "#FEF2F2", border: "#FECACA", label: "Archived" },
   };
   const currentStatus = statusConfig[vendor.status] || statusConfig.active;
 
@@ -6186,205 +6186,22 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
 
                   {/* ── Purchase Orders tab ── */}
                   {locDetailTab === "purchase_orders" && (
-                    <div className="flex-1 flex flex-col overflow-hidden">
-                      <div className="flex items-center justify-between gap-3 px-4 pt-3 pb-2 shrink-0">
-                        <div className="flex items-center gap-2 flex-1 min-w-0">
-                          <div className="relative flex-1 max-w-[220px]">
-                            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8] pointer-events-none" />
-                            <input type="text" placeholder="Search purchase orders..." className="w-full pl-8 h-8 text-[12px] bg-white border border-[#E2E8F0] rounded-lg px-3 py-1.5 focus:outline-none focus:border-[#0A77FF] transition-colors" />
-                          </div>
-                          <button className="h-8 px-2.5 rounded-lg border border-[#E2E8F0] bg-white text-[12px] text-[#475569] hover:bg-[#F8FAFC] cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 500 }}>
-                            <SlidersHorizontal className="w-3.5 h-3.5" /> Filters
-                          </button>
-                        </div>
-                        <button onClick={() => toast.info("Create purchase order coming soon")} className="h-8 px-3 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-[12px] shadow-sm cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 600 }}>
-                          <Plus className="w-3.5 h-3.5" /> Create PO
-                        </button>
-                      </div>
-                      <div className="flex items-center gap-1.5 px-4 pb-2">
-                        {["All", "Draft", "Pending", "Approved", "Received"].map((chip, i) => (
-                          <span key={chip} className={`text-[11px] px-2.5 py-1 rounded-full cursor-pointer transition-colors inline-flex items-center gap-1 ${i === 0 ? "bg-[#EDF4FF] text-[#0A77FF] border border-[#0A77FF]/25" : "bg-[#F8FAFC] text-[#64748B] border border-[#E2E8F0] hover:bg-[#F1F5F9]"}`} style={{ fontWeight: 500 }}>
-                            {chip}
-                          </span>
-                        ))}
-                      </div>
-                      <div className="h-px bg-[#E8ECF1] mx-4 shrink-0" />
-                      <div className="flex-1 overflow-auto">
-                        <table className="w-full text-[12px]">
-                          <thead className="sticky top-0 bg-[#F8FAFC] z-10">
-                            <tr>
-                              <th className="text-left px-4 py-2.5 text-[#94A3B8] text-[11px] border-b border-[#E8ECF1]" style={{ fontWeight: 600 }}>PO Number</th>
-                              <th className="text-left px-4 py-2.5 text-[#94A3B8] text-[11px] border-b border-[#E8ECF1]" style={{ fontWeight: 600 }}>Date</th>
-                              <th className="text-left px-4 py-2.5 text-[#94A3B8] text-[11px] border-b border-[#E8ECF1]" style={{ fontWeight: 600 }}>Items</th>
-                              <th className="text-right px-4 py-2.5 text-[#94A3B8] text-[11px] border-b border-[#E8ECF1]" style={{ fontWeight: 600 }}>Total</th>
-                              <th className="text-left px-4 py-2.5 text-[#94A3B8] text-[11px] border-b border-[#E8ECF1]" style={{ fontWeight: 600 }}>Status</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {[
-                              { id: "PO-2025-0041", date: "15 Mar 2025", items: 12, total: "$24,500.00", status: "Approved", statusColor: "#16A34A", statusBg: "#F0FDF4", statusBorder: "#BBF7D0" },
-                              { id: "PO-2025-0038", date: "10 Mar 2025", items: 5, total: "$8,200.00", status: "Pending", statusColor: "#D97706", statusBg: "#FFFBEB", statusBorder: "#FDE68A" },
-                              { id: "PO-2025-0035", date: "02 Mar 2025", items: 8, total: "$15,750.00", status: "Received", statusColor: "#0A77FF", statusBg: "#EDF4FF", statusBorder: "#BFDBFE" },
-                              { id: "PO-2025-0029", date: "20 Feb 2025", items: 3, total: "$4,300.00", status: "Approved", statusColor: "#16A34A", statusBg: "#F0FDF4", statusBorder: "#BBF7D0" },
-                              { id: "PO-2025-0022", date: "10 Feb 2025", items: 15, total: "$32,100.00", status: "Received", statusColor: "#0A77FF", statusBg: "#EDF4FF", statusBorder: "#BFDBFE" },
-                            ].map((po) => (
-                              <tr key={po.id} className="hover:bg-[#F8FBFF] transition-colors cursor-pointer border-b border-[#F1F5F9]">
-                                <td className="px-4 py-2.5">
-                                  <span className="font-mono text-[12px] text-[#0A77FF]" style={{ fontWeight: 600 }}>{po.id}</span>
-                                </td>
-                                <td className="px-4 py-2.5 text-[12px] text-[#475569]">{po.date}</td>
-                                <td className="px-4 py-2.5 text-[12px] text-[#334155] tabular-nums" style={{ fontWeight: 500 }}>{po.items} items</td>
-                                <td className="px-4 py-2.5 text-right text-[12px] text-[#334155] tabular-nums" style={{ fontWeight: 600 }}>{po.total}</td>
-                                <td className="px-4 py-2.5">
-                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px]" style={{ fontWeight: 600, backgroundColor: po.statusBg, color: po.statusColor, border: `1px solid ${po.statusBorder}` }}>
-                                    <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: po.statusColor }} />
-                                    {po.status}
-                                  </span>
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                      <div className="flex items-center justify-between px-4 py-2 border-t border-[#E8ECF1] shrink-0 bg-[#FAFBFC]">
-                        <span className="text-[11px] text-[#94A3B8]">Showing <span className="text-[#334155]" style={{ fontWeight: 600 }}>5</span> of <span className="text-[#334155]" style={{ fontWeight: 600 }}>5</span> orders</span>
-                        <span className="text-[11px] text-[#94A3B8]">Records per page <select className="h-6 px-1.5 rounded border border-[#E2E8F0] text-[11px] cursor-pointer outline-none ml-1"><option>20</option><option>50</option></select></span>
-                      </div>
+                    <div className="flex-1 flex flex-col overflow-hidden p-4">
+                      <PurchaseOrdersTable />
                     </div>
                   )}
 
                   {/* ── Quotes tab ── */}
                   {locDetailTab === "quotes" && (
-                    <div className="flex-1 flex flex-col overflow-hidden">
-                      <div className="flex items-center justify-between gap-3 px-4 pt-3 pb-2 shrink-0">
-                        <div className="flex items-center gap-2 flex-1 min-w-0">
-                          <div className="relative flex-1 max-w-[220px]">
-                            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8] pointer-events-none" />
-                            <input type="text" placeholder="Search quotes..." className="w-full pl-8 h-8 text-[12px] bg-white border border-[#E2E8F0] rounded-lg px-3 py-1.5 focus:outline-none focus:border-[#0A77FF] transition-colors" />
-                          </div>
-                          <button className="h-8 px-2.5 rounded-lg border border-[#E2E8F0] bg-white text-[12px] text-[#475569] hover:bg-[#F8FAFC] cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 500 }}>
-                            <SlidersHorizontal className="w-3.5 h-3.5" /> Filters
-                          </button>
-                        </div>
-                        <button onClick={() => toast.info("Create quote coming soon")} className="h-8 px-3 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-[12px] shadow-sm cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 600 }}>
-                          <Plus className="w-3.5 h-3.5" /> Create Quote
-                        </button>
-                      </div>
-                      <div className="flex items-center gap-1.5 px-4 pb-2">
-                        {["All", "Draft", "Sent", "Accepted", "Expired"].map((chip, i) => (
-                          <span key={chip} className={`text-[11px] px-2.5 py-1 rounded-full cursor-pointer transition-colors inline-flex items-center gap-1 ${i === 0 ? "bg-[#EDF4FF] text-[#0A77FF] border border-[#0A77FF]/25" : "bg-[#F8FAFC] text-[#64748B] border border-[#E2E8F0] hover:bg-[#F1F5F9]"}`} style={{ fontWeight: 500 }}>
-                            {chip}
-                          </span>
-                        ))}
-                      </div>
-                      <div className="h-px bg-[#E8ECF1] mx-4 shrink-0" />
-                      <div className="flex-1 overflow-auto">
-                        <table className="w-full text-[12px]">
-                          <thead className="sticky top-0 bg-[#F8FAFC] z-10">
-                            <tr>
-                              <th className="text-left px-4 py-2.5 text-[#94A3B8] text-[11px] border-b border-[#E8ECF1]" style={{ fontWeight: 600 }}>Quote ID</th>
-                              <th className="text-left px-4 py-2.5 text-[#94A3B8] text-[11px] border-b border-[#E8ECF1]" style={{ fontWeight: 600 }}>Date</th>
-                              <th className="text-left px-4 py-2.5 text-[#94A3B8] text-[11px] border-b border-[#E8ECF1]" style={{ fontWeight: 600 }}>Valid Until</th>
-                              <th className="text-right px-4 py-2.5 text-[#94A3B8] text-[11px] border-b border-[#E8ECF1]" style={{ fontWeight: 600 }}>Amount</th>
-                              <th className="text-left px-4 py-2.5 text-[#94A3B8] text-[11px] border-b border-[#E8ECF1]" style={{ fontWeight: 600 }}>Status</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {[
-                              { id: "QT-2025-0018", date: "12 Mar 2025", valid: "12 Apr 2025", amount: "$18,400.00", status: "Sent", statusColor: "#0A77FF", statusBg: "#EDF4FF", statusBorder: "#BFDBFE" },
-                              { id: "QT-2025-0015", date: "01 Mar 2025", valid: "01 Apr 2025", amount: "$6,750.00", status: "Accepted", statusColor: "#16A34A", statusBg: "#F0FDF4", statusBorder: "#BBF7D0" },
-                              { id: "QT-2025-0011", date: "15 Feb 2025", valid: "15 Mar 2025", amount: "$12,300.00", status: "Expired", statusColor: "#DC2626", statusBg: "#FEF2F2", statusBorder: "#FECACA" },
-                            ].map((qt) => (
-                              <tr key={qt.id} className="hover:bg-[#F8FBFF] transition-colors cursor-pointer border-b border-[#F1F5F9]">
-                                <td className="px-4 py-2.5">
-                                  <span className="font-mono text-[12px] text-[#0A77FF]" style={{ fontWeight: 600 }}>{qt.id}</span>
-                                </td>
-                                <td className="px-4 py-2.5 text-[12px] text-[#475569]">{qt.date}</td>
-                                <td className="px-4 py-2.5 text-[12px] text-[#475569]">{qt.valid}</td>
-                                <td className="px-4 py-2.5 text-right text-[12px] text-[#334155] tabular-nums" style={{ fontWeight: 600 }}>{qt.amount}</td>
-                                <td className="px-4 py-2.5">
-                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px]" style={{ fontWeight: 600, backgroundColor: qt.statusBg, color: qt.statusColor, border: `1px solid ${qt.statusBorder}` }}>
-                                    <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: qt.statusColor }} />
-                                    {qt.status}
-                                  </span>
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                      <div className="flex items-center justify-between px-4 py-2 border-t border-[#E8ECF1] shrink-0 bg-[#FAFBFC]">
-                        <span className="text-[11px] text-[#94A3B8]">Showing <span className="text-[#334155]" style={{ fontWeight: 600 }}>3</span> of <span className="text-[#334155]" style={{ fontWeight: 600 }}>3</span> quotes</span>
-                        <span className="text-[11px] text-[#94A3B8]">Records per page <select className="h-6 px-1.5 rounded border border-[#E2E8F0] text-[11px] cursor-pointer outline-none ml-1"><option>20</option><option>50</option></select></span>
-                      </div>
+                    <div className="flex-1 flex flex-col overflow-hidden p-4">
+                      <QuotesTable />
                     </div>
                   )}
 
                   {/* ── Sales Orders tab ── */}
                   {locDetailTab === "sales_orders" && (
-                    <div className="flex-1 flex flex-col overflow-hidden">
-                      <div className="flex items-center justify-between gap-3 px-4 pt-3 pb-2 shrink-0">
-                        <div className="flex items-center gap-2 flex-1 min-w-0">
-                          <div className="relative flex-1 max-w-[220px]">
-                            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8] pointer-events-none" />
-                            <input type="text" placeholder="Search sales orders..." className="w-full pl-8 h-8 text-[12px] bg-white border border-[#E2E8F0] rounded-lg px-3 py-1.5 focus:outline-none focus:border-[#0A77FF] transition-colors" />
-                          </div>
-                          <button className="h-8 px-2.5 rounded-lg border border-[#E2E8F0] bg-white text-[12px] text-[#475569] hover:bg-[#F8FAFC] cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 500 }}>
-                            <SlidersHorizontal className="w-3.5 h-3.5" /> Filters
-                          </button>
-                        </div>
-                        <button onClick={() => toast.info("Create sales order coming soon")} className="h-8 px-3 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-[12px] shadow-sm cursor-pointer transition-colors inline-flex items-center gap-1.5" style={{ fontWeight: 600 }}>
-                          <Plus className="w-3.5 h-3.5" /> Create Sales Order
-                        </button>
-                      </div>
-                      <div className="flex items-center gap-1.5 px-4 pb-2">
-                        {["All", "Open", "Processing", "Shipped", "Completed"].map((chip, i) => (
-                          <span key={chip} className={`text-[11px] px-2.5 py-1 rounded-full cursor-pointer transition-colors inline-flex items-center gap-1 ${i === 0 ? "bg-[#EDF4FF] text-[#0A77FF] border border-[#0A77FF]/25" : "bg-[#F8FAFC] text-[#64748B] border border-[#E2E8F0] hover:bg-[#F1F5F9]"}`} style={{ fontWeight: 500 }}>
-                            {chip}
-                          </span>
-                        ))}
-                      </div>
-                      <div className="h-px bg-[#E8ECF1] mx-4 shrink-0" />
-                      <div className="flex-1 overflow-auto">
-                        <table className="w-full text-[12px]">
-                          <thead className="sticky top-0 bg-[#F8FAFC] z-10">
-                            <tr>
-                              <th className="text-left px-4 py-2.5 text-[#94A3B8] text-[11px] border-b border-[#E8ECF1]" style={{ fontWeight: 600 }}>SO Number</th>
-                              <th className="text-left px-4 py-2.5 text-[#94A3B8] text-[11px] border-b border-[#E8ECF1]" style={{ fontWeight: 600 }}>Date</th>
-                              <th className="text-left px-4 py-2.5 text-[#94A3B8] text-[11px] border-b border-[#E8ECF1]" style={{ fontWeight: 600 }}>Customer</th>
-                              <th className="text-right px-4 py-2.5 text-[#94A3B8] text-[11px] border-b border-[#E8ECF1]" style={{ fontWeight: 600 }}>Total</th>
-                              <th className="text-left px-4 py-2.5 text-[#94A3B8] text-[11px] border-b border-[#E8ECF1]" style={{ fontWeight: 600 }}>Status</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {[
-                              { id: "SO-2025-0067", date: "14 Mar 2025", customer: "Acme Industries", total: "$19,800.00", status: "Processing", statusColor: "#D97706", statusBg: "#FFFBEB", statusBorder: "#FDE68A" },
-                              { id: "SO-2025-0062", date: "08 Mar 2025", customer: "TechCorp Ltd", total: "$7,450.00", status: "Shipped", statusColor: "#0A77FF", statusBg: "#EDF4FF", statusBorder: "#BFDBFE" },
-                              { id: "SO-2025-0055", date: "25 Feb 2025", customer: "GlobalTech Inc", total: "$31,200.00", status: "Completed", statusColor: "#16A34A", statusBg: "#F0FDF4", statusBorder: "#BBF7D0" },
-                              { id: "SO-2025-0048", date: "18 Feb 2025", customer: "Pacific Solutions", total: "$12,600.00", status: "Completed", statusColor: "#16A34A", statusBg: "#F0FDF4", statusBorder: "#BBF7D0" },
-                            ].map((so) => (
-                              <tr key={so.id} className="hover:bg-[#F8FBFF] transition-colors cursor-pointer border-b border-[#F1F5F9]">
-                                <td className="px-4 py-2.5">
-                                  <span className="font-mono text-[12px] text-[#0A77FF]" style={{ fontWeight: 600 }}>{so.id}</span>
-                                </td>
-                                <td className="px-4 py-2.5 text-[12px] text-[#475569]">{so.date}</td>
-                                <td className="px-4 py-2.5 text-[12px] text-[#334155]" style={{ fontWeight: 500 }}>{so.customer}</td>
-                                <td className="px-4 py-2.5 text-right text-[12px] text-[#334155] tabular-nums" style={{ fontWeight: 600 }}>{so.total}</td>
-                                <td className="px-4 py-2.5">
-                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px]" style={{ fontWeight: 600, backgroundColor: so.statusBg, color: so.statusColor, border: `1px solid ${so.statusBorder}` }}>
-                                    <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: so.statusColor }} />
-                                    {so.status}
-                                  </span>
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                      <div className="flex items-center justify-between px-4 py-2 border-t border-[#E8ECF1] shrink-0 bg-[#FAFBFC]">
-                        <span className="text-[11px] text-[#94A3B8]">Showing <span className="text-[#334155]" style={{ fontWeight: 600 }}>4</span> of <span className="text-[#334155]" style={{ fontWeight: 600 }}>4</span> orders</span>
-                        <span className="text-[11px] text-[#94A3B8]">Records per page <select className="h-6 px-1.5 rounded border border-[#E2E8F0] text-[11px] cursor-pointer outline-none ml-1"><option>20</option><option>50</option></select></span>
-                      </div>
+                    <div className="flex-1 flex flex-col overflow-hidden p-4">
+                      <SalesOrdersTable />
                     </div>
                   )}
 

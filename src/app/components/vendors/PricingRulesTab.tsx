@@ -1470,7 +1470,7 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
               const ST_P: Record<string, { bg: string; text: string; border: string }> = {
                 "active": { bg: "#ECFDF5", text: "#065F46", border: "#A7F3D0" },
                 "inactive": { bg: "#FFFBEB", text: "#92400E", border: "#FDE68A" },
-                "archived": { bg: "#F1F5F9", text: "#475569", border: "#E2E8F0" },
+                "archived": { bg: "#FEF2F2", text: "#991B1B", border: "#FECACA" },
               };
 
               return (
@@ -2171,7 +2171,7 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
         const pmList = partnerModalView === "browse" ? pmBrowseList : pmAddedList;
         const pmSelSet = partnerModalView === "browse" ? partnerModalSelectedIds : partnerModalAddedSelectedIds;
         const pmSetSel = partnerModalView === "browse" ? setPartnerModalSelectedIds : setPartnerModalAddedSelectedIds;
-        const ST_PM: Record<string, { bg: string; text: string; border: string }> = { "active": { bg: "#ECFDF5", text: "#065F46", border: "#A7F3D0" }, "inactive": { bg: "#FFFBEB", text: "#92400E", border: "#FDE68A" }, "archived": { bg: "#F1F5F9", text: "#475569", border: "#E2E8F0" } };
+        const ST_PM: Record<string, { bg: string; text: string; border: string }> = { "active": { bg: "#ECFDF5", text: "#065F46", border: "#A7F3D0" }, "inactive": { bg: "#FFFBEB", text: "#92400E", border: "#FDE68A" }, "archived": { bg: "#FEF2F2", text: "#991B1B", border: "#FECACA" } };
 
         return (
         <Dialog open={partnerModalOpen} onOpenChange={setPartnerModalOpen}>

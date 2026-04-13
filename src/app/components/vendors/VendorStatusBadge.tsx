@@ -8,7 +8,7 @@ import { STATUS_LABELS } from "../../data/vendors";
  *
  * Active:   #065F46 on #ECFDF5 → ~10.2:1 ✓ AAA
  * Inactive: #92400E on #FFFBEB → ~8.5:1  ✓ AAA
- * Archived: #334155 on #F1F5F9 → ~9.6:1  ✓ AAA
+ * Archived: #991B1B on #FEF2F2 → ~7.0:1  ✓ AAA  (matches the partner Archive modal palette)
  */
 
 const statusStyles: Record<VendorStatus, { bg: string; text: string; border: string; dot: string }> = {
@@ -25,10 +25,10 @@ const statusStyles: Record<VendorStatus, { bg: string; text: string; border: str
     dot: "#D97706",
   },
   archived: {
-    bg: "#F1F5F9",
-    text: "#334155",
-    border: "#CBD5E1",
-    dot: "#64748B",
+    bg: "#FEF2F2",
+    text: "#991B1B",
+    border: "#FECACA",
+    dot: "#DC2626",
   },
 };
 

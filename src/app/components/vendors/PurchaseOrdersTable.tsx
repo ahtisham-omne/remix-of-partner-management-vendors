@@ -240,7 +240,9 @@ export function PurchaseOrdersTable() {
   };
 
   return (
-    <div className="border border-border rounded-xl bg-card overflow-clip flex flex-col flex-1 min-h-[calc(100vh-260px)]">
+    <div className="border border-border rounded-xl bg-card overflow-clip flex flex-1 min-h-[calc(100vh-260px)]">
+      {/* Inner column — toolbar + tabs + table + pagination, sibling to the side drawer below */}
+      <div className="flex-1 min-w-0 flex flex-col overflow-clip">
       {/* Toolbar */}
       <div className="px-4 py-3 flex items-center gap-3 border-b border-[#F1F5F9] flex-wrap">
         <div className="relative flex-1 max-w-xs"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70 pointer-events-none" /><Input placeholder="Search by PO, partner, item..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9 pr-8 h-9 text-sm bg-white border-border/80 shadow-sm placeholder:text-muted-foreground/50" />{search && <button onClick={() => setSearch("")} className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded-full hover:bg-muted/60 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"><X className="w-3.5 h-3.5" /></button>}</div>
@@ -254,8 +256,7 @@ export function PurchaseOrdersTable() {
         {FILTER_TABS.map(tab => { const a = statusFilter === tab.key; const c = filterCounts[tab.key] || 0; return (<button key={tab.key} onClick={() => setStatusFilter(tab.key)} className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs transition-colors whitespace-nowrap shrink-0 cursor-pointer ${a ? "border-primary bg-[#EDF4FF]" : "border-border text-muted-foreground hover:bg-muted/60 hover:text-foreground"}`} style={{ fontWeight: a ? 500 : 400, color: a ? "#0A77FF" : undefined }}>{tab.label}<span className={`text-[10px] rounded-full px-1.5 py-px min-w-[18px] text-center ${a ? "bg-primary/10" : "bg-muted"}`} style={{ fontWeight: 600, color: a ? "#0A77FF" : "#475569" }}>{c}</span></button>); })}
       </div>
       {/* Table */}
-      <div className="flex flex-1 min-h-0">
-      <div className={`overflow-auto flex-1 ${isResizing || draggingColumnKey ? "select-none" : ""}`}>
+      <div className={`min-h-0 overflow-auto flex-1 ${isResizing || draggingColumnKey ? "select-none" : ""}`}>
         <Table style={{ tableLayout: "fixed", width: `${totalW}px` }}>
           <TableHeader className="sticky top-0 z-20 bg-card">
             <TableRow className={`bg-muted/30 hover:bg-muted/30 ${density === "condensed" ? "[&>th]:h-8" : "[&>th]:h-9"}`}>
@@ -286,16 +287,16 @@ export function PurchaseOrdersTable() {
           </TableBody>
         </Table>
       </div>
-      {/* Column Selector Side Drawer */}
-      <ColumnSelector columns={COLUMN_DEFS} columnOrder={columnOrder} columnVisibility={columnVisibility} onColumnOrderChange={(o) => setColumnOrder(o as ColKey[])} onColumnVisibilityChange={setColumnVisibility} lockedColumns={["po_no"]} open={columnDrawerOpen} onOpenChange={setColumnDrawerOpen} />
-      </div>
       {/* Drag ghost */}
       <div ref={ghostElRef} className="fixed top-0 left-0 z-[9999] pointer-events-none" style={{ opacity: draggingColumnKey ? 1 : 0 }}>{draggingColumnKey && <div className="bg-white/95 backdrop-blur-sm border border-[#0A77FF]/20 shadow-lg rounded-lg px-3 py-1.5 -translate-x-1/2 -translate-y-full" style={{ marginTop: -8 }}><span className="text-[12px] text-[#0A77FF]" style={{ fontWeight: 600 }}>{cDef(draggingColumnKey as ColKey)?.label}</span></div>}</div>
       {/* Pagination */}
-      <div className="flex items-center justify-center px-4 py-3 border-t border-border gap-3">
+      <div className="flex items-center justify-center px-4 py-3 border-t border-border gap-3 shrink-0">
         <span className="text-sm text-muted-foreground">Records per page</span><span className="text-sm px-2 py-1 border border-border rounded-md" style={{ fontWeight: 500 }}>20</span>
         <div className="flex items-center gap-1 ml-4"><Button variant="ghost" size="sm" className="h-8 w-8 p-0" disabled><ChevronsLeft className="w-4 h-4" /></Button><Button variant="ghost" size="sm" className="h-8 gap-1 text-sm text-muted-foreground" disabled><ChevronLeft className="w-3.5 h-3.5" /> Prev</Button><Button size="sm" className="h-8 w-8 p-0 text-sm bg-primary text-primary-foreground">1</Button><Button variant="ghost" size="sm" className="h-8 gap-1 text-sm text-muted-foreground" disabled>Next <ChevronRight className="w-3.5 h-3.5" /></Button><Button variant="ghost" size="sm" className="h-8 w-8 p-0" disabled><ChevronsRight className="w-4 h-4" /></Button></div>
       </div>
+      </div>
+      {/* Column Selector Side Drawer — full card height, sibling to inner column */}
+      <ColumnSelector columns={COLUMN_DEFS} columnOrder={columnOrder} columnVisibility={columnVisibility} onColumnOrderChange={(o) => setColumnOrder(o as ColKey[])} onColumnVisibilityChange={setColumnVisibility} lockedColumns={["po_no"]} open={columnDrawerOpen} onOpenChange={setColumnDrawerOpen} />
     </div>
   );
 }

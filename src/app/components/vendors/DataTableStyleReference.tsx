@@ -277,7 +277,7 @@ function VendorStatusBadge({ status }: { status: string }) {
   const config: Record<string, { bg: string; text: string; border: string; dot: string; label: string }> = {
     active: { bg: "#F0FDF4", text: "#166534", border: "#BBF7D0", dot: "#22C55E", label: "Active" },
     inactive: { bg: "#FEF9C3", text: "#854D0E", border: "#FDE68A", dot: "#EAB308", label: "Inactive" },
-    archived: { bg: "#F1F5F9", text: "#475569", border: "#E2E8F0", dot: "#94A3B8", label: "Archived" },
+    archived: { bg: "#FEF2F2", text: "#991B1B", border: "#FECACA", dot: "#DC2626", label: "Archived" },
   };
   const c = config[status] || config.active;
   return (
