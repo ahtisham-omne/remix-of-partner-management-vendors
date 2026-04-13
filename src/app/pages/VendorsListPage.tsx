@@ -1120,7 +1120,7 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
   };
 
   return (
-    <div className={embedded ? "flex flex-col flex-1 min-h-[calc(100vh-260px)] bg-transparent" : "flex flex-col h-full bg-[#F8FAFC]"}>
+    <div className={embedded ? "flex flex-col min-h-[calc(100vh-360px)] pb-4 bg-transparent" : "flex flex-col h-full bg-[#F8FAFC]"}>
       {/* Top Bar — hidden when embedded */}
       {!embedded && (
       <div className="flex items-center justify-between px-6 lg:px-8 h-12 border-b border-border bg-card shrink-0">
@@ -1157,8 +1157,8 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
       )}
 
       {/* Content */}
-      <div className={embedded ? "flex-1 flex flex-col min-h-0" : "flex-1 overflow-hidden flex flex-col min-h-0"}>
-        <div className={embedded ? "flex-1 min-h-0 flex flex-col" : "px-6 lg:px-8 py-6 flex-1 min-h-0 flex flex-col"}>
+      <div className={embedded ? "flex-1 flex flex-col" : "flex-1 overflow-hidden flex flex-col min-h-0"}>
+        <div className={embedded ? "flex-1 flex flex-col" : "px-6 lg:px-8 py-6 flex-1 min-h-0 flex flex-col"}>
           {/* Page Header — hidden when embedded */}
           {!embedded && (
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 -mx-6 lg:-mx-8 -mt-6 px-6 lg:px-8 pt-3.5 pb-3.5 bg-white border-b border-border shrink-0">
@@ -1300,8 +1300,8 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
           )}
 
           {/* Unified Table Container with Search, Filters & Data */}
-          <div className="border border-border rounded-xl bg-card overflow-clip flex flex-1 min-h-0">
-            <div className="flex-1 min-w-0 overflow-clip flex flex-col">
+          <div className={`border border-border rounded-xl bg-card flex flex-1 min-h-0 ${embedded ? "" : "overflow-clip"}`}>
+            <div className={`flex-1 min-w-0 flex flex-col ${embedded ? "" : "overflow-clip"}`}>
               {/* Row 1: Search + Filters ... Count + Density */}
               <div className="flex items-center justify-between gap-3 px-4 pt-3.5 pb-2 shrink-0">
                 <div className="flex items-center gap-2.5 flex-1 min-w-0">
@@ -1538,7 +1538,7 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
               <div className="border-t border-border shrink-0" />
               {density === "card" ? (
                 /* Card View */
-                <div className="p-4 min-h-0 overflow-y-auto flex-1">
+                <div className={embedded ? "p-4" : "p-4 min-h-0 overflow-y-auto flex-1"}>
                   {paginatedVendors.length === 0 ? (
                     <div className="flex flex-col items-center gap-2 py-16 text-muted-foreground">
                       <Users className="w-8 h-8" />
@@ -1658,7 +1658,7 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                 </div>
               ) : (
                 /* Table View */
-                <div className={`min-h-0 overflow-auto flex-1 ${isResizing || draggingColumnKey ? "select-none" : ""}`}>
+                <div className={`${embedded ? "overflow-x-auto" : "min-h-0 overflow-auto flex-1"} ${isResizing || draggingColumnKey ? "select-none" : ""}`}>
                   <Table style={{ tableLayout: "fixed", width: `${CHECKBOX_COL_WIDTH + visibleColumns.reduce((sum, key) => sum + (columnWidths[key] ?? parseInt(colDef(key).minWidth, 10)), 0) + 60}px` }}>
                     <TableHeader className="sticky top-0 z-20 bg-card">
                       <TableRow className={`bg-muted/30 hover:bg-muted/30 ${
@@ -2331,7 +2331,7 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
 
               {/* Pagination */}
               {filteredVendors.length > 0 && (
-                <div className="flex flex-col sm:flex-row items-center justify-center px-4 py-3 border-t border-border gap-3 shrink-0">
+                <div className={`flex flex-col sm:flex-row items-center justify-center px-4 py-3 border-t border-border gap-3 shrink-0 ${embedded ? "mt-auto" : ""}`}>
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <span>Records per page</span>
                     <Select
