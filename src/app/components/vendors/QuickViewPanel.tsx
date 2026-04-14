@@ -22,6 +22,7 @@ import {
   ZoomIn,
   ZoomOut,
   Star,
+  Truck,
 } from "lucide-react";
 import { usePersonLightbox } from "./PersonAvatarLightbox";
 import type { OverflowItem } from "./OverflowTooltip";
@@ -310,28 +311,48 @@ function getLocationPhoto(name: string): string {
   return LOCATION_PHOTOS[hashStr(name) % LOCATION_PHOTOS.length];
 }
 
-function LocationQuickView({ locationName, vendorName }: { locationName: string; vendorName: string }) {
+function LocationQuickView({ locationName, vendorName, subtitle }: { locationName: string; vendorName: string; subtitle?: string }) {
   const d = mockLocationData(locationName);
   const { openLightbox } = usePersonLightbox();
   const photo = getLocationPhoto(locationName);
+  const isCarrier = subtitle?.toLowerCase().includes("carrier");
   return (
     <>
-      {/* Image area — location photo matching Items card layout */}
-      <div className="relative overflow-hidden bg-[#052E16] shrink-0" style={{ height: "clamp(180px, 40vh, 360px)" }}>
-        <img src={photo} alt={locationName} className="w-full h-full object-cover" />
-        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/60 to-transparent" />
-        <button
-          type="button"
-          onClick={(e) => { e.stopPropagation(); openLightbox({ src: photo, name: locationName, subtitle: `${d.type} · ${vendorName}` }); }}
-          className="absolute top-3 right-14 w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white/80 hover:bg-black/50 hover:text-white transition-colors cursor-pointer"
-        >
-          <ZoomIn className="w-4 h-4" />
-        </button>
-        <div className="absolute bottom-3 left-4 right-4">
-          <p className="text-[16px] text-white truncate" style={{ fontWeight: 700 }}>{locationName}</p>
-          <div className="text-[12px] text-white/70 mt-0.5" style={{ fontWeight: 500 }}>{d.type}</div>
+      {isCarrier ? (
+        /* Carrier-style: gradient header with truck icon (no photo) */
+        <div className="px-5 pt-5 pb-4 shrink-0" style={{ background: "linear-gradient(135deg, #052E16 0%, #14532D 100%)" }}>
+          <div className="flex items-center gap-3 pr-10">
+            <div className="w-11 h-11 rounded-xl bg-[#166534] flex items-center justify-center shrink-0">
+              <Truck className="w-5 h-5 text-[#4ADE80]" />
+            </div>
+            <div className="min-w-0">
+              <div className="text-[16px] text-white truncate" style={{ fontWeight: 700 }}>{locationName}</div>
+              <div className="text-[12px] text-white/60 mt-0.5" style={{ fontWeight: 500 }}>{subtitle}</div>
+            </div>
+          </div>
+          <div className="flex items-center gap-1.5 mt-2.5 text-[11px] text-white/40">
+            <Building2 className="w-3 h-3" />
+            <span>{vendorName}</span>
+          </div>
         </div>
-      </div>
+      ) : (
+        /* Location-style: image area with photo */
+        <div className="relative overflow-hidden bg-[#052E16] shrink-0" style={{ height: "clamp(180px, 40vh, 360px)" }}>
+          <img src={photo} alt={locationName} className="w-full h-full object-cover" />
+          <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/60 to-transparent" />
+          <button
+            type="button"
+            onClick={(e) => { e.stopPropagation(); openLightbox({ src: photo, name: locationName, subtitle: `${d.type} · ${vendorName}` }); }}
+            className="absolute top-3 right-14 w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white/80 hover:bg-black/50 hover:text-white transition-colors cursor-pointer"
+          >
+            <ZoomIn className="w-4 h-4" />
+          </button>
+          <div className="absolute bottom-3 left-4 right-4">
+            <p className="text-[16px] text-white truncate" style={{ fontWeight: 700 }}>{locationName}</p>
+            <div className="text-[12px] text-white/70 mt-0.5" style={{ fontWeight: 500 }}>{d.type}</div>
+          </div>
+        </div>
+      )}
 
       {/* Data area */}
       <div className="px-5 pt-3 pb-4">
@@ -508,7 +529,7 @@ export function QuickViewPanel({ data, onClose }: QuickViewPanelProps) {
         {/* Scrollable content */}
         <div className="flex-1 overflow-y-auto scrollbar-hide">
           {type === "item" && <ItemQuickView code={item.name} vendorName={vendorName} tableImageUrl={item.imageUrl} />}
-          {type === "location" && <LocationQuickView locationName={item.name} vendorName={vendorName} />}
+          {type === "location" && <LocationQuickView locationName={item.name} vendorName={vendorName} subtitle={item.subtitle} />}
           {type === "contact" && (
             <ContactQuickView
               contactName={item.name}
