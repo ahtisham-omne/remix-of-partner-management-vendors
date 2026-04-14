@@ -201,6 +201,7 @@ const CHECKBOX_COL_WIDTH = 40; // width of the checkbox column in px
 
 import { getAvatarTint } from "../utils/avatarTints";
 import { usePersonLightbox } from "../components/vendors/PersonAvatarLightbox";
+import { ItemQuickViewTrigger } from "../components/vendors/ItemQuickViewTrigger";
 
 /* Partners listing — lazy loaded via routes.ts */
 export interface VendorsListPageProps {
@@ -1913,16 +1914,16 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                                       >
                                         <img src={itemPhotoUrl} alt="" className="w-full h-full object-cover" />
                                       </div>
-                                      <div
-                                        className="min-w-0 cursor-pointer group/itemcode"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          setQuickViewData({ type: "item", item: { id: `${vendor.id}-item-0`, name: itemCodes[0], subtitle: "ITEM", imageUrl: itemPhotoUrl }, vendorName: vendor.displayName });
-                                        }}
+                                      <ItemQuickViewTrigger
+                                        itemCode={itemCodes[0]}
+                                        vendorName={vendor.displayName}
+                                        imageUrl={itemPhotoUrl}
+                                        onOpen={setQuickViewData}
+                                        className="min-w-0 group/itemcode"
                                       >
                                         <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} block truncate group-hover/itemcode:text-[#0A77FF] group-hover/itemcode:underline transition-colors`} style={{ fontWeight: 500 }}>{itemCodes[0] || "\u2013"}</span>
                                         {isRelaxed && <span className="text-[10px] text-muted-foreground/50 block">{itemCodes.length} item{itemCodes.length !== 1 ? "s" : ""} total</span>}
-                                      </div>
+                                      </ItemQuickViewTrigger>
                                       {extraItems > 0 && (
                                         <OverflowTooltip
                                           category="Items"
