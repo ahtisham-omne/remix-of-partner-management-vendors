@@ -368,72 +368,80 @@ function LocationQuickView({ locationName, vendorName }: { locationName: string;
 
 /* ─────────── Contact Quick View ─────────── */
 
+/** Deterministic person photos for QuickView */
+const PERSON_PHOTOS = [
+  "https://randomuser.me/api/portraits/men/32.jpg",
+  "https://randomuser.me/api/portraits/women/44.jpg",
+  "https://randomuser.me/api/portraits/men/75.jpg",
+  "https://randomuser.me/api/portraits/women/65.jpg",
+  "https://randomuser.me/api/portraits/men/46.jpg",
+  "https://randomuser.me/api/portraits/women/28.jpg",
+  "https://randomuser.me/api/portraits/men/85.jpg",
+  "https://randomuser.me/api/portraits/women/91.jpg",
+];
+function getPersonPhotoUrl(name: string): string {
+  return PERSON_PHOTOS[hashStr(name) % PERSON_PHOTOS.length];
+}
+
 function ContactQuickView({ contactName, initials, avatarBg, avatarFg, vendorName }: { contactName: string; initials?: string; avatarBg?: string; avatarFg?: string; vendorName: string }) {
   const d = mockContactData(contactName);
-  const ini = initials || contactName.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
+  const { openLightbox } = usePersonLightbox();
+  const photo = getPersonPhotoUrl(contactName);
   return (
     <>
-      {/* Header — purple gradient for contacts */}
-      <div className="px-5 pt-5 pb-4" style={{ background: "linear-gradient(135deg, #1E1B4B 0%, #312E81 100%)" }}>
-        <div className="flex items-center gap-3 pr-10">
-          <div
-            className="w-12 h-12 rounded-full flex items-center justify-center text-[15px] border-2 border-white/20 shrink-0"
-            style={{ backgroundColor: avatarBg || "#F5F3FF", color: avatarFg || "#7C3AED", fontWeight: 700 }}
-          >
-            {ini}
-          </div>
-          <div className="min-w-0">
-            <div className="text-[16px] text-white truncate" style={{ fontWeight: 700 }}>{contactName}</div>
-            <div className="text-[12px] text-white/60 mt-0.5" style={{ fontWeight: 500 }}>{d.role}</div>
-          </div>
+      {/* Image area — person photo, matching Items card layout (~70/30) */}
+      <div className="relative overflow-hidden bg-[#1E1B4B] shrink-0" style={{ height: "clamp(200px, 45vh, 420px)" }}>
+        <img src={photo} alt={contactName} className="w-full h-full object-cover" />
+        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/60 to-transparent" />
+        {/* Zoom button */}
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); openLightbox({ src: photo, name: contactName, subtitle: `${d.role} · ${d.dept}` }); }}
+          className="absolute top-3 right-14 w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white/80 hover:bg-black/50 hover:text-white transition-colors cursor-pointer"
+        >
+          <ZoomIn className="w-4 h-4" />
+        </button>
+        {/* Name + role over gradient */}
+        <div className="absolute bottom-3 left-4 right-4">
+          <p className="text-[16px] text-white truncate" style={{ fontWeight: 700 }}>{contactName}</p>
+          <div className="text-[12px] text-white/70 mt-0.5" style={{ fontWeight: 500 }}>{d.role}</div>
         </div>
-        <div className="flex items-center gap-3 mt-2.5 text-[11px] text-white/40">
+      </div>
+
+      {/* Data area */}
+      <div className="px-5 pt-4 pb-4">
+        {/* Context */}
+        <div className="flex items-center gap-3 text-[12px] text-[#64748B] mb-3">
           <span className="flex items-center gap-1"><Building2 className="w-3 h-3" />{vendorName}</span>
           <span>•</span>
           <span className="flex items-center gap-1"><Briefcase className="w-3 h-3" />{d.dept}</span>
         </div>
-      </div>
 
-      {/* Stat row */}
-      <div className="mx-5 mt-4 grid grid-cols-3 divide-x divide-[#E2E8F0] rounded-xl border border-[#E2E8F0] overflow-hidden">
-        <div className="px-3 py-2.5 text-center">
-          <div className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 700 }}>{d.dept}</div>
-          <div className="text-[10px] text-[#94A3B8] mt-0.5" style={{ fontWeight: 500 }}>Department</div>
+        {/* Stat row */}
+        <div className="grid grid-cols-3 divide-x divide-[#E2E8F0] rounded-xl border border-[#E2E8F0] overflow-hidden">
+          <div className="px-3 py-2.5 text-center">
+            <div className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 700 }}>{d.dept}</div>
+            <div className="text-[10px] text-[#94A3B8] mt-0.5" style={{ fontWeight: 500 }}>Department</div>
+          </div>
+          <div className="px-3 py-2.5 text-center">
+            <div className="text-[13px] text-[#0F172A]" style={{ fontWeight: 700 }}>{d.timezone}</div>
+            <div className="text-[10px] text-[#94A3B8] mt-0.5" style={{ fontWeight: 500 }}>Timezone</div>
+          </div>
+          <div className="px-3 py-2.5 text-center">
+            <div className="text-[13px] text-[#0F172A]" style={{ fontWeight: 700 }}>{d.lastActive}</div>
+            <div className="text-[10px] text-[#94A3B8] mt-0.5" style={{ fontWeight: 500 }}>Last Active</div>
+          </div>
         </div>
-        <div className="px-3 py-2.5 text-center">
-          <div className="text-[13px] text-[#0F172A]" style={{ fontWeight: 700 }}>{d.timezone}</div>
-          <div className="text-[10px] text-[#94A3B8] mt-0.5" style={{ fontWeight: 500 }}>Timezone</div>
-        </div>
-        <div className="px-3 py-2.5 text-center">
-          <div className="text-[13px] text-[#0F172A]" style={{ fontWeight: 700 }}>{d.lastActive}</div>
-          <div className="text-[10px] text-[#94A3B8] mt-0.5" style={{ fontWeight: 500 }}>Last Active</div>
-        </div>
-      </div>
 
-      {/* Contact details */}
-      <div className="px-5 pt-3 pb-4">
-        <div className="text-[11px] text-muted-foreground/60 mb-2" style={{ fontWeight: 600 }}>Contact Info</div>
-        <div className="space-y-2.5">
-          <div className="flex items-start gap-2.5">
-            <Mail className="w-3.5 h-3.5 text-[#94A3B8] mt-0.5 shrink-0" />
-            <div>
-              <div className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Email</div>
-              <div className="text-[13px] text-foreground" style={{ fontWeight: 500 }}>{d.email}</div>
-            </div>
+        {/* Contact details */}
+        <div className="mt-3 space-y-2">
+          <div className="flex items-center gap-2.5">
+            <Mail className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" />
+            <span className="text-[13px] text-foreground truncate" style={{ fontWeight: 500 }}>{d.email}</span>
           </div>
-          <div className="flex items-start gap-2.5">
-            <Phone className="w-3.5 h-3.5 text-[#94A3B8] mt-0.5 shrink-0" />
-            <div>
-              <div className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Phone</div>
-              <div className="text-[13px] text-foreground" style={{ fontWeight: 500 }}>{d.phone}</div>
-            </div>
-          </div>
-          <div className="flex items-start gap-2.5">
-            <Briefcase className="w-3.5 h-3.5 text-[#94A3B8] mt-0.5 shrink-0" />
-            <div>
-              <div className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Role</div>
-              <div className="text-[13px] text-foreground" style={{ fontWeight: 500 }}>{d.role}</div>
-            </div>
+          <div className="flex items-center gap-2.5">
+            <Phone className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" />
+            <span className="text-[13px] text-foreground" style={{ fontWeight: 500 }}>{d.phone}</span>
           </div>
         </div>
       </div>

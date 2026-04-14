@@ -2103,8 +2103,8 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                                           </div>
                                         </HoverCardContent>
                                       </HoverCard>
-                                      <div className="min-w-0 flex-1">
-                                        <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} block truncate`} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{vendor.defaultCarrierVendor}</span>
+                                      <div className="min-w-0 flex-1 group/cv">
+                                        <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} block truncate group-hover/cv:text-[#0A77FF] group-hover/cv:underline transition-colors cursor-default`} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{vendor.defaultCarrierVendor}</span>
                                         {isRelaxed && <span className="text-[10px] text-muted-foreground/50 block">Vendor Carrier</span>}
                                       </div>
                                     </div>
@@ -2136,8 +2136,8 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                                           </div>
                                         </HoverCardContent>
                                       </HoverCard>
-                                      <div className="min-w-0 flex-1">
-                                        <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} block truncate`} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{vendor.defaultCarrierCustomer}</span>
+                                      <div className="min-w-0 flex-1 group/cc">
+                                        <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} block truncate group-hover/cc:text-[#0A77FF] group-hover/cc:underline transition-colors cursor-default`} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{vendor.defaultCarrierCustomer}</span>
                                         {isRelaxed && <span className="text-[10px] text-muted-foreground/50 block">Customer Carrier</span>}
                                       </div>
                                     </div>
@@ -2191,8 +2191,16 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                                             </HoverCardContent>
                                           </HoverCard>
                                           ); })()}
-                                          <div className="min-w-0 flex-1">
-                                            <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} block truncate`} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{highlightText(vendor.createdByContact.name)}</span>
+                                          <div
+                                            className="min-w-0 flex-1 cursor-pointer group/cb"
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              const cb = vendor.createdByContact!;
+                                              const t = getAvatarTint(cb.name || "");
+                                              setQuickViewData({ type: "contact", item: { id: `${vendor.id}-cb`, name: cb.name, subtitle: (cb as any).role || "Team Member", initials: cb.initials, avatarBg: t.bg, avatarFg: t.fg }, vendorName: vendor.displayName });
+                                            }}
+                                          >
+                                            <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} block truncate group-hover/cb:text-[#0A77FF] group-hover/cb:underline transition-colors`} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{highlightText(vendor.createdByContact.name)}</span>
                                             {isRelaxed && <span className="text-[10px] text-muted-foreground/50 truncate block">{(vendor.createdByContact as any).role || "Team Member"}</span>}
                                           </div>
                                         </>
