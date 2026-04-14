@@ -479,6 +479,11 @@ export function QuickViewPanel({ data, onClose }: QuickViewPanelProps) {
   const { type, item, vendorName } = data;
 
   const navLabel = type === "item" ? "Go to Item" : type === "location" ? "Go to Location" : "Go to Contact";
+  const navUrl = type === "item"
+    ? "https://lovable.dev/projects/e2a76e6d-aa32-48d4-afb2-14909ce77ec2"
+    : type === "location"
+    ? `/vendors/${encodeURIComponent(vendorName)}`
+    : `/partners/contacts`;
 
   return createPortal(
     <>
@@ -534,7 +539,7 @@ export function QuickViewPanel({ data, onClose }: QuickViewPanelProps) {
           </button>
           <button
             type="button"
-            onClick={onClose}
+            onClick={() => { window.open(navUrl, "_blank", "noopener"); onClose(); }}
             className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-[13px] text-white transition-colors cursor-pointer"
             style={{ fontWeight: 600, backgroundColor: "#0A77FF" }}
             onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#0862D4")}
