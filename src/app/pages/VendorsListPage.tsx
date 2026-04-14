@@ -1922,7 +1922,20 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                                         className="min-w-0 group/itemcode"
                                       >
                                         <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} block truncate group-hover/itemcode:text-[#0A77FF] group-hover/itemcode:underline transition-colors`} style={{ fontWeight: 500 }}>{itemCodes[0] || "\u2013"}</span>
-                                        {isRelaxed && <span className="text-[10px] text-muted-foreground/50 block">{itemCodes.length} item{itemCodes.length !== 1 ? "s" : ""} total</span>}
+                                        {isRelaxed && (() => {
+                                          const FIRST_ITEM_DESCS = [
+                                            "Zinc-plated hex head screw, industrial grade",
+                                            "Deep groove ball bearing, sealed type",
+                                            "DC relay, SPDT, 10A contact rating",
+                                            "Push-to-connect fitting, brass tube",
+                                            "Stainless welding rod, 3/32\" diameter",
+                                            "Cut-resistant safety gloves, ANSI A4",
+                                            "Classical V-belt, B68, heavy duty",
+                                            "Inductive proximity sensor, M12 barrel",
+                                          ];
+                                          let dh = 0; for (let c = 0; c < (itemCodes[0] || "").length; c++) dh = (itemCodes[0] || "").charCodeAt(c) + ((dh << 5) - dh);
+                                          return <span className="text-[10px] text-muted-foreground/50 block truncate max-w-[180px]">{FIRST_ITEM_DESCS[Math.abs(dh) % FIRST_ITEM_DESCS.length]}</span>;
+                                        })()}
                                       </ItemQuickViewTrigger>
                                       {extraItems > 0 && (
                                         <OverflowTooltip
@@ -1937,10 +1950,22 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                                               "https://images.unsplash.com/photo-1758873263527-ca53b938fbd4?w=80&h=80&fit=crop",
                                             ];
                                             let ch = 0; for (let c = 0; c < code.length; c++) ch = code.charCodeAt(c) + ((ch << 5) - ch);
+                                            const ITEM_DESCS_SHORT = [
+                                              "Zinc-plated hex head screw, industrial grade",
+                                              "Deep groove ball bearing, sealed",
+                                              "DC relay, SPDT, 10A contact rating",
+                                              "Push-to-connect fitting, brass tube",
+                                              "Stainless welding rod, 3/32\" dia",
+                                              "Cut-resistant gloves, ANSI level",
+                                              "Classical V-belt, B68, heavy duty",
+                                              "Inductive proximity sensor, M12",
+                                              "Compression spring, .750 OD",
+                                              "Jaw coupling hub, L099, bore",
+                                            ];
                                             return {
                                               id: `${vendor.id}-item-${i}`,
                                               name: code,
-                                              subtitle: ["EA", "FT", "PK", "RL", "KG", "LB", "BOX", "SET"][Math.abs(ch) % 8],
+                                              subtitle: ITEM_DESCS_SHORT[Math.abs(ch) % ITEM_DESCS_SHORT.length],
                                               imageUrl: ITEM_PHOTOS_SM[Math.abs(ch) % ITEM_PHOTOS_SM.length],
                                             };
                                           })}
