@@ -71,7 +71,7 @@ export function LinkedPartnersTable({ partners, onNavigate }: { partners: Partne
       </div>
       <div className="flex flex-1 min-h-0">
       <div className={`overflow-auto flex-1 ${isResizing || draggingColumnKey ? "select-none" : ""}`}>
-        <Table style={{ tableLayout: "fixed", width: `${totalW}px` }}>
+        <Table style={{ tableLayout: "fixed", width: `max(${totalW}px, 100%)` }}>
           <TableHeader className="sticky top-0 z-20 bg-card"><TableRow className={`bg-muted/30 hover:bg-muted/30 ${density === "condensed" ? "[&>th]:h-8" : "[&>th]:h-9"}`}>
             <TableHead className="sticky left-0 z-20 bg-[#f8fafc]" style={{ width: CHECKBOX_W, minWidth: CHECKBOX_W, maxWidth: CHECKBOX_W, paddingLeft: 8, paddingRight: 0 }}><Checkbox checked={allSel ? true : someSel ? "indeterminate" : false} onCheckedChange={() => { if (allSel) setSelectedRows(new Set()); else setSelectedRows(new Set(filtered.map(r => r.name))); }} /></TableHead>
             {visibleColumns.map(key => { const def = cDef(key); const w = getWidth(key); const isS = def.sticky === "left"; const isLS = key === lastStickyKey; const isD = draggingColumnKey === key; const isDbl = !def.locked; return (

@@ -1305,7 +1305,7 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
                       <p className="text-sm" style={{ fontWeight: 500 }}>No categories assigned</p>
                     </div>
                   ) : (
-                    <Table style={{ tableLayout: "fixed", width: `${40 + 140 + 220 + 200 + 160 + 170 + 120 + 100 + 60}px` }}>
+                    <Table style={{ tableLayout: "fixed", width: `max(${40 + 140 + 220 + 200 + 160 + 170 + 120 + 100 + 60}px, 100%)` }}>
                       <TableHeader className="sticky top-0 z-20 bg-card">
                         <TableRow className="bg-muted/30 hover:bg-muted/30 [&>th]:h-8">
                           <TableHead className="sticky left-0 z-20 bg-[#f8fafc]" style={{ width: 40, minWidth: 40, maxWidth: 40, paddingLeft: 8, paddingRight: 0 }}>
@@ -1538,7 +1538,7 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
                       <p className="text-sm" style={{ fontWeight: 500 }}>No partners found</p>
                     </div>
                   ) : (
-                    <Table style={{ tableLayout: "fixed", width: `${40 + 240 + 140 + 180 + 150 + 130 + 100 + 60}px` }}>
+                    <Table style={{ tableLayout: "fixed", width: `max(${40 + 240 + 140 + 180 + 150 + 130 + 100 + 60}px, 100%)` }}>
                       <TableHeader className="sticky top-0 z-20 bg-card">
                         <TableRow className="bg-muted/30 hover:bg-muted/30 [&>th]:h-8">
                           <TableHead className="sticky left-0 z-20 bg-[#f8fafc]" style={{ width: 40, minWidth: 40, maxWidth: 40, paddingLeft: 8, paddingRight: 0 }}>

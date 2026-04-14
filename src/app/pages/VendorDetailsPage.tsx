@@ -4635,7 +4635,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
         ) : (
           /* Table View (condensed/comfort) — matches VendorsListPage exactly */
           <div className={`min-h-0 overflow-auto flex-1 ${locIsResizing || locDraggingColumnKey ? "select-none" : ""}`}>
-            <Table style={{ tableLayout: "fixed", width: `${locTotalWidth}px` }}>
+            <Table style={{ tableLayout: "fixed", width: `max(${locTotalWidth}px, 100%)` }}>
               <TableHeader className="sticky top-0 z-20 bg-card">
                 <TableRow className={`bg-muted/30 hover:bg-muted/30 ${density === "condensed" ? "[&>th]:h-8" : "[&>th]:h-9"}`}>
                   {/* Checkbox — sticky left */}

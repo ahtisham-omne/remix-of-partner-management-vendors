@@ -1997,7 +1997,7 @@ export function PartnerItemsTab({ vendor, hideHeader, compact, contextLabel, con
           ) : (
             /* Table View — Condensed / Comfort */
             <div className={`min-h-0 overflow-auto flex-1 ${isResizing || draggingColumnKey ? "select-none" : ""}`}>
-              <Table style={{ tableLayout: "fixed", width: `${tableWidth}px` }}>
+              <Table style={{ tableLayout: "fixed", width: `max(${tableWidth}px, 100%)` }}>
                 <TableHeader className="sticky top-0 z-20 bg-card">
                   <TableRow className={`bg-muted/30 hover:bg-muted/30 ${density === "condensed" ? "[&>th]:h-8" : "[&>th]:h-9"}`}>
                     {/* Checkbox column — sticky leftmost */}
