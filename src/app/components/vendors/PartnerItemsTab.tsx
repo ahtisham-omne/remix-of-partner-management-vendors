@@ -648,7 +648,7 @@ function AddItemModal({
         <TableCell className="bg-white group-hover:bg-[#F0F7FF]">
           <div className="flex items-center gap-2.5">
             <div
-              className="w-8 h-8 rounded-lg bg-[#F1F5F9] overflow-hidden shrink-0 border border-[#E8ECF1] cursor-zoom-in"
+              className="w-7 h-7 rounded-lg bg-[#F1F5F9] overflow-hidden shrink-0 border border-[#E8ECF1] cursor-zoom-in"
               onClick={(e) => { e.stopPropagation(); openLightbox({ src: item.image, name: item.description, subtitle: item.partNo }); }}
             >
               <img src={item.image} alt="" className="w-full h-full object-cover" />
@@ -1549,7 +1549,7 @@ export function PartnerItemsTab({ vendor, hideHeader, compact, contextLabel, con
           <TableCell key={colKey}>
             <div className={`flex items-center ${isComfort ? "gap-3" : "gap-2.5"}`}>
               <div
-                className={`${isComfort ? "w-11 h-11" : "w-8 h-8"} rounded-lg bg-[#F1F5F9] overflow-hidden shrink-0 border border-[#E8ECF1] cursor-zoom-in`}
+                className={`${isComfort ? "w-11 h-11" : "w-7 h-7"} rounded-lg bg-[#F1F5F9] overflow-hidden shrink-0 border border-[#E8ECF1] cursor-zoom-in`}
                 onClick={(e) => { e.stopPropagation(); openLightbox({ src: item.image, name: item.description, subtitle: item.partNo }); }}
               >
                 <img src={item.image} alt="" className="w-full h-full object-cover" />

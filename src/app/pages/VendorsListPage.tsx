@@ -1909,7 +1909,7 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                                   <TableCell key={colKey}>
                                     <div className={`flex items-center ${isRelaxed ? "gap-2.5" : "gap-2"}`}>
                                       <div
-                                        className={`${isRelaxed ? "w-10 h-10" : "w-8 h-8"} rounded-md bg-[#F1F5F9] overflow-hidden shrink-0 border border-[#E8ECF1] cursor-zoom-in`}
+                                        className={`${isRelaxed ? "w-10 h-10" : "w-7 h-7"} rounded-md bg-[#F1F5F9] overflow-hidden shrink-0 border border-[#E8ECF1] cursor-zoom-in`}
                                         onClick={(e) => { e.stopPropagation(); openLightbox({ src: itemPhotoUrl, name: itemCodes[0] || "Item", subtitle: vendor.displayName }); }}
                                       >
                                         <img src={itemPhotoUrl} alt="" className="w-full h-full object-cover" />
@@ -1983,8 +1983,8 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                                   <TableCell key={colKey}>
                                     <div className={`flex items-center ${isRelaxed ? "gap-2.5" : "gap-1.5"}`}>
                                       {isRelaxed && (
-                                        <div className="w-7 h-7 rounded-md bg-[#F0FDF4] flex items-center justify-center shrink-0">
-                                          <MapPin className="w-3.5 h-3.5 text-[#059669]" />
+                                        <div className={`${isRelaxed ? "w-10 h-10" : "w-7 h-7"} rounded-md bg-[#F0FDF4] flex items-center justify-center shrink-0`}>
+                                          <MapPin className={`${isRelaxed ? "w-4.5 h-4.5" : "w-3.5 h-3.5"} text-[#059669]`} />
                                         </div>
                                       )}
                                       <div
@@ -2118,7 +2118,7 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                                     <div className={`flex items-center ${isRelaxed ? "gap-2.5" : "gap-2"}`}>
                                       <HoverCard>
                                         <HoverCardTrigger asChild onClick={(e: React.MouseEvent) => e.stopPropagation()}>
-                                          <div className="cursor-pointer"><CarrierIcon carrier={vendor.defaultCarrierVendor} /></div>
+                                          <div className="cursor-pointer"><CarrierIcon carrier={vendor.defaultCarrierVendor} large={isRelaxed} /></div>
                                         </HoverCardTrigger>
                                         <HoverCardContent side="bottom" align="start" className="w-[280px] p-0 rounded-xl border-0 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
                                           <div className="bg-gradient-to-br from-[#1E293B] to-[#334155] px-3.5 py-3 relative overflow-hidden">
@@ -2157,7 +2157,7 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                                     <div className={`flex items-center ${isRelaxed ? "gap-2.5" : "gap-2"}`}>
                                       <HoverCard>
                                         <HoverCardTrigger asChild onClick={(e: React.MouseEvent) => e.stopPropagation()}>
-                                          <div className="cursor-pointer"><CarrierIcon carrier={vendor.defaultCarrierCustomer} /></div>
+                                          <div className="cursor-pointer"><CarrierIcon carrier={vendor.defaultCarrierCustomer} large={isRelaxed} /></div>
                                         </HoverCardTrigger>
                                         <HoverCardContent side="bottom" align="start" className="w-[280px] p-0 rounded-xl border-0 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
                                           <div className="bg-gradient-to-br from-[#1E293B] to-[#334155] px-3.5 py-3 relative overflow-hidden">
@@ -2906,7 +2906,7 @@ function KpiRichTooltip({ data, children }: { data?: KpiTooltipData; children: R
 function LogoAvatar({ logoUrl, initials, bg, size = "md", type = "logo", personName }: { logoUrl?: string; initials: string; bg: string; size?: "sm" | "md" | "lg"; type?: "logo" | "person"; personName?: string }) {
   const [imgFailed, setImgFailed] = useState(false);
   const { openLightbox } = usePersonLightbox();
-  const sizeClass = size === "lg" ? "w-10 h-10" : size === "sm" ? "w-8 h-8" : "w-9 h-9";
+  const sizeClass = size === "lg" ? "w-10 h-10" : size === "sm" ? "w-7 h-7" : "w-8 h-8";
   const textSize = size === "lg" ? "text-[11px]" : size === "sm" ? "text-[9px]" : "text-[10px]";
   const showImg = logoUrl && !imgFailed;
   const isPerson = type === "person";
@@ -2926,7 +2926,7 @@ function LogoAvatar({ logoUrl, initials, bg, size = "md", type = "logo", personN
   );
 }
 
-function CarrierIcon({ carrier }: { carrier: string }) {
+function CarrierIcon({ carrier, large }: { carrier: string; large?: boolean }) {
   const getInitials = (name: string): string => {
     if (!name) return "\u2013";
     if (name.includes("FedEx")) return "FE";
@@ -2959,7 +2959,7 @@ function CarrierIcon({ carrier }: { carrier: string }) {
   const tint = getAvatarTint(carrier || "");
   return (
     <div
-      className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 overflow-hidden border border-[#E8ECF1]"
+      className={`${large ? "w-10 h-10" : "w-7 h-7"} rounded-lg flex items-center justify-center shrink-0 overflow-hidden border border-[#E8ECF1]`}
       style={{
         backgroundColor: carrierLogo ? "#FFFFFF" : "#F1F5F9",
         color: "#475569",
