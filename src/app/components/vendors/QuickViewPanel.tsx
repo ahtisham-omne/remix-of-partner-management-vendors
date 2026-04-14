@@ -302,15 +302,15 @@ function LocationQuickView({ locationName, vendorName }: { locationName: string;
   const d = mockLocationData(locationName);
   return (
     <>
-      {/* Header */}
-      <div className="px-5 pt-5 pb-4" style={{ background: "linear-gradient(135deg, #0C1222 0%, #162033 100%)" }}>
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-[#1A3D2E] flex items-center justify-center">
+      {/* Header — green gradient for locations */}
+      <div className="px-5 pt-5 pb-4" style={{ background: "linear-gradient(135deg, #052E16 0%, #14532D 100%)" }}>
+        <div className="flex items-center gap-3 pr-10">
+          <div className="w-11 h-11 rounded-xl bg-[#166534] flex items-center justify-center shrink-0">
             <MapPin className="w-5 h-5 text-[#4ADE80]" />
           </div>
-          <div>
-            <div className="text-[15px] text-white" style={{ fontWeight: 600 }}>{locationName}</div>
-            <div className="text-[12px] text-white/50" style={{ fontWeight: 500 }}>{d.type}</div>
+          <div className="min-w-0">
+            <div className="text-[16px] text-white truncate" style={{ fontWeight: 700 }}>{locationName}</div>
+            <div className="text-[12px] text-white/60 mt-0.5" style={{ fontWeight: 500 }}>{d.type}</div>
           </div>
         </div>
         <div className="flex items-center gap-1.5 mt-2.5 text-[11px] text-white/40">
@@ -319,35 +319,47 @@ function LocationQuickView({ locationName, vendorName }: { locationName: string;
         </div>
       </div>
 
-      {/* KPI cards */}
-      <div className="px-5 pt-4 pb-3 flex gap-2">
-        <KpiCard label="Type" value={d.type} color="#16A34A" />
-        <KpiCard label="Staff" value={`${d.contactCount} contacts`} color="#0A77FF" />
-        <KpiCard label="Area" value={`${formatNumber(d.sqft)} sqft`} color="#7C3AED" />
+      {/* Stat row */}
+      <div className="mx-5 mt-4 grid grid-cols-3 divide-x divide-[#E2E8F0] rounded-xl border border-[#E2E8F0] overflow-hidden">
+        <div className="px-3 py-2.5 text-center">
+          <div className="text-[15px] text-[#0F172A]" style={{ fontWeight: 700 }}>{d.type}</div>
+          <div className="text-[10px] text-[#94A3B8] mt-0.5" style={{ fontWeight: 500 }}>Facility</div>
+        </div>
+        <div className="px-3 py-2.5 text-center">
+          <div className="text-[15px] text-[#0F172A]" style={{ fontWeight: 700 }}>{d.contactCount}</div>
+          <div className="text-[10px] text-[#94A3B8] mt-0.5" style={{ fontWeight: 500 }}>Contacts</div>
+        </div>
+        <div className="px-3 py-2.5 text-center">
+          <div className="text-[15px] text-[#0F172A]" style={{ fontWeight: 700 }}>{formatNumber(d.sqft)}<span className="text-[11px] text-[#64748B] ml-0.5">sqft</span></div>
+          <div className="text-[10px] text-[#94A3B8] mt-0.5" style={{ fontWeight: 500 }}>Area</div>
+        </div>
       </div>
 
       {/* Details */}
-      <div className="px-5 pb-4">
-        <div className="text-[11px] uppercase tracking-wider text-muted-foreground/60 mb-1" style={{ fontWeight: 600 }}>Details</div>
-        <div className="divide-y divide-border/30">
-          <div className="flex items-start gap-2.5 py-2">
-            <div className="w-7 h-7 rounded-md bg-muted/50 flex items-center justify-center shrink-0 mt-0.5">
-              <MapPin className="w-3.5 h-3.5 text-muted-foreground" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="text-[10px] uppercase tracking-wider text-muted-foreground/60" style={{ fontWeight: 500 }}>Address</div>
-              <a
-                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${d.street}, ${d.city}`)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[13px] text-foreground hover:text-[#0A77FF] hover:underline transition-colors block"
-                style={{ fontWeight: 500 }}
-              >{d.street}, {d.city}</a>
+      <div className="px-5 pt-3 pb-4">
+        <div className="text-[11px] text-muted-foreground/60 mb-2" style={{ fontWeight: 600 }}>Details</div>
+        <div className="space-y-2.5">
+          <div className="flex items-start gap-2.5">
+            <MapPin className="w-3.5 h-3.5 text-[#94A3B8] mt-0.5 shrink-0" />
+            <div>
+              <div className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Address</div>
+              <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${d.street}, ${d.city}`)}`} target="_blank" rel="noopener noreferrer" className="text-[13px] text-foreground hover:text-[#0A77FF] hover:underline transition-colors" style={{ fontWeight: 500 }}>{d.street}, {d.city}</a>
             </div>
           </div>
-          <InfoRow icon={Warehouse} label="Facility Type" value={d.type} />
-          <InfoRow icon={Clock} label="Operating Hours" value={d.operatingHours} />
-          <InfoRow icon={User} label="On-Site Contacts" value={`${d.contactCount} people`} />
+          <div className="flex items-start gap-2.5">
+            <Clock className="w-3.5 h-3.5 text-[#94A3B8] mt-0.5 shrink-0" />
+            <div>
+              <div className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Operating Hours</div>
+              <div className="text-[13px] text-foreground" style={{ fontWeight: 500 }}>{d.operatingHours}</div>
+            </div>
+          </div>
+          <div className="flex items-start gap-2.5">
+            <User className="w-3.5 h-3.5 text-[#94A3B8] mt-0.5 shrink-0" />
+            <div>
+              <div className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>On-Site Contacts</div>
+              <div className="text-[13px] text-foreground" style={{ fontWeight: 500 }}>{d.contactCount} people</div>
+            </div>
+          </div>
         </div>
       </div>
     </>
@@ -361,18 +373,18 @@ function ContactQuickView({ contactName, initials, avatarBg, avatarFg, vendorNam
   const ini = initials || contactName.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
   return (
     <>
-      {/* Header */}
-      <div className="px-5 pt-5 pb-4" style={{ background: "linear-gradient(135deg, #0C1222 0%, #162033 100%)" }}>
-        <div className="flex items-center gap-3">
+      {/* Header — purple gradient for contacts */}
+      <div className="px-5 pt-5 pb-4" style={{ background: "linear-gradient(135deg, #1E1B4B 0%, #312E81 100%)" }}>
+        <div className="flex items-center gap-3 pr-10">
           <div
-            className="w-11 h-11 rounded-lg flex items-center justify-center text-[13px]"
+            className="w-12 h-12 rounded-full flex items-center justify-center text-[15px] border-2 border-white/20 shrink-0"
             style={{ backgroundColor: avatarBg || "#F5F3FF", color: avatarFg || "#7C3AED", fontWeight: 700 }}
           >
             {ini}
           </div>
-          <div>
-            <div className="text-[15px] text-white" style={{ fontWeight: 600 }}>{contactName}</div>
-            <div className="text-[12px] text-white/50" style={{ fontWeight: 500 }}>{d.role}</div>
+          <div className="min-w-0">
+            <div className="text-[16px] text-white truncate" style={{ fontWeight: 700 }}>{contactName}</div>
+            <div className="text-[12px] text-white/60 mt-0.5" style={{ fontWeight: 500 }}>{d.role}</div>
           </div>
         </div>
         <div className="flex items-center gap-3 mt-2.5 text-[11px] text-white/40">
@@ -382,21 +394,47 @@ function ContactQuickView({ contactName, initials, avatarBg, avatarFg, vendorNam
         </div>
       </div>
 
-      {/* KPI cards */}
-      <div className="px-5 pt-4 pb-3 flex gap-2">
-        <KpiCard label="Department" value={d.dept} color="#7C3AED" />
-        <KpiCard label="Timezone" value={d.timezone} color="#0A77FF" />
-        <KpiCard label="Last Active" value={d.lastActive} color="#16A34A" />
+      {/* Stat row */}
+      <div className="mx-5 mt-4 grid grid-cols-3 divide-x divide-[#E2E8F0] rounded-xl border border-[#E2E8F0] overflow-hidden">
+        <div className="px-3 py-2.5 text-center">
+          <div className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 700 }}>{d.dept}</div>
+          <div className="text-[10px] text-[#94A3B8] mt-0.5" style={{ fontWeight: 500 }}>Department</div>
+        </div>
+        <div className="px-3 py-2.5 text-center">
+          <div className="text-[13px] text-[#0F172A]" style={{ fontWeight: 700 }}>{d.timezone}</div>
+          <div className="text-[10px] text-[#94A3B8] mt-0.5" style={{ fontWeight: 500 }}>Timezone</div>
+        </div>
+        <div className="px-3 py-2.5 text-center">
+          <div className="text-[13px] text-[#0F172A]" style={{ fontWeight: 700 }}>{d.lastActive}</div>
+          <div className="text-[10px] text-[#94A3B8] mt-0.5" style={{ fontWeight: 500 }}>Last Active</div>
+        </div>
       </div>
 
-      {/* Details */}
-      <div className="px-5 pb-4">
-        <div className="text-[11px] uppercase tracking-wider text-muted-foreground/60 mb-1" style={{ fontWeight: 600 }}>Contact Info</div>
-        <div className="divide-y divide-border/30">
-          <InfoRow icon={Mail} label="Email" value={d.email} />
-          <InfoRow icon={Phone} label="Phone" value={d.phone} />
-          <InfoRow icon={Briefcase} label="Role" value={d.role} />
-          <InfoRow icon={Globe} label="Timezone" value={d.timezone} />
+      {/* Contact details */}
+      <div className="px-5 pt-3 pb-4">
+        <div className="text-[11px] text-muted-foreground/60 mb-2" style={{ fontWeight: 600 }}>Contact Info</div>
+        <div className="space-y-2.5">
+          <div className="flex items-start gap-2.5">
+            <Mail className="w-3.5 h-3.5 text-[#94A3B8] mt-0.5 shrink-0" />
+            <div>
+              <div className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Email</div>
+              <div className="text-[13px] text-foreground" style={{ fontWeight: 500 }}>{d.email}</div>
+            </div>
+          </div>
+          <div className="flex items-start gap-2.5">
+            <Phone className="w-3.5 h-3.5 text-[#94A3B8] mt-0.5 shrink-0" />
+            <div>
+              <div className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Phone</div>
+              <div className="text-[13px] text-foreground" style={{ fontWeight: 500 }}>{d.phone}</div>
+            </div>
+          </div>
+          <div className="flex items-start gap-2.5">
+            <Briefcase className="w-3.5 h-3.5 text-[#94A3B8] mt-0.5 shrink-0" />
+            <div>
+              <div className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Role</div>
+              <div className="text-[13px] text-foreground" style={{ fontWeight: 500 }}>{d.role}</div>
+            </div>
+          </div>
         </div>
       </div>
     </>

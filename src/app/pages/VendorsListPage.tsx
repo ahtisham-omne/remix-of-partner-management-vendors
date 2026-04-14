@@ -1962,8 +1962,14 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                                           <MapPin className="w-3.5 h-3.5 text-[#059669]" />
                                         </div>
                                       )}
-                                      <div className="min-w-0">
-                                        <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} block truncate`} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{highlightText(partnerLocations[0] || "\u2013")}</span>
+                                      <div
+                                        className="min-w-0 cursor-pointer group/loc"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          setQuickViewData({ type: "location", item: { id: `${vendor.id}-loc-0`, name: partnerLocations[0], subtitle: "LOCATION" }, vendorName: vendor.displayName });
+                                        }}
+                                      >
+                                        <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} block truncate group-hover/loc:text-[#0A77FF] group-hover/loc:underline transition-colors`} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{highlightText(partnerLocations[0] || "\u2013")}</span>
                                         {isRelaxed && <span className="text-[10px] text-muted-foreground/50 block">{partnerLocations.length} location{partnerLocations.length !== 1 ? "s" : ""}</span>}
                                       </div>
                                       {extraLocations > 0 && (
@@ -2016,8 +2022,16 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                                             </HoverCardContent>
                                           </HoverCard>
                                           ); })()}
-                                          <div className="min-w-0">
-                                            <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} block truncate`}>{highlightText(globalPointOfContacts[0]?.name)}</span>
+                                          <div
+                                            className="min-w-0 cursor-pointer group/poc"
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              const poc = globalPointOfContacts[0];
+                                              const t = getAvatarTint(poc?.name || "");
+                                              setQuickViewData({ type: "contact", item: { id: `${vendor.id}-poc-0`, name: poc?.name, subtitle: (poc as any)?.role || "CONTACT", initials: poc?.initials, avatarBg: t.bg, avatarFg: t.fg }, vendorName: vendor.displayName });
+                                            }}
+                                          >
+                                            <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} block truncate group-hover/poc:text-[#0A77FF] group-hover/poc:underline transition-colors`}>{highlightText(globalPointOfContacts[0]?.name)}</span>
                                             {isRelaxed && (globalPointOfContacts[0] as any)?.role && (
                                               <span className="text-xs text-muted-foreground/60 truncate block">{(globalPointOfContacts[0] as any)?.role}</span>
                                             )}
