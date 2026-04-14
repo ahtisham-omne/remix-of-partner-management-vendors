@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import {
   X,
@@ -17,7 +17,13 @@ import {
   Layers,
   TrendingUp,
   Briefcase,
+  ChevronLeft,
+  ChevronRight,
+  ZoomIn,
+  ZoomOut,
+  Star,
 } from "lucide-react";
+import { usePersonLightbox } from "./PersonAvatarLightbox";
 import type { OverflowItem } from "./OverflowTooltip";
 
 /* ─────────── Types ─────────── */
@@ -38,19 +44,19 @@ interface QuickViewPanelProps {
 
 /* ─────────── Mock data generators ─────────── */
 
-const ITEM_NAMES: Record<string, string> = {
-  "100219-42": "Industrial Steel Pipes",
-  "100219-43": "Copper Fittings Kit",
-  "100219-44": "Welding Rods Pack",
-  "100219-45": "Aluminum Sheet Roll",
-  "100219-46": "Stainless Steel Bolts",
-  "100219-47": "Hydraulic Hose Assembly",
-  "100219-48": "Carbon Fiber Panel",
-  "100219-49": "Titanium Bracket Set",
-  "100219-50": "Rubber Gasket Kit",
-  "100219-51": "Precision Ball Bearings",
-  "100219-52": "Electrical Wire Spool",
-  "100219-53": "LED Circuit Board",
+const ITEM_DATA: Record<string, { name: string; desc: string }> = {
+  "100219-42": { name: "Industrial Steel Pipes", desc: "Heavy-gauge seamless carbon steel pipes — Schedule 40, ASTM A106 Grade B, suitable for high-pressure steam, oil, and gas applications in petrochemical and industrial piping systems" },
+  "100219-43": { name: "Copper Fittings Kit", desc: "Professional-grade copper sweat fittings assortment — includes 90° elbows, tees, couplings, and reducers in 1/2\" to 1\" sizes, lead-free for potable water systems per NSF/ANSI 61" },
+  "100219-44": { name: "Welding Rods Pack", desc: "E7018 low-hydrogen welding electrodes — 1/8\" diameter, 14\" length, all-position capable with smooth arc transfer, ideal for structural steel, pressure vessels, and heavy fabrication" },
+  "100219-45": { name: "Aluminum Sheet Roll", desc: "6061-T6 aluminum alloy sheet — 0.125\" thickness, mill finish, excellent machinability and weldability for aerospace, marine, and precision manufacturing applications" },
+  "100219-46": { name: "Stainless Steel Bolts", desc: "18-8 stainless steel hex cap screws — Grade A2-70, fully threaded, corrosion-resistant for outdoor, marine, and food-processing equipment assembly" },
+  "100219-47": { name: "Hydraulic Hose Assembly", desc: "SAE 100R2AT twin-wire braided hydraulic hose — 3/8\" ID, 4800 PSI working pressure, with JIC 37° flare fittings, suitable for mobile equipment and industrial hydraulic systems" },
+  "100219-48": { name: "Carbon Fiber Panel", desc: "3K twill-weave carbon fiber composite panel — 2mm thickness, high-gloss resin finish, exceptional stiffness-to-weight ratio for aerospace, motorsport, and precision instrument enclosures" },
+  "100219-49": { name: "Titanium Bracket Set", desc: "Grade 5 (Ti-6Al-4V) precision CNC-machined mounting brackets — lightweight, high-strength, corrosion-proof, designed for aerospace structural and medical device applications" },
+  "100219-50": { name: "Rubber Gasket Kit", desc: "Multi-material gasket assortment — Buna-N, Viton®, and EPDM compounds in standard flange sizes, temperature rated -40°F to +400°F for chemical processing and HVAC systems" },
+  "100219-51": { name: "Precision Ball Bearings", desc: "ABEC-7 deep-groove ball bearings — 6204-2RS sealed, chrome steel races with synthetic grease fill, low-noise design for electric motors, pumps, and conveyor systems" },
+  "100219-52": { name: "Electrical Wire Spool", desc: "THHN/THWN-2 stranded copper building wire — 12 AWG, 500 ft spool, dual-rated for wet and dry locations, UL listed for commercial and industrial electrical installations" },
+  "100219-53": { name: "LED Circuit Board", desc: "High-density SMD LED driver PCB — 24V constant-current, aluminum-core substrate with thermal management, designed for commercial lighting fixtures and architectural illumination panels" },
 };
 
 const ITEM_CATEGORIES = ["Raw Material", "Component", "Assembly", "Consumable", "Finished Good"];
@@ -66,8 +72,10 @@ const ITEM_PHOTOS = [
   "https://images.unsplash.com/photo-1661069387900-54d5843b704d?w=600&h=400&fit=crop",
   "https://images.unsplash.com/photo-1758873263527-ca53b938fbd4?w=600&h=400&fit=crop",
 ];
-function getItemPhoto(code: string): string {
-  return ITEM_PHOTOS[hashStr(code) % ITEM_PHOTOS.length];
+function getItemPhotos(code: string): string[] {
+  const base = hashStr(code);
+  const count = (base % 2) + 2; // 2 or 3 photos per item
+  return Array.from({ length: count }, (_, i) => ITEM_PHOTOS[(base + i) % ITEM_PHOTOS.length]);
 }
 const STATUS_COLORS: Record<string, { bg: string; fg: string; border: string }> = {
   "In Stock": { bg: "#F0FDF4", fg: "#166534", border: "#BBF7D0" },
@@ -90,8 +98,18 @@ function pick<T>(arr: T[], seed: string): T {
   return arr[hashStr(seed) % arr.length];
 }
 
+const GENERIC_DESCS = [
+  "High-performance industrial component — precision-engineered from premium materials, designed for demanding operational environments with extended service life and low maintenance requirements",
+  "Professional-grade supply item — manufactured to strict quality standards with full traceability, suitable for production lines, maintenance operations, and capital equipment assembly",
+  "Certified industrial material — meets ASTM/ISO specifications, available in standard and custom sizes for fabrication, construction, and heavy manufacturing applications",
+  "Multi-purpose operational consumable — tested for reliability across temperature and pressure ranges, compatible with industry-standard equipment and tooling systems",
+  "Engineered precision part — tight-tolerance machining with quality-assured dimensional accuracy, designed for critical assemblies in automotive, aerospace, and energy sectors",
+];
+
 function mockItemData(code: string) {
-  const name = ITEM_NAMES[code] || `Part ${code}`;
+  const entry = ITEM_DATA[code];
+  const name = entry?.name || `Part ${code}`;
+  const desc = entry?.desc || GENERIC_DESCS[hashStr(code) % GENERIC_DESCS.length];
   const category = pick(ITEM_CATEGORIES, code);
   const uom = pick(ITEM_UOMS, code + "u");
   const status = pick(ITEM_STATUSES, code + "s");
@@ -99,7 +117,7 @@ function mockItemData(code: string) {
   const stockQty = hashStr(code + "q") % 5000;
   const reorderPoint = Math.floor(stockQty * 0.2);
   const leadTime = (hashStr(code + "l") % 14) + 3;
-  return { name, category, uom, status, unitPrice, stockQty, reorderPoint, leadTime };
+  return { name, desc, category, uom, status, unitPrice, stockQty, reorderPoint, leadTime };
 }
 
 function mockLocationData(locationName: string) {
@@ -138,7 +156,7 @@ function formatNumber(n: number): string {
 function KpiCard({ label, value, color }: { label: string; value: string; color: string }) {
   return (
     <div className="flex-1 min-w-0 rounded-lg border border-border/50 px-3 py-2.5" style={{ backgroundColor: `${color}08` }}>
-      <div className="text-[10px] uppercase tracking-wider mb-0.5" style={{ color, fontWeight: 600 }}>{label}</div>
+      <div className="text-[11px] mb-0.5" style={{ color, fontWeight: 600 }}>{label}</div>
       <div className="text-[15px] text-foreground truncate" style={{ fontWeight: 600 }}>{value}</div>
     </div>
   );
@@ -158,67 +176,119 @@ function InfoRow({ icon: Icon, label, value }: { icon: typeof Mail; label: strin
   );
 }
 
-/* ─────────── Item Quick View — image-first modern card ─────────── */
+/* ─────────── Item Quick View — large image carousel + detail card ─────────── */
 
-function ItemQuickView({ code, vendorName }: { code: string; vendorName: string }) {
+function ItemQuickView({ code, vendorName, tableImageUrl }: { code: string; vendorName: string; tableImageUrl?: string }) {
   const d = mockItemData(code);
   const sc = STATUS_COLORS[d.status] || STATUS_COLORS["In Stock"];
-  const photo = getItemPhoto(code);
+  // Use the table's image as the first photo so images match; append others from the pool
+  const poolPhotos = getItemPhotos(code);
+  const photos = tableImageUrl
+    ? [tableImageUrl.replace(/w=80&h=80/, "w=600&h=400"), ...poolPhotos.filter((p) => !tableImageUrl.includes(p.split("?")[0]))]
+    : poolPhotos;
+  const [photoIdx, setPhotoIdx] = useState(0);
+  const { openLightbox } = usePersonLightbox();
+  const currentPhoto = photos[photoIdx % photos.length];
   return (
     <>
-      {/* Image banner — edge-to-edge with status pill overlay */}
-      <div className="relative h-[200px] overflow-hidden bg-[#F1F5F9]">
+      {/* Image carousel — responsive height: compact on small screens, generous on large */}
+      <div className="relative overflow-hidden bg-[#0C1222] select-none shrink-0" style={{ height: "clamp(200px, 45vh, 420px)" }}>
         <img
-          src={photo}
+          src={currentPhoto}
           alt={d.name}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover transition-opacity duration-200"
         />
-        {/* Gradient fade at bottom for text legibility */}
-        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/60 to-transparent" />
-        {/* Status pill — top-right */}
+        {/* Gradient overlays */}
+        <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/40 to-transparent" />
+
+        {/* Status pill — top-left */}
         <span
-          className="absolute top-3 right-3 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] border backdrop-blur-sm"
+          className="absolute top-3 left-3 inline-flex items-center px-2.5 py-1 rounded-full text-[11px] border backdrop-blur-sm"
           style={{ fontWeight: 600, backgroundColor: sc.bg + "E6", color: sc.fg, borderColor: sc.border }}
         >
           {d.status}
         </span>
-        {/* Name + code — bottom-left over the gradient */}
-        <div className="absolute bottom-3 left-4 right-4">
-          <p className="text-[15px] text-white truncate" style={{ fontWeight: 600 }}>{d.name}</p>
-          <div className="flex items-center gap-2 mt-0.5">
-            <span className="text-[12px] text-white/70 font-mono" style={{ fontWeight: 500 }}>{code}</span>
-            <span className="text-[11px] text-white/50">·</span>
-            <span className="text-[11px] text-white/50">{vendorName}</span>
+
+        {/* Zoom button — top-right (offset from close) */}
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); openLightbox({ src: currentPhoto, name: d.name, subtitle: `${code} · ${vendorName}` }); }}
+          className="absolute top-3 right-14 w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white/80 hover:bg-black/50 hover:text-white transition-colors cursor-pointer"
+        >
+          <ZoomIn className="w-4 h-4" />
+        </button>
+
+        {/* Prev / Next carousel arrows */}
+        {photos.length > 1 && (
+          <>
+            <button
+              type="button"
+              onClick={() => setPhotoIdx((prev) => (prev - 1 + photos.length) % photos.length)}
+              className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white/80 hover:bg-black/50 hover:text-white transition-colors cursor-pointer"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <button
+              type="button"
+              onClick={() => setPhotoIdx((prev) => (prev + 1) % photos.length)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white/80 hover:bg-black/50 hover:text-white transition-colors cursor-pointer"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </>
+        )}
+
+        {/* Dot indicators + counter — bottom-right */}
+        {photos.length > 1 && (
+          <div className="absolute bottom-3 right-4 flex items-center gap-1.5">
+            {photos.map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => setPhotoIdx(i)}
+                className={`w-1.5 h-1.5 rounded-full transition-all cursor-pointer ${i === photoIdx ? "bg-white w-3" : "bg-white/40 hover:bg-white/60"}`}
+              />
+            ))}
           </div>
+        )}
+      </div>
+
+      {/* Data area: code + description + stat cards + vendor */}
+      <div className="px-5 pt-4 pb-4">
+        {/* Item code + category context pill */}
+        <div className="flex items-center gap-2.5 flex-wrap">
+          <span className="text-[15px] font-mono text-[#0F172A]" style={{ fontWeight: 700 }}>{code}</span>
+          <span
+            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] border"
+            style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#475569", borderColor: "#E2E8F0" }}
+          >
+            <Star className="w-3 h-3" />
+            Primary: {d.category}
+          </span>
         </div>
-      </div>
 
-      {/* KPI cards */}
-      <div className="px-4 pt-4 pb-3 flex gap-2">
-        <KpiCard label="Unit Price" value={formatCurrency(d.unitPrice)} color="#0A77FF" />
-        <KpiCard label="In Stock" value={`${formatNumber(d.stockQty)} ${d.uom}`} color="#16A34A" />
-        <KpiCard label="Lead Time" value={`${d.leadTime} days`} color="#7C3AED" />
-      </div>
+        {/* Long description */}
+        <p className="text-[13px] text-[#475569] mt-2 leading-relaxed line-clamp-3" style={{ fontWeight: 400 }}>
+          {d.desc}
+        </p>
 
-      {/* Details — compact 2-column grid */}
-      <div className="px-4 pb-4">
-        <div className="text-[10px] uppercase tracking-wider text-muted-foreground/50 mb-2" style={{ fontWeight: 600 }}>Details</div>
-        <div className="grid grid-cols-2 gap-x-4 gap-y-2.5">
-          <div>
-            <div className="text-[10px] uppercase tracking-wider text-muted-foreground/50" style={{ fontWeight: 500 }}>Category</div>
-            <div className="text-[13px] text-foreground" style={{ fontWeight: 500 }}>{d.category}</div>
+        {/* 4-column stat cards — responsive: 2×2 on tiny screens, 4-col on md+ */}
+        <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 divide-x divide-[#E2E8F0] rounded-xl border border-[#E2E8F0] overflow-hidden [&>*:nth-child(n+3)]:border-t [&>*:nth-child(n+3)]:sm:border-t-0">
+          <div className="px-2.5 py-2.5 text-center">
+            <div className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 700 }}>{vendorName.split(" ").slice(0, 2).join(" ")}</div>
+            <div className="text-[10px] text-[#94A3B8] mt-0.5" style={{ fontWeight: 500 }}>Partner</div>
           </div>
-          <div>
-            <div className="text-[10px] uppercase tracking-wider text-muted-foreground/50" style={{ fontWeight: 500 }}>Unit of Measure</div>
-            <div className="text-[13px] text-foreground" style={{ fontWeight: 500 }}>{d.uom}</div>
+          <div className="px-2.5 py-2.5 text-center">
+            <div className="text-[15px] text-[#0F172A]" style={{ fontWeight: 700 }}>{formatCurrency(d.unitPrice)}</div>
+            <div className="text-[10px] text-[#94A3B8] mt-0.5" style={{ fontWeight: 500 }}>Unit Price</div>
           </div>
-          <div>
-            <div className="text-[10px] uppercase tracking-wider text-muted-foreground/50" style={{ fontWeight: 500 }}>Reorder Point</div>
-            <div className="text-[13px] text-foreground" style={{ fontWeight: 500 }}>{formatNumber(d.reorderPoint)} {d.uom}</div>
+          <div className="px-2.5 py-2.5 text-center">
+            <div className="text-[15px] text-[#0F172A]" style={{ fontWeight: 700 }}>{formatNumber(d.stockQty)}<span className="text-[11px] text-[#64748B] ml-0.5">{d.uom}</span></div>
+            <div className="text-[10px] text-[#94A3B8] mt-0.5" style={{ fontWeight: 500 }}>In Stock</div>
           </div>
-          <div>
-            <div className="text-[10px] uppercase tracking-wider text-muted-foreground/50" style={{ fontWeight: 500 }}>Item Code</div>
-            <div className="text-[13px] text-foreground font-mono" style={{ fontWeight: 500 }}>{code}</div>
+          <div className="px-2.5 py-2.5 text-center">
+            <div className="text-[15px] text-[#0F172A]" style={{ fontWeight: 700 }}>{d.leadTime}<span className="text-[11px] text-[#64748B] ml-0.5">days</span></div>
+            <div className="text-[10px] text-[#94A3B8] mt-0.5" style={{ fontWeight: 500 }}>Lead Time</div>
           </div>
         </div>
       </div>
@@ -363,7 +433,7 @@ export function QuickViewPanel({ data, onClose }: QuickViewPanelProps) {
 
       {/* Panel */}
       <div
-        className="fixed z-[210] top-1/2 left-1/2 w-[420px] max-w-[calc(100vw-32px)] max-h-[calc(100vh-64px)] bg-card rounded-2xl border border-border/50 overflow-hidden flex flex-col"
+        className="fixed z-[210] top-1/2 left-1/2 w-[calc(100vw-32px)] sm:w-[480px] md:w-[540px] lg:w-[600px] max-h-[calc(100vh-48px)] bg-card rounded-2xl border border-border/50 overflow-hidden flex flex-col"
         style={{
           transform: "translate(-50%, -50%)",
           boxShadow:
@@ -371,18 +441,18 @@ export function QuickViewPanel({ data, onClose }: QuickViewPanelProps) {
           animation: "quickViewIn 200ms cubic-bezier(0.16, 1, 0.3, 1) forwards",
         }}
       >
-        {/* Close button — pinned top-right, above everything */}
+        {/* Close button — pinned top-right, above everything. White pill for visibility over both dark images and light content. */}
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-3 right-3 z-50 w-7 h-7 rounded-full flex items-center justify-center bg-black/30 backdrop-blur-sm hover:bg-black/50 transition-colors cursor-pointer ring-1 ring-white/10"
+          className="absolute top-3 right-3 z-50 w-8 h-8 rounded-full flex items-center justify-center bg-white/90 hover:bg-white shadow-md transition-all cursor-pointer border border-[#E2E8F0]"
         >
-          <X className="w-3.5 h-3.5 text-white" />
+          <X className="w-4 h-4 text-[#334155]" />
         </button>
 
         {/* Scrollable content */}
         <div className="flex-1 overflow-y-auto scrollbar-hide">
-          {type === "item" && <ItemQuickView code={item.name} vendorName={vendorName} />}
+          {type === "item" && <ItemQuickView code={item.name} vendorName={vendorName} tableImageUrl={item.imageUrl} />}
           {type === "location" && <LocationQuickView locationName={item.name} vendorName={vendorName} />}
           {type === "contact" && (
             <ContactQuickView

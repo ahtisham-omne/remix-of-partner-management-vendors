@@ -1893,42 +1893,56 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                                   </TableCell>
                                 );
                               }
-                              case "num_items":
+                              case "num_items": {
+                                const ITEM_PHOTOS_CELL = [
+                                  "https://images.unsplash.com/photo-1772209049802-cd0e0ff1a5d3?w=80&h=80&fit=crop",
+                                  "https://images.unsplash.com/photo-1713575882582-8938739db351?w=80&h=80&fit=crop",
+                                  "https://images.unsplash.com/photo-1737223450913-2af6885945e1?w=80&h=80&fit=crop",
+                                  "https://images.unsplash.com/photo-1759159091728-e2c87b9d9315?w=80&h=80&fit=crop",
+                                  "https://images.unsplash.com/photo-1661069387900-54d5843b704d?w=80&h=80&fit=crop",
+                                  "https://images.unsplash.com/photo-1758873263527-ca53b938fbd4?w=80&h=80&fit=crop",
+                                ];
+                                let itemPhotoHash = 0; for (let c = 0; c < vendor.id.length; c++) itemPhotoHash = vendor.id.charCodeAt(c) + ((itemPhotoHash << 5) - itemPhotoHash);
+                                const itemPhotoUrl = ITEM_PHOTOS_CELL[Math.abs(itemPhotoHash) % ITEM_PHOTOS_CELL.length];
                                 return (
                                   <TableCell key={colKey}>
-                                    <div className={`flex items-center ${isRelaxed ? "gap-2.5" : "gap-1.5"}`}>
-                                      {isRelaxed && (() => {
-                                        const ITEM_PHOTOS = [
-                                          "https://images.unsplash.com/photo-1772209049802-cd0e0ff1a5d3?w=80&h=80&fit=crop",
-                                          "https://images.unsplash.com/photo-1713575882582-8938739db351?w=80&h=80&fit=crop",
-                                          "https://images.unsplash.com/photo-1737223450913-2af6885945e1?w=80&h=80&fit=crop",
-                                          "https://images.unsplash.com/photo-1759159091728-e2c87b9d9315?w=80&h=80&fit=crop",
-                                          "https://images.unsplash.com/photo-1661069387900-54d5843b704d?w=80&h=80&fit=crop",
-                                          "https://images.unsplash.com/photo-1758873263527-ca53b938fbd4?w=80&h=80&fit=crop",
-                                        ];
-                                        let h = 0; for (let c = 0; c < vendor.id.length; c++) h = vendor.id.charCodeAt(c) + ((h << 5) - h);
-                                        const photoUrl = ITEM_PHOTOS[Math.abs(h) % ITEM_PHOTOS.length];
-                                        return (
-                                          <div
-                                            className="w-7 h-7 rounded-md bg-[#F1F5F9] overflow-hidden shrink-0 border border-[#E8ECF1] cursor-zoom-in"
-                                            onClick={(e) => { e.stopPropagation(); openLightbox({ src: photoUrl, name: itemCodes[0] || "Item", subtitle: vendor.displayName }); }}
-                                          >
-                                            <img src={photoUrl} alt="" className="w-full h-full object-cover" />
-                                          </div>
-                                        );
-                                      })()}
-                                      <div className="min-w-0">
-                                        <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} block truncate`} style={{ fontWeight: 500 }}>{itemCodes[0] || "\u2013"}</span>
+                                    <div className={`flex items-center ${isRelaxed ? "gap-2.5" : "gap-2"}`}>
+                                      <div
+                                        className="w-7 h-7 rounded-md bg-[#F1F5F9] overflow-hidden shrink-0 border border-[#E8ECF1] cursor-zoom-in"
+                                        onClick={(e) => { e.stopPropagation(); openLightbox({ src: itemPhotoUrl, name: itemCodes[0] || "Item", subtitle: vendor.displayName }); }}
+                                      >
+                                        <img src={itemPhotoUrl} alt="" className="w-full h-full object-cover" />
+                                      </div>
+                                      <div
+                                        className="min-w-0 cursor-pointer group/itemcode"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          setQuickViewData({ type: "item", item: { id: `${vendor.id}-item-0`, name: itemCodes[0], subtitle: "ITEM", imageUrl: itemPhotoUrl }, vendorName: vendor.displayName });
+                                        }}
+                                      >
+                                        <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} block truncate group-hover/itemcode:text-[#0A77FF] group-hover/itemcode:underline transition-colors`} style={{ fontWeight: 500 }}>{itemCodes[0] || "\u2013"}</span>
                                         {isRelaxed && <span className="text-[10px] text-muted-foreground/50 block">{itemCodes.length} item{itemCodes.length !== 1 ? "s" : ""} total</span>}
                                       </div>
                                       {extraItems > 0 && (
                                         <OverflowTooltip
                                           category="Items"
-                                          items={itemCodes.slice(1).map((code, i) => ({
-                                            id: `${vendor.id}-item-${i}`,
-                                            name: code,
-                                            subtitle: "ITEM",
-                                          }))}
+                                          items={itemCodes.slice(1).map((code, i) => {
+                                            const ITEM_PHOTOS_SM = [
+                                              "https://images.unsplash.com/photo-1772209049802-cd0e0ff1a5d3?w=80&h=80&fit=crop",
+                                              "https://images.unsplash.com/photo-1713575882582-8938739db351?w=80&h=80&fit=crop",
+                                              "https://images.unsplash.com/photo-1737223450913-2af6885945e1?w=80&h=80&fit=crop",
+                                              "https://images.unsplash.com/photo-1759159091728-e2c87b9d9315?w=80&h=80&fit=crop",
+                                              "https://images.unsplash.com/photo-1661069387900-54d5843b704d?w=80&h=80&fit=crop",
+                                              "https://images.unsplash.com/photo-1758873263527-ca53b938fbd4?w=80&h=80&fit=crop",
+                                            ];
+                                            let ch = 0; for (let c = 0; c < code.length; c++) ch = code.charCodeAt(c) + ((ch << 5) - ch);
+                                            return {
+                                              id: `${vendor.id}-item-${i}`,
+                                              name: code,
+                                              subtitle: ["EA", "FT", "PK", "RL", "KG", "LB", "BOX", "SET"][Math.abs(ch) % 8],
+                                              imageUrl: ITEM_PHOTOS_SM[Math.abs(ch) % ITEM_PHOTOS_SM.length],
+                                            };
+                                          })}
                                           onItemClick={(item) => setQuickViewData({ type: "item", item, vendorName: vendor.displayName })}
                                         >
                                           <span className="text-[11px] shrink-0 cursor-default leading-none" style={{ fontWeight: 600, color: '#085FCC' }}>+{extraItems} more</span>
@@ -1937,6 +1951,7 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                                     </div>
                                   </TableCell>
                                 );
+                              }
                               case "partner_locations":
                                 return (
                                   <TableCell key={colKey}>

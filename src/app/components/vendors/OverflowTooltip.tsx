@@ -13,6 +13,8 @@ export interface OverflowItem {
   initials?: string;
   avatarBg?: string;
   avatarFg?: string;
+  /** Product/item thumbnail URL — rendered as a small image in the tooltip list. */
+  imageUrl?: string;
   /** Arbitrary extra data forwarded to QuickView */
   meta?: Record<string, unknown>;
 }
@@ -168,7 +170,11 @@ export function OverflowTooltip({ items, category, children, onItemClick }: Over
                   }}
                   className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md transition-colors hover:bg-primary/[0.04] cursor-pointer text-left"
                 >
-                  {item.initials ? (
+                  {item.imageUrl ? (
+                    <div className="w-7 h-7 rounded-md overflow-hidden shrink-0 bg-[#F1F5F9] border border-[#E8ECF1]">
+                      <img src={item.imageUrl} alt="" className="w-full h-full object-cover" />
+                    </div>
+                  ) : item.initials ? (
                     <div
                       className="w-6 h-6 rounded-md flex items-center justify-center shrink-0 text-[9px]"
                       style={{ backgroundColor: item.avatarBg || color.bg, color: item.avatarFg || color.fg, fontWeight: 600 }}
