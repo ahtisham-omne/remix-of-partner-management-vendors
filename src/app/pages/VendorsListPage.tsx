@@ -1981,8 +1981,9 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                               case "partner_locations":
                                 return (
                                   <TableCell key={colKey}>
-                                    <div className={`flex items-center ${isRelaxed ? "gap-2.5" : "gap-2"}`}>
-                                      {(() => {
+                                    <div className={`flex items-center ${isRelaxed ? "gap-2.5" : "gap-1.5"}`}>
+                                      {/* Photo only in comfort mode */}
+                                      {isRelaxed && (() => {
                                         const LOC_PHOTOS = [
                                           "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=80&h=80&fit=crop",
                                           "https://images.unsplash.com/photo-1497366216548-37526070297c?w=80&h=80&fit=crop",
@@ -1993,39 +1994,59 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                                         const locPhoto = LOC_PHOTOS[Math.abs(lh) % LOC_PHOTOS.length];
                                         return (
                                           <div
-                                            className={`${isRelaxed ? "w-10 h-10" : "w-7 h-7"} rounded-md bg-[#F1F5F9] overflow-hidden shrink-0 border border-[#E8ECF1] cursor-zoom-in`}
+                                            className="w-10 h-10 rounded-md bg-[#F1F5F9] overflow-hidden shrink-0 border border-[#E8ECF1] cursor-zoom-in"
                                             onClick={(e) => { e.stopPropagation(); openLightbox({ src: locPhoto, name: partnerLocations[0] || "Location", subtitle: vendor.displayName }); }}
                                           >
                                             <img src={locPhoto} alt="" className="w-full h-full object-cover" />
                                           </div>
                                         );
                                       })()}
-                                      <div
-                                        className="min-w-0 cursor-pointer group/loc"
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          setQuickViewData({ type: "location", item: { id: `${vendor.id}-loc-0`, name: partnerLocations[0], subtitle: "LOCATION" }, vendorName: vendor.displayName });
-                                        }}
-                                      >
-                                        <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} block truncate group-hover/loc:text-[#0A77FF] group-hover/loc:underline transition-colors`} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{highlightText(partnerLocations[0] || "\u2013")}</span>
-                                        {isRelaxed && <span className="text-[10px] text-muted-foreground/50 block">{partnerLocations.length} location{partnerLocations.length !== 1 ? "s" : ""}</span>}
-                                      </div>
+                                      {(() => {
+                                        /* Generate a deterministic address for the first location */
+                                        const STREETS = ["Industrial Blvd", "Commerce Dr", "Technology Way", "Supply Chain Ave", "Factory Rd", "Park Ave", "Main St"];
+                                        const CITIES = ["Plano, TX", "Detroit, MI", "San Jose, CA", "Seattle, WA", "Austin, TX", "Chicago, IL"];
+                                        let ah = 0; for (let c = 0; c < (partnerLocations[0] || "").length; c++) ah = (partnerLocations[0] || "").charCodeAt(c) + ((ah << 5) - ah);
+                                        const addr = `${(Math.abs(ah) % 999) + 1} ${STREETS[Math.abs(ah) % STREETS.length]}, ${CITIES[Math.abs(ah + 1) % CITIES.length]}`;
+                                        return (
+                                          <div
+                                            className="min-w-0 cursor-pointer group/loc"
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              setQuickViewData({ type: "location", item: { id: `${vendor.id}-loc-0`, name: partnerLocations[0], subtitle: "LOCATION" }, vendorName: vendor.displayName });
+                                            }}
+                                          >
+                                            <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} block truncate group-hover/loc:text-[#0A77FF] group-hover/loc:underline transition-colors`} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{highlightText(partnerLocations[0] || "\u2013")}</span>
+                                            {isRelaxed && (
+                                              <a
+                                                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(addr)}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-[10px] text-muted-foreground/50 block truncate hover:text-[#0A77FF] hover:underline transition-colors"
+                                                onClick={(e) => e.stopPropagation()}
+                                              >{addr}</a>
+                                            )}
+                                          </div>
+                                        );
+                                      })()}
                                       {extraLocations > 0 && (
                                         <OverflowTooltip
                                           category="Locations"
                                           items={partnerLocations.slice(1).map((loc, i) => {
-                                            const LOC_PHOTOS = [
+                                            const LOC_PHOTOS_SM = [
                                               "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=80&h=80&fit=crop",
                                               "https://images.unsplash.com/photo-1497366216548-37526070297c?w=80&h=80&fit=crop",
                                               "https://images.unsplash.com/photo-1553877522-43269d4ea984?w=80&h=80&fit=crop",
                                               "https://images.unsplash.com/photo-1565008447742-97f6f38c985c?w=80&h=80&fit=crop",
                                             ];
+                                            const STREETS = ["Industrial Blvd", "Commerce Dr", "Technology Way", "Supply Chain Ave", "Factory Rd"];
+                                            const CITIES = ["Plano, TX", "Detroit, MI", "San Jose, CA", "Seattle, WA", "Austin, TX"];
                                             let lh = 0; for (let c = 0; c < loc.length; c++) lh = loc.charCodeAt(c) + ((lh << 5) - lh);
+                                            const locAddr = `${(Math.abs(lh) % 999) + 1} ${STREETS[Math.abs(lh) % STREETS.length]}, ${CITIES[Math.abs(lh + 1) % CITIES.length]}`;
                                             return {
                                               id: `${vendor.id}-loc-${i}`,
                                               name: loc,
-                                              subtitle: "LOCATION",
-                                              imageUrl: LOC_PHOTOS[Math.abs(lh) % LOC_PHOTOS.length],
+                                              subtitle: locAddr,
+                                              imageUrl: LOC_PHOTOS_SM[Math.abs(lh) % LOC_PHOTOS_SM.length],
                                             };
                                           })}
                                           onItemClick={(item) => setQuickViewData({ type: "location", item, vendorName: vendor.displayName })}
