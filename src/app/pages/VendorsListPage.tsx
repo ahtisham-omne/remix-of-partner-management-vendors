@@ -1981,12 +1981,25 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                               case "partner_locations":
                                 return (
                                   <TableCell key={colKey}>
-                                    <div className={`flex items-center ${isRelaxed ? "gap-2.5" : "gap-1.5"}`}>
-                                      {isRelaxed && (
-                                        <div className={`${isRelaxed ? "w-10 h-10" : "w-7 h-7"} rounded-md bg-[#F0FDF4] flex items-center justify-center shrink-0`}>
-                                          <MapPin className={`${isRelaxed ? "w-4.5 h-4.5" : "w-3.5 h-3.5"} text-[#059669]`} />
-                                        </div>
-                                      )}
+                                    <div className={`flex items-center ${isRelaxed ? "gap-2.5" : "gap-2"}`}>
+                                      {(() => {
+                                        const LOC_PHOTOS = [
+                                          "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=80&h=80&fit=crop",
+                                          "https://images.unsplash.com/photo-1497366216548-37526070297c?w=80&h=80&fit=crop",
+                                          "https://images.unsplash.com/photo-1553877522-43269d4ea984?w=80&h=80&fit=crop",
+                                          "https://images.unsplash.com/photo-1565008447742-97f6f38c985c?w=80&h=80&fit=crop",
+                                        ];
+                                        let lh = 0; for (let c = 0; c < (partnerLocations[0] || "").length; c++) lh = (partnerLocations[0] || "").charCodeAt(c) + ((lh << 5) - lh);
+                                        const locPhoto = LOC_PHOTOS[Math.abs(lh) % LOC_PHOTOS.length];
+                                        return (
+                                          <div
+                                            className={`${isRelaxed ? "w-10 h-10" : "w-7 h-7"} rounded-md bg-[#F1F5F9] overflow-hidden shrink-0 border border-[#E8ECF1] cursor-zoom-in`}
+                                            onClick={(e) => { e.stopPropagation(); openLightbox({ src: locPhoto, name: partnerLocations[0] || "Location", subtitle: vendor.displayName }); }}
+                                          >
+                                            <img src={locPhoto} alt="" className="w-full h-full object-cover" />
+                                          </div>
+                                        );
+                                      })()}
                                       <div
                                         className="min-w-0 cursor-pointer group/loc"
                                         onClick={(e) => {
