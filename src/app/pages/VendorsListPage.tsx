@@ -1975,11 +1975,21 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                                       {extraLocations > 0 && (
                                         <OverflowTooltip
                                           category="Locations"
-                                          items={partnerLocations.slice(1).map((loc, i) => ({
-                                            id: `${vendor.id}-loc-${i}`,
-                                            name: loc,
-                                            subtitle: "LOCATION",
-                                          }))}
+                                          items={partnerLocations.slice(1).map((loc, i) => {
+                                            const LOC_PHOTOS = [
+                                              "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=80&h=80&fit=crop",
+                                              "https://images.unsplash.com/photo-1497366216548-37526070297c?w=80&h=80&fit=crop",
+                                              "https://images.unsplash.com/photo-1553877522-43269d4ea984?w=80&h=80&fit=crop",
+                                              "https://images.unsplash.com/photo-1565008447742-97f6f38c985c?w=80&h=80&fit=crop",
+                                            ];
+                                            let lh = 0; for (let c = 0; c < loc.length; c++) lh = loc.charCodeAt(c) + ((lh << 5) - lh);
+                                            return {
+                                              id: `${vendor.id}-loc-${i}`,
+                                              name: loc,
+                                              subtitle: "LOCATION",
+                                              imageUrl: LOC_PHOTOS[Math.abs(lh) % LOC_PHOTOS.length],
+                                            };
+                                          })}
                                           onItemClick={(item) => setQuickViewData({ type: "location", item, vendorName: vendor.displayName })}
                                         >
                                           <span className="text-[11px] shrink-0 cursor-default leading-none" style={{ fontWeight: 600, color: '#085FCC' }}>+{extraLocations} more</span>
@@ -2103,8 +2113,14 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                                           </div>
                                         </HoverCardContent>
                                       </HoverCard>
-                                      <div className="min-w-0 flex-1 group/cv">
-                                        <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} block truncate group-hover/cv:text-[#0A77FF] group-hover/cv:underline transition-colors cursor-default`} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{vendor.defaultCarrierVendor}</span>
+                                      <div
+                                        className="min-w-0 flex-1 cursor-pointer group/cv"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          setQuickViewData({ type: "location", item: { id: `${vendor.id}-cv`, name: vendor.defaultCarrierVendor, subtitle: "Vendor Carrier" }, vendorName: vendor.displayName });
+                                        }}
+                                      >
+                                        <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} block truncate group-hover/cv:text-[#0A77FF] group-hover/cv:underline transition-colors`} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{vendor.defaultCarrierVendor}</span>
                                         {isRelaxed && <span className="text-[10px] text-muted-foreground/50 block">Vendor Carrier</span>}
                                       </div>
                                     </div>
@@ -2136,8 +2152,14 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                                           </div>
                                         </HoverCardContent>
                                       </HoverCard>
-                                      <div className="min-w-0 flex-1 group/cc">
-                                        <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} block truncate group-hover/cc:text-[#0A77FF] group-hover/cc:underline transition-colors cursor-default`} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{vendor.defaultCarrierCustomer}</span>
+                                      <div
+                                        className="min-w-0 flex-1 cursor-pointer group/cc"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          setQuickViewData({ type: "location", item: { id: `${vendor.id}-cc`, name: vendor.defaultCarrierCustomer, subtitle: "Customer Carrier" }, vendorName: vendor.displayName });
+                                        }}
+                                      >
+                                        <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} block truncate group-hover/cc:text-[#0A77FF] group-hover/cc:underline transition-colors`} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{vendor.defaultCarrierCustomer}</span>
                                         {isRelaxed && <span className="text-[10px] text-muted-foreground/50 block">Customer Carrier</span>}
                                       </div>
                                     </div>

@@ -298,29 +298,49 @@ function ItemQuickView({ code, vendorName, tableImageUrl }: { code: string; vend
 
 /* ─────────── Location Quick View ─────────── */
 
+/** Deterministic location photos */
+const LOCATION_PHOTOS = [
+  "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=600&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1553877522-43269d4ea984?w=600&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1565008447742-97f6f38c985c?w=600&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=600&h=400&fit=crop",
+];
+function getLocationPhoto(name: string): string {
+  return LOCATION_PHOTOS[hashStr(name) % LOCATION_PHOTOS.length];
+}
+
 function LocationQuickView({ locationName, vendorName }: { locationName: string; vendorName: string }) {
   const d = mockLocationData(locationName);
+  const { openLightbox } = usePersonLightbox();
+  const photo = getLocationPhoto(locationName);
   return (
     <>
-      {/* Header — green gradient for locations */}
-      <div className="px-5 pt-5 pb-4" style={{ background: "linear-gradient(135deg, #052E16 0%, #14532D 100%)" }}>
-        <div className="flex items-center gap-3 pr-10">
-          <div className="w-11 h-11 rounded-xl bg-[#166534] flex items-center justify-center shrink-0">
-            <MapPin className="w-5 h-5 text-[#4ADE80]" />
-          </div>
-          <div className="min-w-0">
-            <div className="text-[16px] text-white truncate" style={{ fontWeight: 700 }}>{locationName}</div>
-            <div className="text-[12px] text-white/60 mt-0.5" style={{ fontWeight: 500 }}>{d.type}</div>
-          </div>
-        </div>
-        <div className="flex items-center gap-1.5 mt-2.5 text-[11px] text-white/40">
-          <Building2 className="w-3 h-3" />
-          <span>{vendorName}</span>
+      {/* Image area — location photo matching Items card layout */}
+      <div className="relative overflow-hidden bg-[#052E16] shrink-0" style={{ height: "clamp(180px, 40vh, 360px)" }}>
+        <img src={photo} alt={locationName} className="w-full h-full object-cover" />
+        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/60 to-transparent" />
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); openLightbox({ src: photo, name: locationName, subtitle: `${d.type} · ${vendorName}` }); }}
+          className="absolute top-3 right-14 w-8 h-8 rounded-full bg-black/30 backdrop-blur-sm flex items-center justify-center text-white/80 hover:bg-black/50 hover:text-white transition-colors cursor-pointer"
+        >
+          <ZoomIn className="w-4 h-4" />
+        </button>
+        <div className="absolute bottom-3 left-4 right-4">
+          <p className="text-[16px] text-white truncate" style={{ fontWeight: 700 }}>{locationName}</p>
+          <div className="text-[12px] text-white/70 mt-0.5" style={{ fontWeight: 500 }}>{d.type}</div>
         </div>
       </div>
 
-      {/* Stat row */}
-      <div className="mx-5 mt-4 grid grid-cols-3 divide-x divide-[#E2E8F0] rounded-xl border border-[#E2E8F0] overflow-hidden">
+      {/* Data area */}
+      <div className="px-5 pt-3 pb-4">
+        <div className="flex items-center gap-1.5 text-[12px] text-[#64748B] mb-3">
+          <Building2 className="w-3 h-3" />
+          <span style={{ fontWeight: 500 }}>{vendorName}</span>
+        </div>
+        {/* Stat row */}
+        <div className="grid grid-cols-3 divide-x divide-[#E2E8F0] rounded-xl border border-[#E2E8F0] overflow-hidden">
         <div className="px-3 py-2.5 text-center">
           <div className="text-[15px] text-[#0F172A]" style={{ fontWeight: 700 }}>{d.type}</div>
           <div className="text-[10px] text-[#94A3B8] mt-0.5" style={{ fontWeight: 500 }}>Facility</div>
@@ -333,32 +353,21 @@ function LocationQuickView({ locationName, vendorName }: { locationName: string;
           <div className="text-[15px] text-[#0F172A]" style={{ fontWeight: 700 }}>{formatNumber(d.sqft)}<span className="text-[11px] text-[#64748B] ml-0.5">sqft</span></div>
           <div className="text-[10px] text-[#94A3B8] mt-0.5" style={{ fontWeight: 500 }}>Area</div>
         </div>
-      </div>
+        </div>
 
-      {/* Details */}
-      <div className="px-5 pt-3 pb-4">
-        <div className="text-[11px] text-muted-foreground/60 mb-2" style={{ fontWeight: 600 }}>Details</div>
-        <div className="space-y-2.5">
-          <div className="flex items-start gap-2.5">
-            <MapPin className="w-3.5 h-3.5 text-[#94A3B8] mt-0.5 shrink-0" />
-            <div>
-              <div className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Address</div>
-              <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${d.street}, ${d.city}`)}`} target="_blank" rel="noopener noreferrer" className="text-[13px] text-foreground hover:text-[#0A77FF] hover:underline transition-colors" style={{ fontWeight: 500 }}>{d.street}, {d.city}</a>
-            </div>
+        {/* Details */}
+        <div className="mt-3 space-y-2">
+          <div className="flex items-center gap-2.5">
+            <MapPin className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" />
+            <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${d.street}, ${d.city}`)}`} target="_blank" rel="noopener noreferrer" className="text-[13px] text-foreground hover:text-[#0A77FF] hover:underline transition-colors truncate" style={{ fontWeight: 500 }}>{d.street}, {d.city}</a>
           </div>
-          <div className="flex items-start gap-2.5">
-            <Clock className="w-3.5 h-3.5 text-[#94A3B8] mt-0.5 shrink-0" />
-            <div>
-              <div className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Operating Hours</div>
-              <div className="text-[13px] text-foreground" style={{ fontWeight: 500 }}>{d.operatingHours}</div>
-            </div>
+          <div className="flex items-center gap-2.5">
+            <Clock className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" />
+            <span className="text-[13px] text-foreground" style={{ fontWeight: 500 }}>{d.operatingHours}</span>
           </div>
-          <div className="flex items-start gap-2.5">
-            <User className="w-3.5 h-3.5 text-[#94A3B8] mt-0.5 shrink-0" />
-            <div>
-              <div className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>On-Site Contacts</div>
-              <div className="text-[13px] text-foreground" style={{ fontWeight: 500 }}>{d.contactCount} people</div>
-            </div>
+          <div className="flex items-center gap-2.5">
+            <User className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" />
+            <span className="text-[13px] text-foreground" style={{ fontWeight: 500 }}>{d.contactCount} people on-site</span>
           </div>
         </div>
       </div>
