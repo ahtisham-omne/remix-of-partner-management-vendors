@@ -19,6 +19,7 @@ import {
   Mail, Phone, Building2, Plus,
 } from "lucide-react";
 import { getAvatarTint } from "../../utils/avatarTints";
+import { usePersonLightbox } from "../vendors/PersonAvatarLightbox";
 
 /* ─── External module URL (fixed) ─── */
 const PO_MODULE_URL = "https://pleasant-flow.lovable.app/purchase-orders";
@@ -117,6 +118,7 @@ function PersonHoverCard({ name, role, email, dept, phone, children }: { name: s
 }
 
 export function PurchaseOrdersTable() {
+  const { openLightbox } = usePersonLightbox();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [density, setDensity] = useState<"condensed" | "comfort">("condensed");
@@ -212,7 +214,7 @@ export function PurchaseOrdersTable() {
       case "poc": return (
         <PersonHoverCard name={po.poc} role={po.pocRole} email={po.pocEmail} dept={po.pocDept} phone={po.pocPhone}>
           <div className={`flex items-center ${isRelaxed ? "gap-2.5" : "gap-2"} cursor-pointer`}>
-            <div className={`${isRelaxed ? "w-7 h-7" : "w-6 h-6"} rounded-full shrink-0 overflow-hidden`} style={{ backgroundColor: getAvatarTint(po.poc).bg }}>
+            <div className={`${isRelaxed ? "w-7 h-7" : "w-6 h-6"} rounded-full shrink-0 overflow-hidden cursor-zoom-in`} style={{ backgroundColor: getAvatarTint(po.poc).bg }} onClick={(e) => { e.stopPropagation(); openLightbox({ src: getPhoto(po.poc), name: po.poc }); }}>
               <img src={getPhoto(po.poc)} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
             </div>
             <span className={`${sz} text-[#334155] truncate`} style={{ fontWeight: 500 }}>{po.poc}</span>
@@ -225,7 +227,7 @@ export function PurchaseOrdersTable() {
         return (
           <PersonHoverCard name={po.createdBy} role={po.cbRole} email={po.cbEmail} dept={po.cbDept} phone={po.cbPhone}>
             <div className={`flex items-center ${isRelaxed ? "gap-2.5" : "gap-2"} cursor-pointer`}>
-              <div className={`${isRelaxed ? "w-7 h-7" : "w-6 h-6"} rounded-full shrink-0 overflow-hidden`} style={{ backgroundColor: getAvatarTint(po.createdBy).bg }}>
+              <div className={`${isRelaxed ? "w-7 h-7" : "w-6 h-6"} rounded-full shrink-0 overflow-hidden cursor-zoom-in`} style={{ backgroundColor: getAvatarTint(po.createdBy).bg }} onClick={(e) => { e.stopPropagation(); openLightbox({ src: getPhoto(po.createdBy), name: po.createdBy }); }}>
                 <img src={getPhoto(po.createdBy)} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
               </div>
               <span className={`${sz} text-[#334155] truncate`} style={{ fontWeight: 500 }}>{po.createdBy}</span>

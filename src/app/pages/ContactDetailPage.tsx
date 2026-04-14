@@ -78,6 +78,7 @@ import { AttachmentsTab } from "../components/vendors/AttachmentsTab";
 import { VendorsListPage } from "./VendorsListPage";
 import { getAvatarTint } from "../utils/avatarTints";
 import { useVendors } from "../context/VendorContext";
+import { usePersonLightbox } from "../components/vendors/PersonAvatarLightbox";
 import { ALL_KPI_DEFINITIONS, DEFAULT_ACTIVE_KPIS, computeKpiValue } from "../components/vendors/KpiInsightsPanel";
 import { CreatePocModal } from "../components/vendors/PocModals";
 import {
@@ -1024,6 +1025,7 @@ export function ContactDetailPage() {
   }, []);
   const [imgFailed, setImgFailed] = useState(false);
   const [isCompact, setIsCompact] = useState(false);
+  const { openLightbox } = usePersonLightbox();
   const [isFullscreen, setIsFullscreen] = useState(false);
   const sentinelRef = useRef<HTMLDivElement>(null);
 
@@ -1188,10 +1190,15 @@ export function ContactDetailPage() {
                   <button onClick={() => navigate("/partners/contacts")} className="rounded-xl border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] flex items-center justify-center shrink-0 cursor-pointer shadow-[0_1px_3px_0_rgba(0,0,0,0.04),0_1px_2px_-1px_rgba(0,0,0,0.03)] transition-all duration-250" style={{ width: isCompact ? 32 : 44, height: isCompact ? 32 : 44 }}>
                     <ChevronLeft className="text-[#94A3B8] transition-all duration-250" style={{ width: isCompact ? 16 : 20, height: isCompact ? 16 : 20 }} />
                   </button>
-                  {/* Avatar — 88px expanded, 38px compact */}
-                  <div className="rounded-2xl flex items-center justify-center shrink-0 overflow-hidden border-[3px] border-white shadow-[0_4px_16px_-4px_rgba(0,0,0,0.18),0_0_0_1px_rgba(0,0,0,0.04)] transition-all duration-250" style={{ width: isCompact ? 38 : 88, height: isCompact ? 38 : 88, backgroundColor: tint.bg }}>
-                    {photo && !imgFailed ? (<img src={photo} alt="" className="w-full h-full object-cover" onError={() => setImgFailed(true)} />) : (<span className="transition-all duration-250" style={{ fontSize: isCompact ? 13 : 30, fontWeight: 700, color: tint.fg }}>{initials}</span>)}
-                  </div>
+                  {/* Avatar — 120px expanded, 42px compact; click to open lightbox */}
+                  <button
+                    type="button"
+                    onClick={() => { if (photo && !imgFailed) openLightbox({ src: photo, name: contact.name, subtitle: `${contact.department} · ${contact.company}` }); }}
+                    className="rounded-2xl flex items-center justify-center shrink-0 overflow-hidden border-[3px] border-white shadow-[0_4px_16px_-4px_rgba(0,0,0,0.18),0_0_0_1px_rgba(0,0,0,0.04)] transition-all duration-250 focus:outline-none"
+                    style={{ width: isCompact ? 42 : 120, height: isCompact ? 42 : 120, backgroundColor: tint.bg, cursor: photo && !imgFailed ? "zoom-in" : "default" }}
+                  >
+                    {photo && !imgFailed ? (<img src={photo} alt="" className="w-full h-full object-cover" onError={() => setImgFailed(true)} />) : (<span className="transition-all duration-250" style={{ fontSize: isCompact ? 14 : 36, fontWeight: 700, color: tint.fg }}>{initials}</span>)}
+                  </button>
                   <div className="min-w-0 flex-1">
                     {/* Row 1: Name + Status dropdown + Department badges */}
                     <div className="flex items-center flex-wrap transition-all duration-250" style={{ gap: isCompact ? 6 : 8 }}>
@@ -1753,6 +1760,7 @@ export function ContactDetailPage() {
           </div>
         </AlertDialogContent>
       </AlertDialog>
+
 
       {/* ── Gmail-style Compose Email Box ── */}
       {composeOpen && (

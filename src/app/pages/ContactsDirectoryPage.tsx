@@ -94,6 +94,7 @@ import { OverflowTooltip } from "../components/vendors/OverflowTooltip";
 import { useVendors } from "../context/VendorContext";
 import { ColumnHeaderMenu, type SortConfig as CMSortConfig } from "../components/vendors/ColumnHeaderMenu";
 import { getAvatarTint } from "../utils/avatarTints";
+import { usePersonLightbox } from "../components/vendors/PersonAvatarLightbox";
 
 /* ─── Person Avatar Photos ─── */
 const PERSON_AVATARS: Record<string, string> = {
@@ -252,6 +253,7 @@ function DraggableContactDirectoryKpiCard({
 
 function ContactAvatar({ name, size = "md", circle = false }: { name: string; size?: "sm" | "md" | "lg"; circle?: boolean }) {
   const [imgFailed, setImgFailed] = useState(false);
+  const { openLightbox } = usePersonLightbox();
   const photo = getPersonPhoto(name);
   const tint = getAvatarTint(name);
   const initials = name.split(" ").filter(Boolean).map(w => w[0]).slice(0, 2).join("").toUpperCase();
@@ -259,7 +261,11 @@ function ContactAvatar({ name, size = "md", circle = false }: { name: string; si
   const textSize = size === "lg" ? "text-[11px]" : size === "sm" ? "text-[9px]" : "text-[10px]";
   const showImg = photo && !imgFailed;
   return (
-    <div className={`${sizeClass} ${circle ? "rounded-full" : "rounded-lg"} flex items-center justify-center shrink-0 overflow-hidden border border-[#E8ECF1]`} style={{ backgroundColor: showImg ? "transparent" : tint.bg }}>
+    <div
+      className={`${sizeClass} ${circle ? "rounded-full" : "rounded-lg"} flex items-center justify-center shrink-0 overflow-hidden border border-[#E8ECF1] ${showImg ? "cursor-zoom-in" : ""}`}
+      style={{ backgroundColor: showImg ? "transparent" : tint.bg }}
+      onClick={showImg ? (e) => { e.stopPropagation(); openLightbox({ src: photo!, name }); } : undefined}
+    >
       {showImg ? (
         <img src={photo} alt="" className="w-full h-full object-cover" onError={() => setImgFailed(true)} />
       ) : (

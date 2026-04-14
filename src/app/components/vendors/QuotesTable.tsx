@@ -7,6 +7,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { HoverCard, HoverCardTrigger, HoverCardContent } from "../ui/hover-card";
 import { ColumnSelector, ColumnSelectorTrigger } from "./ColumnSelector";
 import { Search, X, SlidersHorizontal, MoreHorizontal, Eye, Pencil, Trash2, Copy, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, AlignJustify, List, Check, ChevronDown, GripVertical, Mail, Phone, Building2, Plus } from "lucide-react";
+import { usePersonLightbox } from "../vendors/PersonAvatarLightbox";
 import { getAvatarTint } from "../../utils/avatarTints";
 
 /* ─── External module URL (fixed) ─── */
@@ -64,6 +65,7 @@ function PersonHoverCard({ name, role, email, dept, phone, children }: { name: s
 }
 
 export function QuotesTable() {
+  const { openLightbox } = usePersonLightbox();
   const [search, setSearch] = useState(""); const [statusFilter, setStatusFilter] = useState("all"); const [density, setDensity] = useState<"condensed" | "comfort">("condensed");
   const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>(() => { const v: Record<string, boolean> = {}; COLUMN_DEFS.forEach(c => { v[c.key] = DEFAULT_VIS.includes(c.key); }); return v; });
   const [columnOrder, setColumnOrder] = useState<ColKey[]>(COLUMN_DEFS.map(c => c.key)); const [columnWidths, setColumnWidths] = useState<Record<string, number>>({}); const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());

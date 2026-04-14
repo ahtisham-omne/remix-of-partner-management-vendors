@@ -134,6 +134,10 @@ export function AppSidebar() {
   const [isResizing, setIsResizing] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  /** Suppress the CSS width transition on the very first render so the collapsed
+   *  sidebar doesn't visually animate from full-width to icon-width on page load. */
+  const [hasMounted, setHasMounted] = useState(false);
+  useEffect(() => { requestAnimationFrame(() => setHasMounted(true)); }, []);
 
   const actualWidth = collapsed ? COLLAPSED_WIDTH : sidebarWidth;
 
@@ -570,7 +574,7 @@ export function AppSidebar() {
       className="relative flex-shrink-0 h-full"
       style={{
         width: actualWidth,
-        transition: isResizing ? "none" : "width 200ms cubic-bezier(0.4, 0, 0.2, 1)",
+        transition: (!hasMounted || isResizing) ? "none" : "width 200ms cubic-bezier(0.4, 0, 0.2, 1)",
       }}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}

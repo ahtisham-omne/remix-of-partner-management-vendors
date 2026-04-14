@@ -200,6 +200,7 @@ const MIN_COL_WIDTH = 1; // unrestricted resize — user can shrink columns free
 const CHECKBOX_COL_WIDTH = 40; // width of the checkbox column in px
 
 import { getAvatarTint } from "../utils/avatarTints";
+import { usePersonLightbox } from "../components/vendors/PersonAvatarLightbox";
 
 /* Partners listing — lazy loaded via routes.ts */
 export interface VendorsListPageProps {
@@ -1958,7 +1959,7 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                                           {(() => { const poc = globalPointOfContacts[0]; const photoUrl = getPersonAvatar(poc?.name || ""); const t = getAvatarTint(poc?.name || ""); const cd = getContactDetails(poc?.name || ""); return (
                                           <HoverCard>
                                             <HoverCardTrigger asChild onClick={(e: React.MouseEvent) => e.stopPropagation()}>
-                                              <div className="cursor-pointer"><LogoAvatar logoUrl={photoUrl} initials={poc?.initials || "?"} bg={t.bg} size={isRelaxed ? "lg" : "md"} type="person" /></div>
+                                              <div className="cursor-pointer"><LogoAvatar logoUrl={photoUrl} initials={poc?.initials || "?"} bg={t.bg} size={isRelaxed ? "lg" : "md"} type="person" personName={poc?.name} /></div>
                                             </HoverCardTrigger>
                                             <HoverCardContent side="bottom" align="start" className="w-[280px] p-0 rounded-xl border-0 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
                                               {/* Header with gradient */}
@@ -2121,7 +2122,7 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                                           {(() => { const cb = vendor.createdByContact; const photoUrl = getPersonAvatar(cb.name || ""); const t = getAvatarTint(cb.name || ""); const cd = getContactDetails(cb.name || ""); return (
                                           <HoverCard>
                                             <HoverCardTrigger asChild onClick={(e: React.MouseEvent) => e.stopPropagation()}>
-                                              <div className="cursor-pointer"><LogoAvatar logoUrl={photoUrl} initials={cb.initials || "?"} bg={t.bg} size={isRelaxed ? "lg" : "md"} type="person" /></div>
+                                              <div className="cursor-pointer"><LogoAvatar logoUrl={photoUrl} initials={cb.initials || "?"} bg={t.bg} size={isRelaxed ? "lg" : "md"} type="person" personName={cb.name} /></div>
                                             </HoverCardTrigger>
                                             <HoverCardContent side="bottom" align="start" className="w-[280px] p-0 rounded-xl border-0 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
                                               <div className="bg-gradient-to-br from-[#1E293B] to-[#334155] px-4 py-3 relative overflow-hidden">
@@ -2801,14 +2802,20 @@ function KpiRichTooltip({ data, children }: { data?: KpiTooltipData; children: R
   );
 }
 
-function LogoAvatar({ logoUrl, initials, bg, size = "md", type = "logo" }: { logoUrl?: string; initials: string; bg: string; size?: "sm" | "md" | "lg"; type?: "logo" | "person" }) {
+function LogoAvatar({ logoUrl, initials, bg, size = "md", type = "logo", personName }: { logoUrl?: string; initials: string; bg: string; size?: "sm" | "md" | "lg"; type?: "logo" | "person"; personName?: string }) {
   const [imgFailed, setImgFailed] = useState(false);
+  const { openLightbox } = usePersonLightbox();
   const sizeClass = size === "lg" ? "w-9 h-9" : size === "sm" ? "w-7 h-7" : "w-8 h-8";
   const textSize = size === "lg" ? "text-[11px]" : size === "sm" ? "text-[9px]" : "text-[10px]";
   const showImg = logoUrl && !imgFailed;
   const isPerson = type === "person";
+  const canLightbox = isPerson && showImg && personName;
   return (
-    <div className={`${sizeClass} ${isPerson ? "rounded-full" : "rounded-lg"} flex items-center justify-center shrink-0 overflow-hidden border border-[#E8ECF1]`} style={{ backgroundColor: showImg ? (isPerson ? "transparent" : "#FFFFFF") : bg }}>
+    <div
+      className={`${sizeClass} ${isPerson ? "rounded-full" : "rounded-lg"} flex items-center justify-center shrink-0 overflow-hidden border border-[#E8ECF1] ${canLightbox ? "cursor-zoom-in" : ""}`}
+      style={{ backgroundColor: showImg ? (isPerson ? "transparent" : "#FFFFFF") : bg }}
+      onClick={canLightbox ? (e) => { e.stopPropagation(); openLightbox({ src: logoUrl!, name: personName! }); } : undefined}
+    >
       {showImg ? (
         <img src={logoUrl} alt="" className={`w-full h-full ${isPerson ? "object-cover" : "object-contain p-1.5"}`} onError={() => setImgFailed(true)} />
       ) : (

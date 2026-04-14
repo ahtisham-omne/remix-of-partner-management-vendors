@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { PersonAvatarLightboxProvider } from "./app/components/vendors/PersonAvatarLightbox";
 import { AppLayout } from "./app/components/layout/AppLayout";
 import { lazy, Suspense } from "react";
 
@@ -23,6 +24,7 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
+      <PersonAvatarLightboxProvider>
       <BrowserRouter>
         <Suspense fallback={<div className="flex min-h-screen items-center justify-center">Loading…</div>}>
           <Routes>
@@ -45,6 +47,7 @@ const App = () => (
           </Routes>
         </Suspense>
       </BrowserRouter>
+      </PersonAvatarLightboxProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
