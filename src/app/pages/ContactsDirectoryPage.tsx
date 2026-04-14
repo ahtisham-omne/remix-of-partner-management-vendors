@@ -257,7 +257,7 @@ function ContactAvatar({ name, size = "md", circle = false }: { name: string; si
   const photo = getPersonPhoto(name);
   const tint = getAvatarTint(name);
   const initials = name.split(" ").filter(Boolean).map(w => w[0]).slice(0, 2).join("").toUpperCase();
-  const sizeClass = size === "lg" ? "w-9 h-9" : size === "sm" ? "w-7 h-7" : "w-8 h-8";
+  const sizeClass = size === "lg" ? "w-10 h-10" : size === "sm" ? "w-8 h-8" : "w-9 h-9";
   const textSize = size === "lg" ? "text-[11px]" : size === "sm" ? "text-[9px]" : "text-[10px]";
   const showImg = photo && !imgFailed;
   return (

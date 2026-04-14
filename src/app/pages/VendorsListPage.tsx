@@ -1909,7 +1909,7 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                                   <TableCell key={colKey}>
                                     <div className={`flex items-center ${isRelaxed ? "gap-2.5" : "gap-2"}`}>
                                       <div
-                                        className="w-7 h-7 rounded-md bg-[#F1F5F9] overflow-hidden shrink-0 border border-[#E8ECF1] cursor-zoom-in"
+                                        className={`${isRelaxed ? "w-10 h-10" : "w-8 h-8"} rounded-md bg-[#F1F5F9] overflow-hidden shrink-0 border border-[#E8ECF1] cursor-zoom-in`}
                                         onClick={(e) => { e.stopPropagation(); openLightbox({ src: itemPhotoUrl, name: itemCodes[0] || "Item", subtitle: vendor.displayName }); }}
                                       >
                                         <img src={itemPhotoUrl} alt="" className="w-full h-full object-cover" />
@@ -2906,7 +2906,7 @@ function KpiRichTooltip({ data, children }: { data?: KpiTooltipData; children: R
 function LogoAvatar({ logoUrl, initials, bg, size = "md", type = "logo", personName }: { logoUrl?: string; initials: string; bg: string; size?: "sm" | "md" | "lg"; type?: "logo" | "person"; personName?: string }) {
   const [imgFailed, setImgFailed] = useState(false);
   const { openLightbox } = usePersonLightbox();
-  const sizeClass = size === "lg" ? "w-9 h-9" : size === "sm" ? "w-7 h-7" : "w-8 h-8";
+  const sizeClass = size === "lg" ? "w-10 h-10" : size === "sm" ? "w-8 h-8" : "w-9 h-9";
   const textSize = size === "lg" ? "text-[11px]" : size === "sm" ? "text-[9px]" : "text-[10px]";
   const showImg = logoUrl && !imgFailed;
   const isPerson = type === "person";
