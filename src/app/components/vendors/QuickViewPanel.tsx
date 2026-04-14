@@ -56,6 +56,19 @@ const ITEM_NAMES: Record<string, string> = {
 const ITEM_CATEGORIES = ["Raw Material", "Component", "Assembly", "Consumable", "Finished Good"];
 const ITEM_UOMS = ["EA", "FT", "PK", "RL", "KG", "LB", "BOX", "SET"];
 const ITEM_STATUSES = ["In Stock", "Low Stock", "Out of Stock", "On Order"];
+
+/** Product photos — deterministic per item code */
+const ITEM_PHOTOS = [
+  "https://images.unsplash.com/photo-1772209049802-cd0e0ff1a5d3?w=600&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1713575882582-8938739db351?w=600&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1737223450913-2af6885945e1?w=600&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1759159091728-e2c87b9d9315?w=600&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1661069387900-54d5843b704d?w=600&h=400&fit=crop",
+  "https://images.unsplash.com/photo-1758873263527-ca53b938fbd4?w=600&h=400&fit=crop",
+];
+function getItemPhoto(code: string): string {
+  return ITEM_PHOTOS[hashStr(code) % ITEM_PHOTOS.length];
+}
 const STATUS_COLORS: Record<string, { bg: string; fg: string; border: string }> = {
   "In Stock": { bg: "#F0FDF4", fg: "#166534", border: "#BBF7D0" },
   "Low Stock": { bg: "#FFFBEB", fg: "#92400E", border: "#FDE68A" },
@@ -145,48 +158,68 @@ function InfoRow({ icon: Icon, label, value }: { icon: typeof Mail; label: strin
   );
 }
 
-/* ─────────── Item Quick View ─────────── */
+/* ─────────── Item Quick View — image-first modern card ─────────── */
 
 function ItemQuickView({ code, vendorName }: { code: string; vendorName: string }) {
   const d = mockItemData(code);
   const sc = STATUS_COLORS[d.status] || STATUS_COLORS["In Stock"];
+  const photo = getItemPhoto(code);
   return (
     <>
-      {/* Header */}
-      <div className="px-5 pt-5 pb-4" style={{ background: "linear-gradient(135deg, #0C1222 0%, #162033 100%)" }}>
-        <div className="flex items-center gap-3 pr-10">
-          <div className="w-10 h-10 rounded-lg bg-[#1E3A5F] flex items-center justify-center shrink-0">
-            <Package className="w-5 h-5 text-[#7AB5FF]" />
+      {/* Image banner — edge-to-edge with status pill overlay */}
+      <div className="relative h-[200px] overflow-hidden bg-[#F1F5F9]">
+        <img
+          src={photo}
+          alt={d.name}
+          className="w-full h-full object-cover"
+        />
+        {/* Gradient fade at bottom for text legibility */}
+        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/60 to-transparent" />
+        {/* Status pill — top-right */}
+        <span
+          className="absolute top-3 right-3 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] border backdrop-blur-sm"
+          style={{ fontWeight: 600, backgroundColor: sc.bg + "E6", color: sc.fg, borderColor: sc.border }}
+        >
+          {d.status}
+        </span>
+        {/* Name + code — bottom-left over the gradient */}
+        <div className="absolute bottom-3 left-4 right-4">
+          <p className="text-[15px] text-white truncate" style={{ fontWeight: 600 }}>{d.name}</p>
+          <div className="flex items-center gap-2 mt-0.5">
+            <span className="text-[12px] text-white/70 font-mono" style={{ fontWeight: 500 }}>{code}</span>
+            <span className="text-[11px] text-white/50">·</span>
+            <span className="text-[11px] text-white/50">{vendorName}</span>
           </div>
-          <div className="min-w-0">
-            <div className="text-[15px] text-white truncate" style={{ fontWeight: 600 }}>{d.name}</div>
-            <div className="flex items-center gap-2 mt-0.5">
-              <span className="text-[12px] text-white/50" style={{ fontWeight: 500 }}>{code}</span>
-              <span className="inline-flex items-center px-1.5 py-px rounded text-[10px] border" style={{ fontWeight: 600, backgroundColor: sc.bg, color: sc.fg, borderColor: sc.border }}>{d.status}</span>
-            </div>
-          </div>
-        </div>
-        <div className="flex items-center gap-1.5 mt-2.5 text-[11px] text-white/40">
-          <Building2 className="w-3 h-3" />
-          <span>{vendorName}</span>
         </div>
       </div>
 
       {/* KPI cards */}
-      <div className="px-5 pt-4 pb-3 flex gap-2">
+      <div className="px-4 pt-4 pb-3 flex gap-2">
         <KpiCard label="Unit Price" value={formatCurrency(d.unitPrice)} color="#0A77FF" />
         <KpiCard label="In Stock" value={`${formatNumber(d.stockQty)} ${d.uom}`} color="#16A34A" />
         <KpiCard label="Lead Time" value={`${d.leadTime} days`} color="#7C3AED" />
       </div>
 
-      {/* Details */}
-      <div className="px-5 pb-4">
-        <div className="text-[11px] uppercase tracking-wider text-muted-foreground/60 mb-1" style={{ fontWeight: 600 }}>Details</div>
-        <div className="divide-y divide-border/30">
-          <InfoRow icon={Tag} label="Category" value={d.category} />
-          <InfoRow icon={Layers} label="Unit of Measure" value={d.uom} />
-          <InfoRow icon={TrendingUp} label="Reorder Point" value={`${formatNumber(d.reorderPoint)} ${d.uom}`} />
-          <InfoRow icon={Hash} label="Item Code" value={code} />
+      {/* Details — compact 2-column grid */}
+      <div className="px-4 pb-4">
+        <div className="text-[10px] uppercase tracking-wider text-muted-foreground/50 mb-2" style={{ fontWeight: 600 }}>Details</div>
+        <div className="grid grid-cols-2 gap-x-4 gap-y-2.5">
+          <div>
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground/50" style={{ fontWeight: 500 }}>Category</div>
+            <div className="text-[13px] text-foreground" style={{ fontWeight: 500 }}>{d.category}</div>
+          </div>
+          <div>
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground/50" style={{ fontWeight: 500 }}>Unit of Measure</div>
+            <div className="text-[13px] text-foreground" style={{ fontWeight: 500 }}>{d.uom}</div>
+          </div>
+          <div>
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground/50" style={{ fontWeight: 500 }}>Reorder Point</div>
+            <div className="text-[13px] text-foreground" style={{ fontWeight: 500 }}>{formatNumber(d.reorderPoint)} {d.uom}</div>
+          </div>
+          <div>
+            <div className="text-[10px] uppercase tracking-wider text-muted-foreground/50" style={{ fontWeight: 500 }}>Item Code</div>
+            <div className="text-[13px] text-foreground font-mono" style={{ fontWeight: 500 }}>{code}</div>
+          </div>
         </div>
       </div>
     </>

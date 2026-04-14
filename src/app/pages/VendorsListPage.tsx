@@ -216,6 +216,7 @@ export interface VendorsListPageProps {
 
 export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColumnVisibility, embeddedDefaultDensity }: VendorsListPageProps = {}) {
   const navigate = useNavigate();
+  const { openLightbox } = usePersonLightbox();
   const [searchParams, setSearchParams] = useSearchParams();
   const ctx = useVendors();
   const { getVendor, addVendor, updateVendor, archiveVendor, restoreVendor, deleteVendor } = ctx;
@@ -1896,11 +1897,26 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                                 return (
                                   <TableCell key={colKey}>
                                     <div className={`flex items-center ${isRelaxed ? "gap-2.5" : "gap-1.5"}`}>
-                                      {isRelaxed && (
-                                        <div className="w-7 h-7 rounded-md bg-[#F1F5F9] flex items-center justify-center shrink-0">
-                                          <Package className="w-3.5 h-3.5 text-[#64748B]" />
-                                        </div>
-                                      )}
+                                      {isRelaxed && (() => {
+                                        const ITEM_PHOTOS = [
+                                          "https://images.unsplash.com/photo-1772209049802-cd0e0ff1a5d3?w=80&h=80&fit=crop",
+                                          "https://images.unsplash.com/photo-1713575882582-8938739db351?w=80&h=80&fit=crop",
+                                          "https://images.unsplash.com/photo-1737223450913-2af6885945e1?w=80&h=80&fit=crop",
+                                          "https://images.unsplash.com/photo-1759159091728-e2c87b9d9315?w=80&h=80&fit=crop",
+                                          "https://images.unsplash.com/photo-1661069387900-54d5843b704d?w=80&h=80&fit=crop",
+                                          "https://images.unsplash.com/photo-1758873263527-ca53b938fbd4?w=80&h=80&fit=crop",
+                                        ];
+                                        let h = 0; for (let c = 0; c < vendor.id.length; c++) h = vendor.id.charCodeAt(c) + ((h << 5) - h);
+                                        const photoUrl = ITEM_PHOTOS[Math.abs(h) % ITEM_PHOTOS.length];
+                                        return (
+                                          <div
+                                            className="w-7 h-7 rounded-md bg-[#F1F5F9] overflow-hidden shrink-0 border border-[#E8ECF1] cursor-zoom-in"
+                                            onClick={(e) => { e.stopPropagation(); openLightbox({ src: photoUrl, name: itemCodes[0] || "Item", subtitle: vendor.displayName }); }}
+                                          >
+                                            <img src={photoUrl} alt="" className="w-full h-full object-cover" />
+                                          </div>
+                                        );
+                                      })()}
                                       <div className="min-w-0">
                                         <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} block truncate`} style={{ fontWeight: 500 }}>{itemCodes[0] || "\u2013"}</span>
                                         {isRelaxed && <span className="text-[10px] text-muted-foreground/50 block">{itemCodes.length} item{itemCodes.length !== 1 ? "s" : ""} total</span>}

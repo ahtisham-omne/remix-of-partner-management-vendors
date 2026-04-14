@@ -73,6 +73,7 @@ import {
   ArrowDown,
   ArrowUpDown,
 } from "lucide-react";
+import { usePersonLightbox } from "./PersonAvatarLightbox";
 import { toast } from "sonner";
 import type { Vendor } from "../../data/vendors";
 import { ColumnSelector, ColumnSelectorTrigger, type ColumnConfig } from "./ColumnSelector";
@@ -448,6 +449,7 @@ function AddItemModal({
   contextLabel?: string;
   contextType?: "discount" | "premium";
 }) {
+  const { openLightbox } = usePersonLightbox();
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [search, setSearch] = useState("");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -645,7 +647,10 @@ function AddItemModal({
         </TableCell>
         <TableCell className="bg-white group-hover:bg-[#F0F7FF]">
           <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-lg bg-[#F1F5F9] overflow-hidden shrink-0 border border-[#E8ECF1]">
+            <div
+              className="w-7 h-7 rounded-lg bg-[#F1F5F9] overflow-hidden shrink-0 border border-[#E8ECF1] cursor-zoom-in"
+              onClick={(e) => { e.stopPropagation(); openLightbox({ src: item.image, name: item.description, subtitle: item.partNo }); }}
+            >
               <img src={item.image} alt="" className="w-full h-full object-cover" />
             </div>
             <span className="text-sm font-mono whitespace-nowrap" style={{ fontWeight: 500, color: '#1E293B' }}>{item.partNo}</span>
@@ -1143,6 +1148,7 @@ const DENSITY_CONFIG: { key: Density; label: string; description: string; icon: 
 ];
 
 export function PartnerItemsTab({ vendor, hideHeader, compact, contextLabel, contextType }: { vendor: Vendor; hideHeader?: boolean; compact?: boolean; contextLabel?: string; contextType?: "discount" | "premium" }) {
+  const { openLightbox } = usePersonLightbox();
   const generatedItems = useMemo(() => generateItemsFromVendor(vendor), [vendor]);
   const [addedItems, setAddedItems] = useState<PartnerItemData[]>([]);
   const [highlightedIds, setHighlightedIds] = useState<Set<string>>(new Set());
@@ -1542,7 +1548,10 @@ export function PartnerItemsTab({ vendor, hideHeader, compact, contextLabel, con
         return (
           <TableCell key={colKey}>
             <div className={`flex items-center ${isComfort ? "gap-3" : "gap-2.5"}`}>
-              <div className={`${isComfort ? "w-9 h-9" : "w-7 h-7"} rounded-lg bg-[#F1F5F9] overflow-hidden shrink-0 border border-[#E8ECF1]`}>
+              <div
+                className={`${isComfort ? "w-9 h-9" : "w-7 h-7"} rounded-lg bg-[#F1F5F9] overflow-hidden shrink-0 border border-[#E8ECF1] cursor-zoom-in`}
+                onClick={(e) => { e.stopPropagation(); openLightbox({ src: item.image, name: item.description, subtitle: item.partNo }); }}
+              >
                 <img src={item.image} alt="" className="w-full h-full object-cover" />
               </div>
               <div className="min-w-0">
@@ -1879,8 +1888,11 @@ export function PartnerItemsTab({ vendor, hideHeader, compact, contextLabel, con
                             : "border-[#E2E8F0]"
                         }`}
                       >
-                        {/* Image banner — location card style (160px) */}
-                        <div className="relative w-full h-[160px] overflow-hidden bg-[#F1F5F9]">
+                        {/* Image banner — location card style (160px), click opens lightbox */}
+                        <div
+                          className="relative w-full h-[160px] overflow-hidden bg-[#F1F5F9] cursor-zoom-in"
+                          onClick={(e) => { e.stopPropagation(); openLightbox({ src: item.image, name: item.description, subtitle: item.partNo }); }}
+                        >
                           <img src={item.image} alt="" className="w-full h-full object-cover transition-transform duration-300 group-hover/card:scale-105" />
                           {/* Bottom-left: Status + Control pills on image */}
                           <div className="absolute bottom-2.5 left-2.5 flex items-center gap-1.5 z-10">
