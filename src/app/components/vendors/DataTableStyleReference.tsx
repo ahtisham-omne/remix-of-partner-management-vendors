@@ -277,7 +277,7 @@ function VendorStatusBadge({ status }: { status: string }) {
   const config: Record<string, { bg: string; text: string; border: string; dot: string; label: string }> = {
     active: { bg: "#F0FDF4", text: "#166534", border: "#BBF7D0", dot: "#22C55E", label: "Active" },
     inactive: { bg: "#FEF9C3", text: "#854D0E", border: "#FDE68A", dot: "#EAB308", label: "Inactive" },
-    archived: { bg: "#FEF2F2", text: "#991B1B", border: "#FECACA", dot: "#DC2626", label: "Archived" },
+    archived: { bg: "#FEF2F2", text: "#991B1B", border: "#FECACA", dot: "hsl(var(--destructive))", label: "Archived" },
   };
   const c = config[status] || config.active;
   return (
@@ -340,12 +340,12 @@ function AvatarInitials({
   const sizeClass = size === 9 ? "w-9 h-9" : size === 7 ? "w-7 h-7" : "w-6 h-6";
   const textSize = size === 9 ? "text-sm" : "text-[10px]";
   const POC_TINTS: Record<string, { bg: string; text: string }> = {
-    "#0A77FF": { bg: "#EBF3FF", text: "#0A77FF" }, "#7C3AED": { bg: "#F0EBFF", text: "#7C3AED" },
-    "#059669": { bg: "#E8FAF3", text: "#059669" }, "#D97706": { bg: "#FEF5E7", text: "#B45D04" },
-    "#DC2626": { bg: "#FEF2F2", text: "#DC2626" }, "#0891B2": { bg: "#ECFEFF", text: "#0891B2" },
+    "hsl(var(--primary))": { bg: "#EBF3FF", text: "hsl(var(--primary))" }, "hsl(var(--violet))": { bg: "#F0EBFF", text: "hsl(var(--violet))" },
+    "hsl(var(--success))": { bg: "#E8FAF3", text: "hsl(var(--success))" }, "hsl(var(--warning))": { bg: "#FEF5E7", text: "#B45D04" },
+    "hsl(var(--destructive))": { bg: "#FEF2F2", text: "hsl(var(--destructive))" }, "#0891B2": { bg: "#ECFEFF", text: "#0891B2" },
     "#4F46E5": { bg: "#EEF2FF", text: "#4F46E5" }, "#BE185D": { bg: "#FDF2F8", text: "#BE185D" },
-    "#0ea5e9": { bg: "#F0F9FF", text: "#0284C7" }, "#8b5cf6": { bg: "#F5F3FF", text: "#7C3AED" },
-    "#f59e0b": { bg: "#FFFBEB", text: "#D97706" }, "#10b981": { bg: "#ECFDF5", text: "#059669" },
+    "#0ea5e9": { bg: "#F0F9FF", text: "#0284C7" }, "#8b5cf6": { bg: "#F5F3FF", text: "hsl(var(--violet))" },
+    "#f59e0b": { bg: "#FFFBEB", text: "hsl(var(--warning))" }, "#10b981": { bg: "#ECFDF5", text: "hsl(var(--success))" },
     "#6366f1": { bg: "#EEF2FF", text: "#4F46E5" }, "#ec4899": { bg: "#FDF2F8", text: "#DB2777" },
   };
   const tint = POC_TINTS[bgColor] || { bg: "#F0F4FF", text: bgColor };
@@ -846,7 +846,7 @@ export default function DataTableStyleReference() {
               {activeFilterCount > 0 && (
                 <span
                   className="ml-0.5 min-w-[18px] h-5 rounded-full text-[11px] flex items-center justify-center px-1.5 text-white"
-                  style={{ backgroundColor: "#0A77FF", fontWeight: 600 }}
+                  style={{ backgroundColor: "hsl(var(--primary))", fontWeight: 600 }}
                 >
                   {activeFilterCount}
                 </span>
@@ -922,7 +922,7 @@ export default function DataTableStyleReference() {
                         <div className="text-sm" style={{ fontWeight: 500 }}>{opt.label}</div>
                         <div className="text-xs text-muted-foreground">{opt.description}</div>
                       </div>
-                      {density === opt.key && <Check className="w-4 h-4 shrink-0" style={{ color: "#0A77FF" }} />}
+                      {density === opt.key && <Check className="w-4 h-4 shrink-0" style={{ color: "hsl(var(--primary))" }} />}
                     </DropdownMenuItem>
                   </div>
                 ))}
@@ -960,12 +960,12 @@ export default function DataTableStyleReference() {
                 onClick={() => { setQuickFilter(filter.key); setCurrentPage(1); }}
                 className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                   isActive
-                    ? "border-primary bg-[#EDF4FF] hover:bg-[#D6E8FF] active:bg-[#ADD1FF]"
+                    ? "border-primary bg-accent hover:bg-[#D6E8FF] active:bg-[#ADD1FF]"
                     : "border-border text-muted-foreground hover:bg-muted/60 hover:text-foreground hover:border-muted-foreground/30 active:bg-muted"
                 }`}
                 style={{
                   fontWeight: isActive ? 500 : 400,
-                  color: isActive ? "#0A77FF" : undefined,
+                  color: isActive ? "hsl(var(--primary))" : undefined,
                 }}
               >
                 {filter.label}
@@ -976,7 +976,7 @@ export default function DataTableStyleReference() {
                     }`}
                     style={{
                       fontWeight: 600,
-                      color: isActive ? "#0A77FF" : "#475569",
+                      color: isActive ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))",
                     }}
                   >
                     {count}
@@ -1147,11 +1147,11 @@ export default function DataTableStyleReference() {
                           className="flex items-center gap-1 group/header cursor-pointer"
                           onClick={() => def.sortable && handleSort(key)}
                         >
-                          <span style={currentColSort ? { color: "#0A77FF" } : undefined}>
+                          <span style={currentColSort ? { color: "hsl(var(--primary))" } : undefined}>
                             {def.label}
                           </span>
-                          {currentColSort === "asc" && <ArrowUp className="w-3 h-3" style={{ color: "#0A77FF" }} />}
-                          {currentColSort === "desc" && <ArrowDown className="w-3 h-3" style={{ color: "#0A77FF" }} />}
+                          {currentColSort === "asc" && <ArrowUp className="w-3 h-3" style={{ color: "hsl(var(--primary))" }} />}
+                          {currentColSort === "desc" && <ArrowDown className="w-3 h-3" style={{ color: "hsl(var(--primary))" }} />}
                           {!currentColSort && def.sortable && (
                             <ArrowUpDown className="w-3 h-3 text-muted-foreground opacity-0 group-hover/header:opacity-100 transition-opacity" />
                           )}
@@ -1237,12 +1237,12 @@ export default function DataTableStyleReference() {
                               <>
                                 <DropdownMenuItem><RotateCcw className="w-4 h-4 mr-2" /> Restore</DropdownMenuItem>
                                 <DropdownMenuItem variant="destructive">
-                                  <Archive className="w-4 h-4 mr-2 text-[#DC2626]" /> Archive
+                                  <Archive className="w-4 h-4 mr-2 text-destructive" /> Archive
                                 </DropdownMenuItem>
                               </>
                             ) : (
                               <DropdownMenuItem variant="destructive">
-                                <Archive className="w-4 h-4 mr-2 text-[#DC2626]" /> Archive
+                                <Archive className="w-4 h-4 mr-2 text-destructive" /> Archive
                               </DropdownMenuItem>
                             )}
                           </DropdownMenuContent>
@@ -1357,14 +1357,14 @@ export default function DataTableStyleReference() {
           ├─────────────────────────┼────────────────────────────────────────┤
           │ Quick filter pill       │ px-3 py-1.5 rounded-full border      │
           │   (inactive)            │ text-xs text-muted-foreground         │
-          │   (active)              │ border-primary bg-[#EDF4FF]           │
+          │   (active)              │ border-primary bg-accent           │
           │                         │ color: #0A77FF fontWeight: 500        │
           ├─────────────────────────┼────────────────────────────────────────┤
           │ Count badge (pill)      │ text-[10px] rounded-full px-1.5      │
           │                         │ min-w-[18px] fontWeight: 600          │
           ├─────────────────────────┼────────────────────────────────────────┤
           │ Filter count badge      │ text-[11px] rounded-full min-w-[18px]│
-          │                         │ h-5 bg-[#0A77FF] text-white          │
+          │                         │ h-5 bg-primary text-white          │
           ├─────────────────────────┼────────────────────────────────────────┤
           │ Table header row        │ bg-muted/30 hover:bg-muted/30        │
           │   condensed             │ [&>th]:h-8                            │
@@ -1391,8 +1391,8 @@ export default function DataTableStyleReference() {
           │                         │ border + dot circle (1.5×1.5)         │
           ├─────────────────────────┼────────────────────────────────────────┤
           │ Partner type badge      │ rounded px-2 py-0.5 text-xs border   │
-          │   Vendor                │ bg-[#F0FDF4] text-[#166534]          │
-          │   Customer              │ bg-[#EFF6FF] text-[#1E40AF]          │
+          │   Vendor                │ bg-green-50 text-[#166534]          │
+          │   Customer              │ bg-blue-50 text-blue-800          │
           ├─────────────────────────┼────────────────────────────────────────┤
           │ Avatar initials         │ rounded-md (table) or rounded-full   │
           │                         │ bg via toAAAColor() + white text      │

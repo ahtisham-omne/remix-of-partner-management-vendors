@@ -356,10 +356,10 @@ export function VendorDetailsPage() {
   if (!vendor) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center gap-4 p-8">
-        <div className="w-16 h-16 rounded-2xl bg-[#F1F5F9] flex items-center justify-center">
-          <Building2 className="w-8 h-8 text-[#94A3B8]" />
+        <div className="w-16 h-16 rounded-2xl bg-muted flex items-center justify-center">
+          <Building2 className="w-8 h-8 text-slate-400" />
         </div>
-        <p className="text-[#64748B] text-sm">Partner not found.</p>
+        <p className="text-slate-500 text-sm">Partner not found.</p>
         <Button variant="outline" onClick={() => navigate("/vendors")} className="gap-1.5">
           <ArrowLeft className="w-4 h-4" />
           Back to Partners
@@ -464,9 +464,9 @@ export function VendorDetailsPage() {
   const ActionsDropdown = ({ compact = false }: { compact?: boolean }) => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className={`rounded-lg border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] text-[#334155] inline-flex items-center gap-1.5 transition-all duration-200 cursor-pointer shadow-sm ${compact ? "h-8 px-3 text-[12px]" : "h-9 px-3.5 text-[13px]"}`} style={{ fontWeight: 500 }}>
+        <button className={`rounded-lg border border-border bg-white hover:bg-slate-50 text-slate-700 inline-flex items-center gap-1.5 transition-all duration-200 cursor-pointer shadow-sm ${compact ? "h-8 px-3 text-[12px]" : "h-9 px-3.5 text-[13px]"}`} style={{ fontWeight: 500 }}>
           Actions
-          <ChevronDown className="w-3.5 h-3.5 text-[#94A3B8]" />
+          <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="z-[200] w-56">
@@ -474,37 +474,37 @@ export function VendorDetailsPage() {
           <>
             {/* Create & communicate */}
             <DropdownMenuItem onClick={() => toast.info("Create New Location – coming soon")}>
-              <MapPinPlus className="w-4 h-4 mr-2 text-[#64748B]" />
+              <MapPinPlus className="w-4 h-4 mr-2 text-slate-500" />
               Create New Location
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => toast.info("Email feature coming soon")}>
-              <Mail className="w-4 h-4 mr-2 text-[#64748B]" />
+              <Mail className="w-4 h-4 mr-2 text-slate-500" />
               Send Email
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => toast.info("Purchase Order creation coming soon")}>
-              <ClipboardList className="w-4 h-4 mr-2 text-[#64748B]" />
+              <ClipboardList className="w-4 h-4 mr-2 text-slate-500" />
               Create Purchase Order
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => toast.info("Sales Order creation coming soon")}>
-              <FileText className="w-4 h-4 mr-2 text-[#64748B]" />
+              <FileText className="w-4 h-4 mr-2 text-slate-500" />
               Create Sales Order
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => toast.info("Quote creation coming soon")}>
-              <FileUp className="w-4 h-4 mr-2 text-[#64748B]" />
+              <FileUp className="w-4 h-4 mr-2 text-slate-500" />
               Create Quote
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => toast.info("Invoice creation coming soon")}>
-              <Receipt className="w-4 h-4 mr-2 text-[#64748B]" />
+              <Receipt className="w-4 h-4 mr-2 text-slate-500" />
               Add Invoice
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             {/* Documents & Notes */}
             <DropdownMenuItem onClick={() => toast.info("Note creation coming soon")}>
-              <StickyNote className="w-4 h-4 mr-2 text-[#64748B]" />
+              <StickyNote className="w-4 h-4 mr-2 text-slate-500" />
               Add Note
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => toast.info("Upload feature coming soon")}>
-              <Upload className="w-4 h-4 mr-2 text-[#64748B]" />
+              <Upload className="w-4 h-4 mr-2 text-slate-500" />
               Upload
             </DropdownMenuItem>
             <DropdownMenuSeparator />
@@ -512,17 +512,17 @@ export function VendorDetailsPage() {
         )}
         {/* Utilities */}
         <DropdownMenuItem onClick={() => { navigator.clipboard.writeText(window.location.href); toast.success("Link copied to clipboard"); }}>
-          <Link2 className="w-4 h-4 mr-2 text-[#64748B]" />
+          <Link2 className="w-4 h-4 mr-2 text-slate-500" />
           Copy Link
         </DropdownMenuItem>
         {vendor.website && (
           <DropdownMenuItem onClick={() => window.open(vendor.website.startsWith("http") ? vendor.website : `https://${vendor.website}`, "_blank")}>
-            <ExternalLink className="w-4 h-4 mr-2 text-[#64748B]" />
+            <ExternalLink className="w-4 h-4 mr-2 text-slate-500" />
             Visit Website
           </DropdownMenuItem>
         )}
         <DropdownMenuItem onClick={() => toast.info("Print feature coming soon")}>
-          <Printer className="w-4 h-4 mr-2 text-[#64748B]" />
+          <Printer className="w-4 h-4 mr-2 text-slate-500" />
           Print Partner Details
         </DropdownMenuItem>
         <DropdownMenuSeparator />
@@ -545,8 +545,8 @@ export function VendorDetailsPage() {
             Unarchive
           </DropdownMenuItem>
         ) : (
-          <DropdownMenuItem onClick={() => setArchiveDialogOpen(true)} className="text-[#DC2626] focus:text-[#DC2626]">
-            <Archive className="w-4 h-4 mr-2 text-[#DC2626]" />
+          <DropdownMenuItem onClick={() => setArchiveDialogOpen(true)} className="text-destructive focus:text-destructive">
+            <Archive className="w-4 h-4 mr-2 text-destructive" />
             Archive
           </DropdownMenuItem>
         )}
@@ -558,7 +558,7 @@ export function VendorDetailsPage() {
   const EditCta = ({ compact = false }: { compact?: boolean }) => (
     <button
       onClick={() => setEditModalOpen(true)}
-      className={`rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white inline-flex items-center gap-1.5 transition-all duration-200 cursor-pointer shadow-sm ${compact ? "h-8 px-3.5 text-[12px]" : "h-9 px-4 text-[13px]"}`}
+      className={`rounded-lg bg-primary hover:bg-[#0862D0] text-white inline-flex items-center gap-1.5 transition-all duration-200 cursor-pointer shadow-sm ${compact ? "h-8 px-3.5 text-[12px]" : "h-9 px-4 text-[13px]"}`}
       style={{ fontWeight: 600 }}
     >
       <Pencil className={compact ? "w-3 h-3" : "w-3.5 h-3.5"} />
@@ -574,7 +574,7 @@ export function VendorDetailsPage() {
     <Popover open={statusDropdownOpen} onOpenChange={setStatusDropdownOpen}>
       <PopoverTrigger asChild>
         <button
-          className={`inline-flex items-center rounded-full border cursor-pointer transition-all duration-150 hover:ring-2 hover:ring-offset-1 hover:ring-[#E2E8F0] ${compact ? "px-1.5 py-px text-[10px] gap-0.5" : "px-2 py-0.5 text-[11px] gap-1"}`}
+          className={`inline-flex items-center rounded-full border cursor-pointer transition-all duration-150 hover:ring-2 hover:ring-offset-1 hover:ring-border ${compact ? "px-1.5 py-px text-[10px] gap-0.5" : "px-2 py-0.5 text-[11px] gap-1"}`}
           style={{ fontWeight: 500, backgroundColor: currentStatus.bg, color: currentStatus.color, borderColor: currentStatus.border }}
         >
           {currentStatus.label}
@@ -596,7 +596,7 @@ export function VendorDetailsPage() {
                     setStatusDropdownOpen(false);
                   }
                 }}
-                className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg transition-colors cursor-pointer ${isCurrent ? "bg-[#F8FAFC]" : "hover:bg-[#F8FAFC]"}`}
+                className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg transition-colors cursor-pointer ${isCurrent ? "bg-slate-50" : "hover:bg-slate-50"}`}
               >
                 <span
                   className="inline-flex items-center rounded-full border px-2 py-0.5 text-[10px]"
@@ -604,7 +604,7 @@ export function VendorDetailsPage() {
                 >
                   {sc.label}
                 </span>
-                {isCurrent && <Check className="w-3.5 h-3.5 ml-auto text-[#0A77FF]" />}
+                {isCurrent && <Check className="w-3.5 h-3.5 ml-auto text-primary" />}
               </button>
             );
           })}
@@ -619,46 +619,46 @@ export function VendorDetailsPage() {
   const allSubTypes = [...vendorSubTypeLabels, ...customerSubTypeLabels];
 
   return (
-    <div ref={scrollContainerRef} className="flex-1 flex flex-col overflow-y-auto bg-[#F8FAFC]">
+    <div ref={scrollContainerRef} className="flex-1 flex flex-col overflow-y-auto bg-slate-50">
       {/* ══════════════════════════════════════════════
           TOP NAV BAR
          ══════════════════════════════════════════════ */}
-      <div className="bg-white border-b border-[#E2E8F0] shrink-0 sticky top-0 z-30">
+      <div className="bg-white border-b border-border shrink-0 sticky top-0 z-30">
         <div className="flex items-center justify-between px-4 lg:px-6 h-11">
-          <div className="flex items-center gap-2 text-[13px] text-[#64748B]">
+          <div className="flex items-center gap-2 text-[13px] text-slate-500">
             <button
               onClick={() => navigate("/partners")}
-              className="hover:text-[#0F172A] transition-colors cursor-pointer"
+              className="hover:text-foreground transition-colors cursor-pointer"
               style={{ fontWeight: 500 }}
             >
               Partners Management
             </button>
-            <span className="text-[#CBD5E1]">/</span>
+            <span className="text-slate-300">/</span>
             <button
               onClick={() => navigate("/vendors")}
-              className="hover:text-[#0F172A] transition-colors cursor-pointer"
+              className="hover:text-foreground transition-colors cursor-pointer"
               style={{ fontWeight: 500 }}
             >
               Partners
             </button>
-            <span className="text-[#CBD5E1]">/</span>
-            <span className="text-[#0F172A]" style={{ fontWeight: 500 }}>{vendor.displayName}</span>
+            <span className="text-slate-300">/</span>
+            <span className="text-foreground" style={{ fontWeight: 500 }}>{vendor.displayName}</span>
           </div>
           <div className="flex items-center gap-3">
             <div className="relative hidden md:block">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <Input
                 placeholder="Search partner..."
-                className="pl-9 w-[220px] h-8 bg-[#F8FAFC] border-[#E2E8F0] text-[13px] placeholder:text-[#94A3B8] rounded-lg"
+                className="pl-9 w-[220px] h-8 bg-slate-50 border-border text-[13px] placeholder:text-slate-400 rounded-lg"
               />
             </div>
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden border-2 border-[#E2E8F0]" style={{ backgroundColor: '#0A77FF' }}>
+              <div className="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden border-2 border-border" style={{ backgroundColor: "hsl(var(--primary))" }}>
                 <span className="text-[11px] text-white" style={{ fontWeight: 600 }}>AA</span>
               </div>
               <div className="hidden sm:block">
-                <p className="text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>Ahtisham Ahmad</p>
-                <p className="text-[11px] text-[#94A3B8] leading-tight">Product Designer</p>
+                <p className="text-[13px] text-foreground" style={{ fontWeight: 500 }}>Ahtisham Ahmad</p>
+                <p className="text-[11px] text-slate-400 leading-tight">Product Designer</p>
               </div>
             </div>
           </div>
@@ -671,10 +671,10 @@ export function VendorDetailsPage() {
       {/* ══════════════════════════════════════════════
           SINGLE STICKY HEADER — morphs between full & compact
          ══════════════════════════════════════════════ */}
-      <div className="shrink-0 sticky top-[44px] z-20 bg-[#F8FAFC]">
+      <div className="shrink-0 sticky top-[44px] z-20 bg-slate-50">
         <div style={{ paddingTop: isScrolled ? "8px" : "12px", paddingBottom: "4px", transition: "padding-top 250ms ease" }}>
           <div className={`mx-auto px-4 lg:px-6 xl:px-8 transition-all duration-300 ${isFullscreen ? "max-w-full" : "max-w-[1440px] 2xl:max-w-[1600px]"}`}>
-            <div className={`bg-white border border-[#E2E8F0] rounded-xl overflow-hidden transition-shadow duration-250 ${isScrolled ? "shadow-[0_1px_3px_0_rgba(0,0,0,0.04),0_4px_12px_-4px_rgba(0,0,0,0.05)]" : "shadow-sm"}`}>
+            <div className={`bg-white border border-border rounded-xl overflow-hidden transition-shadow duration-250 ${isScrolled ? "shadow-[0_1px_3px_0_rgba(0,0,0,0.04),0_4px_12px_-4px_rgba(0,0,0,0.05)]" : "shadow-sm"}`}>
               {/* Main header row — morphs between full and compact */}
               <div
                 className="flex items-center justify-between gap-4 px-4 lg:px-5 transition-all duration-250 ease-in-out"
@@ -685,10 +685,10 @@ export function VendorDetailsPage() {
                   {/* Back button */}
                   <button
                     onClick={() => navigate("/vendors")}
-                    className="rounded-xl border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] flex items-center justify-center shrink-0 cursor-pointer shadow-[0_1px_3px_0_rgba(0,0,0,0.04),0_1px_2px_-1px_rgba(0,0,0,0.03)] transition-all duration-250"
+                    className="rounded-xl border border-border bg-white hover:bg-slate-50 flex items-center justify-center shrink-0 cursor-pointer shadow-[0_1px_3px_0_rgba(0,0,0,0.04),0_1px_2px_-1px_rgba(0,0,0,0.03)] transition-all duration-250"
                     style={{ width: isScrolled ? 32 : 44, height: isScrolled ? 32 : 44 }}
                   >
-                    <ChevronLeft className="text-[#94A3B8] transition-all duration-250" style={{ width: isScrolled ? 16 : 20, height: isScrolled ? 16 : 20 }} />
+                    <ChevronLeft className="text-slate-400 transition-all duration-250" style={{ width: isScrolled ? 16 : 20, height: isScrolled ? 16 : 20 }} />
                   </button>
 
                   {/* Avatar */}
@@ -696,7 +696,7 @@ export function VendorDetailsPage() {
                     <img
                       src={vendor.profileImage}
                       alt={vendor.displayName}
-                      className="rounded-xl object-cover shrink-0 border border-[#E2E8F0] shadow-[0_1px_3px_0_rgba(0,0,0,0.04),0_1px_2px_-1px_rgba(0,0,0,0.03)] transition-all duration-250"
+                      className="rounded-xl object-cover shrink-0 border border-border shadow-[0_1px_3px_0_rgba(0,0,0,0.04),0_1px_2px_-1px_rgba(0,0,0,0.03)] transition-all duration-250"
                       style={{ width: isScrolled ? 32 : 44, height: isScrolled ? 32 : 44 }}
                     />
                   ) : (
@@ -706,7 +706,7 @@ export function VendorDetailsPage() {
                         width: isScrolled ? 32 : 44,
                         height: isScrolled ? 32 : 44,
                         fontSize: isScrolled ? 10 : 14,
-                        backgroundColor: toAAAColor(vendor.createdByContact?.bgColor || "#0A77FF"),
+                        backgroundColor: toAAAColor(vendor.createdByContact?.bgColor || "hsl(var(--primary))"),
                         fontWeight: 700,
                       }}
                     >
@@ -719,7 +719,7 @@ export function VendorDetailsPage() {
                     {/* Line 1: Name + Status + Type + (expanded-only: Sub-types + Group) */}
                     <div className="flex items-center flex-wrap gap-1.5 transition-all duration-250" style={{ gap: isScrolled ? 6 : 8 }}>
                       <h1
-                        className="text-[#0F172A] truncate transition-all duration-250"
+                        className="text-foreground truncate transition-all duration-250"
                         style={{ fontSize: isScrolled ? 13 : 16, fontWeight: isScrolled ? 600 : 700, lineHeight: isScrolled ? "18px" : "22px" }}
                       >
                         {vendor.displayName}
@@ -735,8 +735,8 @@ export function VendorDetailsPage() {
                           <span
                             className={`inline-flex items-center gap-1 rounded-md border transition-all duration-250 ${
                               type === "vendor"
-                                ? "border-[#BFDBFE] bg-[#DBEAFE] text-[#2563EB]"
-                                : "border-[#C4B5FD] bg-[#EDE9FE] text-[#7C3AED]"
+                                ? "border-blue-200 bg-blue-100 text-[#2563EB]"
+                                : "border-[#C4B5FD] bg-[#EDE9FE] text-violet"
                             }`}
                             style={{ padding: isScrolled ? "1px 6px" : "2px 8px", fontSize: isScrolled ? 10 : 11, fontWeight: 600, cursor: subs.length > 0 ? "default" : undefined }}
                           >
@@ -757,13 +757,13 @@ export function VendorDetailsPage() {
                             <TooltipTrigger asChild>{badge}</TooltipTrigger>
                             <TooltipContent side="bottom" sideOffset={6} className="z-[300] max-w-[260px]">
                               <div className="space-y-1">
-                                <p className="text-[10px] text-[#94A3B8] mb-1.5" style={{ fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                                <p className="text-[10px] text-slate-400 mb-1.5" style={{ fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em" }}>
                                   {type === "vendor" ? "Vendor" : "Customer"} Profiles
                                 </p>
                                 {subs.map((st) => (
                                   <div key={st} className="flex items-center gap-2 py-0.5">
-                                    <Settings2 className="w-3 h-3 text-[#94A3B8] shrink-0" />
-                                    <span className="text-[11px] text-[#334155]" style={{ fontWeight: 500 }}>{st}</span>
+                                    <Settings2 className="w-3 h-3 text-slate-400 shrink-0" />
+                                    <span className="text-[11px] text-slate-700" style={{ fontWeight: 500 }}>{st}</span>
                                   </div>
                                 ))}
                               </div>
@@ -777,8 +777,8 @@ export function VendorDetailsPage() {
                         const primaryGroup = PARTNER_GROUPS.find((g) => g.id === vendor.partnerGroup);
                         const extraGroups = PARTNER_GROUPS.filter((g) => g.id !== vendor.partnerGroup && g.country === vendor.country).slice(0, 2);
                         if (!primaryGroup) return (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] border border-[#E2E8F0] bg-[#F1F5F9] text-[#475569]" style={{ fontWeight: 500 }}>
-                            <Building2 className="w-3 h-3 text-[#94A3B8]" />
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] border border-border bg-muted text-muted-foreground" style={{ fontWeight: 500 }}>
+                            <Building2 className="w-3 h-3 text-slate-400" />
                             {vendor.partnerGroup}
                           </span>
                         );
@@ -803,7 +803,7 @@ export function VendorDetailsPage() {
                       }}
                     >
                       <div ref={descRef} className="overflow-hidden" style={{ maxHeight: descExpanded ? 500 : 20 }}>
-                        <p className="text-[12px] text-[#64748B] leading-[1.6]">
+                        <p className="text-[12px] text-slate-500 leading-[1.6]">
                           {descriptionText}
                           {descExpanded && descNeedsTruncation && (
                             <>
@@ -811,7 +811,7 @@ export function VendorDetailsPage() {
                               <button
                                 type="button"
                                 onClick={(e) => { e.stopPropagation(); setDescExpanded(false); }}
-                                className="inline-flex items-center gap-0.5 text-[11px] text-[#0A77FF] hover:text-[#0862D0] cursor-pointer align-baseline"
+                                className="inline-flex items-center gap-0.5 text-[11px] text-primary hover:text-[#0862D0] cursor-pointer align-baseline"
                                 style={{ fontWeight: 500 }}
                               >
                                 Show less <ChevronUp className="w-3 h-3 inline" />
@@ -824,7 +824,7 @@ export function VendorDetailsPage() {
                         <button
                           type="button"
                           onClick={(e) => { e.stopPropagation(); setDescExpanded(true); }}
-                          className="absolute right-0 bottom-0 bg-gradient-to-l from-white via-white to-transparent pl-6 pr-0 inline-flex items-center gap-0.5 text-[11px] text-[#0A77FF] hover:text-[#0862D0] cursor-pointer"
+                          className="absolute right-0 bottom-0 bg-gradient-to-l from-white via-white to-transparent pl-6 pr-0 inline-flex items-center gap-0.5 text-[11px] text-primary hover:text-[#0862D0] cursor-pointer"
                           style={{ fontWeight: 500, lineHeight: "20px" }}
                         >
                           ... more <ChevronDown className="w-3 h-3" />
@@ -840,13 +840,13 @@ export function VendorDetailsPage() {
                     <TooltipTrigger asChild>
                       <button
                         onClick={() => setIsFullscreen(!isFullscreen)}
-                        className="rounded-lg border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] flex items-center justify-center cursor-pointer shadow-sm transition-all duration-250"
+                        className="rounded-lg border border-border bg-white hover:bg-slate-50 flex items-center justify-center cursor-pointer shadow-sm transition-all duration-250"
                         style={{ width: isScrolled ? 32 : 36, height: isScrolled ? 32 : 36 }}
                       >
                         {isFullscreen ? (
-                          <Minimize2 className="text-[#64748B] transition-all duration-250" style={{ width: isScrolled ? 14 : 16, height: isScrolled ? 14 : 16 }} />
+                          <Minimize2 className="text-slate-500 transition-all duration-250" style={{ width: isScrolled ? 14 : 16, height: isScrolled ? 14 : 16 }} />
                         ) : (
-                          <Maximize2 className="text-[#64748B] transition-all duration-250" style={{ width: isScrolled ? 14 : 16, height: isScrolled ? 14 : 16 }} />
+                          <Maximize2 className="text-slate-500 transition-all duration-250" style={{ width: isScrolled ? 14 : 16, height: isScrolled ? 14 : 16 }} />
                         )}
                       </button>
                     </TooltipTrigger>
@@ -858,7 +858,7 @@ export function VendorDetailsPage() {
               </div>
 
               {/* Tab bar — always visible at the bottom of the card */}
-              <div className="flex items-center gap-0 overflow-x-auto scrollbar-hide border-t border-[#F1F5F9] px-4 lg:px-5">
+              <div className="flex items-center gap-0 overflow-x-auto scrollbar-hide border-t border-muted px-4 lg:px-5">
                 {TABS.map((tab) => {
                   const isActive = activeTab === tab.id;
                   const isExternal = tab.id === "partner_communication";
@@ -874,8 +874,8 @@ export function VendorDetailsPage() {
                       }}
                       className={`flex items-center gap-1.5 px-3.5 border-b-2 transition-all duration-200 whitespace-nowrap cursor-pointer ${
                         isActive
-                          ? "border-[#0A77FF] text-[#0A77FF]"
-                          : "border-transparent text-[#64748B] hover:text-[#334155] hover:border-[#CBD5E1]"
+                          ? "border-primary text-primary"
+                          : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
                       }`}
                       style={{
                         padding: isScrolled ? "8px 14px" : "10px 14px",
@@ -910,7 +910,7 @@ export function VendorDetailsPage() {
           const el = scrollContainerRef.current;
           if (el) el.scrollTo({ top: 0, behavior: "smooth" });
         }}
-        className="fixed bottom-6 right-6 z-40 rounded-full bg-white border border-[#E2E8F0] shadow-[0_2px_12px_-3px_rgba(0,0,0,0.12),0_4px_16px_-4px_rgba(0,0,0,0.08)] flex items-center justify-center cursor-pointer hover:bg-[#F8FAFC] hover:border-[#CBD5E1] hover:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.15)] active:scale-95 transition-all duration-300"
+        className="fixed bottom-6 right-6 z-40 rounded-full bg-white border border-border shadow-[0_2px_12px_-3px_rgba(0,0,0,0.12),0_4px_16px_-4px_rgba(0,0,0,0.08)] flex items-center justify-center cursor-pointer hover:bg-slate-50 hover:border-slate-300 hover:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.15)] active:scale-95 transition-all duration-300"
         style={{
           width: 40,
           height: 40,
@@ -920,7 +920,7 @@ export function VendorDetailsPage() {
         }}
         aria-label="Scroll to top"
       >
-        <ChevronUp className="w-5 h-5 text-[#64748B]" />
+        <ChevronUp className="w-5 h-5 text-slate-500" />
       </button>
 
       {/* ══════════════════════════════════════════════
@@ -933,7 +933,7 @@ export function VendorDetailsPage() {
             <div className="space-y-3">
               {/* Info bar */}
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-[12px] text-[#64748B]">
+                <div className="flex items-center gap-2 text-[12px] text-slate-500">
                   <span className="text-sm text-muted-foreground" style={{ fontWeight: 500 }}>Dashboard</span>
                   {/* Date Range Filter */}
                   <DropdownMenu>
@@ -965,25 +965,25 @@ export function VendorDetailsPage() {
                         >
                           <span className="text-sm">{opt.label}</span>
                           {dashDateRange === opt.key && (
-                            <Check className="w-3.5 h-3.5" style={{ color: "#0A77FF" }} />
+                            <Check className="w-3.5 h-3.5" style={{ color: "hsl(var(--primary))" }} />
                           )}
                         </DropdownMenuItem>
                       ))}
                     </DropdownMenuContent>
                   </DropdownMenu>
-                  <span className="text-[#CBD5E1]">|</span>
-                  <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 400 }}>Updated {format(lastRefreshed, "h:mm a")}</span>
-                  <button onClick={handleRefresh} className="inline-flex items-center gap-1 text-[11px] text-[#0A77FF] hover:text-[#0862D4] transition-colors cursor-pointer" style={{ fontWeight: 500 }}>
+                  <span className="text-slate-300">|</span>
+                  <span className="text-[11px] text-slate-400" style={{ fontWeight: 400 }}>Updated {format(lastRefreshed, "h:mm a")}</span>
+                  <button onClick={handleRefresh} className="inline-flex items-center gap-1 text-[11px] text-primary hover:text-[#0862D4] transition-colors cursor-pointer" style={{ fontWeight: 500 }}>
                     <RefreshCw className="w-3 h-3" />
                     Refresh
                   </button>
                 </div>
                 <button
                   onClick={() => setCustomizePanelOpen(true)}
-                  className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] text-[#334155] text-[12px] shadow-sm transition-all cursor-pointer"
+                  className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border border-border bg-white hover:bg-slate-50 text-slate-700 text-[12px] shadow-sm transition-all cursor-pointer"
                   style={{ fontWeight: 500 }}
                 >
-                  <Sliders className="w-3.5 h-3.5 text-[#94A3B8]" />
+                  <Sliders className="w-3.5 h-3.5 text-slate-400" />
                   Customize Widgets
                 </button>
               </div>
@@ -1026,7 +1026,7 @@ export function VendorDetailsPage() {
                 <button
                   onClick={() => setLocKpiPanelOpen(true)}
                   className="inline-flex items-center gap-1 text-[11px] hover:bg-muted/50 px-2 py-0.5 rounded-md transition-colors cursor-pointer"
-                  style={{ fontWeight: 500, color: "#0A77FF" }}
+                  style={{ fontWeight: 500, color: "hsl(var(--primary))" }}
                 >
                   <Plus className="w-3 h-3" />
                   Add Insights
@@ -1132,7 +1132,7 @@ export function VendorDetailsPage() {
                   <StatBox label="Total Orders" value={String(vendor.totalOrders)} icon={ShoppingCart} />
                   <StatBox label="Total Spent" value={formatCurrency(vendor.totalSpent)} icon={TrendingUp} />
                   <StatBox label="Rating" value={vendor.rating > 0 ? `${vendor.rating}/5` : "N/A"} icon={Star} color="#F59E0B" />
-                  <StatBox label="Credit Used" value={`${creditUtilization}%`} icon={DollarSign} color={creditUtilization > 80 ? "#DC2626" : creditUtilization > 50 ? "#D97706" : "#059669"} />
+                  <StatBox label="Credit Used" value={`${creditUtilization}%`} icon={DollarSign} color={creditUtilization > 80 ? "hsl(var(--destructive))" : creditUtilization > 50 ? "hsl(var(--warning))" : "hsl(var(--success))"} />
                 </div>
               </SidebarCard>
 
@@ -1150,9 +1150,9 @@ export function VendorDetailsPage() {
                         >
                           {contact.initials}
                         </div>
-                        <span className="text-[12px] text-[#334155] truncate" style={{ fontWeight: 500 }}>{contact.name}</span>
+                        <span className="text-[12px] text-slate-700 truncate" style={{ fontWeight: 500 }}>{contact.name}</span>
                         {idx === 0 && (
-                          <span className="text-[10px] text-[#0A77FF] px-1.5 py-0.5 rounded-md bg-[#EDF4FF] ml-auto shrink-0" style={{ fontWeight: 600 }}>PRIMARY</span>
+                          <span className="text-[10px] text-primary px-1.5 py-0.5 rounded-md bg-accent ml-auto shrink-0" style={{ fontWeight: 600 }}>PRIMARY</span>
                         )}
                       </div>
                       );
@@ -1160,7 +1160,7 @@ export function VendorDetailsPage() {
                     {vendor.globalPointOfContacts.length > 4 && (
                       <button
                         onClick={() => setActiveTab("global_contacts")}
-                        className="text-xs text-[#0A77FF] hover:text-[#0862D0] transition-colors cursor-pointer mt-1"
+                        className="text-xs text-primary hover:text-[#0862D0] transition-colors cursor-pointer mt-1"
                         style={{ fontWeight: 500 }}
                       >
                         +{vendor.globalPointOfContacts.length - 4} more
@@ -1175,14 +1175,14 @@ export function VendorDetailsPage() {
                 <div className="space-y-2">
                   {(vendor.partnerTypes || []).map((type) => (
                     <div key={type} className="flex items-center gap-2">
-                      <div className={`w-5 h-5 rounded flex items-center justify-center ${type === "vendor" ? "bg-[#F0FDF4]" : "bg-[#EFF6FF]"}`}>
+                      <div className={`w-5 h-5 rounded flex items-center justify-center ${type === "vendor" ? "bg-green-50" : "bg-blue-50"}`}>
                         {type === "vendor" ? (
                           <Truck className="w-3 h-3 text-[#166534]" />
                         ) : (
-                          <ShoppingCart className="w-3 h-3 text-[#1E40AF]" />
+                          <ShoppingCart className="w-3 h-3 text-blue-800" />
                         )}
                       </div>
-                      <span className="text-[12px] text-[#334155]" style={{ fontWeight: 500 }}>
+                      <span className="text-[12px] text-slate-700" style={{ fontWeight: 500 }}>
                         {type === "vendor" ? "Vendor" : "Customer"}
                       </span>
                     </div>
@@ -1190,12 +1190,12 @@ export function VendorDetailsPage() {
                   {cfg && (
                     <div className="flex flex-wrap gap-1.5 mt-1">
                       {(cfg.vendorSubTypes || []).map((st) => (
-                        <span key={st} className="text-[10px] px-2 py-0.5 rounded-md bg-[#F1F5F9] text-[#475569] border border-[#E2E8F0]" style={{ fontWeight: 500 }}>
+                        <span key={st} className="text-[10px] px-2 py-0.5 rounded-md bg-muted text-muted-foreground border border-border" style={{ fontWeight: 500 }}>
                           {st.replace(/_/g, " ")}
                         </span>
                       ))}
                       {(cfg.customerSubTypes || []).map((st) => (
-                        <span key={st} className="text-[10px] px-2 py-0.5 rounded-md bg-[#F1F5F9] text-[#475569] border border-[#E2E8F0]" style={{ fontWeight: 500 }}>
+                        <span key={st} className="text-[10px] px-2 py-0.5 rounded-md bg-muted text-muted-foreground border border-border" style={{ fontWeight: 500 }}>
                           {st.replace(/_/g, " ")}
                         </span>
                       ))}
@@ -1208,7 +1208,7 @@ export function VendorDetailsPage() {
               <SidebarCard title="CREATED">
                 <div className="space-y-2.5">
                   <div>
-                    <p className="text-[10px] text-[#94A3B8] mb-0.5" style={{ fontWeight: 500 }}>Created By</p>
+                    <p className="text-[10px] text-slate-400 mb-0.5" style={{ fontWeight: 500 }}>Created By</p>
                     <div className="flex items-center gap-2">
                       <div
                         className="w-5 h-5 rounded-full flex items-center justify-center text-white text-[8px] shrink-0"
@@ -1216,21 +1216,21 @@ export function VendorDetailsPage() {
                       >
                         {vendor.createdByContact?.initials || "?"}
                       </div>
-                      <span className="text-[12px] text-[#334155]" style={{ fontWeight: 500 }}>{vendor.createdByContact?.name || "—"}</span>
+                      <span className="text-[12px] text-slate-700" style={{ fontWeight: 500 }}>{vendor.createdByContact?.name || "—"}</span>
                     </div>
                   </div>
                   <div>
-                    <p className="text-[10px] text-[#94A3B8] mb-0.5" style={{ fontWeight: 500 }}>Created On</p>
+                    <p className="text-[10px] text-slate-400 mb-0.5" style={{ fontWeight: 500 }}>Created On</p>
                     <div className="flex items-center gap-1.5">
-                      <Calendar className="w-3.5 h-3.5 text-[#94A3B8]" />
-                      <span className="text-[12px] text-[#334155]" style={{ fontWeight: 500 }}>{formatDate(vendor.createdAt)}</span>
+                      <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                      <span className="text-[12px] text-slate-700" style={{ fontWeight: 500 }}>{formatDate(vendor.createdAt)}</span>
                     </div>
                   </div>
                   <div>
-                    <p className="text-[10px] text-[#94A3B8] mb-0.5" style={{ fontWeight: 500 }}>Last Updated</p>
+                    <p className="text-[10px] text-slate-400 mb-0.5" style={{ fontWeight: 500 }}>Last Updated</p>
                     <div className="flex items-center gap-1.5">
-                      <Clock className="w-3.5 h-3.5 text-[#94A3B8]" />
-                      <span className="text-[12px] text-[#334155]" style={{ fontWeight: 500 }}>{formatDate(vendor.updatedAt)}</span>
+                      <Clock className="w-3.5 h-3.5 text-slate-400" />
+                      <span className="text-[12px] text-slate-700" style={{ fontWeight: 500 }}>{formatDate(vendor.updatedAt)}</span>
                     </div>
                   </div>
                 </div>
@@ -1269,7 +1269,7 @@ export function VendorDetailsPage() {
           <div className="relative flex flex-col items-center pt-10 pb-6" style={{ background: "linear-gradient(180deg, #FEF2F2 0%, rgba(254,242,242,0.3) 70%, transparent 100%)" }}>
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[180px] h-[80px] rounded-full blur-[50px] opacity-25" style={{ backgroundColor: "#EF4444" }} />
             <div className="relative w-16 h-16 rounded-2xl flex items-center justify-center" style={{ backgroundColor: "#FEE2E2" }}>
-              <AlertTriangle className="w-8 h-8" style={{ color: "#DC2626" }} />
+              <AlertTriangle className="w-8 h-8" style={{ color: "hsl(var(--destructive))" }} />
             </div>
             <span
               className="mt-4 px-3 py-1 rounded-full text-[11px]"
@@ -1280,11 +1280,11 @@ export function VendorDetailsPage() {
           </div>
           <div className="flex flex-col items-center text-center px-8 pb-8">
             <AlertDialogHeader className="p-0 gap-0 text-center">
-              <AlertDialogTitle className="text-[18px] tracking-[-0.02em]" style={{ fontWeight: 600, color: "#0F172A" }}>
+              <AlertDialogTitle className="text-[18px] tracking-[-0.02em]" style={{ fontWeight: 600, color: "hsl(var(--foreground))" }}>
                 Archive this partner?
               </AlertDialogTitle>
             </AlertDialogHeader>
-            <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "#475569", lineHeight: "1.65" }}>
+            <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "hsl(var(--muted-foreground))", lineHeight: "1.65" }}>
               <span style={{ fontWeight: 600, color: "#1E293B" }}>{vendor.displayName}</span>{" "}
               will be removed from active workflows. Historical records are preserved and you can restore later.
             </AlertDialogDescription>
@@ -1292,14 +1292,14 @@ export function VendorDetailsPage() {
               <button
                 onClick={handleArchive}
                 className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors hover:opacity-90"
-                style={{ fontWeight: 600, backgroundColor: "#DC2626", color: "#fff" }}
+                style={{ fontWeight: 600, backgroundColor: "hsl(var(--destructive))", color: "#fff" }}
               >
                 Archive Partner
               </button>
               <button
                 onClick={() => setArchiveDialogOpen(false)}
                 className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors"
-                style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#334155" }}
+                style={{ fontWeight: 500, backgroundColor: "hsl(var(--muted))", color: "#334155" }}
               >
                 Cancel
               </button>
@@ -1327,11 +1327,11 @@ export function VendorDetailsPage() {
           </div>
           <div className="flex flex-col items-center text-center px-8 pb-8">
             <AlertDialogHeader className="p-0 gap-0 text-center">
-              <AlertDialogTitle className="text-[18px] tracking-[-0.02em]" style={{ fontWeight: 600, color: "#0F172A" }}>
+              <AlertDialogTitle className="text-[18px] tracking-[-0.02em]" style={{ fontWeight: 600, color: "hsl(var(--foreground))" }}>
                 Activate this partner?
               </AlertDialogTitle>
             </AlertDialogHeader>
-            <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "#475569", lineHeight: "1.65" }}>
+            <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "hsl(var(--muted-foreground))", lineHeight: "1.65" }}>
               <span style={{ fontWeight: 600, color: "#1E293B" }}>{vendor.displayName}</span>{" "}
               will be restored to active status and become available for new transactions, orders, and search results.
             </AlertDialogDescription>
@@ -1339,7 +1339,7 @@ export function VendorDetailsPage() {
               <button onClick={() => handleStatusChange("active")} className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors hover:opacity-90" style={{ fontWeight: 600, backgroundColor: "#16A34A", color: "#fff" }}>
                 Activate Partner
               </button>
-              <button onClick={() => { setStatusConfirmOpen(false); setStatusChangeTarget(null); }} className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors" style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#334155" }}>
+              <button onClick={() => { setStatusConfirmOpen(false); setStatusChangeTarget(null); }} className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors" style={{ fontWeight: 500, backgroundColor: "hsl(var(--muted))", color: "#334155" }}>
                 Cancel
               </button>
             </div>
@@ -1357,7 +1357,7 @@ export function VendorDetailsPage() {
           <div className="relative flex flex-col items-center pt-10 pb-6" style={{ background: "linear-gradient(180deg, #FEFCE8 0%, rgba(254,252,232,0.3) 70%, transparent 100%)" }}>
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[180px] h-[80px] rounded-full blur-[50px] opacity-25" style={{ backgroundColor: "#EAB308" }} />
             <div className="relative w-16 h-16 rounded-2xl flex items-center justify-center" style={{ backgroundColor: "#FEF3C7" }}>
-              <AlertTriangle className="w-8 h-8" style={{ color: "#D97706" }} />
+              <AlertTriangle className="w-8 h-8" style={{ color: "hsl(var(--warning))" }} />
             </div>
             <span className="mt-4 px-3 py-1 rounded-full text-[11px]" style={{ fontWeight: 600, backgroundColor: "#FEF9C3", color: "#92400E", textTransform: "uppercase" as const, letterSpacing: "0.05em" }}>
               Warning
@@ -1365,11 +1365,11 @@ export function VendorDetailsPage() {
           </div>
           <div className="flex flex-col items-center text-center px-8 pb-8">
             <AlertDialogHeader className="p-0 gap-0 text-center">
-              <AlertDialogTitle className="text-[18px] tracking-[-0.02em]" style={{ fontWeight: 600, color: "#0F172A" }}>
+              <AlertDialogTitle className="text-[18px] tracking-[-0.02em]" style={{ fontWeight: 600, color: "hsl(var(--foreground))" }}>
                 Deactivate this partner?
               </AlertDialogTitle>
             </AlertDialogHeader>
-            <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "#475569", lineHeight: "1.65" }}>
+            <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "hsl(var(--muted-foreground))", lineHeight: "1.65" }}>
               <span style={{ fontWeight: 600, color: "#1E293B" }}>{vendor.displayName}</span>{" "}
               will be hidden from active lists and no new transactions can be created. You can reactivate anytime.
             </AlertDialogDescription>
@@ -1377,7 +1377,7 @@ export function VendorDetailsPage() {
               <button onClick={() => handleStatusChange("inactive")} className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors hover:opacity-90" style={{ fontWeight: 600, backgroundColor: "#F97316", color: "#FFFFFF" }}>
                 Deactivate Partner
               </button>
-              <button onClick={() => { setStatusConfirmOpen(false); setStatusChangeTarget(null); }} className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors" style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#334155" }}>
+              <button onClick={() => { setStatusConfirmOpen(false); setStatusChangeTarget(null); }} className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors" style={{ fontWeight: 500, backgroundColor: "hsl(var(--muted))", color: "#334155" }}>
                 Cancel
               </button>
             </div>
@@ -1425,12 +1425,12 @@ function PartnerGroupHoverPill({ group }: { group: { id: string; name: string; d
       <PopoverTrigger
         onMouseEnter={handleEnter}
         onMouseLeave={handleLeave}
-        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] border border-[#E2E8F0] bg-[#F1F5F9] text-[#475569] cursor-default transition-colors hover:bg-[#E2E8F0]"
+        className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] border border-border bg-muted text-muted-foreground cursor-default transition-colors hover:bg-border"
         style={{ fontWeight: 600 }}
       >
-        <Star className="w-2.5 h-2.5 fill-[#94A3B8] text-[#94A3B8]" />
+        <Star className="w-2.5 h-2.5 fill-slate-400 text-slate-400" />
         {group.countryFlag} {group.name}
-        <span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 400 }}>· {group.memberCount}</span>
+        <span className="text-[10px] text-slate-400" style={{ fontWeight: 400 }}>· {group.memberCount}</span>
       </PopoverTrigger>
       <PopoverContent
         side="bottom"
@@ -1441,9 +1441,9 @@ function PartnerGroupHoverPill({ group }: { group: { id: string; name: string; d
         onMouseLeave={handleLeave}
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
-        <div className="w-[280px] rounded-xl overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-[#E2E8F0]/60">
+        <div className="w-[280px] rounded-xl overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-border/60">
           {/* Dark gradient header */}
-          <div className="bg-gradient-to-br from-[#1E293B] to-[#334155] px-3.5 py-3 relative overflow-hidden">
+          <div className="bg-gradient-to-br from-slate-800 to-slate-700 px-3.5 py-3 relative overflow-hidden">
             <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-white/[0.04]" />
             <div className="flex items-center justify-between relative">
               <div className="flex items-center gap-2 min-w-0">
@@ -1453,28 +1453,28 @@ function PartnerGroupHoverPill({ group }: { group: { id: string; name: string; d
                 </span>
               </div>
               <span
-                className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] bg-[#0A77FF]/25 text-[#60A5FA] shrink-0"
+                className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] bg-primary/25 text-[#60A5FA] shrink-0"
                 style={{ fontWeight: 600 }}
               >
                 <Star className="w-2.5 h-2.5 fill-[#60A5FA]" /> Primary
               </span>
             </div>
-            <p className="text-[11px] text-[#94A3B8] mt-1.5 relative">
+            <p className="text-[11px] text-slate-400 mt-1.5 relative">
               {group.country} Region
             </p>
           </div>
           {/* Body */}
           <div className="bg-white px-3.5 py-3 space-y-3">
-            <p className="text-[12px] text-[#475569] leading-relaxed line-clamp-3">
+            <p className="text-[12px] text-muted-foreground leading-relaxed line-clamp-3">
               {group.description}
             </p>
-            <div className="flex items-center gap-4 pt-2 border-t border-[#F1F5F9]">
-              <div className="flex items-center gap-1.5 text-[11px] text-[#64748B]">
-                <Users className="w-3 h-3 text-[#94A3B8]" />
+            <div className="flex items-center gap-4 pt-2 border-t border-muted">
+              <div className="flex items-center gap-1.5 text-[11px] text-slate-500">
+                <Users className="w-3 h-3 text-slate-400" />
                 <span style={{ fontWeight: 500 }}>{group.memberCount} partners</span>
               </div>
-              <div className="flex items-center gap-1.5 text-[11px] text-[#64748B]">
-                <Globe className="w-3 h-3 text-[#94A3B8]" />
+              <div className="flex items-center gap-1.5 text-[11px] text-slate-500">
+                <Globe className="w-3 h-3 text-slate-400" />
                 <span style={{ fontWeight: 500 }}>{group.country}</span>
               </div>
             </div>
@@ -1512,7 +1512,7 @@ function PartnerGroupOverflowPill({ groups }: { groups: { id: string; name: stri
       <PopoverTrigger
         onMouseEnter={handleListEnter}
         onMouseLeave={handleListLeave}
-        className="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] border border-[#E2E8F0] bg-[#F1F5F9] text-[#0A77FF] cursor-default transition-colors hover:bg-[#E2E8F0]"
+        className="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] border border-border bg-muted text-primary cursor-default transition-colors hover:bg-border"
         style={{ fontWeight: 600 }}
       >
         +{groups.length}
@@ -1528,23 +1528,23 @@ function PartnerGroupOverflowPill({ groups }: { groups: { id: string; name: stri
       >
         <div className="flex gap-2">
           {/* List dropdown */}
-          <div className="w-[220px] rounded-xl overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-[#E2E8F0]/60 bg-white">
-            <div className="px-3 py-2 border-b border-[#F1F5F9]">
-              <p className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em" }}>Secondary Groups</p>
+          <div className="w-[220px] rounded-xl overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-border/60 bg-white">
+            <div className="px-3 py-2 border-b border-muted">
+              <p className="text-[10px] text-slate-400" style={{ fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em" }}>Secondary Groups</p>
             </div>
             <div className="py-1">
               {groups.map((g) => (
                 <button
                   key={g.id}
                   onMouseEnter={() => setHoveredGroup(g.id)}
-                  className={`w-full flex items-center gap-2.5 px-3 py-2 text-left transition-colors cursor-default ${hoveredGroup === g.id ? "bg-[#F8FAFC]" : "hover:bg-[#F8FAFC]"}`}
+                  className={`w-full flex items-center gap-2.5 px-3 py-2 text-left transition-colors cursor-default ${hoveredGroup === g.id ? "bg-slate-50" : "hover:bg-slate-50"}`}
                 >
                   <span className="text-sm shrink-0">{g.countryFlag}</span>
                   <div className="min-w-0 flex-1">
-                    <p className="text-[12px] text-[#334155] truncate" style={{ fontWeight: 600 }}>{g.name}</p>
-                    <p className="text-[10px] text-[#94A3B8]">{g.memberCount} members · {g.country}</p>
+                    <p className="text-[12px] text-slate-700 truncate" style={{ fontWeight: 600 }}>{g.name}</p>
+                    <p className="text-[10px] text-slate-400">{g.memberCount} members · {g.country}</p>
                   </div>
-                  <ChevronRight className="w-3 h-3 text-[#CBD5E1] shrink-0" />
+                  <ChevronRight className="w-3 h-3 text-slate-300 shrink-0" />
                 </button>
               ))}
             </div>
@@ -1555,29 +1555,29 @@ function PartnerGroupOverflowPill({ groups }: { groups: { id: string; name: stri
             const g = groups.find((grp) => grp.id === hoveredGroup);
             if (!g) return null;
             return (
-              <div className="w-[280px] rounded-xl overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-[#E2E8F0]/60 self-start">
-                <div className="bg-gradient-to-br from-[#1E293B] to-[#334155] px-3.5 py-3 relative overflow-hidden">
+              <div className="w-[280px] rounded-xl overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-border/60 self-start">
+                <div className="bg-gradient-to-br from-slate-800 to-slate-700 px-3.5 py-3 relative overflow-hidden">
                   <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-white/[0.04]" />
                   <div className="flex items-center justify-between relative">
                     <div className="flex items-center gap-2 min-w-0">
                       <span className="text-base shrink-0">{g.countryFlag}</span>
                       <span className="text-white text-[13px] truncate" style={{ fontWeight: 600 }}>{g.name}</span>
                     </div>
-                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] bg-white/10 text-[#94A3B8] shrink-0" style={{ fontWeight: 600 }}>
+                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] bg-white/10 text-slate-400 shrink-0" style={{ fontWeight: 600 }}>
                       Secondary
                     </span>
                   </div>
-                  <p className="text-[11px] text-[#94A3B8] mt-1.5 relative">{g.country} Region</p>
+                  <p className="text-[11px] text-slate-400 mt-1.5 relative">{g.country} Region</p>
                 </div>
                 <div className="bg-white px-3.5 py-3 space-y-3">
-                  <p className="text-[12px] text-[#475569] leading-relaxed line-clamp-3">{g.description}</p>
-                  <div className="flex items-center gap-4 pt-2 border-t border-[#F1F5F9]">
-                    <div className="flex items-center gap-1.5 text-[11px] text-[#64748B]">
-                      <Users className="w-3 h-3 text-[#94A3B8]" />
+                  <p className="text-[12px] text-muted-foreground leading-relaxed line-clamp-3">{g.description}</p>
+                  <div className="flex items-center gap-4 pt-2 border-t border-muted">
+                    <div className="flex items-center gap-1.5 text-[11px] text-slate-500">
+                      <Users className="w-3 h-3 text-slate-400" />
                       <span style={{ fontWeight: 500 }}>{g.memberCount} partners</span>
                     </div>
-                    <div className="flex items-center gap-1.5 text-[11px] text-[#64748B]">
-                      <Globe className="w-3 h-3 text-[#94A3B8]" />
+                    <div className="flex items-center gap-1.5 text-[11px] text-slate-500">
+                      <Globe className="w-3 h-3 text-slate-400" />
                       <span style={{ fontWeight: 500 }}>{g.country}</span>
                     </div>
                   </div>
@@ -1600,15 +1600,15 @@ function SidebarCard({ title, children }: { title: string; children: React.React
 function SidebarRow({ icon: Icon, label, value, isLink, isAddress }: { icon: React.ElementType; label: string; value: string; isLink?: boolean; isAddress?: boolean }) {
   return (
     <div className="flex items-start gap-2.5">
-      <Icon className="w-3.5 h-3.5 text-[#94A3B8] mt-0.5 shrink-0" />
+      <Icon className="w-3.5 h-3.5 text-slate-400 mt-0.5 shrink-0" />
       <div className="min-w-0">
-        <p className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>{label}</p>
+        <p className="text-[10px] text-slate-400" style={{ fontWeight: 500 }}>{label}</p>
         {isLink ? (
           <a
             href={value.startsWith("http") ? value : `https://${value}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[12px] text-[#0A77FF] hover:underline break-all"
+            className="text-[12px] text-primary hover:underline break-all"
             style={{ fontWeight: 500 }}
           >
             {value}
@@ -1618,13 +1618,13 @@ function SidebarRow({ icon: Icon, label, value, isLink, isAddress }: { icon: Rea
             href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(value)}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[12px] text-[#334155] hover:text-[#0A77FF] hover:underline break-words transition-colors"
+            className="text-[12px] text-slate-700 hover:text-primary hover:underline break-words transition-colors"
             style={{ fontWeight: 500 }}
           >
             {value}
           </a>
         ) : (
-          <p className="text-[12px] text-[#334155] break-words" style={{ fontWeight: 500 }}>{value}</p>
+          <p className="text-[12px] text-slate-700 break-words" style={{ fontWeight: 500 }}>{value}</p>
         )}
       </div>
     </div>
@@ -1633,12 +1633,12 @@ function SidebarRow({ icon: Icon, label, value, isLink, isAddress }: { icon: Rea
 
 function StatBox({ label, value, icon: Icon, color }: { label: string; value: string; icon: React.ElementType; color?: string }) {
   return (
-    <div className="rounded-lg bg-[#F8FAFC] border border-[#F1F5F9] p-2.5">
+    <div className="rounded-lg bg-slate-50 border border-muted p-2.5">
       <div className="flex items-center gap-1.5 mb-1">
         <Icon className="w-3 h-3" style={{ color: color || "#94A3B8" }} />
-        <span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>{label}</span>
+        <span className="text-[10px] text-slate-400" style={{ fontWeight: 500 }}>{label}</span>
       </div>
-      <p className="text-[14px] text-[#334155]" style={{ fontWeight: 700 }}>{value}</p>
+      <p className="text-[14px] text-slate-700" style={{ fontWeight: 700 }}>{value}</p>
     </div>
   );
 }
@@ -1664,26 +1664,26 @@ function CarrierShippingCard({ carrier }: {
 
   return (
     <div
-      className="bg-white border border-[#E2E8F0] rounded-xl cursor-pointer group transition-all duration-200 flex flex-col relative shadow-[0_1px_3px_rgba(0,0,0,0.03)]"
+      className="bg-white border border-border rounded-xl cursor-pointer group transition-all duration-200 flex flex-col relative shadow-[0_1px_3px_rgba(0,0,0,0.03)]"
       onMouseEnter={(e) => { e.currentTarget.style.borderColor = "#BFDBFE"; e.currentTarget.style.boxShadow = "0 4px 16px -4px rgba(10,119,255,0.10), 0 0 0 1px #BFDBFE"; }}
-      onMouseLeave={(e) => { e.currentTarget.style.borderColor = "#E2E8F0"; e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.03)"; }}
+      onMouseLeave={(e) => { e.currentTarget.style.borderColor = "hsl(var(--border))"; e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.03)"; }}
     >
       <div className="p-3 flex-1 flex flex-col min-h-0 overflow-hidden">
         {/* Row 1: Type pill + badges */}
         <div className="flex items-center justify-between gap-2 mb-2 shrink-0">
-          <span className="inline-flex items-stretch rounded-full overflow-hidden border border-[#BFDBFE] shrink-0">
-            <span className="inline-flex items-center gap-1 px-2 py-[2px] text-[10px] text-[#1E40AF] bg-[#EFF6FF]" style={{ fontWeight: 600 }}>
+          <span className="inline-flex items-stretch rounded-full overflow-hidden border border-blue-200 shrink-0">
+            <span className="inline-flex items-center gap-1 px-2 py-[2px] text-[10px] text-blue-800 bg-blue-50" style={{ fontWeight: 600 }}>
               <Truck className="w-3 h-3" /> Carrier
             </span>
-            <span className="inline-flex items-center px-2 py-[2px] text-[10px] bg-white text-[#64748B] border-l border-[#BFDBFE]" style={{ fontWeight: 500 }}>
+            <span className="inline-flex items-center px-2 py-[2px] text-[10px] bg-white text-slate-500 border-l border-blue-200" style={{ fontWeight: 500 }}>
               {carrier.methods.length} Method{carrier.methods.length !== 1 ? "s" : ""}
             </span>
           </span>
           <div className="flex items-center gap-1.5">
             {carrier.isDefault && (
-              <span className="px-1.5 py-[2px] rounded-md text-[10px] border border-[#BFDBFE] bg-[#EFF6FF] text-[#1E40AF]" style={{ fontWeight: 600 }}>Primary</span>
+              <span className="px-1.5 py-[2px] rounded-md text-[10px] border border-blue-200 bg-blue-50 text-blue-800" style={{ fontWeight: 600 }}>Primary</span>
             )}
-            <span className={`px-1.5 py-[2px] rounded-md text-[10px] border ${carrier.status === "active" ? "border-[#BBF7D0] bg-[#F0FDF4] text-[#166534]" : "border-[#E2E8F0] bg-[#F8FAFC] text-[#94A3B8]"}`} style={{ fontWeight: 500 }}>
+            <span className={`px-1.5 py-[2px] rounded-md text-[10px] border ${carrier.status === "active" ? "border-[#BBF7D0] bg-green-50 text-[#166534]" : "border-border bg-slate-50 text-slate-400"}`} style={{ fontWeight: 500 }}>
               {carrier.status === "active" ? "Active" : "Inactive"}
             </span>
           </div>
@@ -1691,23 +1691,23 @@ function CarrierShippingCard({ carrier }: {
 
         {/* Row 2: Carrier name */}
         <div className="shrink-0 mb-1">
-          <p className="text-[13px] text-[#334155] truncate" style={{ fontWeight: 600 }}>{carrier.name}</p>
+          <p className="text-[13px] text-slate-700 truncate" style={{ fontWeight: 600 }}>{carrier.name}</p>
         </div>
 
         {/* Row 3: Description */}
         <div className="h-[32px] shrink-0 mb-2">
-          <p className="text-[11px] text-[#64748B] line-clamp-2 leading-relaxed" style={{ fontWeight: 400 }}>{carrier.desc}</p>
+          <p className="text-[11px] text-slate-500 line-clamp-2 leading-relaxed" style={{ fontWeight: 400 }}>{carrier.desc}</p>
         </div>
 
         {/* Row 4: Hero metric + vendor count inline */}
         <div className="flex items-baseline justify-between shrink-0">
           <div className="flex items-baseline gap-2">
-            <span className="text-[22px] text-[#334155] tabular-nums leading-none tracking-tight" style={{ fontWeight: 600 }}>
+            <span className="text-[22px] text-slate-700 tabular-nums leading-none tracking-tight" style={{ fontWeight: 600 }}>
               {activeMethod.cost}
             </span>
-            <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>/ shipment</span>
+            <span className="text-[11px] text-slate-400" style={{ fontWeight: 500 }}>/ shipment</span>
           </div>
-          <span className="inline-flex items-center gap-1 text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>
+          <span className="inline-flex items-center gap-1 text-[10px] text-slate-400" style={{ fontWeight: 500 }}>
             <Clock className="w-3 h-3" /> {activeMethod.minDays}–{activeMethod.maxDays} days
           </span>
         </div>
@@ -1722,10 +1722,10 @@ function CarrierShippingCard({ carrier }: {
                 <button
                   key={m.id}
                   onClick={(e) => { e.stopPropagation(); setSelectedMethodIdx(idx); }}
-                  className={`px-2 py-[3px] rounded-md text-[10px] transition-all cursor-pointer ${isActive ? "shadow-sm" : "hover:bg-[#E2E8F0]"}`}
-                  style={{ fontWeight: isActive ? 600 : 500, backgroundColor: isActive ? "#EFF6FF" : "#F1F5F9", color: isActive ? "#0A77FF" : "#64748B", boxShadow: isActive ? `0 0 0 1px #0A77FF30` : undefined }}
+                  className={`px-2 py-[3px] rounded-md text-[10px] transition-all cursor-pointer ${isActive ? "shadow-sm" : "hover:bg-border"}`}
+                  style={{ fontWeight: isActive ? 600 : 500, backgroundColor: isActive ? "#EFF6FF" : "hsl(var(--muted))", color: isActive ? "hsl(var(--primary))" : "#64748B", boxShadow: isActive ? `0 0 0 1px #0A77FF30` : undefined }}
                 >
-                  <span className="inline-flex items-center gap-1">{m.shortName}{m.isDefault && <Star className="w-2.5 h-2.5 text-[#0A77FF] fill-[#0A77FF]" />}</span>
+                  <span className="inline-flex items-center gap-1">{m.shortName}{m.isDefault && <Star className="w-2.5 h-2.5 text-primary fill-primary" />}</span>
                 </button>
                 );
               })}
@@ -1736,27 +1736,27 @@ function CarrierShippingCard({ carrier }: {
         {/* Row 6: Active method detail strip */}
         <div className="mt-auto pt-2 shrink-0">
           <div className="flex items-center justify-between px-2.5 py-[5px] rounded-lg border border-[#E8ECF1] bg-[#FAFBFC] text-[11px] tabular-nums">
-            <div className="flex items-center gap-1.5 text-[#64748B] min-w-0">
-              <Package className="w-3 h-3 text-[#94A3B8] shrink-0" />
+            <div className="flex items-center gap-1.5 text-slate-500 min-w-0">
+              <Package className="w-3 h-3 text-slate-400 shrink-0" />
               <span className="truncate" style={{ fontWeight: 400 }}>{activeMethod.name}</span>
             </div>
-            <span className="shrink-0 ml-2 text-[#334155]" style={{ fontWeight: 600 }}>{activeMethod.cost}</span>
+            <span className="shrink-0 ml-2 text-slate-700" style={{ fontWeight: 600 }}>{activeMethod.cost}</span>
           </div>
         </div>
       </div>
 
       {/* Footer — full-width 2-col CTAs matching pricing rules */}
-      <div className="grid grid-cols-2 border-t border-[#F1F5F9] shrink-0">
+      <div className="grid grid-cols-2 border-t border-muted shrink-0">
         <button
           onClick={(e) => { e.stopPropagation(); toast.info("Edit carrier coming soon"); }}
-          className="inline-flex items-center justify-center gap-1 py-2 text-[11px] text-[#64748B] hover:text-[#0A77FF] hover:bg-[#F8FAFC] transition-colors border-r border-[#F1F5F9] cursor-pointer"
+          className="inline-flex items-center justify-center gap-1 py-2 text-[11px] text-slate-500 hover:text-primary hover:bg-slate-50 transition-colors border-r border-muted cursor-pointer"
           style={{ fontWeight: 500 }}
         >
           <Pencil className="w-3 h-3" /> Edit
         </button>
         <button
           onClick={(e) => { e.stopPropagation(); toast.info("Duplicate carrier coming soon"); }}
-          className="inline-flex items-center justify-center gap-1 py-2 text-[11px] text-[#64748B] hover:text-[#0A77FF] hover:bg-[#F8FAFC] transition-colors cursor-pointer"
+          className="inline-flex items-center justify-center gap-1 py-2 text-[11px] text-slate-500 hover:text-primary hover:bg-slate-50 transition-colors cursor-pointer"
           style={{ fontWeight: 500 }}
         >
           <Copy className="w-3 h-3" /> Duplicate
@@ -1785,21 +1785,21 @@ function ContentCard({ title, icon: Icon, count, children, action, currentSize, 
     <div
       className={`rounded-xl border bg-white overflow-hidden h-full flex flex-col transition-[box-shadow,border-color] duration-300 ${
         isDragging
-          ? "border-[#E2E8F0] shadow-[0_1px_3px_rgba(0,0,0,0.04)]"
-          : "border-[#E2E8F0] shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-[0_2px_8px_-2px_rgba(0,0,0,0.06)]"
+          ? "border-border shadow-[0_1px_3px_rgba(0,0,0,0.04)]"
+          : "border-border shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-[0_2px_8px_-2px_rgba(0,0,0,0.06)]"
       }`}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
       {/* Header — entire bar is the drag handle */}
-      <div ref={dragRef} className="px-4 py-2.5 border-b border-[#F1F5F9] flex items-center justify-between shrink-0 cursor-grab active:cursor-grabbing select-none">
+      <div ref={dragRef} className="px-4 py-2.5 border-b border-muted flex items-center justify-between shrink-0 cursor-grab active:cursor-grabbing select-none">
         <div className="flex items-center gap-2 pointer-events-none">
           {Icon && (
-            <div className="w-7 h-7 rounded-lg bg-[#EDF4FF] flex items-center justify-center shrink-0">
-              <Icon className="w-3.5 h-3.5 text-[#0A77FF]" />
+            <div className="w-7 h-7 rounded-lg bg-accent flex items-center justify-center shrink-0">
+              <Icon className="w-3.5 h-3.5 text-primary" />
             </div>
           )}
-          <span className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>{title}</span>
+          <span className="text-[13px] text-foreground" style={{ fontWeight: 600 }}>{title}</span>
           {tooltip && (
             <span className="pointer-events-auto">
               <Tooltip>
@@ -1811,7 +1811,7 @@ function ContentCard({ title, icon: Icon, count, children, action, currentSize, 
                 <TooltipContent
                   side="bottom"
                   sideOffset={6}
-                  className="z-[300] max-w-[260px] rounded-xl bg-white/95 backdrop-blur-md text-[#334155] border border-[#E2E8F0]/80 px-3.5 py-2.5 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.12),0_4px_12px_-4px_rgba(0,0,0,0.05)]"
+                  className="z-[300] max-w-[260px] rounded-xl bg-white/95 backdrop-blur-md text-slate-700 border border-border/80 px-3.5 py-2.5 shadow-[0_8px_32px_-8px_rgba(0,0,0,0.12),0_4px_12px_-4px_rgba(0,0,0,0.05)]"
                 >
                   <p className="text-[11px] leading-relaxed">{tooltip}</p>
                 </TooltipContent>
@@ -1819,22 +1819,22 @@ function ContentCard({ title, icon: Icon, count, children, action, currentSize, 
             </span>
           )}
           {count != null && (
-            <span className="text-[10px] text-[#0A77FF] px-1.5 py-0.5 rounded-md bg-[#EDF4FF]" style={{ fontWeight: 600 }}>{count}</span>
+            <span className="text-[10px] text-primary px-1.5 py-0.5 rounded-md bg-accent" style={{ fontWeight: 600 }}>{count}</span>
           )}
         </div>
         <div className="flex items-center gap-2 pointer-events-auto">
           {/* Size toggle — slides in from right on hover */}
           <div className={`flex items-center transition-all duration-200 ease-out ${hovered && onSizeChange ? "opacity-100 translate-x-0" : "opacity-0 translate-x-2 pointer-events-none"}`}>
             {onSizeChange && currentSize && (
-              <div className="flex items-center h-7 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-0.5 gap-0.5">
+              <div className="flex items-center h-7 rounded-lg border border-border bg-slate-50 p-0.5 gap-0.5">
                 {(["sm", "md", "lg"] as const).map((s) => (
                   <button
                     key={s}
                     onClick={(e) => { e.stopPropagation(); onSizeChange(s); }}
                     className={`h-6 px-2.5 rounded-md text-[11px] cursor-pointer transition-all duration-150 ${
                       currentSize === s
-                        ? "bg-white text-[#0A77FF] shadow-sm border border-[#E2E8F0]"
-                        : "text-[#94A3B8] hover:text-[#334155] hover:bg-white/60 border border-transparent"
+                        ? "bg-white text-primary shadow-sm border border-border"
+                        : "text-slate-400 hover:text-slate-700 hover:bg-white/60 border border-transparent"
                     }`}
                     style={{ fontWeight: currentSize === s ? 600 : 500 }}
                   >
@@ -1881,7 +1881,7 @@ function DraggableWidgetCard({ widgetKey, index, moveWidget, children }: {
   return (
     <div
       ref={ref}
-      className={`transition-all duration-300 ease-out rounded-xl h-full ${isOver && !isDragging ? "ring-2 ring-[#0A77FF]/20 ring-offset-2 scale-[1.005]" : ""}`}
+      className={`transition-all duration-300 ease-out rounded-xl h-full ${isOver && !isDragging ? "ring-2 ring-primary/20 ring-offset-2 scale-[1.005]" : ""}`}
       style={{ opacity: isDragging ? 0.3 : 1, transform: isDragging ? "scale(0.97) rotate(-0.5deg)" : undefined }}
     >
       {children((node) => { drag(node); }, isDragging)}
@@ -1894,14 +1894,14 @@ function EmptyState({ icon: Icon, title, description }: { icon: React.ElementTyp
     <div className="flex flex-col items-center justify-center py-10 text-center" style={{ animation: "csFade 0.4s ease-out both" }}>
       <div className="relative mb-3">
         <div
-          className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#F8FAFC] to-[#F1F5F9] border border-[#E2E8F0] flex items-center justify-center shadow-sm"
+          className="w-12 h-12 rounded-xl bg-gradient-to-br from-slate-50 to-muted border border-border flex items-center justify-center shadow-sm"
           style={{ animation: "csFloat 4s ease-in-out infinite" }}
         >
-          <Icon className="w-5 h-5 text-[#94A3B8]" />
+          <Icon className="w-5 h-5 text-slate-400" />
         </div>
       </div>
-      <p className="text-[13px] text-[#334155] mb-0.5" style={{ fontWeight: 600 }}>{title}</p>
-      <p className="text-[12px] text-[#94A3B8] max-w-xs leading-relaxed">{description}</p>
+      <p className="text-[13px] text-slate-700 mb-0.5" style={{ fontWeight: 600 }}>{title}</p>
+      <p className="text-[12px] text-slate-400 max-w-xs leading-relaxed">{description}</p>
     </div>
   );
 }
@@ -1935,7 +1935,7 @@ const ORDER_ACTIVITY_DATA = [
   { day: "Sun", orders: 2, returns: 1 },
 ];
 
-const PIE_COLORS = ["#0A77FF", "#7C3AED", "#059669", "#94A3B8"];
+const PIE_COLORS = ["hsl(var(--primary))", "hsl(var(--violet))", "hsl(var(--success))", "#94A3B8"];
 
 // ═════════════════════���════════════════════════
 // TAB CONTENT COMPONENTS
@@ -1949,29 +1949,29 @@ function PlaceholderTab({ label, description, icon: Icon }: { label: string; des
       <div className="flex flex-col items-center justify-center w-full h-full py-24 px-6 text-center">
         {/* Animated icon */}
         <div className="relative mb-6">
-          <div className="absolute inset-0 w-16 h-16 rounded-2xl bg-[#0A77FF]/5 animate-ping" style={{ animationDuration: "3s" }} />
+          <div className="absolute inset-0 w-16 h-16 rounded-2xl bg-primary/5 animate-ping" style={{ animationDuration: "3s" }} />
           <div
-            className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-[#F8FAFC] to-[#EDF4FF] border border-[#E2E8F0] flex items-center justify-center shadow-sm"
+            className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-slate-50 to-accent border border-border flex items-center justify-center shadow-sm"
             style={{ animation: "csFloat 4s ease-in-out infinite" }}
           >
-            <DisplayIcon className="w-7 h-7 text-[#94A3B8]" />
+            <DisplayIcon className="w-7 h-7 text-slate-400" />
           </div>
         </div>
         <div
-          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#F1F5F9] border border-[#E2E8F0] mb-3"
+          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-muted border border-border mb-3"
           style={{ animation: "csFade 0.5s ease-out both", animationDelay: "0.1s" }}
         >
-          <span className="w-1.5 h-1.5 rounded-full bg-[#0A77FF] animate-pulse" />
-          <span className="text-[11px] text-[#475569]" style={{ fontWeight: 600 }}>Coming Soon</span>
+          <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+          <span className="text-[11px] text-muted-foreground" style={{ fontWeight: 600 }}>Coming Soon</span>
         </div>
         <h3
-          className="text-[#0F172A] text-[16px] mb-1.5"
+          className="text-foreground text-[16px] mb-1.5"
           style={{ fontWeight: 600, animation: "csFade 0.5s ease-out both", animationDelay: "0.2s" }}
         >
           {label}
         </h3>
         <p
-          className="text-[#94A3B8] text-[13px] max-w-sm leading-relaxed"
+          className="text-slate-400 text-[13px] max-w-sm leading-relaxed"
           style={{ animation: "csFade 0.5s ease-out both", animationDelay: "0.3s" }}
         >
           {description}
@@ -2044,7 +2044,7 @@ function computeDashKpiValue(
     case "credit_limit": return { value: formatCurrency(vendor.creditLimit) };
     case "last_order_date": return { value: formatDate(vendor.updatedAt) };
     case "payment_status": return { value: "—" };
-    case "credit_utilization": return { value: `${creditPct}%`, change: "↗ 3.7%", changeColor: "#059669" };
+    case "credit_utilization": return { value: `${creditPct}%`, change: "↗ 3.7%", changeColor: "hsl(var(--success))" };
     case "on_time_rate": return { value: "94.2%" };
     case "rating": return { value: `${vendor.rating.toFixed(1)} / 5` };
     case "total_locations": return { value: String(vendor.partnerLocations?.length ?? 0) };
@@ -2106,12 +2106,12 @@ const PARTNER_WIDGET_CATEGORY_ORDER: PartnerWidgetDef["category"][] = ["Performa
  *  family) give the drawer an airy feel; inactive cards desaturate to slate. */
 function PartnerWidgetVisual({ type, isActive }: { type: PartnerWidgetVisualType; isActive: boolean }) {
   const C = {
-    blue:    isActive ? "#93C5FD" : "#E2E8F0",
-    orange:  isActive ? "#FDBA74" : "#E2E8F0",
-    purple:  isActive ? "#C4B5FD" : "#E2E8F0",
-    green:   isActive ? "#86EFAC" : "#E2E8F0",
-    red:     isActive ? "#FCA5A5" : "#E2E8F0",
-    slate:   isActive ? "#CBD5E1" : "#E2E8F0",
+    blue:    isActive ? "#93C5FD" : "hsl(var(--border))",
+    orange:  isActive ? "#FDBA74" : "hsl(var(--border))",
+    purple:  isActive ? "#C4B5FD" : "hsl(var(--border))",
+    green:   isActive ? "#86EFAC" : "hsl(var(--border))",
+    red:     isActive ? "#FCA5A5" : "hsl(var(--border))",
+    slate:   isActive ? "#CBD5E1" : "hsl(var(--border))",
     needle:  isActive ? "#64748B" : "#94A3B8",
     lineFg:  isActive ? "#93C5FD" : "#CBD5E1",
   };
@@ -2284,9 +2284,9 @@ function DashboardCustomizePanel({ open, onOpenChange, activeKpis, onToggleKpi, 
             <div className="flex items-start gap-3">
               <div
                 className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-                style={{ backgroundColor: "#EDF4FF" }}
+                style={{ backgroundColor: "hsl(var(--accent))" }}
               >
-                <Sliders className="w-5 h-5" style={{ color: "#0A77FF" }} />
+                <Sliders className="w-5 h-5" style={{ color: "hsl(var(--primary))" }} />
               </div>
               <div>
                 <h2 className="text-base text-foreground" style={{ fontWeight: 600 }}>
@@ -2321,16 +2321,16 @@ function DashboardCustomizePanel({ open, onOpenChange, activeKpis, onToggleKpi, 
               }}
               className={`flex items-center gap-1.5 text-[12px] px-3 py-1.5 rounded-full border transition-all duration-200 cursor-pointer ${
                 DASH_KPI_DEFS.every(k => activeKpis.includes(k.key))
-                  ? "bg-[#EBF3FF] border-[#0A77FF]/25 text-[#0A77FF] hover:bg-[#DCEAFF] hover:border-[#0A77FF]/40 shadow-sm shadow-[#0A77FF]/10"
+                  ? "bg-[#EBF3FF] border-primary/25 text-primary hover:bg-[#DCEAFF] hover:border-primary/40 shadow-sm shadow-primary/10"
                   : activeKpis.length === 0
-                  ? "bg-[#F8FAFC] border-[#E2E8F0] text-[#94A3B8] hover:bg-[#F1F5F9] hover:border-[#CBD5E1] hover:text-[#64748B]"
-                  : "bg-[#F8FAFC] border-[#E2E8F0] text-[#64748B] hover:bg-[#EBF3FF] hover:border-[#0A77FF]/25 hover:text-[#0A77FF]"
+                  ? "bg-slate-50 border-border text-slate-400 hover:bg-muted hover:border-slate-300 hover:text-slate-500"
+                  : "bg-slate-50 border-border text-slate-500 hover:bg-[#EBF3FF] hover:border-primary/25 hover:text-primary"
               }`}
               style={{ fontWeight: 600 }}
             >
               {DASH_KPI_DEFS.every(k => activeKpis.includes(k.key)) ? (
                 <>
-                  <ToggleRight className="w-4 h-4 text-[#0A77FF]" />
+                  <ToggleRight className="w-4 h-4 text-primary" />
                   <span>All On</span>
                 </>
               ) : activeKpis.length === 0 ? (
@@ -2362,15 +2362,15 @@ function DashboardCustomizePanel({ open, onOpenChange, activeKpis, onToggleKpi, 
         </div>
 
         {/* Tab bar — matches header tab style */}
-        <div className="flex items-center gap-0 px-5 border-b border-[#F1F5F9] shrink-0 mt-3">
+        <div className="flex items-center gap-0 px-5 border-b border-muted shrink-0 mt-3">
           {(["kpis", "widgets"] as const).map((t) => (
             <button
               key={t}
               onClick={() => setPanelTab(t)}
               className={`px-4 py-2.5 border-b-2 text-[13px] transition-all duration-200 cursor-pointer whitespace-nowrap ${
                 panelTab === t
-                  ? "border-[#0A77FF] text-[#0A77FF]"
-                  : "border-transparent text-[#64748B] hover:text-[#334155] hover:border-[#CBD5E1]"
+                  ? "border-primary text-primary"
+                  : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
               }`}
               style={{ fontWeight: panelTab === t ? 600 : 400 }}
             >
@@ -2405,14 +2405,14 @@ function DashboardCustomizePanel({ open, onOpenChange, activeKpis, onToggleKpi, 
                           onClick={() => onToggleKpi(kpi.key)}
                           className={`relative text-left rounded-lg border px-3 py-2.5 transition-all duration-150 cursor-pointer group ${
                             isActive
-                              ? "border-[#0A77FF]/25 bg-[#0A77FF]/[0.04] shadow-[0_0_0_1px_rgba(10,119,255,0.08)]"
+                              ? "border-primary/25 bg-primary/[0.04] shadow-[0_0_0_1px_rgba(10,119,255,0.08)]"
                               : "border-border/60 bg-white hover:border-border hover:bg-muted/20 hover:shadow-sm"
                           }`}
                         >
                           <div className="flex items-center justify-between gap-1">
-                            <span className={`text-[11.5px] truncate transition-colors ${isActive ? "text-[#0A77FF]" : "text-muted-foreground/70"}`} style={{ fontWeight: 500 }} title={kpi.label}>{kpi.label}</span>
+                            <span className={`text-[11.5px] truncate transition-colors ${isActive ? "text-primary" : "text-muted-foreground/70"}`} style={{ fontWeight: 500 }} title={kpi.label}>{kpi.label}</span>
                             <div className="shrink-0">
-                              {isActive ? <Check className="w-3.5 h-3.5" style={{ color: "#0A77FF" }} /> : <Plus className="w-3.5 h-3.5 text-muted-foreground/25 group-hover:text-muted-foreground/50 transition-colors" />}
+                              {isActive ? <Check className="w-3.5 h-3.5" style={{ color: "hsl(var(--primary))" }} /> : <Plus className="w-3.5 h-3.5 text-muted-foreground/25 group-hover:text-muted-foreground/50 transition-colors" />}
                             </div>
                           </div>
                           <p className={`text-[15px] mt-1 transition-colors ${isActive ? "text-foreground" : "text-foreground/80"}`} style={{ fontWeight: 550 }}>{computed.value}</p>
@@ -2455,36 +2455,36 @@ function DashboardCustomizePanel({ open, onOpenChange, activeKpis, onToggleKpi, 
                             onClick={() => onToggleWidget(w.key)}
                             className={`relative text-left rounded-xl border overflow-hidden transition-all duration-150 cursor-pointer group ${
                               isActive
-                                ? "border-[#0A77FF]/30 bg-white shadow-[0_0_0_1px_rgba(10,119,255,0.08)]"
+                                ? "border-primary/30 bg-white shadow-[0_0_0_1px_rgba(10,119,255,0.08)]"
                                 : "border-border/60 bg-white hover:border-border hover:shadow-sm"
                             }`}
                           >
-                            <div className={`h-[68px] flex items-center justify-center transition-colors ${isActive ? "bg-[#F8FAFF]" : "bg-[#F8FAFC]"}`}>
+                            <div className={`h-[68px] flex items-center justify-center transition-colors ${isActive ? "bg-[#F8FAFF]" : "bg-slate-50"}`}>
                               <PartnerWidgetVisual type={w.type} isActive={isActive} />
                             </div>
                             <div className="absolute top-1.5 right-1.5">
                               {isActive ? (
-                                <div className="w-5 h-5 rounded-full bg-[#0A77FF] flex items-center justify-center shadow-sm">
+                                <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center shadow-sm">
                                   <Check className="w-3 h-3 text-white" strokeWidth={3} />
                                 </div>
                               ) : (
-                                <div className="w-5 h-5 rounded-full bg-white border border-[#E2E8F0] flex items-center justify-center group-hover:border-[#CBD5E1] transition-colors">
-                                  <Plus className="w-3 h-3 text-[#94A3B8]" />
+                                <div className="w-5 h-5 rounded-full bg-white border border-border flex items-center justify-center group-hover:border-slate-300 transition-colors">
+                                  <Plus className="w-3 h-3 text-slate-400" />
                                 </div>
                               )}
                             </div>
-                            <div className="px-3 py-2.5 border-t border-[#F1F5F9]">
-                              <p className="text-[12.5px] text-[#0F172A] truncate" style={{ fontWeight: 600 }} title={w.label}>{w.label}</p>
-                              <p className="text-[11px] text-[#64748B] mt-0.5 line-clamp-2 leading-snug" title={w.description}>{w.description}</p>
+                            <div className="px-3 py-2.5 border-t border-muted">
+                              <p className="text-[12.5px] text-foreground truncate" style={{ fontWeight: 600 }} title={w.label}>{w.label}</p>
+                              <p className="text-[11px] text-slate-500 mt-0.5 line-clamp-2 leading-snug" title={w.description}>{w.description}</p>
                               {isActive && (
-                                <div className="mt-2 flex items-center h-6 rounded-md border border-[#E2E8F0] bg-[#F8FAFC] p-0.5 gap-0.5" onClick={(e) => e.stopPropagation()}>
+                                <div className="mt-2 flex items-center h-6 rounded-md border border-border bg-slate-50 p-0.5 gap-0.5" onClick={(e) => e.stopPropagation()}>
                                   {(["sm", "md", "lg"] as const).map((s) => (
                                     <button
                                       key={s}
                                       type="button"
                                       onClick={(e) => { e.stopPropagation(); onWidgetSizeChange(w.key, s); }}
                                       className={`flex-1 h-5 rounded text-[9.5px] transition-all duration-150 cursor-pointer ${
-                                        sz === s ? "bg-white text-[#0A77FF] shadow-sm" : "text-[#94A3B8] hover:text-[#334155]"
+                                        sz === s ? "bg-white text-primary shadow-sm" : "text-slate-400 hover:text-slate-700"
                                       }`}
                                       style={{ fontWeight: sz === s ? 600 : 500 }}
                                     >
@@ -2536,7 +2536,7 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
   const [ptDetailOpen, setPtDetailOpen] = useState(false);
   const [ptDetailTerm, setPtDetailTerm] = useState<PaymentTermPreset | null>(null);
   const creditStatusLabel = creditPct > 80 ? "Critical" : creditPct > 50 ? "Warning" : "Healthy";
-  const creditStatusColor = creditPct > 80 ? "#DC2626" : creditPct > 50 ? "#D97706" : "#059669";
+  const creditStatusColor = creditPct > 80 ? "hsl(var(--destructive))" : creditPct > 50 ? "hsl(var(--warning))" : "hsl(var(--success))";
   const creditBarColor = creditPct > 80 ? "#FEE2E2" : creditPct > 50 ? "#FEF3C7" : "#D1FAE5";
 
   return (
@@ -2582,15 +2582,15 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
               <div style={{ height: h }} className="-ml-2"><ResponsiveContainer width="100%" height="100%">{chart}</ResponsiveContainer></div>
             );
             const statRow = (stats: { label: string; value: string; color?: string }[], compact?: boolean) => (
-              <div className={`flex items-center ${compact ? "gap-3 mt-1.5 pt-1.5" : "gap-4 mt-2 pt-2"} border-t border-[#F1F5F9]`}>
-                {stats.map((s, i) => (<div key={i}><p className={`${compact ? "text-[9px]" : "text-[10px]"} text-[#94A3B8]`} style={{ fontWeight: 500 }}>{s.label}</p><p className={compact ? "text-[11px]" : "text-[13px]"} style={{ fontWeight: 700, color: s.color || "#334155" }}>{s.value}</p></div>))}
+              <div className={`flex items-center ${compact ? "gap-3 mt-1.5 pt-1.5" : "gap-4 mt-2 pt-2"} border-t border-muted`}>
+                {stats.map((s, i) => (<div key={i}><p className={`${compact ? "text-[9px]" : "text-[10px]"} text-slate-400`} style={{ fontWeight: 500 }}>{s.label}</p><p className={compact ? "text-[11px]" : "text-[13px]"} style={{ fontWeight: 700, color: s.color || "#334155" }}>{s.value}</p></div>))}
               </div>
             );
             const ttStyle = { borderRadius: 8, border: "1px solid #E2E8F0", boxShadow: "0 4px 12px rgba(0,0,0,0.08)", fontSize: 12 };
 
             if (wKey === "spend_trend") {
             icon = TrendingUp; title = "Spend Trend"; tip = "Tracks total monthly spend with this partner across all purchase orders and invoices. Use this to identify seasonal patterns and budget alignment.";
-            cardAction = <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>This Year</span>;
+            cardAction = <span className="text-[11px] text-slate-400" style={{ fontWeight: 500 }}>This Year</span>;
             const totalYTD = SPEND_TREND_DATA.reduce((s, d) => s + d.amount, 0);
             const avgMonthly = Math.round(totalYTD / SPEND_TREND_DATA.length);
             const peakMonth = SPEND_TREND_DATA.reduce((a, b) => a.amount > b.amount ? a : b);
@@ -2599,12 +2599,12 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
               <>
                 {chartBox(CH[sz], (
                   <AreaChart data={SPEND_TREND_DATA} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
-                    <defs><linearGradient id="spendGradientUniq" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#0A77FF" stopOpacity={0.15} /><stop offset="100%" stopColor="#0A77FF" stopOpacity={0.01} /></linearGradient></defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
+                    <defs><linearGradient id="spendGradientUniq" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.15} /><stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0.01} /></linearGradient></defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted))" vertical={false} />
                     <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
                     <YAxis tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
                     <ReTooltip contentStyle={ttStyle} formatter={(val: number) => [`$${val.toLocaleString()}`, "Spend"]} />
-                    <Area type="monotone" dataKey="amount" stroke="#0A77FF" strokeWidth={2} fill="url(#spendGradientUniq)" />
+                    <Area type="monotone" dataKey="amount" stroke="hsl(var(--primary))" strokeWidth={2} fill="url(#spendGradientUniq)" />
                   </AreaChart>
                 ))}
                 {sz === "sm" && statRow([
@@ -2618,14 +2618,14 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
                 {sz === "lg" && statRow([
                   { label: "YTD Total", value: formatCurrency(totalYTD) },
                   { label: "Monthly Avg", value: formatCurrency(avgMonthly) },
-                  { label: "Peak Month", value: `${peakMonth.month} · ${formatCurrency(peakMonth.amount)}`, color: "#0A77FF" },
+                  { label: "Peak Month", value: `${peakMonth.month} · ${formatCurrency(peakMonth.amount)}`, color: "hsl(var(--primary))" },
                   { label: "Lowest", value: `${lowMonth.month} · ${formatCurrency(lowMonth.amount)}`, color: "#94A3B8" },
                 ])}
               </>
             );
           } else if (wKey === "order_activity") {
             icon = BarChart3; title = "Order Activity"; tip = "Shows daily order volume and return rates for the current week. Helps identify peak ordering days and track return patterns for quality monitoring.";
-            cardAction = (<div className="flex items-center gap-3"><div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-[#0A77FF]" /><span className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Orders</span></div><div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-[#F59E0B]" /><span className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Returns</span></div></div>);
+            cardAction = (<div className="flex items-center gap-3"><div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-primary" /><span className="text-[11px] text-slate-500" style={{ fontWeight: 500 }}>Orders</span></div><div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-amber-500" /><span className="text-[11px] text-slate-500" style={{ fontWeight: 500 }}>Returns</span></div></div>);
             const totalOrd = ORDER_ACTIVITY_DATA.reduce((s, d) => s + d.orders, 0);
             const totalRet = ORDER_ACTIVITY_DATA.reduce((s, d) => s + d.returns, 0);
             const retPct = totalOrd > 0 ? ((totalRet / totalOrd) * 100).toFixed(1) : "0";
@@ -2633,11 +2633,11 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
               <>
                 {chartBox(CH[sz], (
                   <BarChart data={ORDER_ACTIVITY_DATA} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted))" vertical={false} />
                     <XAxis dataKey="day" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
                     <YAxis tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
                     <ReTooltip contentStyle={ttStyle} />
-                    <Bar dataKey="orders" fill="#0A77FF" radius={[4, 4, 0, 0]} barSize={sz === "sm" ? 14 : 24} name="Orders" />
+                    <Bar dataKey="orders" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} barSize={sz === "sm" ? 14 : 24} name="Orders" />
                     <Bar dataKey="returns" fill="#F59E0B" radius={[4, 4, 0, 0]} barSize={sz === "sm" ? 14 : 24} name="Returns" />
                   </BarChart>
                 ))}
@@ -2652,7 +2652,7 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
                 {sz === "lg" && statRow([
                   { label: "This Week", value: `${totalOrd} orders` },
                   { label: "Returns", value: `${totalRet} (${retPct}%)`, color: "#F59E0B" },
-                  { label: "Peak Day", value: "Thursday · 8", color: "#0A77FF" },
+                  { label: "Peak Day", value: "Thursday · 8", color: "hsl(var(--primary))" },
                   { label: "Avg / Day", value: `${(totalOrd / 7).toFixed(1)}` },
                 ])}
               </>
@@ -2672,14 +2672,14 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
                       </Pie>
                     </RePieChart>
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
-                      <span className="text-[11px] text-[#334155]" style={{ fontWeight: 700 }}>{formatCurrency(vendor.totalSpent)}</span>
+                      <span className="text-[11px] text-slate-700" style={{ fontWeight: 700 }}>{formatCurrency(vendor.totalSpent)}</span>
                     </div>
                   </div>
                   <div className="flex-1 min-w-0 space-y-1.5">
                     {spendCategories.map((cat, idx) => (
                       <div key={cat.name} className="flex items-center justify-between">
-                        <div className="flex items-center gap-2"><span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: PIE_COLORS[idx] }} /><span className="text-[11px] text-[#475569]" style={{ fontWeight: 500 }}>{cat.name}</span></div>
-                        <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>{cat.pct}%</span>
+                        <div className="flex items-center gap-2"><span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: PIE_COLORS[idx] }} /><span className="text-[11px] text-muted-foreground" style={{ fontWeight: 500 }}>{cat.name}</span></div>
+                        <span className="text-[11px] text-slate-400" style={{ fontWeight: 500 }}>{cat.pct}%</span>
                       </div>
                     ))}
                   </div>
@@ -2693,20 +2693,20 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
             icon = Shield; title = "Credit Health"; tip = "Shows how much of the approved credit line is currently in use. Utilization above 80% triggers risk alerts. Includes available balance, current usage, and total limit.";
             content = (
               <>
-                <div className="flex items-center justify-between mb-2"><span className="text-[12px] text-[#475569]" style={{ fontWeight: 500 }}>Credit Utilization</span><span className="text-[13px] text-[#334155]" style={{ fontWeight: 700 }}>{creditPct}%</span></div>
-                <div className="w-full h-3 rounded-full bg-[#F1F5F9] overflow-hidden"><div className="h-full rounded-full transition-all" style={{ width: `${Math.min(creditPct, 100)}%`, backgroundColor: creditPct > 80 ? "#DC2626" : creditPct > 50 ? "#D97706" : "#059669" }} /></div>
-                <div className="flex items-center justify-between mt-1.5"><span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>$0</span><span className="text-[10px]" style={{ fontWeight: 500, color: creditStatusColor }}>{creditStatusLabel}</span><span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>{formatCurrency(vendor.creditLimit)}</span></div>
+                <div className="flex items-center justify-between mb-2"><span className="text-[12px] text-muted-foreground" style={{ fontWeight: 500 }}>Credit Utilization</span><span className="text-[13px] text-slate-700" style={{ fontWeight: 700 }}>{creditPct}%</span></div>
+                <div className="w-full h-3 rounded-full bg-muted overflow-hidden"><div className="h-full rounded-full transition-all" style={{ width: `${Math.min(creditPct, 100)}%`, backgroundColor: creditPct > 80 ? "hsl(var(--destructive))" : creditPct > 50 ? "hsl(var(--warning))" : "hsl(var(--success))" }} /></div>
+                <div className="flex items-center justify-between mt-1.5"><span className="text-[10px] text-slate-400" style={{ fontWeight: 500 }}>$0</span><span className="text-[10px]" style={{ fontWeight: 500, color: creditStatusColor }}>{creditStatusLabel}</span><span className="text-[10px] text-slate-400" style={{ fontWeight: 500 }}>{formatCurrency(vendor.creditLimit)}</span></div>
                 {sz === "sm" && statRow([
-                  { label: "Available", value: formatCurrency(Math.max(available, 0)), color: "#059669" },
+                  { label: "Available", value: formatCurrency(Math.max(available, 0)), color: "hsl(var(--success))" },
                   { label: "Limit", value: formatCurrency(vendor.creditLimit) },
                 ], true)}
                 {sz === "md" && statRow([
-                  { label: "Available", value: formatCurrency(Math.max(available, 0)), color: "#059669" },
+                  { label: "Available", value: formatCurrency(Math.max(available, 0)), color: "hsl(var(--success))" },
                   { label: "Used", value: formatCurrency(vendor.creditUtilization) },
                   { label: "Limit", value: formatCurrency(vendor.creditLimit) },
                 ])}
                 {sz === "lg" && statRow([
-                  { label: "Available", value: formatCurrency(Math.max(available, 0)), color: "#059669" },
+                  { label: "Available", value: formatCurrency(Math.max(available, 0)), color: "hsl(var(--success))" },
                   { label: "Used", value: formatCurrency(vendor.creditUtilization) },
                   { label: "Limit", value: formatCurrency(vendor.creditLimit) },
                   { label: "Status", value: creditStatusLabel, color: creditStatusColor },
@@ -2719,28 +2719,28 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
               <>
                 {chartBox(CH[sz], (
                   <AreaChart data={[{ month: "Oct", rate: 91 }, { month: "Nov", rate: 88 }, { month: "Dec", rate: 93 }, { month: "Jan", rate: 95 }, { month: "Feb", rate: 92 }, { month: "Mar", rate: 94 }]} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
-                    <defs><linearGradient id="delivGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#059669" stopOpacity={0.15} /><stop offset="100%" stopColor="#059669" stopOpacity={0.01} /></linearGradient></defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
+                    <defs><linearGradient id="delivGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="hsl(var(--success))" stopOpacity={0.15} /><stop offset="100%" stopColor="hsl(var(--success))" stopOpacity={0.01} /></linearGradient></defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted))" vertical={false} />
                     <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
                     <YAxis tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} domain={[80, 100]} tickFormatter={(v) => `${v}%`} />
                     <ReTooltip contentStyle={ttStyle} formatter={(v: number) => [`${v}%`, "On-Time"]} />
-                    <Area type="monotone" dataKey="rate" stroke="#059669" strokeWidth={2} fill="url(#delivGrad)" />
+                    <Area type="monotone" dataKey="rate" stroke="hsl(var(--success))" strokeWidth={2} fill="url(#delivGrad)" />
                   </AreaChart>
                 ))}
                 {sz === "sm" && statRow([
-                  { label: "On-Time", value: "94%", color: "#059669" },
-                  { label: "Late", value: "6%", color: "#D97706" },
+                  { label: "On-Time", value: "94%", color: "hsl(var(--success))" },
+                  { label: "Late", value: "6%", color: "hsl(var(--warning))" },
                 ], true)}
                 {sz === "md" && statRow([
-                  { label: "Current", value: "94%", color: "#059669" },
+                  { label: "Current", value: "94%", color: "hsl(var(--success))" },
                   { label: "Average", value: "92.2%" },
-                  { label: "Late", value: "6%", color: "#D97706" },
+                  { label: "Late", value: "6%", color: "hsl(var(--warning))" },
                 ])}
                 {sz === "lg" && statRow([
-                  { label: "Current", value: "94%", color: "#059669" },
+                  { label: "Current", value: "94%", color: "hsl(var(--success))" },
                   { label: "6-Mo Avg", value: "92.2%" },
-                  { label: "Late Rate", value: "6%", color: "#D97706" },
-                  { label: "Best Month", value: "Jan · 95%", color: "#059669" },
+                  { label: "Late Rate", value: "6%", color: "hsl(var(--warning))" },
+                  { label: "Best Month", value: "Jan · 95%", color: "hsl(var(--success))" },
                 ])}
               </>
             );
@@ -2755,29 +2755,29 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
                     { range: "61-90d", amount: Math.round(vendor.outstandingBalance * 0.2) },
                     { range: "90d+", amount: Math.round(vendor.outstandingBalance * 0.15) },
                   ]} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted))" vertical={false} />
                     <XAxis dataKey="range" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
                     <YAxis tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
                     <ReTooltip contentStyle={ttStyle} formatter={(v: number) => [`$${v.toLocaleString()}`, "Amount"]} />
                     <Bar dataKey="amount" radius={[4, 4, 0, 0]} barSize={sz === "sm" ? 20 : 36}>
-                      {[0, 1, 2, 3].map((i) => (<Cell key={i} fill={["#0A77FF", "#3B82F6", "#D97706", "#DC2626"][i]} />))}
+                      {[0, 1, 2, 3].map((i) => (<Cell key={i} fill={["hsl(var(--primary))", "#3B82F6", "hsl(var(--warning))", "hsl(var(--destructive))"][i]} />))}
                     </Bar>
                   </BarChart>
                 ))}
                 {sz === "sm" && statRow([
-                  { label: "Overdue", value: formatCurrency(Math.round(vendor.outstandingBalance * 0.35)), color: "#DC2626" },
-                  { label: "Avg Days", value: "42", color: "#D97706" },
+                  { label: "Overdue", value: formatCurrency(Math.round(vendor.outstandingBalance * 0.35)), color: "hsl(var(--destructive))" },
+                  { label: "Avg Days", value: "42", color: "hsl(var(--warning))" },
                 ], true)}
                 {sz === "md" && statRow([
-                  { label: "Total Overdue", value: formatCurrency(Math.round(vendor.outstandingBalance * 0.35)), color: "#DC2626" },
+                  { label: "Total Overdue", value: formatCurrency(Math.round(vendor.outstandingBalance * 0.35)), color: "hsl(var(--destructive))" },
                   { label: "Invoices", value: "11" },
-                  { label: "Avg Days", value: "42", color: "#D97706" },
+                  { label: "Avg Days", value: "42", color: "hsl(var(--warning))" },
                 ])}
                 {sz === "lg" && statRow([
-                  { label: "Total Overdue", value: formatCurrency(Math.round(vendor.outstandingBalance * 0.35)), color: "#DC2626" },
+                  { label: "Total Overdue", value: formatCurrency(Math.round(vendor.outstandingBalance * 0.35)), color: "hsl(var(--destructive))" },
                   { label: "Open Invoices", value: "11" },
-                  { label: "Avg Days", value: "42", color: "#D97706" },
-                  { label: "Oldest", value: "98 days", color: "#DC2626" },
+                  { label: "Avg Days", value: "42", color: "hsl(var(--warning))" },
+                  { label: "Oldest", value: "98 days", color: "hsl(var(--destructive))" },
                 ])}
               </>
             );
@@ -2786,23 +2786,23 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
             content = (
               <>
                 <div className="flex items-start gap-3">
-                  <div className="w-9 h-9 rounded-full bg-[#F1F5F9] flex items-center justify-center shrink-0"><span className="text-xs text-[#475569]" style={{ fontWeight: 600 }}>{vendor.primaryContact.name.split(" ").map((n) => n[0]).join("")}</span></div>
+                  <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center shrink-0"><span className="text-xs text-muted-foreground" style={{ fontWeight: 600 }}>{vendor.primaryContact.name.split(" ").map((n) => n[0]).join("")}</span></div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-[13px] text-[#334155]" style={{ fontWeight: 600 }}>{vendor.primaryContact.name}</p>
-                    <p className="text-[11px] text-[#64748B] mt-0.5">{vendor.primaryContact.designation}</p>
+                    <p className="text-[13px] text-slate-700" style={{ fontWeight: 600 }}>{vendor.primaryContact.name}</p>
+                    <p className="text-[11px] text-slate-500 mt-0.5">{vendor.primaryContact.designation}</p>
                   </div>
                 </div>
                 {sz === "sm" && (
                   <>
-                    <div className="mt-2 pt-1.5 border-t border-[#F1F5F9] space-y-1">
-                      <div className="flex items-center gap-1.5 text-[10px] text-[#334155]"><Mail className="w-3 h-3 text-[#94A3B8]" /><span className="truncate">{vendor.primaryContact.email || "—"}</span></div>
-                      <div className="flex items-center gap-1.5 text-[10px] text-[#334155]"><Phone className="w-3 h-3 text-[#94A3B8]" />{vendor.primaryContact.phone || "—"}</div>
+                    <div className="mt-2 pt-1.5 border-t border-muted space-y-1">
+                      <div className="flex items-center gap-1.5 text-[10px] text-slate-700"><Mail className="w-3 h-3 text-slate-400" /><span className="truncate">{vendor.primaryContact.email || "—"}</span></div>
+                      <div className="flex items-center gap-1.5 text-[10px] text-slate-700"><Phone className="w-3 h-3 text-slate-400" />{vendor.primaryContact.phone || "—"}</div>
                     </div>
                     <div style={{ height: 60 }} className="-ml-2 mt-1.5">
                       <ResponsiveContainer width="100%" height="100%">
                         <LineChart data={[{ w: "W1", h: 4.2 }, { w: "W2", h: 3.8 }, { w: "W3", h: 2.5 }, { w: "W4", h: 3.1 }, { w: "W5", h: 1.8 }, { w: "W6", h: 2.2 }]} margin={{ top: 2, right: 8, left: 0, bottom: 0 }}>
                           <XAxis dataKey="w" tick={{ fontSize: 8, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
-                          <Line type="monotone" dataKey="h" stroke="#7C3AED" strokeWidth={1.5} dot={{ r: 1.5, fill: "#7C3AED" }} />
+                          <Line type="monotone" dataKey="h" stroke="hsl(var(--violet))" strokeWidth={1.5} dot={{ r: 1.5, fill: "hsl(var(--violet))" }} />
                         </LineChart>
                       </ResponsiveContainer>
                     </div>
@@ -2810,15 +2810,15 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
                 )}
                 {sz === "md" && (
                   <>
-                    <div className="flex items-center gap-3 mt-2 pt-2 border-t border-[#F1F5F9]">
-                      <div className="flex items-center gap-1.5 text-[11px] text-[#334155]"><Mail className="w-3 h-3 text-[#94A3B8]" />{vendor.primaryContact.email || "—"}</div>
-                      <div className="flex items-center gap-1.5 text-[11px] text-[#334155]"><Phone className="w-3 h-3 text-[#94A3B8]" />{vendor.primaryContact.phone || "—"}</div>
+                    <div className="flex items-center gap-3 mt-2 pt-2 border-t border-muted">
+                      <div className="flex items-center gap-1.5 text-[11px] text-slate-700"><Mail className="w-3 h-3 text-slate-400" />{vendor.primaryContact.email || "—"}</div>
+                      <div className="flex items-center gap-1.5 text-[11px] text-slate-700"><Phone className="w-3 h-3 text-slate-400" />{vendor.primaryContact.phone || "—"}</div>
                     </div>
                     <div style={{ height: 100 }} className="-ml-2 mt-2">
                       <ResponsiveContainer width="100%" height="100%">
                         <LineChart data={[{ w: "W1", h: 4.2 }, { w: "W2", h: 3.8 }, { w: "W3", h: 2.5 }, { w: "W4", h: 3.1 }, { w: "W5", h: 1.8 }, { w: "W6", h: 2.2 }]} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
                           <XAxis dataKey="w" tick={{ fontSize: 10, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
-                          <Line type="monotone" dataKey="h" stroke="#7C3AED" strokeWidth={2} dot={{ r: 2, fill: "#7C3AED" }} />
+                          <Line type="monotone" dataKey="h" stroke="hsl(var(--violet))" strokeWidth={2} dot={{ r: 2, fill: "hsl(var(--violet))" }} />
                         </LineChart>
                       </ResponsiveContainer>
                     </div>
@@ -2826,23 +2826,23 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
                 )}
                 {sz === "lg" && (
                   <>
-                    <div className="flex items-center gap-3 mt-2 pt-2 border-t border-[#F1F5F9]">
-                      <div className="flex items-center gap-1.5 text-[11px] text-[#334155]"><Mail className="w-3 h-3 text-[#94A3B8]" />{vendor.primaryContact.email || "—"}</div>
-                      <div className="flex items-center gap-1.5 text-[11px] text-[#334155]"><Phone className="w-3 h-3 text-[#94A3B8]" />{vendor.primaryContact.phone || "—"}</div>
+                    <div className="flex items-center gap-3 mt-2 pt-2 border-t border-muted">
+                      <div className="flex items-center gap-1.5 text-[11px] text-slate-700"><Mail className="w-3 h-3 text-slate-400" />{vendor.primaryContact.email || "—"}</div>
+                      <div className="flex items-center gap-1.5 text-[11px] text-slate-700"><Phone className="w-3 h-3 text-slate-400" />{vendor.primaryContact.phone || "—"}</div>
                     </div>
                     <div style={{ height: 160 }} className="-ml-2 mt-2">
-                      <p className="text-[10px] text-[#94A3B8] mb-1 ml-2" style={{ fontWeight: 500 }}>Response Time (hours)</p>
+                      <p className="text-[10px] text-slate-400 mb-1 ml-2" style={{ fontWeight: 500 }}>Response Time (hours)</p>
                       <ResponsiveContainer width="100%" height="85%">
                         <LineChart data={[{ w: "W1", h: 4.2 }, { w: "W2", h: 3.8 }, { w: "W3", h: 2.5 }, { w: "W4", h: 3.1 }, { w: "W5", h: 1.8 }, { w: "W6", h: 2.2 }]} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
-                          <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
+                          <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted))" vertical={false} />
                           <XAxis dataKey="w" tick={{ fontSize: 10, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
                           <YAxis tick={{ fontSize: 10, fill: "#94A3B8" }} axisLine={false} tickLine={false} domain={[0, 6]} />
                           <ReTooltip contentStyle={ttStyle} formatter={(v: number) => [`${v}h`, "Avg"]} />
-                          <Line type="monotone" dataKey="h" stroke="#7C3AED" strokeWidth={2} dot={{ r: 3, fill: "#7C3AED" }} />
+                          <Line type="monotone" dataKey="h" stroke="hsl(var(--violet))" strokeWidth={2} dot={{ r: 3, fill: "hsl(var(--violet))" }} />
                         </LineChart>
                       </ResponsiveContainer>
                     </div>
-                    {statRow([{ label: "Avg Response", value: "2.9h", color: "#7C3AED" }, { label: "Best", value: "1.8h", color: "#059669" }, { label: "Worst", value: "4.2h", color: "#D97706" }])}
+                    {statRow([{ label: "Avg Response", value: "2.9h", color: "hsl(var(--violet))" }, { label: "Best", value: "1.8h", color: "hsl(var(--success))" }, { label: "Worst", value: "4.2h", color: "hsl(var(--warning))" }])}
                   </>
                 )}
               </>
@@ -2853,17 +2853,17 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
               <>
                 {chartBox(CH[sz], (
                   <LineChart data={[{ month: "Oct", rate: 3.2, defect: 1.8 }, { month: "Nov", rate: 2.8, defect: 1.5 }, { month: "Dec", rate: 2.1, defect: 1.2 }, { month: "Jan", rate: 2.5, defect: 1.4 }, { month: "Feb", rate: 1.9, defect: 0.9 }, { month: "Mar", rate: 2.1, defect: 1.1 }]} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted))" vertical={false} />
                     <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
                     <YAxis tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} tickFormatter={(v) => `${v}%`} />
                     <ReTooltip contentStyle={ttStyle} />
                     <Line type="monotone" dataKey="rate" stroke="#F59E0B" strokeWidth={2} dot={{ r: 3, fill: "#F59E0B" }} name="Return %" />
-                    <Line type="monotone" dataKey="defect" stroke="#DC2626" strokeWidth={2} dot={{ r: 3, fill: "#DC2626" }} name="Defect %" strokeDasharray="5 5" />
+                    <Line type="monotone" dataKey="defect" stroke="hsl(var(--destructive))" strokeWidth={2} dot={{ r: 3, fill: "hsl(var(--destructive))" }} name="Defect %" strokeDasharray="5 5" />
                   </LineChart>
                 ))}
-                {sz === "sm" && statRow([{ label: "Returns", value: "2.1%", color: "#F59E0B" }, { label: "Defects", value: "1.1%", color: "#DC2626" }], true)}
-                {sz === "md" && statRow([{ label: "Returns", value: "2.1%", color: "#F59E0B" }, { label: "Defects", value: "1.1%", color: "#DC2626" }])}
-                {sz === "lg" && statRow([{ label: "Returns", value: "2.1%", color: "#F59E0B" }, { label: "Defects", value: "1.1%", color: "#DC2626" }, { label: "6-Mo Trend", value: "↓ Improving", color: "#059669" }, { label: "Items Returned", value: "12" }])}
+                {sz === "sm" && statRow([{ label: "Returns", value: "2.1%", color: "#F59E0B" }, { label: "Defects", value: "1.1%", color: "hsl(var(--destructive))" }], true)}
+                {sz === "md" && statRow([{ label: "Returns", value: "2.1%", color: "#F59E0B" }, { label: "Defects", value: "1.1%", color: "hsl(var(--destructive))" }])}
+                {sz === "lg" && statRow([{ label: "Returns", value: "2.1%", color: "#F59E0B" }, { label: "Defects", value: "1.1%", color: "hsl(var(--destructive))" }, { label: "6-Mo Trend", value: "↓ Improving", color: "hsl(var(--success))" }, { label: "Items Returned", value: "12" }])}
               </>
             );
           } else if (wKey === "top_items") {
@@ -2879,7 +2879,7 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
               <>
                 {chartBox(CH[sz], (
                   <BarChart layout="vertical" data={topItemsData} margin={{ top: 5, right: 30, left: 5, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" horizontal={false} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted))" horizontal={false} />
                     <XAxis type="number" tick={{ fontSize: 10, fill: "#94A3B8" }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
                     <YAxis type="category" dataKey="name" tick={{ fontSize: 10, fill: "#64748B" }} axisLine={false} tickLine={false} width={90} />
                     <ReTooltip contentStyle={ttStyle} formatter={(v: number) => [`$${v.toLocaleString()}`, "Spend"]} />
@@ -2903,18 +2903,18 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
                     { po: "28312", amount: Math.round(vendor.totalSpent * 0.05) }, { po: "28390", amount: Math.round(vendor.totalSpent * 0.06) },
                     { po: "28451", amount: Math.round(vendor.totalSpent * 0.08) },
                   ]} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted))" vertical={false} />
                     <XAxis dataKey="po" tick={{ fontSize: 9, fill: "#94A3B8" }} axisLine={false} tickLine={false} tickFormatter={(v) => `PO-${v}`} />
                     <YAxis tick={{ fontSize: 10, fill: "#94A3B8" }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
                     <ReTooltip contentStyle={ttStyle} formatter={(v: number) => [`$${v.toLocaleString()}`, "Amount"]} />
                     <Bar dataKey="amount" radius={[4, 4, 0, 0]} barSize={sz === "sm" ? 16 : 24}>
-                      {[0, 1, 2, 3, 4].map((i) => (<Cell key={i} fill={[1, 2, 4].includes(i) ? "#059669" : i === 3 ? "#0A77FF" : "#D97706"} />))}
+                      {[0, 1, 2, 3, 4].map((i) => (<Cell key={i} fill={[1, 2, 4].includes(i) ? "hsl(var(--success))" : i === 3 ? "hsl(var(--primary))" : "hsl(var(--warning))"} />))}
                     </Bar>
                   </BarChart>
                 ))}
-                {sz === "sm" && statRow([{ label: "Delivered", value: "3", color: "#059669" }, { label: "Pending", value: "1", color: "#D97706" }], true)}
-                {sz === "md" && statRow([{ label: "Delivered", value: "3", color: "#059669" }, { label: "In Transit", value: "1", color: "#0A77FF" }, { label: "Pending", value: "1", color: "#D97706" }])}
-                {sz === "lg" && statRow([{ label: "Delivered", value: "3", color: "#059669" }, { label: "In Transit", value: "1", color: "#0A77FF" }, { label: "Pending", value: "1", color: "#D97706" }, { label: "Total Value", value: formatCurrency(Math.round(vendor.totalSpent * 0.3)) }])}
+                {sz === "sm" && statRow([{ label: "Delivered", value: "3", color: "hsl(var(--success))" }, { label: "Pending", value: "1", color: "hsl(var(--warning))" }], true)}
+                {sz === "md" && statRow([{ label: "Delivered", value: "3", color: "hsl(var(--success))" }, { label: "In Transit", value: "1", color: "hsl(var(--primary))" }, { label: "Pending", value: "1", color: "hsl(var(--warning))" }])}
+                {sz === "lg" && statRow([{ label: "Delivered", value: "3", color: "hsl(var(--success))" }, { label: "In Transit", value: "1", color: "hsl(var(--primary))" }, { label: "Pending", value: "1", color: "hsl(var(--warning))" }, { label: "Total Value", value: formatCurrency(Math.round(vendor.totalSpent * 0.3)) }])}
               </>
             );
           } else if (wKey === "payment_history") {
@@ -2932,18 +2932,18 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
                     { month: "Feb", paid: Math.round(vendor.totalSpent * 0.08), pending: Math.round(vendor.totalSpent * 0.012) },
                     { month: "Mar", paid: Math.round(vendor.totalSpent * 0.06), pending: Math.round(vendor.totalSpent * 0.01) },
                   ]} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
-                    <defs><linearGradient id="paidGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#059669" stopOpacity={0.12} /><stop offset="100%" stopColor="#059669" stopOpacity={0.01} /></linearGradient></defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
+                    <defs><linearGradient id="paidGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="hsl(var(--success))" stopOpacity={0.12} /><stop offset="100%" stopColor="hsl(var(--success))" stopOpacity={0.01} /></linearGradient></defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted))" vertical={false} />
                     <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
                     <YAxis tick={{ fontSize: 11, fill: "#94A3B8" }} axisLine={false} tickLine={false} tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`} />
                     <ReTooltip contentStyle={ttStyle} formatter={(v: number) => [`$${v.toLocaleString()}`, ""]} />
-                    <Area type="monotone" dataKey="paid" stroke="#059669" strokeWidth={2} fill="url(#paidGrad)" name="Paid" />
-                    <Area type="monotone" dataKey="pending" stroke="#D97706" strokeWidth={1.5} fill="none" strokeDasharray="4 4" name="Pending" />
+                    <Area type="monotone" dataKey="paid" stroke="hsl(var(--success))" strokeWidth={2} fill="url(#paidGrad)" name="Paid" />
+                    <Area type="monotone" dataKey="pending" stroke="hsl(var(--warning))" strokeWidth={1.5} fill="none" strokeDasharray="4 4" name="Pending" />
                   </AreaChart>
                 ))}
-                {sz === "sm" && statRow([{ label: "Paid", value: formatCurrency(paidTotal), color: "#059669" }, { label: "Pending", value: formatCurrency(pendTotal), color: "#D97706" }], true)}
-                {sz === "md" && statRow([{ label: "Total Paid", value: formatCurrency(paidTotal), color: "#059669" }, { label: "Pending", value: formatCurrency(pendTotal), color: "#D97706" }])}
-                {sz === "lg" && statRow([{ label: "Total Paid", value: formatCurrency(paidTotal), color: "#059669" }, { label: "Pending", value: formatCurrency(pendTotal), color: "#D97706" }, { label: "Transactions", value: "24" }, { label: "Avg Payment", value: formatCurrency(Math.round(paidTotal / 24)) }])}
+                {sz === "sm" && statRow([{ label: "Paid", value: formatCurrency(paidTotal), color: "hsl(var(--success))" }, { label: "Pending", value: formatCurrency(pendTotal), color: "hsl(var(--warning))" }], true)}
+                {sz === "md" && statRow([{ label: "Total Paid", value: formatCurrency(paidTotal), color: "hsl(var(--success))" }, { label: "Pending", value: formatCurrency(pendTotal), color: "hsl(var(--warning))" }])}
+                {sz === "lg" && statRow([{ label: "Total Paid", value: formatCurrency(paidTotal), color: "hsl(var(--success))" }, { label: "Pending", value: formatCurrency(pendTotal), color: "hsl(var(--warning))" }, { label: "Transactions", value: "24" }, { label: "Avg Payment", value: formatCurrency(Math.round(paidTotal / 24)) }])}
               </>
             );
           } else if (wKey === "compliance_docs") {
@@ -2954,29 +2954,29 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
                   <div className="shrink-0 relative" style={{ width: 90, height: 90 }}>
                     <RePieChart width={90} height={90}>
                       <Pie data={[{ value: 75 }, { value: 25 }]} cx="50%" cy="50%" innerRadius={28} outerRadius={40} startAngle={90} endAngle={-270} dataKey="value" stroke="none">
-                        <Cell fill="#059669" /><Cell fill="#F1F5F9" />
+                        <Cell fill="hsl(var(--success))" /><Cell fill="hsl(var(--muted))" />
                       </Pie>
                     </RePieChart>
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
-                      <span className="text-[14px] text-[#059669]" style={{ fontWeight: 700 }}>75%</span>
+                      <span className="text-[14px] text-success" style={{ fontWeight: 700 }}>75%</span>
                     </div>
                   </div>
                   <div className="space-y-1.5 flex-1 min-w-0">
-                    <div className="flex items-center justify-between"><span className="text-[11px] text-[#334155]" style={{ fontWeight: 500 }}>Valid Docs</span><span className="text-[11px] text-[#059669]" style={{ fontWeight: 600 }}>3/4</span></div>
-                    <div className="flex items-center justify-between"><span className="text-[11px] text-[#334155]" style={{ fontWeight: 500 }}>Expiring Soon</span><span className="text-[11px] text-[#D97706]" style={{ fontWeight: 600 }}>1</span></div>
-                    <div className="flex items-center justify-between"><span className="text-[11px] text-[#334155]" style={{ fontWeight: 500 }}>Expired</span><span className="text-[11px] text-[#DC2626]" style={{ fontWeight: 600 }}>0</span></div>
+                    <div className="flex items-center justify-between"><span className="text-[11px] text-slate-700" style={{ fontWeight: 500 }}>Valid Docs</span><span className="text-[11px] text-success" style={{ fontWeight: 600 }}>3/4</span></div>
+                    <div className="flex items-center justify-between"><span className="text-[11px] text-slate-700" style={{ fontWeight: 500 }}>Expiring Soon</span><span className="text-[11px] text-warning" style={{ fontWeight: 600 }}>1</span></div>
+                    <div className="flex items-center justify-between"><span className="text-[11px] text-slate-700" style={{ fontWeight: 500 }}>Expired</span><span className="text-[11px] text-destructive" style={{ fontWeight: 600 }}>0</span></div>
                   </div>
                 </div>
                 {sz !== "sm" && (
-                  <div className="space-y-2 mt-3 border-t border-[#F1F5F9] pt-2.5">
+                  <div className="space-y-2 mt-3 border-t border-muted pt-2.5">
                     {[
-                      { name: "W-9 Tax Form", status: "Valid", sc: "#059669", sb: "#ECFDF5" },
-                      { name: "Certificate of Insurance", status: "Valid", sc: "#059669", sb: "#ECFDF5" },
-                      { name: "NDA Agreement", status: "Active", sc: "#059669", sb: "#ECFDF5" },
-                      { name: "Quality Cert (ISO)", status: "Expiring", sc: "#D97706", sb: "#FFFBEB" },
+                      { name: "W-9 Tax Form", status: "Valid", sc: "hsl(var(--success))", sb: "#ECFDF5" },
+                      { name: "Certificate of Insurance", status: "Valid", sc: "hsl(var(--success))", sb: "#ECFDF5" },
+                      { name: "NDA Agreement", status: "Active", sc: "hsl(var(--success))", sb: "#ECFDF5" },
+                      { name: "Quality Cert (ISO)", status: "Expiring", sc: "hsl(var(--warning))", sb: "#FFFBEB" },
                     ].map((doc, i) => (
                       <div key={i} className="flex items-center justify-between py-0.5">
-                        <span className="text-[11px] text-[#334155]" style={{ fontWeight: 500 }}>{doc.name}</span>
+                        <span className="text-[11px] text-slate-700" style={{ fontWeight: 500 }}>{doc.name}</span>
                         <span className="text-[10px] px-1.5 py-0.5 rounded-full shrink-0" style={{ fontWeight: 500, color: doc.sc, backgroundColor: doc.sb }}>{doc.status}</span>
                       </div>
                     ))}
@@ -2989,31 +2989,31 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
             icon = MessageSquare; title = "Notes & Activity"; tip = "Internal partner notes and a chronological timeline of recent activities including payments, deliveries, approvals, and manual annotations by team members.";
             content = (
               <div>
-                <p className={`text-[12px] text-[#475569] leading-relaxed ${sz === "sm" ? "line-clamp-3 mb-2" : "mb-3"}`}>{vendor.notes}</p>
+                <p className={`text-[12px] text-muted-foreground leading-relaxed ${sz === "sm" ? "line-clamp-3 mb-2" : "mb-3"}`}>{vendor.notes}</p>
                 {sz === "sm" && (
-                  <div className="space-y-2 border-t border-[#F1F5F9] pt-2">
+                  <div className="space-y-2 border-t border-muted pt-2">
                     {[
-                      { time: "Mar 28", action: "Payment received", detail: "PAY-9841 · $8,520", color: "#059669" },
-                      { time: "Mar 21", action: "Order delivered", detail: "PO-28390 · 42 items", color: "#0A77FF" },
+                      { time: "Mar 28", action: "Payment received", detail: "PAY-9841 · $8,520", color: "hsl(var(--success))" },
+                      { time: "Mar 21", action: "Order delivered", detail: "PO-28390 · 42 items", color: "hsl(var(--primary))" },
                     ].map((event, i, arr) => (
                       <div key={i} className="flex items-start gap-2">
-                        <div className="flex flex-col items-center mt-0.5"><div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: event.color }} />{i < arr.length - 1 && <div className="w-px h-5 bg-[#E2E8F0] mt-0.5" />}</div>
-                        <div className="min-w-0"><p className="text-[10px] text-[#334155]" style={{ fontWeight: 500 }}>{event.action}</p><p className="text-[9px] text-[#94A3B8]">{event.time} · {event.detail}</p></div>
+                        <div className="flex flex-col items-center mt-0.5"><div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: event.color }} />{i < arr.length - 1 && <div className="w-px h-5 bg-border mt-0.5" />}</div>
+                        <div className="min-w-0"><p className="text-[10px] text-slate-700" style={{ fontWeight: 500 }}>{event.action}</p><p className="text-[9px] text-slate-400">{event.time} · {event.detail}</p></div>
                       </div>
                     ))}
                   </div>
                 )}
                 {sz !== "sm" && (
-                  <div className="space-y-3 border-t border-[#F1F5F9] pt-3">
+                  <div className="space-y-3 border-t border-muted pt-3">
                     {[
-                      { time: "Mar 28", action: "Payment received", detail: "PAY-9841 · $8,520", color: "#059669" },
-                      { time: "Mar 21", action: "Order delivered", detail: "PO-28390 · 42 items", color: "#0A77FF" },
-                      { time: "Mar 15", action: "Note added", detail: "Quality review completed", color: "#7C3AED" },
+                      { time: "Mar 28", action: "Payment received", detail: "PAY-9841 · $8,520", color: "hsl(var(--success))" },
+                      { time: "Mar 21", action: "Order delivered", detail: "PO-28390 · 42 items", color: "hsl(var(--primary))" },
+                      { time: "Mar 15", action: "Note added", detail: "Quality review completed", color: "hsl(var(--violet))" },
                       ...(sz === "lg" ? [{ time: "Mar 10", action: "Invoice approved", detail: "INV-1204 · $11,400", color: "#F59E0B" }] : []),
                     ].map((event, i, arr) => (
                       <div key={i} className="flex items-start gap-2.5">
-                        <div className="flex flex-col items-center mt-0.5"><div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: event.color }} />{i < arr.length - 1 && <div className="w-px h-6 bg-[#E2E8F0] mt-0.5" />}</div>
-                        <div className="min-w-0"><p className="text-[11px] text-[#334155]" style={{ fontWeight: 500 }}>{event.action}</p><p className="text-[10px] text-[#94A3B8]">{event.time} · {event.detail}</p></div>
+                        <div className="flex flex-col items-center mt-0.5"><div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: event.color }} />{i < arr.length - 1 && <div className="w-px h-6 bg-border mt-0.5" />}</div>
+                        <div className="min-w-0"><p className="text-[11px] text-slate-700" style={{ fontWeight: 500 }}>{event.action}</p><p className="text-[10px] text-slate-400">{event.time} · {event.detail}</p></div>
                       </div>
                     ))}
                   </div>
@@ -3062,23 +3062,23 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
           {partnerGroupData && (
             <div className="mb-3">
               <DashInfoLabel>Partner Group</DashInfoLabel>
-              <p className="text-[12.5px] text-[#334155] truncate" style={{ fontWeight: 600 }}>
-                {partnerGroupData.id} <span className="text-[#64748B]" style={{ fontWeight: 400 }}>•</span> {partnerGroupData.name}
+              <p className="text-[12.5px] text-slate-700 truncate" style={{ fontWeight: 600 }}>
+                {partnerGroupData.id} <span className="text-slate-500" style={{ fontWeight: 400 }}>•</span> {partnerGroupData.name}
               </p>
-              <p className="text-[11px] text-[#64748B] mt-0.5 leading-relaxed line-clamp-2">{partnerGroupData.description}</p>
+              <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed line-clamp-2">{partnerGroupData.description}</p>
             </div>
           )}
           {!partnerGroupData && vendor.partnerGroup && (
             <div className="mb-3">
               <DashInfoLabel>Partner Group</DashInfoLabel>
-              <p className="text-[12.5px] text-[#334155]" style={{ fontWeight: 600 }}>{vendor.partnerGroup}</p>
+              <p className="text-[12.5px] text-slate-700" style={{ fontWeight: 600 }}>{vendor.partnerGroup}</p>
             </div>
           )}
           <div className="mb-3">
             <DashInfoLabel>Partner Type</DashInfoLabel>
             <div className="flex items-center gap-1.5 mt-1">
               {vendor.partnerTypes.map((t) => (
-                <span key={t} className={`text-[11px] px-2.5 py-1 rounded-md border ${t === "vendor" ? "bg-[#F0FDF4] border-[#BBF7D0] text-[#166534]" : "bg-[#EFF6FF] border-[#BFDBFE] text-[#1E40AF]"}`} style={{ fontWeight: 500 }}>
+                <span key={t} className={`text-[11px] px-2.5 py-1 rounded-md border ${t === "vendor" ? "bg-green-50 border-[#BBF7D0] text-[#166534]" : "bg-blue-50 border-blue-200 text-blue-800"}`} style={{ fontWeight: 500 }}>
                   {t === "vendor" ? "Vendor" : "Customer"}
                 </span>
               ))}
@@ -3086,10 +3086,10 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
             {cfg && (cfg.vendorSubTypes?.length || cfg.customerSubTypes?.length) ? (
               <div className="flex flex-wrap gap-1 mt-2">
                 {(cfg.vendorSubTypes || []).map((st) => (
-                  <span key={st} className="text-[10px] px-1.5 py-0.5 rounded bg-[#F1F5F9] text-[#475569] border border-[#E2E8F0]" style={{ fontWeight: 500 }}>{st.replace(/_/g, " ")}</span>
+                  <span key={st} className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground border border-border" style={{ fontWeight: 500 }}>{st.replace(/_/g, " ")}</span>
                 ))}
                 {(cfg.customerSubTypes || []).map((st) => (
-                  <span key={st} className="text-[10px] px-1.5 py-0.5 rounded bg-[#F1F5F9] text-[#475569] border border-[#E2E8F0]" style={{ fontWeight: 500 }}>{st.replace(/_/g, " ")}</span>
+                  <span key={st} className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground border border-border" style={{ fontWeight: 500 }}>{st.replace(/_/g, " ")}</span>
                 ))}
               </div>
             ) : null}
@@ -3097,66 +3097,66 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
           <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 mb-2.5">
             <div className="min-w-0">
               <DashInfoLabel>Partner Code</DashInfoLabel>
-              <p className="text-[12px] text-[#334155] truncate font-mono" style={{ fontWeight: 500 }}>{vendor.code}</p>
+              <p className="text-[12px] text-slate-700 truncate font-mono" style={{ fontWeight: 500 }}>{vendor.code}</p>
             </div>
             <div className="min-w-0">
               <DashInfoLabel>Category</DashInfoLabel>
-              <p className="text-[12px] text-[#334155] truncate" style={{ fontWeight: 500 }}>{CATEGORY_LABELS[vendor.category]}</p>
+              <p className="text-[12px] text-slate-700 truncate" style={{ fontWeight: 500 }}>{CATEGORY_LABELS[vendor.category]}</p>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 mb-2.5">
             <div className="min-w-0">
               <DashInfoLabel>Email</DashInfoLabel>
-              <p className="text-[12px] text-[#334155] truncate" style={{ fontWeight: 500 }}>{vendor.emailAddress || "—"}</p>
+              <p className="text-[12px] text-slate-700 truncate" style={{ fontWeight: 500 }}>{vendor.emailAddress || "—"}</p>
             </div>
             <div className="min-w-0">
               <DashInfoLabel>Website</DashInfoLabel>
-              <p className="text-[12px] text-[#334155] truncate" style={{ fontWeight: 500 }}>{vendor.website || "—"}</p>
+              <p className="text-[12px] text-slate-700 truncate" style={{ fontWeight: 500 }}>{vendor.website || "—"}</p>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 mb-2.5">
             <div className="min-w-0">
               <DashInfoLabel>Phone Number</DashInfoLabel>
-              <p className="text-[12px] text-[#334155] truncate" style={{ fontWeight: 500 }}>{vendor.primaryContact.phone || "—"}</p>
+              <p className="text-[12px] text-slate-700 truncate" style={{ fontWeight: 500 }}>{vendor.primaryContact.phone || "—"}</p>
             </div>
             <div className="min-w-0">
               <DashInfoLabel>Tax ID</DashInfoLabel>
-              <p className="text-[12px] text-[#334155] truncate font-mono" style={{ fontWeight: 500 }}>{vendor.taxId || "—"}</p>
+              <p className="text-[12px] text-slate-700 truncate font-mono" style={{ fontWeight: 500 }}>{vendor.taxId || "—"}</p>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 mb-2.5">
             <div className="min-w-0">
               <DashInfoLabel>Services</DashInfoLabel>
-              <p className="text-[12px] text-[#334155] truncate" style={{ fontWeight: 500 }}>{vendor.services || "—"}</p>
+              <p className="text-[12px] text-slate-700 truncate" style={{ fontWeight: 500 }}>{vendor.services || "—"}</p>
             </div>
             <div className="min-w-0">
               <DashInfoLabel>Country</DashInfoLabel>
-              <p className="text-[12px] text-[#334155] truncate" style={{ fontWeight: 500 }}>{vendor.countryFlag} {vendor.country}</p>
+              <p className="text-[12px] text-slate-700 truncate" style={{ fontWeight: 500 }}>{vendor.countryFlag} {vendor.country}</p>
             </div>
           </div>
           {vendor.billingAddress.street && (
             <div className="mb-2.5">
               <DashInfoLabel>Address</DashInfoLabel>
-              <p className="text-[12px] text-[#334155]" style={{ fontWeight: 500 }}>
+              <p className="text-[12px] text-slate-700" style={{ fontWeight: 500 }}>
                 {vendor.billingAddress.street}, {vendor.billingAddress.city}
                 {vendor.billingAddress.state ? `, ${vendor.billingAddress.state}` : ""}{" "}
                 {vendor.billingAddress.zipCode}, {vendor.billingAddress.country}
               </p>
             </div>
           )}
-          <div className="grid grid-cols-2 gap-x-4 pt-2.5 border-t border-[#F1F5F9]">
+          <div className="grid grid-cols-2 gap-x-4 pt-2.5 border-t border-muted">
             <div className="min-w-0">
               <DashInfoLabel>Created By</DashInfoLabel>
               <div className="flex items-center gap-1.5 mt-0.5">
                 <div className="w-5 h-5 rounded-full flex items-center justify-center text-white text-[8px] shrink-0" style={{ backgroundColor: toAAAColor(vendor.createdByContact?.bgColor || "#6366f1"), fontWeight: 600 }}>
                   {vendor.createdByContact?.initials || "?"}
                 </div>
-                <span className="text-[12px] text-[#334155] truncate" style={{ fontWeight: 500 }}>{vendor.createdByContact?.name || "—"}</span>
+                <span className="text-[12px] text-slate-700 truncate" style={{ fontWeight: 500 }}>{vendor.createdByContact?.name || "—"}</span>
               </div>
             </div>
             <div className="min-w-0">
               <DashInfoLabel>Last Updated</DashInfoLabel>
-              <p className="text-[12px] text-[#334155] mt-0.5 truncate" style={{ fontWeight: 500 }}>{formatDate(vendor.updatedAt)}</p>
+              <p className="text-[12px] text-slate-700 mt-0.5 truncate" style={{ fontWeight: 500 }}>{formatDate(vendor.updatedAt)}</p>
             </div>
           </div>
         </DashInfoCard>
@@ -3166,44 +3166,44 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
           <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 mb-3">
             <div className="min-w-0">
               <DashInfoLabel>Currency</DashInfoLabel>
-              <p className="text-[12.5px] text-[#334155]" style={{ fontWeight: 600 }}>USD ($)</p>
+              <p className="text-[12.5px] text-slate-700" style={{ fontWeight: 600 }}>USD ($)</p>
             </div>
             <div className="min-w-0">
               <DashInfoLabel>Rating</DashInfoLabel>
               <div className="flex items-center gap-1">
-                <Star className="w-3.5 h-3.5 text-[#F59E0B] fill-[#F59E0B] shrink-0" />
-                <span className="text-[12.5px] text-[#334155]" style={{ fontWeight: 600 }}>{vendor.rating.toFixed(1)} / 5</span>
+                <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500 shrink-0" />
+                <span className="text-[12.5px] text-slate-700" style={{ fontWeight: 600 }}>{vendor.rating.toFixed(1)} / 5</span>
               </div>
             </div>
             <div className="min-w-0">
               <DashInfoLabel>Pay To</DashInfoLabel>
               <div className="flex items-center gap-1.5 mt-0.5">
-                <div className="w-5 h-5 rounded-full bg-[#F1F5F9] flex items-center justify-center shrink-0">
-                  <Globe className="w-3 h-3 text-[#64748B]" />
+                <div className="w-5 h-5 rounded-full bg-muted flex items-center justify-center shrink-0">
+                  <Globe className="w-3 h-3 text-slate-500" />
                 </div>
-                <span className="text-[12px] text-[#334155] truncate" style={{ fontWeight: 500 }}>{vendor.companyName}</span>
+                <span className="text-[12px] text-slate-700 truncate" style={{ fontWeight: 500 }}>{vendor.companyName}</span>
               </div>
             </div>
             <div className="min-w-0">
               <DashInfoLabel>Ship To</DashInfoLabel>
-              <p className="text-[12px] text-[#334155] truncate" style={{ fontWeight: 500 }}>
+              <p className="text-[12px] text-slate-700 truncate" style={{ fontWeight: 500 }}>
                 {vendor.billingAddress.street || "—"}
               </p>
             </div>
           </div>
-          <div className="border-t border-[#F1F5F9] pt-3 space-y-2.5">
+          <div className="border-t border-muted pt-3 space-y-2.5">
             <div className="grid grid-cols-2 gap-x-4">
               <div className="min-w-0">
                 <DashInfoLabel tooltip="Total payments received from or on behalf of this partner.">Cash Inflow</DashInfoLabel>
-                <p className="text-[15px] text-[#059669]" style={{ fontWeight: 700 }}>{formatCurrency(totalCashIn)}</p>
+                <p className="text-[15px] text-success" style={{ fontWeight: 700 }}>{formatCurrency(totalCashIn)}</p>
               </div>
               <div className="min-w-0">
                 <DashInfoLabel tooltip="Total disbursements made to this partner.">Cash Outflow</DashInfoLabel>
-                <p className="text-[15px] text-[#DC2626]" style={{ fontWeight: 700 }}>{formatCurrency(totalCashOut)}</p>
+                <p className="text-[15px] text-destructive" style={{ fontWeight: 700 }}>{formatCurrency(totalCashOut)}</p>
               </div>
             </div>
             <div className="flex items-center gap-1 mb-px">
-              <p className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Outstanding Payables</p>
+              <p className="text-[10px] text-slate-400" style={{ fontWeight: 500 }}>Outstanding Payables</p>
               <DetailRichTooltip data={{
                 title: "OUTSTANDING PAYABLES",
                 description: "Total unpaid obligations to this partner.",
@@ -3215,12 +3215,12 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
                 ],
                 formula: "Outstanding = Pending + Overdue + Scheduled",
               }}>
-                <span className="inline-flex shrink-0"><Info className="w-2.5 h-2.5 text-[#D1D5DB] hover:text-[#94A3B8] transition-colors cursor-help" /></span>
+                <span className="inline-flex shrink-0"><Info className="w-2.5 h-2.5 text-[#D1D5DB] hover:text-slate-400 transition-colors cursor-help" /></span>
               </DetailRichTooltip>
             </div>
             <div className="flex items-baseline gap-2">
-              <p className="text-[15px] text-[#334155]" style={{ fontWeight: 700 }}>{formatCurrency(vendor.outstandingBalance)}</p>
-              <button className="text-[11px] text-[#0A77FF] hover:underline cursor-pointer" style={{ fontWeight: 500 }}>Invoice Details</button>
+              <p className="text-[15px] text-slate-700" style={{ fontWeight: 700 }}>{formatCurrency(vendor.outstandingBalance)}</p>
+              <button className="text-[11px] text-primary hover:underline cursor-pointer" style={{ fontWeight: 500 }}>Invoice Details</button>
             </div>
           </div>
         </DashInfoCard>
@@ -3230,7 +3230,7 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
           <div className="grid grid-cols-2 gap-x-4 mb-3">
             <div className="min-w-0">
               <div className="flex items-center gap-1 mb-px">
-                <p className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Credit Limit</p>
+                <p className="text-[10px] text-slate-400" style={{ fontWeight: 500 }}>Credit Limit</p>
                 <DetailRichTooltip data={{
                   title: "CREDIT UTILIZATION",
                   description: "How much of the approved credit line is currently in use. Utilization above 80% is flagged as high risk and may trigger enforcement actions.",
@@ -3241,25 +3241,25 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
                   ],
                   formula: "Available = Credit Limit – Current Utilization",
                 }}>
-                  <span className="inline-flex shrink-0"><Info className="w-2.5 h-2.5 text-[#D1D5DB] hover:text-[#94A3B8] transition-colors cursor-help" /></span>
+                  <span className="inline-flex shrink-0"><Info className="w-2.5 h-2.5 text-[#D1D5DB] hover:text-slate-400 transition-colors cursor-help" /></span>
                 </DetailRichTooltip>
               </div>
-              <p className="text-[16px] text-[#334155] truncate" style={{ fontWeight: 700 }}>{formatCurrency(vendor.creditLimit)}</p>
+              <p className="text-[16px] text-slate-700 truncate" style={{ fontWeight: 700 }}>{formatCurrency(vendor.creditLimit)}</p>
             </div>
             <div className="min-w-0">
               <DashInfoLabel tooltip="Amount of credit currently in use. Calculated as sum of open orders and pending invoices against the credit limit.">Utilization</DashInfoLabel>
-              <p className="text-[16px] text-[#334155] truncate" style={{ fontWeight: 700 }}>{formatCurrency(vendor.creditUtilization)}</p>
+              <p className="text-[16px] text-slate-700 truncate" style={{ fontWeight: 700 }}>{formatCurrency(vendor.creditUtilization)}</p>
             </div>
           </div>
-          <div className="w-full h-3 rounded-full overflow-hidden flex" style={{ backgroundColor: "#F1F5F9" }}>
+          <div className="w-full h-3 rounded-full overflow-hidden flex" style={{ backgroundColor: "hsl(var(--muted))" }}>
             <div className="h-full rounded-full transition-all flex items-center justify-start pl-2" style={{ width: `${Math.max(Math.min(creditPct, 100), 8)}%`, backgroundColor: creditBarColor }}>
-              <span className="text-[9px] text-[#334155] whitespace-nowrap" style={{ fontWeight: 600 }}>{creditPct}%</span>
+              <span className="text-[9px] text-slate-700 whitespace-nowrap" style={{ fontWeight: 600 }}>{creditPct}%</span>
             </div>
           </div>
           <div className="flex items-center justify-between mt-1.5">
-            <span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>0%</span>
+            <span className="text-[10px] text-slate-400" style={{ fontWeight: 500 }}>0%</span>
             <span className="text-[10px]" style={{ fontWeight: 500, color: creditStatusColor }}>{creditStatusLabel}</span>
-            <span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>100%</span>
+            <span className="text-[10px] text-slate-400" style={{ fontWeight: 500 }}>100%</span>
           </div>
         </DashInfoCard>
 
@@ -3272,7 +3272,7 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
                   name: paymentTermCfg.name,
                   category: (paymentTermCfg.type === "prepayment" ? "prepayment" : "net") as "net" | "prepayment" | "split",
                   typeBadge: paymentTermCfg.type === "prepayment" ? "Pre" : "NET",
-                  badgeColor: paymentTermCfg.type === "prepayment" ? "#7C3AED" : "#0A77FF",
+                  badgeColor: paymentTermCfg.type === "prepayment" ? "hsl(var(--violet))" : "hsl(var(--primary))",
                   trigger: paymentTermCfg.trigger.replace(/_/g, " "),
                   description: paymentTermCfg.description,
                   vendorsApplied: 4,
@@ -3285,7 +3285,7 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
                   name: PAYMENT_TERMS_LABELS[vendor.paymentTerms],
                   category: "net" as const,
                   typeBadge: "NET",
-                  badgeColor: "#0A77FF",
+                  badgeColor: "hsl(var(--primary))",
                   trigger: "Invoice Date",
                   description: "Standard payment terms for this partner.",
                   vendorsApplied: 3,
@@ -3303,30 +3303,30 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
         {/* Carrier & Shipping */}
         <DashInfoCard title="Carrier & Shipping" icon={Truck} tooltip="Preferred shipping carriers and methods configured for this partner. Affects primary carrier selection on new purchase orders." defaultOpen={false}>
           <div className="space-y-2.5">
-            <div className="rounded-lg border border-[#E2E8F0] p-3">
-              <p className="text-[10px] text-[#94A3B8] mb-1.5" style={{ fontWeight: 500 }}>Primary Carrier (Vendor)</p>
+            <div className="rounded-lg border border-border p-3">
+              <p className="text-[10px] text-slate-400 mb-1.5" style={{ fontWeight: 500 }}>Primary Carrier (Vendor)</p>
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-[#F1F5F9] flex items-center justify-center shrink-0">
-                  <Truck className="w-4 h-4 text-[#0A77FF]" />
+                <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                  <Truck className="w-4 h-4 text-primary" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-[12px] text-[#334155]" style={{ fontWeight: 600 }}>{vendor.defaultCarrierVendor || "—"}</p>
-                  <p className="text-[10.5px] text-[#64748B]">For fastest delivery</p>
+                  <p className="text-[12px] text-slate-700" style={{ fontWeight: 600 }}>{vendor.defaultCarrierVendor || "—"}</p>
+                  <p className="text-[10.5px] text-slate-500">For fastest delivery</p>
                 </div>
-                <span className="text-[10px] px-2 py-0.5 rounded-md border border-[#BFDBFE] bg-[#EFF6FF] text-[#1E40AF] shrink-0" style={{ fontWeight: 600 }}>Primary</span>
+                <span className="text-[10px] px-2 py-0.5 rounded-md border border-blue-200 bg-blue-50 text-blue-800 shrink-0" style={{ fontWeight: 600 }}>Primary</span>
               </div>
             </div>
-            <div className="rounded-lg border border-[#E2E8F0] p-3">
-              <p className="text-[10px] text-[#94A3B8] mb-1.5" style={{ fontWeight: 500 }}>Primary Carrier (Customer)</p>
+            <div className="rounded-lg border border-border p-3">
+              <p className="text-[10px] text-slate-400 mb-1.5" style={{ fontWeight: 500 }}>Primary Carrier (Customer)</p>
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-[#F1F5F9] flex items-center justify-center shrink-0">
-                  <Truck className="w-4 h-4 text-[#7C3AED]" />
+                <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                  <Truck className="w-4 h-4 text-violet" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-[12px] text-[#334155]" style={{ fontWeight: 600 }}>{vendor.defaultCarrierCustomer || "—"}</p>
-                  <p className="text-[10.5px] text-[#64748B]">For customer shipments</p>
+                  <p className="text-[12px] text-slate-700" style={{ fontWeight: 600 }}>{vendor.defaultCarrierCustomer || "—"}</p>
+                  <p className="text-[10.5px] text-slate-500">For customer shipments</p>
                 </div>
-                <span className="text-[10px] px-2 py-0.5 rounded-md border border-[#BFDBFE] bg-[#EFF6FF] text-[#1E40AF] shrink-0" style={{ fontWeight: 600 }}>Primary</span>
+                <span className="text-[10px] px-2 py-0.5 rounded-md border border-blue-200 bg-blue-50 text-blue-800 shrink-0" style={{ fontWeight: 600 }}>Primary</span>
               </div>
             </div>
           </div>
@@ -3337,15 +3337,15 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
           <DashInfoCard title="Partner Locations" icon={MapPin} count={vendor.partnerLocations.length} defaultOpen={false}>
             <div className="space-y-1.5">
               {vendor.partnerLocations.slice(0, 6).map((loc, idx) => (
-                <div key={idx} className="flex items-center gap-2 px-2.5 py-1.5 rounded-md bg-[#F8FAFC] border border-[#F1F5F9]">
-                  <div className="w-4 h-4 rounded bg-[#EDF4FF] flex items-center justify-center shrink-0">
-                    <Building2 className="w-2.5 h-2.5 text-[#0A77FF]" />
+                <div key={idx} className="flex items-center gap-2 px-2.5 py-1.5 rounded-md bg-slate-50 border border-muted">
+                  <div className="w-4 h-4 rounded bg-accent flex items-center justify-center shrink-0">
+                    <Building2 className="w-2.5 h-2.5 text-primary" />
                   </div>
-                  <span className="text-[11px] text-[#334155]" style={{ fontWeight: 500 }}>{loc}</span>
+                  <span className="text-[11px] text-slate-700" style={{ fontWeight: 500 }}>{loc}</span>
                 </div>
               ))}
               {vendor.partnerLocations.length > 6 && (
-                <p className="text-[11px] text-[#0A77FF] text-center pt-1 cursor-pointer hover:underline" style={{ fontWeight: 500 }}>
+                <p className="text-[11px] text-primary text-center pt-1 cursor-pointer hover:underline" style={{ fontWeight: 500 }}>
                   +{vendor.partnerLocations.length - 6} more locations
                 </p>
               )}
@@ -3364,15 +3364,15 @@ function DashboardTab({ vendor, cfg, formatCurrency, formatDate, activeWidgets, 
                   <div className="w-6 h-6 rounded-full flex items-center justify-center text-[8px] shrink-0" style={{ backgroundColor: _at.bg, color: _at.text, fontWeight: 700 }}>
                     {contact.initials}
                   </div>
-                  <span className="text-[11.5px] text-[#334155]" style={{ fontWeight: 500 }}>{contact.name}</span>
+                  <span className="text-[11.5px] text-slate-700" style={{ fontWeight: 500 }}>{contact.name}</span>
                   {idx === 0 && (
-                    <span className="text-[9px] text-[#0A77FF] px-1.5 py-0.5 rounded-md bg-[#EDF4FF] ml-auto shrink-0" style={{ fontWeight: 600 }}>PRIMARY</span>
+                    <span className="text-[9px] text-primary px-1.5 py-0.5 rounded-md bg-accent ml-auto shrink-0" style={{ fontWeight: 600 }}>PRIMARY</span>
                   )}
                 </div>
                 );
               })}
               {vendor.globalPointOfContacts.length > 5 && (
-                <p className="text-[11px] text-[#0A77FF] text-center pt-0.5 cursor-pointer hover:underline" style={{ fontWeight: 500 }}>
+                <p className="text-[11px] text-primary text-center pt-0.5 cursor-pointer hover:underline" style={{ fontWeight: 500 }}>
                   +{vendor.globalPointOfContacts.length - 5} more contacts
                 </p>
               )}
@@ -3407,26 +3407,26 @@ function DetailRichTooltip({ data, children }: { data: DetailTooltipData; childr
   return (
     <Tooltip>
       <TooltipTrigger asChild>{children}</TooltipTrigger>
-      <TooltipContent side="bottom" sideOffset={8} className="p-0 w-[300px] max-w-[90vw] z-[400] !bg-white !border-[#E2E8F0] !shadow-[0_12px_40px_-8px_rgba(0,0,0,0.15),0_0_0_1px_rgba(0,0,0,0.04)]">
+      <TooltipContent side="bottom" sideOffset={8} className="p-0 w-[300px] max-w-[90vw] z-[400] !bg-white !border-border !shadow-[0_12px_40px_-8px_rgba(0,0,0,0.15),0_0_0_1px_rgba(0,0,0,0.04)]">
         <div className="p-3.5">
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-5 h-5 rounded-md bg-[#EDF4FF] flex items-center justify-center shrink-0">
-              <Info className="w-3 h-3 text-[#0A77FF]" />
+            <div className="w-5 h-5 rounded-md bg-accent flex items-center justify-center shrink-0">
+              <Info className="w-3 h-3 text-primary" />
             </div>
-            <span className="text-[11px] text-[#334155] tracking-wide" style={{ fontWeight: 700 }}>{data.title}</span>
+            <span className="text-[11px] text-slate-700 tracking-wide" style={{ fontWeight: 700 }}>{data.title}</span>
           </div>
-          <p className="text-[11px] text-[#64748B] leading-[1.6] mb-3">{data.description}</p>
-          <div className="border-t border-[#F1F5F9] mb-2.5" />
+          <p className="text-[11px] text-slate-500 leading-[1.6] mb-3">{data.description}</p>
+          <div className="border-t border-muted mb-2.5" />
           <div className="space-y-1">
             {data.breakdown.map((row, i) => (
-              <div key={i} className={`flex items-center justify-between px-2.5 py-1.5 rounded-md text-[11px] ${row.isResult ? "bg-[#F0FDF4] border border-[#D1FAE5]" : ""}`}>
-                <span className={row.isResult ? "text-[#334155]" : "text-[#64748B]"} style={{ fontWeight: row.isResult ? 600 : 400 }}>{row.label}</span>
-                <span className={row.isResult ? "text-[#16A34A]" : "text-[#334155]"} style={{ fontWeight: row.isResult ? 700 : 500 }}>{row.value}</span>
+              <div key={i} className={`flex items-center justify-between px-2.5 py-1.5 rounded-md text-[11px] ${row.isResult ? "bg-green-50 border border-[#D1FAE5]" : ""}`}>
+                <span className={row.isResult ? "text-slate-700" : "text-slate-500"} style={{ fontWeight: row.isResult ? 600 : 400 }}>{row.label}</span>
+                <span className={row.isResult ? "text-green-600" : "text-slate-700"} style={{ fontWeight: row.isResult ? 700 : 500 }}>{row.value}</span>
               </div>
             ))}
           </div>
-          <div className="border-t border-[#F1F5F9] my-2.5" />
-          <div className="px-2.5 py-1.5 rounded-lg bg-[#F0F6FF] border border-[#DBEAFE]">
+          <div className="border-t border-muted my-2.5" />
+          <div className="px-2.5 py-1.5 rounded-lg bg-[#F0F6FF] border border-blue-100">
             <code className="text-[10px] text-[#1D4ED8]" style={{ fontWeight: 500, fontFamily: "ui-monospace, monospace" }}>{data.formula}</code>
           </div>
         </div>
@@ -3449,7 +3449,7 @@ function DashInfoCard({ title, icon: Icon, count, tooltip: cardTooltip, children
   }, [children]);
 
   return (
-    <div className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
+    <div className="rounded-xl border border-border bg-white overflow-hidden shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
       <button
         type="button"
         className="w-full px-3.5 py-2.5 flex items-center gap-2 cursor-pointer hover:bg-[#FAFBFC] transition-colors"
@@ -3457,16 +3457,16 @@ function DashInfoCard({ title, icon: Icon, count, tooltip: cardTooltip, children
         onClick={() => setIsOpen((v) => !v)}
       >
         {Icon && (
-          <div className="w-6 h-6 rounded-md bg-[#EDF4FF] flex items-center justify-center shrink-0">
-            <Icon className="w-3 h-3 text-[#0A77FF]" />
+          <div className="w-6 h-6 rounded-md bg-accent flex items-center justify-center shrink-0">
+            <Icon className="w-3 h-3 text-primary" />
           </div>
         )}
-        <span className="text-[12px] text-[#334155] text-left" style={{ fontWeight: 600 }}>{title}</span>
+        <span className="text-[12px] text-slate-700 text-left" style={{ fontWeight: 600 }}>{title}</span>
         {cardTooltip && (
           <Tooltip>
             <TooltipTrigger asChild>
               <span className="inline-flex shrink-0" onClick={(e) => e.stopPropagation()}>
-                <Info className="w-3 h-3 text-[#CBD5E1] hover:text-[#94A3B8] transition-colors cursor-help" />
+                <Info className="w-3 h-3 text-slate-300 hover:text-slate-400 transition-colors cursor-help" />
               </span>
             </TooltipTrigger>
             <TooltipContent side="bottom" sideOffset={6} className="max-w-[260px] z-[300]">
@@ -3475,10 +3475,10 @@ function DashInfoCard({ title, icon: Icon, count, tooltip: cardTooltip, children
           </Tooltip>
         )}
         {count != null && (
-          <span className="text-[10px] text-[#0A77FF] px-1.5 py-0.5 rounded-md bg-[#EDF4FF]" style={{ fontWeight: 600 }}>{count}</span>
+          <span className="text-[10px] text-primary px-1.5 py-0.5 rounded-md bg-accent" style={{ fontWeight: 600 }}>{count}</span>
         )}
         <ChevronDown
-          className="w-3.5 h-3.5 text-[#94A3B8] shrink-0 ml-auto transition-transform duration-200"
+          className="w-3.5 h-3.5 text-slate-400 shrink-0 ml-auto transition-transform duration-200"
           style={{ transform: isOpen ? "rotate(0deg)" : "rotate(-90deg)" }}
         />
       </button>
@@ -3499,11 +3499,11 @@ function DashInfoCard({ title, icon: Icon, count, tooltip: cardTooltip, children
 function DashInfoLabel({ children, tooltip: labelTooltip }: { children: React.ReactNode; tooltip?: string }) {
   return (
     <div className="flex items-center gap-1 mb-px">
-      <p className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>{children}</p>
+      <p className="text-[10px] text-slate-400" style={{ fontWeight: 500 }}>{children}</p>
       {labelTooltip && (
         <Tooltip>
           <TooltipTrigger asChild>
-            <span className="inline-flex shrink-0"><Info className="w-2.5 h-2.5 text-[#D1D5DB] hover:text-[#94A3B8] transition-colors cursor-help" /></span>
+            <span className="inline-flex shrink-0"><Info className="w-2.5 h-2.5 text-[#D1D5DB] hover:text-slate-400 transition-colors cursor-help" /></span>
           </TooltipTrigger>
           <TooltipContent side="right" sideOffset={4} className="max-w-[240px] z-[300]">
             {labelTooltip}
@@ -3553,8 +3553,8 @@ function LocKpiInsightsDrawer({ open, onOpenChange, activeKpis, onToggleKpi, all
         <div className="px-5 pt-5 pb-0 shrink-0">
           <div className="flex items-start justify-between">
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ backgroundColor: "#EDF4FF" }}>
-                <ChartColumn className="w-5 h-5" style={{ color: "#0A77FF" }} />
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ backgroundColor: "hsl(var(--accent))" }}>
+                <ChartColumn className="w-5 h-5" style={{ color: "hsl(var(--primary))" }} />
               </div>
               <div>
                 <h2 className="text-base text-foreground" style={{ fontWeight: 600 }}>Add Insights</h2>
@@ -3576,14 +3576,14 @@ function LocKpiInsightsDrawer({ open, onOpenChange, activeKpis, onToggleKpi, all
               }}
               className={`flex items-center gap-1.5 text-[12px] px-3 py-1.5 rounded-full border transition-all duration-200 cursor-pointer ${
                 allKpis.every(k => activeKpis.includes(k.key))
-                  ? "bg-[#EBF3FF] border-[#0A77FF]/25 text-[#0A77FF] hover:bg-[#DCEAFF] hover:border-[#0A77FF]/40 shadow-sm shadow-[#0A77FF]/10"
+                  ? "bg-[#EBF3FF] border-primary/25 text-primary hover:bg-[#DCEAFF] hover:border-primary/40 shadow-sm shadow-primary/10"
                   : activeKpis.length === 0
-                  ? "bg-[#F8FAFC] border-[#E2E8F0] text-[#94A3B8] hover:bg-[#F1F5F9] hover:border-[#CBD5E1] hover:text-[#64748B]"
-                  : "bg-[#F8FAFC] border-[#E2E8F0] text-[#64748B] hover:bg-[#EBF3FF] hover:border-[#0A77FF]/25 hover:text-[#0A77FF]"
+                  ? "bg-slate-50 border-border text-slate-400 hover:bg-muted hover:border-slate-300 hover:text-slate-500"
+                  : "bg-slate-50 border-border text-slate-500 hover:bg-[#EBF3FF] hover:border-primary/25 hover:text-primary"
               }`}
               style={{ fontWeight: 600 }}
             >
-              {allKpis.every(k => activeKpis.includes(k.key)) ? (<><ToggleRight className="w-4 h-4 text-[#0A77FF]" /><span>All On</span></>) : activeKpis.length === 0 ? (<><ToggleLeft className="w-4 h-4" /><span>All Off</span></>) : (<><ToggleLeft className="w-4 h-4" /><span>Enable All</span></>)}
+              {allKpis.every(k => activeKpis.includes(k.key)) ? (<><ToggleRight className="w-4 h-4 text-primary" /><span>All On</span></>) : activeKpis.length === 0 ? (<><ToggleLeft className="w-4 h-4" /><span>All Off</span></>) : (<><ToggleLeft className="w-4 h-4" /><span>Enable All</span></>)}
             </button>
           </div>
         </div>
@@ -3612,14 +3612,14 @@ function LocKpiInsightsDrawer({ open, onOpenChange, activeKpis, onToggleKpi, all
                       onClick={() => onToggleKpi(kpi.key)}
                       className={`relative text-left rounded-lg border px-3 py-2.5 transition-all duration-150 cursor-pointer group ${
                         isActive
-                          ? "border-[#0A77FF]/25 bg-[#0A77FF]/[0.04] shadow-[0_0_0_1px_rgba(10,119,255,0.08)]"
+                          ? "border-primary/25 bg-primary/[0.04] shadow-[0_0_0_1px_rgba(10,119,255,0.08)]"
                           : "border-border/60 bg-white hover:border-border hover:bg-muted/20 hover:shadow-sm"
                       }`}
                     >
                       <div className="flex items-center justify-between gap-1">
-                        <span className={`text-[11.5px] truncate transition-colors ${isActive ? "text-[#0A77FF]" : "text-muted-foreground/70"}`} style={{ fontWeight: 500 }} title={kpi.label}>{kpi.label}</span>
+                        <span className={`text-[11.5px] truncate transition-colors ${isActive ? "text-primary" : "text-muted-foreground/70"}`} style={{ fontWeight: 500 }} title={kpi.label}>{kpi.label}</span>
                         <div className="shrink-0">
-                          {isActive ? <Check className="w-3.5 h-3.5" style={{ color: "#0A77FF" }} /> : <Plus className="w-3.5 h-3.5 text-muted-foreground/25 group-hover:text-muted-foreground/50 transition-colors" />}
+                          {isActive ? <Check className="w-3.5 h-3.5" style={{ color: "hsl(var(--primary))" }} /> : <Plus className="w-3.5 h-3.5 text-muted-foreground/25 group-hover:text-muted-foreground/50 transition-colors" />}
                         </div>
                       </div>
                       <p className={`text-[15px] mt-1 transition-colors ${isActive ? "text-foreground" : "text-foreground/80"}`} style={{ fontWeight: 550 }}>{value}</p>
@@ -3678,7 +3678,7 @@ function DraggableKpiCard({ index, kpiKey, label, value, subtitle, iconName, too
     return (
       <div
         ref={ref}
-        className="rounded-lg border border-dashed border-[#0A77FF]/20 bg-[#0A77FF]/[0.02] min-h-[52px] pointer-events-none"
+        className="rounded-lg border border-dashed border-primary/20 bg-primary/[0.02] min-h-[52px] pointer-events-none"
       />
     );
   }
@@ -3688,28 +3688,28 @@ function DraggableKpiCard({ index, kpiKey, label, value, subtitle, iconName, too
       ref={ref}
       className={`border rounded-lg bg-white group relative min-w-0 transition-all duration-200 select-none overflow-hidden cursor-grab active:cursor-grabbing ${
         isOver
-          ? "border-[#0A77FF]/30 bg-[#0A77FF]/[0.03] shadow-[0_0_0_2px_rgba(10,119,255,0.08)] scale-[1.02]"
-          : "border-[#E2E8F0] hover:-translate-y-[1px] hover:border-[#93B8F7] hover:shadow-[0_2px_8px_-3px_rgba(10,119,255,0.06)]"
+          ? "border-primary/30 bg-primary/[0.03] shadow-[0_0_0_2px_rgba(10,119,255,0.08)] scale-[1.02]"
+          : "border-border hover:-translate-y-[1px] hover:border-[#93B8F7] hover:shadow-[0_2px_8px_-3px_rgba(10,119,255,0.06)]"
       }`}
     >
       {/* Drop zone overlay */}
       {isOver && (
-        <div className="absolute inset-0 rounded-lg bg-[#0A77FF]/[0.02] pointer-events-none" />
+        <div className="absolute inset-0 rounded-lg bg-primary/[0.02] pointer-events-none" />
       )}
       <div className="px-3 py-2">
         {/* Drag handle — top-right pill (visual cue only, whole card is draggable) */}
-        <div className="absolute top-1.5 right-1.5 opacity-0 group-hover:opacity-100 transition-all duration-150 flex items-center bg-[#F1F5F9] rounded-md p-1 z-10 pointer-events-none">
-          <GripVertical className="w-3.5 h-3.5 text-[#64748B]" />
+        <div className="absolute top-1.5 right-1.5 opacity-0 group-hover:opacity-100 transition-all duration-150 flex items-center bg-muted rounded-md p-1 z-10 pointer-events-none">
+          <GripVertical className="w-3.5 h-3.5 text-slate-500" />
         </div>
         {/* Label row: label + info + icon */}
         <div className="flex items-center justify-between gap-1 mb-1">
           <div className="flex items-center gap-1 min-w-0">
-            <p className="text-[10.5px] text-[#64748B] whitespace-nowrap" style={{ fontWeight: 500 }}>{label}</p>
+            <p className="text-[10.5px] text-slate-500 whitespace-nowrap" style={{ fontWeight: 500 }}>{label}</p>
             {tooltip && (
               <Tooltip>
                 <TooltipTrigger asChild>
                   <button type="button" className="inline-flex shrink-0" tabIndex={-1} onClick={(e) => e.stopPropagation()}>
-                    <Info className="w-3 h-3 text-[#CBD5E1] hover:text-[#94A3B8] transition-colors cursor-help" />
+                    <Info className="w-3 h-3 text-slate-300 hover:text-slate-400 transition-colors cursor-help" />
                   </button>
                 </TooltipTrigger>
                 <TooltipContent side="bottom" sideOffset={6} className="max-w-[240px] text-[11px] z-[300]">
@@ -3723,9 +3723,9 @@ function DraggableKpiCard({ index, kpiKey, label, value, subtitle, iconName, too
         {/* Value row with optional change indicator */}
         <div className="flex items-baseline gap-1.5">
           {change && (
-            <span className="text-[10px] shrink-0" style={{ fontWeight: 500, color: changeColor || "#059669" }}>{change}</span>
+            <span className="text-[10px] shrink-0" style={{ fontWeight: 500, color: changeColor || "hsl(var(--success))" }}>{change}</span>
           )}
-          <p className="text-[15px] text-[#334155] tracking-tight whitespace-nowrap" style={{ fontWeight: 600, lineHeight: 1.2 }}>{value}</p>
+          <p className="text-[15px] text-slate-700 tracking-tight whitespace-nowrap" style={{ fontWeight: 600, lineHeight: 1.2 }}>{value}</p>
         </div>
       </div>
       {/* Remove button — bottom-right on hover */}
@@ -3735,7 +3735,7 @@ function DraggableKpiCard({ index, kpiKey, label, value, subtitle, iconName, too
           className="absolute bottom-1 right-1 opacity-0 group-hover:opacity-100 transition-all duration-150 p-1 rounded cursor-pointer hover:bg-red-50 z-10"
           title={`Remove ${label}`}
         >
-          <Trash2 className="w-3 h-3 text-[#94A3B8] hover:text-[#EF4444]" />
+          <Trash2 className="w-3 h-3 text-slate-400 hover:text-red-500" />
         </button>
       )}
     </div>
@@ -3745,8 +3745,8 @@ function DraggableKpiCard({ index, kpiKey, label, value, subtitle, iconName, too
 function DetailRow({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
   return (
     <div>
-      <p className="text-[10px] text-[#94A3B8] mb-px" style={{ fontWeight: 500 }}>{label}</p>
-      <p className={`text-[12px] text-[#334155] ${mono ? "font-mono" : ""}`} style={{ fontWeight: 500 }}>{value}</p>
+      <p className="text-[10px] text-slate-400 mb-px" style={{ fontWeight: 500 }}>{label}</p>
+      <p className={`text-[12px] text-slate-700 ${mono ? "font-mono" : ""}`} style={{ fontWeight: 500 }}>{value}</p>
     </div>
   );
 }
@@ -3850,10 +3850,10 @@ const MOCK_CITIES = [
 ];
 
 const CREATOR_NAMES = [
-  { name: "Ahtisham Ahmad", initials: "AA", bgColor: "#EDF4FF", fgColor: "#0A77FF", photo: "https://randomuser.me/api/portraits/men/36.jpg" },
+  { name: "Ahtisham Ahmad", initials: "AA", bgColor: "hsl(var(--accent))", fgColor: "hsl(var(--primary))", photo: "https://randomuser.me/api/portraits/men/36.jpg" },
   { name: "Sarah Mitchell", initials: "SM", bgColor: "#F0FDF4", fgColor: "#16A34A", photo: "https://randomuser.me/api/portraits/women/44.jpg" },
   { name: "James Wilson", initials: "JW", bgColor: "#FFF7ED", fgColor: "#EA580C", photo: "https://randomuser.me/api/portraits/men/46.jpg" },
-  { name: "Maria Garcia", initials: "MG", bgColor: "#F5F3FF", fgColor: "#7C3AED", photo: "https://randomuser.me/api/portraits/women/33.jpg" },
+  { name: "Maria Garcia", initials: "MG", bgColor: "#F5F3FF", fgColor: "hsl(var(--violet))", photo: "https://randomuser.me/api/portraits/women/33.jpg" },
   { name: "David Chen", initials: "DC", bgColor: "#ECFEFF", fgColor: "#0891B2", photo: "https://randomuser.me/api/portraits/men/75.jpg" },
   { name: "Emily Johnson", initials: "EJ", bgColor: "#FFF1F2", fgColor: "#E11D48", photo: "https://randomuser.me/api/portraits/women/65.jpg" },
   { name: "Robert Taylor", initials: "RT", bgColor: "#F0FDFA", fgColor: "#0D9488", photo: "https://randomuser.me/api/portraits/men/22.jpg" },
@@ -3861,10 +3861,10 @@ const CREATOR_NAMES = [
 ];
 
 const POC_NAMES = [
-  { name: "Sarah Mitchell", initials: "SM", bgColor: "#EDF4FF", fgColor: "#0A77FF", photo: "https://randomuser.me/api/portraits/women/44.jpg" },
+  { name: "Sarah Mitchell", initials: "SM", bgColor: "hsl(var(--accent))", fgColor: "hsl(var(--primary))", photo: "https://randomuser.me/api/portraits/women/44.jpg" },
   { name: "James Wilson", initials: "JW", bgColor: "#F0FDF4", fgColor: "#16A34A", photo: "https://randomuser.me/api/portraits/men/46.jpg" },
   { name: "Maria Garcia", initials: "MG", bgColor: "#FFF7ED", fgColor: "#EA580C", photo: "https://randomuser.me/api/portraits/women/33.jpg" },
-  { name: "David Chen", initials: "DC", bgColor: "#F5F3FF", fgColor: "#7C3AED", photo: "https://randomuser.me/api/portraits/men/75.jpg" },
+  { name: "David Chen", initials: "DC", bgColor: "#F5F3FF", fgColor: "hsl(var(--violet))", photo: "https://randomuser.me/api/portraits/men/75.jpg" },
   { name: "Emily Johnson", initials: "EJ", bgColor: "#ECFEFF", fgColor: "#0891B2", photo: "https://randomuser.me/api/portraits/women/65.jpg" },
   { name: "Robert Taylor", initials: "RT", bgColor: "#FFF1F2", fgColor: "#E11D48", photo: "https://randomuser.me/api/portraits/men/22.jpg" },
   { name: "Lisa Anderson", initials: "LA", bgColor: "#FEF9C3", fgColor: "#A16207", photo: "https://randomuser.me/api/portraits/women/17.jpg" },
@@ -4269,7 +4269,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
 
   const handleLocSavePoc = useCallback(() => {
     if (!locNewPocName.trim()) { toast.error("Name is required."); return; }
-    const AVATAR_COLORS = ["#0A77FF", "#7C3AED", "#059669", "#D97706"];
+    const AVATAR_COLORS = ["hsl(var(--primary))", "hsl(var(--violet))", "hsl(var(--success))", "hsl(var(--warning))"];
     const newContact: PartnerContact = {
       id: `C-LOC-${Date.now()}`,
       name: locNewPocName.trim(),
@@ -4406,9 +4406,9 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                 {/* Card size options — only when card view is active */}
                 {density === "card" && (
                   <>
-                    <div className="mx-2 my-1.5 border-t border-[#F1F5F9]" />
+                    <div className="mx-2 my-1.5 border-t border-muted" />
                     <div className="px-3 py-1.5">
-                      <p className="text-[10px] text-[#94A3B8] uppercase tracking-wide mb-2" style={{ fontWeight: 600 }}>Card Size</p>
+                      <p className="text-[10px] text-slate-400 uppercase tracking-wide mb-2" style={{ fontWeight: 600 }}>Card Size</p>
                       <div className="flex items-center gap-1.5">
                         {(["large", "medium", "small"] as const).map((size) => (
                           <button
@@ -4416,8 +4416,8 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                             onClick={() => setLocCardSize(size)}
                             className={`flex-1 py-1.5 rounded-md text-[11px] text-center transition-all cursor-pointer ${
                               locCardSize === size
-                                ? "bg-[#0A77FF] text-white shadow-sm"
-                                : "bg-[#F1F5F9] text-[#64748B] hover:bg-[#E2E8F0]"
+                                ? "bg-primary text-white shadow-sm"
+                                : "bg-muted text-slate-500 hover:bg-border"
                             }`}
                             style={{ fontWeight: locCardSize === size ? 600 : 500 }}
                           >
@@ -4437,7 +4437,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
             <button
               type="button"
               onClick={() => setCreateLocationModalOpen(true)}
-              className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-sm shadow-sm transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg bg-primary hover:bg-[#0862D0] text-white text-sm shadow-sm transition-colors cursor-pointer"
               style={{ fontWeight: 600 }}
             >
               <Plus className="w-3.5 h-3.5" />
@@ -4456,15 +4456,15 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                 onClick={() => { setStatusFilter(f.key); setCurrentPage(1); }}
                 className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                   isActive
-                    ? "border-primary bg-[#EDF4FF] hover:bg-[#D6E8FF] active:bg-[#ADD1FF]"
+                    ? "border-primary bg-accent hover:bg-[#D6E8FF] active:bg-[#ADD1FF]"
                     : "border-border text-muted-foreground hover:bg-muted/60 hover:text-foreground hover:border-muted-foreground/30 active:bg-muted"
                 }`}
-                style={{ fontWeight: isActive ? 500 : 400, color: isActive ? "#0A77FF" : undefined }}
+                style={{ fontWeight: isActive ? 500 : 400, color: isActive ? "hsl(var(--primary))" : undefined }}
               >
                 {f.label}
                 <span
                   className={`text-[10px] rounded-full px-1.5 py-px min-w-[18px] text-center ${isActive ? "bg-primary/10" : "bg-muted"}`}
-                  style={{ fontWeight: 600, color: isActive ? "#0A77FF" : "#475569" }}
+                  style={{ fontWeight: 600, color: isActive ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))" }}
                 >
                   {f.count}
                 </span>
@@ -4503,14 +4503,14 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                     key={loc.id}
                     className={`bg-white border rounded-xl cursor-pointer hover:shadow-[0_4px_16px_-4px_rgba(10,119,255,0.10),0_1px_3px_-1px_rgba(0,0,0,0.04)] hover:border-[#93B8F7]/50 transition-all duration-200 group/card flex flex-col overflow-hidden ${
                       isHighlighted
-                        ? "border-[#0A77FF] shadow-[0_0_0_2px_rgba(10,119,255,0.15),0_8px_24px_-8px_rgba(10,119,255,0.20)] animate-[highlight-pulse_1.5s_ease-in-out_2]"
-                        : "border-[#E2E8F0]"
+                        ? "border-primary shadow-[0_0_0_2px_rgba(10,119,255,0.15),0_8px_24px_-8px_rgba(10,119,255,0.20)] animate-[highlight-pulse_1.5s_ease-in-out_2]"
+                        : "border-border"
                     }`}
                     style={isHighlighted ? { animation: "highlight-pulse 1.5s ease-in-out 2" } : undefined}
                     onClick={() => handleOpenLocation(loc)}
                   >
                     {/* Location Image — top banner */}
-                    <div className="relative w-full h-[160px] overflow-hidden bg-[#F1F5F9]">
+                    <div className="relative w-full h-[160px] overflow-hidden bg-muted">
                       <img
                         src={loc.image}
                         alt={loc.name}
@@ -4557,7 +4557,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                           <DropdownMenuTrigger asChild onClick={(e: React.MouseEvent) => e.stopPropagation()}>
                             <button
                               type="button"
-                              className="inline-flex items-center justify-center h-7 w-7 rounded-lg bg-white/80 backdrop-blur-sm text-[#475569] opacity-0 group-hover/card:opacity-100 hover:bg-white hover:text-[#0F172A] transition-all cursor-pointer shadow-sm"
+                              className="inline-flex items-center justify-center h-7 w-7 rounded-lg bg-white/80 backdrop-blur-sm text-muted-foreground opacity-0 group-hover/card:opacity-100 hover:bg-white hover:text-foreground transition-all cursor-pointer shadow-sm"
                             >
                               <MoreHorizontal className="w-4 h-4" />
                             </button>
@@ -4570,8 +4570,8 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                               <Pencil className="w-4 h-4 mr-2" /> Edit
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
-                            <DropdownMenuItem className="text-[#DC2626] focus:text-[#DC2626] focus:bg-[#FEF2F2]" onClick={() => toast.info("Archive coming soon")}>
-                              <Archive className="w-4 h-4 mr-2 text-[#DC2626]" /> Archive
+                            <DropdownMenuItem className="text-destructive focus:text-destructive focus:bg-red-50" onClick={() => toast.info("Archive coming soon")}>
+                              <Archive className="w-4 h-4 mr-2 text-destructive" /> Archive
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -4583,8 +4583,8 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
 
                       {/* Title + Address */}
                       <div className="px-3.5 pt-1.5 pb-0">
-                        <p className="text-[14px] text-[#334155] truncate" style={{ fontWeight: 600, lineHeight: '20px' }}>{highlightText(loc.name)}</p>
-                        <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${loc.address}, ${loc.city}, ${loc.state}, ${loc.country}`)}`} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-[12px] text-[#64748B] hover:text-[#0A77FF] hover:underline truncate block mt-0.5 transition-colors" style={{ lineHeight: '18px' }}>
+                        <p className="text-[14px] text-slate-700 truncate" style={{ fontWeight: 600, lineHeight: '20px' }}>{highlightText(loc.name)}</p>
+                        <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${loc.address}, ${loc.city}, ${loc.state}, ${loc.country}`)}`} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-[12px] text-slate-500 hover:text-primary hover:underline truncate block mt-0.5 transition-colors" style={{ lineHeight: '18px' }}>
                           {loc.address}, {loc.city}, {loc.state}
                         </a>
                       </div>
@@ -4593,24 +4593,24 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                       <div className="px-3.5 pt-3 pb-3 flex-1 flex items-end">
                         <div className="flex items-center gap-3 text-[11.5px]">
                           <div className="flex items-center gap-1">
-                            <Users className="w-3 h-3 text-[#94A3B8]" />
-                            <span className="text-[#334155] tabular-nums" style={{ fontWeight: 600 }}>{loc.contacts}</span>
+                            <Users className="w-3 h-3 text-slate-400" />
+                            <span className="text-slate-700 tabular-nums" style={{ fontWeight: 600 }}>{loc.contacts}</span>
                           </div>
-                          <div className="w-px h-3 bg-[#E2E8F0]" />
+                          <div className="w-px h-3 bg-border" />
                           <div className="flex items-center gap-1">
-                            <Package className="w-3 h-3 text-[#94A3B8]" />
-                            <span className="text-[#334155] tabular-nums" style={{ fontWeight: 600 }}>{loc.items}</span>
+                            <Package className="w-3 h-3 text-slate-400" />
+                            <span className="text-slate-700 tabular-nums" style={{ fontWeight: 600 }}>{loc.items}</span>
                           </div>
-                          <div className="w-px h-3 bg-[#E2E8F0]" />
+                          <div className="w-px h-3 bg-border" />
                           <div className="flex items-center gap-1">
-                            <Wrench className="w-3 h-3 text-[#94A3B8]" />
-                            <span className="text-[#334155] tabular-nums" style={{ fontWeight: 600 }}>{loc.serviceCenters}</span>
+                            <Wrench className="w-3 h-3 text-slate-400" />
+                            <span className="text-slate-700 tabular-nums" style={{ fontWeight: 600 }}>{loc.serviceCenters}</span>
                           </div>
                         </div>
                       </div>
 
                       {/* Footer */}
-                      <div className="px-3.5 py-2.5 border-t border-[#F1F5F9] flex items-center justify-between text-[10.5px] text-[#94A3B8]">
+                      <div className="px-3.5 py-2.5 border-t border-muted flex items-center justify-between text-[10.5px] text-slate-400">
                         <div className="flex items-center gap-1.5 min-w-0">
                           <div
                             className="w-5 h-5 rounded-md flex items-center justify-center text-[8px] shrink-0 overflow-hidden border border-[#E8ECF1]"
@@ -4618,11 +4618,11 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                           >
                             {loc.createdBy.photo ? <img src={loc.createdBy.photo} alt="" className="w-full h-full object-cover" /> : <span style={{ color: loc.createdBy.fgColor || "#334155" }}>{loc.createdBy.initials}</span>}
                           </div>
-                          <span className="text-[#475569] truncate" style={{ fontWeight: 500 }}>{loc.createdBy.name}</span>
+                          <span className="text-muted-foreground truncate" style={{ fontWeight: 500 }}>{loc.createdBy.name}</span>
                         </div>
                         <div className="flex items-center gap-1 shrink-0 ml-2">
-                          <Clock className="w-3 h-3 text-[#CBD5E1]" />
-                          <span className="text-[#64748B]" style={{ fontWeight: 500 }}>{formatDate(loc.lastUpdated)}</span>
+                          <Clock className="w-3 h-3 text-slate-300" />
+                          <span className="text-slate-500" style={{ fontWeight: 500 }}>{formatDate(loc.lastUpdated)}</span>
                         </div>
                       </div>
                     </div>
@@ -4639,7 +4639,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
               <TableHeader className="sticky top-0 z-20 bg-card">
                 <TableRow className={`bg-muted/30 hover:bg-muted/30 ${density === "condensed" ? "[&>th]:h-8" : "[&>th]:h-9"}`}>
                   {/* Checkbox — sticky left */}
-                  <TableHead className="sticky left-0 z-20 bg-[#f8fafc] w-[40px] min-w-[40px] max-w-[40px] !pl-2 !pr-0">
+                  <TableHead className="sticky left-0 z-20 bg-slate-50 w-[40px] min-w-[40px] max-w-[40px] !pl-2 !pr-0">
                     <Checkbox checked={allPageSelected ? true : somePageSelected ? "indeterminate" : false} onCheckedChange={handleSelectAll} aria-label="Select all rows" />
                   </TableHead>
                   {/* Dynamic columns */}
@@ -4662,7 +4662,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                           ...(isBeingDragged ? { background: "linear-gradient(180deg, rgba(10,119,255,0.08) 0%, rgba(10,119,255,0.03) 100%)" } : {}),
                         }}
                       >
-                        {isBeingDragged && <div className="absolute top-0 left-0 right-0 h-[2px] rounded-b-full" style={{ backgroundColor: "#0A77FF" }} />}
+                        {isBeingDragged && <div className="absolute top-0 left-0 right-0 h-[2px] rounded-b-full" style={{ backgroundColor: "hsl(var(--primary))" }} />}
                         {isDraggable && (
                           <GripVertical className={`absolute left-1 top-1/2 -translate-y-1/2 w-3 h-3 transition-opacity z-[5] pointer-events-none ${isBeingDragged ? "opacity-100 text-primary" : "opacity-0 group-hover/colheader:opacity-100 text-muted-foreground/40"}`} />
                         )}
@@ -4678,9 +4678,9 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                             isLocked={isLocked}
                           >
                             <div className="inline-flex items-center gap-1">
-                              <span className="text-[13px]" style={currentSort ? { color: "#0A77FF" } : undefined}>{def.label}</span>
-                              {currentSort === "asc" && <ArrowUp className="w-3 h-3 shrink-0" style={{ color: "#0A77FF" }} />}
-                              {currentSort === "desc" && <ArrowDown className="w-3 h-3 shrink-0" style={{ color: "#0A77FF" }} />}
+                              <span className="text-[13px]" style={currentSort ? { color: "hsl(var(--primary))" } : undefined}>{def.label}</span>
+                              {currentSort === "asc" && <ArrowUp className="w-3 h-3 shrink-0" style={{ color: "hsl(var(--primary))" }} />}
+                              {currentSort === "desc" && <ArrowDown className="w-3 h-3 shrink-0" style={{ color: "hsl(var(--primary))" }} />}
                               {!currentSort && def.sortable && <ArrowUpDown className="w-3 h-3 shrink-0 text-muted-foreground opacity-0 group-hover/colheader:opacity-100 transition-opacity" />}
                             </div>
                           </ColumnHeaderMenu>
@@ -4699,7 +4699,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                     );
                   })}
                   {/* Actions — sticky right */}
-                  <TableHead className="whitespace-nowrap w-[60px] sticky right-0 bg-[#f8fafc] z-20 !pl-2 !pr-2" style={{ boxShadow: "inset 1px 0 0 0 rgba(0,0,0,0.08)" }}>
+                  <TableHead className="whitespace-nowrap w-[60px] sticky right-0 bg-slate-50 z-20 !pl-2 !pr-2" style={{ boxShadow: "inset 1px 0 0 0 rgba(0,0,0,0.08)" }}>
                     <span className="text-[13px]">Actions</span>
                   </TableHead>
                 </TableRow>
@@ -4729,17 +4729,17 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                         case "location_name": return (
                           <TableCell key={colKey}>
                             <div className="flex items-center gap-2.5">
-                              <div className={`${isComfort ? "w-9 h-9" : "w-7 h-7"} rounded-md overflow-hidden bg-[#F1F5F9] shrink-0`}>
+                              <div className={`${isComfort ? "w-9 h-9" : "w-7 h-7"} rounded-md overflow-hidden bg-muted shrink-0`}>
                                 <img src={loc.image} alt={loc.name} className="w-full h-full object-cover" />
                               </div>
                               <div className="min-w-0">
                                 <span className="text-sm truncate block" style={{ fontWeight: 500, color: '#1E293B' }}>{highlightText(loc.name)}</span>
-                                {isComfort && <span className="text-[11px] text-[#94A3B8] truncate block">{loc.city}, {loc.state}</span>}
+                                {isComfort && <span className="text-[11px] text-slate-400 truncate block">{loc.city}, {loc.state}</span>}
                               </div>
                             </div>
                           </TableCell>
                         );
-                        case "address": return (<TableCell key={colKey}><a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${loc.address}, ${loc.city}, ${loc.state}, ${loc.country}`)}`} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-sm text-muted-foreground hover:text-[#0A77FF] hover:underline truncate block transition-colors">{loc.address}</a></TableCell>);
+                        case "address": return (<TableCell key={colKey}><a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${loc.address}, ${loc.city}, ${loc.state}, ${loc.country}`)}`} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="text-sm text-muted-foreground hover:text-primary hover:underline truncate block transition-colors">{loc.address}</a></TableCell>);
                         case "city_state": return (<TableCell key={colKey} className="text-sm text-muted-foreground whitespace-nowrap">{loc.city}, {loc.state}</TableCell>);
                         case "poc": return (
                           <TableCell key={colKey}>
@@ -4751,7 +4751,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                                     <div className="cursor-pointer"><LocAvatar person={loc.pocNames[0]} /></div>
                                   </HoverCardTrigger>
                                   <HoverCardContent side="bottom" align="start" className="w-[280px] p-0 rounded-xl border-0 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
-                                    <div className="bg-gradient-to-br from-[#1E293B] to-[#334155] px-4 py-3 relative overflow-hidden">
+                                    <div className="bg-gradient-to-br from-slate-800 to-slate-700 px-4 py-3 relative overflow-hidden">
                                       <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-white/[0.04]" />
                                       <div className="flex items-center gap-3 relative">
                                         <div className="w-11 h-11 rounded-full overflow-hidden border-2 border-white/20 shrink-0" style={{ backgroundColor: loc.pocNames[0].photo ? "transparent" : loc.pocNames[0].bgColor }}>
@@ -4759,14 +4759,14 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                                         </div>
                                         <div className="min-w-0">
                                           <p className="text-[14px] text-white truncate" style={{ fontWeight: 600 }}>{loc.pocNames[0].name}</p>
-                                          <p className="text-[11px] text-[#94A3B8] truncate">Contact · {loc.name}</p>
+                                          <p className="text-[11px] text-slate-400 truncate">Contact · {loc.name}</p>
                                         </div>
                                       </div>
                                     </div>
                                     <div className="bg-white px-4 py-3 space-y-2">
-                                      <div className="flex items-center gap-2.5 text-[12px] text-[#334155]"><Mail className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" /><span className="truncate">{loc.pocNames[0].name.toLowerCase().replace(/\s+/g, ".")}@company.com</span></div>
-                                      <div className="flex items-center gap-2.5 text-[12px] text-[#334155]"><Phone className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" /><span>+1 (555) 012-3456</span></div>
-                                      <div className="flex items-center gap-2.5 text-[12px] text-[#334155]"><Building2 className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" /><span>{loc.name}</span></div>
+                                      <div className="flex items-center gap-2.5 text-[12px] text-slate-700"><Mail className="w-3.5 h-3.5 text-slate-400 shrink-0" /><span className="truncate">{loc.pocNames[0].name.toLowerCase().replace(/\s+/g, ".")}@company.com</span></div>
+                                      <div className="flex items-center gap-2.5 text-[12px] text-slate-700"><Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" /><span>+1 (555) 012-3456</span></div>
+                                      <div className="flex items-center gap-2.5 text-[12px] text-slate-700"><Building2 className="w-3.5 h-3.5 text-slate-400 shrink-0" /><span>{loc.name}</span></div>
                                     </div>
                                   </HoverCardContent>
                                 </HoverCard>
@@ -4796,8 +4796,8 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                         case "service_centers": return (
                           <TableCell key={colKey}>
                             <div className="flex items-center gap-1.5">
-                              <span className={`inline-flex items-center gap-1 ${isComfort ? "px-2 py-0.5 text-xs" : "px-1.5 py-px text-[11px]"} rounded-md border`} style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#475569", borderColor: "#E2E8F0" }}>
-                                <Wrench className="w-3 h-3 text-[#94A3B8]" />
+                              <span className={`inline-flex items-center gap-1 ${isComfort ? "px-2 py-0.5 text-xs" : "px-1.5 py-px text-[11px]"} rounded-md border`} style={{ fontWeight: 500, backgroundColor: "hsl(var(--muted))", color: "hsl(var(--muted-foreground))", borderColor: "hsl(var(--border))" }}>
+                                <Wrench className="w-3 h-3 text-slate-400" />
                                 {loc.serviceCenterNames[0] || "Center"}
                               </span>
                               {loc.serviceCenterNames.length > 1 && (
@@ -4809,7 +4809,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                                     subtitle: "SERVICE CENTER",
                                   }))}
                                 >
-                                  <span className="inline-flex items-center px-1.5 py-0.5 rounded-md text-xs border cursor-default" style={{ fontWeight: 600, backgroundColor: "#F1F5F9", color: "#475569", borderColor: "#E2E8F0" }}>+{loc.serviceCenterNames.length - 1}</span>
+                                  <span className="inline-flex items-center px-1.5 py-0.5 rounded-md text-xs border cursor-default" style={{ fontWeight: 600, backgroundColor: "hsl(var(--muted))", color: "hsl(var(--muted-foreground))", borderColor: "hsl(var(--border))" }}>+{loc.serviceCenterNames.length - 1}</span>
                                 </OverflowTooltip>
                               )}
                             </div>
@@ -4824,7 +4824,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                                   <div className="cursor-pointer"><LocAvatar person={loc.createdBy} /></div>
                                 </HoverCardTrigger>
                                 <HoverCardContent side="bottom" align="start" className="w-[280px] p-0 rounded-xl border-0 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
-                                  <div className="bg-gradient-to-br from-[#1E293B] to-[#334155] px-4 py-3 relative overflow-hidden">
+                                  <div className="bg-gradient-to-br from-slate-800 to-slate-700 px-4 py-3 relative overflow-hidden">
                                     <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-white/[0.04]" />
                                     <div className="flex items-center gap-3 relative">
                                       <div className="w-11 h-11 rounded-full overflow-hidden border-2 border-white/20 shrink-0" style={{ backgroundColor: loc.createdBy.photo ? "transparent" : loc.createdBy.bgColor }}>
@@ -4832,14 +4832,14 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                                       </div>
                                       <div className="min-w-0">
                                         <p className="text-[14px] text-white truncate" style={{ fontWeight: 600 }}>{loc.createdBy.name}</p>
-                                        <p className="text-[11px] text-[#94A3B8] truncate">Team Member</p>
+                                        <p className="text-[11px] text-slate-400 truncate">Team Member</p>
                                       </div>
                                     </div>
                                   </div>
                                   <div className="bg-white px-4 py-3 space-y-2">
-                                    <div className="flex items-center gap-2.5 text-[12px] text-[#334155]"><Mail className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" /><span className="truncate">{loc.createdBy.name.toLowerCase().replace(/\s+/g, ".")}@company.com</span></div>
-                                    <div className="flex items-center gap-2.5 text-[12px] text-[#334155]"><Building2 className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" /><span>Operations</span></div>
-                                    <div className="flex items-center gap-2.5 text-[12px] text-[#334155]"><Phone className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" /><span>+1 (555) 987-6543</span></div>
+                                    <div className="flex items-center gap-2.5 text-[12px] text-slate-700"><Mail className="w-3.5 h-3.5 text-slate-400 shrink-0" /><span className="truncate">{loc.createdBy.name.toLowerCase().replace(/\s+/g, ".")}@company.com</span></div>
+                                    <div className="flex items-center gap-2.5 text-[12px] text-slate-700"><Building2 className="w-3.5 h-3.5 text-slate-400 shrink-0" /><span>Operations</span></div>
+                                    <div className="flex items-center gap-2.5 text-[12px] text-slate-700"><Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" /><span>+1 (555) 987-6543</span></div>
                                   </div>
                                 </HoverCardContent>
                               </HoverCard>
@@ -4873,7 +4873,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                       key={loc.id}
                       className={`cursor-pointer group hover:bg-[#F0F7FF] ${
                         density === "condensed" ? "[&>td]:py-1 [&>td]:pl-3 [&>td]:pr-2" : "[&>td]:py-2 [&>td]:pl-3 [&>td]:pr-3"
-                      } ${highlightedLocationId === loc.id ? "animate-row-flash bg-[#EDF4FF]/60" : ""}`}
+                      } ${highlightedLocationId === loc.id ? "animate-row-flash bg-accent/60" : ""}`}
                       onClick={() => handleOpenLocation(loc)}
                     >
                       <TableCell className="sticky left-0 z-10 bg-card group-hover:bg-[#F0F7FF] w-[40px] min-w-[40px] max-w-[40px] !pl-2 !pr-0" onClick={(e) => e.stopPropagation()}>
@@ -4909,10 +4909,10 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                             </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem
-                              className="text-[#DC2626] focus:text-[#DC2626] focus:bg-[#FEF2F2]"
+                              className="text-destructive focus:text-destructive focus:bg-red-50"
                               onClick={() => toast.info("Archive coming soon")}
                             >
-                              <Archive className="w-4 h-4 mr-2 text-[#DC2626]" /> Archive
+                              <Archive className="w-4 h-4 mr-2 text-destructive" /> Archive
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
@@ -5014,7 +5014,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
             pocNames: [],
             serviceCenterNames: [],
             status: (d.status || "Active").toLowerCase() === "active" ? "active" : "inactive",
-            createdBy: { name: "You", initials: "YO", bgColor: "#EDF4FF", fgColor: "#0A77FF" },
+            createdBy: { name: "You", initials: "YO", bgColor: "hsl(var(--accent))", fgColor: "hsl(var(--primary))" },
             lastUpdated: new Date().toISOString(),
             phone: d.phone || "",
             email: d.email || "",
@@ -5063,27 +5063,27 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
             ];
 
             const LOC_POC_DATA = [
-              { id: "LP-1", name: "Issac Archer", dept: "Sales", phone: "(419) 548-1532", landline: "(736) 267-8659", ext: "123", email: "jimmie@example.com", bgColor: "#0A77FF" },
-              { id: "LP-2", name: "Daniel Whitaker", dept: "Procurement", phone: "(372) 588-9852", landline: "(322) 683-5910", ext: "123", email: "malvar@example.com", bgColor: "#7C3AED" },
-              { id: "LP-3", name: "Kimora Avila", dept: "Finance", phone: "(476) 828-2670", landline: "(822) 622-2842", ext: "123", email: "pthom@example.com", bgColor: "#059669" },
-              { id: "LP-4", name: "Laney Zavala", dept: "Production", phone: "(996) 247-1680", landline: "(309) 645-6861", ext: "123", email: "specpr@example.com", bgColor: "#D97706" },
-              { id: "LP-5", name: "Wyatt Bates", dept: "Sampling", phone: "(437) 402-2459", landline: "(778) 804-3466", ext: "123", email: "pthon@example.com", bgColor: "#0A77FF" },
-              { id: "LP-6", name: "Kaleb Figueroa", dept: "Assembly", phone: "(456) 844-9096", landline: "(360) 476-4400", ext: "123", email: "kewley@example.com", bgColor: "#DC2626" },
-              { id: "LP-7", name: "Kylie Norton", dept: "Pre-Production", phone: "(736) 267-8659", landline: "(989) 930-7596", ext: "123", email: "phyrux@example.com", bgColor: "#7C3AED" },
-              { id: "LP-8", name: "Anya Blevins", dept: "Electrical", phone: "(219) 418-4910", landline: "(437) 402-2459", ext: "123", email: "scottz@example.com", bgColor: "#059669" },
-              { id: "LP-9", name: "Jimena Morrow", dept: "Hardware", phone: "(590) 887-7526", landline: "(989) 930-7596", ext: "123", email: "sjava@example.com", bgColor: "#D97706" },
-              { id: "LP-10", name: "Vivian Davila", dept: "Sub-Store", phone: "(632) 372-3424", landline: "(536) 554-1064", ext: "123", email: "hikoza@example.com", bgColor: "#0A77FF" },
+              { id: "LP-1", name: "Issac Archer", dept: "Sales", phone: "(419) 548-1532", landline: "(736) 267-8659", ext: "123", email: "jimmie@example.com", bgColor: "hsl(var(--primary))" },
+              { id: "LP-2", name: "Daniel Whitaker", dept: "Procurement", phone: "(372) 588-9852", landline: "(322) 683-5910", ext: "123", email: "malvar@example.com", bgColor: "hsl(var(--violet))" },
+              { id: "LP-3", name: "Kimora Avila", dept: "Finance", phone: "(476) 828-2670", landline: "(822) 622-2842", ext: "123", email: "pthom@example.com", bgColor: "hsl(var(--success))" },
+              { id: "LP-4", name: "Laney Zavala", dept: "Production", phone: "(996) 247-1680", landline: "(309) 645-6861", ext: "123", email: "specpr@example.com", bgColor: "hsl(var(--warning))" },
+              { id: "LP-5", name: "Wyatt Bates", dept: "Sampling", phone: "(437) 402-2459", landline: "(778) 804-3466", ext: "123", email: "pthon@example.com", bgColor: "hsl(var(--primary))" },
+              { id: "LP-6", name: "Kaleb Figueroa", dept: "Assembly", phone: "(456) 844-9096", landline: "(360) 476-4400", ext: "123", email: "kewley@example.com", bgColor: "hsl(var(--destructive))" },
+              { id: "LP-7", name: "Kylie Norton", dept: "Pre-Production", phone: "(736) 267-8659", landline: "(989) 930-7596", ext: "123", email: "phyrux@example.com", bgColor: "hsl(var(--violet))" },
+              { id: "LP-8", name: "Anya Blevins", dept: "Electrical", phone: "(219) 418-4910", landline: "(437) 402-2459", ext: "123", email: "scottz@example.com", bgColor: "hsl(var(--success))" },
+              { id: "LP-9", name: "Jimena Morrow", dept: "Hardware", phone: "(590) 887-7526", landline: "(989) 930-7596", ext: "123", email: "sjava@example.com", bgColor: "hsl(var(--warning))" },
+              { id: "LP-10", name: "Vivian Davila", dept: "Sub-Store", phone: "(632) 372-3424", landline: "(536) 554-1064", ext: "123", email: "hikoza@example.com", bgColor: "hsl(var(--primary))" },
             ];
 
             const LOC_ITEMS_DATA = [
-              { partNo: "100219-42", desc: "Front bulkhead cabinet lower cov...", category: "Ram Pro Master 2500...", type: "Parts", typeBg: "#DBEAFE", typeColor: "#0A77FF", control: "Non-Serialized" },
-              { partNo: "100219-51", desc: "Box walls inlay cabinet", category: "Hardware", type: "Parts", typeBg: "#DBEAFE", typeColor: "#0A77FF", control: "Non-Serialized" },
-              { partNo: "100219-51-01", desc: "Box walls inlay cabinet with defib...", category: "Cabinet", type: "Equipment - Capital", typeBg: "#DBEAFE", typeColor: "#0A77FF", control: "Serialized" },
-              { partNo: "100219-51-01RC", desc: "Box walls inlay cabinet with defib...", category: "Electronics", type: "Equipment - Non-Capital", typeBg: "#FEF3C7", typeColor: "#D97706", control: "Non-Serialized" },
-              { partNo: "100219-51-02", desc: "Box walls inlay cabinet with refrig...", category: "Hardware", type: "Parts", typeBg: "#DBEAFE", typeColor: "#0A77FF", control: "Serialized" },
-              { partNo: "100219-52", desc: "Box closeout top cap inlay cabinet", category: "Electronics", type: "Equipment - Non-Capital", typeBg: "#FEF3C7", typeColor: "#D97706", control: "Non-Serialized" },
-              { partNo: "100120-70", desc: "Toyota long cut, emergency brak...", category: "Hardware", type: "Miscellaneous", typeBg: "#FEE2E2", typeColor: "#DC2626", control: "Non-Serialized" },
-              { partNo: "100120-71", desc: "Toyota long cut, brake line bracket", category: "Electronics", type: "Equipment - Capital", typeBg: "#DBEAFE", typeColor: "#0A77FF", control: "Serialized" },
+              { partNo: "100219-42", desc: "Front bulkhead cabinet lower cov...", category: "Ram Pro Master 2500...", type: "Parts", typeBg: "#DBEAFE", typeColor: "hsl(var(--primary))", control: "Non-Serialized" },
+              { partNo: "100219-51", desc: "Box walls inlay cabinet", category: "Hardware", type: "Parts", typeBg: "#DBEAFE", typeColor: "hsl(var(--primary))", control: "Non-Serialized" },
+              { partNo: "100219-51-01", desc: "Box walls inlay cabinet with defib...", category: "Cabinet", type: "Equipment - Capital", typeBg: "#DBEAFE", typeColor: "hsl(var(--primary))", control: "Serialized" },
+              { partNo: "100219-51-01RC", desc: "Box walls inlay cabinet with defib...", category: "Electronics", type: "Equipment - Non-Capital", typeBg: "#FEF3C7", typeColor: "hsl(var(--warning))", control: "Non-Serialized" },
+              { partNo: "100219-51-02", desc: "Box walls inlay cabinet with refrig...", category: "Hardware", type: "Parts", typeBg: "#DBEAFE", typeColor: "hsl(var(--primary))", control: "Serialized" },
+              { partNo: "100219-52", desc: "Box closeout top cap inlay cabinet", category: "Electronics", type: "Equipment - Non-Capital", typeBg: "#FEF3C7", typeColor: "hsl(var(--warning))", control: "Non-Serialized" },
+              { partNo: "100120-70", desc: "Toyota long cut, emergency brak...", category: "Hardware", type: "Miscellaneous", typeBg: "#FEE2E2", typeColor: "hsl(var(--destructive))", control: "Non-Serialized" },
+              { partNo: "100120-71", desc: "Toyota long cut, brake line bracket", category: "Electronics", type: "Equipment - Capital", typeBg: "#DBEAFE", typeColor: "hsl(var(--primary))", control: "Serialized" },
             ];
 
             const LOC_VENDOR_CARRIERS = [
@@ -5133,69 +5133,69 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
               <div className="shrink-0 bg-white rounded-t-none sm:rounded-t-2xl border-b border-[#EEF2F6]">
                 <div className="px-3 sm:px-5 py-3 sm:py-3.5 flex items-center justify-between gap-3">
                   <div className="flex items-center gap-3 min-w-0">
-                    <button onClick={handleCloseDetailModal} className="w-8 h-8 rounded-lg border border-[#E2E8F0] flex items-center justify-center hover:bg-[#F8FAFC] hover:border-[#CBD5E1] transition-all shrink-0 cursor-pointer">
-                      <ArrowLeft className="w-4 h-4 text-[#64748B]" />
+                    <button onClick={handleCloseDetailModal} className="w-8 h-8 rounded-lg border border-border flex items-center justify-center hover:bg-slate-50 hover:border-slate-300 transition-all shrink-0 cursor-pointer">
+                      <ArrowLeft className="w-4 h-4 text-slate-500" />
                     </button>
-                    <div className="w-10 h-10 rounded-lg overflow-hidden bg-[#F1F5F9] shrink-0">
+                    <div className="w-10 h-10 rounded-lg overflow-hidden bg-muted shrink-0">
                       <img src={loc.image} alt={loc.name} className="w-full h-full object-cover" />
                     </div>
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <h2 className="text-[15px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{loc.name}</h2>
+                        <h2 className="text-[15px] text-foreground truncate" style={{ fontWeight: 600 }}>{loc.name}</h2>
                         <span className="inline-flex items-center justify-center rounded-full border px-2 py-0.5 text-[10px] whitespace-nowrap shrink-0" style={{ fontWeight: 500, backgroundColor: loc.status === "active" ? "#ECFDF5" : "#FFFBEB", color: loc.status === "active" ? "#065F46" : "#92400E", borderColor: loc.status === "active" ? "#A7F3D0" : "#FDE68A" }}>
                           {loc.status === "active" ? "Active" : "Inactive"}
                         </span>
-                        <span className="inline-flex items-center gap-1 text-[11px] text-[#64748B] shrink-0">
+                        <span className="inline-flex items-center gap-1 text-[11px] text-slate-500 shrink-0">
                           <span className="text-[12px]">{getCountryFlag(loc.country)}</span> {loc.country}
                         </span>
                       </div>
                       <div className="flex items-center gap-3 mt-0.5">
-                        <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${loc.address}, ${loc.city}, ${loc.state} ${loc.zipCode}, ${loc.country}`)}`} target="_blank" rel="noopener noreferrer" className="text-[11px] text-[#94A3B8] hover:text-[#0A77FF] hover:underline truncate transition-colors" style={{ fontWeight: 400 }}>{loc.address}, {loc.city}, {loc.state}</a>
-                        {loc.phone && <span className="text-[11px] text-[#94A3B8] shrink-0 hidden sm:inline">· {loc.phone}</span>}
+                        <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${loc.address}, ${loc.city}, ${loc.state} ${loc.zipCode}, ${loc.country}`)}`} target="_blank" rel="noopener noreferrer" className="text-[11px] text-slate-400 hover:text-primary hover:underline truncate transition-colors" style={{ fontWeight: 400 }}>{loc.address}, {loc.city}, {loc.state}</a>
+                        {loc.phone && <span className="text-[11px] text-slate-400 shrink-0 hidden sm:inline">· {loc.phone}</span>}
                       </div>
                     </div>
                   </div>
                   <div className="flex items-center gap-1.5 shrink-0">
                     {/* Edit Button */}
-                    <button onClick={() => toast.info("Edit coming soon")} className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#475569] hover:bg-[#F8FAFC] hover:border-[#CBD5E1] transition-all cursor-pointer" style={{ fontWeight: 500 }}>
+                    <button onClick={() => toast.info("Edit coming soon")} className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-border bg-white text-xs text-muted-foreground hover:bg-slate-50 hover:border-slate-300 transition-all cursor-pointer" style={{ fontWeight: 500 }}>
                       <Pencil className="w-3.5 h-3.5" /> Edit
                     </button>
                     {/* Archive Button */}
-                    <button onClick={() => toast.info("Archive coming soon")} className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#DC2626] hover:bg-[#FEF2F2] hover:border-[#FECACA] transition-all cursor-pointer" style={{ fontWeight: 500 }}>
-                      <Archive className="w-3.5 h-3.5 text-[#DC2626]" /> Archive
+                    <button onClick={() => toast.info("Archive coming soon")} className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-border bg-white text-xs text-destructive hover:bg-red-50 hover:border-red-200 transition-all cursor-pointer" style={{ fontWeight: 500 }}>
+                      <Archive className="w-3.5 h-3.5 text-destructive" /> Archive
                     </button>
                     {/* More Dropdown */}
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <button className="hidden sm:flex w-8 h-8 rounded-lg border border-[#E2E8F0] bg-white items-center justify-center cursor-pointer transition-all duration-150 hover:bg-[#EDF4FF] hover:border-[#BFDBFE] hover:text-[#0A77FF] active:scale-[0.96]">
-                          <MoreHorizontal className="w-3.5 h-3.5 text-[#94A3B8]" />
+                        <button className="hidden sm:flex w-8 h-8 rounded-lg border border-border bg-white items-center justify-center cursor-pointer transition-all duration-150 hover:bg-accent hover:border-blue-200 hover:text-primary active:scale-[0.96]">
+                          <MoreHorizontal className="w-3.5 h-3.5 text-slate-400" />
                         </button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" sideOffset={6} className="z-[200] min-w-[190px] rounded-xl border border-[#E2E8F0] bg-white p-1 shadow-lg">
-                        <DropdownMenuItem onClick={() => toast.info("Send Email coming soon")} className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-xs text-[#475569] cursor-pointer hover:bg-[#EDF4FF] hover:text-[#0A77FF]" style={{ fontWeight: 500 }}>
-                          <Mail className="w-3.5 h-3.5 text-[#94A3B8]" /> Send Email
+                      <DropdownMenuContent align="end" sideOffset={6} className="z-[200] min-w-[190px] rounded-xl border border-border bg-white p-1 shadow-lg">
+                        <DropdownMenuItem onClick={() => toast.info("Send Email coming soon")} className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-xs text-muted-foreground cursor-pointer hover:bg-accent hover:text-primary" style={{ fontWeight: 500 }}>
+                          <Mail className="w-3.5 h-3.5 text-slate-400" /> Send Email
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => toast.info("Purchase Order coming soon")} className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-xs text-[#475569] cursor-pointer hover:bg-[#EDF4FF] hover:text-[#0A77FF]" style={{ fontWeight: 500 }}>
-                          <ShoppingCart className="w-3.5 h-3.5 text-[#94A3B8]" /> Purchase Order
+                        <DropdownMenuItem onClick={() => toast.info("Purchase Order coming soon")} className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-xs text-muted-foreground cursor-pointer hover:bg-accent hover:text-primary" style={{ fontWeight: 500 }}>
+                          <ShoppingCart className="w-3.5 h-3.5 text-slate-400" /> Purchase Order
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => toast.info("Sales Order coming soon")} className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-xs text-[#475569] cursor-pointer hover:bg-[#EDF4FF] hover:text-[#0A77FF]" style={{ fontWeight: 500 }}>
-                          <FileText className="w-3.5 h-3.5 text-[#94A3B8]" /> Sales Order
+                        <DropdownMenuItem onClick={() => toast.info("Sales Order coming soon")} className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-xs text-muted-foreground cursor-pointer hover:bg-accent hover:text-primary" style={{ fontWeight: 500 }}>
+                          <FileText className="w-3.5 h-3.5 text-slate-400" /> Sales Order
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => toast.info("Create Quote coming soon")} className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-xs text-[#475569] cursor-pointer hover:bg-[#EDF4FF] hover:text-[#0A77FF]" style={{ fontWeight: 500 }}>
-                          <StickyNote className="w-3.5 h-3.5 text-[#94A3B8]" /> Create Quote
+                        <DropdownMenuItem onClick={() => toast.info("Create Quote coming soon")} className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-xs text-muted-foreground cursor-pointer hover:bg-accent hover:text-primary" style={{ fontWeight: 500 }}>
+                          <StickyNote className="w-3.5 h-3.5 text-slate-400" /> Create Quote
                         </DropdownMenuItem>
-                        <DropdownMenuSeparator className="my-1 bg-[#E2E8F0]" />
-                        <DropdownMenuItem onClick={() => toast.info("Upload Attachment coming soon")} className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-xs text-[#475569] cursor-pointer hover:bg-[#EDF4FF] hover:text-[#0A77FF]" style={{ fontWeight: 500 }}>
-                          <Upload className="w-3.5 h-3.5 text-[#94A3B8]" /> Upload Attachment
+                        <DropdownMenuSeparator className="my-1 bg-border" />
+                        <DropdownMenuItem onClick={() => toast.info("Upload Attachment coming soon")} className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-xs text-muted-foreground cursor-pointer hover:bg-accent hover:text-primary" style={{ fontWeight: 500 }}>
+                          <Upload className="w-3.5 h-3.5 text-slate-400" /> Upload Attachment
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
-                    <div className="w-px h-5 bg-[#E2E8F0] mx-0.5 hidden sm:block" />
-                    <button onClick={() => setIsFullScreen(!isFullScreen)} className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#475569] hover:bg-[#F8FAFC] hover:border-[#CBD5E1] transition-all cursor-pointer" style={{ fontWeight: 500 }}>
+                    <div className="w-px h-5 bg-border mx-0.5 hidden sm:block" />
+                    <button onClick={() => setIsFullScreen(!isFullScreen)} className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-border bg-white text-xs text-muted-foreground hover:bg-slate-50 hover:border-slate-300 transition-all cursor-pointer" style={{ fontWeight: 500 }}>
                       {isFullScreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
                       {isFullScreen ? "Exit full" : "Full view"}
                     </button>
-                    <button onClick={handleCloseDetailModal} className="w-8 h-8 rounded-lg flex items-center justify-center text-[#94A3B8] hover:text-[#64748B] hover:bg-[#F1F5F9] transition-all cursor-pointer">
+                    <button onClick={handleCloseDetailModal} className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-500 hover:bg-muted transition-all cursor-pointer">
                       <X className="w-4 h-4" />
                     </button>
                   </div>
@@ -5206,21 +5206,21 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
               <div className="flex flex-row-reverse flex-1 overflow-hidden min-h-0">
 
                 {/* ─── RIGHT PANEL (Sidebar) ─── */}
-                <div className="w-[280px] border-l border-[#E8ECF1] flex flex-col bg-gradient-to-b from-[#F8FAFC] to-[#F1F5F9] shrink-0 overflow-y-auto">
+                <div className="w-[280px] border-l border-[#E8ECF1] flex flex-col bg-gradient-to-b from-slate-50 to-muted shrink-0 overflow-y-auto">
                   {/* ── Metric Cards ── */}
                   <div className="px-3 pt-3.5 pb-1">
                     <div className="grid grid-cols-3 gap-2">
                       {[
-                        { label: "Contacts", value: String(loc.contacts), icon: Users, color: "#0A77FF", bg: "linear-gradient(135deg, #EBF3FF 0%, #DBEAFE 100%)" },
-                        { label: "Items", value: String(loc.items), icon: Package, color: "#7C3AED", bg: "linear-gradient(135deg, #F0EBFF 0%, #E9DFFF 100%)" },
-                        { label: "Centers", value: String(loc.serviceCenters), icon: Wrench, color: "#D97706", bg: "linear-gradient(135deg, #FEF5E7 0%, #FDE8C8 100%)" },
+                        { label: "Contacts", value: String(loc.contacts), icon: Users, color: "hsl(var(--primary))", bg: "linear-gradient(135deg, #EBF3FF 0%, #DBEAFE 100%)" },
+                        { label: "Items", value: String(loc.items), icon: Package, color: "hsl(var(--violet))", bg: "linear-gradient(135deg, #F0EBFF 0%, #E9DFFF 100%)" },
+                        { label: "Centers", value: String(loc.serviceCenters), icon: Wrench, color: "hsl(var(--warning))", bg: "linear-gradient(135deg, #FEF5E7 0%, #FDE8C8 100%)" },
                       ].map((s) => (
                         <div key={s.label} className="relative rounded-xl border border-white/80 bg-white p-2.5 flex flex-col items-center gap-1.5 transition-all duration-200 hover:shadow-[0_4px_12px_-2px_rgba(0,0,0,0.06)] hover:-translate-y-0.5 cursor-pointer group/metric" style={{ boxShadow: "0 1px 3px -1px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.03)" }}>
                           <div className="w-8 h-8 rounded-lg flex items-center justify-center transition-transform duration-200 group-hover/metric:scale-110" style={{ background: s.bg }}>
                             <s.icon className="w-3.5 h-3.5" style={{ color: s.color }} />
                           </div>
-                          <p className="text-[15px] text-[#334155] tabular-nums" style={{ fontWeight: 700 }}>{s.value}</p>
-                          <p className="text-[9px] text-[#94A3B8] uppercase tracking-wider" style={{ fontWeight: 600 }}>{s.label}</p>
+                          <p className="text-[15px] text-slate-700 tabular-nums" style={{ fontWeight: 700 }}>{s.value}</p>
+                          <p className="text-[9px] text-slate-400 uppercase tracking-wider" style={{ fontWeight: 600 }}>{s.label}</p>
                         </div>
                       ))}
                     </div>
@@ -5229,11 +5229,11 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                   {/* ── Contact Details Card ── */}
                   <div className="px-3 pt-2.5 pb-1">
                     <div className="rounded-xl bg-white border border-[#E8ECF1]/60 overflow-hidden" style={{ boxShadow: "0 1px 3px -1px rgba(0,0,0,0.04)" }}>
-                      <div className="px-3 py-2 flex items-center gap-2 border-b border-[#F1F5F9]">
-                        <div className="w-5 h-5 rounded-md bg-gradient-to-br from-[#EBF3FF] to-[#DBEAFE] flex items-center justify-center">
-                          <Phone className="w-2.5 h-2.5 text-[#0A77FF]" />
+                      <div className="px-3 py-2 flex items-center gap-2 border-b border-muted">
+                        <div className="w-5 h-5 rounded-md bg-gradient-to-br from-[#EBF3FF] to-blue-100 flex items-center justify-center">
+                          <Phone className="w-2.5 h-2.5 text-primary" />
                         </div>
-                        <p className="text-[10px] text-[#64748B] uppercase tracking-wider" style={{ fontWeight: 600 }}>Contact Details</p>
+                        <p className="text-[10px] text-slate-500 uppercase tracking-wider" style={{ fontWeight: 600 }}>Contact Details</p>
                       </div>
                       <div className="p-1.5">
                         {[
@@ -5242,15 +5242,15 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                           { icon: PhoneCall, label: "Landline", value: `${locLandline} ext.123` },
                           { icon: Globe, label: "Website", value: locWebsite },
                         ].map((item) => (
-                          <div key={item.label} className="flex items-center gap-2.5 px-2.5 py-[7px] rounded-lg hover:bg-[#F8FAFC] transition-all duration-150 group/row cursor-pointer">
-                            <div className="w-6 h-6 rounded-lg bg-[#F8FAFC] border border-[#F1F5F9] flex items-center justify-center shrink-0 group-hover/row:bg-[#EDF4FF] group-hover/row:border-[#DBEAFE] transition-all duration-150">
-                              <item.icon className="w-3 h-3 text-[#B0BEC5] group-hover/row:text-[#0A77FF] transition-colors" />
+                          <div key={item.label} className="flex items-center gap-2.5 px-2.5 py-[7px] rounded-lg hover:bg-slate-50 transition-all duration-150 group/row cursor-pointer">
+                            <div className="w-6 h-6 rounded-lg bg-slate-50 border border-muted flex items-center justify-center shrink-0 group-hover/row:bg-accent group-hover/row:border-blue-100 transition-all duration-150">
+                              <item.icon className="w-3 h-3 text-[#B0BEC5] group-hover/row:text-primary transition-colors" />
                             </div>
                             <div className="min-w-0 flex-1">
                               <p className="text-[9px] text-[#B0BEC5] uppercase tracking-wide" style={{ fontWeight: 500 }}>{item.label}</p>
-                              <p className="text-[11px] text-[#1E293B] truncate" style={{ fontWeight: 500 }}>{item.value}</p>
+                              <p className="text-[11px] text-slate-800 truncate" style={{ fontWeight: 500 }}>{item.value}</p>
                             </div>
-                            <ChevronRight className="w-3 h-3 text-[#E2E8F0] opacity-0 group-hover/row:opacity-100 transition-opacity" />
+                            <ChevronRight className="w-3 h-3 text-border opacity-0 group-hover/row:opacity-100 transition-opacity" />
                           </div>
                         ))}
                       </div>
@@ -5260,24 +5260,24 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                   {/* ── Address Card ── */}
                   <div className="px-3 pt-2.5 pb-1">
                     <div className="rounded-xl bg-white border border-[#E8ECF1]/60 overflow-hidden" style={{ boxShadow: "0 1px 3px -1px rgba(0,0,0,0.04)" }}>
-                      <div className="px-3 py-2 flex items-center gap-2 border-b border-[#F1F5F9]">
+                      <div className="px-3 py-2 flex items-center gap-2 border-b border-muted">
                         <div className="w-5 h-5 rounded-md bg-gradient-to-br from-[#FEF5E7] to-[#FDE8C8] flex items-center justify-center">
-                          <MapPin className="w-2.5 h-2.5 text-[#D97706]" />
+                          <MapPin className="w-2.5 h-2.5 text-warning" />
                         </div>
-                        <p className="text-[10px] text-[#64748B] uppercase tracking-wider" style={{ fontWeight: 600 }}>Address</p>
+                        <p className="text-[10px] text-slate-500 uppercase tracking-wider" style={{ fontWeight: 600 }}>Address</p>
                       </div>
                       <div className="p-3">
                         <div className="flex items-start gap-3">
-                          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#F8FAFC] to-[#F1F5F9] border border-[#E8ECF1] flex items-center justify-center shrink-0">
-                            <Building2 className="w-4 h-4 text-[#94A3B8]" />
+                          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-slate-50 to-muted border border-[#E8ECF1] flex items-center justify-center shrink-0">
+                            <Building2 className="w-4 h-4 text-slate-400" />
                           </div>
                           <div className="min-w-0 flex-1">
-                            <p className="text-[11px] text-[#1E293B]" style={{ fontWeight: 600 }}>{loc.address}</p>
-                            <p className="text-[11px] text-[#64748B] mt-0.5">{loc.city}, {loc.state} {loc.zipCode}</p>
-                            <p className="text-[10px] text-[#94A3B8] mt-0.5">{loc.country}</p>
+                            <p className="text-[11px] text-slate-800" style={{ fontWeight: 600 }}>{loc.address}</p>
+                            <p className="text-[11px] text-slate-500 mt-0.5">{loc.city}, {loc.state} {loc.zipCode}</p>
+                            <p className="text-[10px] text-slate-400 mt-0.5">{loc.country}</p>
                           </div>
                         </div>
-                        <button className="mt-2.5 w-full flex items-center justify-center gap-1.5 py-1.5 rounded-lg border border-dashed border-[#E2E8F0] text-[10px] text-[#94A3B8] hover:text-[#0A77FF] hover:border-[#BFDBFE] hover:bg-[#FAFCFF] transition-all duration-150 cursor-pointer" style={{ fontWeight: 500 }}>
+                        <button className="mt-2.5 w-full flex items-center justify-center gap-1.5 py-1.5 rounded-lg border border-dashed border-border text-[10px] text-slate-400 hover:text-primary hover:border-blue-200 hover:bg-[#FAFCFF] transition-all duration-150 cursor-pointer" style={{ fontWeight: 500 }}>
                           <ExternalLink className="w-2.5 h-2.5" />
                           View on map
                         </button>
@@ -5287,22 +5287,22 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
 
                   {/* ── Primary Contact Card ── */}
                   <div className="px-3 pt-2.5 pb-1">
-                    <div className="rounded-xl bg-white border border-[#E8ECF1]/60 overflow-hidden transition-all duration-200 hover:border-[#BFDBFE]/60 hover:shadow-[0_4px_16px_-4px_rgba(10,119,255,0.06)]" style={{ boxShadow: "0 1px 3px -1px rgba(0,0,0,0.04)" }}>
-                      <div className="px-3 py-2 flex items-center gap-2 border-b border-[#F1F5F9]">
+                    <div className="rounded-xl bg-white border border-[#E8ECF1]/60 overflow-hidden transition-all duration-200 hover:border-blue-200/60 hover:shadow-[0_4px_16px_-4px_rgba(10,119,255,0.06)]" style={{ boxShadow: "0 1px 3px -1px rgba(0,0,0,0.04)" }}>
+                      <div className="px-3 py-2 flex items-center gap-2 border-b border-muted">
                         <div className="w-5 h-5 rounded-md bg-gradient-to-br from-[#F0EBFF] to-[#E9DFFF] flex items-center justify-center">
-                          <Users className="w-2.5 h-2.5 text-[#7C3AED]" />
+                          <Users className="w-2.5 h-2.5 text-violet" />
                         </div>
-                        <p className="text-[10px] text-[#64748B] uppercase tracking-wider" style={{ fontWeight: 600 }}>Primary Contact</p>
+                        <p className="text-[10px] text-slate-500 uppercase tracking-wider" style={{ fontWeight: 600 }}>Primary Contact</p>
                       </div>
                       <div className="p-3">
                         <div className="flex items-center gap-3">
                           <div className="relative">
-                            <div className="w-10 h-10 rounded-xl flex items-center justify-center text-[12px] shrink-0" style={{ background: "linear-gradient(135deg, #EBF3FF 0%, #DBEAFE 100%)", color: "#0A77FF", fontWeight: 700 }}>IA</div>
-                            <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-[#10B981] border-2 border-white" />
+                            <div className="w-10 h-10 rounded-xl flex items-center justify-center text-[12px] shrink-0" style={{ background: "linear-gradient(135deg, #EBF3FF 0%, #DBEAFE 100%)", color: "hsl(var(--primary))", fontWeight: 700 }}>IA</div>
+                            <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-white" />
                           </div>
                           <div className="min-w-0 flex-1">
-                            <p className="text-[12px] text-[#334155] truncate" style={{ fontWeight: 600 }}>Issac Archer</p>
-                            <p className="text-[10px] text-[#64748B] mt-0.5">Sales Department</p>
+                            <p className="text-[12px] text-slate-700 truncate" style={{ fontWeight: 600 }}>Issac Archer</p>
+                            <p className="text-[10px] text-slate-500 mt-0.5">Sales Department</p>
                           </div>
                         </div>
                         <div className="mt-3 space-y-1.5">
@@ -5310,9 +5310,9 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                             { icon: Phone, value: "+1 327 899 3892" },
                             { icon: Mail, value: "irtaza.abid@toyota.com" },
                           ].map((c) => (
-                            <div key={c.value} className="flex items-center gap-2.5 px-2.5 py-[6px] rounded-lg bg-[#F8FAFC] border border-[#F1F5F9] group/cinfo hover:bg-[#EDF4FF] hover:border-[#DBEAFE] transition-all duration-150 cursor-pointer">
-                              <c.icon className="w-3 h-3 text-[#B0BEC5] group-hover/cinfo:text-[#0A77FF] transition-colors shrink-0" />
-                              <span className="text-[10px] text-[#475569] truncate" style={{ fontWeight: 500 }}>{c.value}</span>
+                            <div key={c.value} className="flex items-center gap-2.5 px-2.5 py-[6px] rounded-lg bg-slate-50 border border-muted group/cinfo hover:bg-accent hover:border-blue-100 transition-all duration-150 cursor-pointer">
+                              <c.icon className="w-3 h-3 text-[#B0BEC5] group-hover/cinfo:text-primary transition-colors shrink-0" />
+                              <span className="text-[10px] text-muted-foreground truncate" style={{ fontWeight: 500 }}>{c.value}</span>
                             </div>
                           ))}
                         </div>
@@ -5323,20 +5323,20 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                   {/* ── Credit Utilization Card ── */}
                   <div className="px-3 pt-2.5 pb-1">
                     <div className="rounded-xl bg-white border border-[#E8ECF1]/60 overflow-hidden" style={{ boxShadow: "0 1px 3px -1px rgba(0,0,0,0.04)" }}>
-                      <div className="px-3 py-2 flex items-center justify-between border-b border-[#F1F5F9]">
+                      <div className="px-3 py-2 flex items-center justify-between border-b border-muted">
                         <div className="flex items-center gap-2">
                           <div className="w-5 h-5 rounded-md flex items-center justify-center" style={{ background: creditPctLoc > 80 ? "linear-gradient(135deg, #FEE2E2, #FECACA)" : creditPctLoc > 50 ? "linear-gradient(135deg, #FEF3C7, #FDE68A)" : "linear-gradient(135deg, #D1FAE5, #A7F3D0)" }}>
-                            <DollarSign className="w-2.5 h-2.5" style={{ color: creditPctLoc > 80 ? "#EF4444" : creditPctLoc > 50 ? "#D97706" : "#10B981" }} />
+                            <DollarSign className="w-2.5 h-2.5" style={{ color: creditPctLoc > 80 ? "#EF4444" : creditPctLoc > 50 ? "hsl(var(--warning))" : "#10B981" }} />
                           </div>
-                          <p className="text-[10px] text-[#64748B] uppercase tracking-wider" style={{ fontWeight: 600 }}>Credit</p>
+                          <p className="text-[10px] text-slate-500 uppercase tracking-wider" style={{ fontWeight: 600 }}>Credit</p>
                         </div>
-                        <span className="text-[9px] px-1.5 py-0.5 rounded-md" style={{ fontWeight: 600, color: creditPctLoc > 80 ? "#DC2626" : creditPctLoc > 50 ? "#D97706" : "#059669", backgroundColor: creditPctLoc > 80 ? "#FEE2E2" : creditPctLoc > 50 ? "#FEF3C7" : "#D1FAE5" }}>{creditPctLoc > 80 ? "Critical" : creditPctLoc > 50 ? "Warning" : "Healthy"}</span>
+                        <span className="text-[9px] px-1.5 py-0.5 rounded-md" style={{ fontWeight: 600, color: creditPctLoc > 80 ? "hsl(var(--destructive))" : creditPctLoc > 50 ? "hsl(var(--warning))" : "hsl(var(--success))", backgroundColor: creditPctLoc > 80 ? "#FEE2E2" : creditPctLoc > 50 ? "#FEF3C7" : "#D1FAE5" }}>{creditPctLoc > 80 ? "Critical" : creditPctLoc > 50 ? "Warning" : "Healthy"}</span>
                       </div>
                       <div className="p-3">
                         <div className="flex items-baseline justify-between mb-3">
                           <div>
-                            <p className="text-[17px] text-[#334155] tabular-nums" style={{ fontWeight: 700 }}>${creditUsed.toLocaleString()}</p>
-                            <p className="text-[10px] text-[#94A3B8] mt-0.5" style={{ fontWeight: 400 }}>of ${creditLimit.toLocaleString()} limit</p>
+                            <p className="text-[17px] text-slate-700 tabular-nums" style={{ fontWeight: 700 }}>${creditUsed.toLocaleString()}</p>
+                            <p className="text-[10px] text-slate-400 mt-0.5" style={{ fontWeight: 400 }}>of ${creditLimit.toLocaleString()} limit</p>
                           </div>
                           <p className="text-[20px] tabular-nums" style={{ fontWeight: 800, color: creditPctLoc > 80 ? "#EF4444" : creditPctLoc > 50 ? "#F59E0B" : "#10B981" }}>{creditPctLoc}%</p>
                         </div>
@@ -5344,8 +5344,8 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                           <div className="h-full rounded-full transition-all duration-700 ease-out" style={{ width: `${creditPctLoc}%`, background: creditPctLoc > 80 ? "linear-gradient(90deg, #F87171, #EF4444)" : creditPctLoc > 50 ? "linear-gradient(90deg, #FBBF24, #F59E0B)" : "linear-gradient(90deg, #34D399, #10B981)" }} />
                         </div>
                         <div className="flex items-center justify-between mt-2">
-                          <span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Available</span>
-                          <span className="text-[11px] text-[#1E293B] tabular-nums" style={{ fontWeight: 600 }}>${(creditLimit - creditUsed).toLocaleString()}</span>
+                          <span className="text-[10px] text-slate-400" style={{ fontWeight: 500 }}>Available</span>
+                          <span className="text-[11px] text-slate-800 tabular-nums" style={{ fontWeight: 600 }}>${(creditLimit - creditUsed).toLocaleString()}</span>
                         </div>
                       </div>
                     </div>
@@ -5359,13 +5359,13 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                           <div className="w-6 h-6 rounded-lg flex items-center justify-center text-white text-[8px] shrink-0" style={{ backgroundColor: toAAAColor(loc.createdBy.bgColor), fontWeight: 700 }}>{loc.createdBy.initials}</div>
                           <div className="min-w-0">
                             <p className="text-[9px] text-[#B0BEC5]" style={{ fontWeight: 500 }}>Created by</p>
-                            <p className="text-[10px] text-[#475569] truncate" style={{ fontWeight: 500 }}>{loc.createdBy.name}</p>
+                            <p className="text-[10px] text-muted-foreground truncate" style={{ fontWeight: 500 }}>{loc.createdBy.name}</p>
                           </div>
                         </div>
-                        <div className="w-px h-6 bg-[#F1F5F9]" />
+                        <div className="w-px h-6 bg-muted" />
                         <div className="text-right shrink-0">
                           <p className="text-[9px] text-[#B0BEC5]" style={{ fontWeight: 500 }}>Updated</p>
-                          <p className="text-[10px] text-[#475569]" style={{ fontWeight: 500 }}>{formatDate(loc.lastUpdated)}</p>
+                          <p className="text-[10px] text-muted-foreground" style={{ fontWeight: 500 }}>{formatDate(loc.lastUpdated)}</p>
                         </div>
                       </div>
                     </div>
@@ -5385,13 +5385,13 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                             key={t.id}
                             onClick={() => setLocDetailTab(t.id)}
                             className={`inline-flex items-center gap-1.5 px-3 py-2.5 text-[12px] border-b-2 transition-all cursor-pointer whitespace-nowrap ${
-                              active ? "border-[#0A77FF] text-[#0A77FF] bg-white" : "border-transparent text-[#94A3B8] hover:text-[#64748B]"
+                              active ? "border-primary text-primary bg-white" : "border-transparent text-slate-400 hover:text-slate-500"
                             }`}
                             style={{ fontWeight: active ? 600 : 500 }}
                           >
                             {t.label}
                             {count > 0 && (
-                              <span className={`text-[9px] rounded-full px-1.5 py-px min-w-[16px] text-center ${active ? "bg-[#0A77FF]/10 text-[#0A77FF]" : "bg-[#F1F5F9] text-[#94A3B8]"}`} style={{ fontWeight: 700 }}>
+                              <span className={`text-[9px] rounded-full px-1.5 py-px min-w-[16px] text-center ${active ? "bg-primary/10 text-primary" : "bg-muted text-slate-400"}`} style={{ fontWeight: 700 }}>
                                 {count}
                               </span>
                             )}
@@ -5426,7 +5426,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                               <button
                                 type="button"
                                 onClick={handleLocOpenCreate}
-                                className="inline-flex items-center justify-center h-9 gap-1.5 px-3.5 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-sm shadow-sm transition-colors cursor-pointer"
+                                className="inline-flex items-center justify-center h-9 gap-1.5 px-3.5 rounded-lg bg-primary hover:bg-[#0862D0] text-white text-sm shadow-sm transition-colors cursor-pointer"
                                 style={{ fontWeight: 600 }}
                               >
                                 <Plus className="w-3.5 h-3.5" />
@@ -5484,7 +5484,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                     <div className="flex-1 flex flex-col overflow-hidden">
                       {/* Row 1: Sub-tabs + primary CTA (matches Items tab) */}
                       <div className="flex items-center justify-between gap-3 px-4 pt-2.5 pb-2 border-b border-border shrink-0">
-                        <div className="inline-flex items-center rounded-lg bg-[#F1F5F9] p-0.5">
+                        <div className="inline-flex items-center rounded-lg bg-muted p-0.5">
                         {CARRIER_SUB_TABS.map((t) => {
                           const isActive = carrierSubTab === t.key;
                           const tint = t.key === "vendor"
@@ -5495,7 +5495,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                               key={t.key}
                               onClick={() => { setCarrierSubTab(t.key); setCarrierFilter("all"); setCarrierSearch(""); }}
                               className={`inline-flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-md text-[13px] transition-all cursor-pointer ${
-                                isActive ? "bg-white shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.04)]" : "text-[#64748B] hover:text-[#334155]"
+                                isActive ? "bg-white shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.04)]" : "text-slate-500 hover:text-slate-700"
                               }`}
                               style={{ fontWeight: isActive ? 600 : 500, color: isActive ? tint.color : undefined }}
                             >
@@ -5587,15 +5587,15 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                               onClick={() => setCarrierFilter(f.key)}
                               className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                                 isActive
-                                  ? "border-primary bg-[#EDF4FF] hover:bg-[#D6E8FF] active:bg-[#ADD1FF]"
+                                  ? "border-primary bg-accent hover:bg-[#D6E8FF] active:bg-[#ADD1FF]"
                                   : "border-border text-muted-foreground hover:bg-muted/60 hover:text-foreground hover:border-muted-foreground/30 active:bg-muted"
                               }`}
-                              style={{ fontWeight: isActive ? 500 : 400, color: isActive ? "#0A77FF" : undefined }}
+                              style={{ fontWeight: isActive ? 500 : 400, color: isActive ? "hsl(var(--primary))" : undefined }}
                             >
                               {f.label}
                               <span
                                 className={`text-[10px] rounded-full px-1.5 py-px min-w-[18px] text-center ${isActive ? "bg-primary/10" : "bg-muted"}`}
-                                style={{ fontWeight: 600, color: isActive ? "#0A77FF" : "#475569" }}
+                                style={{ fontWeight: 600, color: isActive ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))" }}
                               >
                                 {f.count}
                               </span>
@@ -5648,10 +5648,10 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                           <div className="px-3 sm:px-5 pt-3 sm:pt-4 pb-2.5 sm:pb-3 shrink-0 bg-white rounded-t-none sm:rounded-t-2xl border-b border-[#EEF2F6]">
                             <div className="flex items-start justify-between gap-3">
                               <div className="min-w-0">
-                                <h2 className="text-[15px] sm:text-[17px] text-[#0F172A]" style={{ fontWeight: 700 }}>Add Carrier</h2>
-                                <p className="text-[11px] sm:text-xs text-[#64748B] mt-0.5" style={{ fontWeight: 400 }}>Browse and select carriers to associate with this location.</p>
+                                <h2 className="text-[15px] sm:text-[17px] text-foreground" style={{ fontWeight: 700 }}>Add Carrier</h2>
+                                <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5" style={{ fontWeight: 400 }}>Browse and select carriers to associate with this location.</p>
                               </div>
-                              <button onClick={() => { setAddCarrierModalOpen(false); resetAddCarrierModal(); }} className="w-8 h-8 rounded-lg flex items-center justify-center text-[#94A3B8] hover:text-[#64748B] hover:bg-[#F1F5F9] transition-all cursor-pointer">
+                              <button onClick={() => { setAddCarrierModalOpen(false); resetAddCarrierModal(); }} className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-500 hover:bg-muted transition-all cursor-pointer">
                                 <X className="w-4 h-4" />
                               </button>
                             </div>
@@ -5677,7 +5677,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                               href="/vendors?createPartner=carrier"
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-sm shadow-sm transition-colors cursor-pointer shrink-0"
+                              className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg bg-primary hover:bg-[#0862D0] text-white text-sm shadow-sm transition-colors cursor-pointer shrink-0"
                               style={{ fontWeight: 600 }}
                             >
                               <Plus className="w-3.5 h-3.5" />
@@ -5733,7 +5733,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                                       href="/vendors?createPartner=carrier"
                                       target="_blank"
                                       rel="noopener noreferrer"
-                                      className="text-xs text-[#0A77FF] hover:underline mt-2 inline-block"
+                                      className="text-xs text-primary hover:underline mt-2 inline-block"
                                     >
                                       Create a new carrier instead
                                     </a>
@@ -5761,8 +5761,8 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                                         }}
                                         className={`bg-white border rounded-xl cursor-pointer group/cc transition-all duration-200 flex flex-col relative ${
                                           isSelected || isAdded
-                                            ? "border-[#0A77FF] bg-[#F8FAFF] shadow-[0_0_0_3px_rgba(10,119,255,0.06)]"
-                                            : "border-[#E8ECF1] shadow-[0_1px_3px_rgba(0,0,0,0.03)] hover:border-[#BFDBFE] hover:shadow-[0_4px_16px_-4px_rgba(10,119,255,0.10)]"
+                                            ? "border-primary bg-[#F8FAFF] shadow-[0_0_0_3px_rgba(10,119,255,0.06)]"
+                                            : "border-[#E8ECF1] shadow-[0_1px_3px_rgba(0,0,0,0.03)] hover:border-blue-200 hover:shadow-[0_4px_16px_-4px_rgba(10,119,255,0.10)]"
                                         }`}
                                       >
                                         <div className="p-3 flex-1 flex flex-col min-h-0 overflow-hidden">
@@ -5771,32 +5771,32 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                                             {(() => {
                                               const logo = getCarrierLogo(carrier.name);
                                               return (
-                                                <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 overflow-hidden border border-[#E8ECF1]" style={{ backgroundColor: logo ? "#fff" : "#F1F5F9" }}>
-                                                  {logo ? <img src={logo} alt="" className="w-full h-full object-contain p-1" /> : <span className="text-[9px] text-[#475569]" style={{ fontWeight: 700 }}>{getCarrierInitials(carrier.name)}</span>}
+                                                <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 overflow-hidden border border-[#E8ECF1]" style={{ backgroundColor: logo ? "#fff" : "hsl(var(--muted))" }}>
+                                                  {logo ? <img src={logo} alt="" className="w-full h-full object-contain p-1" /> : <span className="text-[9px] text-muted-foreground" style={{ fontWeight: 700 }}>{getCarrierInitials(carrier.name)}</span>}
                                                 </div>
                                               );
                                             })()}
                                             <div className="flex-1 min-w-0">
-                                              <p className="text-[13px] text-[#334155] truncate" style={{ fontWeight: 600 }}>{carrier.name}</p>
-                                              <p className="text-[11px] text-[#64748B] line-clamp-2 leading-relaxed mt-0.5" style={{ fontWeight: 400 }}>{carrier.desc}</p>
+                                              <p className="text-[13px] text-slate-700 truncate" style={{ fontWeight: 600 }}>{carrier.name}</p>
+                                              <p className="text-[11px] text-slate-500 line-clamp-2 leading-relaxed mt-0.5" style={{ fontWeight: 400 }}>{carrier.desc}</p>
                                             </div>
                                             <div className="flex items-center gap-1.5 shrink-0 mt-0.5">
                                               {/* Status */}
-                                              <span className="inline-flex items-center justify-center rounded-full border px-2 py-0.5 text-[10px] whitespace-nowrap" style={{ fontWeight: 500, backgroundColor: carrier.status === "Active" ? "#ECFDF5" : carrier.status === "Under Review" ? "#FFFBEB" : "#F1F5F9", color: carrier.status === "Active" ? "#065F46" : carrier.status === "Under Review" ? "#92400E" : "#64748B", borderColor: carrier.status === "Active" ? "#A7F3D0" : carrier.status === "Under Review" ? "#FDE68A" : "#E2E8F0" }}>
+                                              <span className="inline-flex items-center justify-center rounded-full border px-2 py-0.5 text-[10px] whitespace-nowrap" style={{ fontWeight: 500, backgroundColor: carrier.status === "Active" ? "#ECFDF5" : carrier.status === "Under Review" ? "#FFFBEB" : "hsl(var(--muted))", color: carrier.status === "Active" ? "#065F46" : carrier.status === "Under Review" ? "#92400E" : "#64748B", borderColor: carrier.status === "Active" ? "#A7F3D0" : carrier.status === "Under Review" ? "#FDE68A" : "hsl(var(--border))" }}>
                                                 {carrier.status}
                                               </span>
                                               {/* Primary star */}
                                               <div
                                                 onClick={(e) => { e.stopPropagation(); if (isSelected || isAdded) setAddCarrierPrimaryId(carrier.id); }}
                                                 className={`w-6 h-6 rounded-full flex items-center justify-center transition-colors cursor-pointer ${
-                                                  isPrimary ? "text-[#0A77FF]" : (isSelected || isAdded) ? "text-[#94A3B8] hover:text-[#0A77FF]" : "text-[#E2E8F0]"
+                                                  isPrimary ? "text-primary" : (isSelected || isAdded) ? "text-slate-400 hover:text-primary" : "text-border"
                                                 }`}
                                                 title={isPrimary ? "Primary carrier" : "Set as primary"}
                                               >
-                                                <Star className={`w-3.5 h-3.5 ${isPrimary ? "fill-[#0A77FF]" : ""}`} />
+                                                <Star className={`w-3.5 h-3.5 ${isPrimary ? "fill-primary" : ""}`} />
                                               </div>
                                               {/* Checkbox */}
-                                              <div className={`w-[18px] h-[18px] rounded flex items-center justify-center border-[1.5px] transition-all duration-150 ${isSelected || isAdded ? "border-[#0A77FF] bg-[#0A77FF] shadow-[0_0_0_2px_rgba(10,119,255,0.12)]" : "border-[#CBD5E1] bg-white"}`}>
+                                              <div className={`w-[18px] h-[18px] rounded flex items-center justify-center border-[1.5px] transition-all duration-150 ${isSelected || isAdded ? "border-primary bg-primary shadow-[0_0_0_2px_rgba(10,119,255,0.12)]" : "border-slate-300 bg-white"}`}>
                                                 {(isSelected || isAdded) && <Check className="w-3 h-3 text-white" />}
                                               </div>
                                             </div>
@@ -5804,10 +5804,10 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                                           {/* Row 2: Price + delivery */}
                                           <div className="flex items-baseline justify-between shrink-0">
                                             <div className="flex items-baseline gap-2">
-                                              <span className="text-[22px] text-[#334155] tabular-nums leading-none tracking-tight" style={{ fontWeight: 600 }}>{activeMethod.cost}</span>
-                                              <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>/ shipment</span>
+                                              <span className="text-[22px] text-slate-700 tabular-nums leading-none tracking-tight" style={{ fontWeight: 600 }}>{activeMethod.cost}</span>
+                                              <span className="text-[11px] text-slate-400" style={{ fontWeight: 500 }}>/ shipment</span>
                                             </div>
-                                            <span className="inline-flex items-center gap-1 text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>
+                                            <span className="inline-flex items-center gap-1 text-[10px] text-slate-400" style={{ fontWeight: 500 }}>
                                               <Clock className="w-3 h-3" /> {activeMethod.minDays}–{activeMethod.maxDays} days
                                             </span>
                                           </div>
@@ -5821,10 +5821,10 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                                                     key={m.id}
                                                     type="button"
                                                     onClick={(e) => { e.stopPropagation(); setAddCarrierMethodIdx(prev => ({ ...prev, [carrier.id]: mIdx })); }}
-                                                    className={`inline-flex items-center gap-1 px-2 py-[3px] rounded-md text-[10px] transition-all cursor-pointer ${isMethodActive ? "shadow-sm" : "hover:bg-[#E2E8F0]"}`}
-                                                    style={{ fontWeight: isMethodActive ? 600 : 500, backgroundColor: isMethodActive ? "#EFF6FF" : "#F1F5F9", color: isMethodActive ? "#0A77FF" : "#64748B", boxShadow: isMethodActive ? "0 0 0 1px #0A77FF30" : undefined }}
+                                                    className={`inline-flex items-center gap-1 px-2 py-[3px] rounded-md text-[10px] transition-all cursor-pointer ${isMethodActive ? "shadow-sm" : "hover:bg-border"}`}
+                                                    style={{ fontWeight: isMethodActive ? 600 : 500, backgroundColor: isMethodActive ? "#EFF6FF" : "hsl(var(--muted))", color: isMethodActive ? "hsl(var(--primary))" : "#64748B", boxShadow: isMethodActive ? "0 0 0 1px #0A77FF30" : undefined }}
                                                   >
-                                                    {m.shortName}{m.isDefault && <Star className="w-2.5 h-2.5 text-[#0A77FF] fill-[#0A77FF]" />}
+                                                    {m.shortName}{m.isDefault && <Star className="w-2.5 h-2.5 text-primary fill-primary" />}
                                                   </button>
                                                 );
                                               })}
@@ -5833,13 +5833,13 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                                           {/* Row 4: Detail strip */}
                                           <div className="mt-auto pt-2 shrink-0">
                                             <div className="flex items-center justify-between px-2.5 py-[5px] rounded-lg border border-[#E8ECF1] bg-[#FAFBFC] text-[11px] tabular-nums">
-                                              <div className="flex items-center gap-1.5 text-[#64748B] min-w-0">
-                                                <Star className="w-3 h-3 text-[#0A77FF] fill-[#0A77FF] shrink-0" />
+                                              <div className="flex items-center gap-1.5 text-slate-500 min-w-0">
+                                                <Star className="w-3 h-3 text-primary fill-primary shrink-0" />
                                                 <span style={{ fontWeight: 500 }}>{carrier.rating}</span>
-                                                <span className="text-[#CBD5E1]">·</span>
+                                                <span className="text-slate-300">·</span>
                                                 <span>{carrier.shipments} shipments</span>
                                               </div>
-                                              <span className="shrink-0 ml-2 text-[#94A3B8]">{carrier.regions.slice(0, 2).join(", ")}</span>
+                                              <span className="shrink-0 ml-2 text-slate-400">{carrier.regions.slice(0, 2).join(", ")}</span>
                                             </div>
                                           </div>
                                         </div>
@@ -5853,7 +5853,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
 
                           {/* Footer */}
                           <div className="flex items-center justify-between px-3 sm:px-5 py-2.5 sm:py-3 border-t border-[#EEF2F6] shrink-0 bg-white sm:rounded-b-2xl">
-                            <button onClick={() => { setAddCarrierModalOpen(false); resetAddCarrierModal(); }} className="h-9 px-5 rounded-lg border border-[#E2E8F0] text-[#64748B] hover:text-[#0F172A] hover:border-[#CBD5E1] text-[13px] transition-colors cursor-pointer" style={{ fontWeight: 500 }}>Cancel</button>
+                            <button onClick={() => { setAddCarrierModalOpen(false); resetAddCarrierModal(); }} className="h-9 px-5 rounded-lg border border-border text-slate-500 hover:text-foreground hover:border-slate-300 text-[13px] transition-colors cursor-pointer" style={{ fontWeight: 500 }}>Cancel</button>
                             <div className="flex items-center gap-2">
                               {addCarrierSelectedIds.size > 0 && (
                                 <span className="text-xs text-muted-foreground">{addCarrierSelectedIds.size} selected</span>
@@ -5884,7 +5884,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                     <div className="flex-1 flex flex-col overflow-hidden">
                       {/* Row 1: Vendor/Customer pill toggle + primary CTAs (matches Items tab) */}
                       <div className="flex items-center justify-between gap-3 px-4 pt-2.5 pb-2 border-b border-border shrink-0">
-                        <div className="inline-flex items-center rounded-lg bg-[#F1F5F9] p-0.5">
+                        <div className="inline-flex items-center rounded-lg bg-muted p-0.5">
                           {([
                             { key: "vendor" as const,   label: "Vendor Pricing",   icon: Package,       color: "#1E40AF" },
                             { key: "customer" as const, label: "Customer Pricing", icon: ShoppingCart,  color: "#5B21B6" },
@@ -5896,7 +5896,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                                 type="button"
                                 onClick={() => setLocPricingSubTab(t.key)}
                                 className={`inline-flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-md text-[13px] transition-all cursor-pointer ${
-                                  isActive ? "bg-white shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.04)]" : "text-[#64748B] hover:text-[#334155]"
+                                  isActive ? "bg-white shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.04)]" : "text-slate-500 hover:text-slate-700"
                                 }`}
                                 style={{ fontWeight: isActive ? 600 : 500, color: isActive ? t.color : undefined }}
                               >
@@ -5928,7 +5928,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                           <button
                             type="button"
                             onClick={() => toast.info("Templates coming soon")}
-                            className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-[13px] shadow-sm transition-colors cursor-pointer"
+                            className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-primary hover:bg-[#0862D0] text-white text-[13px] shadow-sm transition-colors cursor-pointer"
                             style={{ fontWeight: 600 }}
                           >
                             <Sparkles className="w-3.5 h-3.5" />
@@ -5941,10 +5941,10 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                       <div className="flex items-center justify-between gap-3 px-4 pt-3 pb-2 shrink-0">
                         <div className="flex items-center gap-2 flex-1 min-w-0">
                           <div className="relative flex-1 max-w-[220px]">
-                            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8] pointer-events-none" />
-                            <input type="text" placeholder="Search pricing rules..." className="w-full pl-8 h-9 text-[13px] bg-white border border-[#E2E8F0] rounded-lg px-3 py-1.5 focus:outline-none focus:border-[#0A77FF] transition-colors" />
+                            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" />
+                            <input type="text" placeholder="Search pricing rules..." className="w-full pl-8 h-9 text-[13px] bg-white border border-border rounded-lg px-3 py-1.5 focus:outline-none focus:border-primary transition-colors" />
                           </div>
-                          <button className="h-9 px-3 rounded-lg border border-[#E2E8F0] bg-white text-[13px] text-[#475569] hover:bg-[#F8FAFC] cursor-pointer transition-colors inline-flex items-center gap-1.5 shrink-0" style={{ fontWeight: 500 }}>
+                          <button className="h-9 px-3 rounded-lg border border-border bg-white text-[13px] text-muted-foreground hover:bg-slate-50 cursor-pointer transition-colors inline-flex items-center gap-1.5 shrink-0" style={{ fontWeight: 500 }}>
                             <SlidersHorizontal className="w-3.5 h-3.5" /> Filters
                           </button>
                         </div>
@@ -5953,7 +5953,7 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                       {/* Filter chips */}
                       <div className="flex items-center gap-1.5 px-4 pb-3 overflow-x-auto scrollbar-hide">
                         {["Me mode", "Discount", "Premium Plus Rules", "Active", "Inactive"].map((chip) => (
-                          <span key={chip} className="text-[11px] px-2.5 py-1 rounded-full cursor-pointer transition-colors bg-[#F8FAFC] text-[#64748B] border border-[#E2E8F0] hover:bg-[#F1F5F9] whitespace-nowrap shrink-0" style={{ fontWeight: 500 }}>
+                          <span key={chip} className="text-[11px] px-2.5 py-1 rounded-full cursor-pointer transition-colors bg-slate-50 text-slate-500 border border-border hover:bg-muted whitespace-nowrap shrink-0" style={{ fontWeight: 500 }}>
                             {chip}
                           </span>
                         ))}
@@ -5965,13 +5965,13 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                             <div
                               key={rule.id}
                               onClick={() => toast.info("View details coming soon")}
-                              className="bg-white border border-[#E2E8F0] rounded-xl cursor-pointer group transition-all duration-200 flex flex-col relative"
+                              className="bg-white border border-border rounded-xl cursor-pointer group transition-all duration-200 flex flex-col relative"
                               onMouseEnter={(e) => {
                                 e.currentTarget.style.borderColor = "#BFDBFE";
                                 e.currentTarget.style.boxShadow = "0 4px 16px -4px rgba(10,119,255,0.10), 0 0 0 1px #BFDBFE";
                               }}
                               onMouseLeave={(e) => {
-                                e.currentTarget.style.borderColor = "#E2E8F0";
+                                e.currentTarget.style.borderColor = "hsl(var(--border))";
                                 e.currentTarget.style.boxShadow = "none";
                               }}
                             >
@@ -5979,51 +5979,51 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                                 {/* Row 1: Type pill */}
                                 <div className="flex items-center justify-between gap-2 mb-2 shrink-0">
                                   <span className="inline-flex items-stretch rounded-full overflow-hidden border border-[#D1FAE5] shrink-0">
-                                    <span className="inline-flex items-center gap-1 px-2 py-[2px] text-[10px] text-[#047857] bg-[#ECFDF5]" style={{ fontWeight: 600 }}>
+                                    <span className="inline-flex items-center gap-1 px-2 py-[2px] text-[10px] text-[#047857] bg-emerald-50" style={{ fontWeight: 600 }}>
                                       <Tag className="w-3 h-3" /> Discount
                                     </span>
-                                    <span className="inline-flex items-center px-2 py-[2px] text-[10px] bg-white text-[#64748B] border-l border-[#D1FAE5]" style={{ fontWeight: 500 }}>
+                                    <span className="inline-flex items-center px-2 py-[2px] text-[10px] bg-white text-slate-500 border-l border-[#D1FAE5]" style={{ fontWeight: 500 }}>
                                       Value
                                     </span>
                                   </span>
-                                  <span className="px-1.5 py-[2px] rounded-md text-[10px] border border-[#E2E8F0] bg-white text-[#64748B]" style={{ fontWeight: 500 }}>Custom</span>
+                                  <span className="px-1.5 py-[2px] rounded-md text-[10px] border border-border bg-white text-slate-500" style={{ fontWeight: 500 }}>Custom</span>
                                 </div>
 
                                 {/* Row 2: Name */}
-                                <p className="text-[13px] text-[#334155] truncate shrink-0 mb-1" style={{ fontWeight: 600 }}>{rule.name}</p>
+                                <p className="text-[13px] text-slate-700 truncate shrink-0 mb-1" style={{ fontWeight: 600 }}>{rule.name}</p>
 
                                 {/* Row 3: Description */}
                                 <div className="h-[32px] shrink-0 mb-2">
-                                  <p className="text-[11px] text-[#64748B] line-clamp-2 leading-relaxed" style={{ fontWeight: 400 }}>{rule.desc}</p>
+                                  <p className="text-[11px] text-slate-500 line-clamp-2 leading-relaxed" style={{ fontWeight: 400 }}>{rule.desc}</p>
                                 </div>
 
                                 {/* Row 4: Hero value */}
                                 <div className="flex items-baseline gap-2 shrink-0">
-                                  <span className="text-[22px] text-[#334155] tabular-nums leading-none tracking-tight" style={{ fontWeight: 600 }}>
+                                  <span className="text-[22px] text-slate-700 tabular-nums leading-none tracking-tight" style={{ fontWeight: 600 }}>
                                     {rule.discount}
                                   </span>
-                                  <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>off</span>
+                                  <span className="text-[11px] text-slate-400" style={{ fontWeight: 500 }}>off</span>
                                 </div>
 
                                 {/* Row 5: Range detail */}
                                 <div className="mt-auto pt-2 shrink-0">
                                   <div className="flex items-center justify-between px-3 py-[6px] rounded-lg border border-[#E8ECF1] bg-[#FAFBFC] text-[11px] tabular-nums min-w-0">
-                                    <div className="flex items-center gap-1.5 text-[#64748B] min-w-0">
+                                    <div className="flex items-center gap-1.5 text-slate-500 min-w-0">
                                       <span style={{ fontWeight: 400 }}>{rule.minQty}</span>
-                                      <span className="text-[#CBD5E1]">–</span>
+                                      <span className="text-slate-300">–</span>
                                       <span style={{ fontWeight: 400 }}>{rule.maxQty}</span>
                                     </div>
-                                    <span className="shrink-0 ml-2 text-[#334155]" style={{ fontWeight: 600 }}>{rule.discount}</span>
+                                    <span className="shrink-0 ml-2 text-slate-700" style={{ fontWeight: 600 }}>{rule.discount}</span>
                                   </div>
                                 </div>
                               </div>
 
                               {/* Footer */}
-                              <div className="flex items-center gap-2 px-3.5 py-2.5 border-t border-[#F1F5F9] shrink-0">
-                                <span className="text-[10px] px-2 py-0.5 rounded-full border border-[#E2E8F0] bg-white text-[#475569]" style={{ fontWeight: 500 }}>Expire In ({rule.expiry})</span>
+                              <div className="flex items-center gap-2 px-3.5 py-2.5 border-t border-muted shrink-0">
+                                <span className="text-[10px] px-2 py-0.5 rounded-full border border-border bg-white text-muted-foreground" style={{ fontWeight: 500 }}>Expire In ({rule.expiry})</span>
                                 <span
                                   className="ml-auto px-2 py-[2px] rounded-full text-[10px] border"
-                                  style={{ fontWeight: 500, color: "#059669", backgroundColor: "#F0FDF4", borderColor: "#BBF7D0" }}
+                                  style={{ fontWeight: 500, color: "hsl(var(--success))", backgroundColor: "#F0FDF4", borderColor: "#BBF7D0" }}
                                 >
                                   Active
                                 </span>
@@ -6033,9 +6033,9 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                         </div>
                       </div>
                       <div className="flex items-center justify-between px-4 py-2 border-t border-[#E8ECF1] shrink-0 bg-[#FAFBFC]">
-                        <span className="text-[11px] text-[#94A3B8]">Records per page <select className="h-6 px-1.5 rounded border border-[#E2E8F0] text-[11px] cursor-pointer outline-none ml-1"><option>20</option><option>50</option></select></span>
-                        <div className="flex items-center gap-1 text-[11px] text-[#94A3B8]">
-                          <span className="px-2 py-0.5 rounded bg-[#0A77FF] text-white" style={{ fontWeight: 600 }}>1</span>
+                        <span className="text-[11px] text-slate-400">Records per page <select className="h-6 px-1.5 rounded border border-border text-[11px] cursor-pointer outline-none ml-1"><option>20</option><option>50</option></select></span>
+                        <div className="flex items-center gap-1 text-[11px] text-slate-400">
+                          <span className="px-2 py-0.5 rounded bg-primary text-white" style={{ fontWeight: 600 }}>1</span>
                         </div>
                       </div>
                     </div>
@@ -6045,13 +6045,13 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                   {locDetailTab === "service_centers" && (
                     <div className="flex-1 flex items-center justify-center">
                       <div className="text-center">
-                        <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 bg-gradient-to-br from-[#FEF5E7] to-[#FDE8C8] border border-[#FDE68A]/30 animate-pulse">
-                          <Wrench className="w-7 h-7 text-[#D97706]" />
+                        <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 bg-gradient-to-br from-[#FEF5E7] to-[#FDE8C8] border border-amber-200/30 animate-pulse">
+                          <Wrench className="w-7 h-7 text-warning" />
                         </div>
-                        <p className="text-[15px] text-[#334155]" style={{ fontWeight: 600 }}>Service Center</p>
-                        <p className="text-[12px] text-[#94A3B8] mt-1.5 max-w-[260px] mx-auto leading-relaxed">Manage service centers associated with this location. This feature is currently under development.</p>
-                        <div className="mt-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#FEF5E7] border border-[#FDE68A]/40 text-[11px] text-[#D97706]" style={{ fontWeight: 600 }}>
-                          <span className="w-1.5 h-1.5 rounded-full bg-[#D97706] animate-pulse" />
+                        <p className="text-[15px] text-slate-700" style={{ fontWeight: 600 }}>Service Center</p>
+                        <p className="text-[12px] text-slate-400 mt-1.5 max-w-[260px] mx-auto leading-relaxed">Manage service centers associated with this location. This feature is currently under development.</p>
+                        <div className="mt-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#FEF5E7] border border-amber-200/40 text-[11px] text-warning" style={{ fontWeight: 600 }}>
+                          <span className="w-1.5 h-1.5 rounded-full bg-warning animate-pulse" />
                           Coming Soon
                         </div>
                       </div>
@@ -6062,13 +6062,13 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                   {locDetailTab === "partner_communication" && (
                     <div className="flex-1 flex items-center justify-center">
                       <div className="text-center">
-                        <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 bg-gradient-to-br from-[#EBF3FF] to-[#DBEAFE] border border-[#BFDBFE]/30 animate-pulse">
-                          <Mail className="w-7 h-7 text-[#0A77FF]" />
+                        <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 bg-gradient-to-br from-[#EBF3FF] to-blue-100 border border-blue-200/30 animate-pulse">
+                          <Mail className="w-7 h-7 text-primary" />
                         </div>
-                        <p className="text-[15px] text-[#334155]" style={{ fontWeight: 600 }}>Partner Communication</p>
-                        <p className="text-[12px] text-[#94A3B8] mt-1.5 max-w-[260px] mx-auto leading-relaxed">Track and manage communications with this partner location. This feature is currently under development.</p>
-                        <div className="mt-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#EDF4FF] border border-[#BFDBFE]/40 text-[11px] text-[#0A77FF]" style={{ fontWeight: 600 }}>
-                          <span className="w-1.5 h-1.5 rounded-full bg-[#0A77FF] animate-pulse" />
+                        <p className="text-[15px] text-slate-700" style={{ fontWeight: 600 }}>Partner Communication</p>
+                        <p className="text-[12px] text-slate-400 mt-1.5 max-w-[260px] mx-auto leading-relaxed">Track and manage communications with this partner location. This feature is currently under development.</p>
+                        <div className="mt-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent border border-blue-200/40 text-[11px] text-primary" style={{ fontWeight: 600 }}>
+                          <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
                           Coming Soon
                         </div>
                       </div>
@@ -6114,11 +6114,11 @@ function PartnerLocationsTab({ vendor, cfg, formatDate }: {
                   {!["poc", "items", "carrier_shipping", "pricing_rules", "service_centers", "partner_communication", "purchase_orders", "quotes", "sales_orders", "attachments", "activity"].includes(locDetailTab) && (
                     <div className="flex-1 flex items-center justify-center">
                       <div className="text-center">
-                        <div className="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3 bg-[#EDF4FF] border border-[#0A77FF]/15">
-                          {(() => { const T = LOC_TABS.find((x) => x.id === locDetailTab); return T ? <T.icon className="w-5 h-5 text-[#0A77FF]" /> : null; })()}
+                        <div className="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3 bg-accent border border-primary/15">
+                          {(() => { const T = LOC_TABS.find((x) => x.id === locDetailTab); return T ? <T.icon className="w-5 h-5 text-primary" /> : null; })()}
                         </div>
-                        <p className="text-[13px] text-[#334155]" style={{ fontWeight: 500 }}>{LOC_TABS.find((x) => x.id === locDetailTab)?.label || locDetailTab}</p>
-                        <p className="text-[11px] text-[#CBD5E1] mt-1" style={{ fontWeight: 400 }}>Coming soon</p>
+                        <p className="text-[13px] text-slate-700" style={{ fontWeight: 500 }}>{LOC_TABS.find((x) => x.id === locDetailTab)?.label || locDetailTab}</p>
+                        <p className="text-[11px] text-slate-300 mt-1" style={{ fontWeight: 400 }}>Coming soon</p>
                       </div>
                     </div>
                   )}
@@ -6198,10 +6198,10 @@ function BillingShippingTab({ vendor, cfg }: { vendor: Vendor; cfg?: VendorConfi
       {/* Billing Address */}
       <ContentCard title="Billing Address" icon={MapPin}>
         <div className="flex items-start gap-2.5">
-          <div className="w-7 h-7 rounded-md bg-[#F1F5F9] flex items-center justify-center shrink-0">
-            <MapPin className="w-3.5 h-3.5 text-[#64748B]" />
+          <div className="w-7 h-7 rounded-md bg-muted flex items-center justify-center shrink-0">
+            <MapPin className="w-3.5 h-3.5 text-slate-500" />
           </div>
-          <div className="text-[12px] text-[#334155] space-y-0.5">
+          <div className="text-[12px] text-slate-700 space-y-0.5">
             <p style={{ fontWeight: 500 }}>{vendor.billingAddress.street}</p>
             {vendor.billingAddress.city && (
               <p>{vendor.billingAddress.city}{vendor.billingAddress.state ? `, ${vendor.billingAddress.state}` : ""} {vendor.billingAddress.zipCode}</p>
@@ -6212,12 +6212,12 @@ function BillingShippingTab({ vendor, cfg }: { vendor: Vendor; cfg?: VendorConfi
         {vendor.shippingAddress && (
           <>
             <Separator className="my-2.5" />
-            <p className="text-[11px] text-[#64748B] mb-1.5" style={{ fontWeight: 600 }}>Shipping Address</p>
+            <p className="text-[11px] text-slate-500 mb-1.5" style={{ fontWeight: 600 }}>Shipping Address</p>
             <div className="flex items-start gap-2.5">
-              <div className="w-7 h-7 rounded-md bg-[#F1F5F9] flex items-center justify-center shrink-0">
-                <Truck className="w-3.5 h-3.5 text-[#64748B]" />
+              <div className="w-7 h-7 rounded-md bg-muted flex items-center justify-center shrink-0">
+                <Truck className="w-3.5 h-3.5 text-slate-500" />
               </div>
-              <div className="text-[12px] text-[#334155] space-y-0.5">
+              <div className="text-[12px] text-slate-700 space-y-0.5">
                 <p style={{ fontWeight: 500 }}>{vendor.shippingAddress.street}</p>
                 {vendor.shippingAddress.city && (
                   <p>{vendor.shippingAddress.city}{vendor.shippingAddress.state ? `, ${vendor.shippingAddress.state}` : ""} {vendor.shippingAddress.zipCode}</p>
@@ -6232,18 +6232,18 @@ function BillingShippingTab({ vendor, cfg }: { vendor: Vendor; cfg?: VendorConfi
       {/* Default Carriers */}
       <ContentCard title="Primary Carriers" icon={Truck}>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-          <div className="rounded-md border border-[#E2E8F0] p-3">
-            <p className="text-[10px] text-[#94A3B8] mb-1" style={{ fontWeight: 500 }}>Primary Carrier (Vendor)</p>
+          <div className="rounded-md border border-border p-3">
+            <p className="text-[10px] text-slate-400 mb-1" style={{ fontWeight: 500 }}>Primary Carrier (Vendor)</p>
             <div className="flex items-center gap-2">
-              <Truck className="w-3.5 h-3.5 text-[#0A77FF]" />
-              <p className="text-[12px] text-[#334155]" style={{ fontWeight: 600 }}>{vendor.defaultCarrierVendor || "—"}</p>
+              <Truck className="w-3.5 h-3.5 text-primary" />
+              <p className="text-[12px] text-slate-700" style={{ fontWeight: 600 }}>{vendor.defaultCarrierVendor || "—"}</p>
             </div>
           </div>
-          <div className="rounded-md border border-[#E2E8F0] p-3">
-            <p className="text-[10px] text-[#94A3B8] mb-1" style={{ fontWeight: 500 }}>Primary Carrier (Customer)</p>
+          <div className="rounded-md border border-border p-3">
+            <p className="text-[10px] text-slate-400 mb-1" style={{ fontWeight: 500 }}>Primary Carrier (Customer)</p>
             <div className="flex items-center gap-2">
-              <Truck className="w-3.5 h-3.5 text-[#0A77FF]" />
-              <p className="text-[12px] text-[#334155]" style={{ fontWeight: 600 }}>{vendor.defaultCarrierCustomer || "—"}</p>
+              <Truck className="w-3.5 h-3.5 text-primary" />
+              <p className="text-[12px] text-slate-700" style={{ fontWeight: 600 }}>{vendor.defaultCarrierCustomer || "—"}</p>
             </div>
           </div>
         </div>
@@ -6255,20 +6255,20 @@ function BillingShippingTab({ vendor, cfg }: { vendor: Vendor; cfg?: VendorConfi
           <div className="space-y-3">
             {cfg!.shippingConfig!.carrierServices.length > 0 && (
               <div>
-                <p className="text-[11px] text-[#64748B] mb-1.5" style={{ fontWeight: 600 }}>Carrier Services</p>
+                <p className="text-[11px] text-slate-500 mb-1.5" style={{ fontWeight: 600 }}>Carrier Services</p>
                 <div className="space-y-1.5">
                   {cfg!.shippingConfig!.carrierServices.map((cs, idx) => (
-                    <div key={idx} className="rounded-md border border-[#E2E8F0] p-2.5 flex items-center justify-between">
+                    <div key={idx} className="rounded-md border border-border p-2.5 flex items-center justify-between">
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="text-[12px] text-[#334155]" style={{ fontWeight: 600 }}>{cs.name}</span>
+                          <span className="text-[12px] text-slate-700" style={{ fontWeight: 600 }}>{cs.name}</span>
                           {cs.isDefault && (
-                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#EDF4FF] text-[#0A77FF]" style={{ fontWeight: 600 }}>Primary</span>
+                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-accent text-primary" style={{ fontWeight: 600 }}>Primary</span>
                           )}
                         </div>
-                        <p className="text-[12px] text-[#64748B] mt-0.5">{cs.description}</p>
+                        <p className="text-[12px] text-slate-500 mt-0.5">{cs.description}</p>
                       </div>
-                      <span className="text-[12px] text-[#94A3B8] shrink-0 ml-3" style={{ fontWeight: 500 }}>
+                      <span className="text-[12px] text-slate-400 shrink-0 ml-3" style={{ fontWeight: 500 }}>
                         {cs.minDays}–{cs.maxDays} days
                       </span>
                     </div>
@@ -6278,18 +6278,18 @@ function BillingShippingTab({ vendor, cfg }: { vendor: Vendor; cfg?: VendorConfi
             )}
             {cfg!.shippingConfig!.vendorPreferences.length > 0 && cfg!.shippingConfig!.vendorPreferences.some((vp) => vp.carrier) && (
               <div>
-                <p className="text-[11px] text-[#64748B] mb-1.5" style={{ fontWeight: 600 }}>Vendor Preferences</p>
+                <p className="text-[11px] text-slate-500 mb-1.5" style={{ fontWeight: 600 }}>Vendor Preferences</p>
                 <div className="space-y-1.5">
                   {cfg!.shippingConfig!.vendorPreferences.filter((vp) => vp.carrier).map((vp, idx) => (
-                    <div key={idx} className="rounded-md border border-[#E2E8F0] p-2.5 flex items-center justify-between">
+                    <div key={idx} className="rounded-md border border-border p-2.5 flex items-center justify-between">
                       <div>
-                        <span className="text-[12px] text-[#334155]" style={{ fontWeight: 600 }}>{vp.carrier}</span>
+                        <span className="text-[12px] text-slate-700" style={{ fontWeight: 600 }}>{vp.carrier}</span>
                         {vp.methods.length > 0 && (
-                          <p className="text-[12px] text-[#64748B] mt-0.5">{vp.methods.join(", ")}</p>
+                          <p className="text-[12px] text-slate-500 mt-0.5">{vp.methods.join(", ")}</p>
                         )}
                       </div>
                       {vp.isDefault && (
-                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#EDF4FF] text-[#0A77FF]" style={{ fontWeight: 600 }}>Primary</span>
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-accent text-primary" style={{ fontWeight: 600 }}>Primary</span>
                       )}
                     </div>
                   ))}
@@ -6394,38 +6394,38 @@ function PaymentTermsTab({ vendor, cfg }: { vendor: Vendor; cfg?: VendorConfigDa
         <div className="space-y-0">
           <div className="flex items-center justify-between py-2">
             <div className="flex items-center gap-2 text-[12px]">
-              <CreditCard className="w-3.5 h-3.5 text-[#94A3B8]" />
-              <span className="text-[#64748B]">Payment Terms</span>
+              <CreditCard className="w-3.5 h-3.5 text-slate-400" />
+              <span className="text-slate-500">Payment Terms</span>
             </div>
-            <span className="text-[12px] text-[#334155]" style={{ fontWeight: 600 }}>{PAYMENT_TERMS_LABELS[vendor.paymentTerms]}</span>
+            <span className="text-[12px] text-slate-700" style={{ fontWeight: 600 }}>{PAYMENT_TERMS_LABELS[vendor.paymentTerms]}</span>
           </div>
           <Separator />
           <div className="flex items-center justify-between py-2">
             <div className="flex items-center gap-2 text-[12px]">
-              <DollarSign className="w-3.5 h-3.5 text-[#94A3B8]" />
-              <span className="text-[#64748B]">Credit Limit</span>
+              <DollarSign className="w-3.5 h-3.5 text-slate-400" />
+              <span className="text-slate-500">Credit Limit</span>
             </div>
-            <span className="text-[12px] text-[#334155]" style={{ fontWeight: 600 }}>
+            <span className="text-[12px] text-slate-700" style={{ fontWeight: 600 }}>
               {vendor.creditLimit > 0 ? `$${vendor.creditLimit.toLocaleString()}` : "Not set"}
             </span>
           </div>
           <Separator />
           <div className="flex items-center justify-between py-2">
             <div className="flex items-center gap-2 text-[12px]">
-              <Shield className="w-3.5 h-3.5 text-[#94A3B8]" />
-              <span className="text-[#64748B]">Credit Utilization</span>
+              <Shield className="w-3.5 h-3.5 text-slate-400" />
+              <span className="text-slate-500">Credit Utilization</span>
             </div>
             <div className="flex items-center gap-2.5">
-              <div className="w-20 bg-[#F1F5F9] rounded-full h-1.5">
+              <div className="w-20 bg-muted rounded-full h-1.5">
                 <div
                   className="h-1.5 rounded-full transition-all"
                   style={{
                     width: `${Math.min(getCreditUtilizationPct(vendor), 100)}%`,
-                    backgroundColor: getCreditUtilizationPct(vendor) > 80 ? "#DC2626" : getCreditUtilizationPct(vendor) > 50 ? "#D97706" : "#059669",
+                    backgroundColor: getCreditUtilizationPct(vendor) > 80 ? "hsl(var(--destructive))" : getCreditUtilizationPct(vendor) > 50 ? "hsl(var(--warning))" : "hsl(var(--success))",
                   }}
                 />
               </div>
-              <span className="text-[12px] text-[#334155]" style={{ fontWeight: 600 }}>
+              <span className="text-[12px] text-slate-700" style={{ fontWeight: 600 }}>
                 {getCreditUtilizationPct(vendor)}%
               </span>
             </div>
@@ -6442,7 +6442,7 @@ function PaymentTermsTab({ vendor, cfg }: { vendor: Vendor; cfg?: VendorConfigDa
               name: cfg!.paymentTermConfig!.name,
               category: (cfg!.paymentTermConfig!.type === "Pre" ? "prepayment" : cfg!.paymentTermConfig!.type === "Split" ? "split" : "net") as "net" | "prepayment" | "split",
               typeBadge: cfg!.paymentTermConfig!.type,
-              badgeColor: cfg!.paymentTermConfig!.type === "Pre" ? "#7C3AED" : cfg!.paymentTermConfig!.type === "Split" ? "#D97706" : "#0A77FF",
+              badgeColor: cfg!.paymentTermConfig!.type === "Pre" ? "hsl(var(--violet))" : cfg!.paymentTermConfig!.type === "Split" ? "hsl(var(--warning))" : "hsl(var(--primary))",
               trigger: cfg!.paymentTermConfig!.trigger,
               description: cfg!.paymentTermConfig!.description,
               vendorsApplied: 4,
@@ -6477,28 +6477,28 @@ function PricingRulesTab({ cfg }: { cfg?: VendorConfigData }) {
           <div className="@container/prdetail">
           <div className="grid grid-cols-1 @[400px]/prdetail:grid-cols-2 @[750px]/prdetail:grid-cols-3 gap-2">
             {cfg!.pricingRules!.map((rule) => (
-              <div key={rule.id} className="rounded-md border border-[#E2E8F0] p-3 space-y-1.5 hover:border-[#CBD5E1] transition-colors">
+              <div key={rule.id} className="rounded-md border border-border p-3 space-y-1.5 hover:border-slate-300 transition-colors">
                 <div className="flex items-center gap-2">
                   <span
                     className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] text-white"
-                    style={{ fontWeight: 700, backgroundColor: rule.type === "discount" ? "#059669" : "#D97706" }}
+                    style={{ fontWeight: 700, backgroundColor: rule.type === "discount" ? "hsl(var(--success))" : "hsl(var(--warning))" }}
                   >
                     {rule.type === "discount" ? "Discount" : "Premium"}
                   </span>
-                  <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-[#F1F5F9] text-[#64748B] border border-[#E2E8F0]" style={{ fontWeight: 500 }}>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-muted text-slate-500 border border-border" style={{ fontWeight: 500 }}>
                     {rule.basis}
                   </span>
                 </div>
-                <p className="text-[13px] text-[#334155]" style={{ fontWeight: 600 }}>{rule.name}</p>
-                <p className="text-[11px] text-[#64748B] leading-relaxed">{rule.description}</p>
+                <p className="text-[13px] text-slate-700" style={{ fontWeight: 600 }}>{rule.name}</p>
+                <p className="text-[11px] text-slate-500 leading-relaxed">{rule.description}</p>
                 {rule.tiers && rule.tiers.length > 0 && (
-                  <div className="mt-2 pt-2.5 border-t border-[#F1F5F9]">
-                    <p className="text-[11px] text-[#94A3B8] mb-1.5" style={{ fontWeight: 600 }}>TIERS</p>
+                  <div className="mt-2 pt-2.5 border-t border-muted">
+                    <p className="text-[11px] text-slate-400 mb-1.5" style={{ fontWeight: 600 }}>TIERS</p>
                     <div className="space-y-1">
                       {rule.tiers.map((tier, idx) => (
                         <div key={idx} className="flex items-center justify-between text-[11px]">
-                          <span className="text-[#64748B]">{tier.from}���{tier.to === Infinity ? "∞" : tier.to}</span>
-                          <span className="text-[#334155]" style={{ fontWeight: 600 }}>{tier.discount}%</span>
+                          <span className="text-slate-500">{tier.from}���{tier.to === Infinity ? "∞" : tier.to}</span>
+                          <span className="text-slate-700" style={{ fontWeight: 600 }}>{tier.discount}%</span>
                         </div>
                       ))}
                     </div>
@@ -6636,10 +6636,10 @@ function ContactsTab({ vendor, cfg }: { vendor: Vendor; cfg?: VendorConfigData }
     "Finance": { bg: "#FFF8ED", text: "#B05E10", accent: "#E58E2A", border: "#FADCB0" },
   };
   const TAB_AVATAR_TINTS: Record<string, { bg: string; text: string }> = {
-    "#0A77FF": { bg: "#EBF3FF", text: "#0A77FF" },
-    "#7C3AED": { bg: "#F0EBFF", text: "#7C3AED" },
-    "#059669": { bg: "#E8FAF3", text: "#059669" },
-    "#D97706": { bg: "#FEF5E7", text: "#B45D04" },
+    "hsl(var(--primary))": { bg: "#EBF3FF", text: "hsl(var(--primary))" },
+    "hsl(var(--violet))": { bg: "#F0EBFF", text: "hsl(var(--violet))" },
+    "hsl(var(--success))": { bg: "#E8FAF3", text: "hsl(var(--success))" },
+    "hsl(var(--warning))": { bg: "#FEF5E7", text: "#B45D04" },
   };
   const getTabAvatarTint = (c: string) => TAB_AVATAR_TINTS[c] || { bg: "#F0F4FF", text: c };
   const getTabInitials = (name: string) => name.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2);
@@ -6743,7 +6743,7 @@ function ContactsTab({ vendor, cfg }: { vendor: Vendor; cfg?: VendorConfigData }
 
   const handleSavePoc = useCallback(() => {
     if (!newPocName.trim()) { toast.error("Name is required."); return; }
-    const AVATAR_COLORS = ["#0A77FF", "#7C3AED", "#059669", "#D97706"];
+    const AVATAR_COLORS = ["hsl(var(--primary))", "hsl(var(--violet))", "hsl(var(--success))", "hsl(var(--warning))"];
     const newContact: PartnerContact = {
       id: `C-NEW-${Date.now()}`,
       name: newPocName.trim(),
@@ -6798,7 +6798,7 @@ function ContactsTab({ vendor, cfg }: { vendor: Vendor; cfg?: VendorConfigData }
             <button
               type="button"
               onClick={handleOpenCreate}
-              className="inline-flex items-center justify-center h-9 gap-1.5 px-3.5 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-sm shadow-sm transition-colors cursor-pointer"
+              className="inline-flex items-center justify-center h-9 gap-1.5 px-3.5 rounded-lg bg-primary hover:bg-[#0862D0] text-white text-sm shadow-sm transition-colors cursor-pointer"
               style={{ fontWeight: 600 }}
             >
               <Plus className="w-3.5 h-3.5" />
@@ -6876,10 +6876,10 @@ function DocumentsTab() {
 // ----- ACTIVITY TAB -----
 function ActivityTab({ vendor, formatDate }: { vendor: Vendor; formatDate: (d: string) => string }) {
   const activities = [
-    { action: "Partner profile last updated", date: vendor.updatedAt, icon: Pencil, color: "#0A77FF" },
-    { action: "Payment configuration saved", date: vendor.updatedAt, icon: CreditCard, color: "#7C3AED" },
-    { action: "Shipping preferences configured", date: vendor.createdAt, icon: Truck, color: "#059669" },
-    { action: "Partner created", date: vendor.createdAt, icon: Calendar, color: "#D97706" },
+    { action: "Partner profile last updated", date: vendor.updatedAt, icon: Pencil, color: "hsl(var(--primary))" },
+    { action: "Payment configuration saved", date: vendor.updatedAt, icon: CreditCard, color: "hsl(var(--violet))" },
+    { action: "Shipping preferences configured", date: vendor.createdAt, icon: Truck, color: "hsl(var(--success))" },
+    { action: "Partner created", date: vendor.createdAt, icon: Calendar, color: "hsl(var(--warning))" },
   ];
 
   return (
@@ -6892,7 +6892,7 @@ function ActivityTab({ vendor, formatDate }: { vendor: Vendor; formatDate: (d: s
               <div key={index} className="flex items-start gap-2.5 relative pb-4 last:pb-0">
                 {/* Timeline line */}
                 {index < activities.length - 1 && (
-                  <div className="absolute left-[13px] top-[30px] w-px h-[calc(100%-20px)] bg-[#E2E8F0]" />
+                  <div className="absolute left-[13px] top-[30px] w-px h-[calc(100%-20px)] bg-border" />
                 )}
                 <div
                   className="w-7 h-7 rounded-md flex items-center justify-center shrink-0"
@@ -6901,15 +6901,15 @@ function ActivityTab({ vendor, formatDate }: { vendor: Vendor; formatDate: (d: s
                   <Icon className="w-3 h-3" style={{ color: item.color }} />
                 </div>
                 <div className="min-w-0 pt-0.5">
-                  <p className="text-[12px] text-[#334155]" style={{ fontWeight: 500 }}>{item.action}</p>
-                  <p className="text-[10px] text-[#94A3B8] mt-0.5">{formatDate(item.date)}</p>
+                  <p className="text-[12px] text-slate-700" style={{ fontWeight: 500 }}>{item.action}</p>
+                  <p className="text-[10px] text-slate-400 mt-0.5">{formatDate(item.date)}</p>
                 </div>
               </div>
             );
           })}
         </div>
-        <div className="pt-2.5 mt-2.5 border-t border-[#F1F5F9] text-center">
-          <p className="text-[11px] text-[#94A3B8]">Full activity log will be available with backend integration</p>
+        <div className="pt-2.5 mt-2.5 border-t border-muted text-center">
+          <p className="text-[11px] text-slate-400">Full activity log will be available with backend integration</p>
         </div>
       </ContentCard>
     </div>
@@ -6923,8 +6923,8 @@ function NotesTab({ vendor, cfg }: { vendor: Vendor; cfg?: VendorConfigData }) {
       {/* Notes */}
       <ContentCard title="Notes" icon={MessageSquare}>
         {vendor.notes ? (
-          <div className="rounded-md bg-[#FAFBFC] border border-[#F1F5F9] p-3">
-            <p className="text-[12px] text-[#475569] leading-relaxed whitespace-pre-wrap">{vendor.notes}</p>
+          <div className="rounded-md bg-[#FAFBFC] border border-muted p-3">
+            <p className="text-[12px] text-muted-foreground leading-relaxed whitespace-pre-wrap">{vendor.notes}</p>
           </div>
         ) : (
           <EmptyState icon={MessageSquare} title="No notes" description="Notes about this partner will appear here." />
@@ -6934,8 +6934,8 @@ function NotesTab({ vendor, cfg }: { vendor: Vendor; cfg?: VendorConfigData }) {
       {/* Description from config */}
       {(vendor.description || cfg?.description) && (
         <ContentCard title="Description" icon={Info}>
-          <div className="rounded-md bg-[#FAFBFC] border border-[#F1F5F9] p-3">
-            <p className="text-[12px] text-[#475569] leading-relaxed whitespace-pre-wrap">{vendor.description || cfg?.description}</p>
+          <div className="rounded-md bg-[#FAFBFC] border border-muted p-3">
+            <p className="text-[12px] text-muted-foreground leading-relaxed whitespace-pre-wrap">{vendor.description || cfg?.description}</p>
           </div>
         </ContentCard>
       )}

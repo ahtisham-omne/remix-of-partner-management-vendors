@@ -2,26 +2,26 @@ import { Search, Filter, Plus, MapPin, Building2, Warehouse, Phone } from "lucid
 
 export function PartnerLocationsPage() {
   const locations = [
-    { id: 1, name: "Acme HQ", partner: "Acme Corporation", type: "Headquarters", address: "123 Business Ave, New York, NY 10001", phone: "+1 (555) 100-2000", icon: Building2, color: "#0A77FF" },
-    { id: 2, name: "Acme Warehouse East", partner: "Acme Corporation", type: "Warehouse", address: "456 Industrial Blvd, Newark, NJ 07102", phone: "+1 (555) 100-3000", icon: Warehouse, color: "#7C3AED" },
-    { id: 3, name: "Global Industries Office", partner: "Global Industries", type: "Office", address: "789 Commerce St, Chicago, IL 60601", phone: "+1 (555) 200-1000", icon: Building2, color: "#0A77FF" },
-    { id: 4, name: "TechSupply Distribution", partner: "TechSupply Co", type: "Distribution Center", address: "321 Logistics Way, Dallas, TX 75201", phone: "+1 (555) 300-1000", icon: Warehouse, color: "#7C3AED" },
-    { id: 5, name: "Premium Logistics Hub", partner: "Premium Logistics", type: "Warehouse", address: "654 Freight Dr, Los Angeles, CA 90001", phone: "+1 (555) 400-1000", icon: Warehouse, color: "#7C3AED" },
+    { id: 1, name: "Acme HQ", partner: "Acme Corporation", type: "Headquarters", address: "123 Business Ave, New York, NY 10001", phone: "+1 (555) 100-2000", icon: Building2, color: "hsl(var(--primary))" },
+    { id: 2, name: "Acme Warehouse East", partner: "Acme Corporation", type: "Warehouse", address: "456 Industrial Blvd, Newark, NJ 07102", phone: "+1 (555) 100-3000", icon: Warehouse, color: "hsl(var(--violet))" },
+    { id: 3, name: "Global Industries Office", partner: "Global Industries", type: "Office", address: "789 Commerce St, Chicago, IL 60601", phone: "+1 (555) 200-1000", icon: Building2, color: "hsl(var(--primary))" },
+    { id: 4, name: "TechSupply Distribution", partner: "TechSupply Co", type: "Distribution Center", address: "321 Logistics Way, Dallas, TX 75201", phone: "+1 (555) 300-1000", icon: Warehouse, color: "hsl(var(--violet))" },
+    { id: 5, name: "Premium Logistics Hub", partner: "Premium Logistics", type: "Warehouse", address: "654 Freight Dr, Los Angeles, CA 90001", phone: "+1 (555) 400-1000", icon: Warehouse, color: "hsl(var(--violet))" },
     { id: 6, name: "SteelWorks Plant", partner: "SteelWorks Ltd", type: "Manufacturing", address: "987 Factory Rd, Pittsburgh, PA 15201", phone: "+1 (555) 500-1000", icon: Building2, color: "#EA580C" },
-    { id: 7, name: "NexGen R&D Center", partner: "NexGen Materials", type: "Office", address: "246 Innovation Pkwy, San Jose, CA 95101", phone: "+1 (555) 600-1000", icon: Building2, color: "#0A77FF" },
-    { id: 8, name: "QuickShip Depot", partner: "QuickShip Inc", type: "Distribution Center", address: "135 Express Ln, Memphis, TN 38101", phone: "+1 (555) 700-1000", icon: Warehouse, color: "#7C3AED" },
+    { id: 7, name: "NexGen R&D Center", partner: "NexGen Materials", type: "Office", address: "246 Innovation Pkwy, San Jose, CA 95101", phone: "+1 (555) 600-1000", icon: Building2, color: "hsl(var(--primary))" },
+    { id: 8, name: "QuickShip Depot", partner: "QuickShip Inc", type: "Distribution Center", address: "135 Express Ln, Memphis, TN 38101", phone: "+1 (555) 700-1000", icon: Warehouse, color: "hsl(var(--violet))" },
   ];
 
   const typeColors: Record<string, { bg: string; text: string }> = {
-    Headquarters: { bg: "#EDF4FF", text: "#0A77FF" },
-    Office: { bg: "#EDF4FF", text: "#0A77FF" },
-    Warehouse: { bg: "#F5F3FF", text: "#7C3AED" },
-    "Distribution Center": { bg: "#F5F3FF", text: "#7C3AED" },
+    Headquarters: { bg: "hsl(var(--accent))", text: "hsl(var(--primary))" },
+    Office: { bg: "hsl(var(--accent))", text: "hsl(var(--primary))" },
+    Warehouse: { bg: "#F5F3FF", text: "hsl(var(--violet))" },
+    "Distribution Center": { bg: "#F5F3FF", text: "hsl(var(--violet))" },
     Manufacturing: { bg: "#FFF7ED", text: "#EA580C" },
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#F8FAFC]">
+    <div className="flex flex-col h-full bg-slate-50">
       <div className="px-5 py-3.5 border-b border-border bg-card">
         <div className="flex items-center justify-between">
           <div>
@@ -34,7 +34,7 @@ export function PartnerLocationsPage() {
           </div>
           <button
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-white text-[13px] transition-colors hover:opacity-90"
-            style={{ backgroundColor: "#0A77FF", fontWeight: 500 }}
+            style={{ backgroundColor: "hsl(var(--primary))", fontWeight: 500 }}
           >
             <Plus className="w-4 h-4" />
             Add Location
@@ -49,7 +49,7 @@ export function PartnerLocationsPage() {
             <input
               type="text"
               placeholder="Search locations..."
-              className="w-full pl-9 pr-4 py-2 rounded-lg border border-border bg-card text-[13px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#0A77FF]/20 focus:border-[#0A77FF]"
+              className="w-full pl-9 pr-4 py-2 rounded-lg border border-border bg-card text-[13px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
             />
           </div>
           <button className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-border text-[13px] text-muted-foreground hover:bg-muted transition-colors">
@@ -92,7 +92,7 @@ export function PartnerLocationsPage() {
                     href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location.address)}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-start gap-2 text-muted-foreground hover:text-[#0A77FF] hover:underline transition-colors"
+                    className="flex items-start gap-2 text-muted-foreground hover:text-primary hover:underline transition-colors"
                     style={{ fontSize: "12px" }}
                   >
                     <MapPin className="w-3.5 h-3.5 shrink-0 mt-0.5" />

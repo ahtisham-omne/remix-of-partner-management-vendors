@@ -29,7 +29,7 @@ export function ExpandableTextarea({
 
   return (
     <div>
-      {label && <label className="text-[12px] text-[#0F172A] mb-1.5 block" style={{ fontWeight: 500 }}>{label}</label>}
+      {label && <label className="text-[12px] text-foreground mb-1.5 block" style={{ fontWeight: 500 }}>{label}</label>}
       <div className="relative" style={{ height: 72 }}>
         {expanded && <div className="fixed inset-0 z-[99]" onClick={() => setExpanded(false)} />}
         <div
@@ -48,10 +48,10 @@ export function ExpandableTextarea({
             onChange={(e) => { if (e.target.value.length <= maxLength) onChange(e.target.value); }}
             onDoubleClick={() => { if (!expanded) setExpanded(true); }}
             placeholder={placeholder}
-            className={`w-full rounded-lg bg-white resize-none text-[13px] text-[#0F172A] placeholder:text-[#94A3B8] px-3 py-2 pb-6 border outline-none ${
+            className={`w-full rounded-lg bg-white resize-none text-[13px] text-foreground placeholder:text-slate-400 px-3 py-2 pb-6 border outline-none ${
               expanded
-                ? "border-[#0A77FF] ring-2 ring-[#0A77FF]/15"
-                : "border-[#E2E8F0] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
+                ? "border-primary ring-2 ring-primary/15"
+                : "border-border focus:border-primary focus:ring-1 focus:ring-primary/20"
             }`}
             style={{
               height: expanded ? 190 : 72,
@@ -59,14 +59,14 @@ export function ExpandableTextarea({
               transition: "height 300ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 300ms cubic-bezier(0.16, 1, 0.3, 1), border-color 200ms ease",
             }}
           />
-          <p className="absolute bottom-1.5 right-2.5 text-[11px] text-[#94A3B8] pointer-events-none">{value.length}/{maxLength}</p>
+          <p className="absolute bottom-1.5 right-2.5 text-[11px] text-slate-400 pointer-events-none">{value.length}/{maxLength}</p>
           <button
             type="button"
             onClick={() => setExpanded(!expanded)}
             className={`absolute top-2 right-2 w-6 h-6 rounded-md flex items-center justify-center cursor-pointer ${
               expanded
-                ? "text-[#0A77FF] hover:bg-[#EDF4FF]"
-                : "text-[#94A3B8] hover:text-[#0A77FF] hover:bg-[#EDF4FF]"
+                ? "text-primary hover:bg-accent"
+                : "text-slate-400 hover:text-primary hover:bg-accent"
             }`}
             style={{ transition: "color 200ms ease, background-color 200ms ease" }}
             title={expanded ? "Collapse" : "Expand"}

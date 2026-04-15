@@ -1,9 +1,9 @@
 /** Consistent pastel avatar tint from a name string */
 export const AVATAR_TINTS = [
-  { bg: "#EDF4FF", fg: "#0A77FF" }, // blue
+  { bg: "hsl(var(--accent))", fg: "hsl(var(--primary))" }, // blue
   { bg: "#F0FDF4", fg: "#16A34A" }, // green
   { bg: "#FFF7ED", fg: "#EA580C" }, // orange
-  { bg: "#F5F3FF", fg: "#7C3AED" }, // violet
+  { bg: "#F5F3FF", fg: "hsl(var(--violet))" }, // violet
   { bg: "#ECFEFF", fg: "#0891B2" }, // cyan
   { bg: "#FFF1F2", fg: "#E11D48" }, // rose
   { bg: "#FEF9C3", fg: "#A16207" }, // amber

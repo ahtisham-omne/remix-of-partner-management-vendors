@@ -382,7 +382,7 @@ function StatusBadge({ status }: { status: string }) {
 
 function CategoryPill({ label }: { label: string }) {
   return (
-    <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] whitespace-nowrap bg-[#F1F5F9] text-[#475569] border border-[#E2E8F0]" style={{ fontWeight: 500 }}>
+    <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] whitespace-nowrap bg-muted text-muted-foreground border border-border" style={{ fontWeight: 500 }}>
       {label}
     </span>
   );
@@ -635,7 +635,7 @@ function AddItemModal({
     return (
       <TableRow
         key={item.id}
-        className={`cursor-pointer group bg-white hover:bg-[#F0F7FF] [&>td]:py-1 [&>td]:pl-3 [&>td]:pr-2 ${isSelected || isAddedSelected ? "!bg-[#EDF4FF]/60" : ""}`}
+        className={`cursor-pointer group bg-white hover:bg-[#F0F7FF] [&>td]:py-1 [&>td]:pl-3 [&>td]:pr-2 ${isSelected || isAddedSelected ? "!bg-accent/60" : ""}`}
         onClick={() => mode === "browse" ? toggleItem(item.id) : toggleAddedItem(item.id)}
       >
         {/* Checkbox */}
@@ -648,7 +648,7 @@ function AddItemModal({
         <TableCell className="bg-white group-hover:bg-[#F0F7FF]">
           <div className="flex items-center gap-2.5">
             <div
-              className="w-7 h-7 rounded-lg bg-[#F1F5F9] overflow-hidden shrink-0 border border-[#E8ECF1] cursor-zoom-in"
+              className="w-7 h-7 rounded-lg bg-muted overflow-hidden shrink-0 border border-[#E8ECF1] cursor-zoom-in"
               onClick={(e) => { e.stopPropagation(); openLightbox({ src: item.image, name: item.description, subtitle: item.partNo }); }}
             >
               <img src={item.image} alt="" className="w-full h-full object-cover" />
@@ -657,19 +657,19 @@ function AddItemModal({
           </div>
         </TableCell>
         <TableCell className="bg-white group-hover:bg-[#F0F7FF]">
-          <p className="text-sm text-[#334155] truncate" style={{ fontWeight: 400 }}>{item.description}</p>
+          <p className="text-sm text-slate-700 truncate" style={{ fontWeight: 400 }}>{item.description}</p>
         </TableCell>
         <TableCell className="bg-white group-hover:bg-[#F0F7FF]"><StockStatusDot status={item.stockStatus} /></TableCell>
-        <TableCell className="bg-white group-hover:bg-[#F0F7FF]"><span className="text-[13px] text-[#334155] whitespace-nowrap">{item.itemControlType}</span></TableCell>
-        <TableCell className="bg-white group-hover:bg-[#F0F7FF]"><span className="text-[13px] text-[#334155] whitespace-nowrap">{item.category}</span></TableCell>
+        <TableCell className="bg-white group-hover:bg-[#F0F7FF]"><span className="text-[13px] text-slate-700 whitespace-nowrap">{item.itemControlType}</span></TableCell>
+        <TableCell className="bg-white group-hover:bg-[#F0F7FF]"><span className="text-[13px] text-slate-700 whitespace-nowrap">{item.category}</span></TableCell>
         <TableCell className="bg-white group-hover:bg-[#F0F7FF]"><CategoryPill label={item.additionalCategory} /></TableCell>
         <TableCell className="text-right !pr-3 bg-white group-hover:bg-[#F0F7FF]">
-          <span className="text-[14px] text-[#334155] tabular-nums" style={{ fontWeight: 600 }}>{item.onHand.toLocaleString()}</span>
+          <span className="text-[14px] text-slate-700 tabular-nums" style={{ fontWeight: 600 }}>{item.onHand.toLocaleString()}</span>
           <p className="text-[10px] text-muted-foreground">{item.onHandUnit}</p>
         </TableCell>
-        <TableCell className="bg-white group-hover:bg-[#F0F7FF]"><span className="text-[13px] text-[#334155] whitespace-nowrap">{item.altUnits}</span></TableCell>
-        <TableCell className="bg-white group-hover:bg-[#F0F7FF]"><span className="text-[13px] text-[#334155] truncate block max-w-[140px]">{item.inboundLocation}</span></TableCell>
-        <TableCell className="bg-white group-hover:bg-[#F0F7FF]"><span className="text-[13px] text-[#334155] truncate block max-w-[140px]">{item.outboundLocation}</span></TableCell>
+        <TableCell className="bg-white group-hover:bg-[#F0F7FF]"><span className="text-[13px] text-slate-700 whitespace-nowrap">{item.altUnits}</span></TableCell>
+        <TableCell className="bg-white group-hover:bg-[#F0F7FF]"><span className="text-[13px] text-slate-700 truncate block max-w-[140px]">{item.inboundLocation}</span></TableCell>
+        <TableCell className="bg-white group-hover:bg-[#F0F7FF]"><span className="text-[13px] text-slate-700 truncate block max-w-[140px]">{item.outboundLocation}</span></TableCell>
         <TableCell className="bg-white group-hover:bg-[#F0F7FF]">
           <div className="flex items-center gap-1 flex-wrap">
             {item.acquisitionMethods.map((m) => <AcqBadge key={m} method={m} />)}
@@ -681,7 +681,7 @@ function AddItemModal({
             <div className="flex items-center justify-center w-full h-full">
               <button
                 onClick={() => onItemRemoved(item.id)}
-                className="w-7 h-7 rounded-md flex items-center justify-center text-[#94A3B8] hover:text-[#DC2626] hover:bg-[#FEF2F2] transition-colors cursor-pointer"
+                className="w-7 h-7 rounded-md flex items-center justify-center text-slate-400 hover:text-destructive hover:bg-red-50 transition-colors cursor-pointer"
                 title="Remove item"
               >
                 <Trash2 className="w-3.5 h-3.5" />
@@ -717,7 +717,7 @@ function AddItemModal({
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
               <div className="flex items-center gap-2.5">
-                <h2 className="text-[15px] sm:text-[17px] text-[#0F172A]" style={{ fontWeight: 700 }}>
+                <h2 className="text-[15px] sm:text-[17px] text-foreground" style={{ fontWeight: 700 }}>
                   {generic ? "Manage Items" : (activeSubTab === "sell" ? "Manage Items They Sell" : "Manage Items They Purchase")}
                 </h2>
                 {/* Trade direction indicator — hidden in generic mode */}
@@ -752,7 +752,7 @@ function AddItemModal({
                 </span>
                 )}
               </div>
-              <p className="text-[11px] sm:text-xs text-[#64748B] mt-1" style={{ fontWeight: 400 }}>
+              <p className="text-[11px] sm:text-xs text-slate-500 mt-1" style={{ fontWeight: 400 }}>
                 {generic
                   ? "Browse inventory to add items, or manage already added items."
                   : activeSubTab === "sell"
@@ -763,7 +763,7 @@ function AddItemModal({
             <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
               <button
                 onClick={() => setIsFullScreen(!isFullScreen)}
-                className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#475569] hover:bg-[#F8FAFC] hover:border-[#CBD5E1] transition-all cursor-pointer"
+                className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-border bg-white text-xs text-muted-foreground hover:bg-slate-50 hover:border-slate-300 transition-all cursor-pointer"
                 style={{ fontWeight: 500 }}
               >
                 {isFullScreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
@@ -771,7 +771,7 @@ function AddItemModal({
               </button>
               <button
                 onClick={() => onOpenChange(false)}
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-[#94A3B8] hover:text-[#64748B] hover:bg-[#F1F5F9] transition-all cursor-pointer"
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-500 hover:bg-muted transition-all cursor-pointer"
               >
                 <X className="w-4.5 h-4.5" />
               </button>
@@ -803,30 +803,30 @@ function AddItemModal({
             </div>
 
             {/* View toggle — after search */}
-            <div className="inline-flex items-center rounded-lg bg-[#F1F5F9] p-0.5 shrink-0">
+            <div className="inline-flex items-center rounded-lg bg-muted p-0.5 shrink-0">
               <button
                 onClick={() => setView("browse")}
                 className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[12px] transition-all cursor-pointer ${
-                  view === "browse" ? "bg-white shadow-[0_1px_3px_rgba(0,0,0,0.08)] text-[#0F172A]" : "text-[#64748B] hover:text-[#334155]"
+                  view === "browse" ? "bg-white shadow-[0_1px_3px_rgba(0,0,0,0.08)] text-foreground" : "text-slate-500 hover:text-slate-700"
                 }`}
                 style={{ fontWeight: view === "browse" ? 600 : 500 }}
               >
-                <Package className={`w-3.5 h-3.5 ${view === "browse" ? "text-[#0A77FF]" : "text-[#94A3B8]"}`} />
+                <Package className={`w-3.5 h-3.5 ${view === "browse" ? "text-primary" : "text-slate-400"}`} />
                 Browse Inventory
-                <span className={`text-[10px] rounded-full px-1.5 py-px min-w-[16px] text-center ${view === "browse" ? "bg-[#EDF4FF] text-[#0A77FF]" : "bg-[#E2E8F0] text-[#64748B]"}`} style={{ fontWeight: 600 }}>
+                <span className={`text-[10px] rounded-full px-1.5 py-px min-w-[16px] text-center ${view === "browse" ? "bg-accent text-primary" : "bg-border text-slate-500"}`} style={{ fontWeight: 600 }}>
                   {available.length}
                 </span>
               </button>
               <button
                 onClick={() => setView("added")}
                 className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[12px] transition-all cursor-pointer ${
-                  view === "added" ? "bg-white shadow-[0_1px_3px_rgba(0,0,0,0.08)] text-[#0F172A]" : "text-[#64748B] hover:text-[#334155]"
+                  view === "added" ? "bg-white shadow-[0_1px_3px_rgba(0,0,0,0.08)] text-foreground" : "text-slate-500 hover:text-slate-700"
                 }`}
                 style={{ fontWeight: view === "added" ? 600 : 500 }}
               >
-                <Check className={`w-3.5 h-3.5 ${view === "added" ? "text-[#059669]" : "text-[#94A3B8]"}`} />
+                <Check className={`w-3.5 h-3.5 ${view === "added" ? "text-success" : "text-slate-400"}`} />
                 Added Items
-                <span className={`text-[10px] rounded-full px-1.5 py-px min-w-[16px] text-center ${view === "added" ? "bg-[#ECFDF5] text-[#059669]" : "bg-[#E2E8F0] text-[#64748B]"}`} style={{ fontWeight: 600 }}>
+                <span className={`text-[10px] rounded-full px-1.5 py-px min-w-[16px] text-center ${view === "added" ? "bg-emerald-50 text-success" : "bg-border text-slate-500"}`} style={{ fontWeight: 600 }}>
                   {existingItems.length}
                 </span>
               </button>
@@ -835,7 +835,7 @@ function AddItemModal({
             {/* Selection count / total */}
             <div className="flex items-center gap-2 ml-auto shrink-0">
               {view === "browse" && selectedIds.size > 0 && (
-                <span className="text-xs text-[#0A77FF] shrink-0" style={{ fontWeight: 600 }}>
+                <span className="text-xs text-primary shrink-0" style={{ fontWeight: 600 }}>
                   {selectedIds.size} selected
                 </span>
               )}
@@ -855,15 +855,15 @@ function AddItemModal({
                   onClick={() => { setModalSort(opt.key); setCurrentPage(1); }}
                   className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                     isActive
-                      ? "border-primary bg-[#EDF4FF] hover:bg-[#D6E8FF] active:bg-[#ADD1FF]"
+                      ? "border-primary bg-accent hover:bg-[#D6E8FF] active:bg-[#ADD1FF]"
                       : "border-border text-muted-foreground hover:bg-muted/60 hover:text-foreground hover:border-muted-foreground/30 active:bg-muted"
                   }`}
-                  style={{ fontWeight: isActive ? 500 : 400, color: isActive ? "#0A77FF" : undefined }}
+                  style={{ fontWeight: isActive ? 500 : 400, color: isActive ? "hsl(var(--primary))" : undefined }}
                 >
                   {opt.label}
                   <span
                     className={`text-[10px] rounded-full px-1.5 py-px min-w-[18px] text-center ${isActive ? "bg-primary/10" : "bg-muted"}`}
-                    style={{ fontWeight: 600, color: isActive ? "#0A77FF" : "#475569" }}
+                    style={{ fontWeight: 600, color: isActive ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))" }}
                   >
                     {opt.count}
                   </span>
@@ -1010,18 +1010,18 @@ function AddItemModal({
 
         {/* Footer — actions */}
         <div className="shrink-0 border-t border-[#EEF2F6] bg-white px-3 sm:px-5 py-2.5 flex items-center justify-between sm:rounded-b-2xl">
-          <div className="flex items-center gap-2 text-[12px] text-[#64748B]">
+          <div className="flex items-center gap-2 text-[12px] text-slate-500">
             <span style={{ fontWeight: 500 }}>{existingItems.length} {tradeLabel.toLowerCase()} added</span>
             {view === "browse" && selectedIds.size > 0 && (
               <>
-                <span className="text-[#CBD5E1]">·</span>
-                <span className="text-[#0A77FF]" style={{ fontWeight: 600 }}>{selectedIds.size} ready to add</span>
+                <span className="text-slate-300">·</span>
+                <span className="text-primary" style={{ fontWeight: 600 }}>{selectedIds.size} ready to add</span>
               </>
             )}
             {view === "added" && addedSelectedIds.size > 0 && (
               <>
-                <span className="text-[#CBD5E1]">·</span>
-                <span className="text-[#DC2626]" style={{ fontWeight: 600 }}>{addedSelectedIds.size} selected</span>
+                <span className="text-slate-300">·</span>
+                <span className="text-destructive" style={{ fontWeight: 600 }}>{addedSelectedIds.size} selected</span>
               </>
             )}
           </div>
@@ -1029,14 +1029,14 @@ function AddItemModal({
             <Button
               variant="outline"
               onClick={() => onOpenChange(false)}
-              className="rounded-lg px-4 text-xs h-9 bg-white border-[#E2E8F0] text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#0F172A]"
+              className="rounded-lg px-4 text-xs h-9 bg-white border-border text-slate-500 hover:bg-slate-50 hover:text-foreground"
             >
               Cancel
             </Button>
             {view === "added" && addedSelectedIds.size > 0 && (
               <Button
                 onClick={() => setBulkRemoveConfirmOpen(true)}
-                className="gap-1.5 rounded-lg px-4 text-xs h-9 bg-[#DC2626] text-white hover:bg-[#B91C1C] shadow-sm"
+                className="gap-1.5 rounded-lg px-4 text-xs h-9 bg-destructive text-white hover:bg-[#B91C1C] shadow-sm"
               >
                 <Trash2 className="w-3.5 h-3.5" />
                 Remove {addedSelectedIds.size} Item{addedSelectedIds.size !== 1 ? "s" : ""}
@@ -1045,7 +1045,7 @@ function AddItemModal({
             {view === "added" && addedSelectedIds.size === 0 && (
               <Button
                 onClick={() => onOpenChange(false)}
-                className="rounded-lg px-4 text-xs h-9 bg-[#0A77FF] text-white hover:bg-[#0862D0] shadow-sm"
+                className="rounded-lg px-4 text-xs h-9 bg-primary text-white hover:bg-[#0862D0] shadow-sm"
               >
                 Done
               </Button>
@@ -1054,7 +1054,7 @@ function AddItemModal({
               <Button
                 onClick={handleAdd}
                 disabled={selectedIds.size === 0}
-                className="gap-1.5 rounded-lg px-4 text-xs h-9 bg-[#0A77FF] text-white hover:bg-[#0862D0] shadow-sm disabled:opacity-50"
+                className="gap-1.5 rounded-lg px-4 text-xs h-9 bg-primary text-white hover:bg-[#0862D0] shadow-sm disabled:opacity-50"
               >
                 <Plus className="w-3.5 h-3.5" />
                 Add {selectedIds.size > 0 ? `${selectedIds.size} Item${selectedIds.size !== 1 ? "s" : ""} ${tradeShort}` : `Items ${tradeShort}`}
@@ -1075,7 +1075,7 @@ function AddItemModal({
           <div className="relative flex flex-col items-center pt-10 pb-6" style={{ background: "linear-gradient(180deg, #FEF2F2 0%, rgba(254,242,242,0.3) 70%, transparent 100%)" }}>
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[180px] h-[80px] rounded-full blur-[50px] opacity-25" style={{ backgroundColor: "#EF4444" }} />
             <div className="relative w-16 h-16 rounded-2xl flex items-center justify-center" style={{ backgroundColor: "#FEE2E2" }}>
-              <Trash2 className="w-8 h-8" style={{ color: "#DC2626" }} />
+              <Trash2 className="w-8 h-8" style={{ color: "hsl(var(--destructive))" }} />
             </div>
             <span className="mt-4 px-3 py-1 rounded-full text-[11px]" style={{ fontWeight: 600, backgroundColor: "#FEF2F2", color: "#991B1B", textTransform: "uppercase" as const, letterSpacing: "0.05em" }}>
               Remove Items
@@ -1084,27 +1084,27 @@ function AddItemModal({
           {/* Content */}
           <div className="flex flex-col items-center text-center px-8 pb-8">
             <AlertDialogHeader className="p-0 gap-0 text-center">
-              <AlertDialogTitle className="text-[18px] tracking-[-0.02em]" style={{ fontWeight: 600, color: "#0F172A" }}>
+              <AlertDialogTitle className="text-[18px] tracking-[-0.02em]" style={{ fontWeight: 600, color: "hsl(var(--foreground))" }}>
                 Remove {addedSelectedIds.size} item{addedSelectedIds.size !== 1 ? "s" : ""}?
               </AlertDialogTitle>
             </AlertDialogHeader>
             <AlertDialogDescription asChild>
-              <div className="text-[13px] mt-2 max-w-[340px] mx-auto" style={{ color: "#475569", lineHeight: "1.65" }}>
+              <div className="text-[13px] mt-2 max-w-[340px] mx-auto" style={{ color: "hsl(var(--muted-foreground))", lineHeight: "1.65" }}>
                 <p>The following items will be removed. You can add them back later.</p>
                 {/* Items list */}
-                <div className="mt-3 max-h-[120px] overflow-y-auto text-left rounded-lg border border-[#E2E8F0] bg-[#F8FAFC]">
+                <div className="mt-3 max-h-[120px] overflow-y-auto text-left rounded-lg border border-border bg-slate-50">
                   {Array.from(addedSelectedIds).slice(0, 10).map((id) => {
                     const item = existingItems.find((it) => it.id === id);
                     return item ? (
-                      <div key={id} className="flex items-center gap-2 px-3 py-1.5 border-b border-[#F1F5F9] last:border-0">
-                        <Package className="w-3 h-3 text-[#94A3B8] shrink-0" />
-                        <span className="text-[12px] text-[#334155] font-mono truncate" style={{ fontWeight: 500 }}>{item.partNo}</span>
-                        <span className="text-[11px] text-[#64748B] truncate">{item.description}</span>
+                      <div key={id} className="flex items-center gap-2 px-3 py-1.5 border-b border-muted last:border-0">
+                        <Package className="w-3 h-3 text-slate-400 shrink-0" />
+                        <span className="text-[12px] text-slate-700 font-mono truncate" style={{ fontWeight: 500 }}>{item.partNo}</span>
+                        <span className="text-[11px] text-slate-500 truncate">{item.description}</span>
                       </div>
                     ) : null;
                   })}
                   {addedSelectedIds.size > 10 && (
-                    <div className="px-3 py-1.5 text-[11px] text-[#94A3B8] text-center" style={{ fontWeight: 500 }}>
+                    <div className="px-3 py-1.5 text-[11px] text-slate-400 text-center" style={{ fontWeight: 500 }}>
                       +{addedSelectedIds.size - 10} more items
                     </div>
                   )}
@@ -1115,13 +1115,13 @@ function AddItemModal({
               <AlertDialogAction
                 onClick={handleBulkRemove}
                 className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors hover:opacity-90"
-                style={{ fontWeight: 600, backgroundColor: "#DC2626", color: "#fff" }}
+                style={{ fontWeight: 600, backgroundColor: "hsl(var(--destructive))", color: "#fff" }}
               >
                 Remove {addedSelectedIds.size} Item{addedSelectedIds.size !== 1 ? "s" : ""}
               </AlertDialogAction>
               <AlertDialogCancel
                 className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors"
-                style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#334155" }}
+                style={{ fontWeight: 500, backgroundColor: "hsl(var(--muted))", color: "#334155" }}
               >
                 Cancel
               </AlertDialogCancel>
@@ -1549,7 +1549,7 @@ export function PartnerItemsTab({ vendor, hideHeader, compact, contextLabel, con
           <TableCell key={colKey}>
             <div className={`flex items-center ${isComfort ? "gap-3" : "gap-2.5"}`}>
               <div
-                className={`${isComfort ? "w-11 h-11" : "w-7 h-7"} rounded-lg bg-[#F1F5F9] overflow-hidden shrink-0 border border-[#E8ECF1] cursor-zoom-in`}
+                className={`${isComfort ? "w-11 h-11" : "w-7 h-7"} rounded-lg bg-muted overflow-hidden shrink-0 border border-[#E8ECF1] cursor-zoom-in`}
                 onClick={(e) => { e.stopPropagation(); openLightbox({ src: item.image, name: item.description, subtitle: item.partNo }); }}
               >
                 <img src={item.image} alt="" className="w-full h-full object-cover" />
@@ -1567,7 +1567,7 @@ export function PartnerItemsTab({ vendor, hideHeader, compact, contextLabel, con
         return (
           <TableCell key={colKey}>
             <div className="min-w-0">
-              <p className={`${isComfort ? "text-[13px]" : "text-sm"} text-[#334155] truncate`} style={{ fontWeight: 400 }}>
+              <p className={`${isComfort ? "text-[13px]" : "text-sm"} text-slate-700 truncate`} style={{ fontWeight: 400 }}>
                 {highlightText(item.description)}
               </p>
               {isComfort && (
@@ -1587,19 +1587,19 @@ export function PartnerItemsTab({ vendor, hideHeader, compact, contextLabel, con
       case "item_type":
         return (
           <TableCell key={colKey}>
-            <span className="text-[13px] text-[#334155] whitespace-nowrap">{item.itemType}</span>
+            <span className="text-[13px] text-slate-700 whitespace-nowrap">{item.itemType}</span>
           </TableCell>
         );
       case "control_type":
         return (
           <TableCell key={colKey}>
-            <span className="text-[13px] text-[#334155] whitespace-nowrap">{item.itemControlType}</span>
+            <span className="text-[13px] text-slate-700 whitespace-nowrap">{item.itemControlType}</span>
           </TableCell>
         );
       case "category":
         return (
           <TableCell key={colKey}>
-            <span className="text-[13px] text-[#334155] whitespace-nowrap">{highlightText(item.category)}</span>
+            <span className="text-[13px] text-slate-700 whitespace-nowrap">{highlightText(item.category)}</span>
           </TableCell>
         );
       case "additional_category":
@@ -1610,7 +1610,7 @@ export function PartnerItemsTab({ vendor, hideHeader, compact, contextLabel, con
               {item.category !== item.additionalCategory && (
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <span className="inline-flex items-center px-1.5 py-0.5 rounded-md text-xs border cursor-default" style={{ fontWeight: 600, backgroundColor: "#F1F5F9", color: "#475569", borderColor: "#E2E8F0" }}>+1</span>
+                    <span className="inline-flex items-center px-1.5 py-0.5 rounded-md text-xs border cursor-default" style={{ fontWeight: 600, backgroundColor: "hsl(var(--muted))", color: "hsl(var(--muted-foreground))", borderColor: "hsl(var(--border))" }}>+1</span>
                   </TooltipTrigger>
                   <TooltipContent side="bottom" className="z-[300]">
                     <span className="text-[11px]">{item.category}</span>
@@ -1624,7 +1624,7 @@ export function PartnerItemsTab({ vendor, hideHeader, compact, contextLabel, con
         return (
           <TableCell key={colKey} className="text-right !pr-3">
             <div className="text-right">
-              <span className="text-[14px] text-[#334155] tabular-nums" style={{ fontWeight: 600 }}>
+              <span className="text-[14px] text-slate-700 tabular-nums" style={{ fontWeight: 600 }}>
                 {item.onHand.toLocaleString()}
               </span>
               <p className="text-[10px] text-muted-foreground mt-px" style={{ fontWeight: 400 }}>{item.onHandUnit}</p>
@@ -1634,19 +1634,19 @@ export function PartnerItemsTab({ vendor, hideHeader, compact, contextLabel, con
       case "alt_units":
         return (
           <TableCell key={colKey}>
-            <span className="text-[13px] text-[#334155] whitespace-nowrap">{item.altUnits}</span>
+            <span className="text-[13px] text-slate-700 whitespace-nowrap">{item.altUnits}</span>
           </TableCell>
         );
       case "inbound_location":
         return (
           <TableCell key={colKey}>
-            <span className="text-[13px] text-[#334155] truncate block max-w-[180px]">{item.inboundLocation}</span>
+            <span className="text-[13px] text-slate-700 truncate block max-w-[180px]">{item.inboundLocation}</span>
           </TableCell>
         );
       case "outbound_location":
         return (
           <TableCell key={colKey}>
-            <span className="text-[13px] text-[#334155] truncate block max-w-[180px]">{item.outboundLocation}</span>
+            <span className="text-[13px] text-slate-700 truncate block max-w-[180px]">{item.outboundLocation}</span>
           </TableCell>
         );
       case "acquisition":
@@ -1680,7 +1680,7 @@ export function PartnerItemsTab({ vendor, hideHeader, compact, contextLabel, con
             {/* Sub-tabs row — hidden when hideHeader is true */}
             {!hideHeader && (
             <div className="flex items-center justify-between gap-3 px-4 pt-2.5 pb-2 border-b border-border">
-              <div className="inline-flex items-center rounded-lg bg-[#F1F5F9] p-0.5">
+              <div className="inline-flex items-center rounded-lg bg-muted p-0.5">
               {([
                 { key: "sell" as SubTab, label: "Items They Sell", icon: Tag, color: "#1E40AF", bg: "#EFF6FF" },
                 { key: "purchase" as SubTab, label: "Items They Purchase", icon: ShoppingCart, color: "#5B21B6", bg: "#F5F3FF" },
@@ -1691,7 +1691,7 @@ export function PartnerItemsTab({ vendor, hideHeader, compact, contextLabel, con
                     key={t.key}
                     onClick={() => { setSubTab(t.key); setCurrentPage(1); }}
                     className={`inline-flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-md text-[13px] transition-all cursor-pointer ${
-                      isActive ? "bg-white shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.04)]" : "text-[#64748B] hover:text-[#334155]"
+                      isActive ? "bg-white shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.04)]" : "text-slate-500 hover:text-slate-700"
                     }`}
                     style={{ fontWeight: isActive ? 600 : 500, color: isActive ? t.color : undefined }}
                   >
@@ -1823,7 +1823,7 @@ export function PartnerItemsTab({ vendor, hideHeader, compact, contextLabel, con
                 <button
                   type="button"
                   onClick={() => setAddModalOpen(true)}
-                  className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-sm shadow-sm transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg bg-primary hover:bg-[#0862D0] text-white text-sm shadow-sm transition-colors cursor-pointer"
                   style={{ fontWeight: 600 }}
                 >
                   <Plus className="w-3.5 h-3.5" />
@@ -1843,15 +1843,15 @@ export function PartnerItemsTab({ vendor, hideHeader, compact, contextLabel, con
                   onClick={() => { setItemFilter(f.key); setCurrentPage(1); }}
                   className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                     isActive
-                      ? "border-primary bg-[#EDF4FF] hover:bg-[#D6E8FF] active:bg-[#ADD1FF]"
+                      ? "border-primary bg-accent hover:bg-[#D6E8FF] active:bg-[#ADD1FF]"
                       : "border-border text-muted-foreground hover:bg-muted/60 hover:text-foreground hover:border-muted-foreground/30 active:bg-muted"
                   }`}
-                  style={{ fontWeight: isActive ? 500 : 400, color: isActive ? "#0A77FF" : undefined }}
+                  style={{ fontWeight: isActive ? 500 : 400, color: isActive ? "hsl(var(--primary))" : undefined }}
                 >
                   {f.label}
                   <span
                     className={`text-[10px] rounded-full px-1.5 py-px min-w-[18px] text-center ${isActive ? "bg-primary/10" : "bg-muted"}`}
-                    style={{ fontWeight: 600, color: isActive ? "#0A77FF" : "#475569" }}
+                    style={{ fontWeight: 600, color: isActive ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))" }}
                   >
                     {f.count}
                   </span>
@@ -1884,13 +1884,13 @@ export function PartnerItemsTab({ vendor, hideHeader, compact, contextLabel, con
                         key={item.id}
                         className={`bg-white border rounded-xl cursor-pointer hover:shadow-[0_4px_16px_-4px_rgba(10,119,255,0.10),0_1px_3px_-1px_rgba(0,0,0,0.04)] hover:border-[#93B8F7]/50 transition-all duration-200 group/card flex flex-col overflow-hidden ${
                           isHighlighted
-                            ? "border-[#0A77FF] shadow-[0_0_0_2px_rgba(10,119,255,0.15)]"
-                            : "border-[#E2E8F0]"
+                            ? "border-primary shadow-[0_0_0_2px_rgba(10,119,255,0.15)]"
+                            : "border-border"
                         }`}
                       >
                         {/* Image banner — large photo for card view, click opens lightbox */}
                         <div
-                          className="relative w-full h-[200px] overflow-hidden bg-[#F1F5F9] cursor-zoom-in"
+                          className="relative w-full h-[200px] overflow-hidden bg-muted cursor-zoom-in"
                           onClick={(e) => { e.stopPropagation(); openLightbox({ src: item.image, name: item.description, subtitle: item.partNo }); }}
                         >
                           <img src={item.image} alt="" className="w-full h-full object-cover transition-transform duration-300 group-hover/card:scale-105" />
@@ -1934,7 +1934,7 @@ export function PartnerItemsTab({ vendor, hideHeader, compact, contextLabel, con
                               <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
                                 <button
                                   type="button"
-                                  className="inline-flex items-center justify-center h-7 w-7 rounded-lg bg-white/80 backdrop-blur-sm text-[#475569] opacity-0 group-hover/card:opacity-100 hover:bg-white hover:text-[#0F172A] transition-all cursor-pointer shadow-sm"
+                                  className="inline-flex items-center justify-center h-7 w-7 rounded-lg bg-white/80 backdrop-blur-sm text-muted-foreground opacity-0 group-hover/card:opacity-100 hover:bg-white hover:text-foreground transition-all cursor-pointer shadow-sm"
                                 >
                                   <MoreHorizontal className="w-4 h-4" />
                                 </button>
@@ -1944,8 +1944,8 @@ export function PartnerItemsTab({ vendor, hideHeader, compact, contextLabel, con
                                   <Eye className="w-4 h-4 mr-2" /> View Details
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem className="text-[#DC2626] focus:text-[#DC2626] focus:bg-[#FEF2F2]" onClick={() => setRemoveConfirmId(item.id)}>
-                                  <Trash2 className="w-4 h-4 mr-2 text-[#DC2626]" /> Remove Item
+                                <DropdownMenuItem className="text-destructive focus:text-destructive focus:bg-red-50" onClick={() => setRemoveConfirmId(item.id)}>
+                                  <Trash2 className="w-4 h-4 mr-2 text-destructive" /> Remove Item
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
@@ -1956,10 +1956,10 @@ export function PartnerItemsTab({ vendor, hideHeader, compact, contextLabel, con
                         <div className="flex flex-col flex-1">
                           {/* Title + Manufacturer */}
                           <div className="px-3.5 pt-2.5 pb-0">
-                            <p className="text-[14px] text-[#334155] truncate" style={{ fontWeight: 600, lineHeight: "20px" }}>{item.description}</p>
-                            <p className="text-[12px] text-[#64748B] truncate mt-0.5" style={{ lineHeight: "18px" }}>
-                              <span className="text-[#0A77FF] font-mono" style={{ fontWeight: 600 }}>{item.partNo}</span>
-                              <span className="text-[#CBD5E1] mx-1.5">·</span>
+                            <p className="text-[14px] text-slate-700 truncate" style={{ fontWeight: 600, lineHeight: "20px" }}>{item.description}</p>
+                            <p className="text-[12px] text-slate-500 truncate mt-0.5" style={{ lineHeight: "18px" }}>
+                              <span className="text-primary font-mono" style={{ fontWeight: 600 }}>{item.partNo}</span>
+                              <span className="text-slate-300 mx-1.5">·</span>
                               {item.manufacturer}
                             </p>
                           </div>
@@ -1968,11 +1968,11 @@ export function PartnerItemsTab({ vendor, hideHeader, compact, contextLabel, con
                           <div className="px-3.5 pt-3 pb-3 flex-1 flex items-end">
                             <div className="flex items-center gap-3 text-[11.5px]">
                               <div className="flex items-center gap-1">
-                                <Package className="w-3 h-3 text-[#94A3B8]" />
-                                <span className="text-[#334155] tabular-nums" style={{ fontWeight: 600 }}>{item.onHand.toLocaleString()}</span>
-                                <span className="text-[#94A3B8] text-[10px]">{item.onHandUnit}</span>
+                                <Package className="w-3 h-3 text-slate-400" />
+                                <span className="text-slate-700 tabular-nums" style={{ fontWeight: 600 }}>{item.onHand.toLocaleString()}</span>
+                                <span className="text-slate-400 text-[10px]">{item.onHandUnit}</span>
                               </div>
-                              <div className="w-px h-3 bg-[#E2E8F0]" />
+                              <div className="w-px h-3 bg-border" />
                               <div className="flex items-center gap-1">
                                 {item.acquisitionMethods.map((m) => <AcqBadge key={m} method={m} />)}
                               </div>
@@ -1980,7 +1980,7 @@ export function PartnerItemsTab({ vendor, hideHeader, compact, contextLabel, con
                           </div>
 
                           {/* Footer — categories + status */}
-                          <div className="px-3.5 py-2.5 border-t border-[#F1F5F9] flex items-center justify-between">
+                          <div className="px-3.5 py-2.5 border-t border-muted flex items-center justify-between">
                             <div className="flex items-center gap-1 min-w-0">
                               <CategoryPill label={item.category} />
                               {item.additionalCategory !== item.category && <CategoryPill label={item.additionalCategory} />}
@@ -2002,7 +2002,7 @@ export function PartnerItemsTab({ vendor, hideHeader, compact, contextLabel, con
                   <TableRow className={`bg-muted/30 hover:bg-muted/30 ${density === "condensed" ? "[&>th]:h-8" : "[&>th]:h-9"}`}>
                     {/* Checkbox column — sticky leftmost */}
                     <TableHead
-                      className="sticky left-0 z-20 bg-[#f8fafc] w-[40px] min-w-[40px] max-w-[40px] !pl-2 !pr-0"
+                      className="sticky left-0 z-20 bg-slate-50 w-[40px] min-w-[40px] max-w-[40px] !pl-2 !pr-0"
                     >
                       <Checkbox
                         checked={allPageSelected ? true : somePageSelected ? "indeterminate" : false}
@@ -2032,7 +2032,7 @@ export function PartnerItemsTab({ vendor, hideHeader, compact, contextLabel, con
                               e.preventDefault();
                             }
                           } : undefined}
-                          className={`whitespace-nowrap relative group/colheader ${isFrozen ? "sticky bg-[#f8fafc] z-20" : ""} ${isDraggable ? "cursor-grab" : ""} ${def.align === "right" ? "text-right" : ""}`}
+                          className={`whitespace-nowrap relative group/colheader ${isFrozen ? "sticky bg-slate-50 z-20" : ""} ${isDraggable ? "cursor-grab" : ""} ${def.align === "right" ? "text-right" : ""}`}
                           style={{
                             width: `${width}px`, minWidth: `${width}px`, maxWidth: `${width}px`,
                             overflow: "hidden",
@@ -2045,7 +2045,7 @@ export function PartnerItemsTab({ vendor, hideHeader, compact, contextLabel, con
                         >
                           {/* Blue accent bar on top edge of dragged column header */}
                           {isBeingDragged && (
-                            <div className="absolute top-0 left-0 right-0 h-[2px] rounded-b-full" style={{ backgroundColor: "#0A77FF" }} />
+                            <div className="absolute top-0 left-0 right-0 h-[2px] rounded-b-full" style={{ backgroundColor: "hsl(var(--primary))" }} />
                           )}
                           {/* Drag grip icon */}
                           {isDraggable && (
@@ -2067,12 +2067,12 @@ export function PartnerItemsTab({ vendor, hideHeader, compact, contextLabel, con
                               hasActiveFilter={false}
                             >
                               <div className={`inline-flex items-center gap-1 ${def.align === "right" ? "w-full justify-end" : ""}`}>
-                                <span className="text-[13px]" style={currentColSort ? { color: "#0A77FF" } : undefined}>{def.label}</span>
+                                <span className="text-[13px]" style={currentColSort ? { color: "hsl(var(--primary))" } : undefined}>{def.label}</span>
                                 {currentColSort === "asc" && (
-                                  <ArrowUp className="w-3 h-3 shrink-0" style={{ color: "#0A77FF" }} />
+                                  <ArrowUp className="w-3 h-3 shrink-0" style={{ color: "hsl(var(--primary))" }} />
                                 )}
                                 {currentColSort === "desc" && (
-                                  <ArrowDown className="w-3 h-3 shrink-0" style={{ color: "#0A77FF" }} />
+                                  <ArrowDown className="w-3 h-3 shrink-0" style={{ color: "hsl(var(--primary))" }} />
                                 )}
                                 {!currentColSort && def.sortable && (
                                   <ArrowUpDown className="w-3 h-3 shrink-0 text-muted-foreground opacity-0 group-hover/colheader:opacity-100 transition-opacity" />
@@ -2101,7 +2101,7 @@ export function PartnerItemsTab({ vendor, hideHeader, compact, contextLabel, con
                       );
                     })}
                     {/* Actions column — sticky right */}
-                    <TableHead className="whitespace-nowrap w-[60px] sticky right-0 bg-[#f8fafc] z-20 !pl-2 !pr-2" style={{ boxShadow: "inset 1px 0 0 0 rgba(0,0,0,0.08)" }}>
+                    <TableHead className="whitespace-nowrap w-[60px] sticky right-0 bg-slate-50 z-20 !pl-2 !pr-2" style={{ boxShadow: "inset 1px 0 0 0 rgba(0,0,0,0.08)" }}>
                       <span className="text-[13px]">Actions</span>
                     </TableHead>
                   </TableRow>
@@ -2127,7 +2127,7 @@ export function PartnerItemsTab({ vendor, hideHeader, compact, contextLabel, con
                             isComfort
                               ? "[&>td]:py-2 [&>td]:pl-3 [&>td]:pr-2"
                               : "[&>td]:py-1 [&>td]:pl-3 [&>td]:pr-2"
-                          } ${isHighlighted ? "animate-row-flash bg-[#EDF4FF]/60" : ""}`}
+                          } ${isHighlighted ? "animate-row-flash bg-accent/60" : ""}`}
                         >
                           {/* Checkbox cell — sticky leftmost */}
                           <TableCell
@@ -2192,10 +2192,10 @@ export function PartnerItemsTab({ vendor, hideHeader, compact, contextLabel, con
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem
-                                  className="text-[#DC2626] focus:text-[#DC2626] focus:bg-[#FEF2F2]"
+                                  className="text-destructive focus:text-destructive focus:bg-red-50"
                                   onClick={() => setRemoveConfirmId(item.id)}
                                 >
-                                  <Trash2 className="w-4 h-4 mr-2 text-[#DC2626]" /> Remove Item
+                                  <Trash2 className="w-4 h-4 mr-2 text-destructive" /> Remove Item
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
@@ -2344,12 +2344,12 @@ export function PartnerItemsTab({ vendor, hideHeader, compact, contextLabel, con
                   boxShadow: "0 1px 3px rgba(10,119,255,0.08), 0 6px 20px rgba(0,0,0,0.10)",
                 }}
               >
-                <GripVertical className="w-3 h-3 shrink-0" style={{ color: "#0A77FF" }} />
-                <span className="text-[13px]" style={{ color: "#0A77FF", fontWeight: 500 }}>
+                <GripVertical className="w-3 h-3 shrink-0" style={{ color: "hsl(var(--primary))" }} />
+                <span className="text-[13px]" style={{ color: "hsl(var(--primary))", fontWeight: 500 }}>
                   {colDef(draggingColumnKey)?.label}
                 </span>
-                {ghostSort === "asc" && <ArrowUp className="w-3 h-3 shrink-0" style={{ color: "#0A77FF" }} />}
-                {ghostSort === "desc" && <ArrowDown className="w-3 h-3 shrink-0" style={{ color: "#0A77FF" }} />}
+                {ghostSort === "asc" && <ArrowUp className="w-3 h-3 shrink-0" style={{ color: "hsl(var(--primary))" }} />}
+                {ghostSort === "desc" && <ArrowDown className="w-3 h-3 shrink-0" style={{ color: "hsl(var(--primary))" }} />}
               </div>
             );
           })()}
@@ -2386,7 +2386,7 @@ export function PartnerItemsTab({ vendor, hideHeader, compact, contextLabel, con
                 <div className="relative flex flex-col items-center pt-10 pb-6" style={{ background: "linear-gradient(180deg, #FEF2F2 0%, rgba(254,242,242,0.3) 70%, transparent 100%)" }}>
                   <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[180px] h-[80px] rounded-full blur-[50px] opacity-25" style={{ backgroundColor: "#EF4444" }} />
                   <div className="relative w-16 h-16 rounded-2xl flex items-center justify-center" style={{ backgroundColor: "#FEE2E2" }}>
-                    <AlertTriangle className="w-8 h-8" style={{ color: "#DC2626" }} />
+                    <AlertTriangle className="w-8 h-8" style={{ color: "hsl(var(--destructive))" }} />
                   </div>
                   <span className="mt-4 px-3 py-1 rounded-full text-[11px]" style={{ fontWeight: 600, backgroundColor: "#FEF2F2", color: "#991B1B", textTransform: "uppercase" as const, letterSpacing: "0.05em" }}>
                     Caution
@@ -2395,11 +2395,11 @@ export function PartnerItemsTab({ vendor, hideHeader, compact, contextLabel, con
                 {/* Content */}
                 <div className="flex flex-col items-center text-center px-8 pb-8">
                   <AlertDialogHeader className="p-0 gap-0 text-center">
-                    <AlertDialogTitle className="text-[18px] tracking-[-0.02em]" style={{ fontWeight: 600, color: "#0F172A" }}>
+                    <AlertDialogTitle className="text-[18px] tracking-[-0.02em]" style={{ fontWeight: 600, color: "hsl(var(--foreground))" }}>
                       Remove this item?
                     </AlertDialogTitle>
                   </AlertDialogHeader>
-                  <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "#475569", lineHeight: "1.65" }}>
+                  <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "hsl(var(--muted-foreground))", lineHeight: "1.65" }}>
                     {removeItem && (
                       <>
                         <span style={{ fontWeight: 600, color: "#1E293B" }}>{removeItem.partNo}</span>
@@ -2416,13 +2416,13 @@ export function PartnerItemsTab({ vendor, hideHeader, compact, contextLabel, con
                         }
                       }}
                       className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors hover:opacity-90"
-                      style={{ fontWeight: 600, backgroundColor: "#DC2626", color: "#fff" }}
+                      style={{ fontWeight: 600, backgroundColor: "hsl(var(--destructive))", color: "#fff" }}
                     >
                       Remove Item
                     </AlertDialogAction>
                     <AlertDialogCancel
                       className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors"
-                      style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#334155" }}
+                      style={{ fontWeight: 500, backgroundColor: "hsl(var(--muted))", color: "#334155" }}
                     >
                       Cancel
                     </AlertDialogCancel>

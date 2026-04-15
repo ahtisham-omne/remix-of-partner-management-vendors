@@ -28,12 +28,12 @@ export function FilterPills({ options, activeKey, onSelect }: FilterPillsProps) 
             onClick={() => onSelect(opt.key)}
             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
               isActive
-                ? "border-primary bg-[#EDF4FF] hover:bg-[#D6E8FF] active:bg-[#ADD1FF]"
+                ? "border-primary bg-accent hover:bg-[#D6E8FF] active:bg-[#ADD1FF]"
                 : "border-border text-muted-foreground hover:bg-muted/60 hover:text-foreground hover:border-muted-foreground/30 active:bg-muted"
             }`}
             style={{
               fontWeight: isActive ? 500 : 400,
-              color: isActive ? "#0A77FF" : undefined,
+              color: isActive ? "hsl(var(--primary))" : undefined,
             }}
           >
             {opt.label}
@@ -44,7 +44,7 @@ export function FilterPills({ options, activeKey, onSelect }: FilterPillsProps) 
                 }`}
                 style={{
                   fontWeight: 600,
-                  color: isActive ? "#0A77FF" : "#475569",
+                  color: isActive ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))",
                 }}
               >
                 {opt.count}

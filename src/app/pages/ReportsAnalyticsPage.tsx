@@ -2,9 +2,9 @@ import { TrendingUp, TrendingDown, Users, DollarSign, Package, Clock, ChartColum
 
 export function ReportsAnalyticsPage() {
   const kpis = [
-    { label: "Total Partners", value: "248", change: "+18", up: true, icon: Users, color: "#0A77FF" },
+    { label: "Total Partners", value: "248", change: "+18", up: true, icon: Users, color: "hsl(var(--primary))" },
     { label: "Total Spend (YTD)", value: "$4.2M", change: "+15.3%", up: true, icon: DollarSign, color: "#16A34A" },
-    { label: "Avg. Lead Time", value: "5.2 days", change: "-0.8 days", up: false, icon: Clock, color: "#7C3AED" },
+    { label: "Avg. Lead Time", value: "5.2 days", change: "-0.8 days", up: false, icon: Clock, color: "hsl(var(--violet))" },
     { label: "Active Orders", value: "1,342", change: "+23%", up: true, icon: Package, color: "#EA580C" },
   ];
 
@@ -17,15 +17,15 @@ export function ReportsAnalyticsPage() {
   ];
 
   const recentActivity = [
-    { action: "New partner onboarded", detail: "QuickShip Inc added to approved vendors", time: "2 hours ago", icon: Users, color: "#0A77FF" },
+    { action: "New partner onboarded", detail: "QuickShip Inc added to approved vendors", time: "2 hours ago", icon: Users, color: "hsl(var(--primary))" },
     { action: "Credit limit updated", detail: "Global Industries limit raised to $400K", time: "5 hours ago", icon: DollarSign, color: "#16A34A" },
-    { action: "Performance review", detail: "Acme Corporation quarterly review completed", time: "1 day ago", icon: Activity, color: "#7C3AED" },
+    { action: "Performance review", detail: "Acme Corporation quarterly review completed", time: "1 day ago", icon: Activity, color: "hsl(var(--violet))" },
     { action: "Contract renewed", detail: "SteelWorks Ltd contract extended 2 years", time: "2 days ago", icon: Package, color: "#EA580C" },
     { action: "New location added", detail: "TechSupply Co warehouse in Austin, TX", time: "3 days ago", icon: ChartColumn, color: "#0891B2" },
   ];
 
   return (
-    <div className="flex flex-col h-full bg-[#F8FAFC]">
+    <div className="flex flex-col h-full bg-slate-50">
       <div className="px-6 py-4 border-b border-border bg-card">
         <h1 className="text-foreground" style={{ fontSize: "20px", fontWeight: 600 }}>
           Reports & Analytics
@@ -97,7 +97,7 @@ export function ReportsAnalyticsPage() {
                   <div className="ml-6 h-1.5 rounded-full bg-muted overflow-hidden">
                     <div
                       className="h-full rounded-full"
-                      style={{ width: `${partner.percentage}%`, backgroundColor: "#0A77FF" }}
+                      style={{ width: `${partner.percentage}%`, backgroundColor: "hsl(var(--primary))" }}
                     />
                   </div>
                 </div>
@@ -112,7 +112,7 @@ export function ReportsAnalyticsPage() {
                 <PieChart className="w-4.5 h-4.5 text-muted-foreground" />
                 <h2 className="text-foreground" style={{ fontSize: "15px", fontWeight: 600 }}>Recent Activity</h2>
               </div>
-              <button className="text-[#0A77FF]" style={{ fontSize: "12px", fontWeight: 500 }}>View All</button>
+              <button className="text-primary" style={{ fontSize: "12px", fontWeight: 500 }}>View All</button>
             </div>
             <div className="space-y-3">
               {recentActivity.map((activity, idx) => {

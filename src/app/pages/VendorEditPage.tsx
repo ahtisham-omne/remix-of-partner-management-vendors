@@ -192,7 +192,7 @@ export function VendorEditPage() {
   const cfg = vendor.configData;
 
   return (
-    <div className="p-6 lg:p-8 overflow-y-auto flex-1 bg-[#F8FAFC]">
+    <div className="p-6 lg:p-8 overflow-y-auto flex-1 bg-slate-50">
       {/* Breadcrumb */}
       <Breadcrumb className="mb-6">
         <BreadcrumbList>
@@ -243,7 +243,7 @@ export function VendorEditPage() {
                 onClick={() => setActiveSection(item.id)}
                 className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors text-left ${
                   activeSection === item.id
-                    ? "bg-[#EDF4FF] text-[#0A77FF]"
+                    ? "bg-accent text-primary"
                     : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
                 }`}
                 style={{ fontWeight: activeSection === item.id ? 500 : 400 }}
@@ -266,19 +266,19 @@ export function VendorEditPage() {
               <div className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="companyName" className="text-[13px]" style={{ fontWeight: 600, color: "#0F172A" }}>Company name *</Label>
+                    <Label htmlFor="companyName" className="text-[13px]" style={{ fontWeight: 600, color: "hsl(var(--foreground))" }}>Company name *</Label>
                     <Input id="companyName" value={companyName} onChange={(e) => setCompanyName(e.target.value)} className="mt-1.5 bg-white" />
                     {renderFieldError("companyName")}
                   </div>
                   <div>
-                    <Label htmlFor="displayName" className="text-[13px]" style={{ fontWeight: 600, color: "#0F172A" }}>Display name *</Label>
+                    <Label htmlFor="displayName" className="text-[13px]" style={{ fontWeight: 600, color: "hsl(var(--foreground))" }}>Display name *</Label>
                     <Input id="displayName" value={displayName} onChange={(e) => setDisplayName(e.target.value)} className="mt-1.5 bg-white" />
                     {renderFieldError("displayName")}
                   </div>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <Label className="text-[13px]" style={{ fontWeight: 600, color: "#0F172A" }}>Category</Label>
+                    <Label className="text-[13px]" style={{ fontWeight: 600, color: "hsl(var(--foreground))" }}>Category</Label>
                     <Select value={category} onValueChange={(v) => setCategory(v as VendorCategory)}>
                       <SelectTrigger className="mt-1.5 bg-white"><SelectValue /></SelectTrigger>
                       <SelectContent className="z-[250]">
@@ -289,7 +289,7 @@ export function VendorEditPage() {
                     </Select>
                   </div>
                   <div>
-                    <Label className="text-[13px]" style={{ fontWeight: 600, color: "#0F172A" }}>Status</Label>
+                    <Label className="text-[13px]" style={{ fontWeight: 600, color: "hsl(var(--foreground))" }}>Status</Label>
                     <Select value={status} onValueChange={(v) => setStatus(v as VendorStatus)}>
                       <SelectTrigger className="mt-1.5 bg-white"><SelectValue /></SelectTrigger>
                       <SelectContent className="z-[250]">
@@ -302,26 +302,26 @@ export function VendorEditPage() {
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="website" className="text-[13px]" style={{ fontWeight: 600, color: "#0F172A" }}>Website</Label>
+                    <Label htmlFor="website" className="text-[13px]" style={{ fontWeight: 600, color: "hsl(var(--foreground))" }}>Website</Label>
                     <Input id="website" value={website} onChange={(e) => setWebsite(e.target.value)} className="mt-1.5 bg-white" placeholder="https://example.com" />
                   </div>
                   <div>
-                    <Label htmlFor="emailAddress" className="text-[13px]" style={{ fontWeight: 600, color: "#0F172A" }}>Email address</Label>
+                    <Label htmlFor="emailAddress" className="text-[13px]" style={{ fontWeight: 600, color: "hsl(var(--foreground))" }}>Email address</Label>
                     <Input id="emailAddress" value={emailAddress} onChange={(e) => setEmailAddress(e.target.value)} className="mt-1.5 bg-white" placeholder="contact@company.com" />
                   </div>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="country" className="text-[13px]" style={{ fontWeight: 600, color: "#0F172A" }}>Country</Label>
+                    <Label htmlFor="country" className="text-[13px]" style={{ fontWeight: 600, color: "hsl(var(--foreground))" }}>Country</Label>
                     <Input id="country" value={country} onChange={(e) => setCountry(e.target.value)} className="mt-1.5 bg-white" />
                   </div>
                   <div>
-                    <Label htmlFor="vendorType" className="text-[13px]" style={{ fontWeight: 600, color: "#0F172A" }}>Vendor type</Label>
+                    <Label htmlFor="vendorType" className="text-[13px]" style={{ fontWeight: 600, color: "hsl(var(--foreground))" }}>Vendor type</Label>
                     <Input id="vendorType" value={vendorType} onChange={(e) => setVendorType(e.target.value)} className="mt-1.5 bg-white" />
                   </div>
                 </div>
                 <div>
-                  <Label htmlFor="services" className="text-[13px]" style={{ fontWeight: 600, color: "#0F172A" }}>Services</Label>
+                  <Label htmlFor="services" className="text-[13px]" style={{ fontWeight: 600, color: "hsl(var(--foreground))" }}>Services</Label>
                   <Input id="services" value={services} onChange={(e) => setServices(e.target.value)} className="mt-1.5 bg-white" placeholder="e.g. Laser cutting" />
                 </div>
                 <ExpandableTextarea
@@ -343,22 +343,22 @@ export function VendorEditPage() {
               <div className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="contactName" className="text-[13px]" style={{ fontWeight: 600, color: "#0F172A" }}>Full name *</Label>
+                    <Label htmlFor="contactName" className="text-[13px]" style={{ fontWeight: 600, color: "hsl(var(--foreground))" }}>Full name *</Label>
                     <Input id="contactName" value={contactName} onChange={(e) => setContactName(e.target.value)} className="mt-1.5 bg-white" />
                     {renderFieldError("contactName")}
                   </div>
                   <div>
-                    <Label htmlFor="contactDesignation" className="text-[13px]" style={{ fontWeight: 600, color: "#0F172A" }}>Designation</Label>
+                    <Label htmlFor="contactDesignation" className="text-[13px]" style={{ fontWeight: 600, color: "hsl(var(--foreground))" }}>Designation</Label>
                     <Input id="contactDesignation" value={contactDesignation} onChange={(e) => setContactDesignation(e.target.value)} className="mt-1.5 bg-white" />
                   </div>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="contactEmail" className="text-[13px]" style={{ fontWeight: 600, color: "#0F172A" }}>Email</Label>
+                    <Label htmlFor="contactEmail" className="text-[13px]" style={{ fontWeight: 600, color: "hsl(var(--foreground))" }}>Email</Label>
                     <Input id="contactEmail" type="email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} className="mt-1.5 bg-white" />
                   </div>
                   <div>
-                    <Label htmlFor="contactPhone" className="text-[13px]" style={{ fontWeight: 600, color: "#0F172A" }}>Phone</Label>
+                    <Label htmlFor="contactPhone" className="text-[13px]" style={{ fontWeight: 600, color: "hsl(var(--foreground))" }}>Phone</Label>
                     <Input id="contactPhone" value={contactPhone} onChange={(e) => setContactPhone(e.target.value)} className="mt-1.5 bg-white" />
                   </div>
                 </div>
@@ -368,14 +368,14 @@ export function VendorEditPage() {
                   <>
                     <Separator className="my-4" />
                     <div>
-                      <p className="text-[13px] text-[#0F172A] mb-3" style={{ fontWeight: 600 }}>
+                      <p className="text-[13px] text-foreground mb-3" style={{ fontWeight: 600 }}>
                         Additional points of contact ({cfg.pointsOfContact.length})
                       </p>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         {cfg.pointsOfContact.map((poc) => {
                           const initials = poc.name.split(" ").filter(Boolean).map((n) => n[0]).join("").toUpperCase().substring(0, 2);
                           return (
-                            <div key={poc.id} className="flex items-center gap-2.5 rounded-lg border border-[#E2E8F0] px-3 py-2">
+                            <div key={poc.id} className="flex items-center gap-2.5 rounded-lg border border-border px-3 py-2">
                               <div
                                 className="w-7 h-7 rounded-full flex items-center justify-center text-white text-[10px] shrink-0"
                                 style={{ backgroundColor: toAAAColor(poc.avatarColor), fontWeight: 600 }}
@@ -408,27 +408,27 @@ export function VendorEditPage() {
               </p>
               <div className="space-y-4">
                 <div>
-                  <Label htmlFor="street" className="text-[13px]" style={{ fontWeight: 600, color: "#0F172A" }}>Street address *</Label>
+                  <Label htmlFor="street" className="text-[13px]" style={{ fontWeight: 600, color: "hsl(var(--foreground))" }}>Street address *</Label>
                   <Input id="street" value={street} onChange={(e) => setStreet(e.target.value)} className="mt-1.5 bg-white" />
                   {renderFieldError("street")}
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="city" className="text-[13px]" style={{ fontWeight: 600, color: "#0F172A" }}>City</Label>
+                    <Label htmlFor="city" className="text-[13px]" style={{ fontWeight: 600, color: "hsl(var(--foreground))" }}>City</Label>
                     <Input id="city" value={city} onChange={(e) => setCity(e.target.value)} className="mt-1.5 bg-white" />
                   </div>
                   <div>
-                    <Label htmlFor="state" className="text-[13px]" style={{ fontWeight: 600, color: "#0F172A" }}>State</Label>
+                    <Label htmlFor="state" className="text-[13px]" style={{ fontWeight: 600, color: "hsl(var(--foreground))" }}>State</Label>
                     <Input id="state" value={state} onChange={(e) => setState(e.target.value)} className="mt-1.5 bg-white" />
                   </div>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="zipCode" className="text-[13px]" style={{ fontWeight: 600, color: "#0F172A" }}>ZIP code</Label>
+                    <Label htmlFor="zipCode" className="text-[13px]" style={{ fontWeight: 600, color: "hsl(var(--foreground))" }}>ZIP code</Label>
                     <Input id="zipCode" value={zipCode} onChange={(e) => setZipCode(e.target.value)} className="mt-1.5 bg-white" />
                   </div>
                   <div>
-                    <Label htmlFor="addressCountry" className="text-[13px]" style={{ fontWeight: 600, color: "#0F172A" }}>Country</Label>
+                    <Label htmlFor="addressCountry" className="text-[13px]" style={{ fontWeight: 600, color: "hsl(var(--foreground))" }}>Country</Label>
                     <Input id="addressCountry" value={addressCountry} onChange={(e) => setAddressCountry(e.target.value)} className="mt-1.5 bg-white" />
                   </div>
                 </div>
@@ -445,11 +445,11 @@ export function VendorEditPage() {
               <div className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="taxId" className="text-[13px]" style={{ fontWeight: 600, color: "#0F172A" }}>Tax ID / EIN</Label>
+                    <Label htmlFor="taxId" className="text-[13px]" style={{ fontWeight: 600, color: "hsl(var(--foreground))" }}>Tax ID / EIN</Label>
                     <Input id="taxId" value={taxId} onChange={(e) => setTaxId(e.target.value)} className="mt-1.5 bg-white" placeholder="XX-XXXXXXX" />
                   </div>
                   <div>
-                    <Label className="text-[13px]" style={{ fontWeight: 600, color: "#0F172A" }}>Payment terms</Label>
+                    <Label className="text-[13px]" style={{ fontWeight: 600, color: "hsl(var(--foreground))" }}>Payment terms</Label>
                     <Select value={paymentTerms} onValueChange={(v) => setPaymentTerms(v as PaymentTerms)}>
                       <SelectTrigger className="mt-1.5 bg-white"><SelectValue /></SelectTrigger>
                       <SelectContent className="z-[250]">
@@ -461,16 +461,16 @@ export function VendorEditPage() {
                   </div>
                 </div>
                 <div>
-                  <Label htmlFor="creditLimit" className="text-[13px]" style={{ fontWeight: 600, color: "#0F172A" }}>Credit limit ($)</Label>
+                  <Label htmlFor="creditLimit" className="text-[13px]" style={{ fontWeight: 600, color: "hsl(var(--foreground))" }}>Credit limit ($)</Label>
                   <Input id="creditLimit" type="number" value={creditLimit || ""} onChange={(e) => setCreditLimit(Number(e.target.value))} className="mt-1.5 bg-white" placeholder="100000" />
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="defaultCarrierVendor" className="text-[13px]" style={{ fontWeight: 600, color: "#0F172A" }}>Default carrier (vendor)</Label>
+                    <Label htmlFor="defaultCarrierVendor" className="text-[13px]" style={{ fontWeight: 600, color: "hsl(var(--foreground))" }}>Default carrier (vendor)</Label>
                     <Input id="defaultCarrierVendor" value={defaultCarrierVendor} onChange={(e) => setDefaultCarrierVendor(e.target.value)} className="mt-1.5 bg-white" />
                   </div>
                   <div>
-                    <Label htmlFor="defaultCarrierCustomer" className="text-[13px]" style={{ fontWeight: 600, color: "#0F172A" }}>Default carrier (customer)</Label>
+                    <Label htmlFor="defaultCarrierCustomer" className="text-[13px]" style={{ fontWeight: 600, color: "hsl(var(--foreground))" }}>Default carrier (customer)</Label>
                     <Input id="defaultCarrierCustomer" value={defaultCarrierCustomer} onChange={(e) => setDefaultCarrierCustomer(e.target.value)} className="mt-1.5 bg-white" />
                   </div>
                 </div>
@@ -480,11 +480,11 @@ export function VendorEditPage() {
                   <>
                     <Separator className="my-2" />
                     <div>
-                      <p className="text-[13px] text-[#0F172A] mb-2" style={{ fontWeight: 600 }}>Applied payment term</p>
-                      <div className="rounded-lg border border-[#E2E8F0] p-3 flex items-center gap-2">
+                      <p className="text-[13px] text-foreground mb-2" style={{ fontWeight: 600 }}>Applied payment term</p>
+                      <div className="rounded-lg border border-border p-3 flex items-center gap-2">
                         <span
                           className="inline-flex items-center px-2 py-0.5 rounded text-[11px] text-white"
-                          style={{ fontWeight: 600, backgroundColor: cfg.paymentTermConfig.type === "NET" ? "#0A77FF" : cfg.paymentTermConfig.type === "Pre" ? "#7C3AED" : "#D97706" }}
+                          style={{ fontWeight: 600, backgroundColor: cfg.paymentTermConfig.type === "NET" ? "hsl(var(--primary))" : cfg.paymentTermConfig.type === "Pre" ? "hsl(var(--violet))" : "hsl(var(--warning))" }}
                         >
                           {cfg.paymentTermConfig.type}
                         </span>
@@ -501,12 +501,12 @@ export function VendorEditPage() {
                   <>
                     <Separator className="my-2" />
                     <div>
-                      <p className="text-[13px] text-[#0F172A] mb-2" style={{ fontWeight: 600 }}>
+                      <p className="text-[13px] text-foreground mb-2" style={{ fontWeight: 600 }}>
                         Payment methods ({cfg.paymentMethods.length})
                       </p>
                       <div className="space-y-2">
                         {cfg.paymentMethods.map((pm) => (
-                          <div key={pm.id} className="rounded-lg border border-[#E2E8F0] px-3 py-2 flex items-center justify-between">
+                          <div key={pm.id} className="rounded-lg border border-border px-3 py-2 flex items-center justify-between">
                             <div className="flex items-center gap-2">
                               <CreditCard className="w-4 h-4 text-muted-foreground" />
                               <span className="text-sm" style={{ fontWeight: 500 }}>{pm.typeLabel}</span>
@@ -532,16 +532,16 @@ export function VendorEditPage() {
                 {/* Pricing Rules */}
                 {cfg?.pricingRules && cfg.pricingRules.length > 0 && (
                   <div>
-                    <p className="text-[13px] text-[#0F172A] mb-3" style={{ fontWeight: 600 }}>
+                    <p className="text-[13px] text-foreground mb-3" style={{ fontWeight: 600 }}>
                       Pricing rules ({cfg.pricingRules.length})
                     </p>
                     <div className="space-y-2">
                       {cfg.pricingRules.map((rule) => (
-                        <div key={rule.id} className="rounded-lg border border-[#E2E8F0] p-3 space-y-1">
+                        <div key={rule.id} className="rounded-lg border border-border p-3 space-y-1">
                           <div className="flex items-center gap-2">
                             <span
                               className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] text-white"
-                              style={{ fontWeight: 600, backgroundColor: rule.type === "discount" ? "#059669" : "#D97706" }}
+                              style={{ fontWeight: 600, backgroundColor: rule.type === "discount" ? "hsl(var(--success))" : "hsl(var(--warning))" }}
                             >
                               {rule.type === "discount" ? "Discount" : "Premium"}
                             </span>
@@ -558,11 +558,11 @@ export function VendorEditPage() {
                 {/* Shipping Config */}
                 {cfg?.shippingConfig && (
                   <div>
-                    <p className="text-[13px] text-[#0F172A] mb-3" style={{ fontWeight: 600 }}>
+                    <p className="text-[13px] text-foreground mb-3" style={{ fontWeight: 600 }}>
                       Shipping configuration
                     </p>
                     {cfg.shippingConfig.carrierServices.map((cs, idx) => (
-                      <div key={idx} className="rounded-lg border border-[#E2E8F0] p-3 mb-2 flex items-center justify-between">
+                      <div key={idx} className="rounded-lg border border-border p-3 mb-2 flex items-center justify-between">
                         <div>
                           <span className="text-sm" style={{ fontWeight: 500 }}>{cs.name}</span>
                           <p className="text-xs text-muted-foreground mt-0.5">{cs.minDays}–{cs.maxDays} business days</p>
@@ -576,10 +576,10 @@ export function VendorEditPage() {
                 {/* Credit Limit Config */}
                 {cfg?.creditLimitConfig && (
                   <div>
-                    <p className="text-[13px] text-[#0F172A] mb-3" style={{ fontWeight: 600 }}>
+                    <p className="text-[13px] text-foreground mb-3" style={{ fontWeight: 600 }}>
                       Credit limit settings
                     </p>
-                    <div className="rounded-lg border border-[#E2E8F0] p-3 space-y-2 text-sm">
+                    <div className="rounded-lg border border-border p-3 space-y-2 text-sm">
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Currency</span>
                         <span style={{ fontWeight: 500 }}>{cfg.creditLimitConfig.currency || "USD"}</span>

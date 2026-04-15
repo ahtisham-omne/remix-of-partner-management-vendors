@@ -8,17 +8,17 @@ import {
 import type { ContactPerson } from "./partnerConstants";
 
 export const POC_DEPT_COLORS: Record<string, { bg: string; text: string; dot: string }> = {
-  "Sales": { bg: "#EBF3FF", text: "#0A77FF", dot: "#0A77FF" },
-  "Supply Chain Management": { bg: "#E8FAF3", text: "#059669", dot: "#059669" },
-  "Finance": { bg: "#FEF5E7", text: "#D97706", dot: "#D97706" },
+  "Sales": { bg: "#EBF3FF", text: "hsl(var(--primary))", dot: "hsl(var(--primary))" },
+  "Supply Chain Management": { bg: "#E8FAF3", text: "hsl(var(--success))", dot: "hsl(var(--success))" },
+  "Finance": { bg: "#FEF5E7", text: "hsl(var(--warning))", dot: "hsl(var(--warning))" },
 };
 
 export const POC_AVATAR_TINTS: Record<string, { bg: string; text: string }> = {
-  "#0A77FF": { bg: "#EBF3FF", text: "#0A77FF" },
-  "#7C3AED": { bg: "#F0EBFF", text: "#7C3AED" },
-  "#059669": { bg: "#E8FAF3", text: "#059669" },
-  "#D97706": { bg: "#FEF5E7", text: "#B45D04" },
-  "#DC2626": { bg: "#FEF2F2", text: "#DC2626" },
+  "hsl(var(--primary))": { bg: "#EBF3FF", text: "hsl(var(--primary))" },
+  "hsl(var(--violet))": { bg: "#F0EBFF", text: "hsl(var(--violet))" },
+  "hsl(var(--success))": { bg: "#E8FAF3", text: "hsl(var(--success))" },
+  "hsl(var(--warning))": { bg: "#FEF5E7", text: "#B45D04" },
+  "hsl(var(--destructive))": { bg: "#FEF2F2", text: "hsl(var(--destructive))" },
   "#0891B2": { bg: "#ECFEFF", text: "#0891B2" },
   "#4F46E5": { bg: "#EEF2FF", text: "#4F46E5" },
   "#BE185D": { bg: "#FDF2F8", text: "#BE185D" },
@@ -28,9 +28,9 @@ export const POC_AVATAR_TINTS: Record<string, { bg: string; text: string }> = {
   "#CA8A04": { bg: "#FEFCE8", text: "#CA8A04" },
   // Vendor data bgColor values
   "#0ea5e9": { bg: "#F0F9FF", text: "#0284C7" },
-  "#8b5cf6": { bg: "#F5F3FF", text: "#7C3AED" },
-  "#f59e0b": { bg: "#FFFBEB", text: "#D97706" },
-  "#10b981": { bg: "#ECFDF5", text: "#059669" },
+  "#8b5cf6": { bg: "#F5F3FF", text: "hsl(var(--violet))" },
+  "#f59e0b": { bg: "#FFFBEB", text: "hsl(var(--warning))" },
+  "#10b981": { bg: "#ECFDF5", text: "hsl(var(--success))" },
   "#6366f1": { bg: "#EEF2FF", text: "#4F46E5" },
   "#ec4899": { bg: "#FDF2F8", text: "#DB2777" },
 };
@@ -50,9 +50,9 @@ export function PocQuickViewCard({ contact }: { contact: ContactPerson }) {
   const initials = getPocInitials(contact.name);
 
   return (
-    <div className="w-[280px] rounded-xl overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-[#E2E8F0]/60">
+    <div className="w-[280px] rounded-xl overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-border/60">
       {/* Dark gradient header */}
-      <div className="bg-gradient-to-br from-[#1E293B] to-[#334155] px-3.5 py-3 relative overflow-hidden">
+      <div className="bg-gradient-to-br from-slate-800 to-slate-700 px-3.5 py-3 relative overflow-hidden">
         <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-white/[0.04]" />
         <div className="flex items-center gap-2.5 relative">
           <div
@@ -65,7 +65,7 @@ export function PocQuickViewCard({ contact }: { contact: ContactPerson }) {
             <span className="text-white text-[13px] block truncate" style={{ fontWeight: 600 }}>
               {contact.name}
             </span>
-            <span className="text-[11px] text-[#94A3B8] block truncate">
+            <span className="text-[11px] text-slate-400 block truncate">
               {contact.department}
             </span>
           </div>
@@ -74,24 +74,24 @@ export function PocQuickViewCard({ contact }: { contact: ContactPerson }) {
       {/* Body */}
       <div className="bg-white px-3.5 py-3 space-y-2.5">
         {contact.company && (
-          <div className="flex items-center gap-2 text-[12px] text-[#475569]">
-            <Building2 className="w-3 h-3 text-[#94A3B8] shrink-0" />
+          <div className="flex items-center gap-2 text-[12px] text-muted-foreground">
+            <Building2 className="w-3 h-3 text-slate-400 shrink-0" />
             <span className="truncate">{contact.company}</span>
           </div>
         )}
         {contact.phone && (
-          <div className="flex items-center gap-2 text-[12px] text-[#475569]">
-            <Phone className="w-3 h-3 text-[#94A3B8] shrink-0" />
+          <div className="flex items-center gap-2 text-[12px] text-muted-foreground">
+            <Phone className="w-3 h-3 text-slate-400 shrink-0" />
             <span className="truncate">{contact.phone}{contact.phoneExt ? ` ext. ${contact.phoneExt}` : ""}</span>
           </div>
         )}
         {contact.email && (
-          <div className="flex items-center gap-2 text-[12px] text-[#475569]">
-            <Mail className="w-3 h-3 text-[#94A3B8] shrink-0" />
+          <div className="flex items-center gap-2 text-[12px] text-muted-foreground">
+            <Mail className="w-3 h-3 text-slate-400 shrink-0" />
             <span className="truncate">{contact.email}</span>
           </div>
         )}
-        <div className="flex items-center gap-3 pt-2 border-t border-[#F1F5F9]">
+        <div className="flex items-center gap-3 pt-2 border-t border-muted">
           <span
             className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px]"
             style={{ backgroundColor: dc.bg, color: dc.text, fontWeight: 600 }}
@@ -126,7 +126,7 @@ export function PocChipWithPopover({ contact }: { contact: ContactPerson }) {
       <PopoverTrigger
         onMouseEnter={handleEnter}
         onMouseLeave={handleLeave}
-        className="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg text-[11px] border border-[#E2E8F0] bg-[#F8FAFC] text-[#334155] hover:border-[#BFDBFE] hover:bg-[#EDF4FF] hover:shadow-[0_2px_8px_-2px_rgba(10,119,255,0.10)] transition-all duration-150 cursor-default shrink-0"
+        className="inline-flex items-center gap-1.5 px-2 py-1 rounded-lg text-[11px] border border-border bg-slate-50 text-slate-700 hover:border-blue-200 hover:bg-accent hover:shadow-[0_2px_8px_-2px_rgba(10,119,255,0.10)] transition-all duration-150 cursor-default shrink-0"
         style={{ fontWeight: 500 }}
       >
         <span
@@ -174,7 +174,7 @@ export function PocOverflowRow({ contact }: { contact: ContactPerson }) {
         onMouseEnter={handleEnter}
         onMouseLeave={handleLeave}
         className={`flex items-center gap-2.5 w-full px-3 py-[9px] text-left transition-colors duration-100 cursor-default ${
-          hovered ? "bg-[#EDF4FF]" : "hover:bg-[#F8FAFC]"
+          hovered ? "bg-accent" : "hover:bg-slate-50"
         }`}
       >
         <span
@@ -184,12 +184,12 @@ export function PocOverflowRow({ contact }: { contact: ContactPerson }) {
           {initials}
         </span>
         <span
-          className={`flex-1 text-[13px] truncate ${hovered ? "text-[#0A77FF]" : "text-[#0F172A]"}`}
+          className={`flex-1 text-[13px] truncate ${hovered ? "text-primary" : "text-foreground"}`}
           style={{ fontWeight: hovered ? 600 : 500 }}
         >
           {contact.name}
         </span>
-        <span className="text-[11px] text-[#94A3B8] shrink-0" style={{ fontWeight: 400 }}>
+        <span className="text-[11px] text-slate-400 shrink-0" style={{ fontWeight: 400 }}>
           {contact.department === "Supply Chain Management" ? "SCM" : contact.department}
         </span>
       </PopoverTrigger>
@@ -264,12 +264,12 @@ export function PocPillsRow({
   return (
     <div className="px-3 py-2.5">
       <div className="flex items-center justify-between mb-2">
-        <p className="text-[12px] text-[#0F172A]" style={{ fontWeight: 600 }}>
+        <p className="text-[12px] text-foreground" style={{ fontWeight: 600 }}>
           {contacts.length} Contact{contacts.length !== 1 ? "s" : ""} Assigned
         </p>
         <button
           onClick={onManage}
-          className="inline-flex items-center gap-1 px-2.5 py-[5px] rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] text-[11px] text-[#475569] hover:bg-white hover:border-[#CBD5E1] hover:shadow-sm transition-all duration-150 shrink-0 cursor-pointer"
+          className="inline-flex items-center gap-1 px-2.5 py-[5px] rounded-lg bg-slate-50 border border-border text-[11px] text-muted-foreground hover:bg-white hover:border-slate-300 hover:shadow-sm transition-all duration-150 shrink-0 cursor-pointer"
           style={{ fontWeight: 500 }}
         >
           <Users className="w-3 h-3" />
@@ -303,7 +303,7 @@ export function PocPillsRow({
         {overflowCount > 0 && (
           <Popover>
             <PopoverTrigger
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] border border-[#E2E8F0] bg-[#F8FAFC] text-[#64748B] hover:border-[#CBD5E1] hover:bg-[#F1F5F9] transition-all duration-150 cursor-default shrink-0"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] border border-border bg-slate-50 text-slate-500 hover:border-slate-300 hover:bg-muted transition-all duration-150 cursor-default shrink-0"
               style={{ fontWeight: 500 }}
             >
               +{overflowCount} more
@@ -316,11 +316,11 @@ export function PocPillsRow({
               onOpenAutoFocus={(e) => e.preventDefault()}
             >
               <div className="px-3 pt-3 pb-2">
-                <p className="text-[13px] text-[#64748B]" style={{ fontWeight: 500 }}>
+                <p className="text-[13px] text-slate-500" style={{ fontWeight: 500 }}>
                   +{overflowCount} more contact{overflowCount !== 1 ? "s" : ""}
                 </p>
               </div>
-              <div className="border-t border-[#F1F5F9]" />
+              <div className="border-t border-muted" />
               <div className="max-h-[320px] overflow-y-auto py-1">
                 {overflowContacts.map((c) => (
                   <PocOverflowRow key={c.id} contact={c} />

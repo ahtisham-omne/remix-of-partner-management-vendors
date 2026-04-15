@@ -2,10 +2,10 @@ import { Search, Filter, CreditCard, TrendingUp, TrendingDown, AlertTriangle } f
 
 export function CreditManagementPage() {
   const summaryCards = [
-    { label: "Total Credit Extended", value: "$2,450,000", change: "+12.5%", up: true, icon: CreditCard, color: "#0A77FF" },
+    { label: "Total Credit Extended", value: "$2,450,000", change: "+12.5%", up: true, icon: CreditCard, color: "hsl(var(--primary))" },
     { label: "Credit Utilization", value: "68.3%", change: "+3.2%", up: true, icon: TrendingUp, color: "#EA580C" },
     { label: "Outstanding Balance", value: "$1,673,500", change: "-5.1%", up: false, icon: TrendingDown, color: "#16A34A" },
-    { label: "Overdue Accounts", value: "4", change: "+2", up: true, icon: AlertTriangle, color: "#DC2626" },
+    { label: "Overdue Accounts", value: "4", change: "+2", up: true, icon: AlertTriangle, color: "hsl(var(--destructive))" },
   ];
 
   const partners = [
@@ -20,11 +20,11 @@ export function CreditManagementPage() {
   const statusColors: Record<string, { bg: string; text: string }> = {
     Good: { bg: "#F0FDF4", text: "#16A34A" },
     Warning: { bg: "#FFF7ED", text: "#EA580C" },
-    Critical: { bg: "#FEF2F2", text: "#DC2626" },
+    Critical: { bg: "#FEF2F2", text: "hsl(var(--destructive))" },
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#F8FAFC]">
+    <div className="flex flex-col h-full bg-slate-50">
       <div className="px-5 py-3.5 border-b border-border bg-card">
         <h1 className="text-foreground" style={{ fontSize: "20px", fontWeight: 600 }}>
           Credit Management
@@ -67,7 +67,7 @@ export function CreditManagementPage() {
             <input
               type="text"
               placeholder="Search partners..."
-              className="w-full pl-9 pr-4 py-2 rounded-lg border border-border bg-card text-[13px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#0A77FF]/20 focus:border-[#0A77FF]"
+              className="w-full pl-9 pr-4 py-2 rounded-lg border border-border bg-card text-[13px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
             />
           </div>
           <button className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-border text-[13px] text-muted-foreground hover:bg-muted transition-colors">
@@ -104,7 +104,7 @@ export function CreditManagementPage() {
                             className="h-full rounded-full"
                             style={{
                               width: `${partner.utilization}%`,
-                              backgroundColor: partner.utilization > 90 ? "#DC2626" : partner.utilization > 75 ? "#EA580C" : "#0A77FF",
+                              backgroundColor: partner.utilization > 90 ? "hsl(var(--destructive))" : partner.utilization > 75 ? "#EA580C" : "hsl(var(--primary))",
                             }}
                           />
                         </div>

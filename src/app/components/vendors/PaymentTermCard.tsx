@@ -77,10 +77,10 @@ function SplitTierDisplay({ term }: { term: PaymentTermPreset }) {
     <>
       {/* Hero value */}
       <div className="flex items-baseline gap-2 shrink-0">
-        <span className="text-[22px] text-[#0F172A] tabular-nums leading-none tracking-tight" style={{ fontWeight: 600 }}>
+        <span className="text-[22px] text-foreground tabular-nums leading-none tracking-tight" style={{ fontWeight: 600 }}>
           {splits.length}
         </span>
-        <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>
+        <span className="text-[11px] text-slate-400" style={{ fontWeight: 500 }}>
           {splits.length === 1 ? "split" : "splits"}
         </span>
       </div>
@@ -99,7 +99,7 @@ function SplitTierDisplay({ term }: { term: PaymentTermPreset }) {
                 className={`h-[22px] rounded-md text-[10px] tabular-nums transition-all duration-200 cursor-pointer flex items-center justify-center px-2 ${
                   isActive
                     ? "shadow-sm"
-                    : "bg-[#F1F5F9] text-[#64748B] hover:bg-[#E2E8F0]"
+                    : "bg-muted text-slate-500 hover:bg-border"
                 }`}
                 style={{
                   fontWeight: isActive ? 600 : 500,
@@ -119,8 +119,8 @@ function SplitTierDisplay({ term }: { term: PaymentTermPreset }) {
         {/* Split detail row */}
         {shown && (
           <div className="flex items-center justify-between px-3 py-[6px] rounded-lg border border-[#E8ECF1] bg-[#FAFBFC] text-[11px] tabular-nums min-w-0">
-            <span className="text-[#64748B] capitalize truncate" style={{ fontWeight: 400 }}>{shown.label}</span>
-            <span className="shrink-0 ml-2 text-[#0F172A]" style={{ fontWeight: 600 }}>{shown.pct}%</span>
+            <span className="text-slate-500 capitalize truncate" style={{ fontWeight: 400 }}>{shown.label}</span>
+            <span className="shrink-0 ml-2 text-foreground" style={{ fontWeight: 600 }}>{shown.pct}%</span>
           </div>
         )}
       </div>
@@ -150,13 +150,13 @@ export function PaymentTermCard({
       onClick={onClick}
       className={`bg-white border rounded-xl cursor-pointer group transition-all duration-200 flex flex-col relative ${
         isSelected
-          ? "border-[#0A77FF]/25 shadow-[0_2px_12px_rgba(10,119,255,0.10)]"
-          : "border-[#E8ECF1] shadow-[0_1px_3px_rgba(0,0,0,0.03)] hover:border-[#BFDBFE] hover:shadow-[0_4px_16px_-4px_rgba(10,119,255,0.10)]"
+          ? "border-primary/25 shadow-[0_2px_12px_rgba(10,119,255,0.10)]"
+          : "border-[#E8ECF1] shadow-[0_1px_3px_rgba(0,0,0,0.03)] hover:border-blue-200 hover:shadow-[0_4px_16px_-4px_rgba(10,119,255,0.10)]"
       }`}
     >
       {/* Selected checkmark */}
       {isSelected && (
-        <div className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-[#0A77FF] flex items-center justify-center z-10 shadow-sm">
+        <div className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-primary flex items-center justify-center z-10 shadow-sm">
           <Check className="w-3 h-3 text-white" />
         </div>
       )}
@@ -182,15 +182,15 @@ export function PaymentTermCard({
               <Receipt className="w-3 h-3" />
               {term.typeBadge}
             </span>
-            <span className="inline-flex items-center px-2 py-[2px] text-[10px] bg-white text-[#64748B] border-l" style={{ fontWeight: 500, borderColor: badgeColor + "40" }}>
+            <span className="inline-flex items-center px-2 py-[2px] text-[10px] bg-white text-slate-500 border-l" style={{ fontWeight: 500, borderColor: badgeColor + "40" }}>
               {term.trigger}
             </span>
           </span>
           {showPresetBadge && (
             <span className={`inline-flex items-center gap-1 px-1.5 py-[3px] rounded-md border text-[9px] shrink-0 ${
               isCustom
-                ? "border-[#CBD5E1] bg-white text-[#475569]"
-                : "bg-[#F1F5F9] border-[#CBD5E1] text-[#64748B]"
+                ? "border-slate-300 bg-white text-muted-foreground"
+                : "bg-muted border-slate-300 text-slate-500"
             }`} style={{ fontWeight: 600 }}>
               {isCustom ? "CUSTOM" : <><Lock className="w-2.5 h-2.5" /> TEMPLATE</>}
             </span>
@@ -200,24 +200,24 @@ export function PaymentTermCard({
             <div className="flex items-center gap-0.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <button onClick={() => onDuplicate?.(term)} className="p-1.5 rounded-md hover:bg-[#F1F5F9] transition-colors cursor-pointer">
-                    <Copy className="w-3.5 h-3.5 text-[#94A3B8] hover:text-[#475569]" />
+                  <button onClick={() => onDuplicate?.(term)} className="p-1.5 rounded-md hover:bg-muted transition-colors cursor-pointer">
+                    <Copy className="w-3.5 h-3.5 text-slate-400 hover:text-muted-foreground" />
                   </button>
                 </TooltipTrigger>
                 <TooltipContent className="z-[300]"><p className="text-xs">Duplicate</p></TooltipContent>
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <button onClick={() => toast.info("Edit flow coming soon.")} className="p-1.5 rounded-md hover:bg-[#F1F5F9] transition-colors cursor-pointer">
-                    <Pencil className="w-3.5 h-3.5 text-[#94A3B8] hover:text-[#475569]" />
+                  <button onClick={() => toast.info("Edit flow coming soon.")} className="p-1.5 rounded-md hover:bg-muted transition-colors cursor-pointer">
+                    <Pencil className="w-3.5 h-3.5 text-slate-400 hover:text-muted-foreground" />
                   </button>
                 </TooltipTrigger>
                 <TooltipContent className="z-[300]"><p className="text-xs">Edit</p></TooltipContent>
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <button onClick={() => onView(term)} className="p-1.5 rounded-md hover:bg-[#F1F5F9] transition-colors cursor-pointer">
-                    <Eye className="w-3.5 h-3.5 text-[#94A3B8] hover:text-[#475569]" />
+                  <button onClick={() => onView(term)} className="p-1.5 rounded-md hover:bg-muted transition-colors cursor-pointer">
+                    <Eye className="w-3.5 h-3.5 text-slate-400 hover:text-muted-foreground" />
                   </button>
                 </TooltipTrigger>
                 <TooltipContent className="z-[300]"><p className="text-xs">View Details</p></TooltipContent>
@@ -228,12 +228,12 @@ export function PaymentTermCard({
 
         {/* Row 2: Name */}
         <div className="shrink-0 mb-1">
-          <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{highlightMatch(term.name, searchText)}</p>
+          <p className="text-[13px] text-foreground truncate" style={{ fontWeight: 600 }}>{highlightMatch(term.name, searchText)}</p>
         </div>
 
         {/* Row 3: Description */}
         <div className="h-[32px] shrink-0 mb-2">
-          <p className="text-[11px] text-[#64748B] line-clamp-2 leading-relaxed" style={{ fontWeight: 400 }}>{highlightMatch(term.description, searchText)}</p>
+          <p className="text-[11px] text-slate-500 line-clamp-2 leading-relaxed" style={{ fontWeight: 400 }}>{highlightMatch(term.description, searchText)}</p>
         </div>
 
         {/* Row 4: Hero value + split tier selector */}
@@ -242,12 +242,12 @@ export function PaymentTermCard({
         ) : (
           <div className="flex items-baseline justify-between shrink-0">
             <div className="flex items-baseline gap-2">
-              <span className="text-[22px] text-[#0F172A] tabular-nums leading-none tracking-tight" style={{ fontWeight: 600 }}>
+              <span className="text-[22px] text-foreground tabular-nums leading-none tracking-tight" style={{ fontWeight: 600 }}>
                 {ptDays}
               </span>
-              <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>days</span>
+              <span className="text-[11px] text-slate-400" style={{ fontWeight: 500 }}>days</span>
             </div>
-            <span className="inline-flex items-center gap-1 text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>
+            <span className="inline-flex items-center gap-1 text-[10px] text-slate-400" style={{ fontWeight: 500 }}>
               <Building2 className="w-3 h-3" /> {term.vendorsApplied} in use
             </span>
           </div>
@@ -257,7 +257,7 @@ export function PaymentTermCard({
         {(term.applyDiscount || term.discountPercent) && (
           <div className="pt-1.5 shrink-0">
             <div className="flex items-center px-2.5 py-[5px] rounded-lg border border-[#E8ECF1] bg-[#FAFBFC] text-[11px] tabular-nums">
-              <span className="text-[#64748B]" style={{ fontWeight: 400 }}>
+              <span className="text-slate-500" style={{ fontWeight: 400 }}>
                 Early pay {(term.discountMode ?? "percent") === "fixed" ? "$" : ""}{term.discountPercent || "2"}{(term.discountMode ?? "percent") === "percent" ? "%" : ""} within {term.discountPeriod || "10"} days
               </span>
             </div>
@@ -267,11 +267,11 @@ export function PaymentTermCard({
 
       {/* Footer — full-width 2-col CTAs */}
       {showFooter && (
-        <div className="grid grid-cols-2 border-t border-[#F1F5F9] shrink-0">
+        <div className="grid grid-cols-2 border-t border-muted shrink-0">
           {onApply && (
             <button
               onClick={(e) => { e.stopPropagation(); onApply(term); }}
-              className="inline-flex items-center justify-center gap-1 py-2 text-[11px] text-[#64748B] hover:text-[#0A77FF] hover:bg-[#F8FAFC] transition-colors border-r border-[#F1F5F9]"
+              className="inline-flex items-center justify-center gap-1 py-2 text-[11px] text-slate-500 hover:text-primary hover:bg-slate-50 transition-colors border-r border-muted"
               style={{ fontWeight: 500 }}
             >
               <Check className="w-3 h-3" /> Apply
@@ -280,7 +280,7 @@ export function PaymentTermCard({
           {onDuplicate && (
             <button
               onClick={(e) => { e.stopPropagation(); onDuplicate(term); }}
-              className="inline-flex items-center justify-center gap-1 py-2 text-[11px] text-[#64748B] hover:text-[#0A77FF] hover:bg-[#F8FAFC] transition-colors"
+              className="inline-flex items-center justify-center gap-1 py-2 text-[11px] text-slate-500 hover:text-primary hover:bg-slate-50 transition-colors"
               style={{ fontWeight: 500 }}
             >
               <Copy className="w-3 h-3" /> Duplicate

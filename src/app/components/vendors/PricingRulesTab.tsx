@@ -253,11 +253,11 @@ const CAT_DESCRIPTIONS = [
 const CAT_TAG_POOL = ["Electronics", "Engine", "Brake", "Transmission", "Safety", "Performance", "Exhaust", "Wiring", "Sensors", "Controls", "HVAC", "Fuel", "Lighting", "Suspension", "Interior", "Exterior"];
 const CAT_STATUSES: ("Active" | "Inactive")[] = ["Active", "Active", "Active", "Active", "Active", "Active", "Active", "Inactive", "Inactive", "Active"];
 const CAT_CREATOR_POOL = [
-  { initials: "AA", name: "Ahtisham Ahmad", color: "#0A77FF" },
-  { initials: "SJ", name: "Sarah Johnson", color: "#7C3AED" },
-  { initials: "DK", name: "David Kim", color: "#D97706" },
-  { initials: "EC", name: "Emily Chen", color: "#059669" },
-  { initials: "MO", name: "Marcus Obi", color: "#DC2626" },
+  { initials: "AA", name: "Ahtisham Ahmad", color: "hsl(var(--primary))" },
+  { initials: "SJ", name: "Sarah Johnson", color: "hsl(var(--violet))" },
+  { initials: "DK", name: "David Kim", color: "hsl(var(--warning))" },
+  { initials: "EC", name: "Emily Chen", color: "hsl(var(--success))" },
+  { initials: "MO", name: "Marcus Obi", color: "hsl(var(--destructive))" },
   { initials: "EV", name: "Elena Volkov", color: "#0891B2" },
 ];
 const CAT_LINKED_CODES = ["HXB-M10-40", "BRK-PAD-22", "ENG-VLV-16", "WIR-HAR-08", "SUS-ARM-12", "TRN-GR-05", "FUL-INJ-09", "LGT-LED-14", "HVC-CMP-03", "EXT-PNL-07"];
@@ -685,13 +685,13 @@ function PricingRuleCard({ rule, onClick }: { rule: PricingRule; onClick: () => 
   return (
     <div
       onClick={onClick}
-      className="bg-white border border-[#E2E8F0] rounded-xl cursor-pointer group transition-all duration-200 flex flex-col relative h-[260px]"
+      className="bg-white border border-border rounded-xl cursor-pointer group transition-all duration-200 flex flex-col relative h-[260px]"
       onMouseEnter={(e) => {
         e.currentTarget.style.borderColor = "#BFDBFE";
         e.currentTarget.style.boxShadow = "0 4px 16px -4px rgba(10,119,255,0.10), 0 0 0 1px #BFDBFE";
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.borderColor = "#E2E8F0";
+        e.currentTarget.style.borderColor = "hsl(var(--border))";
         e.currentTarget.style.boxShadow = "none";
       }}
     >
@@ -706,7 +706,7 @@ function PricingRuleCard({ rule, onClick }: { rule: PricingRule; onClick: () => 
               {isDis ? <TrendingDown className="w-3 h-3" /> : <TrendingUp className="w-3 h-3" />}
               {isDis ? "Discount" : "Premium"}
             </span>
-            <span className="inline-flex items-center px-2 py-[2px] text-[10px] bg-white text-[#64748B] border-l" style={{ fontWeight: 500, borderColor: pill.border }}>
+            <span className="inline-flex items-center px-2 py-[2px] text-[10px] bg-white text-slate-500 border-l" style={{ fontWeight: 500, borderColor: pill.border }}>
               {rule.basis === "volume" ? "Volume" : "Value"}
             </span>
           </span>
@@ -714,46 +714,46 @@ function PricingRuleCard({ rule, onClick }: { rule: PricingRule; onClick: () => 
             {isPreset ? (
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <span className="inline-flex items-center gap-1 px-1.5 py-[3px] rounded-md bg-[#F1F5F9] border border-[#CBD5E1] text-[9px] text-[#64748B]" style={{ fontWeight: 600 }}>
+                  <span className="inline-flex items-center gap-1 px-1.5 py-[3px] rounded-md bg-muted border border-slate-300 text-[9px] text-slate-500" style={{ fontWeight: 600 }}>
                     <Lock className="w-2.5 h-2.5" /> TEMPLATE
                   </span>
                 </TooltipTrigger>
-                <TooltipContent side="top" sideOffset={6} className="z-[300] !bg-white !text-[#334155] !border !border-[#E2E8F0] !shadow-sm rounded-lg text-[11px] px-2.5 py-1.5 max-w-[220px]" style={{ fontWeight: 500 }}>
+                <TooltipContent side="top" sideOffset={6} className="z-[300] !bg-white !text-slate-700 !border !border-border !shadow-sm rounded-lg text-[11px] px-2.5 py-1.5 max-w-[220px]" style={{ fontWeight: 500 }}>
                   System preset — tiers & config are locked. You can assign items, categories, and partners.
                 </TooltipContent>
               </Tooltip>
             ) : (
-              <span className="inline-flex items-center px-1.5 py-[3px] rounded-md border border-[#CBD5E1] bg-white text-[9px] text-[#475569]" style={{ fontWeight: 600 }}>CUSTOM</span>
+              <span className="inline-flex items-center px-1.5 py-[3px] rounded-md border border-slate-300 bg-white text-[9px] text-muted-foreground" style={{ fontWeight: 600 }}>CUSTOM</span>
             )}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button
                   onClick={(e) => e.stopPropagation()}
-                  className="w-6 h-6 rounded-md flex items-center justify-center text-[#CBD5E1] group-hover:text-[#94A3B8] hover:!text-[#475569] hover:bg-[#F1F5F9] transition-all cursor-pointer opacity-0 group-hover:opacity-100"
+                  className="w-6 h-6 rounded-md flex items-center justify-center text-slate-300 group-hover:text-slate-400 hover:!text-muted-foreground hover:bg-muted transition-all cursor-pointer opacity-0 group-hover:opacity-100"
                 >
                   <MoreVertical className="w-3.5 h-3.5" />
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-[180px] p-1 z-[200]">
                 <DropdownMenuItem className="gap-2 py-1.5 cursor-pointer text-[13px]" onSelect={onClick}>
-                  <Eye className="w-3.5 h-3.5 text-[#64748B]" /> View Details
+                  <Eye className="w-3.5 h-3.5 text-slate-500" /> View Details
                 </DropdownMenuItem>
                 {!isPreset && (
                   <DropdownMenuItem className="gap-2 py-1.5 cursor-pointer text-[13px]" onSelect={() => toast.info("Edit coming soon")}>
-                    <Pencil className="w-3.5 h-3.5 text-[#64748B]" /> Edit Rule
+                    <Pencil className="w-3.5 h-3.5 text-slate-500" /> Edit Rule
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuItem className="gap-2 py-1.5 cursor-pointer text-[13px]" onSelect={() => toast.info("Duplicate coming soon")}>
-                  <Copy className="w-3.5 h-3.5 text-[#64748B]" /> Duplicate as Custom
+                  <Copy className="w-3.5 h-3.5 text-slate-500" /> Duplicate as Custom
                 </DropdownMenuItem>
                 <DropdownMenuItem className="gap-2 py-1.5 cursor-pointer text-[13px]" onSelect={() => toast.info("Toggle coming soon")}>
-                  <CircleSlash className="w-3.5 h-3.5 text-[#64748B]" /> {rule.status === "Active" ? "Deactivate" : "Activate"}
+                  <CircleSlash className="w-3.5 h-3.5 text-slate-500" /> {rule.status === "Active" ? "Deactivate" : "Activate"}
                 </DropdownMenuItem>
                 {!isPreset && (
                   <>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem className="gap-2 py-1.5 cursor-pointer text-[13px] text-[#DC2626] focus:text-[#DC2626] focus:bg-[#FEF2F2]" onSelect={() => toast.info("Archive coming soon")}>
-                      <Archive className="w-3.5 h-3.5 text-[#DC2626]" /> Archive
+                    <DropdownMenuItem className="gap-2 py-1.5 cursor-pointer text-[13px] text-destructive focus:text-destructive focus:bg-red-50" onSelect={() => toast.info("Archive coming soon")}>
+                      <Archive className="w-3.5 h-3.5 text-destructive" /> Archive
                     </DropdownMenuItem>
                   </>
                 )}
@@ -764,28 +764,28 @@ function PricingRuleCard({ rule, onClick }: { rule: PricingRule; onClick: () => 
 
         {/* Row 2: Name */}
         <div className="shrink-0 mb-1">
-          <p className="text-[13px] text-[#334155] truncate" style={{ fontWeight: 600 }}>{rule.name}</p>
+          <p className="text-[13px] text-slate-700 truncate" style={{ fontWeight: 600 }}>{rule.name}</p>
         </div>
 
         {/* Row 3: Description — fixed 2-line height */}
         <div className="h-[32px] shrink-0 mb-2">
-          <p className="text-[11px] text-[#64748B] line-clamp-2 leading-relaxed" style={{ fontWeight: 400 }}>{rule.description}</p>
+          <p className="text-[11px] text-slate-500 line-clamp-2 leading-relaxed" style={{ fontWeight: 400 }}>{rule.description}</p>
         </div>
 
         {/* Row 4: Hero value */}
         <div className="flex items-baseline gap-2 shrink-0">
-          <span className="text-[22px] text-[#334155] tabular-nums leading-none tracking-tight" style={{ fontWeight: 600 }}>
+          <span className="text-[22px] text-slate-700 tabular-nums leading-none tracking-tight" style={{ fontWeight: 600 }}>
             {t0?.discount ?? "—"}
           </span>
-          <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>
+          <span className="text-[11px] text-slate-400" style={{ fontWeight: 500 }}>
             {isDis ? "off" : "markup"}
           </span>
           {rule.warningText && (
             <Tooltip>
               <TooltipTrigger asChild>
-                <span className="ml-auto"><AlertTriangle className="w-3.5 h-3.5 text-[#D97706]" /></span>
+                <span className="ml-auto"><AlertTriangle className="w-3.5 h-3.5 text-warning" /></span>
               </TooltipTrigger>
-              <TooltipContent side="top" sideOffset={6} className="z-[300] !bg-white !text-[#92400E] !border !border-[#FDE68A] !shadow-sm rounded-lg text-[11px] px-2.5 py-1.5 max-w-[220px]" style={{ fontWeight: 500 }}>
+              <TooltipContent side="top" sideOffset={6} className="z-[300] !bg-white !text-amber-800 !border !border-amber-200 !shadow-sm rounded-lg text-[11px] px-2.5 py-1.5 max-w-[220px]" style={{ fontWeight: 500 }}>
                 {rule.warningText}
               </TooltipContent>
             </Tooltip>
@@ -805,7 +805,7 @@ function PricingRuleCard({ rule, onClick }: { rule: PricingRule; onClick: () => 
                   className={`h-[22px] rounded-md text-[10px] tabular-nums transition-all duration-200 cursor-pointer flex items-center justify-center px-2 ${
                     isActive
                       ? "shadow-sm"
-                      : "bg-[#F1F5F9] text-[#64748B] hover:bg-[#E2E8F0]"
+                      : "bg-muted text-slate-500 hover:bg-border"
                   }`}
                   style={{
                     fontWeight: isActive ? 600 : 500,
@@ -824,34 +824,34 @@ function PricingRuleCard({ rule, onClick }: { rule: PricingRule; onClick: () => 
           </div>
           {/* Tier detail row */}
           <div className="flex items-center justify-between px-3 py-[6px] rounded-lg border border-[#E8ECF1] bg-[#FAFBFC] text-[11px] tabular-nums min-w-0">
-            <div className="flex items-center gap-1.5 text-[#64748B] min-w-0">
+            <div className="flex items-center gap-1.5 text-slate-500 min-w-0">
               <span style={{ fontWeight: 400 }}>{shownTier?.minQty}</span>
-              <span className="text-[#CBD5E1]">–</span>
+              <span className="text-slate-300">–</span>
               <span style={{ fontWeight: 400 }}>{shownTier?.maxQty}</span>
             </div>
-            <span className="shrink-0 ml-2 text-[#334155]" style={{ fontWeight: 600 }}>{shownTier?.discount}</span>
+            <span className="shrink-0 ml-2 text-slate-700" style={{ fontWeight: 600 }}>{shownTier?.discount}</span>
           </div>
         </div>
       </div>
 
       {/* Footer — pinned to bottom */}
-      <div className="flex items-center gap-2 px-3.5 py-2.5 border-t border-[#F1F5F9] shrink-0">
-        <span className="inline-flex items-center gap-1 text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>
+      <div className="flex items-center gap-2 px-3.5 py-2.5 border-t border-muted shrink-0">
+        <span className="inline-flex items-center gap-1 text-[10px] text-slate-400" style={{ fontWeight: 500 }}>
           <Package className="w-3 h-3" /> {rule.itemCount}
         </span>
         <span className="w-px h-3 bg-[#E8ECF1]" />
-        <span className="inline-flex items-center gap-1 text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>
+        <span className="inline-flex items-center gap-1 text-[10px] text-slate-400" style={{ fontWeight: 500 }}>
           <Layers className="w-3 h-3" /> {rule.categoryCount}
         </span>
         <span className="w-px h-3 bg-[#E8ECF1]" />
-        <span className="inline-flex items-center gap-1 text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>
+        <span className="inline-flex items-center gap-1 text-[10px] text-slate-400" style={{ fontWeight: 500 }}>
           <Users className="w-3 h-3" /> {rule.partnerCount}
         </span>
         <span
           className="ml-auto px-2 py-[2px] rounded-full text-[10px] border"
           style={{
             fontWeight: 500,
-            color: rule.status === "Active" ? "#059669" : "#D97706",
+            color: rule.status === "Active" ? "hsl(var(--success))" : "hsl(var(--warning))",
             backgroundColor: rule.status === "Active" ? "#F0FDF4" : "#FFFBEB",
             borderColor: rule.status === "Active" ? "#BBF7D0" : "#FDE68A",
           }}
@@ -886,16 +886,16 @@ const PR_DUMMY_ITEMS = [
 ];
 
 const PR_DUMMY_CATEGORIES = [
-  { id: "c1", name: "Fasteners", count: 245, color: "#0A77FF" },
-  { id: "c2", name: "Brake Components", count: 89, color: "#7C3AED" },
-  { id: "c3", name: "Engine Parts", count: 167, color: "#059669" },
-  { id: "c4", name: "Electrical", count: 112, color: "#D97706" },
+  { id: "c1", name: "Fasteners", count: 245, color: "hsl(var(--primary))" },
+  { id: "c2", name: "Brake Components", count: 89, color: "hsl(var(--violet))" },
+  { id: "c3", name: "Engine Parts", count: 167, color: "hsl(var(--success))" },
+  { id: "c4", name: "Electrical", count: 112, color: "hsl(var(--warning))" },
 ];
 
 const PR_DUMMY_NOTES = [
-  { id: "n1", author: "Sarah Johnson", initials: "SJ", color: "#0A77FF", date: "Mar 28, 2026", text: "Pricing rule approved for Q2. Applies to all fastener categories." },
-  { id: "n2", author: "David Kim", initials: "DK", color: "#D97706", date: "Mar 22, 2026", text: "Increased discount from 10% to 15% for orders over 500 units per vendor request." },
-  { id: "n3", author: "Emily Chen", initials: "EC", color: "#059669", date: "Mar 18, 2026", text: "Added quantity limit tiers based on supplier feedback." },
+  { id: "n1", author: "Sarah Johnson", initials: "SJ", color: "hsl(var(--primary))", date: "Mar 28, 2026", text: "Pricing rule approved for Q2. Applies to all fastener categories." },
+  { id: "n2", author: "David Kim", initials: "DK", color: "hsl(var(--warning))", date: "Mar 22, 2026", text: "Increased discount from 10% to 15% for orders over 500 units per vendor request." },
+  { id: "n3", author: "Emily Chen", initials: "EC", color: "hsl(var(--success))", date: "Mar 18, 2026", text: "Added quantity limit tiers based on supplier feedback." },
 ];
 
 const PR_DUMMY_ATTACHMENTS = [
@@ -913,20 +913,20 @@ const PR_DUMMY_ACTIVITY = [
 ];
 
 const PARTNER_TYPE_COLORS: Record<string, { bg: string; text: string; border: string }> = {
-  "Vendor": { bg: "#EFF6FF", text: "#0A77FF", border: "#BFDBFE" },
-  "Seller": { bg: "#EFF6FF", text: "#0A77FF", border: "#BFDBFE" },
-  "Sub-Contractor": { bg: "#F5F3FF", text: "#7C3AED", border: "#DDD6FE" },
-  "Service Provider": { bg: "#ECFDF5", text: "#059669", border: "#A7F3D0" },
-  "Customer": { bg: "#FEF3C7", text: "#D97706", border: "#FDE68A" },
+  "Vendor": { bg: "#EFF6FF", text: "hsl(var(--primary))", border: "#BFDBFE" },
+  "Seller": { bg: "#EFF6FF", text: "hsl(var(--primary))", border: "#BFDBFE" },
+  "Sub-Contractor": { bg: "#F5F3FF", text: "hsl(var(--violet))", border: "#DDD6FE" },
+  "Service Provider": { bg: "#ECFDF5", text: "hsl(var(--success))", border: "#A7F3D0" },
+  "Customer": { bg: "#FEF3C7", text: "hsl(var(--warning))", border: "#FDE68A" },
   "Carrier": { bg: "#FFF1F2", text: "#E11D48", border: "#FECDD3" },
 };
 
 function ItemTypeBadge({ type }: { type: string }) {
   const colors: Record<string, { bg: string; text: string; border: string }> = {
-    "Parts": { bg: "#EFF6FF", text: "#0A77FF", border: "#BFDBFE" },
-    "Equipment + Capital": { bg: "#ECFDF5", text: "#059669", border: "#A7F3D0" },
-    "Equipment + Non-Capital": { bg: "#F5F3FF", text: "#7C3AED", border: "#DDD6FE" },
-    "Miscellaneous": { bg: "#FFFBEB", text: "#D97706", border: "#FDE68A" },
+    "Parts": { bg: "#EFF6FF", text: "hsl(var(--primary))", border: "#BFDBFE" },
+    "Equipment + Capital": { bg: "#ECFDF5", text: "hsl(var(--success))", border: "#A7F3D0" },
+    "Equipment + Non-Capital": { bg: "#F5F3FF", text: "hsl(var(--violet))", border: "#DDD6FE" },
+    "Miscellaneous": { bg: "#FFFBEB", text: "hsl(var(--warning))", border: "#FDE68A" },
   };
   const c = colors[type] || colors["Parts"];
   return (
@@ -1130,20 +1130,20 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
         <DialogDescription className="sr-only">Detailed view of pricing rule {rule.name}</DialogDescription>
 
         {/* ─── Header ─── */}
-        <div className="shrink-0 bg-white rounded-t-none sm:rounded-t-2xl border-b border-[#E2E8F0]">
+        <div className="shrink-0 bg-white rounded-t-none sm:rounded-t-2xl border-b border-border">
           <div className="px-4 sm:px-5 py-3 flex items-center justify-between gap-3">
             <div className="flex items-center gap-3 min-w-0">
-              <button onClick={onClose} className="w-8 h-8 rounded-lg border border-[#E2E8F0] bg-white flex items-center justify-center hover:bg-[#F8FAFC] transition-colors cursor-pointer shrink-0">
-                <ArrowLeft className="w-3.5 h-3.5 text-[#334155]" />
+              <button onClick={onClose} className="w-8 h-8 rounded-lg border border-border bg-white flex items-center justify-center hover:bg-slate-50 transition-colors cursor-pointer shrink-0">
+                <ArrowLeft className="w-3.5 h-3.5 text-slate-700" />
               </button>
-              <h2 className="text-sm text-[#0F172A] truncate" style={{ fontWeight: 600 }}>Pricing Rule Details</h2>
+              <h2 className="text-sm text-foreground truncate" style={{ fontWeight: 600 }}>Pricing Rule Details</h2>
             </div>
             <div className="flex items-center gap-1.5 shrink-0">
               {/* Edit — disabled for presets */}
               <button
                 onClick={() => { if (!isPreset && onEdit && rule) { onEdit(rule); onClose(); } }}
                 disabled={isPreset}
-                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#334155] hover:bg-[#F8FAFC] transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white"
+                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border bg-white text-xs text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white"
                 style={{ fontWeight: 500 }}
               >
                 <Pencil className="w-3.5 h-3.5" /> Edit
@@ -1151,22 +1151,22 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
               <button
                 onClick={() => !isPreset && setArchiveConfirmOpen(true)}
                 disabled={isPreset}
-                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#FECACA] bg-[#FEF2F2] text-xs text-[#DC2626] hover:bg-[#FEE2E2] hover:border-[#FCA5A5] transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#FEF2F2]"
+                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-red-200 bg-red-50 text-xs text-destructive hover:bg-red-100 hover:border-[#FCA5A5] transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-red-50"
                 style={{ fontWeight: 500 }}
               >
                 <Archive className="w-3.5 h-3.5" /> Archive
               </button>
               <button
                 onClick={() => setDisableConfirmOpen(true)}
-                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#FDE68A] bg-[#FFFBEB] text-xs text-[#92400E] hover:bg-[#FEF3C7] hover:border-[#FCD34D] transition-colors cursor-pointer"
+                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-amber-200 bg-amber-50 text-xs text-amber-800 hover:bg-[#FEF3C7] hover:border-[#FCD34D] transition-colors cursor-pointer"
                 style={{ fontWeight: 500 }}
               >
                 <CircleSlash className="w-3.5 h-3.5" /> Disable
               </button>
-              <button onClick={() => setIsFullscreen(!isFullscreen)} className="w-8 h-8 rounded-lg border border-[#E2E8F0] bg-white flex items-center justify-center text-[#64748B] hover:text-[#334155] hover:bg-[#F8FAFC] transition-all cursor-pointer">
+              <button onClick={() => setIsFullscreen(!isFullscreen)} className="w-8 h-8 rounded-lg border border-border bg-white flex items-center justify-center text-slate-500 hover:text-slate-700 hover:bg-slate-50 transition-all cursor-pointer">
                 {isFullscreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
               </button>
-              <button onClick={() => { onClose(); setIsFullscreen(false); setTab("items"); }} className="w-8 h-8 rounded-lg flex items-center justify-center text-[#64748B] hover:text-[#334155] hover:bg-[#F8FAFC] transition-all cursor-pointer">
+              <button onClick={() => { onClose(); setIsFullscreen(false); setTab("items"); }} className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-500 hover:text-slate-700 hover:bg-slate-50 transition-all cursor-pointer">
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -1177,9 +1177,9 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
         <div className="flex flex-1 overflow-hidden min-h-0">
 
           {/* ─── LEFT: TABS + DATA ─── */}
-          <div className="flex-1 flex flex-col overflow-hidden bg-[#F8FAFC]">
+          <div className="flex-1 flex flex-col overflow-hidden bg-slate-50">
             {/* Tabs */}
-            <div className="flex items-center border-b border-[#E2E8F0] shrink-0 px-1 bg-white">
+            <div className="flex items-center border-b border-border shrink-0 px-1 bg-white">
               {PR_DETAIL_TABS.map((t) => {
                 const active = tab === t.id;
                 const TabIcon = t.icon;
@@ -1188,13 +1188,13 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
                     key={t.id}
                     onClick={() => setTab(t.id)}
                     className={`inline-flex items-center gap-1.5 px-4 py-3 text-xs border-b-2 transition-all cursor-pointer whitespace-nowrap ${
-                      active ? "border-[#0A77FF] text-[#0A77FF] font-semibold" : "border-transparent text-[#64748B] hover:text-[#334155] font-medium"
+                      active ? "border-primary text-primary font-semibold" : "border-transparent text-slate-500 hover:text-slate-700 font-medium"
                     }`}
                   >
                     <TabIcon className="w-3.5 h-3.5" />
                     {t.label}
                     {t.count > 0 && (
-                      <span className={`text-[9px] rounded-full px-1.5 py-0.5 min-w-[18px] text-center ${active ? "bg-[#EDF4FF] text-[#0A77FF]" : "bg-[#F1F5F9] text-[#64748B]"}`} style={{ fontWeight: 600 }}>
+                      <span className={`text-[9px] rounded-full px-1.5 py-0.5 min-w-[18px] text-center ${active ? "bg-accent text-primary" : "bg-muted text-slate-500"}`} style={{ fontWeight: 600 }}>
                         {t.count}
                       </span>
                     )}
@@ -1247,7 +1247,7 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
                   <div className="flex items-center gap-2.5 flex-1 min-w-0">
                     <div className="relative flex-1 max-w-xs">
                       <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70 pointer-events-none" />
-                      <input type="text" value={catSearch} onChange={(e) => setCatSearch(e.target.value)} placeholder="Search categories..." className="w-full pl-9 pr-8 h-9 text-sm bg-white border border-border/80 rounded-lg shadow-sm focus:outline-none focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 transition-colors placeholder:text-muted-foreground/50" />
+                      <input type="text" value={catSearch} onChange={(e) => setCatSearch(e.target.value)} placeholder="Search categories..." className="w-full pl-9 pr-8 h-9 text-sm bg-white border border-border/80 rounded-lg shadow-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-colors placeholder:text-muted-foreground/50" />
                       {catSearch && (
                         <button onClick={() => setCatSearch("")} className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded-full hover:bg-muted/60 text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
                           <X className="w-3.5 h-3.5" />
@@ -1265,7 +1265,7 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
                       <span className="text-muted-foreground/70"> categories</span>
                     </span>
                     <div className="w-px h-5 bg-border/60 mx-0.5 hidden sm:block" />
-                    <button onClick={() => { setCatModalOpen(true); setCatModalView("browse"); setCatModalSearch(""); setCatModalAddedSearch(""); setCatModalSelectedIds(new Set()); setCatModalAddedSelectedIds(new Set()); }} className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-sm shadow-sm transition-colors cursor-pointer" style={{ fontWeight: 600 }}>
+                    <button onClick={() => { setCatModalOpen(true); setCatModalView("browse"); setCatModalSearch(""); setCatModalAddedSearch(""); setCatModalSelectedIds(new Set()); setCatModalAddedSelectedIds(new Set()); }} className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg bg-primary hover:bg-[#0862D0] text-white text-sm shadow-sm transition-colors cursor-pointer" style={{ fontWeight: 600 }}>
                       <Plus className="w-3.5 h-3.5" /> Add Category
                     </button>
                   </div>
@@ -1280,13 +1280,13 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
                         key={f}
                         className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                           f === "all"
-                            ? "border-primary bg-[#EDF4FF] hover:bg-[#D6E8FF] active:bg-[#ADD1FF]"
+                            ? "border-primary bg-accent hover:bg-[#D6E8FF] active:bg-[#ADD1FF]"
                             : "border-border text-muted-foreground hover:bg-muted/60 hover:text-foreground hover:border-muted-foreground/30 active:bg-muted"
                         }`}
-                        style={{ fontWeight: f === "all" ? 500 : 400, color: f === "all" ? "#0A77FF" : undefined }}
+                        style={{ fontWeight: f === "all" ? 500 : 400, color: f === "all" ? "hsl(var(--primary))" : undefined }}
                       >
                         {f === "all" ? "All Categories" : f}
-                        <span className={`text-[10px] rounded-full px-1.5 py-px min-w-[18px] text-center ${f === "all" ? "bg-primary/10" : "bg-muted"}`} style={{ fontWeight: 600, color: f === "all" ? "#0A77FF" : "#475569" }}>
+                        <span className={`text-[10px] rounded-full px-1.5 py-px min-w-[18px] text-center ${f === "all" ? "bg-primary/10" : "bg-muted"}`} style={{ fontWeight: 600, color: f === "all" ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))" }}>
                           {cnt}
                         </span>
                       </button>
@@ -1308,7 +1308,7 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
                     <Table style={{ tableLayout: "fixed", width: `max(${40 + 140 + 220 + 200 + 160 + 170 + 120 + 100 + 60}px, 100%)` }}>
                       <TableHeader className="sticky top-0 z-20 bg-card">
                         <TableRow className="bg-muted/30 hover:bg-muted/30 [&>th]:h-8">
-                          <TableHead className="sticky left-0 z-20 bg-[#f8fafc]" style={{ width: 40, minWidth: 40, maxWidth: 40, paddingLeft: 8, paddingRight: 0 }}>
+                          <TableHead className="sticky left-0 z-20 bg-slate-50" style={{ width: 40, minWidth: 40, maxWidth: 40, paddingLeft: 8, paddingRight: 0 }}>
                             <Checkbox disabled className="opacity-40" />
                           </TableHead>
                           <TableHead style={{ width: 140, minWidth: 140, maxWidth: 140 }} className="text-[13px] text-foreground !pl-4"><span style={{ fontWeight: 600 }}>Code</span></TableHead>
@@ -1318,7 +1318,7 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
                           <TableHead style={{ width: 170, minWidth: 170, maxWidth: 170 }} className="text-[13px] text-foreground !pl-4"><span style={{ fontWeight: 600 }}>Created By</span></TableHead>
                           <TableHead style={{ width: 120, minWidth: 120, maxWidth: 120 }} className="text-[13px] text-foreground !pl-4"><span style={{ fontWeight: 600 }}>Created Date</span></TableHead>
                           <TableHead style={{ width: 100, minWidth: 100, maxWidth: 100 }} className="text-[13px] text-foreground !pl-4"><span style={{ fontWeight: 600 }}>Status</span></TableHead>
-                          <TableHead className="sticky right-0 z-20 bg-[#f8fafc] !pl-2 !pr-2" style={{ width: 60, minWidth: 60, maxWidth: 60, boxShadow: "inset 1px 0 0 0 rgba(0,0,0,0.08)" }}>
+                          <TableHead className="sticky right-0 z-20 bg-slate-50 !pl-2 !pr-2" style={{ width: 60, minWidth: 60, maxWidth: 60, boxShadow: "inset 1px 0 0 0 rgba(0,0,0,0.08)" }}>
                             <span className="text-[13px]">Actions</span>
                           </TableHead>
                         </TableRow>
@@ -1337,24 +1337,24 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
                                 <div className="flex items-center gap-2">
                                   <span className="font-mono text-sm whitespace-nowrap" style={{ fontWeight: 500, color: '#1E293B' }}>{cat.code}</span>
                                   {cat.isMe && (
-                                    <span className="inline-flex items-center px-1.5 py-px rounded text-[9px] border" style={{ fontWeight: 600, backgroundColor: "#EDF4FF", color: "#0A77FF", borderColor: "#BFDBFE" }}>ME</span>
+                                    <span className="inline-flex items-center px-1.5 py-px rounded text-[9px] border" style={{ fontWeight: 600, backgroundColor: "hsl(var(--accent))", color: "hsl(var(--primary))", borderColor: "#BFDBFE" }}>ME</span>
                                   )}
                                 </div>
                               </TableCell>
                               {/* Description */}
                               <TableCell style={{ width: 220, minWidth: 220, maxWidth: 220, overflow: "hidden" }}>
-                                <p className="text-sm text-[#334155] truncate" style={{ fontWeight: 400 }}>{cat.description}</p>
+                                <p className="text-sm text-slate-700 truncate" style={{ fontWeight: 400 }}>{cat.description}</p>
                               </TableCell>
                               {/* Tags */}
                               <TableCell style={{ width: 200, minWidth: 200, maxWidth: 200, overflow: "hidden" }}>
                                 <div className="flex items-center gap-1">
                                   {cat.tags.slice(0, 2).map((tag) => (
-                                    <span key={tag} className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] whitespace-nowrap bg-[#F1F5F9] text-[#475569] border border-[#E2E8F0]" style={{ fontWeight: 500 }}>
+                                    <span key={tag} className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] whitespace-nowrap bg-muted text-muted-foreground border border-border" style={{ fontWeight: 500 }}>
                                       {tag}
                                     </span>
                                   ))}
                                   {cat.tags.length > 2 && (
-                                    <span className="inline-flex items-center px-1.5 py-0.5 rounded-md text-[11px] border cursor-default" style={{ fontWeight: 600, backgroundColor: "#F1F5F9", color: "#475569", borderColor: "#E2E8F0" }}>
+                                    <span className="inline-flex items-center px-1.5 py-0.5 rounded-md text-[11px] border cursor-default" style={{ fontWeight: 600, backgroundColor: "hsl(var(--muted))", color: "hsl(var(--muted-foreground))", borderColor: "hsl(var(--border))" }}>
                                       +{cat.tags.length - 2}
                                     </span>
                                   )}
@@ -1363,7 +1363,7 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
                               {/* Linked Records */}
                               <TableCell style={{ width: 160, minWidth: 160, maxWidth: 160, overflow: "hidden" }}>
                                 <div className="flex items-center gap-1.5">
-                                  <span className="font-mono text-sm text-[#0A77FF] cursor-pointer hover:underline" style={{ fontWeight: 500 }}>{cat.linkedCode}</span>
+                                  <span className="font-mono text-sm text-primary cursor-pointer hover:underline" style={{ fontWeight: 500 }}>{cat.linkedCode}</span>
                                   {cat.linkedCount > 0 && (
                                     <span className="text-[11px] shrink-0 cursor-default leading-none" style={{ fontWeight: 600, color: "#085FCC" }}>+{cat.linkedCount} more</span>
                                   )}
@@ -1378,14 +1378,14 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
                                       <div className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] shrink-0 border" style={{ backgroundColor: tint.bg, color: tint.fg, borderColor: `${tint.fg}20`, fontWeight: 700 }}>
                                         {cat.creatorInitials}
                                       </div>
-                                      <span className="text-sm text-[#334155] truncate block max-w-[120px]">{cat.creatorName}</span>
+                                      <span className="text-sm text-slate-700 truncate block max-w-[120px]">{cat.creatorName}</span>
                                     </div>
                                   );
                                 })()}
                               </TableCell>
                               {/* Created Date */}
                               <TableCell style={{ width: 120, minWidth: 120, maxWidth: 120, overflow: "hidden" }}>
-                                <span className="text-sm whitespace-nowrap" style={{ color: '#475569' }}>{cat.createdDate}</span>
+                                <span className="text-sm whitespace-nowrap" style={{ color: "hsl(var(--muted-foreground))" }}>{cat.createdDate}</span>
                               </TableCell>
                               {/* Status */}
                               <TableCell style={{ width: 100, minWidth: 100, maxWidth: 100, overflow: "hidden" }}>
@@ -1412,8 +1412,8 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
                                     <DropdownMenuItem onClick={() => toast.info(cat.status === "Active" ? "Deactivated" : "Activated")}>
                                       <CircleSlash className="w-4 h-4 mr-2" /> {cat.status === "Active" ? "Deactivate" : "Activate"}
                                     </DropdownMenuItem>
-                                    <DropdownMenuItem className="text-[#DC2626] focus:text-[#DC2626] focus:bg-[#FEF2F2]" onClick={() => setCatRemoveSingleId(cat.id)}>
-                                      <Trash2 className="w-4 h-4 mr-2 text-[#DC2626]" /> Remove
+                                    <DropdownMenuItem className="text-destructive focus:text-destructive focus:bg-red-50" onClick={() => setCatRemoveSingleId(cat.id)}>
+                                      <Trash2 className="w-4 h-4 mr-2 text-destructive" /> Remove
                                     </DropdownMenuItem>
                                   </DropdownMenuContent>
                                 </DropdownMenu>
@@ -1480,7 +1480,7 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
                   <div className="flex items-center gap-2.5 flex-1 min-w-0">
                     <div className="relative flex-1 max-w-xs">
                       <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70 pointer-events-none" />
-                      <input type="text" value={partnerSearch} onChange={(e) => setPartnerSearch(e.target.value)} placeholder="Search partners..." className="w-full pl-9 pr-8 h-9 text-sm bg-white border border-border/80 rounded-lg shadow-sm focus:outline-none focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 transition-colors placeholder:text-muted-foreground/50" />
+                      <input type="text" value={partnerSearch} onChange={(e) => setPartnerSearch(e.target.value)} placeholder="Search partners..." className="w-full pl-9 pr-8 h-9 text-sm bg-white border border-border/80 rounded-lg shadow-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-colors placeholder:text-muted-foreground/50" />
                       {partnerSearch && (
                         <button onClick={() => setPartnerSearch("")} className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded-full hover:bg-muted/60 text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
                           <X className="w-3.5 h-3.5" />
@@ -1498,7 +1498,7 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
                       <span className="text-muted-foreground/70"> partners</span>
                     </span>
                     <div className="w-px h-5 bg-border/60 mx-0.5 hidden sm:block" />
-                    <button onClick={() => { setPartnerModalOpen(true); setPartnerModalView("browse"); setPartnerModalSearch(""); setPartnerModalAddedSearch(""); setPartnerModalSelectedIds(new Set()); setPartnerModalAddedSelectedIds(new Set()); }} className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-sm shadow-sm transition-colors cursor-pointer" style={{ fontWeight: 600 }}>
+                    <button onClick={() => { setPartnerModalOpen(true); setPartnerModalView("browse"); setPartnerModalSearch(""); setPartnerModalAddedSearch(""); setPartnerModalSelectedIds(new Set()); setPartnerModalAddedSelectedIds(new Set()); }} className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg bg-primary hover:bg-[#0862D0] text-white text-sm shadow-sm transition-colors cursor-pointer" style={{ fontWeight: 600 }}>
                       <Plus className="w-3.5 h-3.5" /> Add Partner
                     </button>
                   </div>
@@ -1513,13 +1513,13 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
                         key={f}
                         className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                           f === "all"
-                            ? "border-primary bg-[#EDF4FF] hover:bg-[#D6E8FF] active:bg-[#ADD1FF]"
+                            ? "border-primary bg-accent hover:bg-[#D6E8FF] active:bg-[#ADD1FF]"
                             : "border-border text-muted-foreground hover:bg-muted/60 hover:text-foreground hover:border-muted-foreground/30 active:bg-muted"
                         }`}
-                        style={{ fontWeight: f === "all" ? 500 : 400, color: f === "all" ? "#0A77FF" : undefined }}
+                        style={{ fontWeight: f === "all" ? 500 : 400, color: f === "all" ? "hsl(var(--primary))" : undefined }}
                       >
                         {f === "all" ? "All Partners" : f.charAt(0).toUpperCase() + f.slice(1)}
-                        <span className={`text-[10px] rounded-full px-1.5 py-px min-w-[18px] text-center ${f === "all" ? "bg-primary/10" : "bg-muted"}`} style={{ fontWeight: 600, color: f === "all" ? "#0A77FF" : "#475569" }}>
+                        <span className={`text-[10px] rounded-full px-1.5 py-px min-w-[18px] text-center ${f === "all" ? "bg-primary/10" : "bg-muted"}`} style={{ fontWeight: 600, color: f === "all" ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))" }}>
                           {cnt}
                         </span>
                       </button>
@@ -1541,7 +1541,7 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
                     <Table style={{ tableLayout: "fixed", width: `max(${40 + 240 + 140 + 180 + 150 + 130 + 100 + 60}px, 100%)` }}>
                       <TableHeader className="sticky top-0 z-20 bg-card">
                         <TableRow className="bg-muted/30 hover:bg-muted/30 [&>th]:h-8">
-                          <TableHead className="sticky left-0 z-20 bg-[#f8fafc]" style={{ width: 40, minWidth: 40, maxWidth: 40, paddingLeft: 8, paddingRight: 0 }}>
+                          <TableHead className="sticky left-0 z-20 bg-slate-50" style={{ width: 40, minWidth: 40, maxWidth: 40, paddingLeft: 8, paddingRight: 0 }}>
                             <Checkbox disabled className="opacity-40" />
                           </TableHead>
                           <TableHead style={{ width: 240, minWidth: 240, maxWidth: 240 }} className="text-[13px] text-foreground !pl-4"><span style={{ fontWeight: 600 }}>Partners</span></TableHead>
@@ -1550,7 +1550,7 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
                           <TableHead style={{ width: 150, minWidth: 150, maxWidth: 150 }} className="text-[13px] text-foreground !pl-4"><span style={{ fontWeight: 600 }}>Country</span></TableHead>
                           <TableHead style={{ width: 130, minWidth: 130, maxWidth: 130 }} className="text-[13px] text-foreground !pl-4 text-right"><span style={{ fontWeight: 600 }}>Credit Limit ($)</span></TableHead>
                           <TableHead style={{ width: 100, minWidth: 100, maxWidth: 100 }} className="text-[13px] text-foreground !pl-4"><span style={{ fontWeight: 600 }}>Status</span></TableHead>
-                          <TableHead className="sticky right-0 z-20 bg-[#f8fafc] !pl-2 !pr-2" style={{ width: 60, minWidth: 60, maxWidth: 60, boxShadow: "inset 1px 0 0 0 rgba(0,0,0,0.08)" }}>
+                          <TableHead className="sticky right-0 z-20 bg-slate-50 !pl-2 !pr-2" style={{ width: 60, minWidth: 60, maxWidth: 60, boxShadow: "inset 1px 0 0 0 rgba(0,0,0,0.08)" }}>
                             <span className="text-[13px]">Actions</span>
                           </TableHead>
                         </TableRow>
@@ -1626,8 +1626,8 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
                                       <Eye className="w-4 h-4 mr-2" /> View Details
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
-                                    <DropdownMenuItem className="text-[#DC2626] focus:text-[#DC2626] focus:bg-[#FEF2F2]" onClick={() => setPartnerRemoveSingleId(v.id)}>
-                                      <Trash2 className="w-4 h-4 mr-2 text-[#DC2626]" /> Remove
+                                    <DropdownMenuItem className="text-destructive focus:text-destructive focus:bg-red-50" onClick={() => setPartnerRemoveSingleId(v.id)}>
+                                      <Trash2 className="w-4 h-4 mr-2 text-destructive" /> Remove
                                     </DropdownMenuItem>
                                   </DropdownMenuContent>
                                 </DropdownMenu>
@@ -1665,15 +1665,15 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
             {tab === "notes" && (
               <div className="flex-1 overflow-auto p-4 space-y-3">
                 {PR_DUMMY_NOTES.map((note) => (
-                  <div key={note.id} className="rounded-lg border border-[#F1F5F9] bg-white p-3.5">
+                  <div key={note.id} className="rounded-lg border border-muted bg-white p-3.5">
                     <div className="flex items-center gap-2.5 mb-2">
                       <div className="w-7 h-7 rounded-full flex items-center justify-center text-[9px] text-white shrink-0" style={{ fontWeight: 700, backgroundColor: note.color }}>{note.initials}</div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-[12px] text-[#334155]" style={{ fontWeight: 600 }}>{note.author}</p>
-                        <p className="text-[10px] text-[#94A3B8]">{note.date}</p>
+                        <p className="text-[12px] text-slate-700" style={{ fontWeight: 600 }}>{note.author}</p>
+                        <p className="text-[10px] text-slate-400">{note.date}</p>
                       </div>
                     </div>
-                    <p className="text-[12px] text-[#334155] leading-relaxed">{note.text}</p>
+                    <p className="text-[12px] text-slate-700 leading-relaxed">{note.text}</p>
                   </div>
                 ))}
               </div>
@@ -1683,13 +1683,13 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
             {tab === "attachments" && (
               <div className="flex-1 overflow-auto p-4 space-y-2">
                 {PR_DUMMY_ATTACHMENTS.map((file) => (
-                  <div key={file.id} className="flex items-center gap-3 rounded-lg border border-[#F1F5F9] bg-white px-3.5 py-3 hover:bg-[#F8FAFC] transition-colors cursor-pointer">
-                    <div className="w-9 h-9 rounded-lg bg-[#F1F5F9] border border-[#E2E8F0] flex items-center justify-center text-base shrink-0">{file.icon}</div>
+                  <div key={file.id} className="flex items-center gap-3 rounded-lg border border-muted bg-white px-3.5 py-3 hover:bg-slate-50 transition-colors cursor-pointer">
+                    <div className="w-9 h-9 rounded-lg bg-muted border border-border flex items-center justify-center text-base shrink-0">{file.icon}</div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-[12px] text-[#334155] truncate" style={{ fontWeight: 500 }}>{file.name}</p>
-                      <p className="text-[10px] text-[#94A3B8] mt-0.5">{file.size} · {file.type} · {file.date}</p>
+                      <p className="text-[12px] text-slate-700 truncate" style={{ fontWeight: 500 }}>{file.name}</p>
+                      <p className="text-[10px] text-slate-400 mt-0.5">{file.size} · {file.type} · {file.date}</p>
                     </div>
-                    <ExternalLink className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" />
+                    <ExternalLink className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                   </div>
                 ))}
               </div>
@@ -1699,15 +1699,15 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
             {tab === "activity" && (
               <div className="flex-1 overflow-auto p-4">
                 <div className="relative pl-5">
-                  <div className="absolute left-[7px] top-2 bottom-2 w-px bg-[#E2E8F0]" />
+                  <div className="absolute left-[7px] top-2 bottom-2 w-px bg-border" />
                   <div className="space-y-4">
                     {PR_DUMMY_ACTIVITY.map((act) => (
                       <div key={act.id} className="relative">
-                        <div className={`absolute -left-5 top-1 w-3.5 h-3.5 rounded-full border-2 border-white ${act.type === "create" ? "bg-[#22C55E]" : act.type === "edit" ? "bg-[#0A77FF]" : "bg-[#F59E0B]"}`} />
+                        <div className={`absolute -left-5 top-1 w-3.5 h-3.5 rounded-full border-2 border-white ${act.type === "create" ? "bg-[#22C55E]" : act.type === "edit" ? "bg-primary" : "bg-amber-500"}`} />
                         <div>
-                          <p className="text-[12px] text-[#334155]" style={{ fontWeight: 500 }}>{act.action}</p>
-                          {act.target && <p className="text-[11px] text-[#64748B] mt-0.5">{act.target}</p>}
-                          <p className="text-[10px] text-[#94A3B8] mt-1">{act.user} · {act.date}</p>
+                          <p className="text-[12px] text-slate-700" style={{ fontWeight: 500 }}>{act.action}</p>
+                          {act.target && <p className="text-[11px] text-slate-500 mt-0.5">{act.target}</p>}
+                          <p className="text-[10px] text-slate-400 mt-1">{act.user} · {act.date}</p>
                         </div>
                       </div>
                     ))}
@@ -1718,28 +1718,28 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
           </div>
 
           {/* ─── RIGHT SIDEBAR: Info card ─── */}
-          <div className="w-[280px] xl:w-[300px] border-l border-[#E2E8F0] shrink-0 overflow-y-auto bg-[#F8FAFC]">
+          <div className="w-[280px] xl:w-[300px] border-l border-border shrink-0 overflow-y-auto bg-slate-50">
             <div className="p-3.5">
-              <div className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
+              <div className="rounded-xl border border-border bg-white overflow-hidden shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
                 {/* Card header */}
-                <div className="px-3.5 py-2.5 border-b border-[#F1F5F9] flex items-center gap-2">
+                <div className="px-3.5 py-2.5 border-b border-muted flex items-center gap-2">
                   <div className="w-6 h-6 rounded-md flex items-center justify-center shrink-0" style={{ backgroundColor: theme.pillBg }}>
                     <ChartColumn className="w-3 h-3" style={{ color: theme.text }} />
                   </div>
-                  <span className="text-[12px] text-[#334155]" style={{ fontWeight: 600 }}>Rule Overview</span>
+                  <span className="text-[12px] text-slate-700" style={{ fontWeight: 600 }}>Rule Overview</span>
                 </div>
 
                 <div className="px-3.5 py-3 space-y-3">
                   {/* Rule Name */}
                   <div>
-                    <p className="text-[10px] text-[#94A3B8] mb-px" style={{ fontWeight: 500 }}>Rule Name</p>
-                    <p className="text-[12.5px] text-[#334155]" style={{ fontWeight: 600 }}>{rule.name}</p>
-                    <p className="text-[11px] text-[#64748B] mt-0.5 leading-relaxed">{rule.description}</p>
+                    <p className="text-[10px] text-slate-400 mb-px" style={{ fontWeight: 500 }}>Rule Name</p>
+                    <p className="text-[12.5px] text-slate-700" style={{ fontWeight: 600 }}>{rule.name}</p>
+                    <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">{rule.description}</p>
                   </div>
 
                   {/* Type pills */}
                   <div>
-                    <p className="text-[10px] text-[#94A3B8] mb-1" style={{ fontWeight: 500 }}>Rule Type</p>
+                    <p className="text-[10px] text-slate-400 mb-1" style={{ fontWeight: 500 }}>Rule Type</p>
                     <div className="flex items-center gap-1.5 flex-wrap">
                       <span
                         className="inline-flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-md border"
@@ -1748,12 +1748,12 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
                         {isDis ? <TrendingDown className="w-3 h-3" /> : <TrendingUp className="w-3 h-3" />}
                         {isDis ? "Discount" : "Premium"}
                       </span>
-                      <span className="inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded-md border border-[#E2E8F0] bg-[#F8FAFC] text-[#64748B]" style={{ fontWeight: 500 }}>
+                      <span className="inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded-md border border-border bg-slate-50 text-slate-500" style={{ fontWeight: 500 }}>
                         {rule.basis === "volume" ? <ChartColumn className="w-3 h-3" /> : <DollarSign className="w-3 h-3" />}
                         {rule.basis === "volume" ? "Volume" : "Value"}-Based
                       </span>
                       {isPreset && (
-                        <span className="inline-flex items-center gap-1 px-1.5 py-[3px] rounded-md bg-[#F1F5F9] border border-[#CBD5E1] text-[9px] text-[#64748B]" style={{ fontWeight: 600 }}>
+                        <span className="inline-flex items-center gap-1 px-1.5 py-[3px] rounded-md bg-muted border border-slate-300 text-[9px] text-slate-500" style={{ fontWeight: 600 }}>
                           <Lock className="w-2.5 h-2.5" /> TEMPLATE
                         </span>
                       )}
@@ -1763,73 +1763,73 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
                   {/* Hero discount value */}
                   <div className="grid grid-cols-2 gap-x-4 gap-y-2.5">
                     <div className="min-w-0">
-                      <p className="text-[10px] text-[#94A3B8] mb-px" style={{ fontWeight: 500 }}>{isDis ? "Discount" : "Premium"}</p>
-                      <p className="text-[16px] text-[#334155] tabular-nums" style={{ fontWeight: 600 }}>{rule.tiers[0]?.discount || "—"}</p>
+                      <p className="text-[10px] text-slate-400 mb-px" style={{ fontWeight: 500 }}>{isDis ? "Discount" : "Premium"}</p>
+                      <p className="text-[16px] text-slate-700 tabular-nums" style={{ fontWeight: 600 }}>{rule.tiers[0]?.discount || "—"}</p>
                     </div>
                     <div className="min-w-0">
-                      <p className="text-[10px] text-[#94A3B8] mb-px" style={{ fontWeight: 500 }}>Tiers</p>
-                      <p className="text-[12.5px] text-[#334155]" style={{ fontWeight: 500 }}>{rule.tiers.length} {rule.tiers.length === 1 ? "tier" : "tiers"}</p>
+                      <p className="text-[10px] text-slate-400 mb-px" style={{ fontWeight: 500 }}>Tiers</p>
+                      <p className="text-[12.5px] text-slate-700" style={{ fontWeight: 500 }}>{rule.tiers.length} {rule.tiers.length === 1 ? "tier" : "tiers"}</p>
                     </div>
                   </div>
 
                   {/* Status + Scope */}
                   <div className="grid grid-cols-2 gap-x-4 gap-y-2.5">
                     <div className="min-w-0">
-                      <p className="text-[10px] text-[#94A3B8] mb-0.5" style={{ fontWeight: 500 }}>Status</p>
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px]" style={{ fontWeight: 600, backgroundColor: rule.status === "Active" ? "#F0FDF4" : "#FFFBEB", color: rule.status === "Active" ? "#16A34A" : "#D97706", border: `1px solid ${rule.status === "Active" ? "#BBF7D0" : "#FDE68A"}` }}>
+                      <p className="text-[10px] text-slate-400 mb-0.5" style={{ fontWeight: 500 }}>Status</p>
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px]" style={{ fontWeight: 600, backgroundColor: rule.status === "Active" ? "#F0FDF4" : "#FFFBEB", color: rule.status === "Active" ? "#16A34A" : "hsl(var(--warning))", border: `1px solid ${rule.status === "Active" ? "#BBF7D0" : "#FDE68A"}` }}>
                         {rule.status}
                       </span>
                     </div>
                     <div className="min-w-0">
-                      <p className="text-[10px] text-[#94A3B8] mb-px" style={{ fontWeight: 500 }}>Scope</p>
-                      <p className="text-[12px] text-[#334155] capitalize" style={{ fontWeight: 500 }}>{rule.scope}</p>
+                      <p className="text-[10px] text-slate-400 mb-px" style={{ fontWeight: 500 }}>Scope</p>
+                      <p className="text-[12px] text-slate-700 capitalize" style={{ fontWeight: 500 }}>{rule.scope}</p>
                     </div>
                   </div>
 
                   {/* Date range */}
                   {rule.hasDateLimit && (
-                    <div className="grid grid-cols-2 gap-x-4 pt-2.5 border-t border-[#F1F5F9]">
+                    <div className="grid grid-cols-2 gap-x-4 pt-2.5 border-t border-muted">
                       <div className="min-w-0">
-                        <p className="text-[10px] text-[#94A3B8] mb-px" style={{ fontWeight: 500 }}>Valid From</p>
-                        <p className="text-[12px] text-[#334155]" style={{ fontWeight: 500 }}>{rule.validFrom}</p>
+                        <p className="text-[10px] text-slate-400 mb-px" style={{ fontWeight: 500 }}>Valid From</p>
+                        <p className="text-[12px] text-slate-700" style={{ fontWeight: 500 }}>{rule.validFrom}</p>
                       </div>
                       <div className="min-w-0">
-                        <p className="text-[10px] text-[#94A3B8] mb-px" style={{ fontWeight: 500 }}>Valid To</p>
-                        <p className="text-[12px] text-[#334155]" style={{ fontWeight: 500 }}>{rule.validTo}</p>
+                        <p className="text-[10px] text-slate-400 mb-px" style={{ fontWeight: 500 }}>Valid To</p>
+                        <p className="text-[12px] text-slate-700" style={{ fontWeight: 500 }}>{rule.validTo}</p>
                       </div>
                     </div>
                   )}
 
                   {/* Tiers detail */}
-                  <div className="pt-2.5 border-t border-[#F1F5F9] space-y-1.5">
-                    <p className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Tier Breakdown</p>
+                  <div className="pt-2.5 border-t border-muted space-y-1.5">
+                    <p className="text-[10px] text-slate-400" style={{ fontWeight: 500 }}>Tier Breakdown</p>
                     {rule.tiers.map((tier, idx) => (
                       <div key={idx} className="flex items-center justify-between px-2.5 py-1.5 rounded-lg border border-[#E8ECF1] bg-[#FAFBFC] text-[11px] tabular-nums">
-                        <div className="flex items-center gap-1.5 text-[#64748B]">
+                        <div className="flex items-center gap-1.5 text-slate-500">
                           <span className="w-4 h-4 rounded flex items-center justify-center text-[9px]" style={{ backgroundColor: theme.pillBg, color: theme.text, fontWeight: 700 }}>{idx + 1}</span>
                           <span>{tier.minQty}</span>
-                          <span className="text-[#CBD5E1]">–</span>
+                          <span className="text-slate-300">–</span>
                           <span>{tier.maxQty}</span>
                         </div>
-                        <span className="text-[#334155]" style={{ fontWeight: 600 }}>{tier.discount}</span>
+                        <span className="text-slate-700" style={{ fontWeight: 600 }}>{tier.discount}</span>
                       </div>
                     ))}
                   </div>
 
                   {/* Created By + Date */}
-                  <div className="grid grid-cols-2 gap-x-4 pt-2.5 border-t border-[#F1F5F9]">
+                  <div className="grid grid-cols-2 gap-x-4 pt-2.5 border-t border-muted">
                     <div className="min-w-0">
-                      <p className="text-[10px] text-[#94A3B8] mb-0.5" style={{ fontWeight: 500 }}>Created By</p>
+                      <p className="text-[10px] text-slate-400 mb-0.5" style={{ fontWeight: 500 }}>Created By</p>
                       <div className="flex items-center gap-1.5 mt-0.5">
-                        <div className="w-5 h-5 rounded-full flex items-center justify-center text-[8px] shrink-0" style={{ backgroundColor: isPreset ? "#EDF4FF" : theme.pillBg, color: isPreset ? "#0A77FF" : theme.text, fontWeight: 700 }}>
+                        <div className="w-5 h-5 rounded-full flex items-center justify-center text-[8px] shrink-0" style={{ backgroundColor: isPreset ? "hsl(var(--accent))" : theme.pillBg, color: isPreset ? "hsl(var(--primary))" : theme.text, fontWeight: 700 }}>
                           {isPreset ? "OS" : creatorInitials}
                         </div>
-                        <span className="text-[12px] text-[#334155] truncate" style={{ fontWeight: 500 }}>{isPreset ? "Omnesoft" : rule.createdBy}</span>
+                        <span className="text-[12px] text-slate-700 truncate" style={{ fontWeight: 500 }}>{isPreset ? "Omnesoft" : rule.createdBy}</span>
                       </div>
                     </div>
                     <div className="min-w-0">
-                      <p className="text-[10px] text-[#94A3B8] mb-px" style={{ fontWeight: 500 }}>Created On</p>
-                      <p className="text-[12px] text-[#334155] mt-0.5" style={{ fontWeight: 500 }}>{rule.createdDate}</p>
+                      <p className="text-[10px] text-slate-400 mb-px" style={{ fontWeight: 500 }}>Created On</p>
+                      <p className="text-[12px] text-slate-700 mt-0.5" style={{ fontWeight: 500 }}>{rule.createdDate}</p>
                     </div>
                   </div>
                 </div>
@@ -1839,16 +1839,16 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
         </div>
 
         {/* ─── Footer ─── */}
-        <div className="shrink-0 border-t border-[#E2E8F0] bg-white rounded-b-none sm:rounded-b-2xl">
+        <div className="shrink-0 border-t border-border bg-white rounded-b-none sm:rounded-b-2xl">
           <div className="px-5 py-2.5 flex items-center justify-between">
-            <span className="text-[11px] text-[#64748B]">Reviewing: <span className="text-[#334155]" style={{ fontWeight: 600 }}>{rule.name}</span></span>
+            <span className="text-[11px] text-slate-500">Reviewing: <span className="text-slate-700" style={{ fontWeight: 600 }}>{rule.name}</span></span>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => {
                   if (rule && onDuplicate) { onDuplicate(rule); onClose(); }
                   else { toast.info("Duplicate coming soon"); }
                 }}
-                className="h-8 px-3.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#334155] hover:bg-[#F8FAFC] transition-colors cursor-pointer inline-flex items-center gap-1.5" style={{ fontWeight: 500 }}
+                className="h-8 px-3.5 rounded-lg border border-border bg-white text-xs text-slate-700 hover:bg-slate-50 transition-colors cursor-pointer inline-flex items-center gap-1.5" style={{ fontWeight: 500 }}
               >
                 <Copy className="w-3.5 h-3.5" /> Duplicate
               </button>
@@ -1857,7 +1857,7 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
                   onClick={() => {
                     if (rule && onApply) { onApply(rule); onClose(); }
                   }}
-                  className="h-8 px-3.5 rounded-lg bg-[#0A77FF] text-white text-xs hover:bg-[#0A77FF]/90 transition-colors cursor-pointer inline-flex items-center gap-1.5" style={{ fontWeight: 500 }}
+                  className="h-8 px-3.5 rounded-lg bg-primary text-white text-xs hover:bg-primary/90 transition-colors cursor-pointer inline-flex items-center gap-1.5" style={{ fontWeight: 500 }}
                 >
                   <Check className="w-3.5 h-3.5" /> Use Template
                 </button>
@@ -1883,15 +1883,15 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <div className="flex items-center gap-2.5">
-                  <h2 className="text-[15px] sm:text-[17px] text-[#0F172A]" style={{ fontWeight: 700 }}>Manage Categories</h2>
+                  <h2 className="text-[15px] sm:text-[17px] text-foreground" style={{ fontWeight: 700 }}>Manage Categories</h2>
                   <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] border whitespace-nowrap shrink-0" style={{ fontWeight: 600, backgroundColor: isDis ? "#ECFDF5" : "#F5F3FF", color: isDis ? "#047857" : "#6D28D9", borderColor: isDis ? "#A7F3D0" : "#DDD6FE" }}>
                     {isDis ? "Discount" : "Premium"}<span className="text-[10px] opacity-60">·</span>{rule.name}
                   </span>
                 </div>
-                <p className="text-[11px] sm:text-xs text-[#64748B] mt-1" style={{ fontWeight: 400 }}>Browse available categories to add, or manage already added ones.</p>
+                <p className="text-[11px] sm:text-xs text-slate-500 mt-1" style={{ fontWeight: 400 }}>Browse available categories to add, or manage already added ones.</p>
               </div>
               <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
-                <button onClick={() => setCatModalOpen(false)} className="w-8 h-8 rounded-lg flex items-center justify-center text-[#94A3B8] hover:text-[#64748B] hover:bg-[#F1F5F9] transition-all cursor-pointer">
+                <button onClick={() => setCatModalOpen(false)} className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-500 hover:bg-muted transition-all cursor-pointer">
                   <X className="w-4 h-4" />
                 </button>
               </div>
@@ -1909,7 +1909,7 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
                   value={catModalView === "browse" ? catModalSearch : catModalAddedSearch}
                   onChange={(e) => catModalView === "browse" ? setCatModalSearch(e.target.value) : setCatModalAddedSearch(e.target.value)}
                   placeholder={catModalView === "browse" ? "Search available categories..." : "Search added categories..."}
-                  className="w-full pl-9 pr-8 h-8 text-[13px] bg-white border border-border/80 rounded-lg shadow-sm focus:outline-none focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 transition-colors placeholder:text-muted-foreground/50"
+                  className="w-full pl-9 pr-8 h-8 text-[13px] bg-white border border-border/80 rounded-lg shadow-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-colors placeholder:text-muted-foreground/50"
                 />
                 {(catModalView === "browse" ? catModalSearch : catModalAddedSearch) && (
                   <button onClick={() => catModalView === "browse" ? setCatModalSearch("") : setCatModalAddedSearch("")} className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded-full hover:bg-muted/60 text-muted-foreground hover:text-foreground transition-colors cursor-pointer">
@@ -1919,23 +1919,23 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
               </div>
 
               {/* View toggle */}
-              <div className="inline-flex items-center rounded-lg bg-[#F1F5F9] p-0.5 shrink-0">
-                <button onClick={() => setCatModalView("browse")} className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[12px] transition-all cursor-pointer ${catModalView === "browse" ? "bg-white shadow-[0_1px_3px_rgba(0,0,0,0.08)] text-[#0F172A]" : "text-[#64748B] hover:text-[#334155]"}`} style={{ fontWeight: catModalView === "browse" ? 600 : 500 }}>
-                  <Layers className={`w-3.5 h-3.5 ${catModalView === "browse" ? "text-[#0A77FF]" : "text-[#94A3B8]"}`} />
+              <div className="inline-flex items-center rounded-lg bg-muted p-0.5 shrink-0">
+                <button onClick={() => setCatModalView("browse")} className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[12px] transition-all cursor-pointer ${catModalView === "browse" ? "bg-white shadow-[0_1px_3px_rgba(0,0,0,0.08)] text-foreground" : "text-slate-500 hover:text-slate-700"}`} style={{ fontWeight: catModalView === "browse" ? 600 : 500 }}>
+                  <Layers className={`w-3.5 h-3.5 ${catModalView === "browse" ? "text-primary" : "text-slate-400"}`} />
                   Browse Categories
-                  <span className={`text-[10px] rounded-full px-1.5 py-px min-w-[16px] text-center ${catModalView === "browse" ? "bg-[#EDF4FF] text-[#0A77FF]" : "bg-[#E2E8F0] text-[#64748B]"}`} style={{ fontWeight: 600 }}>{availableCats.length}</span>
+                  <span className={`text-[10px] rounded-full px-1.5 py-px min-w-[16px] text-center ${catModalView === "browse" ? "bg-accent text-primary" : "bg-border text-slate-500"}`} style={{ fontWeight: 600 }}>{availableCats.length}</span>
                 </button>
-                <button onClick={() => setCatModalView("added")} className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[12px] transition-all cursor-pointer ${catModalView === "added" ? "bg-white shadow-[0_1px_3px_rgba(0,0,0,0.08)] text-[#0F172A]" : "text-[#64748B] hover:text-[#334155]"}`} style={{ fontWeight: catModalView === "added" ? 600 : 500 }}>
-                  <Check className={`w-3.5 h-3.5 ${catModalView === "added" ? "text-[#059669]" : "text-[#94A3B8]"}`} />
+                <button onClick={() => setCatModalView("added")} className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[12px] transition-all cursor-pointer ${catModalView === "added" ? "bg-white shadow-[0_1px_3px_rgba(0,0,0,0.08)] text-foreground" : "text-slate-500 hover:text-slate-700"}`} style={{ fontWeight: catModalView === "added" ? 600 : 500 }}>
+                  <Check className={`w-3.5 h-3.5 ${catModalView === "added" ? "text-success" : "text-slate-400"}`} />
                   Added Categories
-                  <span className={`text-[10px] rounded-full px-1.5 py-px min-w-[16px] text-center ${catModalView === "added" ? "bg-[#ECFDF5] text-[#059669]" : "bg-[#E2E8F0] text-[#64748B]"}`} style={{ fontWeight: 600 }}>{allCats.length}</span>
+                  <span className={`text-[10px] rounded-full px-1.5 py-px min-w-[16px] text-center ${catModalView === "added" ? "bg-emerald-50 text-success" : "bg-border text-slate-500"}`} style={{ fontWeight: 600 }}>{allCats.length}</span>
                 </button>
               </div>
 
               {/* Count */}
               <div className="flex items-center gap-2 ml-auto shrink-0">
                 {catModalView === "browse" && catModalSelectedIds.size > 0 && (
-                  <span className="text-xs text-[#0A77FF] shrink-0" style={{ fontWeight: 600 }}>{catModalSelectedIds.size} selected</span>
+                  <span className="text-xs text-primary shrink-0" style={{ fontWeight: 600 }}>{catModalSelectedIds.size} selected</span>
                 )}
                 <span className="text-xs text-muted-foreground shrink-0" style={{ fontWeight: 500 }}>
                   {(catModalView === "browse" ? catModalFiltered : catModalAddedFiltered).length} {catModalView === "browse" ? "available" : "categories"}
@@ -1953,13 +1953,13 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
                     key={f}
                     className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                       f === "all"
-                        ? "border-primary bg-[#EDF4FF] hover:bg-[#D6E8FF] active:bg-[#ADD1FF]"
+                        ? "border-primary bg-accent hover:bg-[#D6E8FF] active:bg-[#ADD1FF]"
                         : "border-border text-muted-foreground hover:bg-muted/60 hover:text-foreground hover:border-muted-foreground/30 active:bg-muted"
                     }`}
-                    style={{ fontWeight: f === "all" ? 500 : 400, color: f === "all" ? "#0A77FF" : undefined }}
+                    style={{ fontWeight: f === "all" ? 500 : 400, color: f === "all" ? "hsl(var(--primary))" : undefined }}
                   >
                     {f === "all" ? "All" : f}
-                    <span className={`text-[10px] rounded-full px-1.5 py-px min-w-[18px] text-center ${f === "all" ? "bg-primary/10" : "bg-muted"}`} style={{ fontWeight: 600, color: f === "all" ? "#0A77FF" : "#475569" }}>
+                    <span className={`text-[10px] rounded-full px-1.5 py-px min-w-[18px] text-center ${f === "all" ? "bg-primary/10" : "bg-muted"}`} style={{ fontWeight: 600, color: f === "all" ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))" }}>
                       {cnt}
                     </span>
                   </button>
@@ -2020,7 +2020,7 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
                     return (
                       <TableRow
                         key={cat.id}
-                        className={`cursor-pointer group bg-white hover:bg-[#F0F7FF] [&>td]:py-1 [&>td]:pl-3 [&>td]:pr-2 ${isSelected ? "!bg-[#EDF4FF]/60" : ""}`}
+                        className={`cursor-pointer group bg-white hover:bg-[#F0F7FF] [&>td]:py-1 [&>td]:pl-3 [&>td]:pr-2 ${isSelected ? "!bg-accent/60" : ""}`}
                         onClick={() => {
                           const setFn = catModalView === "browse" ? setCatModalSelectedIds : setCatModalAddedSelectedIds;
                           setFn((p) => { const n = new Set(p); n.has(cat.id) ? n.delete(cat.id) : n.add(cat.id); return n; });
@@ -2042,7 +2042,7 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
                           <span className="text-sm text-foreground" style={{ fontWeight: 500 }}>{cat.name}</span>
                         </TableCell>
                         <TableCell className="bg-white group-hover:bg-[#F0F7FF]">
-                          <p className="text-sm text-[#334155] truncate" style={{ fontWeight: 400 }}>{cat.description}</p>
+                          <p className="text-sm text-slate-700 truncate" style={{ fontWeight: 400 }}>{cat.description}</p>
                         </TableCell>
                         <TableCell className="bg-white group-hover:bg-[#F0F7FF]">
                           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] border" style={{ fontWeight: 600, backgroundColor: stc.bg, color: stc.text, borderColor: stc.border }}>{cat.status}</span>
@@ -2050,7 +2050,7 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
                         {catModalView === "added" && (
                           <TableCell className="sticky right-0 z-10 bg-white group-hover:bg-[#F0F7FF] !px-0" style={{ boxShadow: "inset 1px 0 0 0 rgba(0,0,0,0.08)" }} onClick={(e) => e.stopPropagation()}>
                             <div className="flex items-center justify-center">
-                              <button onClick={() => handleRemoveCategory(cat.id)} className="w-7 h-7 rounded-md flex items-center justify-center text-[#94A3B8] hover:text-[#DC2626] hover:bg-[#FEF2F2] transition-colors cursor-pointer" title="Remove">
+                              <button onClick={() => handleRemoveCategory(cat.id)} className="w-7 h-7 rounded-md flex items-center justify-center text-slate-400 hover:text-destructive hover:bg-red-50 transition-colors cursor-pointer" title="Remove">
                                 <Trash2 className="w-3.5 h-3.5" />
                               </button>
                             </div>
@@ -2077,23 +2077,23 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
 
           {/* Footer — same as items modal */}
           <div className="shrink-0 border-t border-[#EEF2F6] bg-white px-3 sm:px-5 py-2.5 flex items-center justify-between sm:rounded-b-2xl">
-            <div className="flex items-center gap-2 text-[12px] text-[#64748B]">
+            <div className="flex items-center gap-2 text-[12px] text-slate-500">
               <span style={{ fontWeight: 500 }}>{allCats.length} categories added</span>
-              {catModalView === "browse" && catModalSelectedIds.size > 0 && (<><span className="text-[#CBD5E1]">·</span><span className="text-[#0A77FF]" style={{ fontWeight: 600 }}>{catModalSelectedIds.size} ready to add</span></>)}
-              {catModalView === "added" && catModalAddedSelectedIds.size > 0 && (<><span className="text-[#CBD5E1]">·</span><span className="text-[#DC2626]" style={{ fontWeight: 600 }}>{catModalAddedSelectedIds.size} selected</span></>)}
+              {catModalView === "browse" && catModalSelectedIds.size > 0 && (<><span className="text-slate-300">·</span><span className="text-primary" style={{ fontWeight: 600 }}>{catModalSelectedIds.size} ready to add</span></>)}
+              {catModalView === "added" && catModalAddedSelectedIds.size > 0 && (<><span className="text-slate-300">·</span><span className="text-destructive" style={{ fontWeight: 600 }}>{catModalAddedSelectedIds.size} selected</span></>)}
             </div>
             <div className="flex items-center gap-2">
-              <Button variant="outline" onClick={() => setCatModalOpen(false)} className="rounded-lg px-4 text-xs h-9 bg-white border-[#E2E8F0] text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#0F172A]">Cancel</Button>
+              <Button variant="outline" onClick={() => setCatModalOpen(false)} className="rounded-lg px-4 text-xs h-9 bg-white border-border text-slate-500 hover:bg-slate-50 hover:text-foreground">Cancel</Button>
               {catModalView === "added" && catModalAddedSelectedIds.size > 0 && (
-                <Button onClick={() => setCatRemoveConfirmOpen(true)} className="gap-1.5 rounded-lg px-4 text-xs h-9 bg-[#DC2626] text-white hover:bg-[#B91C1C] shadow-sm">
+                <Button onClick={() => setCatRemoveConfirmOpen(true)} className="gap-1.5 rounded-lg px-4 text-xs h-9 bg-destructive text-white hover:bg-[#B91C1C] shadow-sm">
                   <Trash2 className="w-3.5 h-3.5" /> Remove {catModalAddedSelectedIds.size} Categor{catModalAddedSelectedIds.size !== 1 ? "ies" : "y"}
                 </Button>
               )}
               {catModalView === "added" && catModalAddedSelectedIds.size === 0 && (
-                <Button onClick={() => setCatModalOpen(false)} className="rounded-lg px-4 text-xs h-9 bg-[#0A77FF] text-white hover:bg-[#0862D0] shadow-sm">Done</Button>
+                <Button onClick={() => setCatModalOpen(false)} className="rounded-lg px-4 text-xs h-9 bg-primary text-white hover:bg-[#0862D0] shadow-sm">Done</Button>
               )}
               {catModalView === "browse" && (
-                <Button onClick={handleAddCategories} disabled={catModalSelectedIds.size === 0} className="gap-1.5 rounded-lg px-4 text-xs h-9 bg-[#0A77FF] text-white hover:bg-[#0862D0] shadow-sm disabled:opacity-50">
+                <Button onClick={handleAddCategories} disabled={catModalSelectedIds.size === 0} className="gap-1.5 rounded-lg px-4 text-xs h-9 bg-primary text-white hover:bg-[#0862D0] shadow-sm disabled:opacity-50">
                   <Plus className="w-3.5 h-3.5" /> Add {catModalSelectedIds.size > 0 ? `${catModalSelectedIds.size} Categor${catModalSelectedIds.size !== 1 ? "ies" : "y"}` : "Categories"}
                 </Button>
               )}
@@ -2108,22 +2108,22 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
           <div className="relative flex flex-col items-center pt-10 pb-6" style={{ background: "linear-gradient(180deg, #FEF2F2 0%, rgba(254,242,242,0.3) 70%, transparent 100%)" }}>
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[180px] h-[80px] rounded-full blur-[50px] opacity-25" style={{ backgroundColor: "#EF4444" }} />
             <div className="relative w-16 h-16 rounded-2xl flex items-center justify-center" style={{ backgroundColor: "#FEE2E2" }}>
-              <Trash2 className="w-8 h-8" style={{ color: "#DC2626" }} />
+              <Trash2 className="w-8 h-8" style={{ color: "hsl(var(--destructive))" }} />
             </div>
             <span className="mt-4 px-3 py-1 rounded-full text-[11px]" style={{ fontWeight: 600, backgroundColor: "#FEF2F2", color: "#991B1B", textTransform: "uppercase" as const, letterSpacing: "0.05em" }}>Remove Categories</span>
           </div>
           <div className="flex flex-col items-center text-center px-8 pb-8">
             <AlertDialogHeader className="p-0 gap-0 text-center">
-              <AlertDialogTitle className="text-[18px] tracking-[-0.02em]" style={{ fontWeight: 600, color: "#0F172A" }}>Remove {catModalAddedSelectedIds.size} categor{catModalAddedSelectedIds.size !== 1 ? "ies" : "y"}?</AlertDialogTitle>
+              <AlertDialogTitle className="text-[18px] tracking-[-0.02em]" style={{ fontWeight: 600, color: "hsl(var(--foreground))" }}>Remove {catModalAddedSelectedIds.size} categor{catModalAddedSelectedIds.size !== 1 ? "ies" : "y"}?</AlertDialogTitle>
             </AlertDialogHeader>
-            <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "#475569", lineHeight: "1.65" }}>
+            <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "hsl(var(--muted-foreground))", lineHeight: "1.65" }}>
               These categories will be removed from this pricing rule. You can add them back later.
             </AlertDialogDescription>
             <div className="w-full mt-7 flex flex-col gap-2.5">
-              <AlertDialogAction onClick={handleBulkRemoveCategories} className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors hover:opacity-90" style={{ fontWeight: 600, backgroundColor: "#DC2626", color: "#fff" }}>
+              <AlertDialogAction onClick={handleBulkRemoveCategories} className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors hover:opacity-90" style={{ fontWeight: 600, backgroundColor: "hsl(var(--destructive))", color: "#fff" }}>
                 Remove {catModalAddedSelectedIds.size} Categor{catModalAddedSelectedIds.size !== 1 ? "ies" : "y"}
               </AlertDialogAction>
-              <AlertDialogCancel className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors" style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#334155" }}>Cancel</AlertDialogCancel>
+              <AlertDialogCancel className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors" style={{ fontWeight: 500, backgroundColor: "hsl(var(--muted))", color: "#334155" }}>Cancel</AlertDialogCancel>
             </div>
           </div>
         </AlertDialogContent>
@@ -2139,20 +2139,20 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
                 <div className="relative flex flex-col items-center pt-10 pb-6" style={{ background: "linear-gradient(180deg, #FEF2F2 0%, rgba(254,242,242,0.3) 70%, transparent 100%)" }}>
                   <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[180px] h-[80px] rounded-full blur-[50px] opacity-25" style={{ backgroundColor: "#EF4444" }} />
                   <div className="relative w-16 h-16 rounded-2xl flex items-center justify-center" style={{ backgroundColor: "#FEE2E2" }}>
-                    <AlertTriangle className="w-8 h-8" style={{ color: "#DC2626" }} />
+                    <AlertTriangle className="w-8 h-8" style={{ color: "hsl(var(--destructive))" }} />
                   </div>
                   <span className="mt-4 px-3 py-1 rounded-full text-[11px]" style={{ fontWeight: 600, backgroundColor: "#FEF2F2", color: "#991B1B", textTransform: "uppercase" as const, letterSpacing: "0.05em" }}>Caution</span>
                 </div>
                 <div className="flex flex-col items-center text-center px-8 pb-8">
                   <AlertDialogHeader className="p-0 gap-0 text-center">
-                    <AlertDialogTitle className="text-[18px] tracking-[-0.02em]" style={{ fontWeight: 600, color: "#0F172A" }}>Remove this category?</AlertDialogTitle>
+                    <AlertDialogTitle className="text-[18px] tracking-[-0.02em]" style={{ fontWeight: 600, color: "hsl(var(--foreground))" }}>Remove this category?</AlertDialogTitle>
                   </AlertDialogHeader>
-                  <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "#475569", lineHeight: "1.65" }}>
+                  <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "hsl(var(--muted-foreground))", lineHeight: "1.65" }}>
                     {c && <><span style={{ fontWeight: 600, color: "#1E293B" }}>{c.code} — {c.name}</span>{" "}will be removed from this pricing rule.</>}
                   </AlertDialogDescription>
                   <div className="w-full mt-7 flex flex-col gap-2.5">
-                    <AlertDialogAction onClick={() => catRemoveSingleId && handleRemoveCategory(catRemoveSingleId)} className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors hover:opacity-90" style={{ fontWeight: 600, backgroundColor: "#DC2626", color: "#fff" }}>Remove Category</AlertDialogAction>
-                    <AlertDialogCancel className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors" style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#334155" }}>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={() => catRemoveSingleId && handleRemoveCategory(catRemoveSingleId)} className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors hover:opacity-90" style={{ fontWeight: 600, backgroundColor: "hsl(var(--destructive))", color: "#fff" }}>Remove Category</AlertDialogAction>
+                    <AlertDialogCancel className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors" style={{ fontWeight: 500, backgroundColor: "hsl(var(--muted))", color: "#334155" }}>Cancel</AlertDialogCancel>
                   </div>
                 </div>
               </>
@@ -2189,14 +2189,14 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <div className="flex items-center gap-2.5">
-                    <h2 className="text-[15px] sm:text-[17px] text-[#0F172A]" style={{ fontWeight: 700 }}>Manage Partners</h2>
+                    <h2 className="text-[15px] sm:text-[17px] text-foreground" style={{ fontWeight: 700 }}>Manage Partners</h2>
                     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] border whitespace-nowrap shrink-0" style={{ fontWeight: 600, backgroundColor: isDis ? "#ECFDF5" : "#F5F3FF", color: isDis ? "#047857" : "#6D28D9", borderColor: isDis ? "#A7F3D0" : "#DDD6FE" }}>
                       {isDis ? "Discount" : "Premium"}<span className="text-[10px] opacity-60">·</span>{rule.name}
                     </span>
                   </div>
-                  <p className="text-[11px] sm:text-xs text-[#64748B] mt-1" style={{ fontWeight: 400 }}>Browse partners to add, or manage already assigned ones.</p>
+                  <p className="text-[11px] sm:text-xs text-slate-500 mt-1" style={{ fontWeight: 400 }}>Browse partners to add, or manage already assigned ones.</p>
                 </div>
-                <button onClick={() => setPartnerModalOpen(false)} className="w-8 h-8 rounded-lg flex items-center justify-center text-[#94A3B8] hover:text-[#64748B] hover:bg-[#F1F5F9] transition-all cursor-pointer shrink-0">
+                <button onClick={() => setPartnerModalOpen(false)} className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-500 hover:bg-muted transition-all cursor-pointer shrink-0">
                   <X className="w-4 h-4" />
                 </button>
               </div>
@@ -2207,25 +2207,25 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
               <div className="flex items-center gap-3">
                 <div className="relative flex-1 max-w-xs">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70 pointer-events-none" />
-                  <input type="text" value={pmSearch} onChange={(e) => setPmSearch(e.target.value)} placeholder={partnerModalView === "browse" ? "Search available partners..." : "Search assigned partners..."} className="w-full pl-9 pr-8 h-8 text-[13px] bg-white border border-border/80 rounded-lg shadow-sm focus:outline-none focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 transition-colors placeholder:text-muted-foreground/50" />
+                  <input type="text" value={pmSearch} onChange={(e) => setPmSearch(e.target.value)} placeholder={partnerModalView === "browse" ? "Search available partners..." : "Search assigned partners..."} className="w-full pl-9 pr-8 h-8 text-[13px] bg-white border border-border/80 rounded-lg shadow-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-colors placeholder:text-muted-foreground/50" />
                   {pmSearch && (
                     <button onClick={() => setPmSearch("")} className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded-full hover:bg-muted/60 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"><X className="w-3.5 h-3.5" /></button>
                   )}
                 </div>
-                <div className="inline-flex items-center rounded-lg bg-[#F1F5F9] p-0.5 shrink-0">
-                  <button onClick={() => setPartnerModalView("browse")} className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[12px] transition-all cursor-pointer ${partnerModalView === "browse" ? "bg-white shadow-[0_1px_3px_rgba(0,0,0,0.08)] text-[#0F172A]" : "text-[#64748B] hover:text-[#334155]"}`} style={{ fontWeight: partnerModalView === "browse" ? 600 : 500 }}>
-                    <Users className={`w-3.5 h-3.5 ${partnerModalView === "browse" ? "text-[#0A77FF]" : "text-[#94A3B8]"}`} />
+                <div className="inline-flex items-center rounded-lg bg-muted p-0.5 shrink-0">
+                  <button onClick={() => setPartnerModalView("browse")} className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[12px] transition-all cursor-pointer ${partnerModalView === "browse" ? "bg-white shadow-[0_1px_3px_rgba(0,0,0,0.08)] text-foreground" : "text-slate-500 hover:text-slate-700"}`} style={{ fontWeight: partnerModalView === "browse" ? 600 : 500 }}>
+                    <Users className={`w-3.5 h-3.5 ${partnerModalView === "browse" ? "text-primary" : "text-slate-400"}`} />
                     Browse Partners
-                    <span className={`text-[10px] rounded-full px-1.5 py-px min-w-[16px] text-center ${partnerModalView === "browse" ? "bg-[#EDF4FF] text-[#0A77FF]" : "bg-[#E2E8F0] text-[#64748B]"}`} style={{ fontWeight: 600 }}>{availablePartnerVendors.length}</span>
+                    <span className={`text-[10px] rounded-full px-1.5 py-px min-w-[16px] text-center ${partnerModalView === "browse" ? "bg-accent text-primary" : "bg-border text-slate-500"}`} style={{ fontWeight: 600 }}>{availablePartnerVendors.length}</span>
                   </button>
-                  <button onClick={() => setPartnerModalView("added")} className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[12px] transition-all cursor-pointer ${partnerModalView === "added" ? "bg-white shadow-[0_1px_3px_rgba(0,0,0,0.08)] text-[#0F172A]" : "text-[#64748B] hover:text-[#334155]"}`} style={{ fontWeight: partnerModalView === "added" ? 600 : 500 }}>
-                    <Check className={`w-3.5 h-3.5 ${partnerModalView === "added" ? "text-[#059669]" : "text-[#94A3B8]"}`} />
+                  <button onClick={() => setPartnerModalView("added")} className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[12px] transition-all cursor-pointer ${partnerModalView === "added" ? "bg-white shadow-[0_1px_3px_rgba(0,0,0,0.08)] text-foreground" : "text-slate-500 hover:text-slate-700"}`} style={{ fontWeight: partnerModalView === "added" ? 600 : 500 }}>
+                    <Check className={`w-3.5 h-3.5 ${partnerModalView === "added" ? "text-success" : "text-slate-400"}`} />
                     Assigned Partners
-                    <span className={`text-[10px] rounded-full px-1.5 py-px min-w-[16px] text-center ${partnerModalView === "added" ? "bg-[#ECFDF5] text-[#059669]" : "bg-[#E2E8F0] text-[#64748B]"}`} style={{ fontWeight: 600 }}>{assignedVendors.length}</span>
+                    <span className={`text-[10px] rounded-full px-1.5 py-px min-w-[16px] text-center ${partnerModalView === "added" ? "bg-emerald-50 text-success" : "bg-border text-slate-500"}`} style={{ fontWeight: 600 }}>{assignedVendors.length}</span>
                   </button>
                 </div>
                 <div className="flex items-center gap-2 ml-auto shrink-0">
-                  {partnerModalView === "browse" && partnerModalSelectedIds.size > 0 && (<span className="text-xs text-[#0A77FF] shrink-0" style={{ fontWeight: 600 }}>{partnerModalSelectedIds.size} selected</span>)}
+                  {partnerModalView === "browse" && partnerModalSelectedIds.size > 0 && (<span className="text-xs text-primary shrink-0" style={{ fontWeight: 600 }}>{partnerModalSelectedIds.size} selected</span>)}
                   <span className="text-xs text-muted-foreground shrink-0" style={{ fontWeight: 500 }}>{pmList.length} {partnerModalView === "browse" ? "available" : "partners"}</span>
                 </div>
               </div>
@@ -2233,9 +2233,9 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
                 {(["all", "active", "inactive"] as const).map((f) => {
                   const cnt = f === "all" ? pmList.length : pmList.filter((v) => v.status === f).length;
                   return (
-                    <button key={f} className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs transition-colors whitespace-nowrap shrink-0 cursor-pointer ${f === "all" ? "border-primary bg-[#EDF4FF] hover:bg-[#D6E8FF]" : "border-border text-muted-foreground hover:bg-muted/60 hover:text-foreground hover:border-muted-foreground/30"}`} style={{ fontWeight: f === "all" ? 500 : 400, color: f === "all" ? "#0A77FF" : undefined }}>
+                    <button key={f} className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs transition-colors whitespace-nowrap shrink-0 cursor-pointer ${f === "all" ? "border-primary bg-accent hover:bg-[#D6E8FF]" : "border-border text-muted-foreground hover:bg-muted/60 hover:text-foreground hover:border-muted-foreground/30"}`} style={{ fontWeight: f === "all" ? 500 : 400, color: f === "all" ? "hsl(var(--primary))" : undefined }}>
                       {f === "all" ? "All" : f.charAt(0).toUpperCase() + f.slice(1)}
-                      <span className={`text-[10px] rounded-full px-1.5 py-px min-w-[18px] text-center ${f === "all" ? "bg-primary/10" : "bg-muted"}`} style={{ fontWeight: 600, color: f === "all" ? "#0A77FF" : "#475569" }}>{cnt}</span>
+                      <span className={`text-[10px] rounded-full px-1.5 py-px min-w-[18px] text-center ${f === "all" ? "bg-primary/10" : "bg-muted"}`} style={{ fontWeight: 600, color: f === "all" ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))" }}>{cnt}</span>
                     </button>
                   );
                 })}
@@ -2276,7 +2276,7 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
                       const stp = ST_PM[v.status] || ST_PM["active"];
                       const fmtC = (n: number) => new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
                       return (
-                        <TableRow key={v.id} className={`cursor-pointer group bg-white hover:bg-[#F0F7FF] [&>td]:py-1 [&>td]:pl-3 [&>td]:pr-2 ${isSelected ? "!bg-[#EDF4FF]/60" : ""}`} onClick={() => pmSetSel((p) => { const n = new Set(p); n.has(v.id) ? n.delete(v.id) : n.add(v.id); return n; })}>
+                        <TableRow key={v.id} className={`cursor-pointer group bg-white hover:bg-[#F0F7FF] [&>td]:py-1 [&>td]:pl-3 [&>td]:pr-2 ${isSelected ? "!bg-accent/60" : ""}`} onClick={() => pmSetSel((p) => { const n = new Set(p); n.has(v.id) ? n.delete(v.id) : n.add(v.id); return n; })}>
                           <TableCell className="sticky left-0 z-10 bg-white group-hover:bg-[#F0F7FF] !pl-2 !pr-0" onClick={(e) => e.stopPropagation()}>
                             <Checkbox checked={isSelected} onCheckedChange={() => pmSetSel((p) => { const n = new Set(p); n.has(v.id) ? n.delete(v.id) : n.add(v.id); return n; })} />
                           </TableCell>
@@ -2302,7 +2302,7 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
                           </TableCell>
                           {partnerModalView === "added" && (
                             <TableCell className="sticky right-0 z-10 bg-white group-hover:bg-[#F0F7FF] !px-0" style={{ boxShadow: "inset 1px 0 0 0 rgba(0,0,0,0.08)" }} onClick={(e) => e.stopPropagation()}>
-                              <div className="flex items-center justify-center"><button onClick={() => handleRemovePartner(v.id)} className="w-7 h-7 rounded-md flex items-center justify-center text-[#94A3B8] hover:text-[#DC2626] hover:bg-[#FEF2F2] transition-colors cursor-pointer" title="Remove"><Trash2 className="w-3.5 h-3.5" /></button></div>
+                              <div className="flex items-center justify-center"><button onClick={() => handleRemovePartner(v.id)} className="w-7 h-7 rounded-md flex items-center justify-center text-slate-400 hover:text-destructive hover:bg-red-50 transition-colors cursor-pointer" title="Remove"><Trash2 className="w-3.5 h-3.5" /></button></div>
                             </TableCell>
                           )}
                         </TableRow>
@@ -2326,21 +2326,21 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
 
             {/* Footer */}
             <div className="shrink-0 border-t border-[#EEF2F6] bg-white px-3 sm:px-5 py-2.5 flex items-center justify-between sm:rounded-b-2xl">
-              <div className="flex items-center gap-2 text-[12px] text-[#64748B]">
+              <div className="flex items-center gap-2 text-[12px] text-slate-500">
                 <span style={{ fontWeight: 500 }}>{assignedVendors.length} partners assigned</span>
-                {partnerModalView === "browse" && partnerModalSelectedIds.size > 0 && (<><span className="text-[#CBD5E1]">·</span><span className="text-[#0A77FF]" style={{ fontWeight: 600 }}>{partnerModalSelectedIds.size} ready to add</span></>)}
-                {partnerModalView === "added" && partnerModalAddedSelectedIds.size > 0 && (<><span className="text-[#CBD5E1]">·</span><span className="text-[#DC2626]" style={{ fontWeight: 600 }}>{partnerModalAddedSelectedIds.size} selected</span></>)}
+                {partnerModalView === "browse" && partnerModalSelectedIds.size > 0 && (<><span className="text-slate-300">·</span><span className="text-primary" style={{ fontWeight: 600 }}>{partnerModalSelectedIds.size} ready to add</span></>)}
+                {partnerModalView === "added" && partnerModalAddedSelectedIds.size > 0 && (<><span className="text-slate-300">·</span><span className="text-destructive" style={{ fontWeight: 600 }}>{partnerModalAddedSelectedIds.size} selected</span></>)}
               </div>
               <div className="flex items-center gap-2">
-                <Button variant="outline" onClick={() => setPartnerModalOpen(false)} className="rounded-lg px-4 text-xs h-9 bg-white border-[#E2E8F0] text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#0F172A]">Cancel</Button>
+                <Button variant="outline" onClick={() => setPartnerModalOpen(false)} className="rounded-lg px-4 text-xs h-9 bg-white border-border text-slate-500 hover:bg-slate-50 hover:text-foreground">Cancel</Button>
                 {partnerModalView === "added" && partnerModalAddedSelectedIds.size > 0 && (
-                  <Button onClick={() => setPartnerRemoveConfirmOpen(true)} className="gap-1.5 rounded-lg px-4 text-xs h-9 bg-[#DC2626] text-white hover:bg-[#B91C1C] shadow-sm"><Trash2 className="w-3.5 h-3.5" /> Remove {partnerModalAddedSelectedIds.size} Partner{partnerModalAddedSelectedIds.size !== 1 ? "s" : ""}</Button>
+                  <Button onClick={() => setPartnerRemoveConfirmOpen(true)} className="gap-1.5 rounded-lg px-4 text-xs h-9 bg-destructive text-white hover:bg-[#B91C1C] shadow-sm"><Trash2 className="w-3.5 h-3.5" /> Remove {partnerModalAddedSelectedIds.size} Partner{partnerModalAddedSelectedIds.size !== 1 ? "s" : ""}</Button>
                 )}
                 {partnerModalView === "added" && partnerModalAddedSelectedIds.size === 0 && (
-                  <Button onClick={() => setPartnerModalOpen(false)} className="rounded-lg px-4 text-xs h-9 bg-[#0A77FF] text-white hover:bg-[#0862D0] shadow-sm">Done</Button>
+                  <Button onClick={() => setPartnerModalOpen(false)} className="rounded-lg px-4 text-xs h-9 bg-primary text-white hover:bg-[#0862D0] shadow-sm">Done</Button>
                 )}
                 {partnerModalView === "browse" && (
-                  <Button onClick={handleAddPartners} disabled={partnerModalSelectedIds.size === 0} className="gap-1.5 rounded-lg px-4 text-xs h-9 bg-[#0A77FF] text-white hover:bg-[#0862D0] shadow-sm disabled:opacity-50"><Plus className="w-3.5 h-3.5" /> Add {partnerModalSelectedIds.size > 0 ? `${partnerModalSelectedIds.size} Partner${partnerModalSelectedIds.size !== 1 ? "s" : ""}` : "Partners"}</Button>
+                  <Button onClick={handleAddPartners} disabled={partnerModalSelectedIds.size === 0} className="gap-1.5 rounded-lg px-4 text-xs h-9 bg-primary text-white hover:bg-[#0862D0] shadow-sm disabled:opacity-50"><Plus className="w-3.5 h-3.5" /> Add {partnerModalSelectedIds.size > 0 ? `${partnerModalSelectedIds.size} Partner${partnerModalSelectedIds.size !== 1 ? "s" : ""}` : "Partners"}</Button>
                 )}
               </div>
             </div>
@@ -2354,15 +2354,15 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
         <AlertDialogContent className="sm:max-w-[420px] p-0 gap-0 overflow-hidden rounded-2xl border-0 shadow-[0_24px_80px_-12px_rgba(0,0,0,0.25)] z-[240]" overlayClassName="z-[235]" onInteractOutside={() => setPartnerRemoveConfirmOpen(false)}>
           <div className="relative flex flex-col items-center pt-10 pb-6" style={{ background: "linear-gradient(180deg, #FEF2F2 0%, rgba(254,242,242,0.3) 70%, transparent 100%)" }}>
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[180px] h-[80px] rounded-full blur-[50px] opacity-25" style={{ backgroundColor: "#EF4444" }} />
-            <div className="relative w-16 h-16 rounded-2xl flex items-center justify-center" style={{ backgroundColor: "#FEE2E2" }}><Trash2 className="w-8 h-8" style={{ color: "#DC2626" }} /></div>
+            <div className="relative w-16 h-16 rounded-2xl flex items-center justify-center" style={{ backgroundColor: "#FEE2E2" }}><Trash2 className="w-8 h-8" style={{ color: "hsl(var(--destructive))" }} /></div>
             <span className="mt-4 px-3 py-1 rounded-full text-[11px]" style={{ fontWeight: 600, backgroundColor: "#FEF2F2", color: "#991B1B", textTransform: "uppercase" as const, letterSpacing: "0.05em" }}>Remove Partners</span>
           </div>
           <div className="flex flex-col items-center text-center px-8 pb-8">
-            <AlertDialogHeader className="p-0 gap-0 text-center"><AlertDialogTitle className="text-[18px] tracking-[-0.02em]" style={{ fontWeight: 600, color: "#0F172A" }}>Remove {partnerModalAddedSelectedIds.size} partner{partnerModalAddedSelectedIds.size !== 1 ? "s" : ""}?</AlertDialogTitle></AlertDialogHeader>
-            <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "#475569", lineHeight: "1.65" }}>These partners will be removed from this pricing rule. You can add them back later.</AlertDialogDescription>
+            <AlertDialogHeader className="p-0 gap-0 text-center"><AlertDialogTitle className="text-[18px] tracking-[-0.02em]" style={{ fontWeight: 600, color: "hsl(var(--foreground))" }}>Remove {partnerModalAddedSelectedIds.size} partner{partnerModalAddedSelectedIds.size !== 1 ? "s" : ""}?</AlertDialogTitle></AlertDialogHeader>
+            <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "hsl(var(--muted-foreground))", lineHeight: "1.65" }}>These partners will be removed from this pricing rule. You can add them back later.</AlertDialogDescription>
             <div className="w-full mt-7 flex flex-col gap-2.5">
-              <AlertDialogAction onClick={handleBulkRemovePartners} className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors hover:opacity-90" style={{ fontWeight: 600, backgroundColor: "#DC2626", color: "#fff" }}>Remove {partnerModalAddedSelectedIds.size} Partner{partnerModalAddedSelectedIds.size !== 1 ? "s" : ""}</AlertDialogAction>
-              <AlertDialogCancel className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors" style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#334155" }}>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={handleBulkRemovePartners} className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors hover:opacity-90" style={{ fontWeight: 600, backgroundColor: "hsl(var(--destructive))", color: "#fff" }}>Remove {partnerModalAddedSelectedIds.size} Partner{partnerModalAddedSelectedIds.size !== 1 ? "s" : ""}</AlertDialogAction>
+              <AlertDialogCancel className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors" style={{ fontWeight: 500, backgroundColor: "hsl(var(--muted))", color: "#334155" }}>Cancel</AlertDialogCancel>
             </div>
           </div>
         </AlertDialogContent>
@@ -2377,17 +2377,17 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
               <>
                 <div className="relative flex flex-col items-center pt-10 pb-6" style={{ background: "linear-gradient(180deg, #FEF2F2 0%, rgba(254,242,242,0.3) 70%, transparent 100%)" }}>
                   <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[180px] h-[80px] rounded-full blur-[50px] opacity-25" style={{ backgroundColor: "#EF4444" }} />
-                  <div className="relative w-16 h-16 rounded-2xl flex items-center justify-center" style={{ backgroundColor: "#FEE2E2" }}><AlertTriangle className="w-8 h-8" style={{ color: "#DC2626" }} /></div>
+                  <div className="relative w-16 h-16 rounded-2xl flex items-center justify-center" style={{ backgroundColor: "#FEE2E2" }}><AlertTriangle className="w-8 h-8" style={{ color: "hsl(var(--destructive))" }} /></div>
                   <span className="mt-4 px-3 py-1 rounded-full text-[11px]" style={{ fontWeight: 600, backgroundColor: "#FEF2F2", color: "#991B1B", textTransform: "uppercase" as const, letterSpacing: "0.05em" }}>Caution</span>
                 </div>
                 <div className="flex flex-col items-center text-center px-8 pb-8">
-                  <AlertDialogHeader className="p-0 gap-0 text-center"><AlertDialogTitle className="text-[18px] tracking-[-0.02em]" style={{ fontWeight: 600, color: "#0F172A" }}>Remove this partner?</AlertDialogTitle></AlertDialogHeader>
-                  <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "#475569", lineHeight: "1.65" }}>
+                  <AlertDialogHeader className="p-0 gap-0 text-center"><AlertDialogTitle className="text-[18px] tracking-[-0.02em]" style={{ fontWeight: 600, color: "hsl(var(--foreground))" }}>Remove this partner?</AlertDialogTitle></AlertDialogHeader>
+                  <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "hsl(var(--muted-foreground))", lineHeight: "1.65" }}>
                     {pv && <><span style={{ fontWeight: 600, color: "#1E293B" }}>{pv.displayName}</span> will be removed from this pricing rule.</>}
                   </AlertDialogDescription>
                   <div className="w-full mt-7 flex flex-col gap-2.5">
-                    <AlertDialogAction onClick={() => partnerRemoveSingleId && handleRemovePartner(partnerRemoveSingleId)} className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors hover:opacity-90" style={{ fontWeight: 600, backgroundColor: "#DC2626", color: "#fff" }}>Remove Partner</AlertDialogAction>
-                    <AlertDialogCancel className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors" style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#334155" }}>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={() => partnerRemoveSingleId && handleRemovePartner(partnerRemoveSingleId)} className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors hover:opacity-90" style={{ fontWeight: 600, backgroundColor: "hsl(var(--destructive))", color: "#fff" }}>Remove Partner</AlertDialogAction>
+                    <AlertDialogCancel className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors" style={{ fontWeight: 500, backgroundColor: "hsl(var(--muted))", color: "#334155" }}>Cancel</AlertDialogCancel>
                   </div>
                 </div>
               </>
@@ -2402,26 +2402,26 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
           <div className="relative flex flex-col items-center pt-10 pb-6" style={{ background: "linear-gradient(180deg, #FEF2F2 0%, rgba(254,242,242,0.3) 70%, transparent 100%)" }}>
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[180px] h-[80px] rounded-full blur-[50px] opacity-25" style={{ backgroundColor: "#EF4444" }} />
             <div className="relative w-16 h-16 rounded-2xl flex items-center justify-center" style={{ backgroundColor: "#FEE2E2" }}>
-              <Archive className="w-8 h-8" style={{ color: "#DC2626" }} />
+              <Archive className="w-8 h-8" style={{ color: "hsl(var(--destructive))" }} />
             </div>
             <span className="mt-4 px-3 py-1 rounded-full text-[11px]" style={{ fontWeight: 600, backgroundColor: "#FEF2F2", color: "#991B1B", textTransform: "uppercase" as const, letterSpacing: "0.05em" }}>Caution</span>
           </div>
           <div className="flex flex-col items-center text-center px-8 pb-8">
             <AlertDialogHeader className="p-0 gap-0 text-center">
-              <AlertDialogTitle className="text-[18px] tracking-[-0.02em]" style={{ fontWeight: 600, color: "#0F172A" }}>Archive this pricing rule?</AlertDialogTitle>
+              <AlertDialogTitle className="text-[18px] tracking-[-0.02em]" style={{ fontWeight: 600, color: "hsl(var(--foreground))" }}>Archive this pricing rule?</AlertDialogTitle>
             </AlertDialogHeader>
-            <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "#475569", lineHeight: "1.65" }}>
+            <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "hsl(var(--muted-foreground))", lineHeight: "1.65" }}>
               <span style={{ fontWeight: 600, color: "#1E293B" }}>{rule.name}</span> will be archived and no longer applied to any partners or items. You can restore it later.
             </AlertDialogDescription>
             <div className="w-full mt-7 flex flex-col gap-2.5">
               <AlertDialogAction
                 onClick={() => { setArchiveConfirmOpen(false); toast.success(`"${rule.name}" has been archived`); onClose(); }}
                 className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors hover:opacity-90"
-                style={{ fontWeight: 600, backgroundColor: "#DC2626", color: "#fff" }}
+                style={{ fontWeight: 600, backgroundColor: "hsl(var(--destructive))", color: "#fff" }}
               >
                 Archive Rule
               </AlertDialogAction>
-              <AlertDialogCancel className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors" style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#334155" }}>Cancel</AlertDialogCancel>
+              <AlertDialogCancel className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors" style={{ fontWeight: 500, backgroundColor: "hsl(var(--muted))", color: "#334155" }}>Cancel</AlertDialogCancel>
             </div>
           </div>
         </AlertDialogContent>
@@ -2433,15 +2433,15 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
           <div className="relative flex flex-col items-center pt-10 pb-6" style={{ background: "linear-gradient(180deg, #FEFCE8 0%, rgba(254,252,232,0.3) 70%, transparent 100%)" }}>
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[180px] h-[80px] rounded-full blur-[50px] opacity-25" style={{ backgroundColor: "#EAB308" }} />
             <div className="relative w-16 h-16 rounded-2xl flex items-center justify-center" style={{ backgroundColor: "#FEF3C7" }}>
-              <AlertTriangle className="w-8 h-8" style={{ color: "#D97706" }} />
+              <AlertTriangle className="w-8 h-8" style={{ color: "hsl(var(--warning))" }} />
             </div>
             <span className="mt-4 px-3 py-1 rounded-full text-[11px]" style={{ fontWeight: 600, backgroundColor: "#FEF9C3", color: "#92400E", textTransform: "uppercase" as const, letterSpacing: "0.05em" }}>Warning</span>
           </div>
           <div className="flex flex-col items-center text-center px-8 pb-8">
             <AlertDialogHeader className="p-0 gap-0 text-center">
-              <AlertDialogTitle className="text-[18px] tracking-[-0.02em]" style={{ fontWeight: 600, color: "#0F172A" }}>Disable this pricing rule?</AlertDialogTitle>
+              <AlertDialogTitle className="text-[18px] tracking-[-0.02em]" style={{ fontWeight: 600, color: "hsl(var(--foreground))" }}>Disable this pricing rule?</AlertDialogTitle>
             </AlertDialogHeader>
-            <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "#475569", lineHeight: "1.65" }}>
+            <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "hsl(var(--muted-foreground))", lineHeight: "1.65" }}>
               <span style={{ fontWeight: 600, color: "#1E293B" }}>{rule.name}</span> will be disabled and will stop applying to partner transactions. You can re-enable it at any time.
             </AlertDialogDescription>
             <div className="w-full mt-7 flex flex-col gap-2.5">
@@ -2457,7 +2457,7 @@ export function PricingRuleDetailModal({ rule, open, onClose, mode = "create", o
               >
                 Disable Rule
               </AlertDialogAction>
-              <AlertDialogCancel className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors" style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#334155" }}>Cancel</AlertDialogCancel>
+              <AlertDialogCancel className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors" style={{ fontWeight: 500, backgroundColor: "hsl(var(--muted))", color: "#334155" }}>Cancel</AlertDialogCancel>
             </div>
           </div>
         </AlertDialogContent>
@@ -2718,7 +2718,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
       <div className="bg-card shrink-0">
         {/* Sub-tabs row */}
         <div className="flex items-center justify-between gap-3 px-4 pt-2.5 pb-2 border-b border-border">
-          <div className="inline-flex items-center rounded-lg bg-[#F1F5F9] p-0.5">
+          <div className="inline-flex items-center rounded-lg bg-muted p-0.5">
           {([
             { key: "vendor" as SubTab, label: "Vendor Pricing", icon: Package, color: "#1E40AF", bg: "#EFF6FF" },
             { key: "customer" as SubTab, label: "Customer Pricing", icon: ShoppingCart, color: "#5B21B6", bg: "#F5F3FF" },
@@ -2729,7 +2729,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                 key={t.key}
                 onClick={() => { setSubTab(t.key); setCurrentPage(1); setQuickFilter("all"); setCategoryView("discount"); }}
                 className={`inline-flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-md text-[13px] transition-all cursor-pointer ${
-                  active ? "bg-white shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.04)]" : "text-[#64748B] hover:text-[#334155]"
+                  active ? "bg-white shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.04)]" : "text-slate-500 hover:text-slate-700"
                 }`}
                 style={{ fontWeight: active ? 600 : 500, color: active ? t.color : undefined }}
               >
@@ -2760,7 +2760,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
 
             <div className="w-px h-5 bg-border/60 hidden sm:block" />
 
-            <button type="button" onClick={() => { setExplorePresetsOpen(true); setExplorePresetsSidebar("all"); setExploreCategoryTab("discount"); setExplorePresetsSearch(""); }} className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border border-[#DBEAFE] bg-[#EFF6FF] text-[#0A77FF] hover:bg-[#DBEAFE] text-[13px] transition-colors cursor-pointer" style={{ fontWeight: 500 }}>
+            <button type="button" onClick={() => { setExplorePresetsOpen(true); setExplorePresetsSidebar("all"); setExploreCategoryTab("discount"); setExplorePresetsSearch(""); }} className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border border-blue-100 bg-blue-50 text-primary hover:bg-blue-100 text-[13px] transition-colors cursor-pointer" style={{ fontWeight: 500 }}>
               <FileText className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Templates</span>
             </button>
@@ -2768,7 +2768,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
             <button
               type="button"
               onClick={() => { resetCreateForm(); setCreateModalOpen(true); }}
-              className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-[13px] shadow-sm transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-primary hover:bg-[#0862D0] text-white text-[13px] shadow-sm transition-colors cursor-pointer"
               style={{ fontWeight: 600 }}
             >
               <Plus className="w-3.5 h-3.5" />
@@ -2800,7 +2800,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
           </button>
 
           {/* Category toggle — inline with search */}
-          <div className="inline-flex items-center rounded-lg bg-[#F8FAFC] border border-[#E2E8F0]/60 p-0.5 shrink-0">
+          <div className="inline-flex items-center rounded-lg bg-slate-50 border border-border/60 p-0.5 shrink-0">
             {([
               { key: "discount" as CategoryView, label: "Discounts", icon: TrendingDown, color: "#047857", bg: "#ECFDF5" },
               { key: "premium" as CategoryView, label: "Premiums", icon: TrendingUp, color: "#6D28D9", bg: "#F5F3FF" },
@@ -2820,7 +2820,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                   {cat.label}
                   <span
                     className="text-[10px] rounded-full px-1.5 py-px min-w-[18px] text-center"
-                    style={{ fontWeight: 600, color: active ? cat.color : "#475569", backgroundColor: active ? `${cat.color}15` : "#E2E8F0" }}
+                    style={{ fontWeight: 600, color: active ? cat.color: "hsl(var(--muted-foreground))", backgroundColor: active ? `${cat.color}15` : "hsl(var(--border))" }}
                   >
                     {count}
                   </span>
@@ -2853,17 +2853,17 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
       <div className="p-4 min-h-0 overflow-y-auto flex-1">
         {paginated.length === 0 ? (
           <div className="flex flex-col items-center gap-3 py-20 text-muted-foreground">
-            <div className="w-14 h-14 rounded-2xl bg-[#F8FAFC] border border-[#E8ECF1] flex items-center justify-center">
-              <FileText className="w-7 h-7 text-[#94A3B8]" />
+            <div className="w-14 h-14 rounded-2xl bg-slate-50 border border-[#E8ECF1] flex items-center justify-center">
+              <FileText className="w-7 h-7 text-slate-400" />
             </div>
             <div className="text-center">
-              <p className="text-sm text-[#334155]" style={{ fontWeight: 600 }}>No {categoryView} rules found</p>
-              <p className="text-[13px] text-[#94A3B8] mt-1" style={{ fontWeight: 400 }}>
+              <p className="text-sm text-slate-700" style={{ fontWeight: 600 }}>No {categoryView} rules found</p>
+              <p className="text-[13px] text-slate-400 mt-1" style={{ fontWeight: 400 }}>
                 {searchQuery ? "Try a different search term" : `Create a new ${categoryView} rule or browse templates to get started.`}
               </p>
             </div>
             {searchQuery && (
-              <button onClick={() => { setSearchQuery(""); setCurrentPage(1); }} className="text-xs text-[#0A77FF] hover:text-[#0862D0] cursor-pointer transition-colors" style={{ fontWeight: 500 }}>
+              <button onClick={() => { setSearchQuery(""); setCurrentPage(1); }} className="text-xs text-primary hover:text-[#0862D0] cursor-pointer transition-colors" style={{ fontWeight: 500 }}>
                 Clear search
               </button>
             )}
@@ -2880,9 +2880,9 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                     <div>
                       {showSubHeaders && (
                         <div className="flex items-center gap-1.5 mb-2.5">
-                          <Lock className="w-3 h-3 text-[#94A3B8]" />
-                          <span className="text-[10px] text-[#94A3B8] uppercase tracking-wider" style={{ fontWeight: 600 }}>System Presets</span>
-                          <span className="text-[10px] text-[#0A77FF] bg-[#EDF4FF] px-1.5 py-0.5 rounded-full" style={{ fontWeight: 600 }}>{presets.length}</span>
+                          <Lock className="w-3 h-3 text-slate-400" />
+                          <span className="text-[10px] text-slate-400 uppercase tracking-wider" style={{ fontWeight: 600 }}>System Presets</span>
+                          <span className="text-[10px] text-primary bg-accent px-1.5 py-0.5 rounded-full" style={{ fontWeight: 600 }}>{presets.length}</span>
                         </div>
                       )}
                       <div className="@container/prpresets">
@@ -2898,9 +2898,9 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                     <div>
                       {showSubHeaders && (
                         <div className="flex items-center gap-1.5 mb-2.5">
-                          <Pencil className="w-3 h-3 text-[#94A3B8]" />
-                          <span className="text-[10px] text-[#94A3B8] uppercase tracking-wider" style={{ fontWeight: 600 }}>Custom Rules</span>
-                          <span className="text-[10px] text-[#0A77FF] bg-[#EDF4FF] px-1.5 py-0.5 rounded-full" style={{ fontWeight: 600 }}>{custom.length}</span>
+                          <Pencil className="w-3 h-3 text-slate-400" />
+                          <span className="text-[10px] text-slate-400 uppercase tracking-wider" style={{ fontWeight: 600 }}>Custom Rules</span>
+                          <span className="text-[10px] text-primary bg-accent px-1.5 py-0.5 rounded-full" style={{ fontWeight: 600 }}>{custom.length}</span>
                         </div>
                       )}
                       <div className="@container/prcustom">
@@ -2947,7 +2947,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
             }
             return pages.map((p, idx) =>
               p === "..." ? <span key={`d-${idx}`} className="px-1 text-muted-foreground text-xs">...</span> : (
-                <button key={p} onClick={() => setCurrentPage(p as number)} className={`min-w-[32px] h-8 rounded-lg text-xs transition-colors cursor-pointer ${currentPage === p ? "bg-[#0A77FF] text-white shadow-sm" : "text-muted-foreground hover:bg-muted/60"}`} style={{ fontWeight: currentPage === p ? 600 : 500 }}>{p}</button>
+                <button key={p} onClick={() => setCurrentPage(p as number)} className={`min-w-[32px] h-8 rounded-lg text-xs transition-colors cursor-pointer ${currentPage === p ? "bg-primary text-white shadow-sm" : "text-muted-foreground hover:bg-muted/60"}`} style={{ fontWeight: currentPage === p ? 600 : 500 }}>{p}</button>
               ));
           })()}
           <button onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))} disabled={currentPage === totalPages} className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg hover:bg-muted/60 disabled:opacity-30 text-muted-foreground text-xs cursor-pointer disabled:cursor-default transition-colors" style={{ fontWeight: 500 }}>
@@ -2978,19 +2978,19 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <div className="flex items-center gap-2.5">
-                  <h2 className="text-[15px] sm:text-[17px] text-[#0F172A]" style={{ fontWeight: 700 }}>Create New Pricing Rule</h2>
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#F1F5F9] text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>
+                  <h2 className="text-[15px] sm:text-[17px] text-foreground" style={{ fontWeight: 700 }}>Create New Pricing Rule</h2>
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-muted text-[11px] text-slate-500" style={{ fontWeight: 500 }}>
                     <ChartColumn className="w-3 h-3" /> Vendor Pricing Rule
                   </span>
                 </div>
-                <p className="text-[11px] sm:text-xs text-[#64748B] mt-0.5" style={{ fontWeight: 400 }}>
+                <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5" style={{ fontWeight: 400 }}>
                   Configure the type, tiers, and assign items for the new rule.
                 </p>
               </div>
               <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
                 <button
                   onClick={() => setCreateFullscreen(!createFullscreen)}
-                  className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#475569] hover:bg-[#F8FAFC] hover:border-[#CBD5E1] transition-all cursor-pointer"
+                  className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-border bg-white text-xs text-muted-foreground hover:bg-slate-50 hover:border-slate-300 transition-all cursor-pointer"
                   style={{ fontWeight: 500 }}
                 >
                   {createFullscreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
@@ -2998,7 +2998,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                 </button>
                 <button
                   onClick={() => { setCreateModalOpen(false); setCreateFullscreen(false); resetCreateForm(); }}
-                  className="w-8 h-8 rounded-lg flex items-center justify-center text-[#94A3B8] hover:text-[#64748B] hover:bg-[#F1F5F9] transition-all cursor-pointer"
+                  className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-500 hover:bg-muted transition-all cursor-pointer"
                 >
                   <X className="w-4.5 h-4.5" />
                 </button>
@@ -3024,10 +3024,10 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                   <div
                     className={`w-[22px] h-[22px] sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-[11px] sm:text-[12px] shrink-0 transition-all duration-200 ${
                       tab.completed
-                        ? "bg-[#10B981] text-white"
+                        ? "bg-emerald-500 text-white"
                         : tab.active
-                        ? "bg-[#0A77FF] text-white"
-                        : "border-[1.5px] border-[#CBD5E1] text-[#64748B] bg-white"
+                        ? "bg-primary text-white"
+                        : "border-[1.5px] border-slate-300 text-slate-500 bg-white"
                     }`}
                     style={{ fontWeight: 600 }}
                   >
@@ -3036,10 +3036,10 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                   <span
                     className={`text-[12px] sm:text-[13px] whitespace-nowrap transition-colors ${
                       tab.active
-                        ? "text-[#0A77FF]"
+                        ? "text-primary"
                         : tab.completed
-                        ? "text-[#10B981]"
-                        : "text-[#334155]"
+                        ? "text-emerald-500"
+                        : "text-slate-700"
                     }`}
                     style={{ fontWeight: tab.active || tab.completed ? 600 : 500 }}
                   >
@@ -3047,7 +3047,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                     <span className="sm:hidden">{tab.shortLabel}</span>
                   </span>
                   {(tab.active || tab.completed) && (
-                    <div className={`absolute bottom-0 left-0 right-0 h-[2px] rounded-t-full ${tab.completed ? "bg-[#10B981]" : "bg-[#0A77FF]"}`} />
+                    <div className={`absolute bottom-0 left-0 right-0 h-[2px] rounded-t-full ${tab.completed ? "bg-emerald-500" : "bg-primary"}`} />
                   )}
                 </div>
               ))}
@@ -3064,8 +3064,8 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                   {/* Pricing Rule Type — Clean gradient cards (CreatePartnerModal style) */}
                   <div>
                     <div className="flex items-center gap-1.5 mb-3">
-                      <span className="text-sm text-[#0F172A]" style={{ fontWeight: 600 }}>Pricing Rule Type</span>
-                      <Tooltip><TooltipTrigger asChild><span><Info className="w-3.5 h-3.5 text-[#CBD5E1]" /></span></TooltipTrigger><TooltipContent className="z-[300]"><p className="text-xs">Choose whether this rule decreases or increases prices.</p></TooltipContent></Tooltip>
+                      <span className="text-sm text-foreground" style={{ fontWeight: 600 }}>Pricing Rule Type</span>
+                      <Tooltip><TooltipTrigger asChild><span><Info className="w-3.5 h-3.5 text-slate-300" /></span></TooltipTrigger><TooltipContent className="z-[300]"><p className="text-xs">Choose whether this rule decreases or increases prices.</p></TooltipContent></Tooltip>
                     </div>
 
                     <div className="grid grid-cols-2 gap-3">
@@ -3075,28 +3075,28 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                         className={`group relative rounded-xl overflow-hidden border transition-all duration-200 cursor-pointer ${
                           createCategory === "discount"
                             ? "border-[#86EFAC]/70 bg-white shadow-[0_1px_4px_rgba(4,120,87,0.06)]"
-                            : "border-[#E2E8F0] bg-white hover:border-[#BBF7D0] hover:shadow-[0_4px_16px_-4px_rgba(4,120,87,0.10)]"
+                            : "border-border bg-white hover:border-[#BBF7D0] hover:shadow-[0_4px_16px_-4px_rgba(4,120,87,0.10)]"
                         }`}
                       >
                         <div className={`absolute inset-0 transition-all duration-300 pointer-events-none ${
                           createCategory === "discount"
-                            ? "bg-gradient-to-br from-[#F0FDF4]/50 to-transparent"
-                            : "bg-gradient-to-br from-[#F0FDF4]/0 to-[#F0FDF4]/0 group-hover:from-[#F0FDF4]/60 group-hover:to-transparent"
+                            ? "bg-gradient-to-br from-green-50/50 to-transparent"
+                            : "bg-gradient-to-br from-green-50/0 to-green-50/0 group-hover:from-green-50/60 group-hover:to-transparent"
                         }`} />
                         <div className="relative flex items-center gap-3 pl-3.5 pr-3 py-3">
                           <div className={`w-9 h-9 rounded-[10px] flex items-center justify-center shrink-0 transition-all duration-200 ${
                             createCategory === "discount"
                               ? "bg-gradient-to-br from-[#DCFCE7] to-[#BBF7D0] text-[#15803D]"
-                              : "bg-gradient-to-br from-[#F0FDF4] to-[#DCFCE7] text-[#16A34A] group-hover:scale-105"
+                              : "bg-gradient-to-br from-green-50 to-[#DCFCE7] text-green-600 group-hover:scale-105"
                           }`}>
                             <TrendingDown className="w-[18px] h-[18px]" />
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className={`text-[13px] transition-colors duration-150 ${
-                              createCategory === "discount" ? "text-[#166534]" : "text-[#0F172A] group-hover:text-[#1E293B]"
+                              createCategory === "discount" ? "text-[#166534]" : "text-foreground group-hover:text-slate-800"
                             }`} style={{ fontWeight: 600 }}>Discount</p>
                             <p className={`text-[11px] mt-0.5 truncate transition-colors duration-150 ${
-                              createCategory === "discount" ? "text-[#22C55E]" : "text-[#94A3B8]"
+                              createCategory === "discount" ? "text-[#22C55E]" : "text-slate-400"
                             }`}>Lower price adjustment</p>
                           </div>
                           <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-all duration-200 shrink-0 ${
@@ -3115,28 +3115,28 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                         className={`group relative rounded-xl overflow-hidden border transition-all duration-200 cursor-pointer ${
                           createCategory === "premium"
                             ? "border-[#C4B5FD]/70 bg-white shadow-[0_1px_4px_rgba(124,58,237,0.06)]"
-                            : "border-[#E2E8F0] bg-white hover:border-[#DDD6FE] hover:shadow-[0_4px_16px_-4px_rgba(124,58,237,0.10)]"
+                            : "border-border bg-white hover:border-[#DDD6FE] hover:shadow-[0_4px_16px_-4px_rgba(124,58,237,0.10)]"
                         }`}
                       >
                         <div className={`absolute inset-0 transition-all duration-300 pointer-events-none ${
                           createCategory === "premium"
-                            ? "bg-gradient-to-br from-[#F5F3FF]/50 to-transparent"
-                            : "bg-gradient-to-br from-[#F5F3FF]/0 to-[#F5F3FF]/0 group-hover:from-[#F5F3FF]/60 group-hover:to-transparent"
+                            ? "bg-gradient-to-br from-violet-50/50 to-transparent"
+                            : "bg-gradient-to-br from-violet-50/0 to-violet-50/0 group-hover:from-violet-50/60 group-hover:to-transparent"
                         }`} />
                         <div className="relative flex items-center gap-3 pl-3.5 pr-3 py-3">
                           <div className={`w-9 h-9 rounded-[10px] flex items-center justify-center shrink-0 transition-all duration-200 ${
                             createCategory === "premium"
-                              ? "bg-gradient-to-br from-[#EDE9FE] to-[#DDD6FE] text-[#7C3AED]"
-                              : "bg-gradient-to-br from-[#F5F3FF] to-[#EDE9FE] text-[#8B5CF6] group-hover:scale-105"
+                              ? "bg-gradient-to-br from-[#EDE9FE] to-[#DDD6FE] text-violet"
+                              : "bg-gradient-to-br from-violet-50 to-[#EDE9FE] text-violet-500 group-hover:scale-105"
                           }`}>
                             <TrendingUp className="w-[18px] h-[18px]" />
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className={`text-[13px] transition-colors duration-150 ${
-                              createCategory === "premium" ? "text-[#5B21B6]" : "text-[#0F172A] group-hover:text-[#1E293B]"
+                              createCategory === "premium" ? "text-[#5B21B6]" : "text-foreground group-hover:text-slate-800"
                             }`} style={{ fontWeight: 600 }}>Premium</p>
                             <p className={`text-[11px] mt-0.5 truncate transition-colors duration-150 ${
-                              createCategory === "premium" ? "text-[#8B5CF6]" : "text-[#94A3B8]"
+                              createCategory === "premium" ? "text-violet-500" : "text-slate-400"
                             }`}>Higher price adjustment</p>
                           </div>
                           <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-all duration-200 shrink-0 ${
@@ -3152,7 +3152,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
 
                     {/* Basis selector pills */}
                     <div className="flex items-center gap-2 mt-3">
-                      <span className="text-[12px] text-[#64748B] mr-1" style={{ fontWeight: 500 }}>Basis:</span>
+                      <span className="text-[12px] text-slate-500 mr-1" style={{ fontWeight: 500 }}>Basis:</span>
                       {(["volume", "value"] as const).map((b) => (
                         <button
                           key={b}
@@ -3160,9 +3160,9 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                           className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-[12px] transition-all cursor-pointer ${
                             createBasis === b
                               ? createCategory === "discount"
-                                ? "border-[#16A34A]/30 bg-[#F0FDF4] text-[#15803D]"
-                                : "border-[#7C3AED]/30 bg-[#F5F3FF] text-[#6D28D9]"
-                              : "border-[#E2E8F0] bg-white text-[#64748B] hover:border-[#CBD5E1] hover:bg-[#F8FAFC]"
+                                ? "border-green-600/30 bg-green-50 text-[#15803D]"
+                                : "border-violet/30 bg-violet-50 text-[#6D28D9]"
+                              : "border-border bg-white text-slate-500 hover:border-slate-300 hover:bg-slate-50"
                           }`}
                           style={{ fontWeight: createBasis === b ? 600 : 500 }}
                         >
@@ -3176,18 +3176,18 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                   {/* Pricing Rule Details */}
                   <div>
                     <div className="flex items-center gap-1.5 mb-3">
-                      <span className="text-sm text-[#0F172A]" style={{ fontWeight: 600 }}>Pricing Rule Details</span>
-                      <Tooltip><TooltipTrigger asChild><span><Info className="w-3.5 h-3.5 text-[#CBD5E1]" /></span></TooltipTrigger><TooltipContent className="z-[300]"><p className="text-xs">Name and describe this pricing rule.</p></TooltipContent></Tooltip>
+                      <span className="text-sm text-foreground" style={{ fontWeight: 600 }}>Pricing Rule Details</span>
+                      <Tooltip><TooltipTrigger asChild><span><Info className="w-3.5 h-3.5 text-slate-300" /></span></TooltipTrigger><TooltipContent className="z-[300]"><p className="text-xs">Name and describe this pricing rule.</p></TooltipContent></Tooltip>
                     </div>
-                    <div className="rounded-xl border border-[#E2E8F0] bg-white p-4 space-y-4">
+                    <div className="rounded-xl border border-border bg-white p-4 space-y-4">
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <label className="text-[12px] text-[#0F172A] mb-1.5 block" style={{ fontWeight: 600 }}>{createCategory === "discount" ? "Discount" : "Premium"} Name</label>
+                          <label className="text-[12px] text-foreground mb-1.5 block" style={{ fontWeight: 600 }}>{createCategory === "discount" ? "Discount" : "Premium"} Name</label>
                           <Input
                             value={createName}
                             onChange={(e) => setCreateName(e.target.value)}
                             placeholder={`e.g. ${createCategory === "discount" ? "Volume Discount for Q4" : "Premium Markup for VIP"}`}
-                            className="rounded-lg border-[#E2E8F0] bg-white text-[13px]"
+                            className="rounded-lg border-border bg-white text-[13px]"
                           />
                         </div>
                         <div>
@@ -3204,32 +3204,32 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                       <div>
                         <div className="flex items-center gap-2.5">
                           <Switch checked={createLimitDate} onCheckedChange={setCreateLimitDate} />
-                          <span className="text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>Limit Rule to Date Range</span>
+                          <span className="text-[13px] text-foreground" style={{ fontWeight: 500 }}>Limit Rule to Date Range</span>
                         </div>
                         {createLimitDate && (
-                          <div className="grid grid-cols-2 gap-4 mt-3 pt-3 border-t border-[#F1F5F9]">
+                          <div className="grid grid-cols-2 gap-4 mt-3 pt-3 border-t border-muted">
                             <div>
                               <div className="flex items-center gap-1 mb-1.5">
-                                <label className="text-[12px] text-[#0F172A]" style={{ fontWeight: 600 }}>Valid From</label>
-                                <Tooltip><TooltipTrigger asChild><span><Info className="w-3 h-3 text-[#CBD5E1]" /></span></TooltipTrigger><TooltipContent className="z-[300]"><p className="text-xs">Start date for this rule.</p></TooltipContent></Tooltip>
+                                <label className="text-[12px] text-foreground" style={{ fontWeight: 600 }}>Valid From</label>
+                                <Tooltip><TooltipTrigger asChild><span><Info className="w-3 h-3 text-slate-300" /></span></TooltipTrigger><TooltipContent className="z-[300]"><p className="text-xs">Start date for this rule.</p></TooltipContent></Tooltip>
                               </div>
                               <Input
                                 type="date"
                                 value={createValidFrom}
                                 onChange={(e) => setCreateValidFrom(e.target.value)}
-                                className="rounded-lg border-[#E2E8F0] bg-white text-[13px]"
+                                className="rounded-lg border-border bg-white text-[13px]"
                               />
                             </div>
                             <div>
                               <div className="flex items-center gap-1 mb-1.5">
-                                <label className="text-[12px] text-[#0F172A]" style={{ fontWeight: 600 }}>Valid To</label>
-                                <Tooltip><TooltipTrigger asChild><span><Info className="w-3 h-3 text-[#CBD5E1]" /></span></TooltipTrigger><TooltipContent className="z-[300]"><p className="text-xs">End date for this rule.</p></TooltipContent></Tooltip>
+                                <label className="text-[12px] text-foreground" style={{ fontWeight: 600 }}>Valid To</label>
+                                <Tooltip><TooltipTrigger asChild><span><Info className="w-3 h-3 text-slate-300" /></span></TooltipTrigger><TooltipContent className="z-[300]"><p className="text-xs">End date for this rule.</p></TooltipContent></Tooltip>
                               </div>
                               <Input
                                 type="date"
                                 value={createValidTo}
                                 onChange={(e) => setCreateValidTo(e.target.value)}
-                                className="rounded-lg border-[#E2E8F0] bg-white text-[13px]"
+                                className="rounded-lg border-border bg-white text-[13px]"
                               />
                             </div>
                           </div>
@@ -3242,29 +3242,29 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                   <div>
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-1.5">
-                        <span className="text-sm text-[#0F172A]" style={{ fontWeight: 600 }}>{createCategory === "discount" ? "Discount" : "Premium"} Tiers</span>
-                        <span className="text-[11px] text-[#94A3B8] bg-[#F1F5F9] px-1.5 py-0.5 rounded" style={{ fontWeight: 600 }}>{createTiers.length}</span>
+                        <span className="text-sm text-foreground" style={{ fontWeight: 600 }}>{createCategory === "discount" ? "Discount" : "Premium"} Tiers</span>
+                        <span className="text-[11px] text-slate-400 bg-muted px-1.5 py-0.5 rounded" style={{ fontWeight: 600 }}>{createTiers.length}</span>
                       </div>
                     </div>
 
                     <div className="space-y-2.5">
                       {createTiers.map((tier, idx) => {
                         const isDis = createCategory === "discount";
-                        const accent = isDis ? "#16A34A" : "#7C3AED";
+                        const accent = isDis ? "#16A34A" : "hsl(var(--violet))";
                         const accentBg = isDis ? "#F0FDF4" : "#F5F3FF";
                         const accentBorder = isDis ? "#BBF7D0" : "#DDD6FE";
                         return (
-                        <div key={idx} className="rounded-xl border bg-white overflow-hidden transition-all" style={{ borderColor: tier.qtyLimits ? accentBorder : "#E2E8F0" }}>
+                        <div key={idx} className="rounded-xl border bg-white overflow-hidden transition-all" style={{ borderColor: tier.qtyLimits ? accentBorder : "hsl(var(--border))" }}>
                           {/* Header */}
-                          <div className="flex items-center justify-between px-3.5 py-2 border-b border-[#F1F5F9]" style={{ backgroundColor: accentBg }}>
+                          <div className="flex items-center justify-between px-3.5 py-2 border-b border-muted" style={{ backgroundColor: accentBg }}>
                             <div className="flex items-center gap-2">
                               <span className="w-5 h-5 rounded-md flex items-center justify-center text-[10px] text-white" style={{ fontWeight: 700, backgroundColor: accent }}>{idx + 1}</span>
-                              <span className="text-[12px] text-[#0F172A]" style={{ fontWeight: 600 }}>Tier {idx + 1}</span>
+                              <span className="text-[12px] text-foreground" style={{ fontWeight: 600 }}>Tier {idx + 1}</span>
                             </div>
                             {idx > 0 && (
                               <button
                                 onClick={() => removeTier(idx)}
-                                className="w-6 h-6 rounded-md flex items-center justify-center text-[#94A3B8] hover:text-[#EF4444] hover:bg-white/60 transition-all cursor-pointer"
+                                className="w-6 h-6 rounded-md flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-white/60 transition-all cursor-pointer"
                               >
                                 <X className="w-3.5 h-3.5" />
                               </button>
@@ -3277,14 +3277,14 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                               {/* Discount / Premium field */}
                               <div>
                                 <div className="flex items-center justify-between mb-1.5">
-                                  <label className="text-[12px] text-[#0F172A]" style={{ fontWeight: 500 }}>
+                                  <label className="text-[12px] text-foreground" style={{ fontWeight: 500 }}>
                                     {isDis ? "Discount" : "Premium"} {tier.fixRate ? "Amount" : "Rate"}
                                   </label>
-                                  <div className="inline-flex items-center h-[22px] rounded-full bg-[#F1F5F9] p-0.5">
+                                  <div className="inline-flex items-center h-[22px] rounded-full bg-muted p-0.5">
                                     <button
                                       type="button"
                                       onClick={() => updateTier(idx, { fixRate: false })}
-                                      className={`px-2 h-[18px] rounded-full text-[10px] transition-all ${!tier.fixRate ? "bg-white text-[#0A77FF] shadow-sm" : "text-[#64748B] hover:text-[#334155]"}`}
+                                      className={`px-2 h-[18px] rounded-full text-[10px] transition-all ${!tier.fixRate ? "bg-white text-primary shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
                                       style={{ fontWeight: 600 }}
                                     >
                                       %
@@ -3292,7 +3292,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                                     <button
                                       type="button"
                                       onClick={() => updateTier(idx, { fixRate: true })}
-                                      className={`px-2 h-[18px] rounded-full text-[10px] transition-all ${tier.fixRate ? "bg-white text-[#0A77FF] shadow-sm" : "text-[#64748B] hover:text-[#334155]"}`}
+                                      className={`px-2 h-[18px] rounded-full text-[10px] transition-all ${tier.fixRate ? "bg-white text-primary shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
                                       style={{ fontWeight: 600 }}
                                     >
                                       $
@@ -3301,16 +3301,16 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                                 </div>
                                 <div className="relative">
                                   {tier.fixRate && (
-                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[13px] text-[#94A3B8]">$</span>
+                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[13px] text-slate-400">$</span>
                                   )}
                                   <Input
                                     value={tier.discount}
                                     onChange={(e) => updateTier(idx, { discount: e.target.value })}
                                     placeholder={tier.fixRate ? "e.g. 25.00" : "e.g. 50"}
-                                    className={`rounded-lg border-[#E2E8F0] bg-white text-[13px] h-9 text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 ${tier.fixRate ? "pl-7 pr-3" : "pr-8"}`}
+                                    className={`rounded-lg border-border bg-white text-[13px] h-9 text-foreground placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary/20 ${tier.fixRate ? "pl-7 pr-3" : "pr-8"}`}
                                   />
                                   {!tier.fixRate && (
-                                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[13px] text-[#94A3B8]">%</span>
+                                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[13px] text-slate-400">%</span>
                                   )}
                                 </div>
                               </div>
@@ -3321,33 +3321,33 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                                   className="flex items-center gap-2 cursor-pointer select-none"
                                   onClick={() => updateTier(idx, { qtyLimits: !tier.qtyLimits })}
                                 >
-                                  <div className={`w-[16px] h-[16px] rounded-[4px] flex items-center justify-center shrink-0 transition-colors ${tier.qtyLimits ? "bg-[#0A77FF]" : "border-[1.5px] border-[#CBD5E1] bg-white hover:border-[#94A3B8]"}`}>
+                                  <div className={`w-[16px] h-[16px] rounded-[4px] flex items-center justify-center shrink-0 transition-colors ${tier.qtyLimits ? "bg-primary" : "border-[1.5px] border-slate-300 bg-white hover:border-slate-400"}`}>
                                     {tier.qtyLimits && <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />}
                                   </div>
-                                  <span className="text-[12px] text-[#334155]" style={{ fontWeight: 500 }}>Order Qty Limits</span>
+                                  <span className="text-[12px] text-slate-700" style={{ fontWeight: 500 }}>Order Qty Limits</span>
                                 </label>
                               </div>
                             </div>
 
                             {/* Expanded qty fields */}
                             {tier.qtyLimits && (
-                              <div className="grid grid-cols-2 gap-3 mt-3 pt-3 border-t border-[#F1F5F9]">
+                              <div className="grid grid-cols-2 gap-3 mt-3 pt-3 border-t border-muted">
                                 <div>
-                                  <label className="text-[12px] text-[#0F172A] mb-1.5 block" style={{ fontWeight: 500 }}>Min Qty</label>
+                                  <label className="text-[12px] text-foreground mb-1.5 block" style={{ fontWeight: 500 }}>Min Qty</label>
                                   <Input
                                     value={tier.minQty}
                                     onChange={(e) => updateTier(idx, { minQty: e.target.value })}
                                     placeholder="e.g. 100"
-                                    className="rounded-lg border-[#E2E8F0] bg-white text-[13px] h-9 text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
+                                    className="rounded-lg border-border bg-white text-[13px] h-9 text-foreground placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary/20"
                                   />
                                 </div>
                                 <div>
-                                  <label className="text-[12px] text-[#0F172A] mb-1.5 block" style={{ fontWeight: 500 }}>Max Qty</label>
+                                  <label className="text-[12px] text-foreground mb-1.5 block" style={{ fontWeight: 500 }}>Max Qty</label>
                                   <Input
                                     value={tier.maxQty}
                                     onChange={(e) => updateTier(idx, { maxQty: e.target.value })}
                                     placeholder="e.g. 500"
-                                    className="rounded-lg border-[#E2E8F0] bg-white text-[13px] h-9 text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
+                                    className="rounded-lg border-border bg-white text-[13px] h-9 text-foreground placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary/20"
                                   />
                                 </div>
                               </div>
@@ -3360,7 +3360,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
 
                     <button
                       onClick={addTier}
-                      className={`inline-flex items-center gap-1.5 mt-3 px-3 py-1.5 rounded-lg border border-dashed text-[12px] transition-all cursor-pointer w-full justify-center ${createCategory === "discount" ? "border-[#BBF7D0] text-[#16A34A] hover:bg-[#F0FDF4] hover:border-[#86EFAC]" : "border-[#DDD6FE] text-[#7C3AED] hover:bg-[#F5F3FF] hover:border-[#C4B5FD]"}`}
+                      className={`inline-flex items-center gap-1.5 mt-3 px-3 py-1.5 rounded-lg border border-dashed text-[12px] transition-all cursor-pointer w-full justify-center ${createCategory === "discount" ? "border-[#BBF7D0] text-green-600 hover:bg-green-50 hover:border-[#86EFAC]" : "border-[#DDD6FE] text-violet hover:bg-violet-50 hover:border-[#C4B5FD]"}`}
                       style={{ fontWeight: 600 }}
                     >
                       <Plus className="w-3.5 h-3.5" /> Add Tier
@@ -3373,17 +3373,17 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
               {createStep === 2 && (
                 <div className="space-y-5">
                   {/* Summary banner */}
-                  <div className="rounded-xl border border-[#E2E8F0] bg-white p-3.5 flex items-center gap-3">
+                  <div className="rounded-xl border border-border bg-white p-3.5 flex items-center gap-3">
                     <div className={`w-9 h-9 rounded-[10px] flex items-center justify-center shrink-0 ${createCategory === "discount" ? "bg-gradient-to-br from-[#DCFCE7] to-[#BBF7D0]" : "bg-gradient-to-br from-[#EDE9FE] to-[#DDD6FE]"}`}>
-                      {createCategory === "discount" ? <TrendingDown className="w-4.5 h-4.5 text-[#15803D]" /> : <TrendingUp className="w-4.5 h-4.5 text-[#7C3AED]" />}
+                      {createCategory === "discount" ? <TrendingDown className="w-4.5 h-4.5 text-[#15803D]" /> : <TrendingUp className="w-4.5 h-4.5 text-violet" />}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-[13px] text-[#334155] truncate" style={{ fontWeight: 600 }}>{createName || "Untitled Rule"}</p>
-                      <p className="text-[11px] text-[#64748B] truncate">{createCategory === "discount" ? "Discount" : "Premium"} · {createBasis === "volume" ? "Volume-Based" : "Value-Based"} · {createTiers.length} tier{createTiers.length !== 1 ? "s" : ""}{createTiers[0]?.discount ? ` · ${createTiers[0].discount}${createTiers[0].fixRate ? "$" : "%"}` : ""}</p>
+                      <p className="text-[13px] text-slate-700 truncate" style={{ fontWeight: 600 }}>{createName || "Untitled Rule"}</p>
+                      <p className="text-[11px] text-slate-500 truncate">{createCategory === "discount" ? "Discount" : "Premium"} · {createBasis === "volume" ? "Volume-Based" : "Value-Based"} · {createTiers.length} tier{createTiers.length !== 1 ? "s" : ""}{createTiers[0]?.discount ? ` · ${createTiers[0].discount}${createTiers[0].fixRate ? "$" : "%"}` : ""}</p>
                     </div>
                     <button
                       onClick={() => setCreateStep(1)}
-                      className="text-[11px] text-[#0A77FF] hover:text-[#0862D0] transition-colors cursor-pointer shrink-0"
+                      className="text-[11px] text-primary hover:text-[#0862D0] transition-colors cursor-pointer shrink-0"
                       style={{ fontWeight: 600 }}
                     >
                       Edit Setup
@@ -3391,8 +3391,8 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                   </div>
 
                   {/* Items, Categories, Partners & Attachments card */}
-                  <div className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden">
-                    <div className="flex items-center gap-0 border-b border-[#E2E8F0] px-4">
+                  <div className="rounded-xl border border-border bg-white overflow-hidden">
+                    <div className="flex items-center gap-0 border-b border-border px-4">
                       {([
                         { key: "items" as const, label: "Items", icon: Package, count: 0 },
                         { key: "categories" as const, label: "Categories", icon: FolderOpen, count: 0 },
@@ -3401,14 +3401,14 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                         <button
                           key={t.key}
                           onClick={() => setCreateItemsTab(t.key)}
-                          className={`relative px-3 py-2.5 text-[12px] flex items-center gap-1.5 transition-colors cursor-pointer ${createItemsTab === t.key ? "text-[#0A77FF]" : "text-[#64748B] hover:text-[#334155]"}`}
+                          className={`relative px-3 py-2.5 text-[12px] flex items-center gap-1.5 transition-colors cursor-pointer ${createItemsTab === t.key ? "text-primary" : "text-slate-500 hover:text-slate-700"}`}
                           style={{ fontWeight: createItemsTab === t.key ? 600 : 500 }}
                         >
                           <t.icon className="w-3.5 h-3.5" />
                           {t.label}
-                          <span className={`px-1.5 py-0.5 rounded text-[10px] ${createItemsTab === t.key ? "bg-[#DBEAFE] text-[#0A77FF]" : "bg-[#F1F5F9] text-[#94A3B8]"}`} style={{ fontWeight: 700 }}>{t.count}</span>
+                          <span className={`px-1.5 py-0.5 rounded text-[10px] ${createItemsTab === t.key ? "bg-blue-100 text-primary" : "bg-muted text-slate-400"}`} style={{ fontWeight: 700 }}>{t.count}</span>
                           {createItemsTab === t.key && (
-                            <div className="absolute bottom-0 left-0 right-0 h-[2px] rounded-t-full bg-[#0A77FF]" />
+                            <div className="absolute bottom-0 left-0 right-0 h-[2px] rounded-t-full bg-primary" />
                           )}
                         </button>
                       ))}
@@ -3419,19 +3419,19 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                       <div className="p-4">
                         <div className="flex items-center gap-2 mb-4">
                           <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8]" />
-                            <Input placeholder="Search items to assign..." className="pl-9 rounded-lg border-[#E2E8F0] bg-[#F8FAFC] text-[13px] h-9" />
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+                            <Input placeholder="Search items to assign..." className="pl-9 rounded-lg border-border bg-slate-50 text-[13px] h-9" />
                           </div>
-                          <button className="inline-flex items-center gap-1.5 h-9 px-3 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-[12px] shadow-sm transition-colors cursor-pointer" style={{ fontWeight: 600 }}>
+                          <button className="inline-flex items-center gap-1.5 h-9 px-3 rounded-lg bg-primary hover:bg-[#0862D0] text-white text-[12px] shadow-sm transition-colors cursor-pointer" style={{ fontWeight: 600 }}>
                             <Plus className="w-3.5 h-3.5" /> Add Items
                           </button>
                         </div>
                         <div className="py-8 text-center">
-                          <div className="w-12 h-12 rounded-xl bg-[#F8FAFC] border border-[#E8ECF1] flex items-center justify-center mx-auto mb-3">
-                            <Package className="w-5.5 h-5.5 text-[#94A3B8]" />
+                          <div className="w-12 h-12 rounded-xl bg-slate-50 border border-[#E8ECF1] flex items-center justify-center mx-auto mb-3">
+                            <Package className="w-5.5 h-5.5 text-slate-400" />
                           </div>
-                          <p className="text-[13px] text-[#334155] mb-1" style={{ fontWeight: 600 }}>No items assigned yet</p>
-                          <p className="text-[11px] text-[#94A3B8] max-w-[260px] mx-auto">Search and add items that should be affected by this pricing rule.</p>
+                          <p className="text-[13px] text-slate-700 mb-1" style={{ fontWeight: 600 }}>No items assigned yet</p>
+                          <p className="text-[11px] text-slate-400 max-w-[260px] mx-auto">Search and add items that should be affected by this pricing rule.</p>
                         </div>
                       </div>
                     )}
@@ -3441,19 +3441,19 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                       <div className="p-4">
                         <div className="flex items-center gap-2 mb-4">
                           <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8]" />
-                            <Input placeholder="Search categories to assign..." className="pl-9 rounded-lg border-[#E2E8F0] bg-[#F8FAFC] text-[13px] h-9" />
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+                            <Input placeholder="Search categories to assign..." className="pl-9 rounded-lg border-border bg-slate-50 text-[13px] h-9" />
                           </div>
-                          <button className="inline-flex items-center gap-1.5 h-9 px-3 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-[12px] shadow-sm transition-colors cursor-pointer" style={{ fontWeight: 600 }}>
+                          <button className="inline-flex items-center gap-1.5 h-9 px-3 rounded-lg bg-primary hover:bg-[#0862D0] text-white text-[12px] shadow-sm transition-colors cursor-pointer" style={{ fontWeight: 600 }}>
                             <Plus className="w-3.5 h-3.5" /> Add Categories
                           </button>
                         </div>
                         <div className="py-8 text-center">
-                          <div className="w-12 h-12 rounded-xl bg-[#F8FAFC] border border-[#E8ECF1] flex items-center justify-center mx-auto mb-3">
-                            <FolderOpen className="w-5.5 h-5.5 text-[#94A3B8]" />
+                          <div className="w-12 h-12 rounded-xl bg-slate-50 border border-[#E8ECF1] flex items-center justify-center mx-auto mb-3">
+                            <FolderOpen className="w-5.5 h-5.5 text-slate-400" />
                           </div>
-                          <p className="text-[13px] text-[#334155] mb-1" style={{ fontWeight: 600 }}>No categories assigned yet</p>
-                          <p className="text-[11px] text-[#94A3B8] max-w-[260px] mx-auto">Assign categories to apply this pricing rule to all items within them.</p>
+                          <p className="text-[13px] text-slate-700 mb-1" style={{ fontWeight: 600 }}>No categories assigned yet</p>
+                          <p className="text-[11px] text-slate-400 max-w-[260px] mx-auto">Assign categories to apply this pricing rule to all items within them.</p>
                         </div>
                       </div>
                     )}
@@ -3462,12 +3462,12 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                     {createItemsTab === "attachments" && (
                       <div className="p-4">
                         <div className="py-8 text-center">
-                          <div className="w-12 h-12 rounded-xl bg-[#F8FAFC] border border-[#E8ECF1] border-dashed flex items-center justify-center mx-auto mb-3">
-                            <Upload className="w-5.5 h-5.5 text-[#94A3B8]" />
+                          <div className="w-12 h-12 rounded-xl bg-slate-50 border border-[#E8ECF1] border-dashed flex items-center justify-center mx-auto mb-3">
+                            <Upload className="w-5.5 h-5.5 text-slate-400" />
                           </div>
-                          <p className="text-[13px] text-[#334155] mb-1" style={{ fontWeight: 600 }}>No attachments yet</p>
-                          <p className="text-[11px] text-[#94A3B8] max-w-[280px] mx-auto mb-3">Upload supporting documents, contracts, or approval files for this pricing rule.</p>
-                          <button className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg border border-[#E2E8F0] bg-white text-[12px] text-[#334155] hover:bg-[#F8FAFC] hover:border-[#CBD5E1] transition-colors cursor-pointer" style={{ fontWeight: 600 }}>
+                          <p className="text-[13px] text-slate-700 mb-1" style={{ fontWeight: 600 }}>No attachments yet</p>
+                          <p className="text-[11px] text-slate-400 max-w-[280px] mx-auto mb-3">Upload supporting documents, contracts, or approval files for this pricing rule.</p>
+                          <button className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg border border-border bg-white text-[12px] text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-colors cursor-pointer" style={{ fontWeight: 600 }}>
                             <Upload className="w-3.5 h-3.5" /> Upload Files
                           </button>
                         </div>
@@ -3485,7 +3485,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
               <>
                 <button
                   onClick={() => { setCreateModalOpen(false); resetCreateForm(); setCreateFullscreen(false); }}
-                  className="px-3 sm:px-5 py-2 rounded-lg border border-[#E2E8F0] text-xs sm:text-[13px] text-[#64748B] hover:text-[#0F172A] hover:border-[#CBD5E1] hover:bg-[#F8FAFC] transition-colors cursor-pointer"
+                  className="px-3 sm:px-5 py-2 rounded-lg border border-border text-xs sm:text-[13px] text-slate-500 hover:text-foreground hover:border-slate-300 hover:bg-slate-50 transition-colors cursor-pointer"
                   style={{ fontWeight: 600 }}
                 >
                   Cancel
@@ -3493,7 +3493,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                 <button
                   onClick={() => { if (createName.trim()) setCreateStep(2); }}
                   disabled={!createName.trim()}
-                  className="inline-flex items-center gap-1.5 px-3 sm:px-5 py-2 rounded-lg bg-[#0A77FF] text-white text-xs sm:text-[13px] hover:bg-[#0862D0] transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-3 sm:px-5 py-2 rounded-lg bg-primary text-white text-xs sm:text-[13px] hover:bg-[#0862D0] transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm cursor-pointer"
                   style={{ fontWeight: 600 }}
                 >
                   Continue
@@ -3504,7 +3504,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
               <>
                 <button
                   onClick={() => setCreateStep(1)}
-                  className="inline-flex items-center gap-1.5 text-xs sm:text-[13px] text-[#64748B] hover:text-[#0F172A] transition-colors mr-auto cursor-pointer"
+                  className="inline-flex items-center gap-1.5 text-xs sm:text-[13px] text-slate-500 hover:text-foreground transition-colors mr-auto cursor-pointer"
                   style={{ fontWeight: 500 }}
                 >
                   <ArrowLeft className="w-3.5 h-3.5" />
@@ -3512,14 +3512,14 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                 </button>
                 <button
                   onClick={() => { setCreateModalOpen(false); resetCreateForm(); setCreateFullscreen(false); }}
-                  className="px-3 sm:px-5 py-2 rounded-lg border border-[#E2E8F0] text-xs sm:text-[13px] text-[#64748B] hover:text-[#0F172A] hover:border-[#CBD5E1] hover:bg-[#F8FAFC] transition-colors cursor-pointer"
+                  className="px-3 sm:px-5 py-2 rounded-lg border border-border text-xs sm:text-[13px] text-slate-500 hover:text-foreground hover:border-slate-300 hover:bg-slate-50 transition-colors cursor-pointer"
                   style={{ fontWeight: 600 }}
                 >
                   Discard
                 </button>
                 <button
                   onClick={handleSaveRule}
-                  className="inline-flex items-center gap-1.5 px-3 sm:px-5 py-2 rounded-lg bg-[#0A77FF] text-white text-xs sm:text-[13px] hover:bg-[#0862D0] transition-colors shadow-sm cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-3 sm:px-5 py-2 rounded-lg bg-primary text-white text-xs sm:text-[13px] hover:bg-[#0862D0] transition-colors shadow-sm cursor-pointer"
                   style={{ fontWeight: 600 }}
                 >
                   <Plus className="w-3.5 h-3.5" />
@@ -3550,13 +3550,13 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
             {/* Title row */}
             <div className="flex items-start justify-between gap-3 mb-4">
               <div className="min-w-0">
-                <h2 className="text-[15px] text-[#0F172A]" style={{ fontWeight: 700 }}>Pricing Rule Presets</h2>
-                <p className="text-[12px] text-[#94A3B8] mt-0.5">Browse and apply pricing rules to this vendor</p>
+                <h2 className="text-[15px] text-foreground" style={{ fontWeight: 700 }}>Pricing Rule Presets</h2>
+                <p className="text-[12px] text-slate-400 mt-0.5">Browse and apply pricing rules to this vendor</p>
               </div>
               <div className="flex items-center gap-1.5 shrink-0">
                 <button
                   onClick={() => setExplorePresetsFullscreen(f => !f)}
-                  className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border border-[#E2E8F0] bg-white text-[12px] text-[#475569] hover:bg-[#F8FAFC] hover:border-[#CBD5E1] transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border border-border bg-white text-[12px] text-muted-foreground hover:bg-slate-50 hover:border-slate-300 transition-colors cursor-pointer"
                   style={{ fontWeight: 500 }}
                 >
                   {explorePresetsFullscreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
@@ -3564,7 +3564,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                 </button>
                 <button
                   onClick={() => { setExplorePresetsOpen(false); setExplorePresetsFullscreen(false); }}
-                  className="w-8 h-8 rounded-lg flex items-center justify-center text-[#94A3B8] hover:text-[#0F172A] hover:bg-[#F1F5F9] transition-colors cursor-pointer"
+                  className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -3574,22 +3574,22 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
             {/* Search row */}
             <div className="flex items-center gap-3 mb-3">
               <div className="relative shrink-0">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8]" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
                 <Input
                   value={explorePresetsSearch}
                   onChange={(e) => setExplorePresetsSearch(e.target.value)}
                   placeholder="Search pricing rules..."
-                  className="pl-9 h-9 rounded-lg border-[#E2E8F0] bg-[#FAFBFC] text-[13px] w-[220px]"
+                  className="pl-9 h-9 rounded-lg border-border bg-[#FAFBFC] text-[13px] w-[220px]"
                 />
                 {explorePresetsSearch && (
-                  <button onClick={() => setExplorePresetsSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#94A3B8] hover:text-[#475569] cursor-pointer">
+                  <button onClick={() => setExplorePresetsSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-muted-foreground cursor-pointer">
                     <X className="w-3.5 h-3.5" />
                   </button>
                 )}
               </div>
 
               {/* Category toggle — inline with search */}
-              <div className="inline-flex items-center rounded-lg bg-[#F8FAFC] border border-[#E2E8F0]/60 p-0.5 shrink-0">
+              <div className="inline-flex items-center rounded-lg bg-slate-50 border border-border/60 p-0.5 shrink-0">
                 {([
                   { key: "discount" as const, label: "Discounts", color: "#047857", bg: "#ECFDF5", icon: TrendingDown },
                   { key: "premium" as const, label: "Premiums", color: "#6D28D9", bg: "#F5F3FF", icon: TrendingUp },
@@ -3609,7 +3609,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                       {cat.label}
                       <span
                         className="text-[10px] rounded-full px-1.5 py-px min-w-[18px] text-center"
-                        style={{ fontWeight: 600, color: active ? cat.color : "#475569", backgroundColor: active ? `${cat.color}15` : "#E2E8F0" }}
+                        style={{ fontWeight: 600, color: active ? cat.color: "hsl(var(--muted-foreground))", backgroundColor: active ? `${cat.color}15` : "hsl(var(--border))" }}
                       >
                         {count}
                       </span>
@@ -3619,17 +3619,17 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
               </div>
 
               <div className="flex items-center gap-2 ml-auto shrink-0">
-                <span className="inline-flex items-center justify-center min-w-7 h-7 px-1.5 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] text-[12px] text-[#64748B] tabular-nums" style={{ fontWeight: 600 }}>
+                <span className="inline-flex items-center justify-center min-w-7 h-7 px-1.5 rounded-lg border border-border bg-slate-50 text-[12px] text-slate-500 tabular-nums" style={{ fontWeight: 600 }}>
                   {exploreCards.length}
                 </span>
                 <button
-                  className="inline-flex items-center gap-1.5 h-8 px-2.5 rounded-lg border border-[#E2E8F0] bg-white text-[12px] text-[#475569] hover:bg-[#F8FAFC] hover:border-[#CBD5E1] transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 h-8 px-2.5 rounded-lg border border-border bg-white text-[12px] text-muted-foreground hover:bg-slate-50 hover:border-slate-300 transition-colors cursor-pointer"
                   style={{ fontWeight: 500 }}
                   onClick={() => toast.info("Sort options coming soon")}
                 >
                   <SlidersHorizontal className="w-3.5 h-3.5" />
                   <span className="hidden sm:inline">Name</span>
-                  <ChevronDown className="w-3 h-3 text-[#94A3B8]" />
+                  <ChevronDown className="w-3 h-3 text-slate-400" />
                 </button>
                 <button
                   onClick={() => {
@@ -3638,7 +3638,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                     resetCreateForm();
                     setCreateModalOpen(true);
                   }}
-                  className="inline-flex items-center gap-1.5 h-8 px-3.5 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-[12px] shadow-sm transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 h-8 px-3.5 rounded-lg bg-primary hover:bg-[#0862D0] text-white text-[12px] shadow-sm transition-colors cursor-pointer"
                   style={{ fontWeight: 600 }}
                 >
                   <Plus className="w-3.5 h-3.5" />
@@ -3701,10 +3701,10 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                 return (
                   <div className="py-16 text-center">
                     <div className="w-12 h-12 rounded-xl bg-white border border-[#E8ECF1] border-dashed flex items-center justify-center mx-auto mb-3">
-                      <Search className="w-5 h-5 text-[#CBD5E1]" />
+                      <Search className="w-5 h-5 text-slate-300" />
                     </div>
-                    <p className="text-[13px] text-[#334155] mb-1" style={{ fontWeight: 600 }}>No rules found</p>
-                    <p className="text-[11px] text-[#94A3B8] max-w-[260px] mx-auto">Try adjusting your search or selecting a different filter.</p>
+                    <p className="text-[13px] text-slate-700 mb-1" style={{ fontWeight: 600 }}>No rules found</p>
+                    <p className="text-[11px] text-slate-400 max-w-[260px] mx-auto">Try adjusting your search or selecting a different filter.</p>
                   </div>
                 );
               }
@@ -3734,13 +3734,13 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                           setDetailMode("create");
                           setDetailOpen(true);
                         }}
-                        className="bg-white border border-[#E2E8F0] rounded-xl cursor-pointer group transition-all duration-200 flex flex-col relative"
+                        className="bg-white border border-border rounded-xl cursor-pointer group transition-all duration-200 flex flex-col relative"
                         onMouseEnter={(e) => {
                           e.currentTarget.style.borderColor = "#BFDBFE";
                           e.currentTarget.style.boxShadow = "0 4px 16px -4px rgba(10,119,255,0.10), 0 0 0 1px #BFDBFE";
                         }}
                         onMouseLeave={(e) => {
-                          e.currentTarget.style.borderColor = "#E2E8F0";
+                          e.currentTarget.style.borderColor = "hsl(var(--border))";
                           e.currentTarget.style.boxShadow = "none";
                         }}
                       >
@@ -3752,35 +3752,35 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                                 {isDis ? <TrendingDown className="w-3 h-3" /> : <TrendingUp className="w-3 h-3" />}
                                 {isDis ? "Discount" : "Premium"}
                               </span>
-                              <span className="inline-flex items-center px-2 py-[2px] text-[10px] bg-white text-[#64748B] border-l" style={{ fontWeight: 500, borderColor: ePill.border }}>
+                              <span className="inline-flex items-center px-2 py-[2px] text-[10px] bg-white text-slate-500 border-l" style={{ fontWeight: 500, borderColor: ePill.border }}>
                                 {card.basis === "volume" ? "Volume" : "Value"}
                               </span>
                             </span>
                             <div className="flex items-center gap-1.5 shrink-0">
                               {card.isPreset ? (
-                                <span className="inline-flex items-center gap-1 px-1.5 py-[3px] rounded-md bg-[#F1F5F9] border border-[#CBD5E1] text-[9px] text-[#64748B]" style={{ fontWeight: 600 }}>
+                                <span className="inline-flex items-center gap-1 px-1.5 py-[3px] rounded-md bg-muted border border-slate-300 text-[9px] text-slate-500" style={{ fontWeight: 600 }}>
                                   <Lock className="w-2.5 h-2.5" /> TEMPLATE
                                 </span>
                               ) : (
-                                <span className="inline-flex items-center px-1.5 py-[3px] rounded-md border border-[#CBD5E1] bg-white text-[9px] text-[#475569]" style={{ fontWeight: 600 }}>CUSTOM</span>
+                                <span className="inline-flex items-center px-1.5 py-[3px] rounded-md border border-slate-300 bg-white text-[9px] text-muted-foreground" style={{ fontWeight: 600 }}>CUSTOM</span>
                               )}
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                   <button
                                     onClick={(e) => e.stopPropagation()}
-                                    className="w-6 h-6 rounded-md flex items-center justify-center text-[#CBD5E1] group-hover:text-[#94A3B8] hover:!text-[#475569] hover:bg-[#F1F5F9] transition-all cursor-pointer opacity-0 group-hover:opacity-100"
+                                    className="w-6 h-6 rounded-md flex items-center justify-center text-slate-300 group-hover:text-slate-400 hover:!text-muted-foreground hover:bg-muted transition-all cursor-pointer opacity-0 group-hover:opacity-100"
                                   >
                                     <MoreVertical className="w-3.5 h-3.5" />
                                   </button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end" className="w-[180px] p-1 z-[200]">
                                   <DropdownMenuItem className="gap-2 py-1.5 cursor-pointer text-[13px]" onSelect={() => { setSelectedRule(card); setDetailMode("create"); setDetailOpen(true); }}>
-                                    <Eye className="w-3.5 h-3.5 text-[#64748B]" /> View Details
+                                    <Eye className="w-3.5 h-3.5 text-slate-500" /> View Details
                                   </DropdownMenuItem>
                                   <DropdownMenuItem className="gap-2 py-1.5 cursor-pointer text-[13px]" onSelect={() => {
                                     toast.success(`"${card.name}" applied to this partner.`);
                                   }}>
-                                    <Check className="w-3.5 h-3.5 text-[#64748B]" /> Apply to Partner
+                                    <Check className="w-3.5 h-3.5 text-slate-500" /> Apply to Partner
                                   </DropdownMenuItem>
                                   <DropdownMenuItem className="gap-2 py-1.5 cursor-pointer text-[13px]" onSelect={() => {
                                     resetCreateForm();
@@ -3793,7 +3793,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                                     setExplorePresetsFullscreen(false);
                                     setCreateModalOpen(true);
                                   }}>
-                                    <Copy className="w-3.5 h-3.5 text-[#64748B]" /> Duplicate as Custom
+                                    <Copy className="w-3.5 h-3.5 text-slate-500" /> Duplicate as Custom
                                   </DropdownMenuItem>
                                 </DropdownMenuContent>
                               </DropdownMenu>
@@ -3801,16 +3801,16 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                           </div>
 
                           {/* Row 2: Name */}
-                          <p className="text-[13px] text-[#334155] truncate" style={{ fontWeight: 600 }}>{card.name}</p>
-                          <p className="text-[11px] text-[#64748B] mt-1 line-clamp-2 leading-relaxed" style={{ fontWeight: 400 }}>{card.description}</p>
+                          <p className="text-[13px] text-slate-700 truncate" style={{ fontWeight: 600 }}>{card.name}</p>
+                          <p className="text-[11px] text-slate-500 mt-1 line-clamp-2 leading-relaxed" style={{ fontWeight: 400 }}>{card.description}</p>
 
                           {/* Row 3: Hero value — neutral */}
                           {t0 && (
                             <div className="flex items-baseline gap-2 mt-3">
-                              <span className="text-[22px] text-[#334155] tabular-nums leading-none tracking-tight" style={{ fontWeight: 600 }}>
+                              <span className="text-[22px] text-slate-700 tabular-nums leading-none tracking-tight" style={{ fontWeight: 600 }}>
                                 {t0.discount}
                               </span>
-                              <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>
+                              <span className="text-[11px] text-slate-400" style={{ fontWeight: 500 }}>
                                 {isDis ? "off" : "markup"}
                               </span>
                             </div>
@@ -3831,7 +3831,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                                           className={`h-[22px] rounded-md text-[10px] tabular-nums transition-all duration-200 cursor-pointer flex items-center justify-center px-2 ${
                                             isActive
                                               ? "shadow-sm"
-                                              : "bg-[#F1F5F9] text-[#64748B] hover:bg-[#E2E8F0]"
+                                              : "bg-muted text-slate-500 hover:bg-border"
                                           }`}
                                           style={{
                                             fontWeight: isActive ? 600 : 500,
@@ -3844,41 +3844,41 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                                     })}
                                   </div>
                                   <div className="flex items-center justify-between px-3 py-[6px] rounded-lg border border-[#E8ECF1] bg-[#FAFBFC] text-[11px] tabular-nums min-w-0">
-                                    <div className="flex items-center gap-1.5 text-[#64748B] min-w-0">
+                                    <div className="flex items-center gap-1.5 text-slate-500 min-w-0">
                                       <span style={{ fontWeight: 400 }}>{shownTier.minQty}</span>
-                                      <span className="text-[#CBD5E1]">–</span>
+                                      <span className="text-slate-300">–</span>
                                       <span style={{ fontWeight: 400 }}>{shownTier.maxQty}</span>
                                     </div>
-                                    <span className="shrink-0 ml-2 text-[#334155]" style={{ fontWeight: 600 }}>{shownTier.discount}</span>
+                                    <span className="shrink-0 ml-2 text-slate-700" style={{ fontWeight: 600 }}>{shownTier.discount}</span>
                                   </div>
                                 </div>
                               ) : (
                                 <div className="flex items-center justify-between px-3 py-[6px] rounded-lg border border-[#E8ECF1] bg-[#FAFBFC] text-[11px] tabular-nums min-w-0">
-                                  <div className="flex items-center gap-1.5 text-[#64748B] min-w-0">
+                                  <div className="flex items-center gap-1.5 text-slate-500 min-w-0">
                                     <span style={{ fontWeight: 400 }}>{shownTier.minQty}</span>
-                                    <span className="text-[#CBD5E1]">–</span>
+                                    <span className="text-slate-300">–</span>
                                     <span style={{ fontWeight: 400 }}>{shownTier.maxQty}</span>
                                   </div>
-                                  <span className="shrink-0 ml-2 text-[#334155]" style={{ fontWeight: 600 }}>{shownTier.discount}</span>
+                                  <span className="shrink-0 ml-2 text-slate-700" style={{ fontWeight: 600 }}>{shownTier.discount}</span>
                                 </div>
                               )}
                             </div>
                           )}
 
                           {/* Row 5: Footer meta */}
-                          <div className="flex items-center gap-2 pt-3 border-t border-[#F1F5F9] mt-3">
-                            <span className="inline-flex items-center gap-1 text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>
+                          <div className="flex items-center gap-2 pt-3 border-t border-muted mt-3">
+                            <span className="inline-flex items-center gap-1 text-[10px] text-slate-400" style={{ fontWeight: 500 }}>
                               <Package className="w-3 h-3" /> {card.itemCount} items
                             </span>
                             <span className="w-px h-3 bg-[#E8ECF1]" />
-                            <span className="inline-flex items-center gap-1 text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>
+                            <span className="inline-flex items-center gap-1 text-[10px] text-slate-400" style={{ fontWeight: 500 }}>
                               <Users className="w-3 h-3" />
                               {card.partnerCount} applied
                             </span>
                             {!card.isPreset && (
                               <>
                                 <span className="w-px h-3 bg-[#E8ECF1]" />
-                                <span className="text-[10px] text-[#94A3B8] truncate" style={{ fontWeight: 500 }}>
+                                <span className="text-[10px] text-slate-400 truncate" style={{ fontWeight: 500 }}>
                                   by {card.createdBy.split(" ")[0]}
                                 </span>
                               </>
@@ -3887,13 +3887,13 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                         </div>
 
                         {/* Action buttons footer */}
-                        <div className="border-t border-[#F1F5F9] px-3 py-2 flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                        <div className="border-t border-muted px-3 py-2 flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
                               toast.success(`"${card.name}" applied to this partner.`);
                             }}
-                            className="flex-1 inline-flex items-center justify-center gap-1.5 py-1.5 rounded-md text-[11px] text-[#64748B] hover:text-[#0A77FF] hover:bg-[#EFF6FF] transition-colors cursor-pointer"
+                            className="flex-1 inline-flex items-center justify-center gap-1.5 py-1.5 rounded-md text-[11px] text-slate-500 hover:text-primary hover:bg-blue-50 transition-colors cursor-pointer"
                             style={{ fontWeight: 600 }}
                           >
                             <Check className="w-3 h-3" /> Apply
@@ -3913,7 +3913,7 @@ export function PricingRulesTabNew({ vendor, cfg }: { vendor: Vendor; cfg?: Vend
                               setCreateModalOpen(true);
                               toast.info(`Duplicated "${card.name}" — rename and customize as needed.`);
                             }}
-                            className="flex-1 inline-flex items-center justify-center gap-1.5 py-1.5 rounded-md text-[11px] text-[#64748B] hover:text-[#475569] hover:bg-[#F8FAFC] transition-colors cursor-pointer"
+                            className="flex-1 inline-flex items-center justify-center gap-1.5 py-1.5 rounded-md text-[11px] text-slate-500 hover:text-muted-foreground hover:bg-slate-50 transition-colors cursor-pointer"
                             style={{ fontWeight: 600 }}
                           >
                             <Copy className="w-3 h-3" /> Duplicate

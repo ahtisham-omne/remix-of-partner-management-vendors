@@ -13,11 +13,11 @@ export function CarrierManagementPage() {
   const statusColors: Record<string, { bg: string; text: string }> = {
     Active: { bg: "#F0FDF4", text: "#16A34A" },
     "Under Review": { bg: "#FFF7ED", text: "#EA580C" },
-    Inactive: { bg: "#F1F5F9", text: "#64748B" },
+    Inactive: { bg: "hsl(var(--muted))", text: "#64748B" },
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#F8FAFC]">
+    <div className="flex flex-col h-full bg-slate-50">
       <div className="px-5 py-3.5 border-b border-border bg-card">
         <div className="flex items-center justify-between">
           <div>
@@ -30,7 +30,7 @@ export function CarrierManagementPage() {
           </div>
           <button
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-white text-[13px] transition-colors hover:opacity-90"
-            style={{ backgroundColor: "#0A77FF", fontWeight: 500 }}
+            style={{ backgroundColor: "hsl(var(--primary))", fontWeight: 500 }}
           >
             <Plus className="w-4 h-4" />
             Add Carrier
@@ -45,7 +45,7 @@ export function CarrierManagementPage() {
             <input
               type="text"
               placeholder="Search carriers..."
-              className="w-full pl-9 pr-4 py-2 rounded-lg border border-border bg-card text-[13px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#0A77FF]/20 focus:border-[#0A77FF]"
+              className="w-full pl-9 pr-4 py-2 rounded-lg border border-border bg-card text-[13px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
             />
           </div>
           <button className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-border text-[13px] text-muted-foreground hover:bg-muted transition-colors">
@@ -66,9 +66,9 @@ export function CarrierManagementPage() {
                   <div className="flex items-center gap-2.5">
                     <div
                       className="w-9 h-9 rounded-lg flex items-center justify-center"
-                      style={{ backgroundColor: "#EDF4FF" }}
+                      style={{ backgroundColor: "hsl(var(--accent))" }}
                     >
-                      <Truck className="w-5 h-5" style={{ color: "#0A77FF" }} />
+                      <Truck className="w-5 h-5" style={{ color: "hsl(var(--primary))" }} />
                     </div>
                     <div>
                       <h3 className="text-foreground" style={{ fontSize: "14px", fontWeight: 500 }}>

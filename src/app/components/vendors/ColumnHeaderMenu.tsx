@@ -418,7 +418,7 @@ export function ColumnHeaderMenu({
                   <ChevronLeft className="w-4 h-4" />
                 </button>
                 <div className="flex items-center gap-1.5 text-[13px] min-w-0">
-                  <span className="truncate" style={{ fontWeight: 500, color: "#0f172a" }}>{label}</span>
+                  <span className="truncate" style={{ fontWeight: 500, color: "hsl(var(--foreground))" }}>{label}</span>
                   <span className="text-muted-foreground/50 shrink-0">{operatorLabel}</span>
                 </div>
                 {isFilterActive(currentFilter) && (
@@ -426,7 +426,7 @@ export function ColumnHeaderMenu({
                     type="button"
                     onClick={handleClearFilter}
                     className="ml-auto text-[12px] cursor-pointer transition-colors hover:text-primary shrink-0"
-                    style={{ fontWeight: 500, color: "#0A77FF" }}
+                    style={{ fontWeight: 500, color: "hsl(var(--primary))" }}
                   >
                     Clear
                   </button>
@@ -515,7 +515,7 @@ export function ColumnHeaderMenu({
                         type="button"
                         onClick={handleClearFilter}
                         className="text-[12px] cursor-pointer transition-colors hover:text-primary"
-                        style={{ fontWeight: 500, color: "#0A77FF" }}
+                        style={{ fontWeight: 500, color: "hsl(var(--primary))" }}
                       >
                         Clear selection
                       </button>
@@ -727,7 +727,7 @@ export function ColumnFilterChip({
             type="button"
             className={`inline-flex items-center gap-1 h-[30px] pl-2.5 rounded-l-md border text-[13px] cursor-pointer transition-colors ${
               active
-                ? "border-primary/30 bg-[#EDF4FF] text-primary hover:bg-[#D6E8FF]"
+                ? "border-primary/30 bg-accent text-primary hover:bg-[#D6E8FF]"
                 : "border-border bg-white text-foreground hover:bg-muted/50"
             } ${open ? "border-primary/40" : ""}`}
             style={{ fontWeight: 500, borderRight: "none" }}
@@ -835,7 +835,7 @@ export function ColumnFilterChip({
                       type="button"
                       onClick={clearSelection}
                       className="text-[13px] cursor-pointer transition-colors hover:text-primary"
-                      style={{ fontWeight: 500, color: "#0A77FF" }}
+                      style={{ fontWeight: 500, color: "hsl(var(--primary))" }}
                     >
                       Clear selection
                     </button>
@@ -860,7 +860,7 @@ export function ColumnFilterChip({
                   type="button"
                   onClick={clearSelection}
                   className="mt-2 text-[13px] cursor-pointer transition-colors hover:text-primary"
-                  style={{ fontWeight: 500, color: "#0A77FF" }}
+                  style={{ fontWeight: 500, color: "hsl(var(--primary))" }}
                 >
                   Clear
                 </button>
@@ -902,7 +902,7 @@ export function ColumnFilterChip({
                   type="button"
                   onClick={clearSelection}
                   className="mt-2 text-[13px] cursor-pointer transition-colors hover:text-primary"
-                  style={{ fontWeight: 500, color: "#0A77FF" }}
+                  style={{ fontWeight: 500, color: "hsl(var(--primary))" }}
                 >
                   Clear
                 </button>
@@ -942,7 +942,7 @@ export function ColumnFilterChip({
                   type="button"
                   onClick={clearSelection}
                   className="mt-2 text-[13px] cursor-pointer transition-colors hover:text-primary"
-                  style={{ fontWeight: 500, color: "#0A77FF" }}
+                  style={{ fontWeight: 500, color: "hsl(var(--primary))" }}
                 >
                   Clear
                 </button>
@@ -958,7 +958,7 @@ export function ColumnFilterChip({
         onClick={onRemove}
         className={`inline-flex items-center justify-center h-[30px] w-[28px] rounded-r-md border border-l-0 cursor-pointer transition-colors ${
           active
-            ? "border-primary/30 bg-[#EDF4FF] text-primary/60 hover:text-primary hover:bg-[#D6E8FF]"
+            ? "border-primary/30 bg-accent text-primary/60 hover:text-primary hover:bg-[#D6E8FF]"
             : "border-border bg-white text-muted-foreground/40 hover:text-muted-foreground hover:bg-muted/50"
         }`}
       >

@@ -124,7 +124,7 @@ const MOCK_ADDRESS_SUGGESTIONS = [
 ];
 
 const AVATAR_COLORS = [
-  "#0A77FF", "#7C3AED", "#059669", "#DC2626", "#D97706",
+  "hsl(var(--primary))", "hsl(var(--violet))", "hsl(var(--success))", "hsl(var(--destructive))", "hsl(var(--warning))",
   "#0891B2", "#4F46E5", "#BE185D", "#65A30D", "#EA580C",
 ];
 
@@ -512,13 +512,13 @@ export function CreatePartnerLocationModal({
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <h2
-                  className="text-[15px] sm:text-[17px] text-[#0F172A]"
+                  className="text-[15px] sm:text-[17px] text-foreground"
                   style={{ fontWeight: 700 }}
                 >
                   {isEditMode ? "Edit Partner Location" : "Create New Partner Location"}
                 </h2>
                 <p
-                  className="text-[11px] sm:text-xs text-[#64748B] mt-0.5"
+                  className="text-[11px] sm:text-xs text-slate-500 mt-0.5"
                   style={{ fontWeight: 400 }}
                 >
                   {vendorName
@@ -529,7 +529,7 @@ export function CreatePartnerLocationModal({
               <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
                 <button
                   onClick={() => setIsFullScreen(!isFullScreen)}
-                  className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#475569] hover:bg-[#F8FAFC] hover:border-[#CBD5E1] transition-all cursor-pointer"
+                  className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-border bg-white text-xs text-muted-foreground hover:bg-slate-50 hover:border-slate-300 transition-all cursor-pointer"
                   style={{ fontWeight: 500 }}
                 >
                   {isFullScreen ? (
@@ -541,7 +541,7 @@ export function CreatePartnerLocationModal({
                 </button>
                 <button
                   onClick={handleCancelAttempt}
-                  className="w-8 h-8 rounded-lg flex items-center justify-center text-[#94A3B8] hover:text-[#64748B] hover:bg-[#F1F5F9] transition-all cursor-pointer"
+                  className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-500 hover:bg-muted transition-all cursor-pointer"
                 >
                   <X className="w-4.5 h-4.5" />
                 </button>
@@ -554,14 +554,14 @@ export function CreatePartnerLocationModal({
             <div className="px-4 py-4 transition-all duration-300 ease-out space-y-3 sm:space-y-4">
 
               {/* ── Location Details Card ── */}
-              <div className="rounded-lg border border-[#E2E8F0] bg-white shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
+              <div className="rounded-lg border border-border bg-white shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
                 <div className="px-3 sm:px-4 py-2 sm:py-2.5 border-b border-[#EEF2F6] flex items-center gap-2 bg-[#FAFBFC] rounded-t-lg">
-                  <div className="w-6 h-6 rounded-md bg-[#0A77FF]/8 flex items-center justify-center shrink-0">
-                    <Info className="w-3.5 h-3.5 text-[#0A77FF]" />
+                  <div className="w-6 h-6 rounded-md bg-primary/8 flex items-center justify-center shrink-0">
+                    <Info className="w-3.5 h-3.5 text-primary" />
                   </div>
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Location Details</span>
-                    <span className="text-[9px] sm:text-[10px] text-[#94A3B8] tracking-wider uppercase hidden min-[480px]:inline" style={{ fontWeight: 500 }}>Required</span>
+                    <span className="text-xs sm:text-[13px] text-foreground" style={{ fontWeight: 600 }}>Location Details</span>
+                    <span className="text-[9px] sm:text-[10px] text-slate-400 tracking-wider uppercase hidden min-[480px]:inline" style={{ fontWeight: 500 }}>Required</span>
                   </div>
                 </div>
                 <div className="px-2.5 sm:px-3 pt-2 sm:pt-2.5 pb-1.5 sm:pb-2">
@@ -583,38 +583,38 @@ export function CreatePartnerLocationModal({
                       onClick={() => profileInputRef.current?.click()}
                       className={`relative w-14 h-14 rounded-xl cursor-pointer shrink-0 transition-all ${
                         profileImage
-                          ? "ring-2 ring-[#E2E8F0]"
-                          : "border-2 border-dashed border-[#CBD5E1] bg-[#F8FAFC]"
+                          ? "ring-2 ring-border"
+                          : "border-2 border-dashed border-slate-300 bg-slate-50"
                       }`}
                     >
                       {profileImage ? (
                         <img src={profileImage} alt="Profile" className="w-full h-full rounded-xl object-cover" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
-                          <Camera className="w-5 h-5 text-[#94A3B8]" />
+                          <Camera className="w-5 h-5 text-slate-400" />
                         </div>
                       )}
                     </div>
                     <div className="min-w-0">
-                      <p className="text-xs text-[#0F172A]" style={{ fontWeight: 500 }}>
+                      <p className="text-xs text-foreground" style={{ fontWeight: 500 }}>
                         {profileImage ? "Location photo" : "Add a photo"}
                       </p>
                       <div className="flex items-center gap-2 mt-0.5">
                         <button
                           type="button"
                           onClick={() => profileInputRef.current?.click()}
-                          className="text-[11px] text-[#0A77FF]"
+                          className="text-[11px] text-primary"
                           style={{ fontWeight: 500 }}
                         >
                           {profileImage ? "Change" : "Upload"}
                         </button>
                         {profileImage && (
                           <>
-                            <span className="text-[#E2E8F0] text-[11px]">&middot;</span>
+                            <span className="text-border text-[11px]">&middot;</span>
                             <button
                               type="button"
                               onClick={() => setProfileImage(null)}
-                              className="text-[11px] text-[#EF4444]"
+                              className="text-[11px] text-red-500"
                               style={{ fontWeight: 500 }}
                             >
                               Remove
@@ -652,10 +652,10 @@ export function CreatePartnerLocationModal({
                         }}
                         className={`relative w-full aspect-square rounded-xl cursor-pointer group transition-all ${
                           profileImage
-                            ? "ring-2 ring-[#E2E8F0] hover:ring-[#0A77FF]/30"
+                            ? "ring-2 ring-border hover:ring-primary/30"
                             : profileDragOver
-                            ? "border-2 border-dashed border-[#0A77FF] bg-[#EDF4FF]"
-                            : "border-2 border-dashed border-[#CBD5E1] hover:border-[#0A77FF]/50 bg-[#F8FAFC] hover:bg-[#EDF4FF]/50"
+                            ? "border-2 border-dashed border-primary bg-accent"
+                            : "border-2 border-dashed border-slate-300 hover:border-primary/50 bg-slate-50 hover:bg-accent/50"
                         }`}
                       >
                         {profileImage ? (
@@ -671,11 +671,11 @@ export function CreatePartnerLocationModal({
                           </>
                         ) : (
                           <div className="w-full h-full flex flex-col items-center justify-center gap-1.5">
-                            <div className="w-10 h-10 rounded-lg bg-[#F1F5F9] group-hover:bg-[#EDF4FF] flex items-center justify-center transition-colors">
-                              <Camera className="w-5 h-5 text-[#94A3B8] group-hover:text-[#0A77FF] transition-colors" />
+                            <div className="w-10 h-10 rounded-lg bg-muted group-hover:bg-accent flex items-center justify-center transition-colors">
+                              <Camera className="w-5 h-5 text-slate-400 group-hover:text-primary transition-colors" />
                             </div>
-                            <span className="text-[11px] text-[#94A3B8] group-hover:text-[#0A77FF] transition-colors" style={{ fontWeight: 500 }}>Upload photo</span>
-                            <span className="text-[9px] text-[#CBD5E1]">Max 5 MB</span>
+                            <span className="text-[11px] text-slate-400 group-hover:text-primary transition-colors" style={{ fontWeight: 500 }}>Upload photo</span>
+                            <span className="text-[9px] text-slate-300">Max 5 MB</span>
                           </div>
                         )}
                       </div>
@@ -684,16 +684,16 @@ export function CreatePartnerLocationModal({
                           <button
                             type="button"
                             onClick={() => profileInputRef.current?.click()}
-                            className="text-[11px] text-[#0A77FF] hover:text-[#0862D0] transition-colors cursor-pointer"
+                            className="text-[11px] text-primary hover:text-[#0862D0] transition-colors cursor-pointer"
                             style={{ fontWeight: 500 }}
                           >
                             Change
                           </button>
-                          <span className="text-[#E2E8F0] text-[11px]">&middot;</span>
+                          <span className="text-border text-[11px]">&middot;</span>
                           <button
                             type="button"
                             onClick={(e) => { e.stopPropagation(); setProfileImage(null); }}
-                            className="text-[11px] text-[#EF4444] hover:text-[#DC2626] transition-colors cursor-pointer"
+                            className="text-[11px] text-red-500 hover:text-destructive transition-colors cursor-pointer"
                             style={{ fontWeight: 500 }}
                           >
                             Remove
@@ -706,8 +706,8 @@ export function CreatePartnerLocationModal({
                     <div className="grid grid-cols-1 min-[480px]:grid-cols-2 gap-x-3 sm:gap-x-4 gap-y-2.5 sm:gap-y-3">
                       {/* Row 1 Left: Location Name */}
                       <div>
-                        <Label htmlFor="loc-name" className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>
-                          Location Name<span className="text-[#EF4444]">*</span>
+                        <Label htmlFor="loc-name" className="text-xs sm:text-[13px] text-foreground" style={{ fontWeight: 500 }}>
+                          Location Name<span className="text-red-500">*</span>
                         </Label>
                         <Input
                           id="loc-name"
@@ -717,18 +717,18 @@ export function CreatePartnerLocationModal({
                             setLocationName(e.target.value);
                             if (errors.locationName) setErrors((p) => ({ ...p, locationName: "" }));
                           }}
-                          className="mt-1 rounded-lg border-[#E2E8F0] bg-white !h-10 text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
+                          className="mt-1 rounded-lg border-border bg-white !h-10 text-sm text-foreground placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary/20"
                         />
                         {errors.locationName && (
-                          <p className="text-[#EF4444] text-xs mt-1">{errors.locationName}</p>
+                          <p className="text-red-500 text-xs mt-1">{errors.locationName}</p>
                         )}
                       </div>
 
                       {/* Row 1 Right: Status */}
                       <div>
-                        <Label className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>Status</Label>
+                        <Label className="text-xs sm:text-[13px] text-foreground" style={{ fontWeight: 500 }}>Status</Label>
                         <Select value={status} onValueChange={(val: string) => setStatus(val as "Active" | "Inactive")}>
-                          <SelectTrigger className="mt-1 !h-10 rounded-lg border-[#E2E8F0] bg-white text-sm hover:border-[#CBD5E1] transition-colors focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 [&>svg]:text-[#94A3B8]">
+                          <SelectTrigger className="mt-1 !h-10 rounded-lg border-border bg-white text-sm hover:border-slate-300 transition-colors focus:border-primary focus:ring-1 focus:ring-primary/20 [&>svg]:text-slate-400">
                             <SelectValue>
                               <span
                                 className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs whitespace-nowrap"
@@ -751,7 +751,7 @@ export function CreatePartnerLocationModal({
 
                       {/* Row 2 Left: Phone Number */}
                       <div>
-                        <Label htmlFor="loc-phone" className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>
+                        <Label htmlFor="loc-phone" className="text-xs sm:text-[13px] text-foreground" style={{ fontWeight: 500 }}>
                           Phone Number
                         </Label>
                         <div className="flex items-center gap-0 mt-1">
@@ -759,29 +759,29 @@ export function CreatePartnerLocationModal({
                             <PopoverTrigger asChild>
                               <button
                                 type="button"
-                                className="flex items-center gap-1.5 pl-2.5 pr-1.5 !h-10 rounded-l-lg border border-r-0 border-[#E2E8F0] bg-white text-sm shrink-0 cursor-pointer hover:border-[#CBD5E1] transition-colors focus:outline-none focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
+                                className="flex items-center gap-1.5 pl-2.5 pr-1.5 !h-10 rounded-l-lg border border-r-0 border-border bg-white text-sm shrink-0 cursor-pointer hover:border-slate-300 transition-colors focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
                               >
                                 <span className="text-base leading-none">{selectedPhoneCountry.flag}</span>
-                                <span className="text-xs text-[#334155]" style={{ fontWeight: 600 }}>
+                                <span className="text-xs text-slate-700" style={{ fontWeight: 600 }}>
                                   {phoneCountryCode}
                                 </span>
-                                <ChevronDown className="w-3 h-3 text-[#94A3B8]" />
+                                <ChevronDown className="w-3 h-3 text-slate-400" />
                               </button>
                             </PopoverTrigger>
                             <PopoverContent
-                              className="w-64 p-0 z-[200] rounded-xl shadow-lg border border-[#E2E8F0]"
+                              className="w-64 p-0 z-[200] rounded-xl shadow-lg border border-border"
                               align="start"
                               sideOffset={4}
                             >
-                              <div className="p-2 border-b border-[#F1F5F9]">
+                              <div className="p-2 border-b border-muted">
                                 <div className="relative">
-                                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8]" />
+                                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
                                   <input
                                     type="text"
                                     placeholder="Search country..."
                                     value={countrySearch}
                                     onChange={(e) => setCountrySearch(e.target.value)}
-                                    className="w-full pl-8 pr-3 py-2 text-sm rounded-lg border border-[#E2E8F0] bg-white text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-none focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
+                                    className="w-full pl-8 pr-3 py-2 text-sm rounded-lg border border-border bg-white text-foreground placeholder:text-slate-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
                                   />
                                 </div>
                               </div>
@@ -797,24 +797,24 @@ export function CreatePartnerLocationModal({
                                     }}
                                     className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-left transition-colors ${
                                       phoneCountryCode === c.code && selectedPhoneCountry.country === c.country
-                                        ? "bg-[#EDF4FF] text-[#0A77FF]"
-                                        : "hover:bg-[#F8FAFC] text-[#334155]"
+                                        ? "bg-accent text-primary"
+                                        : "hover:bg-slate-50 text-slate-700"
                                     }`}
                                   >
                                     <span className="text-base">{c.flag}</span>
                                     <span className="text-sm flex-1 truncate" style={{ fontWeight: 500 }}>
                                       {c.country}
                                     </span>
-                                    <span className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>
+                                    <span className="text-xs text-slate-500" style={{ fontWeight: 500 }}>
                                       {c.code}
                                     </span>
                                     {phoneCountryCode === c.code && selectedPhoneCountry.country === c.country && (
-                                      <Check className="w-3.5 h-3.5 text-[#0A77FF] shrink-0" />
+                                      <Check className="w-3.5 h-3.5 text-primary shrink-0" />
                                     )}
                                   </button>
                                 ))}
                                 {filteredPhoneCountries.length === 0 && (
-                                  <p className="text-xs text-[#94A3B8] text-center py-4">No countries found</p>
+                                  <p className="text-xs text-slate-400 text-center py-4">No countries found</p>
                                 )}
                               </div>
                             </PopoverContent>
@@ -824,14 +824,14 @@ export function CreatePartnerLocationModal({
                             placeholder="(555) 123-4567"
                             value={phone}
                             onChange={(e) => setPhone(e.target.value)}
-                            className="rounded-l-none rounded-r-lg border-[#E2E8F0] bg-white !h-10 text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
+                            className="rounded-l-none rounded-r-lg border-border bg-white !h-10 text-sm text-foreground placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary/20"
                           />
                         </div>
                       </div>
 
                       {/* Row 2 Right: Email */}
                       <div>
-                        <Label htmlFor="loc-email" className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>
+                        <Label htmlFor="loc-email" className="text-xs sm:text-[13px] text-foreground" style={{ fontWeight: 500 }}>
                           Email
                         </Label>
                         <Input
@@ -840,7 +840,7 @@ export function CreatePartnerLocationModal({
                           placeholder="support@toyota.com"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
-                          className="mt-1 rounded-lg border-[#E2E8F0] bg-white !h-10 text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
+                          className="mt-1 rounded-lg border-border bg-white !h-10 text-sm text-foreground placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary/20"
                         />
                       </div>
 
@@ -862,16 +862,16 @@ export function CreatePartnerLocationModal({
               {/* ── Point of Contact Section ── */}
               <div>
                 <div className="flex items-center gap-2 mb-2.5">
-                  <div className="w-6 h-6 rounded-md bg-[#0A77FF]/8 flex items-center justify-center shrink-0">
-                    <Users className="w-3.5 h-3.5 text-[#0A77FF]" />
+                  <div className="w-6 h-6 rounded-md bg-primary/8 flex items-center justify-center shrink-0">
+                    <Users className="w-3.5 h-3.5 text-primary" />
                   </div>
                   <div>
-                    <span className="text-xs sm:text-[13px] text-[#0F172A] block" style={{ fontWeight: 600 }}>Point of Contact</span>
-                    <span className="text-[10px] sm:text-[11px] text-[#94A3B8] block mt-px">Assign contacts for orders and inquiries at this location</span>
+                    <span className="text-xs sm:text-[13px] text-foreground block" style={{ fontWeight: 600 }}>Point of Contact</span>
+                    <span className="text-[10px] sm:text-[11px] text-slate-400 block mt-px">Assign contacts for orders and inquiries at this location</span>
                   </div>
                 </div>
                 {selectedPocContacts.length > 0 ? (
-                  <div className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden relative">
+                  <div className="rounded-xl border border-border bg-white overflow-hidden relative">
                     <PocPillsRow contacts={selectedPocContacts} onManage={handleOpenSelectPoc} />
                   </div>
                 ) : (
@@ -879,32 +879,32 @@ export function CreatePartnerLocationModal({
                     {/* Select from Contact Directory */}
                     <button
                       onClick={handleOpenSelectPoc}
-                      className="group relative rounded-xl overflow-hidden border border-[#E2E8F0] bg-white text-left transition-all duration-200 hover:border-[#BFDBFE] hover:shadow-[0_4px_16px_-4px_rgba(10,119,255,0.12)] cursor-pointer"
+                      className="group relative rounded-xl overflow-hidden border border-border bg-white text-left transition-all duration-200 hover:border-blue-200 hover:shadow-[0_4px_16px_-4px_rgba(10,119,255,0.12)] cursor-pointer"
                     >
-                      <div className="absolute inset-0 bg-gradient-to-br from-[#EDF4FF]/0 to-[#EDF4FF]/0 group-hover:from-[#EDF4FF]/60 group-hover:to-transparent transition-all duration-300 pointer-events-none" />
+                      <div className="absolute inset-0 bg-gradient-to-br from-accent/0 to-accent/0 group-hover:from-accent/60 group-hover:to-transparent transition-all duration-300 pointer-events-none" />
                       <div className="relative flex items-center gap-3 pl-3.5 pr-3 py-3">
-                        <div className="w-9 h-9 rounded-[10px] bg-gradient-to-br from-[#EDF4FF] to-[#DBEAFE] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform duration-200">
-                          <Users className="w-[18px] h-[18px] text-[#0A77FF]" />
+                        <div className="w-9 h-9 rounded-[10px] bg-gradient-to-br from-accent to-blue-100 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform duration-200">
+                          <Users className="w-[18px] h-[18px] text-primary" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Select from Contact Directory</p>
-                          <p className="text-[11px] text-[#94A3B8] mt-0.5 truncate">Browse and pick from saved contacts</p>
+                          <p className="text-[13px] text-foreground" style={{ fontWeight: 600 }}>Select from Contact Directory</p>
+                          <p className="text-[11px] text-slate-400 mt-0.5 truncate">Browse and pick from saved contacts</p>
                         </div>
                       </div>
                     </button>
                     {/* Create new contact */}
                     <button
                       onClick={handleOpenCreatePoc}
-                      className="group relative rounded-xl overflow-hidden border border-[#E2E8F0] bg-white text-left transition-all duration-200 hover:border-[#D5D3EC] hover:shadow-[0_4px_16px_-4px_rgba(124,58,237,0.10)] cursor-pointer"
+                      className="group relative rounded-xl overflow-hidden border border-border bg-white text-left transition-all duration-200 hover:border-[#D5D3EC] hover:shadow-[0_4px_16px_-4px_rgba(124,58,237,0.10)] cursor-pointer"
                     >
-                      <div className="absolute inset-0 bg-gradient-to-br from-[#F5F3FF]/0 to-[#F5F3FF]/0 group-hover:from-[#F5F3FF]/60 group-hover:to-transparent transition-all duration-300 pointer-events-none" />
+                      <div className="absolute inset-0 bg-gradient-to-br from-violet-50/0 to-violet-50/0 group-hover:from-violet-50/60 group-hover:to-transparent transition-all duration-300 pointer-events-none" />
                       <div className="relative flex items-center gap-3 pl-3.5 pr-3 py-3">
-                        <div className="w-9 h-9 rounded-[10px] bg-gradient-to-br from-[#F5F3FF] to-[#EDE9FE] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform duration-200">
-                          <UserPlus className="w-[18px] h-[18px] text-[#7C3AED]" />
+                        <div className="w-9 h-9 rounded-[10px] bg-gradient-to-br from-violet-50 to-[#EDE9FE] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform duration-200">
+                          <UserPlus className="w-[18px] h-[18px] text-violet" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Create new contact</p>
-                          <p className="text-[11px] text-[#94A3B8] mt-0.5 truncate">Add a new point of contact directly</p>
+                          <p className="text-[13px] text-foreground" style={{ fontWeight: 600 }}>Create new contact</p>
+                          <p className="text-[11px] text-slate-400 mt-0.5 truncate">Add a new point of contact directly</p>
                         </div>
                       </div>
                     </button>
@@ -915,13 +915,13 @@ export function CreatePartnerLocationModal({
               {/* ── Attachments (matches partner creation form exactly) ── */}
               <div>
                 <div className="flex items-center gap-2 mb-2.5">
-                  <div className="w-6 h-6 rounded-md bg-[#0A77FF]/8 flex items-center justify-center shrink-0">
-                    <Paperclip className="w-3.5 h-3.5 text-[#0A77FF]" />
+                  <div className="w-6 h-6 rounded-md bg-primary/8 flex items-center justify-center shrink-0">
+                    <Paperclip className="w-3.5 h-3.5 text-primary" />
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Attachments</span>
+                    <span className="text-xs sm:text-[13px] text-foreground" style={{ fontWeight: 600 }}>Attachments</span>
                     {attachments.length > 0 && (
-                      <span className="text-[10px] text-[#64748B] bg-[#F1F5F9] px-1.5 py-0.5 rounded-full" style={{ fontWeight: 500 }}>{attachments.length}</span>
+                      <span className="text-[10px] text-slate-500 bg-muted px-1.5 py-0.5 rounded-full" style={{ fontWeight: 500 }}>{attachments.length}</span>
                     )}
                   </div>
                 </div>
@@ -933,20 +933,20 @@ export function CreatePartnerLocationModal({
                   onClick={() => attachInputRef.current?.click()}
                   className={`rounded-lg border-2 border-dashed p-3 sm:p-4 text-center cursor-pointer transition-all ${
                     attachDragActive
-                      ? "border-[#0A77FF] bg-[#EDF4FF]/30"
-                      : "border-[#E2E8F0] bg-white hover:border-[#CBD5E1] hover:bg-[#FAFBFC]"
+                      ? "border-primary bg-accent/30"
+                      : "border-border bg-white hover:border-slate-300 hover:bg-[#FAFBFC]"
                   }`}
                 >
                   <input ref={attachInputRef} type="file" multiple onChange={(e) => { handleAttachFiles(e.target.files); e.target.value = ""; }} className="hidden" />
                   <div className="flex flex-col items-center gap-2">
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${attachDragActive ? "bg-[#D6E8FF] text-[#0A77FF]" : "bg-[#F1F5F9] text-[#94A3B8]"}`}>
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${attachDragActive ? "bg-[#D6E8FF] text-primary" : "bg-muted text-slate-400"}`}>
                       <Upload className="w-5 h-5" />
                     </div>
                     <div>
-                      <p className="text-xs sm:text-sm text-[#0F172A]" style={{ fontWeight: 500 }}>
-                        <span className="text-[#0A77FF]">Click to upload</span><span className="hidden sm:inline"> or drag and drop</span>
+                      <p className="text-xs sm:text-sm text-foreground" style={{ fontWeight: 500 }}>
+                        <span className="text-primary">Click to upload</span><span className="hidden sm:inline"> or drag and drop</span>
                       </p>
-                      <p className="text-[10px] sm:text-xs text-[#94A3B8] mt-0.5">PDF, DOC, XLS, PNG, JPG up to 10MB</p>
+                      <p className="text-[10px] sm:text-xs text-slate-400 mt-0.5">PDF, DOC, XLS, PNG, JPG up to 10MB</p>
                     </div>
                   </div>
                 </div>
@@ -954,13 +954,13 @@ export function CreatePartnerLocationModal({
                 {attachments.length > 0 && (
                   <div className="mt-2.5 space-y-1.5">
                     {attachments.map((att) => (
-                      <div key={att.id} className="flex items-center gap-2.5 px-3 py-2 rounded-md border border-[#E2E8F0] bg-white hover:bg-[#FAFBFC] transition-colors group">
+                      <div key={att.id} className="flex items-center gap-2.5 px-3 py-2 rounded-md border border-border bg-white hover:bg-[#FAFBFC] transition-colors group">
                         <span className="text-base">{att.type.includes("PDF") ? "\uD83D\uDCC4" : att.type.includes("PNG") || att.type.includes("JPG") || att.type.includes("JPEG") ? "\uD83D\uDDBC\uFE0F" : att.type.includes("XLS") ? "\uD83D\uDCCA" : att.type.includes("DOC") ? "\uD83D\uDCDD" : "\uD83D\uDCCE"}</span>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm text-[#0F172A] truncate" style={{ fontWeight: 500 }}>{att.name}</p>
-                          <p className="text-[11px] text-[#94A3B8]">{att.size}</p>
+                          <p className="text-sm text-foreground truncate" style={{ fontWeight: 500 }}>{att.name}</p>
+                          <p className="text-[11px] text-slate-400">{att.size}</p>
                         </div>
-                        <button type="button" onClick={(e) => { e.stopPropagation(); setAttachments(prev => prev.filter(a => a.id !== att.id)); }} className="w-7 h-7 rounded-md flex items-center justify-center text-[#94A3B8] hover:text-[#EF4444] hover:bg-[#FEF2F2] transition-colors sm:opacity-0 sm:group-hover:opacity-100">
+                        <button type="button" onClick={(e) => { e.stopPropagation(); setAttachments(prev => prev.filter(a => a.id !== att.id)); }} className="w-7 h-7 rounded-md flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors sm:opacity-0 sm:group-hover:opacity-100">
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       </div>
@@ -977,7 +977,7 @@ export function CreatePartnerLocationModal({
             <Button
               variant="outline"
               onClick={handleCancelAttempt}
-              className="border-[#E2E8F0] text-[#64748B] hover:text-[#0F172A] hover:border-[#CBD5E1] rounded-lg px-3 sm:px-5 text-xs sm:text-[13px] h-8 sm:h-9"
+              className="border-border text-slate-500 hover:text-foreground hover:border-slate-300 rounded-lg px-3 sm:px-5 text-xs sm:text-[13px] h-8 sm:h-9"
             >
               Cancel
             </Button>
@@ -1062,7 +1062,7 @@ export function CreatePartnerLocationModal({
               className="relative w-16 h-16 rounded-2xl flex items-center justify-center"
               style={{ backgroundColor: "#FEE2E2" }}
             >
-              <AlertTriangle className="w-8 h-8" style={{ color: "#DC2626" }} />
+              <AlertTriangle className="w-8 h-8" style={{ color: "hsl(var(--destructive))" }} />
             </div>
             <span
               className="mt-4 px-3 py-1 rounded-full text-[11px]"
@@ -1081,14 +1081,14 @@ export function CreatePartnerLocationModal({
             <AlertDialogHeader className="p-0 gap-0 text-center">
               <AlertDialogTitle
                 className="text-[18px] tracking-[-0.02em]"
-                style={{ fontWeight: 600, color: "#0F172A" }}
+                style={{ fontWeight: 600, color: "hsl(var(--foreground))" }}
               >
                 Discard location creation?
               </AlertDialogTitle>
             </AlertDialogHeader>
             <AlertDialogDescription
               className="text-[13px] mt-2 max-w-[300px] mx-auto"
-              style={{ color: "#475569", lineHeight: "1.65" }}
+              style={{ color: "hsl(var(--muted-foreground))", lineHeight: "1.65" }}
             >
               All the information you've entered will be lost. This action cannot be undone.
             </AlertDialogDescription>
@@ -1096,14 +1096,14 @@ export function CreatePartnerLocationModal({
               <button
                 onClick={handleConfirmCancel}
                 className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors hover:opacity-90"
-                style={{ fontWeight: 600, backgroundColor: "#DC2626", color: "#fff" }}
+                style={{ fontWeight: 600, backgroundColor: "hsl(var(--destructive))", color: "#fff" }}
               >
                 Discard changes
               </button>
               <button
                 onClick={() => setShowCancelConfirmation(false)}
                 className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors"
-                style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#334155" }}
+                style={{ fontWeight: 500, backgroundColor: "hsl(var(--muted))", color: "#334155" }}
               >
                 Continue editing
               </button>

@@ -545,20 +545,20 @@ export function CreatePartnerModal({ open, onOpenChange, onPartnerCreated, initi
                 <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
                   <button
                     onClick={handleBackFromConfig}
-                    className="w-8 h-8 rounded-lg border border-[#E2E8F0] flex items-center justify-center hover:bg-[#F8FAFC] hover:border-[#CBD5E1] transition-all shrink-0"
+                    className="w-8 h-8 rounded-lg border border-border flex items-center justify-center hover:bg-slate-50 hover:border-slate-300 transition-all shrink-0"
                   >
-                    <ArrowLeft className="w-4 h-4 text-[#64748B]" />
+                    <ArrowLeft className="w-4 h-4 text-slate-500" />
                   </button>
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
-                      <h3 className="text-sm sm:text-[15px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>
+                      <h3 className="text-sm sm:text-[15px] text-foreground truncate" style={{ fontWeight: 600 }}>
                         Configure {configType === "vendor" ? "Vendor" : "Customer"}
                       </h3>
-                      <span className="hidden sm:inline-flex items-center px-1.5 py-0.5 rounded-md bg-[#F1F5F9] text-[10px] text-[#64748B] uppercase tracking-wide" style={{ fontWeight: 600 }}>
+                      <span className="hidden sm:inline-flex items-center px-1.5 py-0.5 rounded-md bg-muted text-[10px] text-slate-500 uppercase tracking-wide" style={{ fontWeight: 600 }}>
                         Step 3
                       </span>
                     </div>
-                    <p className="text-[11px] sm:text-xs text-[#94A3B8] mt-0.5 truncate hidden sm:block">
+                    <p className="text-[11px] sm:text-xs text-slate-400 mt-0.5 truncate hidden sm:block">
                       {primaryGroup
                         ? `Inheriting from ${primaryGroup.name}`
                         : "Select sub-types and configure details"}
@@ -568,7 +568,7 @@ export function CreatePartnerModal({ open, onOpenChange, onPartnerCreated, initi
                 <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
                   <button
                     onClick={() => setIsFullScreen(!isFullScreen)}
-                    className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#475569] hover:bg-[#F8FAFC] hover:border-[#CBD5E1] transition-all"
+                    className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-border bg-white text-xs text-muted-foreground hover:bg-slate-50 hover:border-slate-300 transition-all"
                     style={{ fontWeight: 500 }}
                   >
                     {isFullScreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
@@ -576,7 +576,7 @@ export function CreatePartnerModal({ open, onOpenChange, onPartnerCreated, initi
                   </button>
                   <button
                     onClick={handleCancelAttempt}
-                    className="w-8 h-8 rounded-lg flex items-center justify-center text-[#94A3B8] hover:text-[#64748B] hover:bg-[#F1F5F9] transition-all"
+                    className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-500 hover:bg-muted transition-all"
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -629,29 +629,29 @@ export function CreatePartnerModal({ open, onOpenChange, onPartnerCreated, initi
                         <div className="flex flex-col items-center gap-5 text-center px-8 max-w-lg animate-coming-soon-in">
                           {/* Profile icon with lock indicator */}
                           <div className="relative">
-                            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#F1F5F9] to-[#E2E8F0] border border-[#E2E8F0] flex items-center justify-center shadow-sm">
-                              {subTypeIcon ? React.cloneElement(subTypeIcon as React.ReactElement, { className: "w-7 h-7 text-[#94A3B8]" }) : <Settings2 className="w-7 h-7 text-[#94A3B8]" />}
+                            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-muted to-border border border-border flex items-center justify-center shadow-sm">
+                              {subTypeIcon ? React.cloneElement(subTypeIcon as React.ReactElement, { className: "w-7 h-7 text-slate-400" }) : <Settings2 className="w-7 h-7 text-slate-400" />}
                             </div>
-                            <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-white border-2 border-[#E2E8F0] flex items-center justify-center">
-                              <Lock className="w-3 h-3 text-[#CBD5E1]" />
+                            <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-white border-2 border-border flex items-center justify-center">
+                              <Lock className="w-3 h-3 text-slate-300" />
                             </div>
                           </div>
 
                           {/* Title + description */}
                           <div className="space-y-2">
-                            <p className="text-[15px] text-[#0F172A]" style={{ fontWeight: 600 }}>{subTypeLabel} Profile</p>
-                            <p className="text-[13px] text-[#64748B] leading-relaxed max-w-sm">
+                            <p className="text-[15px] text-foreground" style={{ fontWeight: 600 }}>{subTypeLabel} Profile</p>
+                            <p className="text-[13px] text-slate-500 leading-relaxed max-w-sm">
                               {profileDesc}
                             </p>
                           </div>
 
                           {/* What enabling unlocks */}
-                          <div className="flex items-center gap-4 text-[11px] text-[#94A3B8]">
+                          <div className="flex items-center gap-4 text-[11px] text-slate-400">
                             <span className="flex items-center gap-1">
                               <Settings2 className="w-3 h-3" />
                               {configCount} configuration sections
                             </span>
-                            <span className="w-1 h-1 rounded-full bg-[#CBD5E1]" />
+                            <span className="w-1 h-1 rounded-full bg-slate-300" />
                             <span className="flex items-center gap-1">
                               <Zap className="w-3 h-3" />
                               Auto-inherits group defaults
@@ -664,13 +664,13 @@ export function CreatePartnerModal({ open, onOpenChange, onPartnerCreated, initi
                               const toggleFn = configType === "vendor" ? handleToggleVendorSubType : handleToggleCustomerSubType;
                               toggleFn(activeSubTypeTab);
                             }}
-                            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#0A77FF] text-white text-[13px] shadow-md hover:bg-[#0862D0] hover:shadow-lg transition-all"
+                            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-primary text-white text-[13px] shadow-md hover:bg-[#0862D0] hover:shadow-lg transition-all"
                             style={{ fontWeight: 600 }}
                           >
                             <Zap className="w-3.5 h-3.5" />
                             Enable {subTypeLabel} Profile
                           </button>
-                          <p className="text-[11px] text-[#CBD5E1]">You can disable this profile anytime</p>
+                          <p className="text-[11px] text-slate-300">You can disable this profile anytime</p>
                         </div>
                       </div>
                     );
@@ -681,27 +681,27 @@ export function CreatePartnerModal({ open, onOpenChange, onPartnerCreated, initi
                     return (
                       <div className="absolute inset-0 z-10 flex items-center justify-center bg-white overflow-hidden">
                         {/* Orbiting rings in light blue tints */}
-                        <div className="absolute w-[320px] h-[320px] rounded-full border border-[#0A77FF]/[0.08] animate-coming-soon-orbit">
-                          <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-[#0A77FF]/20" />
+                        <div className="absolute w-[320px] h-[320px] rounded-full border border-primary/[0.08] animate-coming-soon-orbit">
+                          <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-primary/20" />
                         </div>
-                        <div className="absolute w-[480px] h-[480px] rounded-full border border-[#0A77FF]/[0.05] animate-coming-soon-orbit" style={{ animationDirection: "reverse", animationDuration: "12s" }}>
+                        <div className="absolute w-[480px] h-[480px] rounded-full border border-primary/[0.05] animate-coming-soon-orbit" style={{ animationDirection: "reverse", animationDuration: "12s" }}>
                           <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-1.5 h-1.5 rounded-full bg-[#3B9FFF]/20" />
                         </div>
                         {/* Pulse glow */}
-                        <div className="absolute w-48 h-48 rounded-full bg-[#0A77FF]/[0.04] animate-coming-soon-pulse blur-3xl" />
+                        <div className="absolute w-48 h-48 rounded-full bg-primary/[0.04] animate-coming-soon-pulse blur-3xl" />
                         {/* Content */}
                         <div className="relative flex flex-col items-center gap-5 text-center px-8 max-w-md animate-coming-soon-in">
-                          <div className="w-16 h-16 rounded-2xl bg-[#EDF4FF] border border-[#DBEAFE] flex items-center justify-center">
-                            {subTypeIcon ? React.cloneElement(subTypeIcon as React.ReactElement, { className: "w-7 h-7 text-[#0A77FF]" }) : <Settings2 className="w-7 h-7 text-[#0A77FF]" />}
+                          <div className="w-16 h-16 rounded-2xl bg-accent border border-blue-100 flex items-center justify-center">
+                            {subTypeIcon ? React.cloneElement(subTypeIcon as React.ReactElement, { className: "w-7 h-7 text-primary" }) : <Settings2 className="w-7 h-7 text-primary" />}
                           </div>
                           <div>
-                            <p className="text-[17px] text-[#0F172A] mb-2" style={{ fontWeight: 600 }}>Coming Soon</p>
-                            <p className="text-[13px] text-[#64748B] leading-relaxed max-w-sm">
+                            <p className="text-[17px] text-foreground mb-2" style={{ fontWeight: 600 }}>Coming Soon</p>
+                            <p className="text-[13px] text-slate-500 leading-relaxed max-w-sm">
                               {profileDesc}
                             </p>
                           </div>
-                          <div className="h-[3px] w-24 rounded-full overflow-hidden bg-[#EDF4FF]">
-                            <div className="h-full w-full rounded-full bg-gradient-to-r from-[#0A77FF] via-[#3B9FFF] to-[#0A77FF] animate-coming-soon-shimmer" />
+                          <div className="h-[3px] w-24 rounded-full overflow-hidden bg-accent">
+                            <div className="h-full w-full rounded-full bg-gradient-to-r from-primary via-[#3B9FFF] to-primary animate-coming-soon-shimmer" />
                           </div>
                         </div>
                       </div>
@@ -728,13 +728,13 @@ export function CreatePartnerModal({ open, onOpenChange, onPartnerCreated, initi
             <div className="shrink-0 border-t border-[#EEF2F6] bg-white px-3 sm:px-4 lg:px-5 py-2.5 sm:py-3 flex items-center justify-end gap-2 sm:gap-2.5 sm:rounded-b-2xl">
               <button
                 onClick={handleBackFromConfig}
-                className="inline-flex items-center gap-1.5 text-xs sm:text-[13px] text-[#64748B] hover:text-[#0F172A] transition-colors mr-auto"
+                className="inline-flex items-center gap-1.5 text-xs sm:text-[13px] text-slate-500 hover:text-foreground transition-colors mr-auto"
                 style={{ fontWeight: 500 }}
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
                 <span className="hidden sm:inline">Back</span>
               </button>
-              <Button variant="outline" onClick={handleCancelAttempt} className="border-[#E2E8F0] text-[#64748B] hover:text-[#0F172A] hover:border-[#CBD5E1] rounded-lg text-xs sm:text-[13px] px-3 sm:px-4 h-8 sm:h-9">
+              <Button variant="outline" onClick={handleCancelAttempt} className="border-border text-slate-500 hover:text-foreground hover:border-slate-300 rounded-lg text-xs sm:text-[13px] px-3 sm:px-4 h-8 sm:h-9">
                 Cancel
               </Button>
               <Button
@@ -756,15 +756,15 @@ export function CreatePartnerModal({ open, onOpenChange, onPartnerCreated, initi
               {/* Title row */}
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <h2 className="text-[15px] sm:text-[17px] text-[#0F172A]" style={{ fontWeight: 700 }}>{editMode ? "Edit Partner" : "Create New Partner"}</h2>
-                  <p className="text-[11px] sm:text-xs text-[#64748B] mt-0.5" style={{ fontWeight: 400 }}>
+                  <h2 className="text-[15px] sm:text-[17px] text-foreground" style={{ fontWeight: 700 }}>{editMode ? "Edit Partner" : "Create New Partner"}</h2>
+                  <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5" style={{ fontWeight: 400 }}>
                     {editMode ? "Update the details and settings for this partner." : "Configure the details and settings for the new partner."}
                   </p>
                 </div>
                 <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
                   <button
                     onClick={() => setIsFullScreen(!isFullScreen)}
-                    className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#475569] hover:bg-[#F8FAFC] hover:border-[#CBD5E1] transition-all"
+                    className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-border bg-white text-xs text-muted-foreground hover:bg-slate-50 hover:border-slate-300 transition-all"
                     style={{ fontWeight: 500 }}
                   >
                     {isFullScreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
@@ -772,7 +772,7 @@ export function CreatePartnerModal({ open, onOpenChange, onPartnerCreated, initi
                   </button>
                   <button
                     onClick={handleCancelAttempt}
-                    className="w-8 h-8 rounded-lg flex items-center justify-center text-[#94A3B8] hover:text-[#64748B] hover:bg-[#F1F5F9] transition-all"
+                    className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-500 hover:bg-muted transition-all"
                   >
                     <X className="w-4.5 h-4.5" />
                   </button>
@@ -798,10 +798,10 @@ export function CreatePartnerModal({ open, onOpenChange, onPartnerCreated, initi
                     <div
                       className={`w-[22px] h-[22px] sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-[11px] sm:text-[12px] shrink-0 transition-all duration-200 ${
                         tab.completed
-                          ? "bg-[#10B981] text-white"
+                          ? "bg-emerald-500 text-white"
                           : tab.active
-                          ? "bg-[#0A77FF] text-white"
-                          : "border-[1.5px] border-[#CBD5E1] text-[#64748B] bg-white"
+                          ? "bg-primary text-white"
+                          : "border-[1.5px] border-slate-300 text-slate-500 bg-white"
                       }`}
                       style={{ fontWeight: 600 }}
                     >
@@ -810,10 +810,10 @@ export function CreatePartnerModal({ open, onOpenChange, onPartnerCreated, initi
                     <span
                       className={`text-[12px] sm:text-[13px] whitespace-nowrap transition-colors ${
                         tab.active
-                          ? "text-[#0A77FF]"
+                          ? "text-primary"
                           : tab.completed
-                          ? "text-[#10B981]"
-                          : "text-[#334155]"
+                          ? "text-emerald-500"
+                          : "text-slate-700"
                       }`}
                       style={{ fontWeight: tab.active || tab.completed ? 600 : 500 }}
                     >
@@ -821,7 +821,7 @@ export function CreatePartnerModal({ open, onOpenChange, onPartnerCreated, initi
                       <span className="sm:hidden">{tab.shortLabel}</span>
                     </span>
                     {(tab.active || tab.completed) && (
-                      <div className={`absolute bottom-0 left-0 right-0 h-[2px] rounded-t-full ${tab.completed ? "bg-[#10B981]" : "bg-[#0A77FF]"}`} />
+                      <div className={`absolute bottom-0 left-0 right-0 h-[2px] rounded-t-full ${tab.completed ? "bg-emerald-500" : "bg-primary"}`} />
                     )}
                   </div>
                 ))}
@@ -877,7 +877,7 @@ export function CreatePartnerModal({ open, onOpenChange, onPartnerCreated, initi
             <div className="shrink-0 border-t border-[#EEF2F6] bg-white px-3 sm:px-4 lg:px-5 py-2.5 sm:py-3 flex items-center justify-end gap-2 sm:gap-2.5 sm:rounded-b-2xl">
               {step === 1 ? (
                 <>
-                  <Button variant="outline" onClick={handleCancelAttempt} className="border-[#E2E8F0] text-[#64748B] hover:text-[#0F172A] hover:border-[#CBD5E1] rounded-lg px-3 sm:px-5 text-xs sm:text-[13px] h-8 sm:h-9">
+                  <Button variant="outline" onClick={handleCancelAttempt} className="border-border text-slate-500 hover:text-foreground hover:border-slate-300 rounded-lg px-3 sm:px-5 text-xs sm:text-[13px] h-8 sm:h-9">
                     Cancel
                   </Button>
                   {!primaryGroupId ? (
@@ -907,13 +907,13 @@ export function CreatePartnerModal({ open, onOpenChange, onPartnerCreated, initi
                 <>
                   <button
                     onClick={handleBackToGroupSelection}
-                    className="inline-flex items-center gap-1.5 text-xs sm:text-[13px] text-[#64748B] hover:text-[#0F172A] transition-colors mr-auto"
+                    className="inline-flex items-center gap-1.5 text-xs sm:text-[13px] text-slate-500 hover:text-foreground transition-colors mr-auto"
                     style={{ fontWeight: 500 }}
                   >
                     <ArrowLeft className="w-3.5 h-3.5" />
                     <span className="hidden sm:inline">Back</span>
                   </button>
-                  <Button variant="outline" onClick={handleCancelAttempt} className="border-[#E2E8F0] text-[#64748B] hover:text-[#0F172A] hover:border-[#CBD5E1] rounded-lg px-3 sm:px-5 text-xs sm:text-[13px] h-8 sm:h-9">
+                  <Button variant="outline" onClick={handleCancelAttempt} className="border-border text-slate-500 hover:text-foreground hover:border-slate-300 rounded-lg px-3 sm:px-5 text-xs sm:text-[13px] h-8 sm:h-9">
                     Cancel
                   </Button>
                   <Button onClick={handleSave} className="gap-1.5 rounded-lg px-3 sm:px-5 text-xs sm:text-[13px] h-8 sm:h-9 shadow-sm">
@@ -940,7 +940,7 @@ export function CreatePartnerModal({ open, onOpenChange, onPartnerCreated, initi
         <div className="relative flex flex-col items-center pt-10 pb-6" style={{ background: "linear-gradient(180deg, #FEF2F2 0%, rgba(254,242,242,0.3) 70%, transparent 100%)" }}>
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[180px] h-[80px] rounded-full blur-[50px] opacity-25" style={{ backgroundColor: "#EF4444" }} />
           <div className="relative w-16 h-16 rounded-2xl flex items-center justify-center" style={{ backgroundColor: "#FEE2E2" }}>
-            <AlertTriangle className="w-8 h-8" style={{ color: "#DC2626" }} />
+            <AlertTriangle className="w-8 h-8" style={{ color: "hsl(var(--destructive))" }} />
           </div>
           <span
             className="mt-4 px-3 py-1 rounded-full text-[11px]"
@@ -952,25 +952,25 @@ export function CreatePartnerModal({ open, onOpenChange, onPartnerCreated, initi
         {/* Body */}
         <div className="flex flex-col items-center text-center px-8 pb-8">
           <AlertDialogHeader className="p-0 gap-0 text-center">
-            <AlertDialogTitle className="text-[18px] tracking-[-0.02em]" style={{ fontWeight: 600, color: "#0F172A" }}>
+            <AlertDialogTitle className="text-[18px] tracking-[-0.02em]" style={{ fontWeight: 600, color: "hsl(var(--foreground))" }}>
               {editMode ? "Discard changes?" : "Discard partner creation?"}
             </AlertDialogTitle>
           </AlertDialogHeader>
-          <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "#475569", lineHeight: "1.65" }}>
+          <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "hsl(var(--muted-foreground))", lineHeight: "1.65" }}>
             {editMode ? "All unsaved changes will be lost. This action cannot be undone." : "All the information you've entered will be lost. This action cannot be undone."}
           </AlertDialogDescription>
           <div className="w-full mt-7 flex flex-col gap-2.5">
             <button
               onClick={handleConfirmCancel}
               className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors hover:opacity-90"
-              style={{ fontWeight: 600, backgroundColor: "#DC2626", color: "#fff" }}
+              style={{ fontWeight: 600, backgroundColor: "hsl(var(--destructive))", color: "#fff" }}
             >
               Discard changes
             </button>
             <button
               onClick={() => setShowCancelConfirmation(false)}
               className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors"
-              style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#334155" }}
+              style={{ fontWeight: 500, backgroundColor: "hsl(var(--muted))", color: "#334155" }}
             >
               Continue editing
             </button>
@@ -1002,10 +1002,10 @@ function StepTab({
       <div
         className={`w-5 h-5 sm:w-[22px] sm:h-[22px] rounded-full flex items-center justify-center text-[10px] sm:text-[11px] shrink-0 transition-all duration-200 ${
           isCompleted
-            ? "bg-[#10B981] text-white shadow-[0_0_0_2px_rgba(16,185,129,0.15)]"
+            ? "bg-emerald-500 text-white shadow-[0_0_0_2px_rgba(16,185,129,0.15)]"
             : isActive
-            ? "bg-[#0A77FF] text-white shadow-[0_0_0_2px_rgba(10,119,255,0.15)]"
-            : "bg-[#EEF2F6] text-[#94A3B8]"
+            ? "bg-primary text-white shadow-[0_0_0_2px_rgba(10,119,255,0.15)]"
+            : "bg-[#EEF2F6] text-slate-400"
         }`}
         style={{ fontWeight: 700 }}
       >
@@ -1015,10 +1015,10 @@ function StepTab({
       <span
         className={`text-xs sm:text-[13px] whitespace-nowrap transition-colors ${
           isCompleted
-            ? "text-[#10B981]"
+            ? "text-emerald-500"
             : isActive
-            ? "text-[#0F172A]"
-            : "text-[#94A3B8]"
+            ? "text-foreground"
+            : "text-slate-400"
         }`}
         style={{ fontWeight: isActive || isCompleted ? 600 : 400 }}
       >
@@ -1028,7 +1028,7 @@ function StepTab({
       {/* Active underline bar */}
       {(isActive || isCompleted) && (
         <div className={`absolute bottom-0 left-0 right-0 h-[2px] rounded-t-full transition-all ${
-          isCompleted ? "bg-[#10B981]" : "bg-[#0A77FF]"
+          isCompleted ? "bg-emerald-500" : "bg-primary"
         }`} />
       )}
     </div>
@@ -1070,17 +1070,17 @@ function Step1ChipWithPopover({
           onMouseLeave={handleLeave}
           className={`inline-flex items-center gap-1.5 pl-2 pr-1 py-1 rounded-lg text-[11px] border transition-colors cursor-default shrink-0 ${
             isPrimary
-              ? "bg-[#EDF4FF] text-[#0A77FF] border-[#0A77FF]/25"
-              : "bg-[#F8FAFC] text-[#475569] border-[#E2E8F0] hover:border-[#CBD5E1] hover:bg-[#F1F5F9]"
+              ? "bg-accent text-primary border-primary/25"
+              : "bg-slate-50 text-muted-foreground border-border hover:border-slate-300 hover:bg-muted"
           }`}
           style={{ fontWeight: 500 }}
         >
           {isPrimary && (
-            <Star className="w-2.5 h-2.5 fill-[#0A77FF] text-[#0A77FF]" />
+            <Star className="w-2.5 h-2.5 fill-primary text-primary" />
           )}
           {group.countryFlag} {group.name}
           <span
-            className="text-[10px] text-[#94A3B8]"
+            className="text-[10px] text-slate-400"
             style={{ fontWeight: 400 }}
           >
             · {group.memberCount}
@@ -1102,8 +1102,8 @@ function Step1ChipWithPopover({
         onMouseLeave={handleLeave}
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
-        <div className="w-[280px] rounded-xl overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-[#E2E8F0]/60">
-          <div className="bg-gradient-to-br from-[#1E293B] to-[#334155] px-3.5 py-3 relative overflow-hidden">
+        <div className="w-[280px] rounded-xl overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-border/60">
+          <div className="bg-gradient-to-br from-slate-800 to-slate-700 px-3.5 py-3 relative overflow-hidden">
             <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-white/[0.04]" />
             <div className="flex items-center justify-between relative">
               <div className="flex items-center gap-2 min-w-0">
@@ -1113,26 +1113,26 @@ function Step1ChipWithPopover({
                 </span>
               </div>
               {isPrimary && (
-                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] bg-[#0A77FF]/25 text-[#60A5FA] shrink-0" style={{ fontWeight: 600 }}>
+                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] bg-primary/25 text-[#60A5FA] shrink-0" style={{ fontWeight: 600 }}>
                   <Star className="w-2.5 h-2.5 fill-[#60A5FA]" /> Primary
                 </span>
               )}
             </div>
-            <p className="text-[11px] text-[#94A3B8] mt-1.5 relative">
+            <p className="text-[11px] text-slate-400 mt-1.5 relative">
               {group.country} Region
             </p>
           </div>
           <div className="bg-white px-3.5 py-3 space-y-3">
-            <p className="text-[12px] text-[#475569] leading-relaxed line-clamp-3">
+            <p className="text-[12px] text-muted-foreground leading-relaxed line-clamp-3">
               {group.description}
             </p>
-            <div className="flex items-center gap-4 pt-2 border-t border-[#F1F5F9]">
-              <div className="flex items-center gap-1.5 text-[11px] text-[#64748B]">
-                <Users className="w-3 h-3 text-[#94A3B8]" />
+            <div className="flex items-center gap-4 pt-2 border-t border-muted">
+              <div className="flex items-center gap-1.5 text-[11px] text-slate-500">
+                <Users className="w-3 h-3 text-slate-400" />
                 <span style={{ fontWeight: 500 }}>{group.memberCount} partners</span>
               </div>
-              <div className="flex items-center gap-1.5 text-[11px] text-[#64748B]">
-                <Globe className="w-3 h-3 text-[#94A3B8]" />
+              <div className="flex items-center gap-1.5 text-[11px] text-slate-500">
+                <Globe className="w-3 h-3 text-slate-400" />
                 <span style={{ fontWeight: 500 }}>{group.country}</span>
               </div>
             </div>
@@ -1176,7 +1176,7 @@ function Step1OverflowChip({
       <PopoverTrigger
         onMouseEnter={handleEnter}
         onMouseLeave={handleLeave}
-        className="inline-flex items-center px-2 py-1 rounded-lg text-[11px] border border-[#E2E8F0] bg-[#F8FAFC] text-[#64748B] hover:bg-[#F1F5F9] hover:text-[#475569] hover:border-[#CBD5E1] transition-colors cursor-default shrink-0"
+        className="inline-flex items-center px-2 py-1 rounded-lg text-[11px] border border-border bg-slate-50 text-slate-500 hover:bg-muted hover:text-muted-foreground hover:border-slate-300 transition-colors cursor-default shrink-0"
         style={{ fontWeight: 500 }}
       >
         +{overflowGroups.length} more
@@ -1191,9 +1191,9 @@ function Step1OverflowChip({
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
         <div className="flex items-start gap-2">
-          <div className="w-[240px] rounded-xl border border-[#E2E8F0]/60 bg-white shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden shrink-0">
-            <div className="px-3 py-2 border-b border-[#F1F5F9] bg-[#FAFBFC]">
-              <span className="text-[11px] text-[#64748B]" style={{ fontWeight: 600 }}>
+          <div className="w-[240px] rounded-xl border border-border/60 bg-white shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden shrink-0">
+            <div className="px-3 py-2 border-b border-muted bg-[#FAFBFC]">
+              <span className="text-[11px] text-slate-500" style={{ fontWeight: 600 }}>
                 +{overflowGroups.length} more group{overflowGroups.length !== 1 ? "s" : ""}
               </span>
             </div>
@@ -1206,27 +1206,27 @@ function Step1OverflowChip({
                     key={g.id}
                     onMouseEnter={() => setHoveredGroup(g)}
                     className={`w-full flex items-center gap-2 px-3 py-2 transition-colors text-left cursor-default ${
-                      isHovered ? "bg-[#EDF4FF]" : "hover:bg-[#F8FAFC]"
+                      isHovered ? "bg-accent" : "hover:bg-slate-50"
                     }`}
                   >
                     <span className="shrink-0">{g.countryFlag}</span>
                     <span
-                      className={`text-[12px] truncate ${isHovered ? "text-[#0A77FF]" : "text-[#334155]"}`}
+                      className={`text-[12px] truncate ${isHovered ? "text-primary" : "text-slate-700"}`}
                       style={{ fontWeight: 500 }}
                     >
                       {g.name}
                     </span>
                     {isPrimary && (
-                      <Star className="w-2.5 h-2.5 fill-[#0A77FF] text-[#0A77FF] shrink-0" />
+                      <Star className="w-2.5 h-2.5 fill-primary text-primary shrink-0" />
                     )}
-                    <span className="text-[10px] text-[#94A3B8] ml-auto shrink-0">
+                    <span className="text-[10px] text-slate-400 ml-auto shrink-0">
                       {g.memberCount}
                     </span>
                     <button
                       onClick={(e) => { e.stopPropagation(); onRemove(g); }}
                       className="w-4 h-4 rounded flex items-center justify-center hover:bg-black/10 transition-colors shrink-0 cursor-pointer"
                     >
-                      <X className="w-2.5 h-2.5 text-[#94A3B8]" />
+                      <X className="w-2.5 h-2.5 text-slate-400" />
                     </button>
                   </div>
                 );
@@ -1235,8 +1235,8 @@ function Step1OverflowChip({
           </div>
           {hoveredGroup && (
             <div className="shrink-0 animate-in fade-in-0 slide-in-from-left-2 duration-150">
-              <div className="w-[280px] rounded-xl overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-[#E2E8F0]/60">
-                <div className="bg-gradient-to-br from-[#1E293B] to-[#334155] px-3.5 py-3 relative overflow-hidden">
+              <div className="w-[280px] rounded-xl overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-border/60">
+                <div className="bg-gradient-to-br from-slate-800 to-slate-700 px-3.5 py-3 relative overflow-hidden">
                   <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-white/[0.04]" />
                   <div className="flex items-center justify-between relative">
                     <div className="flex items-center gap-2 min-w-0">
@@ -1246,26 +1246,26 @@ function Step1OverflowChip({
                       </span>
                     </div>
                     {hoveredGroup.id === primaryGroupId && (
-                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] bg-[#0A77FF]/25 text-[#60A5FA] shrink-0" style={{ fontWeight: 600 }}>
+                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] bg-primary/25 text-[#60A5FA] shrink-0" style={{ fontWeight: 600 }}>
                         <Star className="w-2.5 h-2.5 fill-[#60A5FA]" /> Primary
                       </span>
                     )}
                   </div>
-                  <p className="text-[11px] text-[#94A3B8] mt-1.5 relative">
+                  <p className="text-[11px] text-slate-400 mt-1.5 relative">
                     {hoveredGroup.country} Region
                   </p>
                 </div>
                 <div className="bg-white px-3.5 py-3 space-y-3">
-                  <p className="text-[12px] text-[#475569] leading-relaxed line-clamp-3">
+                  <p className="text-[12px] text-muted-foreground leading-relaxed line-clamp-3">
                     {hoveredGroup.description}
                   </p>
-                  <div className="flex items-center gap-4 pt-2 border-t border-[#F1F5F9]">
-                    <div className="flex items-center gap-1.5 text-[11px] text-[#64748B]">
-                      <Users className="w-3 h-3 text-[#94A3B8]" />
+                  <div className="flex items-center gap-4 pt-2 border-t border-muted">
+                    <div className="flex items-center gap-1.5 text-[11px] text-slate-500">
+                      <Users className="w-3 h-3 text-slate-400" />
                       <span style={{ fontWeight: 500 }}>{hoveredGroup.memberCount} partners</span>
                     </div>
-                    <div className="flex items-center gap-1.5 text-[11px] text-[#64748B]">
-                      <Globe className="w-3 h-3 text-[#94A3B8]" />
+                    <div className="flex items-center gap-1.5 text-[11px] text-slate-500">
+                      <Globe className="w-3 h-3 text-slate-400" />
                       <span style={{ fontWeight: 500 }}>{hoveredGroup.country}</span>
                     </div>
                   </div>
@@ -1383,19 +1383,19 @@ function Step1GroupSelection({
         {/* Section label */}
         <div className="mb-2">
           <h4 className="text-[13px] sm:text-sm text-foreground" style={{ fontWeight: 600 }}>Select Partner Groups</h4>
-          <p className="text-[11px] sm:text-xs text-[#94A3B8] mt-0.5">
+          <p className="text-[11px] sm:text-xs text-slate-400 mt-0.5">
             Choose one or more partner groups. Mark one as primary to inherit its configuration.
           </p>
         </div>
 
         {/* Search */}
         <div className="relative mb-2">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <Input
             placeholder="Search partner groups..."
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="pl-9 bg-white border-[#E2E8F0] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 h-8 sm:h-9 text-sm"
+            className="pl-9 bg-white border-border focus:border-primary focus:ring-1 focus:ring-primary/20 h-8 sm:h-9 text-sm"
           />
           {search && (
             <button
@@ -1424,7 +1424,7 @@ function Step1GroupSelection({
         </p>
 
         {/* Bottom edge line */}
-        <div className="absolute bottom-0 left-0 right-0 h-px bg-[#E2E8F0]/60" />
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-border/60" />
       </div>
 
       {/* Scrollable grid area */}
@@ -1457,22 +1457,22 @@ function Step1GroupSelection({
         {pagedGroups.length > 0 && (
           <div className="flex flex-col items-center pt-5 pb-4">
             <div className="flex items-center gap-2.5 w-full max-w-[200px]">
-              <div className="flex-1 h-px bg-[#E2E8F0]" />
-              <span className="text-[10px] text-[#94A3B8] whitespace-nowrap" style={{ fontWeight: 500 }}>
+              <div className="flex-1 h-px bg-border" />
+              <span className="text-[10px] text-slate-400 whitespace-nowrap" style={{ fontWeight: 500 }}>
                 End of page {groupPage} of {totalGroupPages}
               </span>
-              <div className="flex-1 h-px bg-[#E2E8F0]" />
+              <div className="flex-1 h-px bg-border" />
             </div>
           </div>
         )}
 
         {groups.length === 0 && (
           <div className="py-10 sm:py-14 text-center">
-            <div className="w-11 h-11 rounded-xl bg-[#F1F5F9] flex items-center justify-center mx-auto mb-3">
-              <Search className="w-5 h-5 text-[#94A3B8]" />
+            <div className="w-11 h-11 rounded-xl bg-muted flex items-center justify-center mx-auto mb-3">
+              <Search className="w-5 h-5 text-slate-400" />
             </div>
-            <p className="text-[13px] text-[#334155]" style={{ fontWeight: 600 }}>No groups found</p>
-            <p className="text-xs text-[#94A3B8] mt-1">
+            <p className="text-[13px] text-slate-700" style={{ fontWeight: 600 }}>No groups found</p>
+            <p className="text-xs text-slate-400 mt-1">
               Try adjusting your search terms.
             </p>
           </div>
@@ -1480,8 +1480,8 @@ function Step1GroupSelection({
 
         {/* Pagination */}
         {groups.length > 0 && (
-          <div className="sticky bottom-0 z-10 flex flex-col sm:flex-row items-center justify-center px-3 py-1.5 border-t border-[#E2E8F0] bg-white gap-1.5 sm:gap-3">
-            <div className="flex items-center gap-1.5 text-[11px] text-[#94A3B8]">
+          <div className="sticky bottom-0 z-10 flex flex-col sm:flex-row items-center justify-center px-3 py-1.5 border-t border-border bg-white gap-1.5 sm:gap-3">
+            <div className="flex items-center gap-1.5 text-[11px] text-slate-400">
               <span>Per page</span>
               <Select
                 value={String(groupsPerPage)}
@@ -1625,12 +1625,12 @@ function PrTemplateCardInner({
       onClick={onClick}
       className={`bg-white border rounded-xl cursor-pointer group transition-all duration-200 flex flex-col relative ${
         isApplied
-          ? "border-[#0A77FF]/25 shadow-[0_2px_12px_rgba(10,119,255,0.10)]"
-          : "border-[#E8ECF1] shadow-[0_1px_3px_rgba(0,0,0,0.03)] hover:border-[#BFDBFE] hover:shadow-[0_4px_16px_-4px_rgba(10,119,255,0.10)]"
+          ? "border-primary/25 shadow-[0_2px_12px_rgba(10,119,255,0.10)]"
+          : "border-[#E8ECF1] shadow-[0_1px_3px_rgba(0,0,0,0.03)] hover:border-blue-200 hover:shadow-[0_4px_16px_-4px_rgba(10,119,255,0.10)]"
       }`}
     >
       {isApplied && (
-        <div className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-[#0A77FF] flex items-center justify-center z-10 shadow-sm">
+        <div className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-primary flex items-center justify-center z-10 shadow-sm">
           <Check className="w-3 h-3 text-white" />
         </div>
       )}
@@ -1646,14 +1646,14 @@ function PrTemplateCardInner({
               {isDis ? <TrendingDown className="w-3 h-3" /> : <TrendingUp className="w-3 h-3" />}
               {isDis ? "Discount" : "Premium"}
             </span>
-            <span className="inline-flex items-center px-2 py-[2px] text-[10px] bg-white text-[#64748B] border-l" style={{ fontWeight: 500, borderColor: pill.border }}>
+            <span className="inline-flex items-center px-2 py-[2px] text-[10px] bg-white text-slate-500 border-l" style={{ fontWeight: 500, borderColor: pill.border }}>
               {rule.basis === "volume" ? "Volume" : "Value"}
             </span>
           </span>
           <span className={`inline-flex items-center gap-1 px-1.5 py-[3px] rounded-md border text-[9px] shrink-0 ${
             isCustom
-              ? "border-[#CBD5E1] bg-white text-[#475569]"
-              : "bg-[#F1F5F9] border-[#CBD5E1] text-[#64748B]"
+              ? "border-slate-300 bg-white text-muted-foreground"
+              : "bg-muted border-slate-300 text-slate-500"
           }`} style={{ fontWeight: 600 }}>
             {isCustom ? "CUSTOM" : <><Lock className="w-2.5 h-2.5" /> TEMPLATE</>}
           </span>
@@ -1661,25 +1661,25 @@ function PrTemplateCardInner({
 
         {/* Row 2: Name */}
         <div className="shrink-0 mb-1">
-          <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{highlightMatch(rule.name, searchText || "")}</p>
+          <p className="text-[13px] text-foreground truncate" style={{ fontWeight: 600 }}>{highlightMatch(rule.name, searchText || "")}</p>
         </div>
 
         {/* Row 3: Description */}
         <div className="h-[32px] shrink-0 mb-2">
-          <p className="text-[11px] text-[#64748B] line-clamp-2 leading-relaxed" style={{ fontWeight: 400 }}>{highlightMatch(rule.description, searchText || "")}</p>
+          <p className="text-[11px] text-slate-500 line-clamp-2 leading-relaxed" style={{ fontWeight: 400 }}>{highlightMatch(rule.description, searchText || "")}</p>
         </div>
 
         {/* Row 4: Hero value + vendor count */}
         <div className="flex items-baseline justify-between shrink-0">
           <div className="flex items-baseline gap-2">
-            <span className="text-[22px] text-[#0F172A] tabular-nums leading-none tracking-tight" style={{ fontWeight: 600 }}>
+            <span className="text-[22px] text-foreground tabular-nums leading-none tracking-tight" style={{ fontWeight: 600 }}>
               {rule.tiers[0]?.discount ?? "—"}
             </span>
-            <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>
+            <span className="text-[11px] text-slate-400" style={{ fontWeight: 500 }}>
               {isDis ? "off" : "markup"}
             </span>
           </div>
-          <span className="inline-flex items-center gap-1 text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>
+          <span className="inline-flex items-center gap-1 text-[10px] text-slate-400" style={{ fontWeight: 500 }}>
             <Building2 className="w-3 h-3" /> {rule.vendorsApplied} in use
           </span>
         </div>
@@ -1696,7 +1696,7 @@ function PrTemplateCardInner({
                   className={`h-[22px] rounded-md text-[10px] tabular-nums transition-all duration-200 cursor-pointer flex items-center justify-center px-2 ${
                     isActive
                       ? "shadow-sm"
-                      : "bg-[#F1F5F9] text-[#64748B] hover:bg-[#E2E8F0]"
+                      : "bg-muted text-slate-500 hover:bg-border"
                   }`}
                   style={{
                     fontWeight: isActive ? 600 : 500,
@@ -1714,28 +1714,28 @@ function PrTemplateCardInner({
             })}
           </div>
           <div className="flex items-center justify-between px-3 py-[6px] rounded-lg border border-[#E8ECF1] bg-[#FAFBFC] text-[11px] tabular-nums min-w-0">
-            <div className="flex items-center gap-1.5 text-[#64748B] min-w-0">
+            <div className="flex items-center gap-1.5 text-slate-500 min-w-0">
               <span style={{ fontWeight: 400 }}>{shownTier?.minValue}</span>
-              <span className="text-[#CBD5E1]">–</span>
+              <span className="text-slate-300">–</span>
               <span style={{ fontWeight: 400 }}>{shownTier?.maxValue}</span>
             </div>
-            <span className="shrink-0 ml-2 text-[#0F172A]" style={{ fontWeight: 600 }}>{shownTier?.discount}</span>
+            <span className="shrink-0 ml-2 text-foreground" style={{ fontWeight: 600 }}>{shownTier?.discount}</span>
           </div>
         </div>
       </div>
 
       {/* Footer — Apply + Duplicate */}
-      <div className="grid grid-cols-2 border-t border-[#F1F5F9] shrink-0">
+      <div className="grid grid-cols-2 border-t border-muted shrink-0">
         <button
           onClick={(e) => { e.stopPropagation(); onApply(); }}
-          className="inline-flex items-center justify-center gap-1 py-2 text-[11px] text-[#64748B] hover:text-[#0A77FF] hover:bg-[#F8FAFC] transition-colors border-r border-[#F1F5F9]"
+          className="inline-flex items-center justify-center gap-1 py-2 text-[11px] text-slate-500 hover:text-primary hover:bg-slate-50 transition-colors border-r border-muted"
           style={{ fontWeight: 500 }}
         >
           <Check className="w-3 h-3" /> Apply
         </button>
         <button
           onClick={(e) => { e.stopPropagation(); onDuplicate(); }}
-          className="inline-flex items-center justify-center gap-1 py-2 text-[11px] text-[#64748B] hover:text-[#0A77FF] hover:bg-[#F8FAFC] transition-colors"
+          className="inline-flex items-center justify-center gap-1 py-2 text-[11px] text-slate-500 hover:text-primary hover:bg-slate-50 transition-colors"
           style={{ fontWeight: 500 }}
         >
           <Copy className="w-3 h-3" /> Duplicate
@@ -1783,7 +1783,7 @@ function GroupCard({
       onMouseLeave={() => setIsHovered(false)}
       className="group relative text-left p-2.5 sm:p-3 rounded-lg border transition-all duration-150"
       style={{
-        borderColor: isSelected ? "#0A77FF" : isHovered ? "#CBD5E1" : "#E2E8F0",
+        borderColor: isSelected ? "hsl(var(--primary))" : isHovered ? "#CBD5E1" : "hsl(var(--border))",
         backgroundColor: isSelected ? "#F5F9FF" : isHovered ? "#FAFCFF" : "#FFFFFF",
         boxShadow: isSelected
           ? "0 0 0 1px rgba(10,119,255,0.15), 0 1px 3px rgba(10,119,255,0.06)"
@@ -1799,7 +1799,7 @@ function GroupCard({
           <>
             <div
               onClick={(e) => { e.stopPropagation(); onQuickView(e); }}
-              className="w-6 h-6 rounded-full flex items-center justify-center text-[#94A3B8] hover:text-[#64748B] hover:bg-white/80 transition-colors cursor-pointer"
+              className="w-6 h-6 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-500 hover:bg-white/80 transition-colors cursor-pointer"
             >
               <Eye className="w-3.5 h-3.5" />
             </div>
@@ -1807,12 +1807,12 @@ function GroupCard({
               onClick={handlePrimaryClick}
               className={`w-6 h-6 rounded-full flex items-center justify-center transition-colors cursor-pointer ${
                 isPrimary
-                  ? "text-[#0A77FF] hover:bg-white/80"
-                  : "text-[#94A3B8] hover:text-[#F59E0B] hover:bg-white/80"
+                  ? "text-primary hover:bg-white/80"
+                  : "text-slate-400 hover:text-amber-500 hover:bg-white/80"
               }`}
               title={isPrimary ? "Primary group" : "Set as primary"}
             >
-              <Star className={`w-3.5 h-3.5 ${isPrimary ? "fill-[#0A77FF]" : ""}`} />
+              <Star className={`w-3.5 h-3.5 ${isPrimary ? "fill-primary" : ""}`} />
             </div>
           </>
         )}
@@ -1822,7 +1822,7 @@ function GroupCard({
           <>
             <div
               onClick={(e) => { e.stopPropagation(); onQuickView(e); }}
-              className="w-6 h-6 rounded-full flex items-center justify-center text-[#94A3B8] hover:text-[#64748B] hover:bg-[#F1F5F9] transition-colors cursor-pointer"
+              className="w-6 h-6 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-500 hover:bg-muted transition-colors cursor-pointer"
             >
               <Eye className="w-3.5 h-3.5" />
             </div>
@@ -1831,30 +1831,30 @@ function GroupCard({
 
         {/* Primary badge (always visible when primary) */}
         {isPrimary && !isHovered && (
-          <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-[#0A77FF] text-white text-[10px]" style={{ fontWeight: 600 }}>
+          <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-primary text-white text-[10px]" style={{ fontWeight: 600 }}>
             Primary
           </span>
         )}
 
         {/* Checkmark (always visible when selected) */}
         {isSelected && (
-          <div className="w-5 h-5 rounded-full bg-[#0A77FF] flex items-center justify-center">
+          <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center">
             <Check className="w-3 h-3 text-white" />
           </div>
         )}
 
         {/* Empty circle on hover for unselected */}
         {!isSelected && isHovered && (
-          <div className="w-5 h-5 rounded-full border-2 border-[#CBD5E1] bg-white" />
+          <div className="w-5 h-5 rounded-full border-2 border-slate-300 bg-white" />
         )}
       </div>
 
       {/* Icon */}
       <div className={`w-7 h-7 rounded-md flex items-center justify-center mb-1.5 transition-colors ${
-        isSelected ? "bg-[#D6E8FF]" : "bg-[#F1F5F9]"
+        isSelected ? "bg-[#D6E8FF]" : "bg-muted"
       }`}>
         <Building2 className={`w-4 h-4 transition-colors ${
-          isSelected ? "text-primary" : "text-[#64748B]"
+          isSelected ? "text-primary" : "text-slate-500"
         }`} />
       </div>
 
@@ -1862,12 +1862,12 @@ function GroupCard({
       <p className="text-[13px] text-foreground pr-16 break-words" style={{ fontWeight: isSelected ? 600 : 500 }}>{highlightMatch(group.name, searchQuery || "")}</p>
 
       {/* Description — allow wrapping, show up to 2 lines */}
-      <p className="text-[11px] text-[#94A3B8] mt-0.5 line-clamp-2 pr-2 break-words">
+      <p className="text-[11px] text-slate-400 mt-0.5 line-clamp-2 pr-2 break-words">
         {highlightMatch(group.description, searchQuery || "")}
       </p>
 
       {/* Footer: partner count */}
-      <div className="flex items-center gap-1 mt-1.5 text-[11px] text-[#94A3B8]">
+      <div className="flex items-center gap-1 mt-1.5 text-[11px] text-slate-400">
         <Users className="w-3 h-3" />
         <span>{group.memberCount} partner{group.memberCount !== 1 ? "s" : ""}</span>
       </div>
@@ -1946,8 +1946,8 @@ function GroupQuickViewOverlay({
   }, [onClose]);
 
   const statusStyles: Record<string, { bg: string; text: string; border: string; dot: string }> = {
-    Active: { bg: "#ECFDF5", text: "#065F46", border: "#A7F3D0", dot: "#059669" },
-    Inactive: { bg: "#FFFBEB", text: "#92400E", border: "#FDE68A", dot: "#D97706" },
+    Active: { bg: "#ECFDF5", text: "#065F46", border: "#A7F3D0", dot: "hsl(var(--success))" },
+    Inactive: { bg: "#FFFBEB", text: "#92400E", border: "#FDE68A", dot: "hsl(var(--warning))" },
   };
 
   const getStatusStyle = (status: GroupVendor["status"]) =>
@@ -1965,31 +1965,31 @@ function GroupQuickViewOverlay({
     <div className="fixed inset-0 z-[250] flex items-center justify-center bg-black/50">
       <div
         ref={overlayRef}
-        className="bg-white rounded-xl shadow-2xl border border-[#E2E8F0] w-[calc(100%-1rem)] sm:w-full max-w-[700px] max-h-[85vh] sm:max-h-[600px] flex flex-col animate-modal-pop mx-auto"
+        className="bg-white rounded-xl shadow-2xl border border-border w-[calc(100%-1rem)] sm:w-full max-w-[700px] max-h-[85vh] sm:max-h-[600px] flex flex-col animate-modal-pop mx-auto"
       >
         {/* Header */}
         <div className="px-4 sm:px-5 pt-4 sm:pt-5 pb-3 shrink-0">
           <div className="flex items-center justify-between gap-3">
             <div className="min-w-0">
-              <h3 className="text-[13px] sm:text-sm text-[#0F172A] truncate" style={{ fontWeight: 600 }}>
+              <h3 className="text-[13px] sm:text-sm text-foreground truncate" style={{ fontWeight: 600 }}>
                 {group.name} — Associated Vendors
               </h3>
-              <p className="text-[11px] sm:text-xs text-[#94A3B8] mt-0.5">
+              <p className="text-[11px] sm:text-xs text-slate-400 mt-0.5">
                 {allVendors.length} vendor{allVendors.length !== 1 ? "s" : ""} in this group
               </p>
             </div>
             <button
               onClick={onClose}
-              className="shrink-0 w-7 h-7 rounded-lg flex items-center justify-center hover:bg-[#F1F5F9] transition-colors cursor-pointer"
+              className="shrink-0 w-7 h-7 rounded-lg flex items-center justify-center hover:bg-muted transition-colors cursor-pointer"
             >
-              <X className="w-4 h-4 text-[#94A3B8]" />
+              <X className="w-4 h-4 text-slate-400" />
             </button>
           </div>
 
           {/* Search + Status Tabs */}
           <div className="mt-3 flex flex-col sm:flex-row sm:items-center gap-2">
             <div className="relative flex-1">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8] pointer-events-none" />
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" />
               <input
                 type="text"
                 placeholder="Search…"
@@ -2000,14 +2000,14 @@ function GroupQuickViewOverlay({
                   const text = e.clipboardData.getData("text").trim();
                   if (text) setSearch(text);
                 }}
-                className="w-full h-8 pl-8 pr-8 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] text-xs text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 focus:outline-none transition-colors cursor-default"
+                className="w-full h-8 pl-8 pr-8 rounded-lg border border-border bg-slate-50 text-xs text-foreground placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary/20 focus:outline-none transition-colors cursor-default"
               />
               {search && (
                 <button
                   onClick={() => setSearch("")}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-[#E2E8F0] hover:bg-[#CBD5E1] flex items-center justify-center transition-colors cursor-pointer"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-border hover:bg-slate-300 flex items-center justify-center transition-colors cursor-pointer"
                 >
-                  <X className="w-2.5 h-2.5 text-[#64748B]" />
+                  <X className="w-2.5 h-2.5 text-slate-500" />
                 </button>
               )}
             </div>
@@ -2018,8 +2018,8 @@ function GroupQuickViewOverlay({
                   onClick={() => setStatusTab(tab)}
                   className={`px-2 py-1 rounded-md text-[11px] border transition-colors cursor-pointer ${
                     statusTab === tab
-                      ? "bg-[#EDF4FF] text-[#0A77FF] border-[#ADD1FF]"
-                      : "bg-[#F8FAFC] text-[#64748B] border-transparent hover:bg-[#F1F5F9]"
+                      ? "bg-accent text-primary border-[#ADD1FF]"
+                      : "bg-slate-50 text-slate-500 border-transparent hover:bg-muted"
                   }`}
                   style={{ fontWeight: 500 }}
                 >
@@ -2034,10 +2034,10 @@ function GroupQuickViewOverlay({
         {/* Table header */}
         <div className="shrink-0 border-y border-[#EEF2F6] bg-[#FAFBFC] px-4 sm:px-5">
           <div className="grid grid-cols-[72px_1fr_72px] sm:grid-cols-[80px_1.2fr_1.5fr_76px] gap-2 h-8 items-center">
-            <span className="text-[10px] text-[#94A3B8] uppercase tracking-wider" style={{ fontWeight: 600 }}>ID</span>
-            <span className="text-[10px] text-[#94A3B8] uppercase tracking-wider" style={{ fontWeight: 600 }}>Vendor Name</span>
-            <span className="text-[10px] text-[#94A3B8] uppercase tracking-wider hidden sm:block" style={{ fontWeight: 600 }}>Address</span>
-            <span className="text-[10px] text-[#94A3B8] uppercase tracking-wider text-right" style={{ fontWeight: 600 }}>Status</span>
+            <span className="text-[10px] text-slate-400 uppercase tracking-wider" style={{ fontWeight: 600 }}>ID</span>
+            <span className="text-[10px] text-slate-400 uppercase tracking-wider" style={{ fontWeight: 600 }}>Vendor Name</span>
+            <span className="text-[10px] text-slate-400 uppercase tracking-wider hidden sm:block" style={{ fontWeight: 600 }}>Address</span>
+            <span className="text-[10px] text-slate-400 uppercase tracking-wider text-right" style={{ fontWeight: 600 }}>Status</span>
           </div>
         </div>
 
@@ -2052,10 +2052,10 @@ function GroupQuickViewOverlay({
               {visible.map((vendor) => (
                 <div
                   key={vendor.id}
-                  className="grid grid-cols-[72px_1fr_72px] sm:grid-cols-[80px_1.2fr_1.5fr_76px] gap-2 items-center py-2.5 border-b border-[#F1F5F9] last:border-b-0 hover:bg-[#F8FAFC] transition-colors -mx-4 sm:-mx-5 px-4 sm:px-5"
+                  className="grid grid-cols-[72px_1fr_72px] sm:grid-cols-[80px_1.2fr_1.5fr_76px] gap-2 items-center py-2.5 border-b border-muted last:border-b-0 hover:bg-slate-50 transition-colors -mx-4 sm:-mx-5 px-4 sm:px-5"
                   style={{ minHeight: VENDOR_ROW_HEIGHT }}
                 >
-                  <span className="text-[11px] text-[#0A77FF] tabular-nums truncate" style={{ fontWeight: 600 }}>
+                  <span className="text-[11px] text-primary tabular-nums truncate" style={{ fontWeight: 600 }}>
                     {vendor.id}
                   </span>
                   <div className="min-w-0 flex items-center gap-2">
@@ -2069,11 +2069,11 @@ function GroupQuickViewOverlay({
                     >
                       {vendor.name.charAt(0)}
                     </div>
-                    <span className="text-[12px] text-[#0F172A] truncate" style={{ fontWeight: 500 }}>
+                    <span className="text-[12px] text-foreground truncate" style={{ fontWeight: 500 }}>
                       {vendor.name}
                     </span>
                   </div>
-                  <span className="text-[11px] text-[#64748B] truncate hidden sm:block">
+                  <span className="text-[11px] text-slate-500 truncate hidden sm:block">
                     {vendor.address}
                   </span>
                   <div className="flex justify-end">
@@ -2094,7 +2094,7 @@ function GroupQuickViewOverlay({
               ))}
               {visibleCount < filtered.length && (
                 <div className="py-3 text-center">
-                  <span className="text-[11px] text-[#94A3B8]">
+                  <span className="text-[11px] text-slate-400">
                     Showing {visibleCount} of {filtered.length} — scroll for more
                   </span>
                 </div>
@@ -2102,17 +2102,17 @@ function GroupQuickViewOverlay({
             </div>
           ) : (
             <div className="py-10 text-center">
-              <div className="w-10 h-10 rounded-xl bg-[#F1F5F9] flex items-center justify-center mx-auto mb-2.5">
+              <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center mx-auto mb-2.5">
                 {search ? (
-                  <Search className="w-5 h-5 text-[#94A3B8]" />
+                  <Search className="w-5 h-5 text-slate-400" />
                 ) : (
-                  <Users className="w-5 h-5 text-[#94A3B8]" />
+                  <Users className="w-5 h-5 text-slate-400" />
                 )}
               </div>
-              <p className="text-[13px] text-[#334155]" style={{ fontWeight: 600 }}>
+              <p className="text-[13px] text-slate-700" style={{ fontWeight: 600 }}>
                 {search ? "No matching vendors" : "No vendors yet"}
               </p>
-              <p className="text-xs text-[#94A3B8] mt-1">
+              <p className="text-xs text-slate-400 mt-1">
                 {search
                   ? "Try adjusting your search or filter."
                   : "This group doesn't have any associated vendors."}
@@ -2123,14 +2123,14 @@ function GroupQuickViewOverlay({
 
         {/* Footer */}
         <div className="shrink-0 border-t border-[#EEF2F6] px-4 sm:px-5 py-2.5 flex items-center justify-between bg-[#FAFBFC] rounded-b-xl">
-          <span className="text-[11px] text-[#94A3B8]">
+          <span className="text-[11px] text-slate-400">
             {filtered.length === allVendors.length
               ? `${allVendors.length} total`
               : `${filtered.length} of ${allVendors.length} shown`}
           </span>
           <button
             onClick={onClose}
-            className="px-3.5 py-1.5 rounded-lg text-xs text-[#0F172A] bg-white border border-[#E2E8F0] hover:bg-[#F1F5F9] transition-colors cursor-pointer"
+            className="px-3.5 py-1.5 rounded-lg text-xs text-foreground bg-white border border-border hover:bg-muted transition-colors cursor-pointer"
             style={{ fontWeight: 500 }}
           >
             Close
@@ -2228,7 +2228,7 @@ function Step2PartnerForm({
   const [gSaveAndCreateAnother, setGSaveAndCreateAnother] = useState(false);
 
   const AVATAR_COLORS_G = useMemo(() => [
-    "#0A77FF", "#7C3AED", "#059669", "#DC2626", "#D97706",
+    "hsl(var(--primary))", "hsl(var(--violet))", "hsl(var(--success))", "hsl(var(--destructive))", "hsl(var(--warning))",
     "#0891B2", "#4F46E5", "#BE185D", "#65A30D", "#EA580C",
   ], []);
 
@@ -2424,33 +2424,33 @@ function Step2PartnerForm({
       {/* ── Selected Partner Groups Banner — sticky at top ── */}
       {allSelectedGroups.length > 0 && (
         <div className="sticky top-0 z-10 bg-[#FAFBFC] pb-2 -mt-1">
-          <div className="rounded-lg bg-white border border-[#0A77FF]/25 shadow-[0_1px_4px_rgba(10,119,255,0.06),0_4px_12px_-2px_rgba(0,0,0,0.06)] overflow-hidden">
+          <div className="rounded-lg bg-white border border-primary/25 shadow-[0_1px_4px_rgba(10,119,255,0.06),0_4px_12px_-2px_rgba(0,0,0,0.06)] overflow-hidden">
             {/* Header row */}
             <div className="flex items-center justify-between gap-2 px-2.5 sm:px-3 py-2">
               <div className="flex items-center gap-2 min-w-0">
-                <div className="w-6 h-6 rounded-md bg-[#0A77FF]/8 flex items-center justify-center shrink-0">
-                  <Users className="w-3.5 h-3.5 text-[#0A77FF]" />
+                <div className="w-6 h-6 rounded-md bg-primary/8 flex items-center justify-center shrink-0">
+                  <Users className="w-3.5 h-3.5 text-primary" />
                 </div>
                 <div className="min-w-0">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>
+                    <span className="text-xs sm:text-[13px] text-foreground" style={{ fontWeight: 600 }}>
                       {allSelectedGroups.length} Group{allSelectedGroups.length !== 1 ? "s" : ""} Selected
                     </span>
                     {selectedGroup && (
-                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] bg-[#0A77FF]/8 text-[#0A77FF]" style={{ fontWeight: 600 }}>
-                        <Star className="w-2.5 h-2.5 fill-[#0A77FF]" />
+                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] bg-primary/8 text-primary" style={{ fontWeight: 600 }}>
+                        <Star className="w-2.5 h-2.5 fill-primary" />
                         Primary: {selectedGroup.name}
                       </span>
                     )}
                   </div>
-                  <p className="text-[11px] text-[#94A3B8] mt-0.5">
+                  <p className="text-[11px] text-slate-400 mt-0.5">
                     Configuration inherits from the primary group
                   </p>
                 </div>
               </div>
               <button
                 onClick={onEditGroup}
-                className="group inline-flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-[#475569] hover:border-[#0A77FF] hover:text-[#0A77FF] hover:bg-[#EDF4FF] transition-all shrink-0 text-[11px] sm:text-xs cursor-pointer"
+                className="group inline-flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg border border-border bg-white text-muted-foreground hover:border-primary hover:text-primary hover:bg-accent transition-all shrink-0 text-[11px] sm:text-xs cursor-pointer"
                 style={{ fontWeight: 600 }}
               >
                 <Pencil className="w-3 h-3" />
@@ -2467,14 +2467,14 @@ function Step2PartnerForm({
       )}
 
       {/* ── Partner Details — boxed card ── */}
-      <div className="rounded-lg border border-[#E2E8F0] bg-white shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
+      <div className="rounded-lg border border-border bg-white shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
         <div className="px-3 sm:px-4 py-2 sm:py-2.5 border-b border-[#EEF2F6] flex items-center gap-2 bg-[#FAFBFC] rounded-t-lg">
-          <div className="w-6 h-6 rounded-md bg-[#0A77FF]/8 flex items-center justify-center shrink-0">
-            <Info className="w-3.5 h-3.5 text-[#0A77FF]" />
+          <div className="w-6 h-6 rounded-md bg-primary/8 flex items-center justify-center shrink-0">
+            <Info className="w-3.5 h-3.5 text-primary" />
           </div>
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Partner Details</span>
-            <span className="text-[9px] sm:text-[10px] text-[#94A3B8] tracking-wider uppercase hidden min-[480px]:inline" style={{ fontWeight: 500 }}>Required</span>
+            <span className="text-xs sm:text-[13px] text-foreground" style={{ fontWeight: 600 }}>Partner Details</span>
+            <span className="text-[9px] sm:text-[10px] text-slate-400 tracking-wider uppercase hidden min-[480px]:inline" style={{ fontWeight: 500 }}>Required</span>
           </div>
         </div>
         <div className="px-2.5 sm:px-3 pt-2 sm:pt-2.5 pb-1.5 sm:pb-2">
@@ -2496,38 +2496,38 @@ function Step2PartnerForm({
               onClick={() => profileInputRef.current?.click()}
               className={`relative w-14 h-14 rounded-xl cursor-pointer shrink-0 transition-all ${
                 profileImage
-                  ? "ring-2 ring-[#E2E8F0]"
-                  : "border-2 border-dashed border-[#CBD5E1] bg-[#F8FAFC]"
+                  ? "ring-2 ring-border"
+                  : "border-2 border-dashed border-slate-300 bg-slate-50"
               }`}
             >
               {profileImage ? (
                 <img src={profileImage} alt="Profile" className="w-full h-full rounded-xl object-cover" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
-                  <Camera className="w-5 h-5 text-[#94A3B8]" />
+                  <Camera className="w-5 h-5 text-slate-400" />
                 </div>
               )}
             </div>
             <div className="min-w-0">
-              <p className="text-xs text-[#0F172A]" style={{ fontWeight: 500 }}>
+              <p className="text-xs text-foreground" style={{ fontWeight: 500 }}>
                 {profileImage ? "Profile photo" : "Add a photo"}
               </p>
               <div className="flex items-center gap-2 mt-0.5">
                 <button
                   type="button"
                   onClick={() => profileInputRef.current?.click()}
-                  className="text-[11px] text-[#0A77FF]"
+                  className="text-[11px] text-primary"
                   style={{ fontWeight: 500 }}
                 >
                   {profileImage ? "Change" : "Upload"}
                 </button>
                 {profileImage && (
                   <>
-                    <span className="text-[#E2E8F0] text-[11px]">·</span>
+                    <span className="text-border text-[11px]">·</span>
                     <button
                       type="button"
                       onClick={() => onProfileImageChange(null)}
-                      className="text-[11px] text-[#EF4444]"
+                      className="text-[11px] text-red-500"
                       style={{ fontWeight: 500 }}
                     >
                       Remove
@@ -2565,10 +2565,10 @@ function Step2PartnerForm({
                 }}
                 className={`relative w-full aspect-square rounded-xl cursor-pointer group transition-all ${
                   profileImage
-                    ? "ring-2 ring-[#E2E8F0] hover:ring-[#0A77FF]/30"
+                    ? "ring-2 ring-border hover:ring-primary/30"
                     : profileDragOver
-                    ? "border-2 border-dashed border-[#0A77FF] bg-[#EDF4FF]"
-                    : "border-2 border-dashed border-[#CBD5E1] hover:border-[#0A77FF]/50 bg-[#F8FAFC] hover:bg-[#EDF4FF]/50"
+                    ? "border-2 border-dashed border-primary bg-accent"
+                    : "border-2 border-dashed border-slate-300 hover:border-primary/50 bg-slate-50 hover:bg-accent/50"
                 }`}
               >
                 {profileImage ? (
@@ -2584,11 +2584,11 @@ function Step2PartnerForm({
                   </>
                 ) : (
                   <div className="w-full h-full flex flex-col items-center justify-center gap-1.5">
-                    <div className="w-10 h-10 rounded-lg bg-[#F1F5F9] group-hover:bg-[#EDF4FF] flex items-center justify-center transition-colors">
-                      <Camera className="w-5 h-5 text-[#94A3B8] group-hover:text-[#0A77FF] transition-colors" />
+                    <div className="w-10 h-10 rounded-lg bg-muted group-hover:bg-accent flex items-center justify-center transition-colors">
+                      <Camera className="w-5 h-5 text-slate-400 group-hover:text-primary transition-colors" />
                     </div>
-                    <span className="text-[11px] text-[#94A3B8] group-hover:text-[#0A77FF] transition-colors" style={{ fontWeight: 500 }}>Upload photo</span>
-                    <span className="text-[9px] text-[#CBD5E1]">Max 5 MB</span>
+                    <span className="text-[11px] text-slate-400 group-hover:text-primary transition-colors" style={{ fontWeight: 500 }}>Upload photo</span>
+                    <span className="text-[9px] text-slate-300">Max 5 MB</span>
                   </div>
                 )}
               </div>
@@ -2597,16 +2597,16 @@ function Step2PartnerForm({
                   <button
                     type="button"
                     onClick={() => profileInputRef.current?.click()}
-                    className="text-[11px] text-[#0A77FF] hover:text-[#0862D0] transition-colors cursor-pointer"
+                    className="text-[11px] text-primary hover:text-[#0862D0] transition-colors cursor-pointer"
                     style={{ fontWeight: 500 }}
                   >
                     Change
                   </button>
-                  <span className="text-[#E2E8F0] text-[11px]">·</span>
+                  <span className="text-border text-[11px]">·</span>
                   <button
                     type="button"
                     onClick={(e) => { e.stopPropagation(); onProfileImageChange(null); }}
-                    className="text-[11px] text-[#EF4444] hover:text-[#DC2626] transition-colors cursor-pointer"
+                    className="text-[11px] text-red-500 hover:text-destructive transition-colors cursor-pointer"
                     style={{ fontWeight: 500 }}
                   >
                     Remove
@@ -2619,26 +2619,26 @@ function Step2PartnerForm({
             <div className="grid grid-cols-1 min-[480px]:grid-cols-2 gap-x-3 sm:gap-x-4 gap-y-2.5 sm:gap-y-3">
               {/* Row 1 Left: Partner Name */}
               <div>
-                <Label htmlFor="create-partner-name" className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>
-                  Partner Name<span className="text-[#EF4444]">*</span>
+                <Label htmlFor="create-partner-name" className="text-xs sm:text-[13px] text-foreground" style={{ fontWeight: 500 }}>
+                  Partner Name<span className="text-red-500">*</span>
                 </Label>
                 <Input
                   id="create-partner-name"
                   placeholder="e.g. Acme Supply Co."
                   value={partnerName}
                   onChange={(e) => onPartnerNameChange(e.target.value)}
-                  className="mt-1 rounded-lg border-[#E2E8F0] bg-white !h-10 text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
+                  className="mt-1 rounded-lg border-border bg-white !h-10 text-sm text-foreground placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary/20"
                 />
                 {errors.partnerName && (
-                  <p className="text-[#EF4444] text-xs mt-1">{errors.partnerName}</p>
+                  <p className="text-red-500 text-xs mt-1">{errors.partnerName}</p>
                 )}
               </div>
 
               {/* Row 1 Right: Status */}
               <div>
-                <Label className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>Status</Label>
+                <Label className="text-xs sm:text-[13px] text-foreground" style={{ fontWeight: 500 }}>Status</Label>
                 <Select value={status} onValueChange={(val: string) => setStatus(val as "Active" | "Inactive")}>
-                  <SelectTrigger className="mt-1 !h-10 rounded-lg border-[#E2E8F0] bg-white text-sm hover:border-[#CBD5E1] transition-colors focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 [&>svg]:text-[#94A3B8]">
+                  <SelectTrigger className="mt-1 !h-10 rounded-lg border-border bg-white text-sm hover:border-slate-300 transition-colors focus:border-primary focus:ring-1 focus:ring-primary/20 [&>svg]:text-slate-400">
                     <SelectValue>
                       <span
                         className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs whitespace-nowrap"
@@ -2671,7 +2671,7 @@ function Step2PartnerForm({
 
               {/* Row 2 Left: Phone Number */}
               <div>
-                <Label htmlFor="create-partner-phone" className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>
+                <Label htmlFor="create-partner-phone" className="text-xs sm:text-[13px] text-foreground" style={{ fontWeight: 500 }}>
                   Phone Number
                 </Label>
                 <div className="flex items-center gap-0 mt-1">
@@ -2679,23 +2679,23 @@ function Step2PartnerForm({
                     <PopoverTrigger asChild>
                       <button
                         type="button"
-                        className="flex items-center gap-1.5 pl-2.5 pr-1.5 !h-10 rounded-l-lg border border-r-0 border-[#E2E8F0] bg-white text-sm shrink-0 cursor-pointer hover:border-[#CBD5E1] transition-colors focus:outline-none focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
+                        className="flex items-center gap-1.5 pl-2.5 pr-1.5 !h-10 rounded-l-lg border border-r-0 border-border bg-white text-sm shrink-0 cursor-pointer hover:border-slate-300 transition-colors focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
                       >
                         <span className="text-base leading-none">{selectedCountry.flag}</span>
-                        <span className="text-xs text-[#334155]" style={{ fontWeight: 600 }}>{phoneCountryCode}</span>
-                        <ChevronDown className="w-3 h-3 text-[#94A3B8]" />
+                        <span className="text-xs text-slate-700" style={{ fontWeight: 600 }}>{phoneCountryCode}</span>
+                        <ChevronDown className="w-3 h-3 text-slate-400" />
                       </button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-64 p-0 z-[200] rounded-xl shadow-lg border border-[#E2E8F0]" align="start" sideOffset={4}>
-                      <div className="p-2 border-b border-[#F1F5F9]">
+                    <PopoverContent className="w-64 p-0 z-[200] rounded-xl shadow-lg border border-border" align="start" sideOffset={4}>
+                      <div className="p-2 border-b border-muted">
                         <div className="relative">
-                          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8]" />
+                          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
                           <input
                             type="text"
                             placeholder="Search country..."
                             value={countrySearch}
                             onChange={(e) => setCountrySearch(e.target.value)}
-                            className="w-full pl-8 pr-3 py-2 text-sm rounded-lg border border-[#E2E8F0] bg-white text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-none focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
+                            className="w-full pl-8 pr-3 py-2 text-sm rounded-lg border border-border bg-white text-foreground placeholder:text-slate-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
                           />
                         </div>
                       </div>
@@ -2711,20 +2711,20 @@ function Step2PartnerForm({
                             }}
                             className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-left transition-colors ${
                               phoneCountryCode === c.code && selectedCountry.country === c.country
-                                ? "bg-[#EDF4FF] text-[#0A77FF]"
-                                : "hover:bg-[#F8FAFC] text-[#334155]"
+                                ? "bg-accent text-primary"
+                                : "hover:bg-slate-50 text-slate-700"
                             }`}
                           >
                             <span className="text-base">{c.flag}</span>
                             <span className="text-sm flex-1 truncate" style={{ fontWeight: 500 }}>{c.country}</span>
-                            <span className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>{c.code}</span>
+                            <span className="text-xs text-slate-500" style={{ fontWeight: 500 }}>{c.code}</span>
                             {phoneCountryCode === c.code && selectedCountry.country === c.country && (
-                              <Check className="w-3.5 h-3.5 text-[#0A77FF] shrink-0" />
+                              <Check className="w-3.5 h-3.5 text-primary shrink-0" />
                             )}
                           </button>
                         ))}
                         {filteredCountries.length === 0 && (
-                          <p className="text-xs text-[#94A3B8] text-center py-4">No countries found</p>
+                          <p className="text-xs text-slate-400 text-center py-4">No countries found</p>
                         )}
                       </div>
                     </PopoverContent>
@@ -2734,14 +2734,14 @@ function Step2PartnerForm({
                     placeholder="(555) 123-4567"
                     value={partnerPhone}
                     onChange={(e) => onPartnerPhoneChange(e.target.value)}
-                    className="rounded-l-none rounded-r-lg border-[#E2E8F0] bg-white !h-10 text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
+                    className="rounded-l-none rounded-r-lg border-border bg-white !h-10 text-sm text-foreground placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary/20"
                   />
                 </div>
               </div>
 
               {/* Row 2 Right: Website */}
               <div>
-                <Label htmlFor="create-partner-website" className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>
+                <Label htmlFor="create-partner-website" className="text-xs sm:text-[13px] text-foreground" style={{ fontWeight: 500 }}>
                   Website
                 </Label>
                 <Input
@@ -2749,7 +2749,7 @@ function Step2PartnerForm({
                   placeholder="https://example.com"
                   value={website}
                   onChange={(e) => onWebsiteChange(e.target.value)}
-                  className="mt-1 rounded-lg border-[#E2E8F0] bg-white !h-10 text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
+                  className="mt-1 rounded-lg border-border bg-white !h-10 text-sm text-foreground placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary/20"
                 />
               </div>
 
@@ -2771,12 +2771,12 @@ function Step2PartnerForm({
       {/* ── Partner Type Selection ── */}
       <div>
         <div className="flex items-center gap-2 mb-2.5">
-          <div className="w-6 h-6 rounded-md bg-[#0A77FF]/8 flex items-center justify-center shrink-0">
-            <Users className="w-3.5 h-3.5 text-[#0A77FF]" />
+          <div className="w-6 h-6 rounded-md bg-primary/8 flex items-center justify-center shrink-0">
+            <Users className="w-3.5 h-3.5 text-primary" />
           </div>
           <div>
-            <span className="text-xs sm:text-[13px] text-[#0F172A] block" style={{ fontWeight: 600 }}>Partner Type</span>
-            <span className="text-[10px] sm:text-[11px] text-[#94A3B8] block mt-px">Select one or more partner classifications</span>
+            <span className="text-xs sm:text-[13px] text-foreground block" style={{ fontWeight: 600 }}>Partner Type</span>
+            <span className="text-[10px] sm:text-[11px] text-slate-400 block mt-px">Select one or more partner classifications</span>
           </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -2786,29 +2786,29 @@ function Step2PartnerForm({
             className={`group relative rounded-xl overflow-hidden border transition-all duration-200 cursor-pointer ${
               selectedPartnerTypes.has("vendor")
                 ? "border-[#93C5FD]/70 bg-white shadow-[0_1px_4px_rgba(10,119,255,0.06)]"
-                : "border-[#E2E8F0] bg-white hover:border-[#BFDBFE] hover:shadow-[0_4px_16px_-4px_rgba(10,119,255,0.12)]"
+                : "border-border bg-white hover:border-blue-200 hover:shadow-[0_4px_16px_-4px_rgba(10,119,255,0.12)]"
             }`}
           >
             {/* Gradient hover overlay */}
             <div className={`absolute inset-0 transition-all duration-300 pointer-events-none ${
               selectedPartnerTypes.has("vendor")
-                ? "bg-gradient-to-br from-[#EFF6FF]/50 to-transparent"
-                : "bg-gradient-to-br from-[#EDF4FF]/0 to-[#EDF4FF]/0 group-hover:from-[#EDF4FF]/60 group-hover:to-transparent"
+                ? "bg-gradient-to-br from-blue-50/50 to-transparent"
+                : "bg-gradient-to-br from-accent/0 to-accent/0 group-hover:from-accent/60 group-hover:to-transparent"
             }`} />
             <div className="relative flex items-center gap-3 pl-3.5 pr-3 py-3">
               <div className={`w-9 h-9 rounded-[10px] flex items-center justify-center shrink-0 transition-all duration-200 ${
                 selectedPartnerTypes.has("vendor")
-                  ? "bg-gradient-to-br from-[#DBEAFE] to-[#BFDBFE] text-[#2563EB]"
-                  : "bg-gradient-to-br from-[#EDF4FF] to-[#DBEAFE] text-[#0A77FF] group-hover:scale-105"
+                  ? "bg-gradient-to-br from-blue-100 to-blue-200 text-[#2563EB]"
+                  : "bg-gradient-to-br from-accent to-blue-100 text-primary group-hover:scale-105"
               }`}>
                 <Truck className="w-[18px] h-[18px]" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className={`text-[13px] transition-colors duration-150 ${
-                  selectedPartnerTypes.has("vendor") ? "text-[#1E40AF]" : "text-[#0F172A] group-hover:text-[#1E293B]"
+                  selectedPartnerTypes.has("vendor") ? "text-blue-800" : "text-foreground group-hover:text-slate-800"
                 }`} style={{ fontWeight: 600 }}>Vendor</p>
                 <p className={`text-[11px] mt-0.5 truncate transition-colors duration-150 ${
-                  selectedPartnerTypes.has("vendor") ? "text-[#60A5FA]" : "text-[#94A3B8]"
+                  selectedPartnerTypes.has("vendor") ? "text-[#60A5FA]" : "text-slate-400"
                 }`}>Supplies goods or services</p>
               </div>
               <div className="flex items-center gap-1.5 shrink-0">
@@ -2842,29 +2842,29 @@ function Step2PartnerForm({
             className={`group relative rounded-xl overflow-hidden border transition-all duration-200 cursor-pointer ${
               selectedPartnerTypes.has("customer")
                 ? "border-[#C4B5FD]/70 bg-white shadow-[0_1px_4px_rgba(139,92,246,0.06)]"
-                : "border-[#E2E8F0] bg-white hover:border-[#D5D3EC] hover:shadow-[0_4px_16px_-4px_rgba(124,58,237,0.10)]"
+                : "border-border bg-white hover:border-[#D5D3EC] hover:shadow-[0_4px_16px_-4px_rgba(124,58,237,0.10)]"
             }`}
           >
             {/* Gradient hover overlay */}
             <div className={`absolute inset-0 transition-all duration-300 pointer-events-none ${
               selectedPartnerTypes.has("customer")
-                ? "bg-gradient-to-br from-[#F5F3FF]/50 to-transparent"
-                : "bg-gradient-to-br from-[#F5F3FF]/0 to-[#F5F3FF]/0 group-hover:from-[#F5F3FF]/60 group-hover:to-transparent"
+                ? "bg-gradient-to-br from-violet-50/50 to-transparent"
+                : "bg-gradient-to-br from-violet-50/0 to-violet-50/0 group-hover:from-violet-50/60 group-hover:to-transparent"
             }`} />
             <div className="relative flex items-center gap-3 pl-3.5 pr-3 py-3">
               <div className={`w-9 h-9 rounded-[10px] flex items-center justify-center shrink-0 transition-all duration-200 ${
                 selectedPartnerTypes.has("customer")
-                  ? "bg-gradient-to-br from-[#EDE9FE] to-[#DDD6FE] text-[#7C3AED]"
-                  : "bg-gradient-to-br from-[#F5F3FF] to-[#EDE9FE] text-[#8B5CF6] group-hover:scale-105"
+                  ? "bg-gradient-to-br from-[#EDE9FE] to-[#DDD6FE] text-violet"
+                  : "bg-gradient-to-br from-violet-50 to-[#EDE9FE] text-violet-500 group-hover:scale-105"
               }`}>
                 <ShoppingCart className="w-[18px] h-[18px]" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className={`text-[13px] transition-colors duration-150 ${
-                  selectedPartnerTypes.has("customer") ? "text-[#5B21B6]" : "text-[#0F172A] group-hover:text-[#1E293B]"
+                  selectedPartnerTypes.has("customer") ? "text-[#5B21B6]" : "text-foreground group-hover:text-slate-800"
                 }`} style={{ fontWeight: 600 }}>Customer</p>
                 <p className={`text-[11px] mt-0.5 truncate transition-colors duration-150 ${
-                  selectedPartnerTypes.has("customer") ? "text-[#A78BFA]" : "text-[#94A3B8]"
+                  selectedPartnerTypes.has("customer") ? "text-[#A78BFA]" : "text-slate-400"
                 }`}>Purchases goods or services</p>
               </div>
               <div className="flex items-center gap-1.5 shrink-0">
@@ -2874,7 +2874,7 @@ function Step2PartnerForm({
                       e.stopPropagation();
                       onOpenConfigure("customer");
                     }}
-                    className="inline-flex items-center gap-1 px-2 py-[5px] rounded-md bg-white/80 border border-[#C4B5FD]/40 text-[#7C3AED] text-[11px] hover:bg-white hover:border-[#C4B5FD]/70 hover:shadow-sm transition-all duration-150 shrink-0"
+                    className="inline-flex items-center gap-1 px-2 py-[5px] rounded-md bg-white/80 border border-[#C4B5FD]/40 text-violet text-[11px] hover:bg-white hover:border-[#C4B5FD]/70 hover:shadow-sm transition-all duration-150 shrink-0"
                     style={{ fontWeight: 500 }}
                   >
                     <Settings2 className="w-3 h-3" />
@@ -2883,7 +2883,7 @@ function Step2PartnerForm({
                 )}
                 <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-all duration-200 shrink-0 ${
                   selectedPartnerTypes.has("customer")
-                    ? "bg-[#8B5CF6] shadow-[0_0_0_2px_rgba(139,92,246,0.15)]"
+                    ? "bg-violet-500 shadow-[0_0_0_2px_rgba(139,92,246,0.15)]"
                     : "border-[1.5px] border-[#D1D5DB] bg-white group-hover:border-[#C4B5FD]"
                 }`}>
                   {selectedPartnerTypes.has("customer") && <Check className="w-3 h-3 text-white" strokeWidth={2.5} />}
@@ -2897,16 +2897,16 @@ function Step2PartnerForm({
       {/* ── Global Point of Contact (Partner-Level) — compact card ── */}
       <div>
         <div className="flex items-center gap-2 mb-2.5">
-          <div className="w-6 h-6 rounded-md bg-[#0A77FF]/8 flex items-center justify-center shrink-0">
-            <Globe className="w-3.5 h-3.5 text-[#0A77FF]" />
+          <div className="w-6 h-6 rounded-md bg-primary/8 flex items-center justify-center shrink-0">
+            <Globe className="w-3.5 h-3.5 text-primary" />
           </div>
           <div>
-            <span className="text-xs sm:text-[13px] text-[#0F172A] block" style={{ fontWeight: 600 }}>Point of Contact</span>
-            <span className="text-[10px] sm:text-[11px] text-[#94A3B8] block mt-px">Assign partner-level contacts across all locations</span>
+            <span className="text-xs sm:text-[13px] text-foreground block" style={{ fontWeight: 600 }}>Point of Contact</span>
+            <span className="text-[10px] sm:text-[11px] text-slate-400 block mt-px">Assign partner-level contacts across all locations</span>
           </div>
         </div>
         {selectedGlobalPocContacts.length > 0 ? (
-          <div className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden relative">
+          <div className="rounded-xl border border-border bg-white overflow-hidden relative">
             <PocPillsRow contacts={selectedGlobalPocContacts} onManage={handleOpenSelectGlobalPoc} />
           </div>
         ) : (
@@ -2914,32 +2914,32 @@ function Step2PartnerForm({
             {/* Select from Contact Directory */}
             <button
               onClick={handleOpenSelectGlobalPoc}
-              className="group relative rounded-xl overflow-hidden border border-[#E2E8F0] bg-white text-left transition-all duration-200 hover:border-[#BFDBFE] hover:shadow-[0_4px_16px_-4px_rgba(10,119,255,0.12)] cursor-pointer"
+              className="group relative rounded-xl overflow-hidden border border-border bg-white text-left transition-all duration-200 hover:border-blue-200 hover:shadow-[0_4px_16px_-4px_rgba(10,119,255,0.12)] cursor-pointer"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-[#EDF4FF]/0 to-[#EDF4FF]/0 group-hover:from-[#EDF4FF]/60 group-hover:to-transparent transition-all duration-300 pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-br from-accent/0 to-accent/0 group-hover:from-accent/60 group-hover:to-transparent transition-all duration-300 pointer-events-none" />
               <div className="relative flex items-center gap-3 pl-3.5 pr-3 py-3">
-                <div className="w-9 h-9 rounded-[10px] bg-gradient-to-br from-[#EDF4FF] to-[#DBEAFE] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform duration-200">
-                  <Users className="w-[18px] h-[18px] text-[#0A77FF]" />
+                <div className="w-9 h-9 rounded-[10px] bg-gradient-to-br from-accent to-blue-100 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform duration-200">
+                  <Users className="w-[18px] h-[18px] text-primary" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Select from Contact Directory</p>
-                  <p className="text-[11px] text-[#94A3B8] mt-0.5 truncate">Browse and pick from saved contacts</p>
+                  <p className="text-[13px] text-foreground" style={{ fontWeight: 600 }}>Select from Contact Directory</p>
+                  <p className="text-[11px] text-slate-400 mt-0.5 truncate">Browse and pick from saved contacts</p>
                 </div>
               </div>
             </button>
             {/* Create new contact */}
             <button
               onClick={handleOpenCreateGlobalPoc}
-              className="group relative rounded-xl overflow-hidden border border-[#E2E8F0] bg-white text-left transition-all duration-200 hover:border-[#D5D3EC] hover:shadow-[0_4px_16px_-4px_rgba(124,58,237,0.10)] cursor-pointer"
+              className="group relative rounded-xl overflow-hidden border border-border bg-white text-left transition-all duration-200 hover:border-[#D5D3EC] hover:shadow-[0_4px_16px_-4px_rgba(124,58,237,0.10)] cursor-pointer"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-[#F5F3FF]/0 to-[#F5F3FF]/0 group-hover:from-[#F5F3FF]/60 group-hover:to-transparent transition-all duration-300 pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-br from-violet-50/0 to-violet-50/0 group-hover:from-violet-50/60 group-hover:to-transparent transition-all duration-300 pointer-events-none" />
               <div className="relative flex items-center gap-3 pl-3.5 pr-3 py-3">
-                <div className="w-9 h-9 rounded-[10px] bg-gradient-to-br from-[#F5F3FF] to-[#EDE9FE] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform duration-200">
-                  <UserPlus className="w-[18px] h-[18px] text-[#7C3AED]" />
+                <div className="w-9 h-9 rounded-[10px] bg-gradient-to-br from-violet-50 to-[#EDE9FE] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform duration-200">
+                  <UserPlus className="w-[18px] h-[18px] text-violet" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Create new contact</p>
-                  <p className="text-[11px] text-[#94A3B8] mt-0.5 truncate">Add a new point of contact directly</p>
+                  <p className="text-[13px] text-foreground" style={{ fontWeight: 600 }}>Create new contact</p>
+                  <p className="text-[11px] text-slate-400 mt-0.5 truncate">Add a new point of contact directly</p>
                 </div>
               </div>
             </button>
@@ -3025,34 +3025,34 @@ function PartnerTypeCard({
       onClick={onSelect}
       className={`rounded-lg border transition-all cursor-pointer ${
         isSelected
-          ? "border-[#0A77FF] bg-[#F8FAFF] shadow-[0_0_0_3px_rgba(10,119,255,0.06)]"
-          : "border-[#E2E8F0] bg-white hover:border-[#CBD5E1] hover:bg-[#FAFBFC]"
+          ? "border-primary bg-[#F8FAFF] shadow-[0_0_0_3px_rgba(10,119,255,0.06)]"
+          : "border-border bg-white hover:border-slate-300 hover:bg-[#FAFBFC]"
       }`}
     >
       <div className="flex items-center gap-2 sm:gap-2.5 px-2.5 sm:px-3 py-2.5 sm:py-2.5">
         {/* Checkbox */}
         <div
           className={`w-[18px] h-[18px] rounded flex items-center justify-center border-[1.5px] transition-all duration-150 shrink-0 ${
-            isSelected ? "border-[#0A77FF] bg-[#0A77FF] shadow-[0_0_0_2px_rgba(10,119,255,0.12)]" : "border-[#CBD5E1] bg-white"
+            isSelected ? "border-primary bg-primary shadow-[0_0_0_2px_rgba(10,119,255,0.12)]" : "border-slate-300 bg-white"
           }`}
         >
           {isSelected && <Check className="w-3 h-3 text-white" />}
         </div>
         <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center shrink-0 ${
-          isSelected ? "bg-[#D6E8FF] text-[#0A77FF]" : "bg-[#F1F5F9] text-[#64748B]"
+          isSelected ? "bg-[#D6E8FF] text-primary" : "bg-muted text-slate-500"
         }`}>
           {React.cloneElement(icon as React.ReactElement, { className: "w-4 h-4 sm:w-5 sm:h-5" })}
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
-            <p className={`text-xs sm:text-[13px] ${isSelected ? "text-[#0A77FF]" : "text-[#0F172A]"}`} style={{ fontWeight: 600 }}>{label}</p>
+            <p className={`text-xs sm:text-[13px] ${isSelected ? "text-primary" : "text-foreground"}`} style={{ fontWeight: 600 }}>{label}</p>
             {isSelected && (
-              <span className="inline-flex items-center px-1.5 py-px rounded-full bg-[#EDF4FF] text-[#0A77FF] text-[9px] sm:text-[10px]" style={{ fontWeight: 600 }}>
+              <span className="inline-flex items-center px-1.5 py-px rounded-full bg-accent text-primary text-[9px] sm:text-[10px]" style={{ fontWeight: 600 }}>
                 Selected
               </span>
             )}
           </div>
-          <p className="text-[10px] sm:text-[11px] text-[#64748B] mt-px hidden min-[400px]:block">{description}</p>
+          <p className="text-[10px] sm:text-[11px] text-slate-500 mt-px hidden min-[400px]:block">{description}</p>
         </div>
 
         {/* Compact Configure CTA — only visible when selected */}
@@ -3062,10 +3062,10 @@ function PartnerTypeCard({
               e.stopPropagation();
               onConfigure();
             }}
-            className="inline-flex items-center gap-1 px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-md border border-[#E2E8F0] text-[#0F172A] bg-white text-[11px] sm:text-xs hover:bg-[#F8FAFC] hover:border-[#CBD5E1] transition-colors shrink-0"
+            className="inline-flex items-center gap-1 px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-md border border-border text-foreground bg-white text-[11px] sm:text-xs hover:bg-slate-50 hover:border-slate-300 transition-colors shrink-0"
             style={{ fontWeight: 500 }}
           >
-            <Settings2 className="w-3 h-3 text-[#64748B]" />
+            <Settings2 className="w-3 h-3 text-slate-500" />
             <span className="hidden min-[480px]:inline">Configure</span>
           </button>
         )}
@@ -3118,13 +3118,13 @@ function AttachmentsSection() {
   return (
     <div>
       <div className="flex items-center gap-2 mb-2.5">
-        <div className="w-6 h-6 rounded-md bg-[#0A77FF]/8 flex items-center justify-center shrink-0">
-          <Paperclip className="w-3.5 h-3.5 text-[#0A77FF]" />
+        <div className="w-6 h-6 rounded-md bg-primary/8 flex items-center justify-center shrink-0">
+          <Paperclip className="w-3.5 h-3.5 text-primary" />
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Attachments</span>
+          <span className="text-xs sm:text-[13px] text-foreground" style={{ fontWeight: 600 }}>Attachments</span>
           {files.length > 0 && (
-            <span className="text-[10px] text-[#64748B] bg-[#F1F5F9] px-1.5 py-0.5 rounded-full" style={{ fontWeight: 500 }}>{files.length}</span>
+            <span className="text-[10px] text-slate-500 bg-muted px-1.5 py-0.5 rounded-full" style={{ fontWeight: 500 }}>{files.length}</span>
           )}
         </div>
       </div>
@@ -3137,8 +3137,8 @@ function AttachmentsSection() {
         onClick={() => fileInputRef.current?.click()}
         className={`rounded-lg border-2 border-dashed p-3 sm:p-4 text-center cursor-pointer transition-all ${
           dragActive
-            ? "border-[#0A77FF] bg-[#EDF4FF]/30"
-            : "border-[#E2E8F0] bg-white hover:border-[#CBD5E1] hover:bg-[#FAFBFC]"
+            ? "border-primary bg-accent/30"
+            : "border-border bg-white hover:border-slate-300 hover:bg-[#FAFBFC]"
         }`}
       >
         <input
@@ -3150,15 +3150,15 @@ function AttachmentsSection() {
         />
         <div className="flex flex-col items-center gap-2">
           <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-            dragActive ? "bg-[#D6E8FF] text-[#0A77FF]" : "bg-[#F1F5F9] text-[#94A3B8]"
+            dragActive ? "bg-[#D6E8FF] text-primary" : "bg-muted text-slate-400"
           }`}>
             <Upload className="w-5 h-5" />
           </div>
           <div>
-            <p className="text-xs sm:text-sm text-[#0F172A]" style={{ fontWeight: 500 }}>
-              <span className="text-[#0A77FF]">Click to upload</span><span className="hidden sm:inline"> or drag and drop</span>
+            <p className="text-xs sm:text-sm text-foreground" style={{ fontWeight: 500 }}>
+              <span className="text-primary">Click to upload</span><span className="hidden sm:inline"> or drag and drop</span>
             </p>
-            <p className="text-[10px] sm:text-xs text-[#94A3B8] mt-0.5">PDF, DOC, XLS, PNG, JPG up to 10MB</p>
+            <p className="text-[10px] sm:text-xs text-slate-400 mt-0.5">PDF, DOC, XLS, PNG, JPG up to 10MB</p>
           </div>
         </div>
       </div>
@@ -3169,17 +3169,17 @@ function AttachmentsSection() {
           {files.map((file) => (
             <div
               key={file.id}
-              className="flex items-center gap-2.5 px-3 py-2 rounded-md border border-[#E2E8F0] bg-white hover:bg-[#FAFBFC] transition-colors group"
+              className="flex items-center gap-2.5 px-3 py-2 rounded-md border border-border bg-white hover:bg-[#FAFBFC] transition-colors group"
             >
               <span className="text-base">{getFileIcon(file.type)}</span>
               <div className="flex-1 min-w-0">
-                <p className="text-sm text-[#0F172A] truncate" style={{ fontWeight: 500 }}>{file.name}</p>
-                <p className="text-[11px] text-[#94A3B8]">{file.size}</p>
+                <p className="text-sm text-foreground truncate" style={{ fontWeight: 500 }}>{file.name}</p>
+                <p className="text-[11px] text-slate-400">{file.size}</p>
               </div>
               <button
                 type="button"
                 onClick={() => handleRemove(file.id)}
-                className="w-7 h-7 rounded-md flex items-center justify-center text-[#94A3B8] hover:text-[#EF4444] hover:bg-[#FEF2F2] transition-colors sm:opacity-0 sm:group-hover:opacity-100"
+                className="w-7 h-7 rounded-md flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors sm:opacity-0 sm:group-hover:opacity-100"
               >
                 <Trash2 className="w-3.5 h-3.5" />
               </button>
@@ -3225,7 +3225,7 @@ function ConfigUnifiedNav({
       <div className="sm:hidden shrink-0 border-b border-[#EEF2F6] bg-white overflow-x-auto scrollbar-hide">
         <nav className="flex flex-col">
           <div className="px-3 pt-2 pb-1">
-            <p className="text-[10px] text-[#94A3B8] uppercase tracking-wider" style={{ fontWeight: 600 }}>
+            <p className="text-[10px] text-slate-400 uppercase tracking-wider" style={{ fontWeight: 600 }}>
               Profiles · {enabledCount} active
             </p>
           </div>
@@ -3239,22 +3239,22 @@ function ConfigUnifiedNav({
                   onClick={() => onSetActiveSubType(subType.id)}
                   className={`flex items-center gap-2 px-3 py-2 rounded-lg text-left transition-all whitespace-nowrap shrink-0 ${
                     isActive && isEnabled
-                      ? "bg-[#EDF4FF] text-[#0A77FF] ring-1 ring-[#0A77FF]/20"
+                      ? "bg-accent text-primary ring-1 ring-primary/20"
                       : isActive && !isEnabled
-                      ? "bg-[#F8FAFC] text-[#475569] ring-1 ring-[#E2E8F0]"
+                      ? "bg-slate-50 text-muted-foreground ring-1 ring-border"
                       : isEnabled
-                      ? "text-[#475569] hover:bg-[#F8FAFC]"
-                      : "text-[#94A3B8] hover:bg-[#F8FAFC]"
+                      ? "text-muted-foreground hover:bg-slate-50"
+                      : "text-slate-400 hover:bg-slate-50"
                   }`}
                 >
                   <div className={`w-6 h-6 rounded-md flex items-center justify-center shrink-0 ${
-                    isActive && isEnabled ? "bg-[#0A77FF] text-white" : isEnabled ? "bg-[#DBEAFE] text-[#0A77FF]" : "bg-[#F1F5F9] text-[#CBD5E1]"
+                    isActive && isEnabled ? "bg-primary text-white" : isEnabled ? "bg-blue-100 text-primary" : "bg-muted text-slate-300"
                   }`}>
                     {React.cloneElement(subType.icon as React.ReactElement, { className: "w-3.5 h-3.5" })}
                   </div>
                   <span className="text-xs" style={{ fontWeight: isActive ? 600 : 500 }}>{subType.label}</span>
                   {isEnabled && (
-                    <span className={`text-[9px] px-1.5 py-0.5 rounded-full ${isActive ? "bg-[#0A77FF]/10 text-[#0A77FF]" : "bg-[#DCFCE7] text-[#16A34A]"}`} style={{ fontWeight: 600 }}>ON</span>
+                    <span className={`text-[9px] px-1.5 py-0.5 rounded-full ${isActive ? "bg-primary/10 text-primary" : "bg-[#DCFCE7] text-green-600"}`} style={{ fontWeight: 600 }}>ON</span>
                   )}
                 </button>
               );
@@ -3262,7 +3262,7 @@ function ConfigUnifiedNav({
           </div>
           {/* Mobile config section pills */}
           {selectedSubTypes.has(activeSubTypeTab) && (
-            <div className="flex px-3 pb-2 gap-1 min-w-max overflow-x-auto scrollbar-hide border-t border-[#F1F5F9] pt-1.5">
+            <div className="flex px-3 pb-2 gap-1 min-w-max overflow-x-auto scrollbar-hide border-t border-muted pt-1.5">
               {sections.map((section) => {
                 const isActive = section.id === activeSection;
                 return (
@@ -3270,7 +3270,7 @@ function ConfigUnifiedNav({
                     key={section.id}
                     onClick={() => onActiveSectionChange(section.id)}
                     className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-[11px] transition-all whitespace-nowrap ${
-                      isActive ? "bg-[#0A77FF] text-white" : "text-[#64748B] hover:bg-[#F1F5F9]"
+                      isActive ? "bg-primary text-white" : "text-slate-500 hover:bg-muted"
                     }`}
                     style={{ fontWeight: isActive ? 600 : 500 }}
                   >
@@ -3286,14 +3286,14 @@ function ConfigUnifiedNav({
       {/* Desktop: redesigned profile sidebar */}
       <div className="hidden sm:flex sm:flex-col w-[252px] lg:w-[272px] shrink-0 border-r border-[#EEF2F6] bg-white overflow-y-auto">
         {/* Header */}
-        <div className="px-3.5 pt-3.5 pb-2 border-b border-[#F1F5F9]">
+        <div className="px-3.5 pt-3.5 pb-2 border-b border-muted">
           <div className="flex items-center justify-between">
-            <p className="text-[11px] text-[#64748B] uppercase tracking-wider" style={{ fontWeight: 600 }}>Profiles</p>
-            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#EDF4FF] text-[#0A77FF]" style={{ fontWeight: 600 }}>
+            <p className="text-[11px] text-slate-500 uppercase tracking-wider" style={{ fontWeight: 600 }}>Profiles</p>
+            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-accent text-primary" style={{ fontWeight: 600 }}>
               {enabledCount} of {subTypes.length} active
             </span>
           </div>
-          <p className="text-[10px] text-[#94A3B8] mt-0.5">Enable profiles to configure vendor capabilities</p>
+          <p className="text-[10px] text-slate-400 mt-0.5">Enable profiles to configure vendor capabilities</p>
         </div>
 
         <nav className="flex flex-col px-1.5 py-2 flex-1 gap-0.5">
@@ -3310,9 +3310,9 @@ function ConfigUnifiedNav({
                   className={`group flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer transition-all duration-150 ${
                     isActive
                       ? isEnabled
-                        ? "bg-[#EDF4FF] ring-1 ring-[#0A77FF]/15"
-                        : "bg-[#F8FAFC] ring-1 ring-[#E2E8F0]"
-                      : "hover:bg-[#F8FAFC]"
+                        ? "bg-accent ring-1 ring-primary/15"
+                        : "bg-slate-50 ring-1 ring-border"
+                      : "hover:bg-slate-50"
                   }`}
                   onClick={() => {
                     onSetActiveSubType(subType.id);
@@ -3324,10 +3324,10 @@ function ConfigUnifiedNav({
                   {/* Profile icon */}
                   <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-all duration-150 ${
                     isActive && isEnabled
-                      ? "bg-[#0A77FF] text-white shadow-sm"
+                      ? "bg-primary text-white shadow-sm"
                       : isEnabled
-                      ? "bg-[#DBEAFE] text-[#0A77FF]"
-                      : "bg-[#F1F5F9] text-[#94A3B8]"
+                      ? "bg-blue-100 text-primary"
+                      : "bg-muted text-slate-400"
                   }`}>
                     {React.cloneElement(subType.icon as React.ReactElement, { className: "w-4 h-4" })}
                   </div>
@@ -3336,19 +3336,19 @@ function ConfigUnifiedNav({
                   <div className="flex-1 min-w-0">
                     <span className={`block text-[13px] truncate transition-colors duration-150 ${
                       isActive
-                        ? "text-[#0F172A]"
+                        ? "text-foreground"
                         : isEnabled
-                        ? "text-[#1E293B]"
-                        : "text-[#64748B] group-hover:text-[#334155]"
+                        ? "text-slate-800"
+                        : "text-slate-500 group-hover:text-slate-700"
                     }`} style={{ fontWeight: isActive ? 600 : isEnabled ? 500 : 400 }}>
                       {subType.label}
                     </span>
                     <span className={`text-[10px] ${
-                      isEnabled ? "text-[#16A34A]" : "text-[#94A3B8]"
+                      isEnabled ? "text-green-600" : "text-slate-400"
                     }`} style={{ fontWeight: 500 }}>
                       {isEnabled ? "Active" : "Inactive"}
                       {isSeller && isEnabled && enabledCount === 1 && (
-                        <span className="text-[#CBD5E1] ml-1">· Default</span>
+                        <span className="text-slate-300 ml-1">· Default</span>
                       )}
                     </span>
                   </div>
@@ -3365,8 +3365,8 @@ function ConfigUnifiedNav({
                   >
                     <div className={`relative w-8 h-[18px] rounded-full transition-colors duration-200 cursor-pointer ${
                       isEnabled
-                        ? "bg-[#0A77FF]"
-                        : "bg-[#CBD5E1] hover:bg-[#94A3B8]"
+                        ? "bg-primary"
+                        : "bg-slate-300 hover:bg-slate-400"
                     } ${!canToggle && isEnabled ? "opacity-50 cursor-not-allowed" : ""}`}>
                       <div className={`absolute top-[2px] w-[14px] h-[14px] rounded-full bg-white shadow-sm transition-transform duration-200 ${
                         isEnabled ? "left-[16px]" : "left-[2px]"
@@ -3383,7 +3383,7 @@ function ConfigUnifiedNav({
                     opacity: isActive && isEnabled ? 1 : 0,
                   }}
                 >
-                  <div className="ml-[20px] pl-[12px] border-l-[1.5px] border-[#E2E8F0] py-1 mt-0.5">
+                  <div className="ml-[20px] pl-[12px] border-l-[1.5px] border-border py-1 mt-0.5">
                     {sections.map((section) => {
                       const isSectionActive = isActive && isEnabled && section.id === activeSection;
                       return (
@@ -3392,21 +3392,21 @@ function ConfigUnifiedNav({
                           onClick={() => onActiveSectionChange(section.id)}
                           className={`group/item w-full flex items-center gap-2 px-2.5 py-[7px] rounded-md text-left transition-colors duration-150 ${
                             isSectionActive
-                              ? "bg-[#EDF4FF]"
-                              : "hover:bg-[#F1F5F9]/60"
+                              ? "bg-accent"
+                              : "hover:bg-muted/60"
                           }`}
                         >
                           <span className={`transition-colors duration-150 ${
                             isSectionActive
-                              ? "text-[#0A77FF]"
-                              : "text-[#94A3B8] group-hover/item:text-[#64748B]"
+                              ? "text-primary"
+                              : "text-slate-400 group-hover/item:text-slate-500"
                           }`}>
                             {React.cloneElement(section.icon as React.ReactElement, { className: "w-3.5 h-3.5" })}
                           </span>
                           <span className={`text-[12.5px] truncate transition-colors duration-150 ${
                             isSectionActive
-                              ? "text-[#0A77FF]"
-                              : "text-[#475569] group-hover/item:text-[#1E293B]"
+                              ? "text-primary"
+                              : "text-muted-foreground group-hover/item:text-slate-800"
                           }`} style={{ fontWeight: isSectionActive ? 600 : 400 }}>
                             {section.title}
                           </span>
@@ -3421,8 +3421,8 @@ function ConfigUnifiedNav({
         </nav>
 
         {/* Sidebar footer hint */}
-        <div className="px-3.5 py-2.5 border-t border-[#F1F5F9]">
-          <p className="text-[10px] text-[#94A3B8] leading-relaxed">
+        <div className="px-3.5 py-2.5 border-t border-muted">
+          <p className="text-[10px] text-slate-400 leading-relaxed">
             <Info className="w-3 h-3 inline mr-1 -mt-0.5" />
             Seller profile is always required. Enable additional profiles to expand capabilities.
           </p>
@@ -3576,7 +3576,7 @@ function ConfigPageContent({
       return;
     }
     const typeLabel = createPtType === "net" ? "NET" : createPtType === "prepayment" ? "Pre" : "Split";
-    const badgeColor = createPtType === "net" ? "#0A77FF" : createPtType === "prepayment" ? "#7C3AED" : "#D97706";
+    const badgeColor = createPtType === "net" ? "hsl(var(--primary))" : createPtType === "prepayment" ? "hsl(var(--violet))" : "hsl(var(--warning))";
     const triggerLabel = CREATE_PT_TRIGGERS.find((t) => t.id === createPtTrigger)?.label || createPtTrigger;
 
     // Auto-generate a rich description if the user didn't provide one
@@ -4067,7 +4067,7 @@ function ConfigPageContent({
   const [newPocEmail, setNewPocEmail] = useState("");
   const [saveAndCreateAnother, setSaveAndCreateAnother] = useState(false);
 
-  const AVATAR_COLORS = ["#0A77FF", "#7C3AED", "#059669", "#DC2626", "#D97706", "#0891B2", "#4F46E5", "#BE185D", "#15803D", "#9333EA"];
+  const AVATAR_COLORS = ["hsl(var(--primary))", "hsl(var(--violet))", "hsl(var(--success))", "hsl(var(--destructive))", "hsl(var(--warning))", "#0891B2", "#4F46E5", "#BE185D", "#15803D", "#9333EA"];
 
   const pocDepartmentCounts = useMemo(() => {
     const counts: Record<string, number> = { Sales: 0, "Supply Chain Management": 0, Finance: 0 };
@@ -4244,7 +4244,7 @@ function ConfigPageContent({
         label: "Currency",
         sublabel: currencyObj ? currencyObj.id.toUpperCase() : null,
         active: !!currencyObj,
-        color: "#0A77FF",
+        color: "hsl(var(--primary))",
         bgActive: "#EFF6FF",
         dataKey: "currency" as const,
       },
@@ -4285,7 +4285,7 @@ function ConfigPageContent({
       return (
         <span>
           {text.slice(0, idx)}
-          <span className="bg-[#FEF08A] text-[#0F172A] rounded-sm px-0.5" style={{ fontWeight: 600 }}>{text.slice(idx, idx + query.length)}</span>
+          <span className="bg-[#FEF08A] text-foreground rounded-sm px-0.5" style={{ fontWeight: 600 }}>{text.slice(idx, idx + query.length)}</span>
           {text.slice(idx + query.length)}
         </span>
       );
@@ -4358,28 +4358,28 @@ function ConfigPageContent({
           >
             <DialogTitle className="sr-only">{config.title}</DialogTitle>
             <DialogDescription className="sr-only">{config.description}</DialogDescription>
-            <div className="px-5 pt-4 pb-3 border-b border-[#F1F5F9]">
+            <div className="px-5 pt-4 pb-3 border-b border-muted">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2.5">
                   <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: config.iconBg }}>{config.icon}</div>
                   <div>
-                    <h3 className="text-sm text-[#0F172A]" style={{ fontWeight: 600 }}>{config.title}</h3>
-                    <p className="text-[11px] text-[#64748B]">{config.description}</p>
+                    <h3 className="text-sm text-foreground" style={{ fontWeight: 600 }}>{config.title}</h3>
+                    <p className="text-[11px] text-slate-500">{config.description}</p>
                   </div>
                 </div>
-                <button onClick={() => { setDialogOpen(false); setDialogSearch(""); setDialogExpandedPartners(new Set()); }} className="w-7 h-7 rounded-lg flex items-center justify-center text-[#94A3B8] hover:text-[#64748B] hover:bg-[#F1F5F9] transition-all"><X className="w-4 h-4" /></button>
+                <button onClick={() => { setDialogOpen(false); setDialogSearch(""); setDialogExpandedPartners(new Set()); }} className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-500 hover:bg-muted transition-all"><X className="w-4 h-4" /></button>
               </div>
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
-                <input value={dialogSearch} onChange={(e) => setDialogSearch(e.target.value)} placeholder="Search partners & locations..." className="w-full h-9 pl-9 pr-3 rounded-lg border border-[#E2E8F0] bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-none focus:border-[#0A77FF] focus:ring-2 focus:ring-[#0A77FF]/10" autoFocus />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <input value={dialogSearch} onChange={(e) => setDialogSearch(e.target.value)} placeholder="Search partners & locations..." className="w-full h-9 pl-9 pr-3 rounded-lg border border-border bg-white text-sm text-foreground placeholder:text-slate-400 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10" autoFocus />
               </div>
             </div>
             <div className="max-h-[420px] overflow-y-auto">
               {grouped.length === 0 && orphanLocations.length === 0 ? (
                 <div className="py-10 text-center">
-                  <Search className="w-8 h-8 text-[#CBD5E1] mx-auto mb-2" />
-                  <p className="text-sm text-[#64748B]" style={{ fontWeight: 500 }}>No results found</p>
-                  <p className="text-xs text-[#94A3B8] mt-0.5">Try a different search term</p>
+                  <Search className="w-8 h-8 text-slate-300 mx-auto mb-2" />
+                  <p className="text-sm text-slate-500" style={{ fontWeight: 500 }}>No results found</p>
+                  <p className="text-xs text-slate-400 mt-0.5">Try a different search term</p>
                 </div>
               ) : (
                 <div className="py-1">
@@ -4389,21 +4389,21 @@ function ConfigPageContent({
                     const isExpanded = hasSearch ? true : dialogExpandedPartners.has(partner.id);
                     const hasLocs = locsToShow.length > 0;
                     return (
-                      <div key={partner.id} className="border-b border-[#F8FAFC] last:border-b-0">
-                        <div className={`flex items-center gap-3 px-4 py-2.5 transition-colors hover:bg-[#F8FAFC] ${isPartnerSelected ? "bg-[#EDF4FF]/60" : ""}`}>
+                      <div key={partner.id} className="border-b border-slate-50 last:border-b-0">
+                        <div className={`flex items-center gap-3 px-4 py-2.5 transition-colors hover:bg-slate-50 ${isPartnerSelected ? "bg-accent/60" : ""}`}>
                           {hasLocs ? (
-                            <button onClick={(e) => { e.stopPropagation(); togglePartnerExpand(partner.id); }} className="w-5 h-5 flex items-center justify-center rounded text-[#94A3B8] hover:text-[#64748B] hover:bg-[#F1F5F9] transition-all shrink-0">
+                            <button onClick={(e) => { e.stopPropagation(); togglePartnerExpand(partner.id); }} className="w-5 h-5 flex items-center justify-center rounded text-slate-400 hover:text-slate-500 hover:bg-muted transition-all shrink-0">
                               {isExpanded ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
                             </button>
                           ) : <div className="w-5 h-5 shrink-0" />}
                           <PartnerLogo item={partner} size={32} />
                           <button onClick={() => { onSelect(partner.id); setDialogOpen(false); setDialogSearch(""); setDialogExpandedPartners(new Set()); }} className="flex flex-col min-w-0 flex-1 text-left">
-                            <span className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{highlightMatch(partner.name, dialogSearch)}</span>
+                            <span className="text-[13px] text-foreground truncate" style={{ fontWeight: 600 }}>{highlightMatch(partner.name, dialogSearch)}</span>
                           </button>
                           <div className="flex items-center gap-2 shrink-0">
-                            {partner.isDefault && <span className="text-[9px] text-[#0A77FF] bg-[#EDF4FF] border border-[#0A77FF]/20 px-1.5 py-0.5 rounded" style={{ fontWeight: 600 }}>Primary</span>}
-                            {hasLocs && <span className="text-[10px] text-[#94A3B8] bg-[#F8FAFC] border border-[#E8ECF1] px-1.5 py-0.5 rounded" style={{ fontWeight: 500 }}>{locsToShow.length} loc{locsToShow.length !== 1 ? "s" : ""}</span>}
-                            {isPartnerSelected && <Check className="w-4 h-4 text-[#0A77FF]" />}
+                            {partner.isDefault && <span className="text-[9px] text-primary bg-accent border border-primary/20 px-1.5 py-0.5 rounded" style={{ fontWeight: 600 }}>Primary</span>}
+                            {hasLocs && <span className="text-[10px] text-slate-400 bg-slate-50 border border-[#E8ECF1] px-1.5 py-0.5 rounded" style={{ fontWeight: 500 }}>{locsToShow.length} loc{locsToShow.length !== 1 ? "s" : ""}</span>}
+                            {isPartnerSelected && <Check className="w-4 h-4 text-primary" />}
                           </div>
                         </div>
                         {isExpanded && hasLocs && (
@@ -4411,13 +4411,13 @@ function ConfigPageContent({
                             {locsToShow.map((loc) => {
                               const isLocSelected = selectedId === loc.id;
                               return (
-                                <button key={loc.id} onClick={() => { onSelect(loc.id); setDialogOpen(false); setDialogSearch(""); setDialogExpandedPartners(new Set()); }} className={`w-full flex items-center gap-3 pl-4 pr-4 py-2 text-left transition-colors hover:bg-[#F1F5F9] ${isLocSelected ? "bg-[#EDF4FF]/60" : ""}`}>
-                                  <MapPin className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" />
+                                <button key={loc.id} onClick={() => { onSelect(loc.id); setDialogOpen(false); setDialogSearch(""); setDialogExpandedPartners(new Set()); }} className={`w-full flex items-center gap-3 pl-4 pr-4 py-2 text-left transition-colors hover:bg-muted ${isLocSelected ? "bg-accent/60" : ""}`}>
+                                  <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                                   <div className="flex flex-col min-w-0 flex-1">
-                                    <span className="text-[12px] text-[#334155] truncate" style={{ fontWeight: 500 }}>{highlightMatch(loc.name, dialogSearch)}</span>
-                                    {loc.location && <span className="text-[10px] text-[#94A3B8] hover:text-[#0A77FF] hover:underline transition-colors cursor-pointer" onClick={(e) => { e.stopPropagation(); window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(loc.location!)}`, "_blank"); }}>{highlightMatch(loc.location, dialogSearch)}</span>}
+                                    <span className="text-[12px] text-slate-700 truncate" style={{ fontWeight: 500 }}>{highlightMatch(loc.name, dialogSearch)}</span>
+                                    {loc.location && <span className="text-[10px] text-slate-400 hover:text-primary hover:underline transition-colors cursor-pointer" onClick={(e) => { e.stopPropagation(); window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(loc.location!)}`, "_blank"); }}>{highlightMatch(loc.location, dialogSearch)}</span>}
                                   </div>
-                                  {isLocSelected && <Check className="w-4 h-4 text-[#0A77FF] shrink-0" />}
+                                  {isLocSelected && <Check className="w-4 h-4 text-primary shrink-0" />}
                                 </button>
                               );
                             })}
@@ -4428,18 +4428,18 @@ function ConfigPageContent({
                   })}
                   {orphanLocations.length > 0 && (
                     <>
-                      {grouped.length > 0 && <div className="border-t border-[#F1F5F9] my-1" />}
+                      {grouped.length > 0 && <div className="border-t border-muted my-1" />}
                       {orphanLocations.map((loc) => {
                         const isLocSelected = selectedId === loc.id;
                         return (
-                          <button key={loc.id} onClick={() => { onSelect(loc.id); setDialogOpen(false); setDialogSearch(""); setDialogExpandedPartners(new Set()); }} className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-[#F8FAFC] ${isLocSelected ? "bg-[#EDF4FF]/60" : ""}`}>
+                          <button key={loc.id} onClick={() => { onSelect(loc.id); setDialogOpen(false); setDialogSearch(""); setDialogExpandedPartners(new Set()); }} className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-slate-50 ${isLocSelected ? "bg-accent/60" : ""}`}>
                             <div className="w-5 h-5 shrink-0" />
                             <PartnerLogo item={loc} size={32} />
                             <div className="flex flex-col min-w-0 flex-1">
-                              <span className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 500 }}>{highlightMatch(loc.name, dialogSearch)}</span>
-                              {loc.location && <span className="text-[10px] text-[#94A3B8] hover:text-[#0A77FF] hover:underline transition-colors cursor-pointer" onClick={(e) => { e.stopPropagation(); window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(loc.location!)}`, "_blank"); }}>{highlightMatch(loc.location, dialogSearch)}</span>}
+                              <span className="text-[13px] text-foreground truncate" style={{ fontWeight: 500 }}>{highlightMatch(loc.name, dialogSearch)}</span>
+                              {loc.location && <span className="text-[10px] text-slate-400 hover:text-primary hover:underline transition-colors cursor-pointer" onClick={(e) => { e.stopPropagation(); window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(loc.location!)}`, "_blank"); }}>{highlightMatch(loc.location, dialogSearch)}</span>}
                             </div>
-                            {isLocSelected && <Check className="w-4 h-4 text-[#0A77FF] shrink-0" />}
+                            {isLocSelected && <Check className="w-4 h-4 text-primary shrink-0" />}
                           </button>
                         );
                       })}
@@ -4449,12 +4449,12 @@ function ConfigPageContent({
               )}
             </div>
             {selectedId && (
-              <div className="px-4 py-3 border-t border-[#F1F5F9] bg-[#FAFBFC] flex items-center justify-between">
+              <div className="px-4 py-3 border-t border-muted bg-[#FAFBFC] flex items-center justify-between">
                 <div className="flex items-center gap-2.5 min-w-0">
                   <div className="w-1.5 h-1.5 rounded-full bg-[#22C55E] shrink-0" />
-                  <span className="text-xs text-[#334155] truncate" style={{ fontWeight: 500 }}>Selected: <span style={{ fontWeight: 600 }}>{items.find(i => i.id === selectedId)?.name || ""}</span></span>
+                  <span className="text-xs text-slate-700 truncate" style={{ fontWeight: 500 }}>Selected: <span style={{ fontWeight: 600 }}>{items.find(i => i.id === selectedId)?.name || ""}</span></span>
                 </div>
-                <button onClick={() => { setDialogOpen(false); setDialogSearch(""); setDialogExpandedPartners(new Set()); }} className="px-3 py-1.5 rounded-lg bg-[#0A77FF] text-white text-xs hover:bg-[#0966DB] transition-colors" style={{ fontWeight: 600 }}>Done</button>
+                <button onClick={() => { setDialogOpen(false); setDialogSearch(""); setDialogExpandedPartners(new Set()); }} className="px-3 py-1.5 rounded-lg bg-primary text-white text-xs hover:bg-[#0966DB] transition-colors" style={{ fontWeight: 600 }}>Done</button>
               </div>
             )}
           </DialogContent>
@@ -4466,8 +4466,8 @@ function ConfigPageContent({
       <div className="space-y-5">
         {/* ── Heading ── */}
         <div>
-          <h4 className="text-sm text-[#0F172A]" style={{ fontWeight: 700 }}>Billing & Shipping</h4>
-          <p className="text-xs text-[#64748B] mt-0.5 leading-relaxed">
+          <h4 className="text-sm text-foreground" style={{ fontWeight: 700 }}>Billing & Shipping</h4>
+          <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">
             Configure the currency, delivery destination, payment recipient, and funding source for all transactions with this vendor.
           </p>
         </div>
@@ -4503,17 +4503,17 @@ function ConfigPageContent({
                 return (
                   <div className="w-[200px] bg-white rounded-xl border border-[#E8ECF1] shadow-lg p-3">
                     <div className="flex items-center gap-2.5 mb-2">
-                      <div className="w-9 h-9 rounded-lg bg-[#EFF6FF] flex items-center justify-center text-[#0A77FF] text-[18px]" style={{ fontWeight: 700 }}>
+                      <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center text-primary text-[18px]" style={{ fontWeight: 700 }}>
                         {currencyObj.symbol}
                       </div>
                       <div>
-                        <p className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>{code}</p>
-                        <p className="text-[11px] text-[#64748B]">{name}</p>
+                        <p className="text-[13px] text-foreground" style={{ fontWeight: 600 }}>{code}</p>
+                        <p className="text-[11px] text-slate-500">{name}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-1.5 px-2 py-1 bg-[#EFF6FF] rounded-md">
-                      <div className="w-1.5 h-1.5 rounded-full bg-[#0A77FF]" />
-                      <span className="text-[10px] text-[#0A77FF]" style={{ fontWeight: 500 }}>Active transaction currency</span>
+                    <div className="flex items-center gap-1.5 px-2 py-1 bg-blue-50 rounded-md">
+                      <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                      <span className="text-[10px] text-primary" style={{ fontWeight: 500 }}>Active transaction currency</span>
                     </div>
                   </div>
                 );
@@ -4531,15 +4531,15 @@ function ConfigPageContent({
                         {partnerObj.logoText}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>{partnerObj.name}</p>
+                        <p className="text-[13px] text-foreground" style={{ fontWeight: 600 }}>{partnerObj.name}</p>
                         {partnerObj.location && (
                           <a
                             href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(partnerObj.location)}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-start gap-1 mt-1 text-[10px] text-[#64748B] hover:text-[#0A77FF] hover:underline leading-relaxed transition-colors"
+                            className="flex items-start gap-1 mt-1 text-[10px] text-slate-500 hover:text-primary hover:underline leading-relaxed transition-colors"
                           >
-                            <MapPin className="w-3 h-3 shrink-0 mt-0.5 text-[#94A3B8]" />
+                            <MapPin className="w-3 h-3 shrink-0 mt-0.5 text-slate-400" />
                             <span className="break-words">{partnerObj.location}</span>
                           </a>
                         )}
@@ -4549,9 +4549,9 @@ function ConfigPageContent({
                       <span className="text-[10px]" style={{ fontWeight: 500, color: node.color }}>{roleLabel}</span>
                     </div>
                     {partnerObj.isDefault && (
-                      <div className="flex items-center gap-1 mt-2 pt-2 border-t border-[#F1F5F9]">
-                        <Star className="w-3 h-3 text-[#F59E0B]" />
-                        <span className="text-[10px] text-[#64748B]" style={{ fontWeight: 500 }}>Primary selection</span>
+                      <div className="flex items-center gap-1 mt-2 pt-2 border-t border-muted">
+                        <Star className="w-3 h-3 text-amber-500" />
+                        <span className="text-[10px] text-slate-500" style={{ fontWeight: 500 }}>Primary selection</span>
                       </div>
                     )}
                   </div>
@@ -4577,11 +4577,11 @@ function ConfigPageContent({
                           {renderFlowIcon()}
                         </div>
                         {node.sublabel ? (
-                          <span className="text-[10px] text-[#0F172A] max-w-[80px] truncate text-center" style={{ fontWeight: 600 }}>
+                          <span className="text-[10px] text-foreground max-w-[80px] truncate text-center" style={{ fontWeight: 600 }}>
                             {node.sublabel}
                           </span>
                         ) : (
-                          <span className="text-[10px] text-[#94A3B8] max-w-[80px] truncate text-center" style={{ fontWeight: 500 }}>
+                          <span className="text-[10px] text-slate-400 max-w-[80px] truncate text-center" style={{ fontWeight: 500 }}>
                             {node.label}
                           </span>
                         )}
@@ -4608,13 +4608,13 @@ function ConfigPageContent({
                     >
                       {renderFlowIcon()}
                     </div>
-                    <span className="text-[10px] text-[#94A3B8] max-w-[80px] truncate text-center" style={{ fontWeight: 500 }}>
+                    <span className="text-[10px] text-slate-400 max-w-[80px] truncate text-center" style={{ fontWeight: 500 }}>
                       {node.label}
                     </span>
                   </div>
                 )}
                 {i < flowNodes.length - 1 && (
-                  <ChevronRight className="w-4 h-4 text-[#CBD5E1] mx-3 sm:mx-5 shrink-0 -mt-4" />
+                  <ChevronRight className="w-4 h-4 text-slate-300 mx-3 sm:mx-5 shrink-0 -mt-4" />
                 )}
               </div>
             );
@@ -4632,8 +4632,8 @@ function ConfigPageContent({
             !currencyPopoverSearch.trim() || c.label.toLowerCase().includes(currencyPopoverSearch.toLowerCase())
           );
 
-          const fieldCardBase = "group relative rounded-xl border border-[#E8ECF1] bg-white hover:border-[#CBD5E1] hover:shadow-[0_2px_8px_-2px_rgba(0,0,0,0.06)] transition-all duration-200 cursor-pointer";
-          const disabledCardBase = "relative rounded-xl border border-dashed border-[#E2E8F0] bg-[#FAFBFC] transition-all duration-200";
+          const fieldCardBase = "group relative rounded-xl border border-[#E8ECF1] bg-white hover:border-slate-300 hover:shadow-[0_2px_8px_-2px_rgba(0,0,0,0.06)] transition-all duration-200 cursor-pointer";
+          const disabledCardBase = "relative rounded-xl border border-dashed border-border bg-[#FAFBFC] transition-all duration-200";
 
           return (
             <div className="grid grid-cols-2 gap-2.5">
@@ -4643,59 +4643,59 @@ function ConfigPageContent({
                   <div className={fieldCardBase + " p-3 flex flex-col gap-2.5"}>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-1.5">
-                        <DollarSign className="w-3.5 h-3.5 text-[#94A3B8]" />
-                        <span className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Currency</span>
+                        <DollarSign className="w-3.5 h-3.5 text-slate-400" />
+                        <span className="text-[11px] text-slate-500" style={{ fontWeight: 500 }}>Currency</span>
                         <InfoTooltip>The currency used for all transactions with this vendor, including purchase orders, invoices, and payments.</InfoTooltip>
                       </div>
-                      <Pencil className="w-3 h-3 text-[#CBD5E1] opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <Pencil className="w-3 h-3 text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity" />
                     </div>
                     {currObj ? (
                       <div className="flex items-center gap-2.5">
-                        <div className="w-9 h-9 rounded-lg bg-[#EFF6FF] border border-[#0A77FF]/10 flex items-center justify-center shrink-0">
-                          <span className="text-[16px] text-[#0A77FF]" style={{ fontWeight: 700 }}>{currObj.symbol}</span>
+                        <div className="w-9 h-9 rounded-lg bg-blue-50 border border-primary/10 flex items-center justify-center shrink-0">
+                          <span className="text-[16px] text-primary" style={{ fontWeight: 700 }}>{currObj.symbol}</span>
                         </div>
                         <div className="min-w-0">
-                          <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{currObj.id.toUpperCase()}</p>
-                          <p className="text-[11px] text-[#64748B] truncate">{(currObj.label.split(" — ")[1] || currObj.label)}</p>
+                          <p className="text-[13px] text-foreground truncate" style={{ fontWeight: 600 }}>{currObj.id.toUpperCase()}</p>
+                          <p className="text-[11px] text-slate-500 truncate">{(currObj.label.split(" — ")[1] || currObj.label)}</p>
                         </div>
                       </div>
                     ) : (
                       <div className="flex items-center gap-2.5">
-                        <div className="w-9 h-9 rounded-lg bg-[#F8FAFC] border border-dashed border-[#CBD5E1] flex items-center justify-center shrink-0">
-                          <DollarSign className="w-4 h-4 text-[#CBD5E1]" />
+                        <div className="w-9 h-9 rounded-lg bg-slate-50 border border-dashed border-slate-300 flex items-center justify-center shrink-0">
+                          <DollarSign className="w-4 h-4 text-slate-300" />
                         </div>
-                        <p className="text-[12px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Select currency</p>
+                        <p className="text-[12px] text-slate-400" style={{ fontWeight: 500 }}>Select currency</p>
                       </div>
                     )}
                   </div>
                 </PopoverTrigger>
-                <PopoverContent className="w-[300px] p-0 rounded-xl border border-[#E2E8F0] shadow-lg z-[250]" align="start" sideOffset={4}>
+                <PopoverContent className="w-[300px] p-0 rounded-xl border border-border shadow-lg z-[250]" align="start" sideOffset={4}>
                   <div className="p-3 shrink-0">
                     <div className="relative">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                       <input
                         value={currencyPopoverSearch}
                         onChange={(e) => setCurrencyPopoverSearch(e.target.value)}
                         placeholder="Search currency..."
-                        className="w-full h-9 pl-9 pr-3 rounded-lg border border-[#E2E8F0] bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-none focus:border-[#0A77FF] focus:ring-2 focus:ring-[#0A77FF]/10"
+                        className="w-full h-9 pl-9 pr-3 rounded-lg border border-border bg-white text-sm text-foreground placeholder:text-slate-400 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10"
                         autoFocus
                       />
                     </div>
                   </div>
-                  <div className="border-t border-[#F1F5F9]" style={{ maxHeight: 280, overflowY: "auto" }}>
+                  <div className="border-t border-muted" style={{ maxHeight: 280, overflowY: "auto" }}>
                     {currencyFiltered.length === 0 ? (
-                      <div className="py-6 text-center text-xs text-[#94A3B8]">No results found</div>
+                      <div className="py-6 text-center text-xs text-slate-400">No results found</div>
                     ) : (
                       currencyFiltered.map((c) => (
                         <button
                           key={c.id}
                           onClick={() => setCurrency(c.id)}
-                          className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-[#F8FAFC] ${currency === c.id ? "bg-[#EDF4FF]/50" : ""}`}
+                          className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-slate-50 ${currency === c.id ? "bg-accent/50" : ""}`}
                         >
                           <span className="text-base shrink-0">{(c as any).flag || ""}</span>
-                          <span className="w-7 text-center text-[12px] text-[#64748B] shrink-0" style={{ fontWeight: 600 }}>{c.symbol}</span>
-                          <span className="text-sm text-[#0F172A] truncate" style={{ fontWeight: 500 }}>{c.label}</span>
-                          {currency === c.id && <Check className="w-4 h-4 text-[#0A77FF] ml-auto shrink-0" />}
+                          <span className="w-7 text-center text-[12px] text-slate-500 shrink-0" style={{ fontWeight: 600 }}>{c.symbol}</span>
+                          <span className="text-sm text-foreground truncate" style={{ fontWeight: 500 }}>{c.label}</span>
+                          {currency === c.id && <Check className="w-4 h-4 text-primary ml-auto shrink-0" />}
                         </button>
                       ))
                     )}
@@ -4710,23 +4710,23 @@ function ConfigPageContent({
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
-                    <Receipt className="w-3.5 h-3.5 text-[#94A3B8]" />
-                    <span className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Pay To</span>
+                    <Receipt className="w-3.5 h-3.5 text-slate-400" />
+                    <span className="text-[11px] text-slate-500" style={{ fontWeight: 500 }}>Pay To</span>
                     <InfoTooltip>The entity that receives payment for this vendor's transactions. Defaults to this vendor. Change this if payments go to a different party, such as a parent company or billing agent.</InfoTooltip>
                   </div>
-                  <Pencil className="w-3 h-3 text-[#CBD5E1] opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <Pencil className="w-3 h-3 text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
                 {ptObj ? (
                   <div className="flex items-center gap-2.5">
                     <PartnerLogo item={ptObj} size={36} />
-                    <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{ptObj.name}</p>
+                    <p className="text-[13px] text-foreground truncate" style={{ fontWeight: 600 }}>{ptObj.name}</p>
                   </div>
                 ) : (
                   <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-lg bg-[#F8FAFC] border border-dashed border-[#CBD5E1] flex items-center justify-center shrink-0">
-                      <Receipt className="w-4 h-4 text-[#CBD5E1]" />
+                    <div className="w-9 h-9 rounded-lg bg-slate-50 border border-dashed border-slate-300 flex items-center justify-center shrink-0">
+                      <Receipt className="w-4 h-4 text-slate-300" />
                     </div>
-                    <p className="text-[12px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Select recipient</p>
+                    <p className="text-[12px] text-slate-400" style={{ fontWeight: 500 }}>Select recipient</p>
                   </div>
                 )}
               </div>
@@ -4738,26 +4738,26 @@ function ConfigPageContent({
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
-                    <Truck className="w-3.5 h-3.5 text-[#94A3B8]" />
-                    <span className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Ship To</span>
+                    <Truck className="w-3.5 h-3.5 text-slate-400" />
+                    <span className="text-[11px] text-slate-500" style={{ fontWeight: 500 }}>Ship To</span>
                     <InfoTooltip>The default delivery destination for goods ordered from this vendor. Defaults to your company. Change this if items are regularly shipped to a different location.</InfoTooltip>
                   </div>
-                  <Pencil className="w-3 h-3 text-[#CBD5E1] opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <Pencil className="w-3 h-3 text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
                 {stObj ? (
                   <div className="flex items-start gap-2.5">
                     <PartnerLogo item={stObj} size={36} />
                     <div className="min-w-0 flex-1">
-                      <p className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>{stObj.name}</p>
+                      <p className="text-[13px] text-foreground" style={{ fontWeight: 600 }}>{stObj.name}</p>
                       {stObj.location && (
                         <a
                           href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(stObj.location)}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           onClick={(e) => e.stopPropagation()}
-                          className="text-[11px] text-[#64748B] hover:text-[#0A77FF] hover:underline flex items-start gap-1 mt-1 leading-snug transition-colors"
+                          className="text-[11px] text-slate-500 hover:text-primary hover:underline flex items-start gap-1 mt-1 leading-snug transition-colors"
                         >
-                          <MapPin className="w-3 h-3 shrink-0 text-[#94A3B8] mt-[2px]" />
+                          <MapPin className="w-3 h-3 shrink-0 text-slate-400 mt-[2px]" />
                           <span className="break-words">{stObj.location}</span>
                         </a>
                       )}
@@ -4765,10 +4765,10 @@ function ConfigPageContent({
                   </div>
                 ) : (
                   <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-lg bg-[#F8FAFC] border border-dashed border-[#CBD5E1] flex items-center justify-center shrink-0">
-                      <Truck className="w-4 h-4 text-[#CBD5E1]" />
+                    <div className="w-9 h-9 rounded-lg bg-slate-50 border border-dashed border-slate-300 flex items-center justify-center shrink-0">
+                      <Truck className="w-4 h-4 text-slate-300" />
                     </div>
-                    <p className="text-[12px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Select destination</p>
+                    <p className="text-[12px] text-slate-400" style={{ fontWeight: 500 }}>Select destination</p>
                   </div>
                 )}
               </div>
@@ -4777,35 +4777,35 @@ function ConfigPageContent({
               <div className={`${allowAltFunding ? fieldCardBase : disabledCardBase} p-3 flex flex-col`} onClick={allowAltFunding ? () => setFundedByDialogOpen(true) : undefined}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
-                    <Landmark className={`w-3.5 h-3.5 ${allowAltFunding ? "text-[#94A3B8]" : "text-[#CBD5E1]"}`} />
-                    <span className={`text-[11px] ${allowAltFunding ? "text-[#64748B]" : "text-[#94A3B8]"}`} style={{ fontWeight: 500 }}>Funded By</span>
+                    <Landmark className={`w-3.5 h-3.5 ${allowAltFunding ? "text-slate-400" : "text-slate-300"}`} />
+                    <span className={`text-[11px] ${allowAltFunding ? "text-slate-500" : "text-slate-400"}`} style={{ fontWeight: 500 }}>Funded By</span>
                     <InfoTooltip>The entity that funds purchases from this vendor. Defaults to your company. Change this only if another entity — such as a parent company or partner — is responsible for financing these transactions.</InfoTooltip>
                   </div>
-                  <Pencil className={`w-3 h-3 text-[#CBD5E1] opacity-0 ${allowAltFunding ? "group-hover:opacity-100" : ""} transition-opacity`} />
+                  <Pencil className={`w-3 h-3 text-slate-300 opacity-0 ${allowAltFunding ? "group-hover:opacity-100" : ""} transition-opacity`} />
                 </div>
                 {/* Selection */}
                 <div className={`mt-2 ${allowAltFunding ? "" : "opacity-30"}`}>
                   {fbObj ? (
                     <div className="flex items-center gap-2.5">
                       <PartnerLogo item={fbObj} size={36} />
-                      <p className={`text-[13px] truncate ${allowAltFunding ? "text-[#0F172A]" : "text-[#94A3B8]"}`} style={{ fontWeight: 600 }}>{fbObj.name}</p>
+                      <p className={`text-[13px] truncate ${allowAltFunding ? "text-foreground" : "text-slate-400"}`} style={{ fontWeight: 600 }}>{fbObj.name}</p>
                     </div>
                   ) : (
                     <div className="flex items-center gap-2.5">
-                      <div className="w-9 h-9 rounded-lg bg-[#F8FAFC] border border-dashed border-[#CBD5E1] flex items-center justify-center shrink-0">
-                        <Landmark className="w-4 h-4 text-[#CBD5E1]" />
+                      <div className="w-9 h-9 rounded-lg bg-slate-50 border border-dashed border-slate-300 flex items-center justify-center shrink-0">
+                        <Landmark className="w-4 h-4 text-slate-300" />
                       </div>
-                      <p className="text-[12px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Select funding source</p>
+                      <p className="text-[12px] text-slate-400" style={{ fontWeight: 500 }}>Select funding source</p>
                     </div>
                   )}
                 </div>
                 {/* Toggle at bottom */}
-                <div className="flex items-center gap-2 mt-auto pt-2.5 mt-2.5 border-t border-[#F1F5F9]" onClick={(e) => e.stopPropagation()}>
+                <div className="flex items-center gap-2 mt-auto pt-2.5 mt-2.5 border-t border-muted" onClick={(e) => e.stopPropagation()}>
                   <Switch
                     checked={allowAltFunding}
                     onCheckedChange={(val) => { setAllowAltFunding(val); if (!val) setFundedBy("pl-7"); }}
                   />
-                  <span className={`text-[11px] ${allowAltFunding ? "text-[#64748B]" : "text-[#94A3B8]"}`} style={{ fontWeight: 500 }}>Allow Alternative Funding Source</span>
+                  <span className={`text-[11px] ${allowAltFunding ? "text-slate-500" : "text-slate-400"}`} style={{ fontWeight: 500 }}>Allow Alternative Funding Source</span>
                 </div>
               </div>
 
@@ -4822,7 +4822,7 @@ function ConfigPageContent({
                 payToDialogOpen, setPayToDialogOpen,
                 payToDialogSearch, setPayToDialogSearch,
                 PARTNER_LOCATION_ITEMS, payTo, (id) => setPayTo(id),
-                { icon: <Receipt className="w-4 h-4 text-[#8B5CF6]" />, iconBg: "#F5F3FF", iconColor: "#8B5CF6", title: "Select Pay To", description: "Choose payment recipient" }
+                { icon: <Receipt className="w-4 h-4 text-violet-500" />, iconBg: "#F5F3FF", iconColor: "#8B5CF6", title: "Select Pay To", description: "Choose payment recipient" }
               )}
 
               {/* ── Funded By Dialog ── */}
@@ -4830,7 +4830,7 @@ function ConfigPageContent({
                 fundedByDialogOpen, setFundedByDialogOpen,
                 fundedByDialogSearch, setFundedByDialogSearch,
                 FUNDED_BY_ITEMS, fundedBy, (id) => setFundedBy(id),
-                { icon: <Landmark className="w-4 h-4 text-[#F59E0B]" />, iconBg: "#FFFBEB", iconColor: "#F59E0B", title: "Select Funded By", description: "Choose funding source" }
+                { icon: <Landmark className="w-4 h-4 text-amber-500" />, iconBg: "#FFFBEB", iconColor: "#F59E0B", title: "Select Funded By", description: "Choose funding source" }
               )}
             </div>
           );
@@ -4868,35 +4868,35 @@ function ConfigPageContent({
         {(e.type === "wire" || e.type === "ach") && (
           <>
             <div>
-              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Bank Name *</Label>
-              <Input value={e.bankName} onChange={(ev) => updatePaymentEntry(e.id, { bankName: ev.target.value })} placeholder="e.g. Chase Bank" className="mt-1.5 rounded-lg border-[#E2E8F0] !h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+              <Label className="text-xs text-slate-500" style={{ fontWeight: 500 }}>Bank Name *</Label>
+              <Input value={e.bankName} onChange={(ev) => updatePaymentEntry(e.id, { bankName: ev.target.value })} placeholder="e.g. Chase Bank" className="mt-1.5 rounded-lg border-border !h-10 bg-white text-sm text-foreground placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary/20" />
             </div>
             <div>
-              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Account Title *</Label>
-              <Input value={e.accountTitle} onChange={(ev) => updatePaymentEntry(e.id, { accountTitle: ev.target.value })} placeholder="Enter account holder name" className="mt-1.5 rounded-lg border-[#E2E8F0] !h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+              <Label className="text-xs text-slate-500" style={{ fontWeight: 500 }}>Account Title *</Label>
+              <Input value={e.accountTitle} onChange={(ev) => updatePaymentEntry(e.id, { accountTitle: ev.target.value })} placeholder="Enter account holder name" className="mt-1.5 rounded-lg border-border !h-10 bg-white text-sm text-foreground placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary/20" />
             </div>
             <div>
-              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>{e.type === "wire" ? "Account Number/IBAN *" : "Account Number *"}</Label>
-              <Input value={e.accountNumber} onChange={(ev) => updatePaymentEntry(e.id, { accountNumber: ev.target.value })} placeholder={e.type === "wire" ? "Enter account number/IBAN" : "••••••••1234"} className="mt-1.5 rounded-lg border-[#E2E8F0] !h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+              <Label className="text-xs text-slate-500" style={{ fontWeight: 500 }}>{e.type === "wire" ? "Account Number/IBAN *" : "Account Number *"}</Label>
+              <Input value={e.accountNumber} onChange={(ev) => updatePaymentEntry(e.id, { accountNumber: ev.target.value })} placeholder={e.type === "wire" ? "Enter account number/IBAN" : "••••••••1234"} className="mt-1.5 rounded-lg border-border !h-10 bg-white text-sm text-foreground placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary/20" />
             </div>
             {e.type === "ach" && (
               <div>
-                <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Routing Number *</Label>
-                <Input value={e.routingNumber} onChange={(ev) => updatePaymentEntry(e.id, { routingNumber: ev.target.value })} placeholder="e.g. 021000021" className="mt-1.5 rounded-lg border-[#E2E8F0] !h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+                <Label className="text-xs text-slate-500" style={{ fontWeight: 500 }}>Routing Number *</Label>
+                <Input value={e.routingNumber} onChange={(ev) => updatePaymentEntry(e.id, { routingNumber: ev.target.value })} placeholder="e.g. 021000021" className="mt-1.5 rounded-lg border-border !h-10 bg-white text-sm text-foreground placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary/20" />
               </div>
             )}
             {e.type === "wire" && (
               <div>
-                <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Swift Code *</Label>
-                <Input value={e.swiftCode} onChange={(ev) => updatePaymentEntry(e.id, { swiftCode: ev.target.value })} placeholder="Enter swift code" className="mt-1.5 rounded-lg border-[#E2E8F0] !h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+                <Label className="text-xs text-slate-500" style={{ fontWeight: 500 }}>Swift Code *</Label>
+                <Input value={e.swiftCode} onChange={(ev) => updatePaymentEntry(e.id, { swiftCode: ev.target.value })} placeholder="Enter swift code" className="mt-1.5 rounded-lg border-border !h-10 bg-white text-sm text-foreground placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary/20" />
               </div>
             )}
             <div>
               <PhoneFieldWithCountry e={e} updateEntry={(id, updates) => updatePaymentEntry(id, updates)} defaultFormat={DEFAULT_FORMAT} />
             </div>
             <div>
-              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Special Instructions</Label>
-              <Input value={e.specialInstructions} onChange={(ev) => updatePaymentEntry(e.id, { specialInstructions: ev.target.value })} placeholder="Enter any special instructions or notes..." className="mt-1.5 rounded-lg border-[#E2E8F0] !h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+              <Label className="text-xs text-slate-500" style={{ fontWeight: 500 }}>Special Instructions</Label>
+              <Input value={e.specialInstructions} onChange={(ev) => updatePaymentEntry(e.id, { specialInstructions: ev.target.value })} placeholder="Enter any special instructions or notes..." className="mt-1.5 rounded-lg border-border !h-10 bg-white text-sm text-foreground placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary/20" />
             </div>
           </>
         )}
@@ -4905,20 +4905,20 @@ function ConfigPageContent({
         {e.type === "check" && (
           <>
             <div>
-              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Payee Name *</Label>
-              <Input value={e.payeeName} onChange={(ev) => updatePaymentEntry(e.id, { payeeName: ev.target.value })} placeholder="Enter payee name" className="mt-1.5 rounded-lg border-[#E2E8F0] !h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+              <Label className="text-xs text-slate-500" style={{ fontWeight: 500 }}>Payee Name *</Label>
+              <Input value={e.payeeName} onChange={(ev) => updatePaymentEntry(e.id, { payeeName: ev.target.value })} placeholder="Enter payee name" className="mt-1.5 rounded-lg border-border !h-10 bg-white text-sm text-foreground placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary/20" />
             </div>
             <div>
-              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Check Mailing Address *</Label>
-              <Input value={e.mailingAddress} onChange={(ev) => updatePaymentEntry(e.id, { mailingAddress: ev.target.value })} placeholder="Enter mailing address" className="mt-1.5 rounded-lg border-[#E2E8F0] !h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+              <Label className="text-xs text-slate-500" style={{ fontWeight: 500 }}>Check Mailing Address *</Label>
+              <Input value={e.mailingAddress} onChange={(ev) => updatePaymentEntry(e.id, { mailingAddress: ev.target.value })} placeholder="Enter mailing address" className="mt-1.5 rounded-lg border-border !h-10 bg-white text-sm text-foreground placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary/20" />
             </div>
             <div>
-              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Bank Name</Label>
-              <Input value={e.bankName} onChange={(ev) => updatePaymentEntry(e.id, { bankName: ev.target.value })} placeholder="e.g. Chase Bank" className="mt-1.5 rounded-lg border-[#E2E8F0] !h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+              <Label className="text-xs text-slate-500" style={{ fontWeight: 500 }}>Bank Name</Label>
+              <Input value={e.bankName} onChange={(ev) => updatePaymentEntry(e.id, { bankName: ev.target.value })} placeholder="e.g. Chase Bank" className="mt-1.5 rounded-lg border-border !h-10 bg-white text-sm text-foreground placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary/20" />
             </div>
             <div>
-              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Account Number *</Label>
-              <Input value={e.accountNumber} onChange={(ev) => updatePaymentEntry(e.id, { accountNumber: ev.target.value })} placeholder="••••••••1234" className="mt-1.5 rounded-lg border-[#E2E8F0] !h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+              <Label className="text-xs text-slate-500" style={{ fontWeight: 500 }}>Account Number *</Label>
+              <Input value={e.accountNumber} onChange={(ev) => updatePaymentEntry(e.id, { accountNumber: ev.target.value })} placeholder="••••••••1234" className="mt-1.5 rounded-lg border-border !h-10 bg-white text-sm text-foreground placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary/20" />
             </div>
           </>
         )}
@@ -4927,24 +4927,24 @@ function ConfigPageContent({
         {e.type === "card" && (
           <>
             <div>
-              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Cardholder Name *</Label>
-              <Input value={e.cardholderName} onChange={(ev) => updatePaymentEntry(e.id, { cardholderName: ev.target.value })} placeholder="Enter cardholder name" className="mt-1.5 rounded-lg border-[#E2E8F0] !h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+              <Label className="text-xs text-slate-500" style={{ fontWeight: 500 }}>Cardholder Name *</Label>
+              <Input value={e.cardholderName} onChange={(ev) => updatePaymentEntry(e.id, { cardholderName: ev.target.value })} placeholder="Enter cardholder name" className="mt-1.5 rounded-lg border-border !h-10 bg-white text-sm text-foreground placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary/20" />
             </div>
             <div>
-              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Card Number *</Label>
-              <Input value={e.cardNumber} onChange={(ev) => updatePaymentEntry(e.id, { cardNumber: ev.target.value })} placeholder="Enter card number" className="mt-1.5 rounded-lg border-[#E2E8F0] !h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+              <Label className="text-xs text-slate-500" style={{ fontWeight: 500 }}>Card Number *</Label>
+              <Input value={e.cardNumber} onChange={(ev) => updatePaymentEntry(e.id, { cardNumber: ev.target.value })} placeholder="Enter card number" className="mt-1.5 rounded-lg border-border !h-10 bg-white text-sm text-foreground placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary/20" />
             </div>
             <div>
-              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Expiry Date *</Label>
-              <Input value={e.expiryDate} onChange={(ev) => updatePaymentEntry(e.id, { expiryDate: ev.target.value })} placeholder="MM/YY" className="mt-1.5 rounded-lg border-[#E2E8F0] !h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+              <Label className="text-xs text-slate-500" style={{ fontWeight: 500 }}>Expiry Date *</Label>
+              <Input value={e.expiryDate} onChange={(ev) => updatePaymentEntry(e.id, { expiryDate: ev.target.value })} placeholder="MM/YY" className="mt-1.5 rounded-lg border-border !h-10 bg-white text-sm text-foreground placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary/20" />
             </div>
             <div>
-              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>CVV *</Label>
-              <Input value={e.cvv} onChange={(ev) => updatePaymentEntry(e.id, { cvv: ev.target.value })} placeholder="Enter CVV" className="mt-1.5 rounded-lg border-[#E2E8F0] h-10 bg-white max-w-[140px] text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+              <Label className="text-xs text-slate-500" style={{ fontWeight: 500 }}>CVV *</Label>
+              <Input value={e.cvv} onChange={(ev) => updatePaymentEntry(e.id, { cvv: ev.target.value })} placeholder="Enter CVV" className="mt-1.5 rounded-lg border-border h-10 bg-white max-w-[140px] text-sm text-foreground placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary/20" />
             </div>
             <div>
-              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Billing Address</Label>
-              <Input value={e.billingAddress} onChange={(ev) => updatePaymentEntry(e.id, { billingAddress: ev.target.value })} placeholder="Enter billing address" className="mt-1.5 rounded-lg border-[#E2E8F0] !h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+              <Label className="text-xs text-slate-500" style={{ fontWeight: 500 }}>Billing Address</Label>
+              <Input value={e.billingAddress} onChange={(ev) => updatePaymentEntry(e.id, { billingAddress: ev.target.value })} placeholder="Enter billing address" className="mt-1.5 rounded-lg border-border !h-10 bg-white text-sm text-foreground placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary/20" />
             </div>
           </>
         )}
@@ -4953,12 +4953,12 @@ function ConfigPageContent({
         {e.type === "digital_wallet" && (
           <>
             <div>
-              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Wallet Provider *</Label>
-              <Input value={e.walletProvider} onChange={(ev) => updatePaymentEntry(e.id, { walletProvider: ev.target.value })} placeholder="e.g. PayPal, Venmo, Stripe" className="mt-1.5 rounded-lg border-[#E2E8F0] !h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+              <Label className="text-xs text-slate-500" style={{ fontWeight: 500 }}>Wallet Provider *</Label>
+              <Input value={e.walletProvider} onChange={(ev) => updatePaymentEntry(e.id, { walletProvider: ev.target.value })} placeholder="e.g. PayPal, Venmo, Stripe" className="mt-1.5 rounded-lg border-border !h-10 bg-white text-sm text-foreground placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary/20" />
             </div>
             <div>
-              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Wallet ID/Email *</Label>
-              <Input value={e.walletId} onChange={(ev) => updatePaymentEntry(e.id, { walletId: ev.target.value })} placeholder="Enter wallet ID or email" className="mt-1.5 rounded-lg border-[#E2E8F0] !h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+              <Label className="text-xs text-slate-500" style={{ fontWeight: 500 }}>Wallet ID/Email *</Label>
+              <Input value={e.walletId} onChange={(ev) => updatePaymentEntry(e.id, { walletId: ev.target.value })} placeholder="Enter wallet ID or email" className="mt-1.5 rounded-lg border-border !h-10 bg-white text-sm text-foreground placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary/20" />
             </div>
             <div>
               <PhoneFieldWithCountry e={e} updateEntry={(id, updates) => updatePaymentEntry(id, updates)} defaultFormat={DEFAULT_FORMAT} />
@@ -4970,12 +4970,12 @@ function ConfigPageContent({
         {e.type === "cash" && (
           <>
             <div>
-              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Recipient Name *</Label>
-              <Input value={e.recipientName} onChange={(ev) => updatePaymentEntry(e.id, { recipientName: ev.target.value })} placeholder="Enter recipient name" className="mt-1.5 rounded-lg border-[#E2E8F0] !h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+              <Label className="text-xs text-slate-500" style={{ fontWeight: 500 }}>Recipient Name *</Label>
+              <Input value={e.recipientName} onChange={(ev) => updatePaymentEntry(e.id, { recipientName: ev.target.value })} placeholder="Enter recipient name" className="mt-1.5 rounded-lg border-border !h-10 bg-white text-sm text-foreground placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary/20" />
             </div>
             <div>
-              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Collection Point *</Label>
-              <Input value={e.collectionPoint} onChange={(ev) => updatePaymentEntry(e.id, { collectionPoint: ev.target.value })} placeholder="Enter collection point or location" className="mt-1.5 rounded-lg border-[#E2E8F0] !h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+              <Label className="text-xs text-slate-500" style={{ fontWeight: 500 }}>Collection Point *</Label>
+              <Input value={e.collectionPoint} onChange={(ev) => updatePaymentEntry(e.id, { collectionPoint: ev.target.value })} placeholder="Enter collection point or location" className="mt-1.5 rounded-lg border-border !h-10 bg-white text-sm text-foreground placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary/20" />
             </div>
             <div>
               <PhoneFieldWithCountry e={e} updateEntry={(id, updates) => updatePaymentEntry(id, updates)} defaultFormat={DEFAULT_FORMAT} />
@@ -4986,25 +4986,25 @@ function ConfigPageContent({
         {/* Special Instructions (for types that don't already show it) */}
         {(e.type === "card" || e.type === "digital_wallet" || e.type === "cash") && (
           <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Special Instructions</Label>
-            <Input value={e.specialInstructions} onChange={(ev) => updatePaymentEntry(e.id, { specialInstructions: ev.target.value })} placeholder="Enter any special instructions or notes..." className="mt-1.5 rounded-lg border-[#E2E8F0] !h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+            <Label className="text-xs text-slate-500" style={{ fontWeight: 500 }}>Special Instructions</Label>
+            <Input value={e.specialInstructions} onChange={(ev) => updatePaymentEntry(e.id, { specialInstructions: ev.target.value })} placeholder="Enter any special instructions or notes..." className="mt-1.5 rounded-lg border-border !h-10 bg-white text-sm text-foreground placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary/20" />
           </div>
         )}
 
         {/* Discount / Additional Charges checkbox */}
-        <div className="pt-1 border-t border-[#E2E8F0]">
+        <div className="pt-1 border-t border-border">
           <div
             className="flex items-center gap-2.5 cursor-pointer select-none pt-3 group/disc"
             onClick={() => updatePaymentEntry(e.id, { applyDiscount: !e.applyDiscount })}
           >
             <div
               className={`w-[16px] h-[16px] rounded-[4px] flex items-center justify-center shrink-0 transition-colors ${
-                e.applyDiscount ? "bg-[#0A77FF]" : "border-[1.5px] border-[#CBD5E1] bg-white group-hover/disc:border-[#94A3B8]"
+                e.applyDiscount ? "bg-primary" : "border-[1.5px] border-slate-300 bg-white group-hover/disc:border-slate-400"
               }`}
             >
               {e.applyDiscount && <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />}
             </div>
-            <span className="text-xs text-[#334155]" style={{ fontWeight: 500 }}>Apply Discount Terms or Additional Charges</span>
+            <span className="text-xs text-slate-700" style={{ fontWeight: 500 }}>Apply Discount Terms or Additional Charges</span>
           </div>
         </div>
 
@@ -5013,12 +5013,12 @@ function ConfigPageContent({
           <div className="grid grid-cols-2 gap-3">
             <div>
               <div className="flex items-center justify-between">
-                <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Discount</Label>
-                <div className="inline-flex items-center h-[22px] rounded-full bg-[#F1F5F9] p-0.5">
+                <Label className="text-xs text-slate-500" style={{ fontWeight: 500 }}>Discount</Label>
+                <div className="inline-flex items-center h-[22px] rounded-full bg-muted p-0.5">
                   <button
                     type="button"
                     onClick={() => updatePaymentEntry(e.id, { discountMode: "percent" })}
-                    className={`px-2 h-[18px] rounded-full text-[10px] transition-all ${(e.discountMode ?? "percent") === "percent" ? "bg-white text-[#0A77FF] shadow-sm" : "text-[#64748B] hover:text-[#334155]"}`}
+                    className={`px-2 h-[18px] rounded-full text-[10px] transition-all ${(e.discountMode ?? "percent") === "percent" ? "bg-white text-primary shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
                     style={{ fontWeight: 600 }}
                   >
                     %
@@ -5026,7 +5026,7 @@ function ConfigPageContent({
                   <button
                     type="button"
                     onClick={() => updatePaymentEntry(e.id, { discountMode: "fixed" })}
-                    className={`px-2 h-[18px] rounded-full text-[10px] transition-all ${(e.discountMode ?? "percent") === "fixed" ? "bg-white text-[#0A77FF] shadow-sm" : "text-[#64748B] hover:text-[#334155]"}`}
+                    className={`px-2 h-[18px] rounded-full text-[10px] transition-all ${(e.discountMode ?? "percent") === "fixed" ? "bg-white text-primary shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
                     style={{ fontWeight: 600 }}
                   >
                     $
@@ -5035,22 +5035,22 @@ function ConfigPageContent({
               </div>
               <div className="relative mt-1.5">
                 {(e.discountMode ?? "percent") === "fixed" && (
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#94A3B8]">$</span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-400">$</span>
                 )}
-                <Input value={e.discountPercent} onChange={(ev) => updatePaymentEntry(e.id, { discountPercent: ev.target.value })} placeholder={`e.g. ${(e.discountMode ?? "percent") === "percent" ? "5" : "25.00"}`} className={`rounded-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 ${(e.discountMode ?? "percent") === "fixed" ? "pl-7 pr-3" : "pr-8"}`} />
+                <Input value={e.discountPercent} onChange={(ev) => updatePaymentEntry(e.id, { discountPercent: ev.target.value })} placeholder={`e.g. ${(e.discountMode ?? "percent") === "percent" ? "5" : "25.00"}`} className={`rounded-lg border-border h-10 bg-white text-sm text-foreground placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary/20 ${(e.discountMode ?? "percent") === "fixed" ? "pl-7 pr-3" : "pr-8"}`} />
                 {(e.discountMode ?? "percent") === "percent" && (
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-[#94A3B8]">%</span>
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-slate-400">%</span>
                 )}
               </div>
             </div>
             <div>
               <div className="flex items-center justify-between">
-                <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Add. Charges</Label>
-                <div className="inline-flex items-center h-[22px] rounded-full bg-[#F1F5F9] p-0.5">
+                <Label className="text-xs text-slate-500" style={{ fontWeight: 500 }}>Add. Charges</Label>
+                <div className="inline-flex items-center h-[22px] rounded-full bg-muted p-0.5">
                   <button
                     type="button"
                     onClick={() => updatePaymentEntry(e.id, { additionalChargesMode: "percent" })}
-                    className={`px-2 h-[18px] rounded-full text-[10px] transition-all ${(e.additionalChargesMode ?? "percent") === "percent" ? "bg-white text-[#0A77FF] shadow-sm" : "text-[#64748B] hover:text-[#334155]"}`}
+                    className={`px-2 h-[18px] rounded-full text-[10px] transition-all ${(e.additionalChargesMode ?? "percent") === "percent" ? "bg-white text-primary shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
                     style={{ fontWeight: 600 }}
                   >
                     %
@@ -5058,7 +5058,7 @@ function ConfigPageContent({
                   <button
                     type="button"
                     onClick={() => updatePaymentEntry(e.id, { additionalChargesMode: "fixed" })}
-                    className={`px-2 h-[18px] rounded-full text-[10px] transition-all ${(e.additionalChargesMode ?? "percent") === "fixed" ? "bg-white text-[#0A77FF] shadow-sm" : "text-[#64748B] hover:text-[#334155]"}`}
+                    className={`px-2 h-[18px] rounded-full text-[10px] transition-all ${(e.additionalChargesMode ?? "percent") === "fixed" ? "bg-white text-primary shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
                     style={{ fontWeight: 600 }}
                   >
                     $
@@ -5067,11 +5067,11 @@ function ConfigPageContent({
               </div>
               <div className="relative mt-1.5">
                 {(e.additionalChargesMode ?? "percent") === "fixed" && (
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#94A3B8]">$</span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-400">$</span>
                 )}
-                <Input value={e.additionalCharges} onChange={(ev) => updatePaymentEntry(e.id, { additionalCharges: ev.target.value })} placeholder={`e.g. ${(e.additionalChargesMode ?? "percent") === "percent" ? "2" : "50.00"}`} className={`rounded-lg border-[#E2E8F0] h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 ${(e.additionalChargesMode ?? "percent") === "fixed" ? "pl-7 pr-3" : "pr-8"}`} />
+                <Input value={e.additionalCharges} onChange={(ev) => updatePaymentEntry(e.id, { additionalCharges: ev.target.value })} placeholder={`e.g. ${(e.additionalChargesMode ?? "percent") === "percent" ? "2" : "50.00"}`} className={`rounded-lg border-border h-10 bg-white text-sm text-foreground placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary/20 ${(e.additionalChargesMode ?? "percent") === "fixed" ? "pl-7 pr-3" : "pr-8"}`} />
                 {(e.additionalChargesMode ?? "percent") === "percent" && (
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-[#94A3B8]">%</span>
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-slate-400">%</span>
                 )}
               </div>
             </div>
@@ -5084,10 +5084,10 @@ function ConfigPageContent({
       <div className="space-y-3">
         {/* ── Heading + Helper Copy ── */}
         <div className="mb-1">
-          <h4 className="text-sm text-[#0F172A]" style={{ fontWeight: 700 }}>Payment Methods</h4>
-          <p className="text-xs text-[#64748B] mt-0.5 leading-relaxed">
+          <h4 className="text-sm text-foreground" style={{ fontWeight: 700 }}>Payment Methods</h4>
+          <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">
             Add one or more payment methods for this vendor — such as bank transfer, credit card, or digital wallet. These will be available when processing payments.{" "}
-            <span className="text-[#0A77FF] inline-flex items-center gap-0.5 cursor-pointer hover:underline" style={{ fontWeight: 500 }}>
+            <span className="text-primary inline-flex items-center gap-0.5 cursor-pointer hover:underline" style={{ fontWeight: 500 }}>
               Learn More <ExternalLink className="w-3 h-3" />
             </span>
           </p>
@@ -5097,7 +5097,7 @@ function ConfigPageContent({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {/* ���─ Left Column: Payment Type Cards ── */}
           <div className="rounded-lg border border-[#E8ECF1] bg-white p-3 space-y-3 shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
-            <h5 className="text-xs text-[#64748B]" style={{ fontWeight: 600 }}>Select payment type</h5>
+            <h5 className="text-xs text-slate-500" style={{ fontWeight: 600 }}>Select payment type</h5>
 
             {/* 6 Payment type interactive cards */}
             <div className="space-y-2">
@@ -5118,20 +5118,20 @@ function ConfigPageContent({
                     }}
                     className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-left transition-all ${
                       isSelected
-                        ? "bg-white border-[1.5px] border-[#0A77FF] shadow-[0_1px_4px_rgba(10,119,255,0.1)]"
-                        : "bg-white border border-[#E8ECF1] hover:border-[#CBD5E1]"
+                        ? "bg-white border-[1.5px] border-primary shadow-[0_1px_4px_rgba(10,119,255,0.1)]"
+                        : "bg-white border border-[#E8ECF1] hover:border-slate-300"
                     }`}
                   >
-                    <div className={`w-7 h-7 rounded-md flex items-center justify-center shrink-0 ${isSelected ? "bg-[#EDF4FF]" : "bg-[#F8FAFC]"}`}>
-                      <Icon className={`w-3.5 h-3.5 ${isSelected ? "text-[#0A77FF]" : "text-[#64748B]"}`} />
+                    <div className={`w-7 h-7 rounded-md flex items-center justify-center shrink-0 ${isSelected ? "bg-accent" : "bg-slate-50"}`}>
+                      <Icon className={`w-3.5 h-3.5 ${isSelected ? "text-primary" : "text-slate-500"}`} />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className={`text-[13px] truncate ${isSelected ? "text-[#0A77FF]" : "text-[#0F172A]"}`} style={{ fontWeight: 600 }}>{t.label}</p>
-                      <p className="text-[11px] text-[#94A3B8] truncate">{t.description}</p>
+                      <p className={`text-[13px] truncate ${isSelected ? "text-primary" : "text-foreground"}`} style={{ fontWeight: 600 }}>{t.label}</p>
+                      <p className="text-[11px] text-slate-400 truncate">{t.description}</p>
                     </div>
                     {count > 0 && (
                       <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] shrink-0 ${
-                        isSelected ? "bg-[#0A77FF] text-white" : "bg-[#F1F5F9] text-[#64748B]"
+                        isSelected ? "bg-primary text-white" : "bg-muted text-slate-500"
                       }`} style={{ fontWeight: 700 }}>
                         {count}
                       </span>
@@ -5144,7 +5144,7 @@ function ConfigPageContent({
             {/* Saved methods for selected type */}
             {savedPaymentEntries.filter((pe) => pe.type === selectedPaymentType).length > 0 && (
               <div>
-                <p className="text-[11px] text-[#64748B] mb-2" style={{ fontWeight: 600 }}>Saved — {typeLabel(selectedPaymentType)}</p>
+                <p className="text-[11px] text-slate-500 mb-2" style={{ fontWeight: 600 }}>Saved — {typeLabel(selectedPaymentType)}</p>
                 <div className="space-y-1.5">
                   {savedPaymentEntries
                     .filter((pe) => pe.type === selectedPaymentType)
@@ -5157,30 +5157,30 @@ function ConfigPageContent({
                           onClick={() => { setActivePaymentId(pe.id); setIsEditingPayment(false); }}
                           className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-left transition-all ${
                             isActive && !isEditingPayment
-                              ? "bg-[#EDF4FF] border border-[#0A77FF]/30 shadow-[0_1px_4px_rgba(10,119,255,0.08)]"
-                              : "bg-white border border-[#E8ECF1] hover:bg-[#F8FAFC]"
+                              ? "bg-accent border border-primary/30 shadow-[0_1px_4px_rgba(10,119,255,0.08)]"
+                              : "bg-white border border-[#E8ECF1] hover:bg-slate-50"
                           }`}
                         >
-                          <div className={`w-7 h-7 rounded-md flex items-center justify-center shrink-0 ${isActive && !isEditingPayment ? "bg-[#0A77FF]/10" : "bg-[#F1F5F9]"}`}>
-                            <PeIcon className={`w-3.5 h-3.5 ${isActive && !isEditingPayment ? "text-[#0A77FF]" : "text-[#64748B]"}`} />
+                          <div className={`w-7 h-7 rounded-md flex items-center justify-center shrink-0 ${isActive && !isEditingPayment ? "bg-primary/10" : "bg-muted"}`}>
+                            <PeIcon className={`w-3.5 h-3.5 ${isActive && !isEditingPayment ? "text-primary" : "text-slate-500"}`} />
                           </div>
                           <div className="min-w-0 flex-1">
-                            <span className={`text-[12px] block truncate ${isActive && !isEditingPayment ? "text-[#0A77FF]" : "text-[#0F172A]"}`} style={{ fontWeight: 600 }}>
+                            <span className={`text-[12px] block truncate ${isActive && !isEditingPayment ? "text-primary" : "text-foreground"}`} style={{ fontWeight: 600 }}>
                               #{idx + 1} {pe.bankName || pe.payeeName || pe.cardholderName || pe.walletProvider || pe.recipientName || typeLabel(pe.type)}
                             </span>
                           </div>
                           <div className="flex items-center gap-1 shrink-0">
                             <button
                               onClick={(ev) => { ev.stopPropagation(); editPaymentEntry(pe.id); }}
-                              className="p-1 rounded hover:bg-[#EDF4FF] transition-colors"
+                              className="p-1 rounded hover:bg-accent transition-colors"
                             >
-                              <Pencil className="w-3 h-3 text-[#94A3B8] hover:text-[#0A77FF]" />
+                              <Pencil className="w-3 h-3 text-slate-400 hover:text-primary" />
                             </button>
                             <button
                               onClick={(ev) => { ev.stopPropagation(); removePaymentEntry(pe.id); }}
-                              className="p-1 rounded hover:bg-[#FEF2F2] transition-colors"
+                              className="p-1 rounded hover:bg-red-50 transition-colors"
                             >
-                              <Trash2 className="w-3 h-3 text-[#94A3B8] hover:text-[#EF4444]" />
+                              <Trash2 className="w-3 h-3 text-slate-400 hover:text-red-500" />
                             </button>
                           </div>
                         </button>
@@ -5197,10 +5197,10 @@ function ConfigPageContent({
             {isEditingPayment && entry ? (
               <>
                 <div className="flex items-center justify-between">
-                  <h5 className="text-[13px] text-[#64748B]" style={{ fontWeight: 600 }}>
+                  <h5 className="text-[13px] text-slate-500" style={{ fontWeight: 600 }}>
                     {entry.isSaved ? "Edit" : "New"} {typeLabel(entry.type)}
                   </h5>
-                  <button onClick={cancelPaymentEdit} className="text-xs text-[#64748B] hover:text-[#0F172A]" style={{ fontWeight: 500 }}>Cancel</button>
+                  <button onClick={cancelPaymentEdit} className="text-xs text-slate-500 hover:text-foreground" style={{ fontWeight: 500 }}>Cancel</button>
                 </div>
                 {renderFormFields(entry)}
 
@@ -5208,14 +5208,14 @@ function ConfigPageContent({
                 <div className="pt-2 flex gap-2">
                   <button
                     onClick={() => savePaymentEntry(entry.id)}
-                    className="px-3.5 py-2 rounded-lg bg-[#0A77FF] text-white text-xs hover:bg-[#0960D0] transition-colors"
+                    className="px-3.5 py-2 rounded-lg bg-primary text-white text-xs hover:bg-[#0960D0] transition-colors"
                     style={{ fontWeight: 600 }}
                   >
                     {entry.isSaved ? "Update" : "Save"}
                   </button>
                   <button
                     onClick={cancelPaymentEdit}
-                    className="px-3 py-2 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#64748B] hover:bg-[#F1F5F9] transition-colors"
+                    className="px-3 py-2 rounded-lg border border-border bg-white text-xs text-slate-500 hover:bg-muted transition-colors"
                     style={{ fontWeight: 500 }}
                   >
                     Cancel
@@ -5226,12 +5226,12 @@ function ConfigPageContent({
               /* Viewing a saved entry (read-only look) */
               <>
                 <div className="flex items-center justify-between">
-                  <h5 className="text-[13px] text-[#64748B]" style={{ fontWeight: 600 }}>
+                  <h5 className="text-[13px] text-slate-500" style={{ fontWeight: 600 }}>
                     {typeLabel(entry.type)} details
                   </h5>
                   <button
                     onClick={() => editPaymentEntry(entry.id)}
-                    className="flex items-center gap-1 text-[#0A77FF] text-xs hover:underline"
+                    className="flex items-center gap-1 text-primary text-xs hover:underline"
                     style={{ fontWeight: 600 }}
                   >
                     <Pencil className="w-3 h-3" /> Edit
@@ -5242,53 +5242,53 @@ function ConfigPageContent({
                 <div className="space-y-3">
                   {(entry.type === "wire" || entry.type === "ach") && (
                     <>
-                      {entry.bankName && <div><p className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Bank Name</p><p className="text-[13px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>{entry.bankName}</p></div>}
-                      {entry.accountTitle && <div><p className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Account Title</p><p className="text-[13px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>{entry.accountTitle}</p></div>}
-                      {entry.accountNumber && <div><p className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>{entry.type === "wire" ? "Account Number/IBAN" : "Account Number"}</p><p className="text-[13px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>•��••{entry.accountNumber.slice(-4)}</p></div>}
-                      {entry.type === "ach" && entry.routingNumber && <div><p className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Routing Number</p><p className="text-[13px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>{entry.routingNumber}</p></div>}
-                      {entry.type === "wire" && entry.swiftCode && <div><p className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Swift Code</p><p className="text-[13px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>{entry.swiftCode}</p></div>}
+                      {entry.bankName && <div><p className="text-[11px] text-slate-400" style={{ fontWeight: 500 }}>Bank Name</p><p className="text-[13px] text-foreground mt-0.5" style={{ fontWeight: 500 }}>{entry.bankName}</p></div>}
+                      {entry.accountTitle && <div><p className="text-[11px] text-slate-400" style={{ fontWeight: 500 }}>Account Title</p><p className="text-[13px] text-foreground mt-0.5" style={{ fontWeight: 500 }}>{entry.accountTitle}</p></div>}
+                      {entry.accountNumber && <div><p className="text-[11px] text-slate-400" style={{ fontWeight: 500 }}>{entry.type === "wire" ? "Account Number/IBAN" : "Account Number"}</p><p className="text-[13px] text-foreground mt-0.5" style={{ fontWeight: 500 }}>•��••{entry.accountNumber.slice(-4)}</p></div>}
+                      {entry.type === "ach" && entry.routingNumber && <div><p className="text-[11px] text-slate-400" style={{ fontWeight: 500 }}>Routing Number</p><p className="text-[13px] text-foreground mt-0.5" style={{ fontWeight: 500 }}>{entry.routingNumber}</p></div>}
+                      {entry.type === "wire" && entry.swiftCode && <div><p className="text-[11px] text-slate-400" style={{ fontWeight: 500 }}>Swift Code</p><p className="text-[13px] text-foreground mt-0.5" style={{ fontWeight: 500 }}>{entry.swiftCode}</p></div>}
                     </>
                   )}
                   {entry.type === "check" && (
                     <>
-                      {entry.payeeName && <div><p className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Payee Name</p><p className="text-[13px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>{entry.payeeName}</p></div>}
-                      {entry.mailingAddress && <div><p className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Mailing Address</p><p className="text-[13px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>{entry.mailingAddress}</p></div>}
-                      {entry.accountNumber && <div><p className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Account Number</p><p className="text-[13px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>••••{entry.accountNumber.slice(-4)}</p></div>}
+                      {entry.payeeName && <div><p className="text-[11px] text-slate-400" style={{ fontWeight: 500 }}>Payee Name</p><p className="text-[13px] text-foreground mt-0.5" style={{ fontWeight: 500 }}>{entry.payeeName}</p></div>}
+                      {entry.mailingAddress && <div><p className="text-[11px] text-slate-400" style={{ fontWeight: 500 }}>Mailing Address</p><p className="text-[13px] text-foreground mt-0.5" style={{ fontWeight: 500 }}>{entry.mailingAddress}</p></div>}
+                      {entry.accountNumber && <div><p className="text-[11px] text-slate-400" style={{ fontWeight: 500 }}>Account Number</p><p className="text-[13px] text-foreground mt-0.5" style={{ fontWeight: 500 }}>••••{entry.accountNumber.slice(-4)}</p></div>}
                     </>
                   )}
                   {entry.type === "card" && (
                     <>
-                      {entry.cardholderName && <div><p className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Cardholder</p><p className="text-[13px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>{entry.cardholderName}</p></div>}
-                      {entry.cardNumber && <div><p className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Card Number</p><p className="text-[13px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>••••{entry.cardNumber.slice(-4)}</p></div>}
-                      {entry.expiryDate && <div><p className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Expiry</p><p className="text-[13px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>{entry.expiryDate}</p></div>}
+                      {entry.cardholderName && <div><p className="text-[11px] text-slate-400" style={{ fontWeight: 500 }}>Cardholder</p><p className="text-[13px] text-foreground mt-0.5" style={{ fontWeight: 500 }}>{entry.cardholderName}</p></div>}
+                      {entry.cardNumber && <div><p className="text-[11px] text-slate-400" style={{ fontWeight: 500 }}>Card Number</p><p className="text-[13px] text-foreground mt-0.5" style={{ fontWeight: 500 }}>••••{entry.cardNumber.slice(-4)}</p></div>}
+                      {entry.expiryDate && <div><p className="text-[11px] text-slate-400" style={{ fontWeight: 500 }}>Expiry</p><p className="text-[13px] text-foreground mt-0.5" style={{ fontWeight: 500 }}>{entry.expiryDate}</p></div>}
                     </>
                   )}
                   {entry.type === "digital_wallet" && (
                     <>
-                      {entry.walletProvider && <div><p className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Provider</p><p className="text-[13px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>{entry.walletProvider}</p></div>}
-                      {entry.walletId && <div><p className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Wallet ID/Email</p><p className="text-[13px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>{entry.walletId}</p></div>}
+                      {entry.walletProvider && <div><p className="text-[11px] text-slate-400" style={{ fontWeight: 500 }}>Provider</p><p className="text-[13px] text-foreground mt-0.5" style={{ fontWeight: 500 }}>{entry.walletProvider}</p></div>}
+                      {entry.walletId && <div><p className="text-[11px] text-slate-400" style={{ fontWeight: 500 }}>Wallet ID/Email</p><p className="text-[13px] text-foreground mt-0.5" style={{ fontWeight: 500 }}>{entry.walletId}</p></div>}
                     </>
                   )}
                   {entry.type === "cash" && (
                     <>
-                      {entry.recipientName && <div><p className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Recipient</p><p className="text-[13px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>{entry.recipientName}</p></div>}
-                      {entry.collectionPoint && <div><p className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Collection Point</p><p className="text-[13px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>{entry.collectionPoint}</p></div>}
+                      {entry.recipientName && <div><p className="text-[11px] text-slate-400" style={{ fontWeight: 500 }}>Recipient</p><p className="text-[13px] text-foreground mt-0.5" style={{ fontWeight: 500 }}>{entry.recipientName}</p></div>}
+                      {entry.collectionPoint && <div><p className="text-[11px] text-slate-400" style={{ fontWeight: 500 }}>Collection Point</p><p className="text-[13px] text-foreground mt-0.5" style={{ fontWeight: 500 }}>{entry.collectionPoint}</p></div>}
                     </>
                   )}
-                  {entry.phone && <div><p className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Phone</p><p className="text-[13px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>{entry.countryCode} {entry.phone}</p></div>}
+                  {entry.phone && <div><p className="text-[11px] text-slate-400" style={{ fontWeight: 500 }}>Phone</p><p className="text-[13px] text-foreground mt-0.5" style={{ fontWeight: 500 }}>{entry.countryCode} {entry.phone}</p></div>}
                   {entry.applyDiscount && (
                     <div className="flex gap-4">
-                      {entry.discountPercent && <div><p className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Discount</p><p className="text-[13px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>{(entry.discountMode ?? "percent") === "fixed" ? "$" : ""}{entry.discountPercent}{(entry.discountMode ?? "percent") === "percent" ? "%" : ""}</p></div>}
-                      {entry.additionalCharges && <div><p className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Add. Charges</p><p className="text-[13px] text-[#0F172A] mt-0.5" style={{ fontWeight: 500 }}>{(entry.additionalChargesMode ?? "percent") === "fixed" ? "$" : ""}{entry.additionalCharges}{(entry.additionalChargesMode ?? "percent") === "percent" ? "%" : ""}</p></div>}
+                      {entry.discountPercent && <div><p className="text-[11px] text-slate-400" style={{ fontWeight: 500 }}>Discount</p><p className="text-[13px] text-foreground mt-0.5" style={{ fontWeight: 500 }}>{(entry.discountMode ?? "percent") === "fixed" ? "$" : ""}{entry.discountPercent}{(entry.discountMode ?? "percent") === "percent" ? "%" : ""}</p></div>}
+                      {entry.additionalCharges && <div><p className="text-[11px] text-slate-400" style={{ fontWeight: 500 }}>Add. Charges</p><p className="text-[13px] text-foreground mt-0.5" style={{ fontWeight: 500 }}>{(entry.additionalChargesMode ?? "percent") === "fixed" ? "$" : ""}{entry.additionalCharges}{(entry.additionalChargesMode ?? "percent") === "percent" ? "%" : ""}</p></div>}
                     </div>
                   )}
                 </div>
 
                 {/* Add another */}
-                <div className="pt-2 border-t border-[#E2E8F0]">
+                <div className="pt-2 border-t border-border">
                   <button
                     onClick={() => addPaymentEntry(selectedPaymentType)}
-                    className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-[#EDF4FF] text-[#0A77FF] text-xs hover:bg-[#DBEAFE] transition-colors border border-[#DBEAFE]"
+                    className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-accent text-primary text-xs hover:bg-blue-100 transition-colors border border-blue-100"
                     style={{ fontWeight: 600 }}
                   >
                     <Plus className="w-3.5 h-3.5" />
@@ -5299,16 +5299,16 @@ function ConfigPageContent({
             ) : (
               /* Empty state */
               <>
-                <h5 className="text-xs text-[#64748B]" style={{ fontWeight: 600 }}>Payment details</h5>
+                <h5 className="text-xs text-slate-500" style={{ fontWeight: 600 }}>Payment details</h5>
                 <div className="flex flex-col items-center justify-center py-5 text-center">
-                  <div className="w-10 h-10 rounded-lg bg-[#F8FAFC] border border-[#E8ECF1] flex items-center justify-center mb-2">
-                    <CreditCard className="w-5 h-5 text-[#94A3B8]" />
+                  <div className="w-10 h-10 rounded-lg bg-slate-50 border border-[#E8ECF1] flex items-center justify-center mb-2">
+                    <CreditCard className="w-5 h-5 text-slate-400" />
                   </div>
-                  <p className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>No payment method added yet</p>
-                  <p className="text-[11px] text-[#94A3B8] mt-0.5 max-w-[220px]">Select a type on the left, then add details.</p>
+                  <p className="text-xs text-slate-500" style={{ fontWeight: 500 }}>No payment method added yet</p>
+                  <p className="text-[11px] text-slate-400 mt-0.5 max-w-[220px]">Select a type on the left, then add details.</p>
                   <button
                     onClick={() => addPaymentEntry(selectedPaymentType)}
-                    className="mt-3 px-3.5 py-2 rounded-lg bg-[#EDF4FF] text-[#0A77FF] text-xs hover:bg-[#DBEAFE] transition-colors flex items-center gap-1.5 border border-[#DBEAFE]"
+                    className="mt-3 px-3.5 py-2 rounded-lg bg-accent text-primary text-xs hover:bg-blue-100 transition-colors flex items-center gap-1.5 border border-blue-100"
                     style={{ fontWeight: 600 }}
                   >
                     <Plus className="w-3.5 h-3.5" />
@@ -5352,7 +5352,7 @@ function ConfigPageContent({
                 <div className="absolute left-0 top-0 bottom-0 w-10 rounded-l-lg bg-muted/60 border-r border-border flex items-center justify-center">
                   <span className="text-xs text-muted-foreground font-medium">{currencySymbol}</span>
                 </div>
-                <Input placeholder="50,000.00" className="pl-12 rounded-lg border-[#E2E8F0] !h-10 bg-white text-sm placeholder:text-[#94A3B8]" />
+                <Input placeholder="50,000.00" className="pl-12 rounded-lg border-border !h-10 bg-white text-sm placeholder:text-slate-400" />
               </div>
               <p className="text-[10px] text-muted-foreground mt-1">Leave empty for unlimited credit</p>
             </div>
@@ -5372,28 +5372,28 @@ function ConfigPageContent({
               onClick={() => setEnforcement("none")}
               className={`text-left rounded-xl border transition-all flex flex-col overflow-hidden bg-white ${
                 enforcement === "none"
-                  ? "border-[#0A77FF]/30 shadow-sm"
-                  : "border-[#E2E8F0] hover:border-[#0A77FF]/20 shadow-sm hover:shadow-md"
+                  ? "border-primary/30 shadow-sm"
+                  : "border-border hover:border-primary/20 shadow-sm hover:shadow-md"
               }`}
             >
               <div className="p-3.5 flex-1">
                 <div className="flex items-center justify-between mb-2">
                   <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                    enforcement === "none" ? "bg-[#EDF4FF]" : "bg-[#F1F5F9]"
+                    enforcement === "none" ? "bg-accent" : "bg-muted"
                   }`}>
-                    <Info className={`w-4 h-4 ${enforcement === "none" ? "text-[#0A77FF]" : "text-[#94A3B8]"}`} />
+                    <Info className={`w-4 h-4 ${enforcement === "none" ? "text-primary" : "text-slate-400"}`} />
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <span className="text-[8px] px-1.5 py-[1px] rounded-full bg-[#EDF4FF] text-[#0A77FF] border border-[#0A77FF]/15" style={{ fontWeight: 600 }}>Recommended</span>
+                    <span className="text-[8px] px-1.5 py-[1px] rounded-full bg-accent text-primary border border-primary/15" style={{ fontWeight: 600 }}>Recommended</span>
                     <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                      enforcement === "none" ? "border-[#0A77FF]/60" : "border-[#CBD5E1]"
+                      enforcement === "none" ? "border-primary/60" : "border-slate-300"
                     }`}>
-                      {enforcement === "none" && <div className="w-2 h-2 rounded-full bg-[#0A77FF]" />}
+                      {enforcement === "none" && <div className="w-2 h-2 rounded-full bg-primary" />}
                     </div>
                   </div>
                 </div>
-                <p className="text-xs text-[#0F172A]" style={{ fontWeight: 600 }}>No Enforcement</p>
-                <p className="text-[10px] text-[#64748B] mt-0.5 leading-relaxed">No action when exceeded. A passive "Over Limit" label appears on the order as an indicator only.</p>
+                <p className="text-xs text-foreground" style={{ fontWeight: 600 }}>No Enforcement</p>
+                <p className="text-[10px] text-slate-500 mt-0.5 leading-relaxed">No action when exceeded. A passive "Over Limit" label appears on the order as an indicator only.</p>
               </div>
             </button>
 
@@ -5403,24 +5403,24 @@ function ConfigPageContent({
               className={`text-left rounded-xl border transition-all flex flex-col overflow-hidden bg-white ${
                 enforcement === "soft_warning"
                   ? "border-[#EAB308]/30 shadow-sm"
-                  : "border-[#E2E8F0] hover:border-[#EAB308]/20 shadow-sm hover:shadow-md"
+                  : "border-border hover:border-[#EAB308]/20 shadow-sm hover:shadow-md"
               }`}
             >
               <div className="p-3.5 flex-1">
                 <div className="flex items-center justify-between mb-2">
                   <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                    enforcement === "soft_warning" ? "bg-[#FEFCE8]" : "bg-[#F1F5F9]"
+                    enforcement === "soft_warning" ? "bg-[#FEFCE8]" : "bg-muted"
                   }`}>
-                    <AlertTriangle className={`w-4 h-4 ${enforcement === "soft_warning" ? "text-[#CA8A04]" : "text-[#94A3B8]"}`} />
+                    <AlertTriangle className={`w-4 h-4 ${enforcement === "soft_warning" ? "text-[#CA8A04]" : "text-slate-400"}`} />
                   </div>
                   <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                    enforcement === "soft_warning" ? "border-[#EAB308]/60" : "border-[#CBD5E1]"
+                    enforcement === "soft_warning" ? "border-[#EAB308]/60" : "border-slate-300"
                   }`}>
                     {enforcement === "soft_warning" && <div className="w-2 h-2 rounded-full bg-[#EAB308]" />}
                   </div>
                 </div>
-                <p className="text-xs text-[#0F172A]" style={{ fontWeight: 600 }}>Soft Warning</p>
-                <p className="text-[10px] text-[#64748B] mt-0.5 leading-relaxed">A confirmation prompt is shown before the order can proceed. The user must acknowledge to continue.</p>
+                <p className="text-xs text-foreground" style={{ fontWeight: 600 }}>Soft Warning</p>
+                <p className="text-[10px] text-slate-500 mt-0.5 leading-relaxed">A confirmation prompt is shown before the order can proceed. The user must acknowledge to continue.</p>
               </div>
             </button>
 
@@ -5429,35 +5429,35 @@ function ConfigPageContent({
               onClick={() => setEnforcement("hard_block")}
               className={`text-left rounded-xl border transition-all flex flex-col overflow-hidden bg-white ${
                 enforcement === "hard_block"
-                  ? "border-[#EF4444]/40 shadow-sm"
-                  : "border-[#E2E8F0] hover:border-[#EF4444]/20 shadow-sm hover:shadow-md"
+                  ? "border-red-500/40 shadow-sm"
+                  : "border-border hover:border-red-500/20 shadow-sm hover:shadow-md"
               }`}
             >
               <div className="p-3.5 flex-1">
                 <div className="flex items-center justify-between mb-2">
                   <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                    enforcement === "hard_block" ? "bg-[#FEF2F2]" : "bg-[#F1F5F9]"
+                    enforcement === "hard_block" ? "bg-red-50" : "bg-muted"
                   }`}>
-                    <Lock className={`w-4 h-4 ${enforcement === "hard_block" ? "text-[#EF4444]" : "text-[#94A3B8]"}`} />
+                    <Lock className={`w-4 h-4 ${enforcement === "hard_block" ? "text-red-500" : "text-slate-400"}`} />
                   </div>
                   <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                    enforcement === "hard_block" ? "border-[#EF4444]/60" : "border-[#CBD5E1]"
+                    enforcement === "hard_block" ? "border-red-500/60" : "border-slate-300"
                   }`}>
-                    {enforcement === "hard_block" && <div className="w-2 h-2 rounded-full bg-[#EF4444]" />}
+                    {enforcement === "hard_block" && <div className="w-2 h-2 rounded-full bg-red-500" />}
                   </div>
                 </div>
-                <p className="text-xs text-[#0F172A]" style={{ fontWeight: 600 }}>Hard Block</p>
-                <p className="text-[10px] text-[#64748B] mt-0.5 leading-relaxed">Orders cannot be placed when the limit is exceeded. Blocked until the balance is resolved.</p>
+                <p className="text-xs text-foreground" style={{ fontWeight: 600 }}>Hard Block</p>
+                <p className="text-[10px] text-slate-500 mt-0.5 leading-relaxed">Orders cannot be placed when the limit is exceeded. Blocked until the balance is resolved.</p>
               </div>
             </button>
           </div>
 
           {/* ── Contextual settings for selected enforcement ── */}
           {enforcement === "hard_block" && (
-            <div className="mt-3 rounded-xl border border-[#EF4444]/15 bg-white shadow-sm p-4 space-y-3">
+            <div className="mt-3 rounded-xl border border-red-500/15 bg-white shadow-sm p-4 space-y-3">
               <div className="flex items-center gap-2">
-                <Lock className="w-3.5 h-3.5 text-[#EF4444]" />
-                <span className="text-xs text-[#0F172A]" style={{ fontWeight: 600 }}>Hard Block Settings</span>
+                <Lock className="w-3.5 h-3.5 text-red-500" />
+                <span className="text-xs text-foreground" style={{ fontWeight: 600 }}>Hard Block Settings</span>
               </div>
               <SearchableUserPicker
                 selectedIds={hardBlockRecipients}
@@ -5475,18 +5475,18 @@ function ConfigPageContent({
             <div className="mt-3 rounded-xl border border-[#EAB308]/15 bg-white shadow-sm p-4 space-y-3">
               <div className="flex items-center gap-2">
                 <AlertTriangle className="w-3.5 h-3.5 text-[#CA8A04]" />
-                <span className="text-xs text-[#0F172A]" style={{ fontWeight: 600 }}>Soft Warning Settings</span>
+                <span className="text-xs text-foreground" style={{ fontWeight: 600 }}>Soft Warning Settings</span>
               </div>
               {/* Warning Threshold */}
               <div>
-                <Label className="text-xs text-[#0F172A]" style={{ fontWeight: 600 }}>Warning threshold</Label>
+                <Label className="text-xs text-foreground" style={{ fontWeight: 600 }}>Warning threshold</Label>
                 <div className="relative mt-1.5">
-                  <div className="absolute left-0 top-0 bottom-0 w-10 rounded-l-lg bg-[#F8FAFC] border-r border-[#E2E8F0] flex items-center justify-center">
-                    <span className="text-xs text-[#94A3B8] font-medium">%</span>
+                  <div className="absolute left-0 top-0 bottom-0 w-10 rounded-l-lg bg-slate-50 border-r border-border flex items-center justify-center">
+                    <span className="text-xs text-slate-400 font-medium">%</span>
                   </div>
-                  <Input placeholder="80" className="pl-12 rounded-lg border-[#E2E8F0] !h-10 bg-white text-sm placeholder:text-[#94A3B8]" />
+                  <Input placeholder="80" className="pl-12 rounded-lg border-border !h-10 bg-white text-sm placeholder:text-slate-400" />
                 </div>
-                <p className="text-[10px] text-[#94A3B8] mt-1">Alert triggers at this % of credit limit</p>
+                <p className="text-[10px] text-slate-400 mt-1">Alert triggers at this % of credit limit</p>
               </div>
               <SearchableUserPicker
                 selectedIds={softWarningRecipients}
@@ -5501,10 +5501,10 @@ function ConfigPageContent({
           )}
 
           {enforcement === "none" && (
-            <div className="mt-3 rounded-xl border border-[#0A77FF]/15 bg-white shadow-sm p-3.5">
+            <div className="mt-3 rounded-xl border border-primary/15 bg-white shadow-sm p-3.5">
               <div className="flex items-center gap-2.5">
-                <Info className="w-3.5 h-3.5 text-[#0A77FF]" />
-                <p className="text-xs text-[#64748B]">No action is taken when the credit limit is exceeded. An "Over Limit" label appears on the order as a passive indicator only.</p>
+                <Info className="w-3.5 h-3.5 text-primary" />
+                <p className="text-xs text-slate-500">No action is taken when the credit limit is exceeded. An "Over Limit" label appears on the order as a passive indicator only.</p>
               </div>
             </div>
           )}
@@ -5523,10 +5523,10 @@ function ConfigPageContent({
       <div className="space-y-3">
         {/* ── Heading + Helper Copy ── */}
         <div className="mb-1">
-          <h4 className="text-sm text-[#0F172A]" style={{ fontWeight: 700 }}>Payment Terms</h4>
-          <p className="text-xs text-[#64748B] mt-0.5 leading-relaxed">
+          <h4 className="text-sm text-foreground" style={{ fontWeight: 700 }}>Payment Terms</h4>
+          <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">
             Set the default payment terms for this vendor. These will apply automatically to all associated purchase orders.{" "}
-            <span className="text-[#0A77FF] inline-flex items-center gap-0.5 cursor-pointer hover:underline" style={{ fontWeight: 500 }}>
+            <span className="text-primary inline-flex items-center gap-0.5 cursor-pointer hover:underline" style={{ fontWeight: 500 }}>
               Learn More <ExternalLink className="w-3 h-3" />
             </span>
           </p>
@@ -5535,23 +5535,23 @@ function ConfigPageContent({
         {/* ── Content: Empty state or Selected term ── */}
         {!selectedPaymentTermPreset ? (
           /* ── Empty State ── */
-          <div className="rounded-lg border-2 border-dashed border-[#E2E8F0] bg-white py-6 px-4 flex flex-col items-center justify-center text-center">
+          <div className="rounded-lg border-2 border-dashed border-border bg-white py-6 px-4 flex flex-col items-center justify-center text-center">
             {/* Icon */}
-            <div className="w-10 h-10 rounded-lg bg-[#F8FAFC] border border-[#E8ECF1] flex items-center justify-center mb-3">
-              <Receipt className="w-5 h-5 text-[#94A3B8]" />
+            <div className="w-10 h-10 rounded-lg bg-slate-50 border border-[#E8ECF1] flex items-center justify-center mb-3">
+              <Receipt className="w-5 h-5 text-slate-400" />
             </div>
 
             <div className="flex items-center gap-2">
               <button
                 onClick={() => { resetCreatePtForm(); setCreatePtModalOpen(true); }}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#0F172A] hover:bg-[#F8FAFC] transition-colors"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-border bg-white text-xs text-foreground hover:bg-slate-50 transition-colors"
                 style={{ fontWeight: 500 }}
               >
-                <Plus className="w-3.5 h-3.5 text-[#64748B]" /> Create terms
+                <Plus className="w-3.5 h-3.5 text-slate-500" /> Create terms
               </button>
               <button
                 onClick={() => { setPtTypeFilters("net"); setPtStatusFilter("all"); setPtSearch(""); setPaymentTermsModalOpen(true); }}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-[#DBEAFE] bg-[#EFF6FF] text-xs text-[#0A77FF] hover:bg-[#DBEAFE] transition-colors"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-blue-100 bg-blue-50 text-xs text-primary hover:bg-blue-100 transition-colors"
                 style={{ fontWeight: 500 }}
               >
                 <FileText className="w-3.5 h-3.5" /> Templates
@@ -5589,19 +5589,19 @@ function ConfigPageContent({
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <div className="flex items-center gap-2.5">
-                    <h2 className="text-[15px] sm:text-[17px] text-[#0F172A]" style={{ fontWeight: 700 }}>Create New Payment Term</h2>
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#F1F5F9] text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>
+                    <h2 className="text-[15px] sm:text-[17px] text-foreground" style={{ fontWeight: 700 }}>Create New Payment Term</h2>
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-muted text-[11px] text-slate-500" style={{ fontWeight: 500 }}>
                       <Receipt className="w-3 h-3" /> Payment Term
                     </span>
                   </div>
-                  <p className="text-[11px] sm:text-xs text-[#64748B] mt-0.5" style={{ fontWeight: 400 }}>
+                  <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5" style={{ fontWeight: 400 }}>
                     Select the structure of the payment arrangement with this vendor.
                   </p>
                 </div>
                 <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
                   <button
                     onClick={() => setCreatePtFullscreen(!createPtFullscreen)}
-                    className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#475569] hover:bg-[#F8FAFC] hover:border-[#CBD5E1] transition-all cursor-pointer"
+                    className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-border bg-white text-xs text-muted-foreground hover:bg-slate-50 hover:border-slate-300 transition-all cursor-pointer"
                     style={{ fontWeight: 500 }}
                   >
                     {createPtFullscreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
@@ -5609,7 +5609,7 @@ function ConfigPageContent({
                   </button>
                   <button
                     onClick={() => { setCreatePtModalOpen(false); setCreatePtFullscreen(false); resetCreatePtForm(); }}
-                    className="w-8 h-8 rounded-lg flex items-center justify-center text-[#94A3B8] hover:text-[#64748B] hover:bg-[#F1F5F9] transition-all cursor-pointer"
+                    className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-500 hover:bg-muted transition-all cursor-pointer"
                   >
                     <X className="w-4.5 h-4.5" />
                   </button>
@@ -5626,11 +5626,11 @@ function ConfigPageContent({
                     {/* Payment Term Type — card selector matching partner type style */}
                     <div>
                       <div className="flex items-center gap-1.5 mb-3">
-                        <span className="text-sm text-[#0F172A]" style={{ fontWeight: 600 }}>Payment Term Type</span>
+                        <span className="text-sm text-foreground" style={{ fontWeight: 600 }}>Payment Term Type</span>
                         <Tooltip>
-                          <TooltipTrigger asChild><span><Info className="w-3.5 h-3.5 text-[#CBD5E1] cursor-help" /></span></TooltipTrigger>
+                          <TooltipTrigger asChild><span><Info className="w-3.5 h-3.5 text-slate-300 cursor-help" /></span></TooltipTrigger>
                           <TooltipContent side="bottom" sideOffset={6} className="max-w-[260px] text-[11px] leading-[1.5] z-[300]">
-                            <p className="text-[#64748B]">Select a payment structure. Hover each card for details.</p>
+                            <p className="text-slate-500">Select a payment structure. Hover each card for details.</p>
                           </TooltipContent>
                         </Tooltip>
                       </div>
@@ -5646,11 +5646,11 @@ function ConfigPageContent({
                             : t.id === "prepayment"
                             ? { desc: "Collect partial or full payment upfront before goods ship.", example: "50% Upfront", exampleDesc: "— half paid before dispatch." }
                             : { desc: "Split the total across multiple events, each with its own percentage.", example: "40/30/30", exampleDesc: "— order, shipment, delivery." };
-                          const accentColor = t.id === "net" ? "#0A77FF" : t.id === "prepayment" ? "#7C3AED" : "#D97706";
+                          const accentColor = t.id === "net" ? "hsl(var(--primary))" : t.id === "prepayment" ? "hsl(var(--violet))" : "hsl(var(--warning))";
                           const accentBg = t.id === "net" ? "#EFF6FF" : t.id === "prepayment" ? "#F5F3FF" : "#FFFBEB";
                           const accentBorder = t.id === "net" ? "#93C5FD" : t.id === "prepayment" ? "#C4B5FD" : "#FCD34D";
                           const activeBorderClass = t.id === "net" ? "border-[#93C5FD]/70" : t.id === "prepayment" ? "border-[#C4B5FD]/70" : "border-[#FCD34D]/70";
-                          const hoverBorderClass = t.id === "net" ? "hover:border-[#BFDBFE]" : t.id === "prepayment" ? "hover:border-[#DDD6FE]" : "hover:border-[#FDE68A]";
+                          const hoverBorderClass = t.id === "net" ? "hover:border-blue-200" : t.id === "prepayment" ? "hover:border-[#DDD6FE]" : "hover:border-amber-200";
                           const circleActiveBg = t.id === "net" ? "#3B82F6" : t.id === "prepayment" ? "#8B5CF6" : "#F59E0B";
                           const circleActiveShadow = t.id === "net" ? "rgba(59,130,246,0.15)" : t.id === "prepayment" ? "rgba(139,92,246,0.15)" : "rgba(245,158,11,0.15)";
                           const hoverCircleBorder = t.id === "net" ? "group-hover:border-[#93C5FD]" : t.id === "prepayment" ? "group-hover:border-[#C4B5FD]" : "group-hover:border-[#FCD34D]";
@@ -5662,7 +5662,7 @@ function ConfigPageContent({
                                   className={`group relative rounded-xl overflow-hidden border transition-all duration-200 cursor-pointer ${
                                     isActive
                                       ? `${activeBorderClass} bg-white shadow-[0_1px_4px_rgba(0,0,0,0.06)]`
-                                      : `border-[#E2E8F0] bg-white ${hoverBorderClass} hover:shadow-[0_4px_16px_-4px_rgba(0,0,0,0.08)]`
+                                      : `border-border bg-white ${hoverBorderClass} hover:shadow-[0_4px_16px_-4px_rgba(0,0,0,0.08)]`
                                   }`}
                                 >
                                   <div className={`absolute inset-0 transition-all duration-300 pointer-events-none ${isActive ? "opacity-100" : "opacity-0 group-hover:opacity-60"}`} style={{ background: `linear-gradient(135deg, ${accentBg}80 0%, transparent 70%)` }} />
@@ -5671,7 +5671,7 @@ function ConfigPageContent({
                                       {icon}
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                      <p className={`text-[13px] transition-colors duration-150 ${isActive ? "" : "text-[#0F172A] group-hover:text-[#1E293B]"}`} style={{ fontWeight: 600, color: isActive ? accentColor : undefined }}>{shortLabel}</p>
+                                      <p className={`text-[13px] transition-colors duration-150 ${isActive ? "" : "text-foreground group-hover:text-slate-800"}`} style={{ fontWeight: 600, color: isActive ? accentColor : undefined }}>{shortLabel}</p>
                                       <p className={`text-[11px] mt-0.5 truncate transition-colors duration-150`} style={{ color: isActive ? accentColor : "#94A3B8" }}>{shortDesc}</p>
                                     </div>
                                     <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-all duration-200 shrink-0 ${
@@ -5685,10 +5685,10 @@ function ConfigPageContent({
                                 </div>
                               </TooltipTrigger>
                               <TooltipContent side="bottom" sideOffset={8} className="max-w-[260px] text-[11px] leading-[1.5] z-[300]">
-                                <p className="text-[#64748B]">{typeTooltip.desc}</p>
-                                <div className="mt-2 px-2.5 py-2 rounded-lg bg-[#F8FAFC] border border-[#F1F5F9]">
-                                  <p className="text-[10px] text-[#94A3B8] tracking-wide" style={{ fontWeight: 600 }}>EXAMPLE</p>
-                                  <p className="text-[11px] text-[#334155] mt-1"><span style={{ fontWeight: 600, color: accentColor }}>{typeTooltip.example}</span> {typeTooltip.exampleDesc}</p>
+                                <p className="text-slate-500">{typeTooltip.desc}</p>
+                                <div className="mt-2 px-2.5 py-2 rounded-lg bg-slate-50 border border-muted">
+                                  <p className="text-[10px] text-slate-400 tracking-wide" style={{ fontWeight: 600 }}>EXAMPLE</p>
+                                  <p className="text-[11px] text-slate-700 mt-1"><span style={{ fontWeight: 600, color: accentColor }}>{typeTooltip.example}</span> {typeTooltip.exampleDesc}</p>
                                 </div>
                               </TooltipContent>
                             </Tooltip>
@@ -5701,50 +5701,50 @@ function ConfigPageContent({
                     {/* Payment Term Details — compact grid like Partner Details section */}
                     <div>
                       <div className="flex items-center gap-1.5 mb-3">
-                        <span className="text-sm text-[#0F172A]" style={{ fontWeight: 600 }}>Payment Term Details</span>
+                        <span className="text-sm text-foreground" style={{ fontWeight: 600 }}>Payment Term Details</span>
                         <Tooltip>
-                          <TooltipTrigger asChild><span><Info className="w-3.5 h-3.5 text-[#CBD5E1] cursor-help" /></span></TooltipTrigger>
+                          <TooltipTrigger asChild><span><Info className="w-3.5 h-3.5 text-slate-300 cursor-help" /></span></TooltipTrigger>
                           <TooltipContent side="bottom" sideOffset={6} className="max-w-[260px] text-[11px] leading-[1.5] z-[300]">
-                            <p className="text-[#64748B]">Name, duration, and trigger shown on POs and invoices.</p>
-                            <div className="mt-2 px-2.5 py-2 rounded-lg bg-[#F8FAFC] border border-[#F1F5F9]">
-                              <p className="text-[10px] text-[#94A3B8] tracking-wide" style={{ fontWeight: 600 }}>TIP</p>
-                              <p className="text-[11px] text-[#334155] mt-1">Use clear names like <span className="text-[#0A77FF]" style={{ fontWeight: 600 }}>Net 30 Standard</span> or <span className="text-[#0A77FF]" style={{ fontWeight: 600 }}>50% Upfront</span>.</p>
+                            <p className="text-slate-500">Name, duration, and trigger shown on POs and invoices.</p>
+                            <div className="mt-2 px-2.5 py-2 rounded-lg bg-slate-50 border border-muted">
+                              <p className="text-[10px] text-slate-400 tracking-wide" style={{ fontWeight: 600 }}>TIP</p>
+                              <p className="text-[11px] text-slate-700 mt-1">Use clear names like <span className="text-primary" style={{ fontWeight: 600 }}>Net 30 Standard</span> or <span className="text-primary" style={{ fontWeight: 600 }}>50% Upfront</span>.</p>
                             </div>
                           </TooltipContent>
                         </Tooltip>
                       </div>
-                      <div className="rounded-xl border border-[#E2E8F0] bg-white p-4">
+                      <div className="rounded-xl border border-border bg-white p-4">
                         <div className="grid grid-cols-2 gap-x-4 gap-y-3">
                           {/* Row 1: Name + (NET only: Trigger) / (others: Description) */}
                           <div>
-                            <label className="text-[12px] text-[#0F172A] mb-1.5 block" style={{ fontWeight: 500 }}>
+                            <label className="text-[12px] text-foreground mb-1.5 block" style={{ fontWeight: 500 }}>
                               {createPtType === "net" ? "NET Term" : createPtType === "prepayment" ? "Prepayment Term" : "Split Term"} Name
                             </label>
                             <Input
                               value={createPtName}
                               onChange={(e) => setCreatePtName(e.target.value)}
                               placeholder={`e.g. ${createPtType === "net" ? "Net 30 Standard" : createPtType === "prepayment" ? "50% Upfront" : "3-Part Split"}`}
-                              className="rounded-lg border-[#E2E8F0] bg-white h-9 text-[13px] text-[#0F172A] placeholder:text-[#94A3B8]"
+                              className="rounded-lg border-border bg-white h-9 text-[13px] text-foreground placeholder:text-slate-400"
                             />
                           </div>
                           {/* NET: Trigger next to name */}
                           {createPtType === "net" && (
                             <div>
                               <div className="flex items-center gap-1 mb-1.5">
-                                <label className="text-[12px] text-[#0F172A]" style={{ fontWeight: 500 }}>Trigger Event</label>
+                                <label className="text-[12px] text-foreground" style={{ fontWeight: 500 }}>Trigger Event</label>
                                 <Tooltip>
-                                  <TooltipTrigger asChild><span><Info className="w-3 h-3 text-[#CBD5E1] cursor-help" /></span></TooltipTrigger>
+                                  <TooltipTrigger asChild><span><Info className="w-3 h-3 text-slate-300 cursor-help" /></span></TooltipTrigger>
                                   <TooltipContent side="bottom" sideOffset={6} className="max-w-[260px] text-[11px] leading-[1.5] z-[300]">
-                                    <p className="text-[#64748B]">Event that starts the payment countdown.</p>
-                                    <div className="mt-2 px-2.5 py-2 rounded-lg bg-[#F8FAFC] border border-[#F1F5F9]">
-                                      <p className="text-[10px] text-[#94A3B8] tracking-wide" style={{ fontWeight: 600 }}>EXAMPLE</p>
-                                      <p className="text-[11px] text-[#334155] mt-1"><span className="text-[#0A77FF]" style={{ fontWeight: 600 }}>Shipping Date</span> — due 30 days after shipment.</p>
+                                    <p className="text-slate-500">Event that starts the payment countdown.</p>
+                                    <div className="mt-2 px-2.5 py-2 rounded-lg bg-slate-50 border border-muted">
+                                      <p className="text-[10px] text-slate-400 tracking-wide" style={{ fontWeight: 600 }}>EXAMPLE</p>
+                                      <p className="text-[11px] text-slate-700 mt-1"><span className="text-primary" style={{ fontWeight: 600 }}>Shipping Date</span> — due 30 days after shipment.</p>
                                     </div>
                                   </TooltipContent>
                                 </Tooltip>
                               </div>
                               <Select value={createPtTrigger} onValueChange={setCreatePtTrigger}>
-                                <SelectTrigger className="h-9 rounded-lg border-[#E2E8F0] bg-white text-[13px]">
+                                <SelectTrigger className="h-9 rounded-lg border-border bg-white text-[13px]">
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent className="z-[250] rounded-lg">
@@ -5769,14 +5769,14 @@ function ConfigPageContent({
                             <>
                               <div>
                                 <div className="flex items-center gap-1 mb-1.5">
-                                  <label className="text-[12px] text-[#0F172A]" style={{ fontWeight: 500 }}>NET Duration (Days)</label>
+                                  <label className="text-[12px] text-foreground" style={{ fontWeight: 500 }}>NET Duration (Days)</label>
                                   <Tooltip>
-                                    <TooltipTrigger asChild><span><Info className="w-3 h-3 text-[#CBD5E1] cursor-help" /></span></TooltipTrigger>
+                                    <TooltipTrigger asChild><span><Info className="w-3 h-3 text-slate-300 cursor-help" /></span></TooltipTrigger>
                                     <TooltipContent side="bottom" sideOffset={6} className="max-w-[260px] text-[11px] leading-[1.5] z-[300]">
-                                      <p className="text-[#64748B]">Calendar days allowed after trigger. Common: 15, 30, 45, 60, or 90.</p>
-                                      <div className="mt-2 px-2.5 py-2 rounded-lg bg-[#F8FAFC] border border-[#F1F5F9]">
-                                        <p className="text-[10px] text-[#94A3B8] tracking-wide" style={{ fontWeight: 600 }}>EXAMPLE</p>
-                                        <p className="text-[11px] text-[#334155] mt-1"><span className="text-[#0A77FF]" style={{ fontWeight: 600 }}>Net 30</span> — pay in full within 30 days.</p>
+                                      <p className="text-slate-500">Calendar days allowed after trigger. Common: 15, 30, 45, 60, or 90.</p>
+                                      <div className="mt-2 px-2.5 py-2 rounded-lg bg-slate-50 border border-muted">
+                                        <p className="text-[10px] text-slate-400 tracking-wide" style={{ fontWeight: 600 }}>EXAMPLE</p>
+                                        <p className="text-[11px] text-slate-700 mt-1"><span className="text-primary" style={{ fontWeight: 600 }}>Net 30</span> — pay in full within 30 days.</p>
                                       </div>
                                     </TooltipContent>
                                   </Tooltip>
@@ -5786,10 +5786,10 @@ function ConfigPageContent({
                                     value={createPtCustomDuration || createPtDuration}
                                     onChange={(e) => { const v = e.target.value.replace(/\D/g, ""); setCreatePtCustomDuration(v); setCreatePtDuration(v || "30"); }}
                                     placeholder="e.g. 30"
-                                    className="h-9 rounded-lg border-[#E2E8F0] bg-white text-[13px] text-[#0F172A] placeholder:text-[#94A3B8] pr-14"
+                                    className="h-9 rounded-lg border-border bg-white text-[13px] text-foreground placeholder:text-slate-400 pr-14"
                                     inputMode="numeric"
                                   />
-                                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] text-[#94A3B8]" style={{ fontWeight: 500 }}>days</span>
+                                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] text-slate-400" style={{ fontWeight: 500 }}>days</span>
                                 </div>
                               </div>
                               <ExpandableTextarea
@@ -5808,55 +5808,55 @@ function ConfigPageContent({
                     {createPtType === "prepayment" && (
                       <div>
                         <div className="flex items-center gap-1.5 mb-3">
-                          <span className="text-sm text-[#0F172A]" style={{ fontWeight: 600 }}>Prepayment Configuration</span>
+                          <span className="text-sm text-foreground" style={{ fontWeight: 600 }}>Prepayment Configuration</span>
                           <Tooltip>
-                            <TooltipTrigger asChild><span><Info className="w-3.5 h-3.5 text-[#CBD5E1] cursor-help" /></span></TooltipTrigger>
+                            <TooltipTrigger asChild><span><Info className="w-3.5 h-3.5 text-slate-300 cursor-help" /></span></TooltipTrigger>
                             <TooltipContent side="bottom" sideOffset={6} className="max-w-[260px] text-[11px] leading-[1.5] z-[300]">
-                              <p className="text-[#64748B]">Upfront payment before shipment — percentage or fixed amount.</p>
+                              <p className="text-slate-500">Upfront payment before shipment — percentage or fixed amount.</p>
                             </TooltipContent>
                           </Tooltip>
                         </div>
-                        <div className="rounded-xl border border-[#E2E8F0] bg-white p-4">
+                        <div className="rounded-xl border border-border bg-white p-4">
                           <div className="grid grid-cols-2 gap-x-4 gap-y-2.5">
                             {/* Value with % / $ toggle */}
                             <div>
                               <div className="flex items-center justify-between mb-1.5">
-                                <label className="text-[12px] text-[#0F172A]" style={{ fontWeight: 500 }}>
+                                <label className="text-[12px] text-foreground" style={{ fontWeight: 500 }}>
                                   Prepayment {createPtPrepayMode === "fixed" ? "Amount" : "Value"}
                                 </label>
-                                <div className="inline-flex items-center h-[22px] rounded-full bg-[#F1F5F9] p-0.5">
+                                <div className="inline-flex items-center h-[22px] rounded-full bg-muted p-0.5">
                                   <button type="button" onClick={() => setCreatePtPrepayMode("percent")}
-                                    className={`px-2 h-[18px] rounded-full text-[10px] transition-all ${createPtPrepayMode === "percent" ? "bg-white text-[#0A77FF] shadow-sm" : "text-[#64748B] hover:text-[#334155]"}`}
+                                    className={`px-2 h-[18px] rounded-full text-[10px] transition-all ${createPtPrepayMode === "percent" ? "bg-white text-primary shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
                                     style={{ fontWeight: 600 }}
                                   >%</button>
                                   <button type="button" onClick={() => setCreatePtPrepayMode("fixed")}
-                                    className={`px-2 h-[18px] rounded-full text-[10px] transition-all ${createPtPrepayMode === "fixed" ? "bg-white text-[#0A77FF] shadow-sm" : "text-[#64748B] hover:text-[#334155]"}`}
+                                    className={`px-2 h-[18px] rounded-full text-[10px] transition-all ${createPtPrepayMode === "fixed" ? "bg-white text-primary shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
                                     style={{ fontWeight: 600 }}
                                   >$</button>
                                 </div>
                               </div>
                               <div className="relative">
                                 {createPtPrepayMode === "fixed" && (
-                                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[13px] text-[#94A3B8]">$</span>
+                                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[13px] text-slate-400">$</span>
                                 )}
                                 <Input
                                   value={createPtCustomDuration || ""}
                                   onChange={(e) => setCreatePtCustomDuration(e.target.value)}
                                   placeholder={createPtPrepayMode === "percent" ? "e.g. 50" : "e.g. 5000.00"}
-                                  className={`rounded-lg border-[#E2E8F0] bg-white text-[13px] h-9 placeholder:text-[#94A3B8] ${createPtPrepayMode === "fixed" ? "pl-7 pr-3" : "pr-8"}`}
+                                  className={`rounded-lg border-border bg-white text-[13px] h-9 placeholder:text-slate-400 ${createPtPrepayMode === "fixed" ? "pl-7 pr-3" : "pr-8"}`}
                                 />
                                 {createPtPrepayMode === "percent" && (
-                                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[13px] text-[#94A3B8]">%</span>
+                                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[13px] text-slate-400">%</span>
                                 )}
                               </div>
                             </div>
                             {/* Trigger */}
                             <div>
                               <div className="flex items-center h-[22px] mb-1.5">
-                                <label className="text-[12px] text-[#0F172A]" style={{ fontWeight: 500 }}>Trigger Event</label>
+                                <label className="text-[12px] text-foreground" style={{ fontWeight: 500 }}>Trigger Event</label>
                               </div>
                               <Select value={createPtTrigger} onValueChange={setCreatePtTrigger}>
-                                <SelectTrigger className="h-9 rounded-lg border-[#E2E8F0] bg-white text-[13px]">
+                                <SelectTrigger className="h-9 rounded-lg border-border bg-white text-[13px]">
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent className="z-[250] rounded-lg">
@@ -5876,24 +5876,24 @@ function ConfigPageContent({
                       <div>
                         <div className="flex items-center justify-between mb-3">
                           <div className="flex items-center gap-1.5">
-                            <span className="text-sm text-[#0F172A]" style={{ fontWeight: 600 }}>Payment Split Events</span>
-                            <span className="text-[11px] text-[#94A3B8] bg-[#F1F5F9] px-1.5 py-0.5 rounded" style={{ fontWeight: 600 }}>{createPtSplitEvents.length}</span>
+                            <span className="text-sm text-foreground" style={{ fontWeight: 600 }}>Payment Split Events</span>
+                            <span className="text-[11px] text-slate-400 bg-muted px-1.5 py-0.5 rounded" style={{ fontWeight: 600 }}>{createPtSplitEvents.length}</span>
                           </div>
                         </div>
 
                         <div className="space-y-2.5">
                           {createPtSplitEvents.map((evt, idx) => (
-                            <div key={idx} className="rounded-xl border bg-white overflow-hidden transition-all" style={{ borderColor: "#E2E8F0" }}>
+                            <div key={idx} className="rounded-xl border bg-white overflow-hidden transition-all" style={{ borderColor: "hsl(var(--border))" }}>
                               {/* Header — matches pricing rule tier card */}
-                              <div className="flex items-center justify-between px-3.5 py-2 border-b border-[#F1F5F9]" style={{ backgroundColor: "#FFFBEB" }}>
+                              <div className="flex items-center justify-between px-3.5 py-2 border-b border-muted" style={{ backgroundColor: "#FFFBEB" }}>
                                 <div className="flex items-center gap-2">
-                                  <span className="w-5 h-5 rounded-md flex items-center justify-center text-[10px] text-white" style={{ fontWeight: 700, backgroundColor: "#D97706" }}>{idx + 1}</span>
-                                  <span className="text-[12px] text-[#0F172A]" style={{ fontWeight: 600 }}>Split {idx + 1}</span>
+                                  <span className="w-5 h-5 rounded-md flex items-center justify-center text-[10px] text-white" style={{ fontWeight: 700, backgroundColor: "hsl(var(--warning))" }}>{idx + 1}</span>
+                                  <span className="text-[12px] text-foreground" style={{ fontWeight: 600 }}>Split {idx + 1}</span>
                                 </div>
                                 {createPtSplitEvents.length > 2 && (
                                   <button
                                     onClick={() => setCreatePtSplitEvents(createPtSplitEvents.filter((_, i) => i !== idx))}
-                                    className="w-6 h-6 rounded-md flex items-center justify-center text-[#94A3B8] hover:text-[#EF4444] hover:bg-white/60 transition-all cursor-pointer"
+                                    className="w-6 h-6 rounded-md flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-white/60 transition-all cursor-pointer"
                                   >
                                     <X className="w-3.5 h-3.5" />
                                   </button>
@@ -5905,39 +5905,39 @@ function ConfigPageContent({
                                   {/* Split Value with % / $ toggle */}
                                   <div>
                                     <div className="flex items-center justify-between mb-1.5">
-                                      <label className="text-[12px] text-[#0F172A]" style={{ fontWeight: 500 }}>
+                                      <label className="text-[12px] text-foreground" style={{ fontWeight: 500 }}>
                                         Split {evt.fixRate ? "Amount" : "Value"}
                                       </label>
-                                      <div className="inline-flex items-center h-[22px] rounded-full bg-[#F1F5F9] p-0.5">
+                                      <div className="inline-flex items-center h-[22px] rounded-full bg-muted p-0.5">
                                         <button type="button" onClick={() => { const u = [...createPtSplitEvents]; u[idx] = { ...u[idx], fixRate: false }; setCreatePtSplitEvents(u); }}
-                                          className={`px-2 h-[18px] rounded-full text-[10px] transition-all ${!evt.fixRate ? "bg-white text-[#0A77FF] shadow-sm" : "text-[#64748B] hover:text-[#334155]"}`}
+                                          className={`px-2 h-[18px] rounded-full text-[10px] transition-all ${!evt.fixRate ? "bg-white text-primary shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
                                           style={{ fontWeight: 600 }}>%</button>
                                         <button type="button" onClick={() => { const u = [...createPtSplitEvents]; u[idx] = { ...u[idx], fixRate: true }; setCreatePtSplitEvents(u); }}
-                                          className={`px-2 h-[18px] rounded-full text-[10px] transition-all ${evt.fixRate ? "bg-white text-[#0A77FF] shadow-sm" : "text-[#64748B] hover:text-[#334155]"}`}
+                                          className={`px-2 h-[18px] rounded-full text-[10px] transition-all ${evt.fixRate ? "bg-white text-primary shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
                                           style={{ fontWeight: 600 }}>$</button>
                                       </div>
                                     </div>
                                     <div className="relative">
-                                      {evt.fixRate && <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[13px] text-[#94A3B8]">$</span>}
+                                      {evt.fixRate && <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[13px] text-slate-400">$</span>}
                                       <Input
                                         value={evt.percent}
                                         onChange={(e) => { const u = [...createPtSplitEvents]; u[idx] = { ...u[idx], percent: e.target.value }; setCreatePtSplitEvents(u); }}
                                         placeholder={evt.fixRate ? "e.g. 5000.00" : "e.g. 50"}
-                                        className={`rounded-lg border-[#E2E8F0] bg-white text-[13px] h-9 text-[#0F172A] placeholder:text-[#94A3B8] ${evt.fixRate ? "pl-7 pr-3" : "pr-8"}`}
+                                        className={`rounded-lg border-border bg-white text-[13px] h-9 text-foreground placeholder:text-slate-400 ${evt.fixRate ? "pl-7 pr-3" : "pr-8"}`}
                                       />
-                                      {!evt.fixRate && <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[13px] text-[#94A3B8]">%</span>}
+                                      {!evt.fixRate && <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[13px] text-slate-400">%</span>}
                                     </div>
                                   </div>
                                   {/* Trigger Event dropdown */}
                                   <div>
                                     <div className="flex items-center h-[22px] mb-1.5">
-                                      <label className="text-[12px] text-[#0F172A]" style={{ fontWeight: 500 }}>Trigger Event</label>
+                                      <label className="text-[12px] text-foreground" style={{ fontWeight: 500 }}>Trigger Event</label>
                                     </div>
                                     <Select
                                       value={evt.event}
                                       onValueChange={(v) => { const u = [...createPtSplitEvents]; u[idx] = { ...u[idx], event: v }; setCreatePtSplitEvents(u); }}
                                     >
-                                      <SelectTrigger className="h-9 rounded-lg border-[#E2E8F0] bg-white text-[13px]">
+                                      <SelectTrigger className="h-9 rounded-lg border-border bg-white text-[13px]">
                                         <SelectValue placeholder="Select trigger" />
                                       </SelectTrigger>
                                       <SelectContent className="z-[250] rounded-lg">
@@ -5964,7 +5964,7 @@ function ConfigPageContent({
                               setCreatePtSplitEvents([...createPtSplitEvents, { event: nextTrigger, percent: "", fixRate: false }]);
                             }}
                             disabled={createPtSplitEvents.length >= 5}
-                            className="inline-flex items-center gap-1 text-[12px] text-[#D97706] hover:text-[#B45309] transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                            className="inline-flex items-center gap-1 text-[12px] text-warning hover:text-[#B45309] transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                             style={{ fontWeight: 600 }}
                           >
                             <Plus className="w-3.5 h-3.5" /> Add Event {createPtSplitEvents.length >= 5 ? "(Max 5)" : ""}
@@ -5972,7 +5972,7 @@ function ConfigPageContent({
                           {(() => {
                             const total = createPtSplitEvents.reduce((sum, e) => sum + (parseFloat(e.percent) || 0), 0);
                             return (
-                              <span className={`text-[11px] ${Math.abs(total - 100) < 0.01 ? "text-[#10B981]" : "text-[#F59E0B]"}`} style={{ fontWeight: 600 }}>
+                              <span className={`text-[11px] ${Math.abs(total - 100) < 0.01 ? "text-emerald-500" : "text-amber-500"}`} style={{ fontWeight: 600 }}>
                                 Total: {total}%{Math.abs(total - 100) >= 0.01 ? " — must equal 100%" : " ✓"}
                               </span>
                             );
@@ -5984,47 +5984,47 @@ function ConfigPageContent({
                     {/* Early Payment Discount — collapsible card */}
                     <div>
                       <div className="flex items-center gap-1.5 mb-3">
-                        <span className="text-sm text-[#0F172A]" style={{ fontWeight: 600 }}>Early Payment Discount</span>
-                        <span className="text-[11px] text-[#94A3B8] bg-[#F1F5F9] px-1.5 py-0.5 rounded" style={{ fontWeight: 600 }}>Optional</span>
+                        <span className="text-sm text-foreground" style={{ fontWeight: 600 }}>Early Payment Discount</span>
+                        <span className="text-[11px] text-slate-400 bg-muted px-1.5 py-0.5 rounded" style={{ fontWeight: 600 }}>Optional</span>
                         <Tooltip>
-                          <TooltipTrigger asChild><span><Info className="w-3.5 h-3.5 text-[#CBD5E1] cursor-help" /></span></TooltipTrigger>
+                          <TooltipTrigger asChild><span><Info className="w-3.5 h-3.5 text-slate-300 cursor-help" /></span></TooltipTrigger>
                           <TooltipContent side="bottom" sideOffset={6} className="max-w-[260px] text-[11px] leading-[1.5] z-[300]">
-                            <p className="text-[#64748B]">Encourage faster payment with an auto-applied discount within an eligible window.</p>
-                            <div className="mt-2 px-2.5 py-2 rounded-lg bg-[#F8FAFC] border border-[#F1F5F9]">
-                              <p className="text-[10px] text-[#94A3B8] tracking-wide" style={{ fontWeight: 600 }}>EXAMPLE</p>
-                              <p className="text-[11px] text-[#334155] mt-1"><span className="text-[#0A77FF]" style={{ fontWeight: 600 }}>2/10 Net 30</span> — 2% off if paid in 10 days, else full in 30.</p>
+                            <p className="text-slate-500">Encourage faster payment with an auto-applied discount within an eligible window.</p>
+                            <div className="mt-2 px-2.5 py-2 rounded-lg bg-slate-50 border border-muted">
+                              <p className="text-[10px] text-slate-400 tracking-wide" style={{ fontWeight: 600 }}>EXAMPLE</p>
+                              <p className="text-[11px] text-slate-700 mt-1"><span className="text-primary" style={{ fontWeight: 600 }}>2/10 Net 30</span> — 2% off if paid in 10 days, else full in 30.</p>
                             </div>
                           </TooltipContent>
                         </Tooltip>
                       </div>
 
-                      <div className={`rounded-xl border p-4 transition-all duration-200 ${createPtApplyDiscount ? "border-[#0A77FF]/25 bg-white shadow-sm" : "border-[#E2E8F0] bg-white"}`}>
+                      <div className={`rounded-xl border p-4 transition-all duration-200 ${createPtApplyDiscount ? "border-primary/25 bg-white shadow-sm" : "border-border bg-white"}`}>
                         <div className="flex items-center gap-3">
                           <Switch checked={createPtApplyDiscount} onCheckedChange={(v) => setCreatePtApplyDiscount(v === true)} />
                           <div className="flex-1 min-w-0">
-                            <h5 className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Apply Early Payment Discount</h5>
-                            <p className="text-[11px] text-[#64748B] mt-0.5">Incentivize faster payments by offering a percentage or fixed discount within a defined window.</p>
+                            <h5 className="text-[13px] text-foreground" style={{ fontWeight: 600 }}>Apply Early Payment Discount</h5>
+                            <p className="text-[11px] text-slate-500 mt-0.5">Incentivize faster payments by offering a percentage or fixed discount within a defined window.</p>
                           </div>
                         </div>
 
                         {createPtApplyDiscount && (
-                          <div className="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-[#F1F5F9] items-end">
+                          <div className="grid grid-cols-2 gap-4 mt-4 pt-4 border-t border-muted items-end">
                             <div>
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-1">
-                                  <Label className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>Discount</Label>
+                                  <Label className="text-xs sm:text-[13px] text-foreground" style={{ fontWeight: 500 }}>Discount</Label>
                                   <Tooltip>
-                                    <TooltipTrigger asChild><span><Info className="w-3 h-3 text-[#CBD5E1] cursor-help" /></span></TooltipTrigger>
+                                    <TooltipTrigger asChild><span><Info className="w-3 h-3 text-slate-300 cursor-help" /></span></TooltipTrigger>
                                     <TooltipContent side="bottom" sideOffset={6} className="max-w-[260px] text-[11px] leading-[1.5] z-[300]">
-                                      <p className="text-[#64748B]">Amount deducted when paid within the eligible window. Choose % or fixed $.</p>
+                                      <p className="text-slate-500">Amount deducted when paid within the eligible window. Choose % or fixed $.</p>
                                     </TooltipContent>
                                   </Tooltip>
                                 </div>
-                                <div className="inline-flex items-center h-[22px] rounded-full bg-[#F1F5F9] p-0.5">
+                                <div className="inline-flex items-center h-[22px] rounded-full bg-muted p-0.5">
                                   <button
                                     type="button"
                                     onClick={() => setCreatePtDiscountMode("percent")}
-                                    className={`px-2 h-[18px] rounded-full text-[10px] transition-all ${createPtDiscountMode === "percent" ? "bg-white text-[#0A77FF] shadow-sm" : "text-[#64748B] hover:text-[#334155]"}`}
+                                    className={`px-2 h-[18px] rounded-full text-[10px] transition-all ${createPtDiscountMode === "percent" ? "bg-white text-primary shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
                                     style={{ fontWeight: 600 }}
                                   >
                                     %
@@ -6032,7 +6032,7 @@ function ConfigPageContent({
                                   <button
                                     type="button"
                                     onClick={() => setCreatePtDiscountMode("fixed")}
-                                    className={`px-2 h-[18px] rounded-full text-[10px] transition-all ${createPtDiscountMode === "fixed" ? "bg-white text-[#0A77FF] shadow-sm" : "text-[#64748B] hover:text-[#334155]"}`}
+                                    className={`px-2 h-[18px] rounded-full text-[10px] transition-all ${createPtDiscountMode === "fixed" ? "bg-white text-primary shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
                                     style={{ fontWeight: 600 }}
                                   >
                                     $
@@ -6041,29 +6041,29 @@ function ConfigPageContent({
                               </div>
                               <div className="relative mt-1">
                                 {createPtDiscountMode === "fixed" && (
-                                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#94A3B8]">$</span>
+                                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-400">$</span>
                                 )}
                                 <Input
                                   value={createPtDiscountPercent}
                                   onChange={(e) => setCreatePtDiscountPercent(e.target.value)}
                                   placeholder={createPtDiscountMode === "percent" ? "e.g. 5" : "e.g. 25.00"}
-                                  className={`rounded-lg border-[#E2E8F0] bg-white !h-10 text-sm placeholder:text-[#94A3B8] ${createPtDiscountMode === "fixed" ? "pl-7 pr-3" : "pr-8"}`}
+                                  className={`rounded-lg border-border bg-white !h-10 text-sm placeholder:text-slate-400 ${createPtDiscountMode === "fixed" ? "pl-7 pr-3" : "pr-8"}`}
                                 />
                                 {createPtDiscountMode === "percent" && (
-                                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-[#94A3B8]">%</span>
+                                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-slate-400">%</span>
                                 )}
                               </div>
                             </div>
                             <div>
                               <div className="flex items-center gap-1">
-                                <Label className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>Eligible Payment Period</Label>
+                                <Label className="text-xs sm:text-[13px] text-foreground" style={{ fontWeight: 500 }}>Eligible Payment Period</Label>
                                 <Tooltip>
-                                  <TooltipTrigger asChild><span><Info className="w-3 h-3 text-[#CBD5E1] cursor-help" /></span></TooltipTrigger>
+                                  <TooltipTrigger asChild><span><Info className="w-3 h-3 text-slate-300 cursor-help" /></span></TooltipTrigger>
                                   <TooltipContent side="bottom" sideOffset={6} className="max-w-[260px] text-[11px] leading-[1.5] z-[300]">
-                                    <p className="text-[#64748B]">If paid within this window, the discount will be applied to the invoice total.</p>
-                                    <div className="mt-2 px-2.5 py-2 rounded-lg bg-[#F8FAFC] border border-[#F1F5F9]">
-                                      <p className="text-[10px] text-[#94A3B8] tracking-wide" style={{ fontWeight: 600 }}>EXAMPLE</p>
-                                      <p className="text-[11px] text-[#334155] mt-1"><span className="text-[#0A77FF]" style={{ fontWeight: 600 }}>2/10 Net 30</span> — 2% off if paid in 10 days, otherwise full payment in 30 days.</p>
+                                    <p className="text-slate-500">If paid within this window, the discount will be applied to the invoice total.</p>
+                                    <div className="mt-2 px-2.5 py-2 rounded-lg bg-slate-50 border border-muted">
+                                      <p className="text-[10px] text-slate-400 tracking-wide" style={{ fontWeight: 600 }}>EXAMPLE</p>
+                                      <p className="text-[11px] text-slate-700 mt-1"><span className="text-primary" style={{ fontWeight: 600 }}>2/10 Net 30</span> — 2% off if paid in 10 days, otherwise full payment in 30 days.</p>
                                     </div>
                                   </TooltipContent>
                                 </Tooltip>
@@ -6073,10 +6073,10 @@ function ConfigPageContent({
                                   value={createPtCustomDiscountPeriod || createPtDiscountPeriod}
                                   onChange={(e) => { const v = e.target.value.replace(/\D/g, ""); setCreatePtCustomDiscountPeriod(v); setCreatePtDiscountPeriod(v || "10"); }}
                                   placeholder="e.g. 10"
-                                  className="!h-10 rounded-lg border-[#E2E8F0] bg-white text-sm text-[#0F172A] placeholder:text-[#94A3B8] pr-14"
+                                  className="!h-10 rounded-lg border-border bg-white text-sm text-foreground placeholder:text-slate-400 pr-14"
                                   inputMode="numeric"
                                 />
-                                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] text-[#94A3B8]" style={{ fontWeight: 500 }}>days</span>
+                                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[12px] text-slate-400" style={{ fontWeight: 500 }}>days</span>
                               </div>
                             </div>
                           </div>
@@ -6091,7 +6091,7 @@ function ConfigPageContent({
             <div className="flex items-center justify-end gap-2 px-3 sm:px-5 py-3 border-t border-[#EEF2F6] bg-white shrink-0 rounded-b-none sm:rounded-b-2xl">
               <button
                 onClick={() => { setCreatePtModalOpen(false); resetCreatePtForm(); setCreatePtFullscreen(false); }}
-                className="px-3 sm:px-5 py-2 rounded-lg border border-[#E2E8F0] text-xs sm:text-[13px] text-[#64748B] hover:text-[#0F172A] hover:border-[#CBD5E1] hover:bg-[#F8FAFC] transition-colors cursor-pointer"
+                className="px-3 sm:px-5 py-2 rounded-lg border border-border text-xs sm:text-[13px] text-slate-500 hover:text-foreground hover:border-slate-300 hover:bg-slate-50 transition-colors cursor-pointer"
                 style={{ fontWeight: 600 }}
               >
                 Cancel
@@ -6099,7 +6099,7 @@ function ConfigPageContent({
               <button
                 onClick={handleSaveNewPaymentTerm}
                 disabled={!createPtName.trim()}
-                className="inline-flex items-center px-3 sm:px-5 py-2 rounded-lg bg-[#0A77FF] text-white text-xs sm:text-[13px] hover:bg-[#0862D0] transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm cursor-pointer"
+                className="inline-flex items-center px-3 sm:px-5 py-2 rounded-lg bg-primary text-white text-xs sm:text-[13px] hover:bg-[#0862D0] transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm cursor-pointer"
                 style={{ fontWeight: 600 }}
               >
                 Save & Create
@@ -6122,14 +6122,14 @@ function ConfigPageContent({
             <div className="flex items-center justify-between border-b border-[#EEF2F6] bg-card px-6 h-12 shrink-0">
               <div className="flex items-center gap-3">
                 <div>
-                  <h3 className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Payment Terms</h3>
+                  <h3 className="text-[13px] text-foreground" style={{ fontWeight: 600 }}>Payment Terms</h3>
                   <p className="text-[11px] text-muted-foreground" style={{ fontWeight: 400 }}>Browse templates or create custom terms</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setPtFullscreen(!ptFullscreen)}
-                  className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#475569] hover:bg-[#F8FAFC] hover:border-[#CBD5E1] transition-all cursor-pointer"
+                  className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-border bg-white text-xs text-muted-foreground hover:bg-slate-50 hover:border-slate-300 transition-all cursor-pointer"
                   style={{ fontWeight: 500 }}
                 >
                   {ptFullscreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
@@ -6137,7 +6137,7 @@ function ConfigPageContent({
                 </button>
                 <button
                   onClick={() => setPaymentTermsModalOpen(false)}
-                  className="w-8 h-8 rounded-lg flex items-center justify-center text-[#94A3B8] hover:text-[#0F172A] hover:bg-[#F1F5F9] transition-all cursor-pointer"
+                  className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-foreground hover:bg-muted transition-all cursor-pointer"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -6148,26 +6148,26 @@ function ConfigPageContent({
                 <div className="shrink-0 bg-white border-b border-[#EEF2F6] px-5 pt-4 pb-3 space-y-3">
                   <div className="flex items-center gap-3">
                     <div className="relative shrink-0">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                       <Input
                         value={ptSearch}
                         onChange={(e) => setPtSearch(e.target.value)}
                         placeholder="Search payment terms..."
-                        className="pl-9 pr-8 rounded-lg border-[#D0D7E1] h-9 bg-white text-[13px] w-[220px] placeholder:text-[#94A3B8] shadow-[0_1px_2px_rgba(0,0,0,0.05)] focus:border-[#0A77FF] focus:shadow-[0_0_0_3px_rgba(10,119,255,0.08)]"
+                        className="pl-9 pr-8 rounded-lg border-[#D0D7E1] h-9 bg-white text-[13px] w-[220px] placeholder:text-slate-400 shadow-[0_1px_2px_rgba(0,0,0,0.05)] focus:border-primary focus:shadow-[0_0_0_3px_rgba(10,119,255,0.08)]"
                       />
                       {ptSearch && (
-                        <button onClick={() => setPtSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#94A3B8] hover:text-[#0F172A] transition-colors">
+                        <button onClick={() => setPtSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-foreground transition-colors">
                           <X className="w-3.5 h-3.5" />
                         </button>
                       )}
                     </div>
 
                     {/* Type toggle — inline with search */}
-                    <div className="inline-flex items-center rounded-lg bg-[#F8FAFC] border border-[#E2E8F0]/60 p-0.5 shrink-0">
+                    <div className="inline-flex items-center rounded-lg bg-slate-50 border border-border/60 p-0.5 shrink-0">
                       {([
-                        { key: "net", label: "NET", color: "#0A77FF", bg: "#EFF6FF", icon: Receipt },
-                        { key: "prepayment", label: "Pre", color: "#7C3AED", bg: "#F5F3FF", icon: Clock },
-                        { key: "split", label: "Split", color: "#D97706", bg: "#FFFBEB", icon: Copy },
+                        { key: "net", label: "NET", color: "hsl(var(--primary))", bg: "#EFF6FF", icon: Receipt },
+                        { key: "prepayment", label: "Pre", color: "hsl(var(--violet))", bg: "#F5F3FF", icon: Clock },
+                        { key: "split", label: "Split", color: "hsl(var(--warning))", bg: "#FFFBEB", icon: Copy },
                       ] as const).map((cat) => {
                         const active = ptTypeFilters === cat.key;
                         const count = PAYMENT_TERM_PRESETS.filter((t) => t.category === cat.key).length;
@@ -6184,7 +6184,7 @@ function ConfigPageContent({
                             {cat.label}
                             <span
                               className="text-[10px] rounded-full px-1.5 py-px min-w-[18px] text-center"
-                              style={{ fontWeight: 600, color: active ? cat.color : "#475569", backgroundColor: active ? `${cat.color}15` : "#E2E8F0" }}
+                              style={{ fontWeight: 600, color: active ? cat.color: "hsl(var(--muted-foreground))", backgroundColor: active ? `${cat.color}15` : "hsl(var(--border))" }}
                             >
                               {count}
                             </span>
@@ -6195,12 +6195,12 @@ function ConfigPageContent({
 
                     <div className="flex-1" />
                     <div className="flex items-center gap-2 shrink-0">
-                      <span className="inline-flex items-center justify-center min-w-[22px] h-[20px] px-1.5 rounded-md bg-primary/[0.04] text-[11px] text-[#64748B]" style={{ fontWeight: 600 }}>
+                      <span className="inline-flex items-center justify-center min-w-[22px] h-[20px] px-1.5 rounded-md bg-primary/[0.04] text-[11px] text-slate-500" style={{ fontWeight: 600 }}>
                         {filteredPaymentTermPresets.length}
                       </span>
                     <Popover open={ptSortOpen} onOpenChange={setPtSortOpen}>
                       <PopoverTrigger asChild>
-                        <button className={`inline-flex items-center gap-1 text-[12px] transition-colors px-2 py-1 rounded-md border ${ptSortOpen ? "text-[#0A77FF] bg-[#EFF6FF] border-[#DBEAFE]" : "text-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC] border-transparent hover:border-[#E2E8F0]"}`} style={{ fontWeight: 500 }}>
+                        <button className={`inline-flex items-center gap-1 text-[12px] transition-colors px-2 py-1 rounded-md border ${ptSortOpen ? "text-primary bg-blue-50 border-blue-100" : "text-slate-500 hover:text-foreground hover:bg-slate-50 border-transparent hover:border-border"}`} style={{ fontWeight: 500 }}>
                           <ArrowUpDown className="w-3 h-3" />
                           {ptSortBy === "name" ? "Name" : ptSortBy === "vendorsApplied" ? "In Use" : ptSortBy === "duration" ? "Duration" : "Type"}
                           {ptSortDir === "asc" ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />}
@@ -6229,17 +6229,17 @@ function ConfigPageContent({
                                 }}
                                 className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[12px] transition-all ${
                                   isActive
-                                    ? "bg-[#EFF6FF] text-[#0A77FF]"
-                                    : "text-[#475569] hover:bg-[#F8FAFC] hover:text-[#0F172A]"
+                                    ? "bg-blue-50 text-primary"
+                                    : "text-muted-foreground hover:bg-slate-50 hover:text-foreground"
                                 }`}
                                 style={{ fontWeight: isActive ? 600 : 500 }}
                               >
-                                <span className={isActive ? "text-[#0A77FF]" : "text-[#94A3B8]"}>{opt.icon}</span>
+                                <span className={isActive ? "text-primary" : "text-slate-400"}>{opt.icon}</span>
                                 <span className="flex-1 text-left">{opt.label}</span>
                                 {isActive && (
                                   ptSortDir === "asc"
-                                    ? <ArrowUp className="w-3 h-3 text-[#0A77FF]" />
-                                    : <ArrowDown className="w-3 h-3 text-[#0A77FF]" />
+                                    ? <ArrowUp className="w-3 h-3 text-primary" />
+                                    : <ArrowDown className="w-3 h-3 text-primary" />
                                 )}
                               </button>
                             );
@@ -6283,11 +6283,11 @@ function ConfigPageContent({
                 <div className="flex-1 min-h-0 overflow-y-auto p-5">
                   {filteredPaymentTermPresets.length === 0 ? (
                     <div className="py-20 text-center">
-                      <div className="w-12 h-12 rounded-lg bg-[#F1F5F9] border border-[#E8ECF1] flex items-center justify-center mx-auto mb-3">
-                        <Search className="w-5 h-5 text-[#94A3B8]" />
+                      <div className="w-12 h-12 rounded-lg bg-muted border border-[#E8ECF1] flex items-center justify-center mx-auto mb-3">
+                        <Search className="w-5 h-5 text-slate-400" />
                       </div>
-                      <p className="text-[13px] text-[#475569]" style={{ fontWeight: 600 }}>No payment terms found</p>
-                      <p className="text-[12px] text-[#94A3B8] mt-1">Try adjusting your search or filter</p>
+                      <p className="text-[13px] text-muted-foreground" style={{ fontWeight: 600 }}>No payment terms found</p>
+                      <p className="text-[12px] text-slate-400 mt-1">Try adjusting your search or filter</p>
                     </div>
                   ) : (
                     <div className="@container/ptgrid">
@@ -6352,48 +6352,48 @@ function ConfigPageContent({
 
   if (sectionId === "pricing_rules") {
     const PR_MOCK_ITEMS = [
-      { partNo: "100219-42", desc: "Front bulkhead ca...", category: "Ram Pro Master 2500...", type: "Parts", typeBg: "#DBEAFE", typeColor: "#0A77FF", location: "Toyota Loca..." },
-      { partNo: "100219-51", desc: "Box walls inlay ca...", category: "Hardware", type: "Parts", typeBg: "#DBEAFE", typeColor: "#0A77FF", location: "Toyota Tech..." },
-      { partNo: "100219-51-01", desc: "Box walls inlay ca...", category: "Cabinet", type: "Equipment • Capital", typeBg: "#DBEAFE", typeColor: "#0A77FF", location: "Roseville To..." },
-      { partNo: "100219-51-01RC", desc: "Box walls inlay ca...", category: "Electronics", type: "Equipment • Non-Capital", typeBg: "#FEF3C7", typeColor: "#D97706", location: "Right Toyota..." },
-      { partNo: "100219-51-02", desc: "Box walls inlay ca...", category: "Hardware", type: "Parts", typeBg: "#DBEAFE", typeColor: "#0A77FF", location: "Maplewood..." },
-      { partNo: "100219-52", desc: "Box closeout top...", category: "Electronics", type: "Equipment • Non-Capital", typeBg: "#FEF3C7", typeColor: "#D97706", location: "Peterson To..." },
-      { partNo: "100219-52-02", desc: "Box closeout top...", category: "Cabinet", type: "Parts", typeBg: "#DBEAFE", typeColor: "#0A77FF", location: "Toyota of N..." },
-      { partNo: "02901201000", desc: "Foam padding RF1...", category: "Hardware", type: "Parts", typeBg: "#DBEAFE", typeColor: "#0A77FF", location: "Toyota of C..." },
-      { partNo: "100120-79", desc: "Toyota long cut, b...", category: "Electronics", type: "Equipment • Non-Capital", typeBg: "#FEF3C7", typeColor: "#D97706", location: "Toyota 101 (...)" },
+      { partNo: "100219-42", desc: "Front bulkhead ca...", category: "Ram Pro Master 2500...", type: "Parts", typeBg: "#DBEAFE", typeColor: "hsl(var(--primary))", location: "Toyota Loca..." },
+      { partNo: "100219-51", desc: "Box walls inlay ca...", category: "Hardware", type: "Parts", typeBg: "#DBEAFE", typeColor: "hsl(var(--primary))", location: "Toyota Tech..." },
+      { partNo: "100219-51-01", desc: "Box walls inlay ca...", category: "Cabinet", type: "Equipment • Capital", typeBg: "#DBEAFE", typeColor: "hsl(var(--primary))", location: "Roseville To..." },
+      { partNo: "100219-51-01RC", desc: "Box walls inlay ca...", category: "Electronics", type: "Equipment • Non-Capital", typeBg: "#FEF3C7", typeColor: "hsl(var(--warning))", location: "Right Toyota..." },
+      { partNo: "100219-51-02", desc: "Box walls inlay ca...", category: "Hardware", type: "Parts", typeBg: "#DBEAFE", typeColor: "hsl(var(--primary))", location: "Maplewood..." },
+      { partNo: "100219-52", desc: "Box closeout top...", category: "Electronics", type: "Equipment • Non-Capital", typeBg: "#FEF3C7", typeColor: "hsl(var(--warning))", location: "Peterson To..." },
+      { partNo: "100219-52-02", desc: "Box closeout top...", category: "Cabinet", type: "Parts", typeBg: "#DBEAFE", typeColor: "hsl(var(--primary))", location: "Toyota of N..." },
+      { partNo: "02901201000", desc: "Foam padding RF1...", category: "Hardware", type: "Parts", typeBg: "#DBEAFE", typeColor: "hsl(var(--primary))", location: "Toyota of C..." },
+      { partNo: "100120-79", desc: "Toyota long cut, b...", category: "Electronics", type: "Equipment • Non-Capital", typeBg: "#FEF3C7", typeColor: "hsl(var(--warning))", location: "Toyota 101 (...)" },
     ];
 
     return (
       <div className="space-y-3">
         {/* Section header */}
         <div className="mb-1">
-          <h4 className="text-sm text-[#0F172A]" style={{ fontWeight: 700 }}>Vendor Pricing Rules</h4>
-          <p className="text-xs text-[#64748B] mt-0.5 leading-relaxed">
+          <h4 className="text-sm text-foreground" style={{ fontWeight: 700 }}>Vendor Pricing Rules</h4>
+          <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">
             Attach a pricing rule to this vendor to automatically apply tier-based discounts or premiums on purchase and sales orders.{" "}
-            <span className="text-[#0A77FF] inline-flex items-center gap-0.5 cursor-pointer hover:underline" style={{ fontWeight: 500 }}>
+            <span className="text-primary inline-flex items-center gap-0.5 cursor-pointer hover:underline" style={{ fontWeight: 500 }}>
               Learn More <ExternalLink className="w-3 h-3" />
             </span>
           </p>
         </div>
 
         {/* CTA card — always on top */}
-        <div className={`rounded-lg border-2 border-dashed border-[#E2E8F0] bg-white ${selectedPricingRules.length > 0 ? "py-4" : "py-6"} flex flex-col items-center justify-center gap-3`}>
+        <div className={`rounded-lg border-2 border-dashed border-border bg-white ${selectedPricingRules.length > 0 ? "py-4" : "py-6"} flex flex-col items-center justify-center gap-3`}>
           {selectedPricingRules.length === 0 && (
-            <div className="w-10 h-10 rounded-lg bg-[#F8FAFC] border border-[#E8ECF1] flex items-center justify-center">
-              <FileText className="w-5 h-5 text-[#94A3B8]" />
+            <div className="w-10 h-10 rounded-lg bg-slate-50 border border-[#E8ECF1] flex items-center justify-center">
+              <FileText className="w-5 h-5 text-slate-400" />
             </div>
           )}
           <div className="flex items-center gap-2">
             <button
               onClick={() => { resetCreatePrForm(); setCreatePrModalOpen(true); }}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#0F172A] hover:bg-[#F8FAFC] transition-colors"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-border bg-white text-xs text-foreground hover:bg-slate-50 transition-colors"
               style={{ fontWeight: 500 }}
             >
               <Plus className="w-3.5 h-3.5" /> Create rule
             </button>
             <button
               onClick={() => { setPrTypeFilters("discount"); setPrStatusFilter("all"); setPrSearch(""); setPreviewPricingRuleId(null); setPrPreviewTab("preview"); setPricingRulesModalOpen(true); }}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-[#DBEAFE] bg-[#EFF6FF] text-xs text-[#0A77FF] hover:bg-[#DBEAFE] transition-colors"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg border border-blue-100 bg-blue-50 text-xs text-primary hover:bg-blue-100 transition-colors"
               style={{ fontWeight: 500 }}
             >
               <FileText className="w-3.5 h-3.5" /> Templates
@@ -6415,13 +6415,13 @@ function ConfigPageContent({
                 <div
                   key={rule.id}
                   onClick={() => handleOpenRuleDetails(rule)}
-                  className="bg-white border border-[#E2E8F0] rounded-xl cursor-pointer group transition-all duration-200 flex flex-col relative"
+                  className="bg-white border border-border rounded-xl cursor-pointer group transition-all duration-200 flex flex-col relative"
                   onMouseEnter={(e) => {
                     e.currentTarget.style.borderColor = "#BFDBFE";
                     e.currentTarget.style.boxShadow = "0 4px 16px -4px rgba(10,119,255,0.10), 0 0 0 1px #BFDBFE";
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = "#E2E8F0";
+                    e.currentTarget.style.borderColor = "hsl(var(--border))";
                     e.currentTarget.style.boxShadow = "none";
                   }}
                 >
@@ -6444,37 +6444,37 @@ function ConfigPageContent({
                           {isDis ? <TrendingDown className="w-3 h-3" /> : <TrendingUp className="w-3 h-3" />}
                           {isDis ? "Discount" : "Premium"}
                         </span>
-                        <span className="inline-flex items-center px-2 py-[2px] text-[10px] bg-white text-[#64748B] border-l" style={{ fontWeight: 500, borderColor: pill.border }}>
+                        <span className="inline-flex items-center px-2 py-[2px] text-[10px] bg-white text-slate-500 border-l" style={{ fontWeight: 500, borderColor: pill.border }}>
                           {rule.basis === "volume" ? "Volume" : "Value"}
                         </span>
                       </span>
                       <div className="flex items-center gap-1.5 shrink-0">
                         {isPreset ? (
-                          <span className="inline-flex items-center gap-1 px-1.5 py-[3px] rounded-md bg-[#F1F5F9] border border-[#CBD5E1] text-[9px] text-[#64748B]" style={{ fontWeight: 600 }}>
+                          <span className="inline-flex items-center gap-1 px-1.5 py-[3px] rounded-md bg-muted border border-slate-300 text-[9px] text-slate-500" style={{ fontWeight: 600 }}>
                             <Lock className="w-2.5 h-2.5" /> TEMPLATE
                           </span>
                         ) : (
-                          <span className="inline-flex items-center px-1.5 py-[3px] rounded-md border border-[#CBD5E1] bg-white text-[9px] text-[#475569]" style={{ fontWeight: 600 }}>CUSTOM</span>
+                          <span className="inline-flex items-center px-1.5 py-[3px] rounded-md border border-slate-300 bg-white text-[9px] text-muted-foreground" style={{ fontWeight: 600 }}>CUSTOM</span>
                         )}
                       </div>
                     </div>
 
                     {/* Row 2: Name */}
                     <div className="shrink-0 mb-1">
-                      <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{rule.name}</p>
+                      <p className="text-[13px] text-foreground truncate" style={{ fontWeight: 600 }}>{rule.name}</p>
                     </div>
 
                     {/* Row 3: Description */}
                     <div className="h-[32px] shrink-0 mb-2">
-                      <p className="text-[11px] text-[#64748B] line-clamp-2 leading-relaxed" style={{ fontWeight: 400 }}>{rule.description}</p>
+                      <p className="text-[11px] text-slate-500 line-clamp-2 leading-relaxed" style={{ fontWeight: 400 }}>{rule.description}</p>
                     </div>
 
                     {/* Row 4: Hero value */}
                     <div className="flex items-baseline gap-2 shrink-0">
-                      <span className="text-[22px] text-[#0F172A] tabular-nums leading-none tracking-tight" style={{ fontWeight: 600 }}>
+                      <span className="text-[22px] text-foreground tabular-nums leading-none tracking-tight" style={{ fontWeight: 600 }}>
                         {rule.tiers[0]?.discount ?? "—"}
                       </span>
-                      <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>
+                      <span className="text-[11px] text-slate-400" style={{ fontWeight: 500 }}>
                         {isDis ? "off" : "markup"}
                       </span>
                     </div>
@@ -6482,24 +6482,24 @@ function ConfigPageContent({
                     {/* Row 5: Tier detail */}
                     <div className="mt-auto pt-2 shrink-0">
                       <div className="flex items-center justify-between px-3 py-[6px] rounded-lg border border-[#E8ECF1] bg-[#FAFBFC] text-[11px] tabular-nums min-w-0">
-                        <div className="flex items-center gap-1.5 text-[#64748B] min-w-0">
+                        <div className="flex items-center gap-1.5 text-slate-500 min-w-0">
                           <span style={{ fontWeight: 400 }}>{rule.tiers[0]?.minValue || "-"}</span>
-                          <span className="text-[#CBD5E1]">–</span>
+                          <span className="text-slate-300">–</span>
                           <span style={{ fontWeight: 400 }}>{rule.tiers[0]?.maxValue || "-"}</span>
                         </div>
-                        <span className="shrink-0 ml-2 text-[#0F172A]" style={{ fontWeight: 600 }}>{rule.tiers[0]?.discount || "-"}</span>
+                        <span className="shrink-0 ml-2 text-foreground" style={{ fontWeight: 600 }}>{rule.tiers[0]?.discount || "-"}</span>
                       </div>
                     </div>
                   </div>
 
                   {/* Footer */}
-                  <div className="flex items-center gap-2 px-3.5 py-2.5 border-t border-[#F1F5F9] shrink-0">
-                    <span className="inline-flex items-center gap-1 text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>
+                  <div className="flex items-center gap-2 px-3.5 py-2.5 border-t border-muted shrink-0">
+                    <span className="inline-flex items-center gap-1 text-[10px] text-slate-400" style={{ fontWeight: 500 }}>
                       <Users className="w-3 h-3" /> {rule.vendorsApplied}
                     </span>
                     <span
                       className="ml-auto px-2 py-[2px] rounded-full text-[10px] border"
-                      style={{ fontWeight: 500, color: "#059669", backgroundColor: "#F0FDF4", borderColor: "#BBF7D0" }}
+                      style={{ fontWeight: 500, color: "hsl(var(--success))", backgroundColor: "#F0FDF4", borderColor: "#BBF7D0" }}
                     >
                       Active
                     </span>
@@ -6528,20 +6528,20 @@ function ConfigPageContent({
             <div className="flex items-center justify-between px-6 h-12 border-b border-[#EEF2F6] bg-card shrink-0">
               <div className="flex items-center gap-3">
                 <div>
-                  <h3 className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Pricing Rule Presets</h3>
+                  <h3 className="text-[13px] text-foreground" style={{ fontWeight: 600 }}>Pricing Rule Presets</h3>
                   <p className="text-[11px] text-muted-foreground" style={{ fontWeight: 400 }}>Browse and apply pricing rules to this vendor</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setPrFullscreen(!prFullscreen)}
-                  className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#475569] hover:bg-[#F8FAFC] hover:border-[#CBD5E1] transition-all"
+                  className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-border bg-white text-xs text-muted-foreground hover:bg-slate-50 hover:border-slate-300 transition-all"
                   style={{ fontWeight: 500 }}
                 >
                   {prFullscreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
                   {prFullscreen ? "Exit full" : "Full view"}
                 </button>
-                <button onClick={() => setPricingRulesModalOpen(false)} className="w-8 h-8 rounded-lg flex items-center justify-center text-[#94A3B8] hover:text-[#0F172A] hover:bg-[#F1F5F9] transition-all">
+                <button onClick={() => setPricingRulesModalOpen(false)} className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-foreground hover:bg-muted transition-all">
                   <X className="w-4 h-4" />
                 </button>
               </div>
@@ -6556,25 +6556,25 @@ function ConfigPageContent({
                   {/* Search + type toggle + sort row */}
                   <div className="flex items-center gap-3">
                     <div className="relative shrink-0">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                       <Input
                         value={prSearch}
                         onChange={(e) => setPrSearch(e.target.value)}
                         placeholder="Search pricing rules..."
-                        className="pl-9 pr-8 rounded-lg border-[#D0D7E1] h-9 bg-white text-[13px] w-[220px] placeholder:text-[#94A3B8] shadow-[0_1px_2px_rgba(0,0,0,0.05)] focus:border-[#0A77FF] focus:shadow-[0_0_0_3px_rgba(10,119,255,0.08)]"
+                        className="pl-9 pr-8 rounded-lg border-[#D0D7E1] h-9 bg-white text-[13px] w-[220px] placeholder:text-slate-400 shadow-[0_1px_2px_rgba(0,0,0,0.05)] focus:border-primary focus:shadow-[0_0_0_3px_rgba(10,119,255,0.08)]"
                       />
                       {prSearch && (
-                        <button onClick={() => setPrSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#94A3B8] hover:text-[#0F172A] transition-colors">
+                        <button onClick={() => setPrSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-foreground transition-colors">
                           <X className="w-3.5 h-3.5" />
                         </button>
                       )}
                     </div>
 
                     {/* Type toggle — inline with search */}
-                    <div className="inline-flex items-center rounded-lg bg-[#F8FAFC] border border-[#E2E8F0]/60 p-0.5 shrink-0">
+                    <div className="inline-flex items-center rounded-lg bg-slate-50 border border-border/60 p-0.5 shrink-0">
                       {([
                         { key: "discount", label: "Discounts", color: "#047857", bg: "#ECFDF5", icon: TrendingDown },
-                        { key: "premium", label: "Premiums", color: "#7C3AED", bg: "#F5F3FF", icon: TrendingUp },
+                        { key: "premium", label: "Premiums", color: "hsl(var(--violet))", bg: "#F5F3FF", icon: TrendingUp },
                       ] as const).map((cat) => {
                         const active = prTypeFilters === cat.key;
                         const count = allPricingRulePresets.filter((r) => r.category === cat.key).length;
@@ -6591,7 +6591,7 @@ function ConfigPageContent({
                             {cat.label}
                             <span
                               className="text-[10px] rounded-full px-1.5 py-px min-w-[18px] text-center"
-                              style={{ fontWeight: 600, color: active ? cat.color : "#475569", backgroundColor: active ? `${cat.color}15` : "#E2E8F0" }}
+                              style={{ fontWeight: 600, color: active ? cat.color: "hsl(var(--muted-foreground))", backgroundColor: active ? `${cat.color}15` : "hsl(var(--border))" }}
                             >
                               {count}
                             </span>
@@ -6602,12 +6602,12 @@ function ConfigPageContent({
 
                     <div className="flex-1" />
                     <div className="flex items-center gap-2 shrink-0">
-                      <span className="inline-flex items-center justify-center min-w-[22px] h-[20px] px-1.5 rounded-md bg-primary/[0.04] text-[11px] text-[#64748B]" style={{ fontWeight: 600 }}>
+                      <span className="inline-flex items-center justify-center min-w-[22px] h-[20px] px-1.5 rounded-md bg-primary/[0.04] text-[11px] text-slate-500" style={{ fontWeight: 600 }}>
                         {filteredPricingRulePresets.length}
                       </span>
                     <Popover open={prSortOpen} onOpenChange={setPrSortOpen}>
                       <PopoverTrigger asChild>
-                        <button className={`inline-flex items-center gap-1 text-[12px] transition-colors px-2 py-1 rounded-md border ${prSortOpen ? "text-[#0A77FF] bg-[#EFF6FF] border-[#DBEAFE]" : "text-[#64748B] hover:text-[#0F172A] hover:bg-[#F8FAFC] border-transparent hover:border-[#E2E8F0]"}`} style={{ fontWeight: 500 }}>
+                        <button className={`inline-flex items-center gap-1 text-[12px] transition-colors px-2 py-1 rounded-md border ${prSortOpen ? "text-primary bg-blue-50 border-blue-100" : "text-slate-500 hover:text-foreground hover:bg-slate-50 border-transparent hover:border-border"}`} style={{ fontWeight: 500 }}>
                           <ArrowUpDown className="w-3 h-3" />
                           {prSortBy === "name" ? "Name" : prSortBy === "vendorsApplied" ? "In Use" : prSortBy === "category" ? "Type" : "Basis"}
                           {prSortDir === "asc" ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />}
@@ -6636,17 +6636,17 @@ function ConfigPageContent({
                                 }}
                                 className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[12px] transition-all ${
                                   isActive
-                                    ? "bg-[#EFF6FF] text-[#0A77FF]"
-                                    : "text-[#475569] hover:bg-[#F8FAFC] hover:text-[#0F172A]"
+                                    ? "bg-blue-50 text-primary"
+                                    : "text-muted-foreground hover:bg-slate-50 hover:text-foreground"
                                 }`}
                                 style={{ fontWeight: isActive ? 600 : 500 }}
                               >
-                                <span className={isActive ? "text-[#0A77FF]" : "text-[#94A3B8]"}>{opt.icon}</span>
+                                <span className={isActive ? "text-primary" : "text-slate-400"}>{opt.icon}</span>
                                 <span className="flex-1 text-left">{opt.label}</span>
                                 {isActive && (
                                   prSortDir === "asc"
-                                    ? <ArrowUp className="w-3 h-3 text-[#0A77FF]" />
-                                    : <ArrowDown className="w-3 h-3 text-[#0A77FF]" />
+                                    ? <ArrowUp className="w-3 h-3 text-primary" />
+                                    : <ArrowDown className="w-3 h-3 text-primary" />
                                 )}
                               </button>
                             );
@@ -6691,11 +6691,11 @@ function ConfigPageContent({
                 <div className="flex-1 min-h-0 overflow-y-auto p-5">
                   {filteredPricingRulePresets.length === 0 ? (
                     <div className="py-20 text-center">
-                      <div className="w-12 h-12 rounded-lg bg-[#F1F5F9] border border-[#E8ECF1] flex items-center justify-center mx-auto mb-3">
-                        <Search className="w-5 h-5 text-[#94A3B8]" />
+                      <div className="w-12 h-12 rounded-lg bg-muted border border-[#E8ECF1] flex items-center justify-center mx-auto mb-3">
+                        <Search className="w-5 h-5 text-slate-400" />
                       </div>
-                      <p className="text-[13px] text-[#475569]" style={{ fontWeight: 600 }}>No pricing rules found</p>
-                      <p className="text-[12px] text-[#94A3B8] mt-1">Try adjusting your search or filter</p>
+                      <p className="text-[13px] text-muted-foreground" style={{ fontWeight: 600 }}>No pricing rules found</p>
+                      <p className="text-[12px] text-slate-400 mt-1">Try adjusting your search or filter</p>
                     </div>
                   ) : (
                     <div className="@container/prgrid">
@@ -6746,30 +6746,30 @@ function ConfigPageContent({
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <div className="flex items-center gap-2.5">
-                    <h2 className="text-[15px] sm:text-[17px] text-[#0F172A]" style={{ fontWeight: 700 }}>
+                    <h2 className="text-[15px] sm:text-[17px] text-foreground" style={{ fontWeight: 700 }}>
                       {createPrMode === "view" ? (createPrName || "Pricing Rule Details") : "Create New Pricing Rule"}
                     </h2>
                     {createPrMode === "view" ? (
                       <>
                         <span className={`hidden sm:inline-flex items-center px-2 py-0.5 rounded-md text-[10px] uppercase tracking-wide ${
-                          createPrCategory === "discount" ? "bg-[#F0FDF4] text-[#16A34A]" : "bg-[#F5F3FF] text-[#7C3AED]"
+                          createPrCategory === "discount" ? "bg-green-50 text-green-600" : "bg-violet-50 text-violet"
                         }`} style={{ fontWeight: 600 }}>
                           {createPrCategory === "discount" ? "Discount" : "Premium"}
                         </span>
-                        <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-md bg-[#F1F5F9] text-[10px] text-[#64748B]" style={{ fontWeight: 500 }}>
+                        <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-md bg-muted text-[10px] text-slate-500" style={{ fontWeight: 500 }}>
                           {createPrBasis === "volume" ? "Volume" : "Value"}
                         </span>
                         {editingPrRuleId && !editingPrRuleId.startsWith("pr-custom-") && (
-                          <span className="hidden sm:inline-flex items-center gap-1 px-1.5 py-[3px] rounded-md bg-[#F1F5F9] border border-[#CBD5E1] text-[9px] text-[#64748B]" style={{ fontWeight: 600 }}>
+                          <span className="hidden sm:inline-flex items-center gap-1 px-1.5 py-[3px] rounded-md bg-muted border border-slate-300 text-[9px] text-slate-500" style={{ fontWeight: 600 }}>
                             <Lock className="w-2.5 h-2.5" /> TEMPLATE
                           </span>
                         )}
                       </>
                     ) : (
-                      <span className="hidden sm:inline-flex items-center px-1.5 py-[3px] rounded-md border border-[#CBD5E1] bg-white text-[9px] text-[#475569]" style={{ fontWeight: 600 }}>CUSTOM</span>
+                      <span className="hidden sm:inline-flex items-center px-1.5 py-[3px] rounded-md border border-slate-300 bg-white text-[9px] text-muted-foreground" style={{ fontWeight: 600 }}>CUSTOM</span>
                     )}
                   </div>
-                  <p className="text-[11px] sm:text-xs text-[#64748B] mt-0.5" style={{ fontWeight: 400 }}>
+                  <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5" style={{ fontWeight: 400 }}>
                     {createPrMode === "view"
                       ? (createPrDescription || "View and manage this pricing rule's configuration.")
                       : "Configure the type, tiers, and assign items for the new rule."
@@ -6779,7 +6779,7 @@ function ConfigPageContent({
                 <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
                   <button
                     onClick={() => setCreatePrFullscreen(!createPrFullscreen)}
-                    className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#475569] hover:bg-[#F8FAFC] hover:border-[#CBD5E1] transition-all cursor-pointer"
+                    className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-border bg-white text-xs text-muted-foreground hover:bg-slate-50 hover:border-slate-300 transition-all cursor-pointer"
                     style={{ fontWeight: 500 }}
                   >
                     {createPrFullscreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
@@ -6787,7 +6787,7 @@ function ConfigPageContent({
                   </button>
                   <button
                     onClick={() => { setCreatePrModalOpen(false); resetCreatePrForm(); }}
-                    className="w-8 h-8 rounded-lg flex items-center justify-center text-[#94A3B8] hover:text-[#64748B] hover:bg-[#F1F5F9] transition-all cursor-pointer"
+                    className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-500 hover:bg-muted transition-all cursor-pointer"
                   >
                     <X className="w-4.5 h-4.5" />
                   </button>
@@ -6814,10 +6814,10 @@ function ConfigPageContent({
                     <div
                       className={`w-[22px] h-[22px] sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-[11px] sm:text-[12px] shrink-0 transition-all duration-200 ${
                         tab.completed
-                          ? "bg-[#10B981] text-white"
+                          ? "bg-emerald-500 text-white"
                           : tab.active
-                          ? "bg-[#0A77FF] text-white"
-                          : "border-[1.5px] border-[#CBD5E1] text-[#64748B] bg-white"
+                          ? "bg-primary text-white"
+                          : "border-[1.5px] border-slate-300 text-slate-500 bg-white"
                       }`}
                       style={{ fontWeight: 600 }}
                     >
@@ -6826,10 +6826,10 @@ function ConfigPageContent({
                     <span
                       className={`text-[12px] sm:text-[13px] whitespace-nowrap transition-colors ${
                         tab.active
-                          ? "text-[#0A77FF]"
+                          ? "text-primary"
                           : tab.completed
-                          ? "text-[#10B981]"
-                          : "text-[#334155]"
+                          ? "text-emerald-500"
+                          : "text-slate-700"
                       }`}
                       style={{ fontWeight: tab.active || tab.completed ? 600 : 500 }}
                     >
@@ -6837,7 +6837,7 @@ function ConfigPageContent({
                       <span className="sm:hidden">{tab.shortLabel}</span>
                     </span>
                     {(tab.active || tab.completed) && (
-                      <div className={`absolute bottom-0 left-0 right-0 h-[2px] rounded-t-full ${tab.completed ? "bg-[#10B981]" : "bg-[#0A77FF]"}`} />
+                      <div className={`absolute bottom-0 left-0 right-0 h-[2px] rounded-t-full ${tab.completed ? "bg-emerald-500" : "bg-primary"}`} />
                     )}
                   </div>
                 ))}
@@ -6853,10 +6853,10 @@ function ConfigPageContent({
                 <div className="space-y-5">
                   {/* Preset read-only banner */}
                   {isPresetReadOnly && (
-                    <div className="rounded-xl border border-[#FEF3C7] bg-[#FFFBEB] p-3 flex items-start gap-2.5">
-                      <Lock className="w-4 h-4 text-[#D97706] shrink-0 mt-0.5" />
+                    <div className="rounded-xl border border-[#FEF3C7] bg-amber-50 p-3 flex items-start gap-2.5">
+                      <Lock className="w-4 h-4 text-warning shrink-0 mt-0.5" />
                       <div>
-                        <p className="text-[12px] text-[#92400E]" style={{ fontWeight: 600 }}>Preset Rule — Configuration Locked</p>
+                        <p className="text-[12px] text-amber-800" style={{ fontWeight: 600 }}>Preset Rule — Configuration Locked</p>
                         <p className="text-[11px] text-[#B45309] mt-0.5">This is a tenant-provided preset rule. You can view its configuration and add items, categories, and attachments, but you cannot modify the rule type, tiers, or names.</p>
                       </div>
                     </div>
@@ -6864,11 +6864,11 @@ function ConfigPageContent({
                   {/* Pricing Rule Type — gradient cards */}
                   <div className={isPresetReadOnly ? "opacity-60 pointer-events-none" : ""}>
                     <div className="flex items-center gap-1.5 mb-3">
-                      <span className="text-sm text-[#0F172A]" style={{ fontWeight: 600 }}>Pricing Rule Type</span>
+                      <span className="text-sm text-foreground" style={{ fontWeight: 600 }}>Pricing Rule Type</span>
                       <Tooltip>
-                        <TooltipTrigger asChild><span><Info className="w-3.5 h-3.5 text-[#CBD5E1] cursor-help" /></span></TooltipTrigger>
+                        <TooltipTrigger asChild><span><Info className="w-3.5 h-3.5 text-slate-300 cursor-help" /></span></TooltipTrigger>
                         <TooltipContent side="bottom" sideOffset={6} className="max-w-[260px] text-[11px] leading-[1.5] z-[300]">
-                          <p className="text-[#64748B]">Discount lowers prices, Premium adds markup. Hover each card for details.</p>
+                          <p className="text-slate-500">Discount lowers prices, Premium adds markup. Hover each card for details.</p>
                         </TooltipContent>
                       </Tooltip>
                     </div>
@@ -6881,33 +6881,33 @@ function ConfigPageContent({
                             className={`group relative rounded-xl overflow-hidden border transition-all duration-200 cursor-pointer ${
                               createPrCategory === "discount"
                                 ? "border-[#86EFAC]/70 bg-white shadow-[0_1px_4px_rgba(4,120,87,0.06)]"
-                                : "border-[#E2E8F0] bg-white hover:border-[#BBF7D0] hover:shadow-[0_4px_16px_-4px_rgba(4,120,87,0.10)]"
+                                : "border-border bg-white hover:border-[#BBF7D0] hover:shadow-[0_4px_16px_-4px_rgba(4,120,87,0.10)]"
                             }`}
                           >
                             <div className={`absolute inset-0 transition-all duration-300 pointer-events-none ${
-                              createPrCategory === "discount" ? "bg-gradient-to-br from-[#F0FDF4]/50 to-transparent" : "bg-gradient-to-br from-[#F0FDF4]/0 to-[#F0FDF4]/0 group-hover:from-[#F0FDF4]/60 group-hover:to-transparent"
+                              createPrCategory === "discount" ? "bg-gradient-to-br from-green-50/50 to-transparent" : "bg-gradient-to-br from-green-50/0 to-green-50/0 group-hover:from-green-50/60 group-hover:to-transparent"
                             }`} />
                             <div className="relative flex items-center gap-3 pl-3.5 pr-3 py-3">
                               <div className={`w-9 h-9 rounded-[10px] flex items-center justify-center shrink-0 transition-all duration-200 ${
-                                createPrCategory === "discount" ? "bg-gradient-to-br from-[#DCFCE7] to-[#BBF7D0] text-[#15803D]" : "bg-gradient-to-br from-[#F0FDF4] to-[#DCFCE7] text-[#16A34A] group-hover:scale-105"
+                                createPrCategory === "discount" ? "bg-gradient-to-br from-[#DCFCE7] to-[#BBF7D0] text-[#15803D]" : "bg-gradient-to-br from-green-50 to-[#DCFCE7] text-green-600 group-hover:scale-105"
                               }`}>
                                 <TrendingDown className="w-[18px] h-[18px]" />
                               </div>
                               <div className="flex-1 min-w-0">
-                                <p className={`text-[13px] transition-colors duration-150 ${createPrCategory === "discount" ? "text-[#166534]" : "text-[#0F172A] group-hover:text-[#1E293B]"}`} style={{ fontWeight: 600 }}>Discount</p>
-                                <p className={`text-[11px] mt-0.5 truncate transition-colors duration-150 ${createPrCategory === "discount" ? "text-[#22C55E]" : "text-[#94A3B8]"}`}>Lower price adjustment</p>
+                                <p className={`text-[13px] transition-colors duration-150 ${createPrCategory === "discount" ? "text-[#166534]" : "text-foreground group-hover:text-slate-800"}`} style={{ fontWeight: 600 }}>Discount</p>
+                                <p className={`text-[11px] mt-0.5 truncate transition-colors duration-150 ${createPrCategory === "discount" ? "text-[#22C55E]" : "text-slate-400"}`}>Lower price adjustment</p>
                               </div>
-                              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-200 shrink-0 ${createPrCategory === "discount" ? "border-[#16A34A] bg-[#16A34A]" : "border-[#CBD5E1] group-hover:border-[#86EFAC]"}`}>
+                              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-200 shrink-0 ${createPrCategory === "discount" ? "border-green-600 bg-green-600" : "border-slate-300 group-hover:border-[#86EFAC]"}`}>
                                 {createPrCategory === "discount" && <Check className="w-3 h-3 text-white" />}
                               </div>
                             </div>
                           </div>
                         </TooltipTrigger>
                         <TooltipContent side="bottom" sideOffset={8} className="max-w-[260px] text-[11px] leading-[1.5] z-[300]">
-                          <p className="text-[#64748B]">Reduce unit price when quantity or value thresholds are met.</p>
-                          <div className="mt-2 px-2.5 py-2 rounded-lg bg-[#F8FAFC] border border-[#F1F5F9]">
-                            <p className="text-[10px] text-[#94A3B8] tracking-wide" style={{ fontWeight: 600 }}>EXAMPLE</p>
-                            <p className="text-[11px] text-[#334155] mt-1"><span className="text-[#16A34A]" style={{ fontWeight: 600 }}>10% off</span> — orders over 500 units.</p>
+                          <p className="text-slate-500">Reduce unit price when quantity or value thresholds are met.</p>
+                          <div className="mt-2 px-2.5 py-2 rounded-lg bg-slate-50 border border-muted">
+                            <p className="text-[10px] text-slate-400 tracking-wide" style={{ fontWeight: 600 }}>EXAMPLE</p>
+                            <p className="text-[11px] text-slate-700 mt-1"><span className="text-green-600" style={{ fontWeight: 600 }}>10% off</span> — orders over 500 units.</p>
                           </div>
                         </TooltipContent>
                       </Tooltip>
@@ -6919,33 +6919,33 @@ function ConfigPageContent({
                             className={`group relative rounded-xl overflow-hidden border transition-all duration-200 cursor-pointer ${
                               createPrCategory === "premium"
                                 ? "border-[#C4B5FD]/70 bg-white shadow-[0_1px_4px_rgba(124,58,237,0.06)]"
-                                : "border-[#E2E8F0] bg-white hover:border-[#DDD6FE] hover:shadow-[0_4px_16px_-4px_rgba(124,58,237,0.10)]"
+                                : "border-border bg-white hover:border-[#DDD6FE] hover:shadow-[0_4px_16px_-4px_rgba(124,58,237,0.10)]"
                             }`}
                           >
                             <div className={`absolute inset-0 transition-all duration-300 pointer-events-none ${
-                              createPrCategory === "premium" ? "bg-gradient-to-br from-[#F5F3FF]/50 to-transparent" : "bg-gradient-to-br from-[#F5F3FF]/0 to-[#F5F3FF]/0 group-hover:from-[#F5F3FF]/60 group-hover:to-transparent"
+                              createPrCategory === "premium" ? "bg-gradient-to-br from-violet-50/50 to-transparent" : "bg-gradient-to-br from-violet-50/0 to-violet-50/0 group-hover:from-violet-50/60 group-hover:to-transparent"
                             }`} />
                             <div className="relative flex items-center gap-3 pl-3.5 pr-3 py-3">
                               <div className={`w-9 h-9 rounded-[10px] flex items-center justify-center shrink-0 transition-all duration-200 ${
-                                createPrCategory === "premium" ? "bg-gradient-to-br from-[#EDE9FE] to-[#DDD6FE] text-[#7C3AED]" : "bg-gradient-to-br from-[#F5F3FF] to-[#EDE9FE] text-[#8B5CF6] group-hover:scale-105"
+                                createPrCategory === "premium" ? "bg-gradient-to-br from-[#EDE9FE] to-[#DDD6FE] text-violet" : "bg-gradient-to-br from-violet-50 to-[#EDE9FE] text-violet-500 group-hover:scale-105"
                               }`}>
                                 <TrendingUp className="w-[18px] h-[18px]" />
                               </div>
                               <div className="flex-1 min-w-0">
-                                <p className={`text-[13px] transition-colors duration-150 ${createPrCategory === "premium" ? "text-[#5B21B6]" : "text-[#0F172A] group-hover:text-[#1E293B]"}`} style={{ fontWeight: 600 }}>Premium</p>
-                                <p className={`text-[11px] mt-0.5 truncate transition-colors duration-150 ${createPrCategory === "premium" ? "text-[#8B5CF6]" : "text-[#94A3B8]"}`}>Higher price adjustment</p>
+                                <p className={`text-[13px] transition-colors duration-150 ${createPrCategory === "premium" ? "text-[#5B21B6]" : "text-foreground group-hover:text-slate-800"}`} style={{ fontWeight: 600 }}>Premium</p>
+                                <p className={`text-[11px] mt-0.5 truncate transition-colors duration-150 ${createPrCategory === "premium" ? "text-violet-500" : "text-slate-400"}`}>Higher price adjustment</p>
                               </div>
-                              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-200 shrink-0 ${createPrCategory === "premium" ? "border-[#7C3AED] bg-[#7C3AED]" : "border-[#CBD5E1] group-hover:border-[#C4B5FD]"}`}>
+                              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-200 shrink-0 ${createPrCategory === "premium" ? "border-violet bg-violet" : "border-slate-300 group-hover:border-[#C4B5FD]"}`}>
                                 {createPrCategory === "premium" && <Check className="w-3 h-3 text-white" />}
                               </div>
                             </div>
                           </div>
                         </TooltipTrigger>
                         <TooltipContent side="bottom" sideOffset={8} className="max-w-[260px] text-[11px] leading-[1.5] z-[300]">
-                          <p className="text-[#64748B]">Markup on base price for express or value-added services.</p>
-                          <div className="mt-2 px-2.5 py-2 rounded-lg bg-[#F8FAFC] border border-[#F1F5F9]">
-                            <p className="text-[10px] text-[#94A3B8] tracking-wide" style={{ fontWeight: 600 }}>EXAMPLE</p>
-                            <p className="text-[11px] text-[#334155] mt-1"><span className="text-[#7C3AED]" style={{ fontWeight: 600 }}>15% markup</span> — expedited + priority shipping.</p>
+                          <p className="text-slate-500">Markup on base price for express or value-added services.</p>
+                          <div className="mt-2 px-2.5 py-2 rounded-lg bg-slate-50 border border-muted">
+                            <p className="text-[10px] text-slate-400 tracking-wide" style={{ fontWeight: 600 }}>EXAMPLE</p>
+                            <p className="text-[11px] text-slate-700 mt-1"><span className="text-violet" style={{ fontWeight: 600 }}>15% markup</span> — expedited + priority shipping.</p>
                           </div>
                         </TooltipContent>
                       </Tooltip>
@@ -6955,35 +6955,35 @@ function ConfigPageContent({
                   {/* Pricing Rule Details */}
                   <div className={isPresetReadOnly ? "opacity-60 pointer-events-none" : ""}>
                     <div className="flex items-center gap-1.5 mb-3">
-                      <span className="text-sm text-[#0F172A]" style={{ fontWeight: 600 }}>Pricing Rule Details</span>
+                      <span className="text-sm text-foreground" style={{ fontWeight: 600 }}>Pricing Rule Details</span>
                       <Tooltip>
-                        <TooltipTrigger asChild><span><Info className="w-3.5 h-3.5 text-[#CBD5E1] cursor-help" /></span></TooltipTrigger>
+                        <TooltipTrigger asChild><span><Info className="w-3.5 h-3.5 text-slate-300 cursor-help" /></span></TooltipTrigger>
                         <TooltipContent side="bottom" sideOffset={6} className="max-w-[260px] text-[11px] leading-[1.5] z-[300]">
-                          <p className="text-[#64748B]">Name and basis shown on POs and invoices.</p>
-                          <div className="mt-2 px-2.5 py-2 rounded-lg bg-[#F8FAFC] border border-[#F1F5F9]">
-                            <p className="text-[10px] text-[#94A3B8] tracking-wide" style={{ fontWeight: 600 }}>TIP</p>
-                            <p className="text-[11px] text-[#334155] mt-1">Use clear names like <span className="text-[#0A77FF]" style={{ fontWeight: 600 }}>Q4 Volume Discount</span> or <span className="text-[#0A77FF]" style={{ fontWeight: 600 }}>VIP Premium</span>.</p>
+                          <p className="text-slate-500">Name and basis shown on POs and invoices.</p>
+                          <div className="mt-2 px-2.5 py-2 rounded-lg bg-slate-50 border border-muted">
+                            <p className="text-[10px] text-slate-400 tracking-wide" style={{ fontWeight: 600 }}>TIP</p>
+                            <p className="text-[11px] text-slate-700 mt-1">Use clear names like <span className="text-primary" style={{ fontWeight: 600 }}>Q4 Volume Discount</span> or <span className="text-primary" style={{ fontWeight: 600 }}>VIP Premium</span>.</p>
                           </div>
                         </TooltipContent>
                       </Tooltip>
                     </div>
-                    <div className="rounded-xl border border-[#E2E8F0] bg-white p-4">
+                    <div className="rounded-xl border border-border bg-white p-4">
                       <div className="grid grid-cols-2 gap-x-4 gap-y-3">
                         {/* Row 1: Name + Basis */}
                         <div>
-                          <label className="text-[12px] text-[#0F172A] mb-1.5 block" style={{ fontWeight: 500 }}>{createPrCategory === "discount" ? "Discount" : "Premium"} Name</label>
-                          <Input value={createPrName} onChange={(e) => setCreatePrName(e.target.value)} placeholder={`e.g. ${createPrCategory === "discount" ? "Volume Discount for Q4" : "Premium Markup for VIP"}`} className="h-9 rounded-lg border-[#E2E8F0] bg-white text-[13px] text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+                          <label className="text-[12px] text-foreground mb-1.5 block" style={{ fontWeight: 500 }}>{createPrCategory === "discount" ? "Discount" : "Premium"} Name</label>
+                          <Input value={createPrName} onChange={(e) => setCreatePrName(e.target.value)} placeholder={`e.g. ${createPrCategory === "discount" ? "Volume Discount for Q4" : "Premium Markup for VIP"}`} className="h-9 rounded-lg border-border bg-white text-[13px] text-foreground placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary/20" />
                         </div>
                         <div>
                           <div className="flex items-center gap-1 mb-1.5">
-                            <label className="text-[12px] text-[#0F172A]" style={{ fontWeight: 500 }}>Calculation Basis</label>
+                            <label className="text-[12px] text-foreground" style={{ fontWeight: 500 }}>Calculation Basis</label>
                             <Tooltip>
-                              <TooltipTrigger asChild><span><Info className="w-3 h-3 text-[#CBD5E1] cursor-help" /></span></TooltipTrigger>
+                              <TooltipTrigger asChild><span><Info className="w-3 h-3 text-slate-300 cursor-help" /></span></TooltipTrigger>
                               <TooltipContent side="bottom" sideOffset={6} className="max-w-[260px] text-[11px] leading-[1.5] z-[300]">
-                                <p className="text-[#64748B]">Measure thresholds by units ordered or order value.</p>
-                                <div className="mt-2 px-2.5 py-2 rounded-lg bg-[#F8FAFC] border border-[#F1F5F9]">
-                                  <p className="text-[10px] text-[#94A3B8] tracking-wide" style={{ fontWeight: 600 }}>EXAMPLE</p>
-                                  <p className="text-[11px] text-[#334155] mt-1"><span className="text-[#0A77FF]" style={{ fontWeight: 600 }}>Volume</span> — 500+ units. <span className="text-[#0A77FF]" style={{ fontWeight: 600 }}>Value</span> — orders over $10K.</p>
+                                <p className="text-slate-500">Measure thresholds by units ordered or order value.</p>
+                                <div className="mt-2 px-2.5 py-2 rounded-lg bg-slate-50 border border-muted">
+                                  <p className="text-[10px] text-slate-400 tracking-wide" style={{ fontWeight: 600 }}>EXAMPLE</p>
+                                  <p className="text-[11px] text-slate-700 mt-1"><span className="text-primary" style={{ fontWeight: 600 }}>Volume</span> — 500+ units. <span className="text-primary" style={{ fontWeight: 600 }}>Value</span> — orders over $10K.</p>
                                 </div>
                               </TooltipContent>
                             </Tooltip>
@@ -6995,8 +6995,8 @@ function ConfigPageContent({
                                 onClick={() => setCreatePrBasis(b)}
                                 className={`inline-flex items-center gap-1.5 flex-1 justify-center h-9 rounded-lg border text-[12px] transition-all cursor-pointer ${
                                   createPrBasis === b
-                                    ? createPrCategory === "discount" ? "border-[#16A34A]/30 bg-[#F0FDF4] text-[#15803D]" : "border-[#7C3AED]/30 bg-[#F5F3FF] text-[#6D28D9]"
-                                    : "border-[#E2E8F0] bg-white text-[#64748B] hover:border-[#CBD5E1] hover:bg-[#F8FAFC]"
+                                    ? createPrCategory === "discount" ? "border-green-600/30 bg-green-50 text-[#15803D]" : "border-violet/30 bg-violet-50 text-[#6D28D9]"
+                                    : "border-border bg-white text-slate-500 hover:border-slate-300 hover:bg-slate-50"
                                 }`}
                                 style={{ fontWeight: createPrBasis === b ? 600 : 500 }}
                               >
@@ -7020,12 +7020,12 @@ function ConfigPageContent({
                       <div className="mt-3">
                         <div className="flex items-center gap-2.5">
                           <Switch checked={createPrLimitDateRange} onCheckedChange={setCreatePrLimitDateRange} />
-                          <span className="text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>Set Validity Period</span>
-                          <span className="text-[11px] text-[#94A3B8] bg-[#F1F5F9] px-1.5 py-0.5 rounded" style={{ fontWeight: 600 }}>Optional</span>
+                          <span className="text-[13px] text-foreground" style={{ fontWeight: 500 }}>Set Validity Period</span>
+                          <span className="text-[11px] text-slate-400 bg-muted px-1.5 py-0.5 rounded" style={{ fontWeight: 600 }}>Optional</span>
                           <Tooltip>
-                            <TooltipTrigger asChild><span><Info className="w-3 h-3 text-[#CBD5E1] cursor-help" /></span></TooltipTrigger>
+                            <TooltipTrigger asChild><span><Info className="w-3 h-3 text-slate-300 cursor-help" /></span></TooltipTrigger>
                             <TooltipContent side="bottom" sideOffset={6} className="max-w-[260px] text-[11px] leading-[1.5] z-[300]">
-                              <p className="text-[#64748B]">Set a date range. If off, rule applies indefinitely.</p>
+                              <p className="text-slate-500">Set a date range. If off, rule applies indefinitely.</p>
                             </TooltipContent>
                           </Tooltip>
                         </div>
@@ -7033,27 +7033,27 @@ function ConfigPageContent({
                           <div className="grid grid-cols-2 gap-4 mt-3">
                             <div>
                               <div className="flex items-center gap-1 mb-1.5">
-                                <label className="text-[12px] text-[#0F172A]" style={{ fontWeight: 500 }}>Valid From</label>
+                                <label className="text-[12px] text-foreground" style={{ fontWeight: 500 }}>Valid From</label>
                                 <Tooltip>
-                                  <TooltipTrigger asChild><span><Info className="w-3 h-3 text-[#CBD5E1] cursor-help" /></span></TooltipTrigger>
+                                  <TooltipTrigger asChild><span><Info className="w-3 h-3 text-slate-300 cursor-help" /></span></TooltipTrigger>
                                   <TooltipContent side="bottom" sideOffset={6} className="max-w-[260px] text-[11px] leading-[1.5] z-[300]">
-                                    <p className="text-[#64748B]">Rule starts applying from this date.</p>
+                                    <p className="text-slate-500">Rule starts applying from this date.</p>
                                   </TooltipContent>
                                 </Tooltip>
                               </div>
-                              <Input type="date" value={createPrValidFrom} onChange={(e) => setCreatePrValidFrom(e.target.value)} className="h-9 rounded-lg border-[#E2E8F0] bg-white text-[13px] text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+                              <Input type="date" value={createPrValidFrom} onChange={(e) => setCreatePrValidFrom(e.target.value)} className="h-9 rounded-lg border-border bg-white text-[13px] text-foreground placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary/20" />
                             </div>
                             <div>
                               <div className="flex items-center gap-1 mb-1.5">
-                                <label className="text-[12px] text-[#0F172A]" style={{ fontWeight: 500 }}>Valid To</label>
+                                <label className="text-[12px] text-foreground" style={{ fontWeight: 500 }}>Valid To</label>
                                 <Tooltip>
-                                  <TooltipTrigger asChild><span><Info className="w-3 h-3 text-[#CBD5E1] cursor-help" /></span></TooltipTrigger>
+                                  <TooltipTrigger asChild><span><Info className="w-3 h-3 text-slate-300 cursor-help" /></span></TooltipTrigger>
                                   <TooltipContent side="bottom" sideOffset={6} className="max-w-[260px] text-[11px] leading-[1.5] z-[300]">
-                                    <p className="text-[#64748B]">Rule auto-deactivates after this date.</p>
+                                    <p className="text-slate-500">Rule auto-deactivates after this date.</p>
                                   </TooltipContent>
                                 </Tooltip>
                               </div>
-                              <Input type="date" value={createPrValidTo} onChange={(e) => setCreatePrValidTo(e.target.value)} className="h-9 rounded-lg border-[#E2E8F0] bg-white text-[13px] text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+                              <Input type="date" value={createPrValidTo} onChange={(e) => setCreatePrValidTo(e.target.value)} className="h-9 rounded-lg border-border bg-white text-[13px] text-foreground placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary/20" />
                             </div>
                           </div>
                         )}
@@ -7065,28 +7065,28 @@ function ConfigPageContent({
                   <div className={isPresetReadOnly ? "opacity-60 pointer-events-none" : ""}>
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-1.5">
-                        <span className="text-sm text-[#0F172A]" style={{ fontWeight: 600 }}>{createPrCategory === "discount" ? "Discount" : "Premium"} Tiers</span>
-                        <span className="text-[11px] text-[#94A3B8] bg-[#F1F5F9] px-1.5 py-0.5 rounded" style={{ fontWeight: 600 }}>{createPrTiers.length}</span>
+                        <span className="text-sm text-foreground" style={{ fontWeight: 600 }}>{createPrCategory === "discount" ? "Discount" : "Premium"} Tiers</span>
+                        <span className="text-[11px] text-slate-400 bg-muted px-1.5 py-0.5 rounded" style={{ fontWeight: 600 }}>{createPrTiers.length}</span>
                       </div>
                     </div>
                     <div className="space-y-2.5">
                       {createPrTiers.map((tier, idx) => {
                         const isDis = createPrCategory === "discount";
-                        const accent = isDis ? "#16A34A" : "#7C3AED";
+                        const accent = isDis ? "#16A34A" : "hsl(var(--violet))";
                         const accentBg = isDis ? "#F0FDF4" : "#F5F3FF";
                         const accentBorder = isDis ? "#BBF7D0" : "#DDD6FE";
                         return (
-                        <div key={idx} className="rounded-xl border bg-white overflow-hidden transition-all" style={{ borderColor: tier.qtyLimits ? accentBorder : "#E2E8F0" }}>
+                        <div key={idx} className="rounded-xl border bg-white overflow-hidden transition-all" style={{ borderColor: tier.qtyLimits ? accentBorder : "hsl(var(--border))" }}>
                           {/* Header */}
-                          <div className="flex items-center justify-between px-3.5 py-2 border-b border-[#F1F5F9]" style={{ backgroundColor: accentBg }}>
+                          <div className="flex items-center justify-between px-3.5 py-2 border-b border-muted" style={{ backgroundColor: accentBg }}>
                             <div className="flex items-center gap-2">
                               <span className="w-5 h-5 rounded-md flex items-center justify-center text-[10px] text-white" style={{ fontWeight: 700, backgroundColor: accent }}>{idx + 1}</span>
-                              <span className="text-[12px] text-[#0F172A]" style={{ fontWeight: 600 }}>Tier {idx + 1}</span>
+                              <span className="text-[12px] text-foreground" style={{ fontWeight: 600 }}>Tier {idx + 1}</span>
                             </div>
                             {idx > 0 && (
                               <button
                                 onClick={() => removeCpmTier(idx)}
-                                className="w-6 h-6 rounded-md flex items-center justify-center text-[#94A3B8] hover:text-[#EF4444] hover:bg-white/60 transition-all cursor-pointer"
+                                className="w-6 h-6 rounded-md flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-white/60 transition-all cursor-pointer"
                               >
                                 <X className="w-3.5 h-3.5" />
                               </button>
@@ -7099,14 +7099,14 @@ function ConfigPageContent({
                               {/* Discount / Premium field */}
                               <div>
                                 <div className="flex items-center justify-between mb-1.5">
-                                  <label className="text-[12px] text-[#0F172A]" style={{ fontWeight: 500 }}>
+                                  <label className="text-[12px] text-foreground" style={{ fontWeight: 500 }}>
                                     {isDis ? "Discount" : "Premium"} {tier.fixRate ? "Amount" : "Rate"}
                                   </label>
-                                  <div className="inline-flex items-center h-[22px] rounded-full bg-[#F1F5F9] p-0.5">
+                                  <div className="inline-flex items-center h-[22px] rounded-full bg-muted p-0.5">
                                     <button
                                       type="button"
                                       onClick={() => updateCpmTier(idx, { fixRate: false })}
-                                      className={`px-2 h-[18px] rounded-full text-[10px] transition-all ${!tier.fixRate ? "bg-white text-[#0A77FF] shadow-sm" : "text-[#64748B] hover:text-[#334155]"}`}
+                                      className={`px-2 h-[18px] rounded-full text-[10px] transition-all ${!tier.fixRate ? "bg-white text-primary shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
                                       style={{ fontWeight: 600 }}
                                     >
                                       %
@@ -7114,7 +7114,7 @@ function ConfigPageContent({
                                     <button
                                       type="button"
                                       onClick={() => updateCpmTier(idx, { fixRate: true })}
-                                      className={`px-2 h-[18px] rounded-full text-[10px] transition-all ${tier.fixRate ? "bg-white text-[#0A77FF] shadow-sm" : "text-[#64748B] hover:text-[#334155]"}`}
+                                      className={`px-2 h-[18px] rounded-full text-[10px] transition-all ${tier.fixRate ? "bg-white text-primary shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
                                       style={{ fontWeight: 600 }}
                                     >
                                       $
@@ -7123,11 +7123,11 @@ function ConfigPageContent({
                                 </div>
                                 <div className="relative">
                                   {tier.fixRate && (
-                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[13px] text-[#94A3B8]">$</span>
+                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[13px] text-slate-400">$</span>
                                   )}
-                                  <Input value={tier.discount} onChange={(e) => updateCpmTier(idx, { discount: e.target.value })} placeholder={tier.fixRate ? "e.g. 25.00" : "e.g. 50"} className={`rounded-lg border-[#E2E8F0] bg-white text-[13px] h-9 text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 ${tier.fixRate ? "pl-7 pr-3" : "pr-8"}`} />
+                                  <Input value={tier.discount} onChange={(e) => updateCpmTier(idx, { discount: e.target.value })} placeholder={tier.fixRate ? "e.g. 25.00" : "e.g. 50"} className={`rounded-lg border-border bg-white text-[13px] h-9 text-foreground placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary/20 ${tier.fixRate ? "pl-7 pr-3" : "pr-8"}`} />
                                   {!tier.fixRate && (
-                                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[13px] text-[#94A3B8]">%</span>
+                                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[13px] text-slate-400">%</span>
                                   )}
                                 </div>
                               </div>
@@ -7138,24 +7138,24 @@ function ConfigPageContent({
                                   className="flex items-center gap-2 cursor-pointer select-none"
                                   onClick={() => updateCpmTier(idx, { qtyLimits: !tier.qtyLimits })}
                                 >
-                                  <div className={`w-[16px] h-[16px] rounded-[4px] flex items-center justify-center shrink-0 transition-colors ${tier.qtyLimits ? "bg-[#0A77FF]" : "border-[1.5px] border-[#CBD5E1] bg-white hover:border-[#94A3B8]"}`}>
+                                  <div className={`w-[16px] h-[16px] rounded-[4px] flex items-center justify-center shrink-0 transition-colors ${tier.qtyLimits ? "bg-primary" : "border-[1.5px] border-slate-300 bg-white hover:border-slate-400"}`}>
                                     {tier.qtyLimits && <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />}
                                   </div>
-                                  <span className="text-[12px] text-[#334155]" style={{ fontWeight: 500 }}>Order Qty Limits</span>
+                                  <span className="text-[12px] text-slate-700" style={{ fontWeight: 500 }}>Order Qty Limits</span>
                                 </label>
                               </div>
                             </div>
 
                             {/* Expanded qty fields */}
                             {tier.qtyLimits && (
-                              <div className="grid grid-cols-2 gap-3 mt-3 pt-3 border-t border-[#F1F5F9]">
+                              <div className="grid grid-cols-2 gap-3 mt-3 pt-3 border-t border-muted">
                                 <div>
-                                  <label className="text-[12px] text-[#0F172A] mb-1.5 block" style={{ fontWeight: 500 }}>Min Qty</label>
-                                  <Input value={tier.minQty} onChange={(e) => updateCpmTier(idx, { minQty: e.target.value })} placeholder="e.g. 100" className="rounded-lg border-[#E2E8F0] bg-white text-[13px] h-9 text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+                                  <label className="text-[12px] text-foreground mb-1.5 block" style={{ fontWeight: 500 }}>Min Qty</label>
+                                  <Input value={tier.minQty} onChange={(e) => updateCpmTier(idx, { minQty: e.target.value })} placeholder="e.g. 100" className="rounded-lg border-border bg-white text-[13px] h-9 text-foreground placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary/20" />
                                 </div>
                                 <div>
-                                  <label className="text-[12px] text-[#0F172A] mb-1.5 block" style={{ fontWeight: 500 }}>Max Qty</label>
-                                  <Input value={tier.maxQty} onChange={(e) => updateCpmTier(idx, { maxQty: e.target.value })} placeholder="e.g. 500" className="rounded-lg border-[#E2E8F0] bg-white text-[13px] h-9 text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20" />
+                                  <label className="text-[12px] text-foreground mb-1.5 block" style={{ fontWeight: 500 }}>Max Qty</label>
+                                  <Input value={tier.maxQty} onChange={(e) => updateCpmTier(idx, { maxQty: e.target.value })} placeholder="e.g. 500" className="rounded-lg border-border bg-white text-[13px] h-9 text-foreground placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary/20" />
                                 </div>
                               </div>
                             )}
@@ -7164,7 +7164,7 @@ function ConfigPageContent({
                         );
                       })}
                     </div>
-                    <button onClick={addCpmTier} className={`inline-flex items-center gap-1.5 mt-3 px-3 py-1.5 rounded-lg border border-dashed text-[12px] transition-all cursor-pointer w-full justify-center ${createPrCategory === "discount" ? "border-[#BBF7D0] text-[#16A34A] hover:bg-[#F0FDF4] hover:border-[#86EFAC]" : "border-[#DDD6FE] text-[#7C3AED] hover:bg-[#F5F3FF] hover:border-[#C4B5FD]"}`} style={{ fontWeight: 600 }}>
+                    <button onClick={addCpmTier} className={`inline-flex items-center gap-1.5 mt-3 px-3 py-1.5 rounded-lg border border-dashed text-[12px] transition-all cursor-pointer w-full justify-center ${createPrCategory === "discount" ? "border-[#BBF7D0] text-green-600 hover:bg-green-50 hover:border-[#86EFAC]" : "border-[#DDD6FE] text-violet hover:bg-violet-50 hover:border-[#C4B5FD]"}`} style={{ fontWeight: 600 }}>
                       <Plus className="w-3.5 h-3.5" /> Add Tier
                     </button>
                   </div>
@@ -7176,23 +7176,23 @@ function ConfigPageContent({
               {createPrStep === 2 && (
                 <div className="space-y-5">
                   {/* Summary banner */}
-                  <div className="rounded-xl border border-[#E2E8F0] bg-white p-3.5 flex items-center gap-3">
+                  <div className="rounded-xl border border-border bg-white p-3.5 flex items-center gap-3">
                     <div className={`w-9 h-9 rounded-[10px] flex items-center justify-center shrink-0 ${createPrCategory === "discount" ? "bg-gradient-to-br from-[#DCFCE7] to-[#BBF7D0]" : "bg-gradient-to-br from-[#EDE9FE] to-[#DDD6FE]"}`}>
-                      {createPrCategory === "discount" ? <TrendingDown className="w-4.5 h-4.5 text-[#15803D]" /> : <TrendingUp className="w-4.5 h-4.5 text-[#7C3AED]" />}
+                      {createPrCategory === "discount" ? <TrendingDown className="w-4.5 h-4.5 text-[#15803D]" /> : <TrendingUp className="w-4.5 h-4.5 text-violet" />}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{createPrName || "Untitled Rule"}</p>
-                      <p className="text-[11px] text-[#64748B] truncate">
+                      <p className="text-[13px] text-foreground truncate" style={{ fontWeight: 600 }}>{createPrName || "Untitled Rule"}</p>
+                      <p className="text-[11px] text-slate-500 truncate">
                         {createPrCategory === "discount" ? "Discount" : "Premium"} · {createPrBasis === "volume" ? "Volume-Based" : "Value-Based"} · {createPrTiers.length} tier{createPrTiers.length !== 1 ? "s" : ""}
                         {createPrTiers[0]?.discount ? ` · ${createPrTiers[0].discount}${createPrTiers[0].fixRate ? "$" : "%"}` : ""}
                       </p>
                     </div>
-                    <button onClick={() => setCreatePrStep(1)} className="text-[11px] text-[#0A77FF] hover:text-[#0862D0] transition-colors cursor-pointer shrink-0" style={{ fontWeight: 600 }}>{createPrMode === "view" ? "View Setup" : "Edit Setup"}</button>
+                    <button onClick={() => setCreatePrStep(1)} className="text-[11px] text-primary hover:text-[#0862D0] transition-colors cursor-pointer shrink-0" style={{ fontWeight: 600 }}>{createPrMode === "view" ? "View Setup" : "Edit Setup"}</button>
                   </div>
 
                   {/* Items, Categories & Attachments card */}
-                  <div className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden">
-                    <div className="flex items-center gap-0 border-b border-[#E2E8F0] px-4">
+                  <div className="rounded-xl border border-border bg-white overflow-hidden">
+                    <div className="flex items-center gap-0 border-b border-border px-4">
                       {([
                         { key: "items" as const, label: "Items", icon: Package, count: cpmSelectedItems.length },
                         { key: "categories" as const, label: "Categories", icon: FolderOpen, count: cpmSelectedCats.length },
@@ -7201,14 +7201,14 @@ function ConfigPageContent({
                         <button
                           key={t.key}
                           onClick={() => setCreatePrItemsTab(t.key)}
-                          className={`relative px-3 py-2.5 text-[12px] flex items-center gap-1.5 transition-colors cursor-pointer ${createPrItemsTab === t.key ? "text-[#0A77FF]" : "text-[#64748B] hover:text-[#334155]"}`}
+                          className={`relative px-3 py-2.5 text-[12px] flex items-center gap-1.5 transition-colors cursor-pointer ${createPrItemsTab === t.key ? "text-primary" : "text-slate-500 hover:text-slate-700"}`}
                           style={{ fontWeight: createPrItemsTab === t.key ? 600 : 500 }}
                         >
                           <t.icon className="w-3.5 h-3.5" />
                           {t.label}
-                          <span className={`px-1.5 py-0.5 rounded text-[10px] ${createPrItemsTab === t.key ? "bg-[#DBEAFE] text-[#0A77FF]" : "bg-[#F1F5F9] text-[#94A3B8]"}`} style={{ fontWeight: 700 }}>{t.count}</span>
+                          <span className={`px-1.5 py-0.5 rounded text-[10px] ${createPrItemsTab === t.key ? "bg-blue-100 text-primary" : "bg-muted text-slate-400"}`} style={{ fontWeight: 700 }}>{t.count}</span>
                           {createPrItemsTab === t.key && (
-                            <div className="absolute bottom-0 left-0 right-0 h-[2px] rounded-t-full bg-[#0A77FF]" />
+                            <div className="absolute bottom-0 left-0 right-0 h-[2px] rounded-t-full bg-primary" />
                           )}
                         </button>
                       ))}
@@ -7219,17 +7219,17 @@ function ConfigPageContent({
                       <div className="p-4">
                         <div className="flex items-center gap-2 mb-4">
                           <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8]" />
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
                             <Input
                               value={cpmItemSearch}
                               onChange={(e) => setCpmItemSearch(e.target.value)}
                               placeholder="Search assigned items..."
-                              className="pl-9 rounded-lg border-[#E2E8F0] bg-[#F8FAFC] text-[13px] h-9"
+                              className="pl-9 rounded-lg border-border bg-slate-50 text-[13px] h-9"
                             />
                           </div>
                           <button
                             onClick={() => { setCpmShowItemPicker(!cpmShowItemPicker); setCpmItemPickerSearch(""); }}
-                            className="inline-flex items-center gap-1.5 h-9 px-3 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-[12px] shadow-sm transition-colors cursor-pointer"
+                            className="inline-flex items-center gap-1.5 h-9 px-3 rounded-lg bg-primary hover:bg-[#0862D0] text-white text-[12px] shadow-sm transition-colors cursor-pointer"
                             style={{ fontWeight: 600 }}
                           >
                             <Plus className="w-3.5 h-3.5" /> Add Items
@@ -7238,25 +7238,25 @@ function ConfigPageContent({
 
                         {/* Item picker dropdown */}
                         {cpmShowItemPicker && (
-                          <div className="mb-4 rounded-xl border border-[#DBEAFE] bg-[#F8FBFF] p-3">
+                          <div className="mb-4 rounded-xl border border-blue-100 bg-[#F8FBFF] p-3">
                             <div className="flex items-center justify-between mb-2">
-                              <span className="text-[12px] text-[#0F172A]" style={{ fontWeight: 600 }}>Select items to add</span>
-                              <button onClick={() => setCpmShowItemPicker(false)} className="w-6 h-6 rounded-md flex items-center justify-center text-[#94A3B8] hover:text-[#64748B] hover:bg-white transition-colors cursor-pointer">
+                              <span className="text-[12px] text-foreground" style={{ fontWeight: 600 }}>Select items to add</span>
+                              <button onClick={() => setCpmShowItemPicker(false)} className="w-6 h-6 rounded-md flex items-center justify-center text-slate-400 hover:text-slate-500 hover:bg-white transition-colors cursor-pointer">
                                 <X className="w-3.5 h-3.5" />
                               </button>
                             </div>
                             <div className="relative mb-2">
-                              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8]" />
+                              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
                               <Input
                                 value={cpmItemPickerSearch}
                                 onChange={(e) => setCpmItemPickerSearch(e.target.value)}
                                 placeholder="Search by part number, description..."
-                                className="pl-8 rounded-lg border-[#E2E8F0] bg-white text-[12px] h-8"
+                                className="pl-8 rounded-lg border-border bg-white text-[12px] h-8"
                               />
                             </div>
                             <div className="max-h-[200px] overflow-y-auto space-y-1">
                               {cpmAvailableItemsFiltered.length === 0 ? (
-                                <p className="text-[11px] text-[#94A3B8] text-center py-4">No items available</p>
+                                <p className="text-[11px] text-slate-400 text-center py-4">No items available</p>
                               ) : (
                                 cpmAvailableItemsFiltered.map((item) => (
                                   <div
@@ -7264,15 +7264,15 @@ function ConfigPageContent({
                                     onClick={() => { cpmAddItem(item); toast.success(`Added ${item.partNo}`); }}
                                     className="flex items-center gap-3 px-2.5 py-2 rounded-lg hover:bg-white hover:shadow-[0_1px_2px_rgba(0,0,0,0.04)] cursor-pointer transition-all group"
                                   >
-                                    <div className="w-7 h-7 rounded-md bg-[#F1F5F9] flex items-center justify-center shrink-0">
-                                      <Package className="w-3.5 h-3.5 text-[#94A3B8]" />
+                                    <div className="w-7 h-7 rounded-md bg-muted flex items-center justify-center shrink-0">
+                                      <Package className="w-3.5 h-3.5 text-slate-400" />
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                      <p className="text-[12px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{item.partNo}</p>
-                                      <p className="text-[10px] text-[#64748B] truncate">{item.description}</p>
+                                      <p className="text-[12px] text-foreground truncate" style={{ fontWeight: 600 }}>{item.partNo}</p>
+                                      <p className="text-[10px] text-slate-500 truncate">{item.description}</p>
                                     </div>
-                                    <span className="text-[10px] text-[#94A3B8] px-1.5 py-0.5 rounded bg-[#F1F5F9]">{item.category}</span>
-                                    <Plus className="w-3.5 h-3.5 text-[#0A77FF] opacity-0 group-hover:opacity-100 transition-opacity" />
+                                    <span className="text-[10px] text-slate-400 px-1.5 py-0.5 rounded bg-muted">{item.category}</span>
+                                    <Plus className="w-3.5 h-3.5 text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
                                   </div>
                                 ))
                               )}
@@ -7284,22 +7284,22 @@ function ConfigPageContent({
                         {cpmSelectedItems.length > 0 ? (
                           <div className="space-y-1.5">
                             {cpmFilteredSelectedItems.map((item) => (
-                              <div key={item.id} className="flex items-center gap-3 px-3 py-2.5 rounded-lg border border-[#E8ECF1] bg-white hover:border-[#CBD5E1] transition-all group">
-                                <div className={`w-7 h-7 rounded-md flex items-center justify-center shrink-0 ${item.status === "Active" ? "bg-[#F0FDF4]" : "bg-[#FEF2F2]"}`}>
-                                  <Package className={`w-3.5 h-3.5 ${item.status === "Active" ? "text-[#16A34A]" : "text-[#EF4444]"}`} />
+                              <div key={item.id} className="flex items-center gap-3 px-3 py-2.5 rounded-lg border border-[#E8ECF1] bg-white hover:border-slate-300 transition-all group">
+                                <div className={`w-7 h-7 rounded-md flex items-center justify-center shrink-0 ${item.status === "Active" ? "bg-green-50" : "bg-red-50"}`}>
+                                  <Package className={`w-3.5 h-3.5 ${item.status === "Active" ? "text-green-600" : "text-red-500"}`} />
                                 </div>
                                 <div className="flex-1 min-w-0">
                                   <div className="flex items-center gap-2">
-                                    <span className="text-[12px] text-[#0F172A]" style={{ fontWeight: 600 }}>{item.partNo}</span>
-                                    <span className={`px-1.5 py-0.5 rounded text-[9px] ${item.status === "Active" ? "bg-[#F0FDF4] text-[#16A34A]" : "bg-[#FEF2F2] text-[#EF4444]"}`} style={{ fontWeight: 600 }}>{item.status}</span>
+                                    <span className="text-[12px] text-foreground" style={{ fontWeight: 600 }}>{item.partNo}</span>
+                                    <span className={`px-1.5 py-0.5 rounded text-[9px] ${item.status === "Active" ? "bg-green-50 text-green-600" : "bg-red-50 text-red-500"}`} style={{ fontWeight: 600 }}>{item.status}</span>
                                   </div>
-                                  <p className="text-[10px] text-[#64748B] truncate">{item.description}</p>
+                                  <p className="text-[10px] text-slate-500 truncate">{item.description}</p>
                                 </div>
-                                <span className="text-[10px] text-[#94A3B8] px-1.5 py-0.5 rounded bg-[#F1F5F9] hidden sm:inline">{item.category}</span>
-                                <span className="text-[10px] text-[#64748B] px-1.5 py-0.5 rounded border border-[#E2E8F0] hidden sm:inline">{item.itemType}</span>
+                                <span className="text-[10px] text-slate-400 px-1.5 py-0.5 rounded bg-muted hidden sm:inline">{item.category}</span>
+                                <span className="text-[10px] text-slate-500 px-1.5 py-0.5 rounded border border-border hidden sm:inline">{item.itemType}</span>
                                 <button
                                   onClick={() => { cpmRemoveItem(item.id); toast("Item removed"); }}
-                                  className="w-6 h-6 rounded-md flex items-center justify-center text-[#94A3B8] hover:text-[#EF4444] hover:bg-[#FEF2F2] opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
+                                  className="w-6 h-6 rounded-md flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
                                 >
                                   <X className="w-3.5 h-3.5" />
                                 </button>
@@ -7308,11 +7308,11 @@ function ConfigPageContent({
                           </div>
                         ) : (
                           <div className="py-8 text-center">
-                            <div className="w-12 h-12 rounded-xl bg-[#F8FAFC] border border-[#E8ECF1] flex items-center justify-center mx-auto mb-3">
-                              <Package className="w-5 h-5 text-[#94A3B8]" />
+                            <div className="w-12 h-12 rounded-xl bg-slate-50 border border-[#E8ECF1] flex items-center justify-center mx-auto mb-3">
+                              <Package className="w-5 h-5 text-slate-400" />
                             </div>
-                            <p className="text-[13px] text-[#334155] mb-1" style={{ fontWeight: 600 }}>No items assigned yet</p>
-                            <p className="text-[11px] text-[#94A3B8] max-w-[260px] mx-auto">Search and add items that should be affected by this pricing rule.</p>
+                            <p className="text-[13px] text-slate-700 mb-1" style={{ fontWeight: 600 }}>No items assigned yet</p>
+                            <p className="text-[11px] text-slate-400 max-w-[260px] mx-auto">Search and add items that should be affected by this pricing rule.</p>
                           </div>
                         )}
                       </div>
@@ -7323,17 +7323,17 @@ function ConfigPageContent({
                       <div className="p-4">
                         <div className="flex items-center gap-2 mb-4">
                           <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8]" />
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
                             <Input
                               value={cpmCatSearch}
                               onChange={(e) => setCpmCatSearch(e.target.value)}
                               placeholder="Search assigned categories..."
-                              className="pl-9 rounded-lg border-[#E2E8F0] bg-[#F8FAFC] text-[13px] h-9"
+                              className="pl-9 rounded-lg border-border bg-slate-50 text-[13px] h-9"
                             />
                           </div>
                           <button
                             onClick={() => { setCpmShowCatPicker(!cpmShowCatPicker); setCpmCatPickerSearch(""); }}
-                            className="inline-flex items-center gap-1.5 h-9 px-3 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-[12px] shadow-sm transition-colors cursor-pointer"
+                            className="inline-flex items-center gap-1.5 h-9 px-3 rounded-lg bg-primary hover:bg-[#0862D0] text-white text-[12px] shadow-sm transition-colors cursor-pointer"
                             style={{ fontWeight: 600 }}
                           >
                             <Plus className="w-3.5 h-3.5" /> Add Categories
@@ -7342,25 +7342,25 @@ function ConfigPageContent({
 
                         {/* Category picker dropdown */}
                         {cpmShowCatPicker && (
-                          <div className="mb-4 rounded-xl border border-[#DBEAFE] bg-[#F8FBFF] p-3">
+                          <div className="mb-4 rounded-xl border border-blue-100 bg-[#F8FBFF] p-3">
                             <div className="flex items-center justify-between mb-2">
-                              <span className="text-[12px] text-[#0F172A]" style={{ fontWeight: 600 }}>Select categories to add</span>
-                              <button onClick={() => setCpmShowCatPicker(false)} className="w-6 h-6 rounded-md flex items-center justify-center text-[#94A3B8] hover:text-[#64748B] hover:bg-white transition-colors cursor-pointer">
+                              <span className="text-[12px] text-foreground" style={{ fontWeight: 600 }}>Select categories to add</span>
+                              <button onClick={() => setCpmShowCatPicker(false)} className="w-6 h-6 rounded-md flex items-center justify-center text-slate-400 hover:text-slate-500 hover:bg-white transition-colors cursor-pointer">
                                 <X className="w-3.5 h-3.5" />
                               </button>
                             </div>
                             <div className="relative mb-2">
-                              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8]" />
+                              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
                               <Input
                                 value={cpmCatPickerSearch}
                                 onChange={(e) => setCpmCatPickerSearch(e.target.value)}
                                 placeholder="Search by name, code..."
-                                className="pl-8 rounded-lg border-[#E2E8F0] bg-white text-[12px] h-8"
+                                className="pl-8 rounded-lg border-border bg-white text-[12px] h-8"
                               />
                             </div>
                             <div className="max-h-[200px] overflow-y-auto space-y-1">
                               {cpmAvailableCatsFiltered.length === 0 ? (
-                                <p className="text-[11px] text-[#94A3B8] text-center py-4">No categories available</p>
+                                <p className="text-[11px] text-slate-400 text-center py-4">No categories available</p>
                               ) : (
                                 cpmAvailableCatsFiltered.map((cat) => (
                                   <div
@@ -7368,15 +7368,15 @@ function ConfigPageContent({
                                     onClick={() => { cpmAddCat(cat); toast.success(`Added ${cat.name}`); }}
                                     className="flex items-center gap-3 px-2.5 py-2 rounded-lg hover:bg-white hover:shadow-[0_1px_2px_rgba(0,0,0,0.04)] cursor-pointer transition-all group"
                                   >
-                                    <div className="w-7 h-7 rounded-md bg-[#F5F3FF] flex items-center justify-center shrink-0">
-                                      <FolderOpen className="w-3.5 h-3.5 text-[#8B5CF6]" />
+                                    <div className="w-7 h-7 rounded-md bg-violet-50 flex items-center justify-center shrink-0">
+                                      <FolderOpen className="w-3.5 h-3.5 text-violet-500" />
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                      <p className="text-[12px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{cat.name}</p>
-                                      <p className="text-[10px] text-[#64748B] truncate">{cat.code} · {cat.description}</p>
+                                      <p className="text-[12px] text-foreground truncate" style={{ fontWeight: 600 }}>{cat.name}</p>
+                                      <p className="text-[10px] text-slate-500 truncate">{cat.code} · {cat.description}</p>
                                     </div>
-                                    <span className="text-[10px] text-[#64748B]">{cat.linkedItems} items</span>
-                                    <Plus className="w-3.5 h-3.5 text-[#0A77FF] opacity-0 group-hover:opacity-100 transition-opacity" />
+                                    <span className="text-[10px] text-slate-500">{cat.linkedItems} items</span>
+                                    <Plus className="w-3.5 h-3.5 text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
                                   </div>
                                 ))
                               )}
@@ -7388,21 +7388,21 @@ function ConfigPageContent({
                         {cpmSelectedCats.length > 0 ? (
                           <div className="space-y-1.5">
                             {cpmFilteredSelectedCats.map((cat) => (
-                              <div key={cat.id} className="flex items-center gap-3 px-3 py-2.5 rounded-lg border border-[#E8ECF1] bg-white hover:border-[#CBD5E1] transition-all group">
-                                <div className="w-7 h-7 rounded-md bg-[#F5F3FF] flex items-center justify-center shrink-0">
-                                  <FolderOpen className="w-3.5 h-3.5 text-[#8B5CF6]" />
+                              <div key={cat.id} className="flex items-center gap-3 px-3 py-2.5 rounded-lg border border-[#E8ECF1] bg-white hover:border-slate-300 transition-all group">
+                                <div className="w-7 h-7 rounded-md bg-violet-50 flex items-center justify-center shrink-0">
+                                  <FolderOpen className="w-3.5 h-3.5 text-violet-500" />
                                 </div>
                                 <div className="flex-1 min-w-0">
                                   <div className="flex items-center gap-2">
-                                    <span className="text-[12px] text-[#0F172A]" style={{ fontWeight: 600 }}>{cat.name}</span>
-                                    <span className="text-[10px] text-[#94A3B8] px-1.5 py-0.5 rounded bg-[#F1F5F9]">{cat.code}</span>
+                                    <span className="text-[12px] text-foreground" style={{ fontWeight: 600 }}>{cat.name}</span>
+                                    <span className="text-[10px] text-slate-400 px-1.5 py-0.5 rounded bg-muted">{cat.code}</span>
                                   </div>
-                                  <p className="text-[10px] text-[#64748B] truncate">{cat.description} · {cat.linkedItems} linked items</p>
+                                  <p className="text-[10px] text-slate-500 truncate">{cat.description} · {cat.linkedItems} linked items</p>
                                 </div>
-                                <span className={`px-1.5 py-0.5 rounded text-[9px] ${cat.status === "Active" ? "bg-[#F0FDF4] text-[#16A34A]" : "bg-[#FEF2F2] text-[#EF4444]"}`} style={{ fontWeight: 600 }}>{cat.status}</span>
+                                <span className={`px-1.5 py-0.5 rounded text-[9px] ${cat.status === "Active" ? "bg-green-50 text-green-600" : "bg-red-50 text-red-500"}`} style={{ fontWeight: 600 }}>{cat.status}</span>
                                 <button
                                   onClick={() => { cpmRemoveCat(cat.id); toast("Category removed"); }}
-                                  className="w-6 h-6 rounded-md flex items-center justify-center text-[#94A3B8] hover:text-[#EF4444] hover:bg-[#FEF2F2] opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
+                                  className="w-6 h-6 rounded-md flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
                                 >
                                   <X className="w-3.5 h-3.5" />
                                 </button>
@@ -7411,11 +7411,11 @@ function ConfigPageContent({
                           </div>
                         ) : (
                           <div className="py-8 text-center">
-                            <div className="w-12 h-12 rounded-xl bg-[#F8FAFC] border border-[#E8ECF1] flex items-center justify-center mx-auto mb-3">
-                              <FolderOpen className="w-5 h-5 text-[#94A3B8]" />
+                            <div className="w-12 h-12 rounded-xl bg-slate-50 border border-[#E8ECF1] flex items-center justify-center mx-auto mb-3">
+                              <FolderOpen className="w-5 h-5 text-slate-400" />
                             </div>
-                            <p className="text-[13px] text-[#334155] mb-1" style={{ fontWeight: 600 }}>No categories assigned yet</p>
-                            <p className="text-[11px] text-[#94A3B8] max-w-[260px] mx-auto">Assign categories to apply this pricing rule to all items within them.</p>
+                            <p className="text-[13px] text-slate-700 mb-1" style={{ fontWeight: 600 }}>No categories assigned yet</p>
+                            <p className="text-[11px] text-slate-400 max-w-[260px] mx-auto">Assign categories to apply this pricing rule to all items within them.</p>
                           </div>
                         )}
                       </div>
@@ -7427,17 +7427,17 @@ function ConfigPageContent({
                         {cpmAttachments.length > 0 ? (
                           <div className="space-y-2 mb-4">
                             {cpmAttachments.map((att) => (
-                              <div key={att.id} className="flex items-center gap-3 px-3 py-2.5 rounded-lg border border-[#E8ECF1] bg-white hover:border-[#CBD5E1] transition-all group">
-                                <div className="w-8 h-8 rounded-lg bg-[#EFF6FF] flex items-center justify-center shrink-0">
-                                  <FileText className="w-4 h-4 text-[#0A77FF]" />
+                              <div key={att.id} className="flex items-center gap-3 px-3 py-2.5 rounded-lg border border-[#E8ECF1] bg-white hover:border-slate-300 transition-all group">
+                                <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
+                                  <FileText className="w-4 h-4 text-primary" />
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                  <p className="text-[12px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{att.name}</p>
-                                  <p className="text-[10px] text-[#94A3B8]">{att.size} · {att.type} · {att.uploadedAt}</p>
+                                  <p className="text-[12px] text-foreground truncate" style={{ fontWeight: 600 }}>{att.name}</p>
+                                  <p className="text-[10px] text-slate-400">{att.size} · {att.type} · {att.uploadedAt}</p>
                                 </div>
                                 <button
                                   onClick={() => cpmRemoveAttachment(att.id)}
-                                  className="w-6 h-6 rounded-md flex items-center justify-center text-[#94A3B8] hover:text-[#EF4444] hover:bg-[#FEF2F2] opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
+                                  className="w-6 h-6 rounded-md flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
                                 >
                                   <Trash2 className="w-3.5 h-3.5" />
                                 </button>
@@ -7445,17 +7445,17 @@ function ConfigPageContent({
                             ))}
                           </div>
                         ) : null}
-                        <div className="py-6 text-center border-2 border-dashed border-[#E2E8F0] rounded-xl bg-[#FAFBFC]">
-                          <div className="w-12 h-12 rounded-xl bg-[#F8FAFC] border border-[#E8ECF1] border-dashed flex items-center justify-center mx-auto mb-3">
-                            <Upload className="w-5 h-5 text-[#94A3B8]" />
+                        <div className="py-6 text-center border-2 border-dashed border-border rounded-xl bg-[#FAFBFC]">
+                          <div className="w-12 h-12 rounded-xl bg-slate-50 border border-[#E8ECF1] border-dashed flex items-center justify-center mx-auto mb-3">
+                            <Upload className="w-5 h-5 text-slate-400" />
                           </div>
-                          <p className="text-[13px] text-[#334155] mb-1" style={{ fontWeight: 600 }}>
+                          <p className="text-[13px] text-slate-700 mb-1" style={{ fontWeight: 600 }}>
                             {cpmAttachments.length > 0 ? "Upload more files" : "No attachments yet"}
                           </p>
-                          <p className="text-[11px] text-[#94A3B8] max-w-[280px] mx-auto mb-3">Upload supporting documents, contracts, or approval files for this pricing rule.</p>
+                          <p className="text-[11px] text-slate-400 max-w-[280px] mx-auto mb-3">Upload supporting documents, contracts, or approval files for this pricing rule.</p>
                           <button
                             onClick={cpmAddAttachment}
-                            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg border border-[#E2E8F0] bg-white text-[12px] text-[#334155] hover:bg-[#F8FAFC] hover:border-[#CBD5E1] transition-colors cursor-pointer"
+                            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg border border-border bg-white text-[12px] text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-colors cursor-pointer"
                             style={{ fontWeight: 600 }}
                           >
                             <Upload className="w-3.5 h-3.5" /> Upload Files
@@ -7469,10 +7469,10 @@ function ConfigPageContent({
             </div>
 
             {/* Footer — step-aware + mode-aware */}
-            <div className="flex items-center justify-between px-5 py-4 border-t border-[#E2E8F0] bg-white shrink-0">
+            <div className="flex items-center justify-between px-5 py-4 border-t border-border bg-white shrink-0">
               <div>
                 {createPrStep === 2 && (
-                  <button onClick={() => setCreatePrStep(1)} className="px-4 py-2 rounded-lg border border-[#E2E8F0] text-[13px] text-[#475569] hover:bg-[#F8FAFC] transition-colors cursor-pointer" style={{ fontWeight: 600 }}>
+                  <button onClick={() => setCreatePrStep(1)} className="px-4 py-2 rounded-lg border border-border text-[13px] text-muted-foreground hover:bg-slate-50 transition-colors cursor-pointer" style={{ fontWeight: 600 }}>
                     <ArrowLeft className="w-3.5 h-3.5 inline mr-1.5" />Back
                   </button>
                 )}
@@ -7481,26 +7481,26 @@ function ConfigPageContent({
                 {createPrMode === "view" ? (
                   createPrStep === 1 ? (
                     <>
-                      <button onClick={() => { setCreatePrModalOpen(false); resetCreatePrForm(); }} className="px-4 py-2 rounded-lg border border-[#E2E8F0] text-[13px] text-[#475569] hover:bg-[#F8FAFC] transition-colors cursor-pointer" style={{ fontWeight: 600 }}>Close</button>
+                      <button onClick={() => { setCreatePrModalOpen(false); resetCreatePrForm(); }} className="px-4 py-2 rounded-lg border border-border text-[13px] text-muted-foreground hover:bg-slate-50 transition-colors cursor-pointer" style={{ fontWeight: 600 }}>Close</button>
                       {editingPrRuleId?.startsWith("pr-custom-") && (
-                        <button onClick={() => { setCreatePrMode("create"); }} className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg border border-[#DBEAFE] bg-[#EFF6FF] text-[13px] text-[#0A77FF] hover:bg-[#DBEAFE] transition-colors cursor-pointer" style={{ fontWeight: 600 }}>
+                        <button onClick={() => { setCreatePrMode("create"); }} className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg border border-blue-100 bg-blue-50 text-[13px] text-primary hover:bg-blue-100 transition-colors cursor-pointer" style={{ fontWeight: 600 }}>
                           <Pencil className="w-3.5 h-3.5" /> Edit Rule
                         </button>
                       )}
-                      <button onClick={() => setCreatePrStep(2)} className="px-4 py-2 rounded-lg bg-[#0A77FF] text-white text-[13px] hover:bg-[#0862D0] transition-colors cursor-pointer" style={{ fontWeight: 600 }}>
+                      <button onClick={() => setCreatePrStep(2)} className="px-4 py-2 rounded-lg bg-primary text-white text-[13px] hover:bg-[#0862D0] transition-colors cursor-pointer" style={{ fontWeight: 600 }}>
                         View Items & Categories
                       </button>
                     </>
                   ) : (
                     <>
-                      <button onClick={() => { setCreatePrModalOpen(false); resetCreatePrForm(); }} className="px-4 py-2 rounded-lg border border-[#E2E8F0] text-[13px] text-[#475569] hover:bg-[#F8FAFC] transition-colors cursor-pointer" style={{ fontWeight: 600 }}>Close</button>
+                      <button onClick={() => { setCreatePrModalOpen(false); resetCreatePrForm(); }} className="px-4 py-2 rounded-lg border border-border text-[13px] text-muted-foreground hover:bg-slate-50 transition-colors cursor-pointer" style={{ fontWeight: 600 }}>Close</button>
                       <button
                         onClick={() => {
                           toast.success(`Saved changes — ${cpmSelectedItems.length} items, ${cpmSelectedCats.length} categories, ${cpmAttachments.length} attachments`);
                           setCreatePrModalOpen(false);
                           resetCreatePrForm();
                         }}
-                        className="px-4 py-2 rounded-lg bg-[#0A77FF] text-white text-[13px] hover:bg-[#0862D0] transition-colors cursor-pointer"
+                        className="px-4 py-2 rounded-lg bg-primary text-white text-[13px] hover:bg-[#0862D0] transition-colors cursor-pointer"
                         style={{ fontWeight: 600 }}
                       >
                         Save Changes
@@ -7510,13 +7510,13 @@ function ConfigPageContent({
                 ) : (
                   createPrStep === 1 ? (
                     <>
-                      <button onClick={() => { setCreatePrModalOpen(false); resetCreatePrForm(); }} className="px-4 py-2 rounded-lg border border-[#E2E8F0] text-[13px] text-[#475569] hover:bg-[#F8FAFC] transition-colors cursor-pointer" style={{ fontWeight: 600 }}>Cancel</button>
-                      <button onClick={() => setCreatePrStep(2)} disabled={!createPrName.trim()} className="px-4 py-2 rounded-lg bg-[#0A77FF] text-white text-[13px] hover:bg-[#0862D0] transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer" style={{ fontWeight: 600 }}>Continue</button>
+                      <button onClick={() => { setCreatePrModalOpen(false); resetCreatePrForm(); }} className="px-4 py-2 rounded-lg border border-border text-[13px] text-muted-foreground hover:bg-slate-50 transition-colors cursor-pointer" style={{ fontWeight: 600 }}>Cancel</button>
+                      <button onClick={() => setCreatePrStep(2)} disabled={!createPrName.trim()} className="px-4 py-2 rounded-lg bg-primary text-white text-[13px] hover:bg-[#0862D0] transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer" style={{ fontWeight: 600 }}>Continue</button>
                     </>
                   ) : (
                     <>
-                      <button onClick={() => { setCreatePrModalOpen(false); resetCreatePrForm(); }} className="px-4 py-2 rounded-lg border border-[#E2E8F0] text-[13px] text-[#475569] hover:bg-[#F8FAFC] transition-colors cursor-pointer" style={{ fontWeight: 600 }}>Discard</button>
-                      <button onClick={handleSaveNewPricingRule} disabled={!createPrName.trim()} className="px-4 py-2 rounded-lg bg-[#0A77FF] text-white text-[13px] hover:bg-[#0862D0] transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer" style={{ fontWeight: 600 }}>
+                      <button onClick={() => { setCreatePrModalOpen(false); resetCreatePrForm(); }} className="px-4 py-2 rounded-lg border border-border text-[13px] text-muted-foreground hover:bg-slate-50 transition-colors cursor-pointer" style={{ fontWeight: 600 }}>Discard</button>
+                      <button onClick={handleSaveNewPricingRule} disabled={!createPrName.trim()} className="px-4 py-2 rounded-lg bg-primary text-white text-[13px] hover:bg-[#0862D0] transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer" style={{ fontWeight: 600 }}>
                         {editingPrRuleId ? "Save Changes" : "Save & Apply"}
                       </button>
                     </>
@@ -7755,31 +7755,31 @@ function ConfigPageContent({
                     <div className="p-3.5 space-y-3">
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <Label className="text-[11px] text-[#0F172A]" style={{ fontWeight: 600 }}>Shipping Method Name<span className="text-destructive">*</span></Label>
+                          <Label className="text-[11px] text-foreground" style={{ fontWeight: 600 }}>Shipping Method Name<span className="text-destructive">*</span></Label>
                           <Input
                             value={entry.name}
                             onChange={(e) => updateCarrierService(entry.id, { name: e.target.value })}
                             placeholder="e.g. Economical Shipping"
-                            className="mt-1 rounded-lg border-[#E2E8F0] bg-white !h-10 text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
+                            className="mt-1 rounded-lg border-border bg-white !h-10 text-sm text-foreground placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary/20"
                           />
                         </div>
                         <div>
-                          <Label className="text-[11px] text-[#0F172A]" style={{ fontWeight: 600 }}>Description</Label>
+                          <Label className="text-[11px] text-foreground" style={{ fontWeight: 600 }}>Description</Label>
                           <Input
                             value={entry.description}
                             onChange={(e) => updateCarrierService(entry.id, { description: e.target.value })}
                             placeholder="Brief description of this method"
-                            className="mt-1 rounded-lg border-[#E2E8F0] bg-white !h-10 text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
+                            className="mt-1 rounded-lg border-border bg-white !h-10 text-sm text-foreground placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary/20"
                           />
                         </div>
                       </div>
 
                       {/* Duration range */}
                       <div>
-                        <Label className="text-[11px] text-[#0F172A]" style={{ fontWeight: 600 }}>Duration (calendar days)</Label>
-                        <div className="mt-1.5 flex items-center gap-3 bg-white rounded-lg p-2.5 border border-[#E2E8F0]">
+                        <Label className="text-[11px] text-foreground" style={{ fontWeight: 600 }}>Duration (calendar days)</Label>
+                        <div className="mt-1.5 flex items-center gap-3 bg-white rounded-lg p-2.5 border border-border">
                           <div className="flex items-center gap-1.5">
-                            <span className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Min</span>
+                            <span className="text-[11px] text-slate-500" style={{ fontWeight: 500 }}>Min</span>
                             <Input
                               type="number"
                               value={entry.minDuration}
@@ -7787,7 +7787,7 @@ function ConfigPageContent({
                                 const val = Math.max(1, Math.min(entry.maxDuration, parseInt(e.target.value) || 1));
                                 updateCarrierService(entry.id, { minDuration: val });
                               }}
-                              className="w-16 h-8 rounded-md border-[#E2E8F0] bg-white text-sm text-center text-[#0F172A] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
+                              className="w-16 h-8 rounded-md border-border bg-white text-sm text-center text-foreground focus:border-primary focus:ring-1 focus:ring-primary/20"
                             />
                           </div>
                           {/* Interactive dual-thumb slider */}
@@ -7809,9 +7809,9 @@ function ConfigPageContent({
                                 const val = Math.min(60, Math.max(entry.minDuration, parseInt(e.target.value) || 60));
                                 updateCarrierService(entry.id, { maxDuration: val });
                               }}
-                              className="w-16 h-8 rounded-md border-[#E2E8F0] bg-white text-sm text-center text-[#0F172A] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
+                              className="w-16 h-8 rounded-md border-border bg-white text-sm text-center text-foreground focus:border-primary focus:ring-1 focus:ring-primary/20"
                             />
-                            <span className="text-[11px] text-[#64748B]" style={{ fontWeight: 500 }}>Max</span>
+                            <span className="text-[11px] text-slate-500" style={{ fontWeight: 500 }}>Max</span>
                           </div>
                         </div>
                       </div>
@@ -7896,38 +7896,38 @@ function ConfigPageContent({
                         <div className="grid grid-cols-2 gap-3">
                           {/* Carrier Selector */}
                           <div className="relative">
-                            <Label className="text-[11px] text-[#0F172A]" style={{ fontWeight: 600 }}>Shipping Carrier</Label>
+                            <Label className="text-[11px] text-foreground" style={{ fontWeight: 600 }}>Shipping Carrier</Label>
                             <button
                               onClick={() => setCarrierDropdownOpen((prev) => ({ ...prev, [entry.id]: !prev[entry.id] }))}
-                              className="mt-1 w-full flex items-center justify-between !h-10 px-3 rounded-lg border border-[#E2E8F0] bg-white text-sm hover:border-[#CBD5E1] transition-colors focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
+                              className="mt-1 w-full flex items-center justify-between !h-10 px-3 rounded-lg border border-border bg-white text-sm hover:border-slate-300 transition-colors focus:border-primary focus:ring-1 focus:ring-primary/20"
                             >
                               {selectedCarrier ? (
                                 <div className="flex items-center gap-2">
                                   <img src={selectedCarrier.logoImg} alt={selectedCarrier.name} className="w-6 h-6 rounded object-contain" />
-                                  <span className="text-[#0F172A] text-sm truncate">{selectedCarrier.name}</span>
+                                  <span className="text-foreground text-sm truncate">{selectedCarrier.name}</span>
                                 </div>
                               ) : (
-                                <span className="text-[#94A3B8] text-sm">Select a shipping carrier</span>
+                                <span className="text-slate-400 text-sm">Select a shipping carrier</span>
                               )}
-                              <ChevronDown className="w-3.5 h-3.5 text-[#94A3B8]" />
+                              <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
                             </button>
 
                             {carrierDropdownOpen[entry.id] && (
-                              <div className="absolute z-[260] top-full left-0 right-0 mt-1 rounded-lg border border-[#E2E8F0] bg-white shadow-lg max-h-[380px] overflow-hidden">
-                                <div className="p-2 border-b border-[#F1F5F9]">
+                              <div className="absolute z-[260] top-full left-0 right-0 mt-1 rounded-lg border border-border bg-white shadow-lg max-h-[380px] overflow-hidden">
+                                <div className="p-2 border-b border-muted">
                                   <div className="relative">
-                                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8]" />
+                                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
                                     <input
                                       value={searchVal}
                                       onChange={(e) => setCarrierSearches((prev) => ({ ...prev, [entry.id]: e.target.value }))}
                                       placeholder="Search shipping carrier..."
-                                      className="w-full h-8 pl-8 pr-3 rounded-md border border-[#E2E8F0] bg-white text-sm text-[#0F172A] outline-none focus:border-[#0A77FF] transition-colors placeholder:text-[#94A3B8]"
+                                      className="w-full h-8 pl-8 pr-3 rounded-md border border-border bg-white text-sm text-foreground outline-none focus:border-primary transition-colors placeholder:text-slate-400"
                                       autoFocus
                                     />
                                   </div>
                                 </div>
                                 {/* Create New Carrier */}
-                                <div className="p-1.5 border-b border-[#F1F5F9]">
+                                <div className="p-1.5 border-b border-muted">
                                   <button
                                     className="w-full flex items-center justify-center gap-1.5 py-2 rounded-md bg-primary/10 text-primary text-xs hover:bg-primary/20 transition-colors"
                                     style={{ fontWeight: 600 }}
@@ -7971,7 +7971,7 @@ function ConfigPageContent({
                                           </button>
                                         );
                                       })}
-                                      <div className="border-b border-[#F1F5F9] mx-2.5 my-1" />
+                                      <div className="border-b border-muted mx-2.5 my-1" />
                                       <p className="text-[10px] text-muted-foreground uppercase tracking-wider px-2.5 py-1" style={{ fontWeight: 600 }}>All Carriers</p>
                                     </div>
                                   )}
@@ -8009,20 +8009,20 @@ function ConfigPageContent({
 
                           {/* Shipping Methods multi-select */}
                           <div className="relative">
-                            <Label className="text-[11px] text-[#0F172A]" style={{ fontWeight: 600 }}>Shipping Methods</Label>
+                            <Label className="text-[11px] text-foreground" style={{ fontWeight: 600 }}>Shipping Methods</Label>
                             <button
                               onClick={() => {
                                 if (!entry.carrier) { toast.info("Please select a carrier first"); return; }
                                 setMethodDropdownOpen((prev) => ({ ...prev, [entry.id]: !prev[entry.id] }));
                               }}
-                              className="mt-1 w-full flex items-center justify-between !h-10 px-3 rounded-lg border border-[#E2E8F0] bg-white text-sm hover:border-[#CBD5E1] transition-colors"
+                              className="mt-1 w-full flex items-center justify-between !h-10 px-3 rounded-lg border border-border bg-white text-sm hover:border-slate-300 transition-colors"
                             >
                               {selectedMethodIds.length > 0 ? (
-                                <span className="text-[#0F172A] text-sm truncate">{selectedMethodIds.length} method{selectedMethodIds.length !== 1 ? "s" : ""} selected</span>
+                                <span className="text-foreground text-sm truncate">{selectedMethodIds.length} method{selectedMethodIds.length !== 1 ? "s" : ""} selected</span>
                               ) : (
-                                <span className="text-[#94A3B8] text-sm">Select shipping methods</span>
+                                <span className="text-slate-400 text-sm">Select shipping methods</span>
                               )}
-                              <ChevronDown className="w-3.5 h-3.5 text-[#94A3B8]" />
+                              <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
                             </button>
 
                             {methodDropdownOpen[entry.id] && carrierMethods.length > 0 && (() => {
@@ -8071,22 +8071,22 @@ function ConfigPageContent({
                                 );
                               };
                               return (
-                              <div className="absolute z-[260] top-full left-0 right-0 mt-1 rounded-lg border border-[#E2E8F0] bg-white shadow-lg max-h-[400px] overflow-hidden">
+                              <div className="absolute z-[260] top-full left-0 right-0 mt-1 rounded-lg border border-border bg-white shadow-lg max-h-[400px] overflow-hidden">
                                 {/* Search */}
-                                <div className="p-2 border-b border-[#F1F5F9]">
+                                <div className="p-2 border-b border-muted">
                                   <div className="relative">
-                                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8]" />
+                                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
                                     <input
                                       value={mSearchVal}
                                       onChange={(e) => setMethodSearches((prev) => ({ ...prev, [entry.id]: e.target.value }))}
                                       placeholder="Search shipping methods..."
-                                      className="w-full h-8 pl-8 pr-3 rounded-md border border-[#E2E8F0] bg-white text-sm text-[#0F172A] outline-none focus:border-[#0A77FF] transition-colors placeholder:text-[#94A3B8]"
+                                      className="w-full h-8 pl-8 pr-3 rounded-md border border-border bg-white text-sm text-foreground outline-none focus:border-primary transition-colors placeholder:text-slate-400"
                                       autoFocus
                                     />
                                   </div>
                                 </div>
                                 {/* Create New Shipping Method */}
-                                <div className="p-1.5 border-b border-[#F1F5F9]">
+                                <div className="p-1.5 border-b border-muted">
                                   <button
                                     className="w-full flex items-center justify-center gap-1.5 py-2 rounded-md bg-primary/10 text-primary text-xs hover:bg-primary/20 transition-colors"
                                     style={{ fontWeight: 600 }}
@@ -8111,7 +8111,7 @@ function ConfigPageContent({
                                         if (!method) return null;
                                         return renderMethodItem(method);
                                       })}
-                                      <div className="border-b border-[#F1F5F9] mx-2.5 my-1" />
+                                      <div className="border-b border-muted mx-2.5 my-1" />
                                       <p className="text-[10px] text-muted-foreground uppercase tracking-wider px-2.5 py-1" style={{ fontWeight: 600 }}>All Methods</p>
                                     </div>
                                   )}
@@ -8250,7 +8250,7 @@ function ConfigPageContent({
                           value={sm.name}
                           onChange={(e) => setCreateSmMethods((prev) => prev.map((m) => m.id === sm.id ? { ...m, name: e.target.value } : m))}
                           placeholder="Enter shipping method name"
-                          className="mt-1 rounded-lg border-[#E2E8F0] bg-white !h-10 text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-primary focus:ring-1 focus:ring-primary/20"
+                          className="mt-1 rounded-lg border-border bg-white !h-10 text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-primary focus:ring-1 focus:ring-primary/20"
                         />
                       </div>
                       <div>
@@ -8259,7 +8259,7 @@ function ConfigPageContent({
                           value={sm.description}
                           onChange={(e) => setCreateSmMethods((prev) => prev.map((m) => m.id === sm.id ? { ...m, description: e.target.value } : m))}
                           placeholder="Enter description"
-                          className="mt-1 rounded-lg border-[#E2E8F0] bg-white !h-10 text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-primary focus:ring-1 focus:ring-primary/20"
+                          className="mt-1 rounded-lg border-border bg-white !h-10 text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-primary focus:ring-1 focus:ring-primary/20"
                         />
                       </div>
                     </div>
@@ -8275,7 +8275,7 @@ function ConfigPageContent({
                               setCreateSmMethods((prev) => prev.map((m) => m.id === sm.id ? { ...m, minDuration: val } : m));
                             }}
                             placeholder="Enter minimum delivery period"
-                            className="rounded-lg border-[#E2E8F0] bg-white !h-10 text-sm text-foreground pr-12 placeholder:text-muted-foreground/60 focus:border-primary focus:ring-1 focus:ring-primary/20"
+                            className="rounded-lg border-border bg-white !h-10 text-sm text-foreground pr-12 placeholder:text-muted-foreground/60 focus:border-primary focus:ring-1 focus:ring-primary/20"
                           />
                           <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground" style={{ fontWeight: 500 }}>days</span>
                         </div>
@@ -8293,7 +8293,7 @@ function ConfigPageContent({
                                 setCreateSmMethods((prev) => prev.map((m) => m.id === sm.id ? { ...m, maxDuration: val } : m));
                               }}
                               placeholder="Enter maximum delivery period"
-                              className="rounded-lg border-[#E2E8F0] bg-white !h-10 text-sm text-foreground pr-12 placeholder:text-muted-foreground/60 focus:border-primary focus:ring-1 focus:ring-primary/20"
+                              className="rounded-lg border-border bg-white !h-10 text-sm text-foreground pr-12 placeholder:text-muted-foreground/60 focus:border-primary focus:ring-1 focus:ring-primary/20"
                             />
                             <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground" style={{ fontWeight: 500 }}>days</span>
                           </div>
@@ -8323,7 +8323,7 @@ function ConfigPageContent({
               <Button
                 variant="outline"
                 onClick={() => setCreateShippingMethodOpen(false)}
-                className="border-[#E2E8F0] text-muted-foreground rounded-lg text-[13px] px-4 h-9"
+                className="border-border text-muted-foreground rounded-lg text-[13px] px-4 h-9"
               >
                 Discard
               </Button>
@@ -8353,8 +8353,8 @@ function ConfigPageContent({
       <div className="space-y-3">
         {/* Section header */}
         <div className="mb-1">
-          <h4 className="text-sm text-[#0F172A]" style={{ fontWeight: 700 }}>Point of Contact</h4>
-          <p className="text-xs text-[#64748B] mt-0.5 leading-relaxed">
+          <h4 className="text-sm text-foreground" style={{ fontWeight: 700 }}>Point of Contact</h4>
+          <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">
             Select contacts or create new ones for order communication.
           </p>
         </div>
@@ -8363,14 +8363,14 @@ function ConfigPageContent({
         <div className="flex items-center gap-2">
           <button
             onClick={handleOpenSelectPoc}
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#EDF4FF] text-[#0A77FF] text-xs hover:bg-[#DBEAFE] transition-colors border border-[#DBEAFE]"
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-accent text-primary text-xs hover:bg-blue-100 transition-colors border border-blue-100"
             style={{ fontWeight: 600 }}
           >
             <Users className="w-3.5 h-3.5" />
             Select from Contact Directory
           </button>
           <button
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white text-[#334155] text-xs hover:bg-[#F8FAFC] transition-colors border border-[#E2E8F0]"
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white text-slate-700 text-xs hover:bg-slate-50 transition-colors border border-border"
             style={{ fontWeight: 600 }}
             onClick={handleOpenCreatePoc}
           >
@@ -8383,17 +8383,17 @@ function ConfigPageContent({
         {selectedPocContacts.length > 0 ? (
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <span className="text-xs text-[#0F172A]" style={{ fontWeight: 600 }}>
+              <span className="text-xs text-foreground" style={{ fontWeight: 600 }}>
                 {selectedPocContacts.length} contact{selectedPocContacts.length !== 1 ? "s" : ""} selected
               </span>
-              <span className="text-[10px] text-[#64748B] bg-[#F1F5F9] px-1.5 py-0.5 rounded-full" style={{ fontWeight: 500 }}>{selectedPocContacts.length}</span>
+              <span className="text-[10px] text-slate-500 bg-muted px-1.5 py-0.5 rounded-full" style={{ fontWeight: 500 }}>{selectedPocContacts.length}</span>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {selectedPocContacts.map((contact) => (
-                <div key={contact.id} className="rounded-lg border border-[#E8ECF1] bg-white p-3 relative group hover:border-[#BFDBFE] transition-all shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
+                <div key={contact.id} className="rounded-lg border border-[#E8ECF1] bg-white p-3 relative group hover:border-blue-200 transition-all shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
                   <button
                     onClick={() => handleRemovePoc(contact.id)}
-                    className="absolute top-3 right-3 w-6 h-6 rounded-full bg-[#FEF2F2] text-[#EF4444] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-[#FEE2E2]"
+                    className="absolute top-3 right-3 w-6 h-6 rounded-full bg-red-50 text-red-500 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-100"
                   >
                     <X className="w-3.5 h-3.5" />
                   </button>
@@ -8405,23 +8405,23 @@ function ConfigPageContent({
                       {getInitials(contact.name)}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{contact.name}</p>
-                      <p className="text-[11px] text-[#94A3B8] truncate">{contact.company}</p>
+                      <p className="text-sm text-foreground truncate" style={{ fontWeight: 600 }}>{contact.name}</p>
+                      <p className="text-[11px] text-slate-400 truncate">{contact.company}</p>
                       <div className="mt-2.5 space-y-1.5">
-                        <div className="flex items-center gap-2 text-[11px] text-[#64748B]">
-                          <Phone className="w-3 h-3 text-[#94A3B8] shrink-0" />
+                        <div className="flex items-center gap-2 text-[11px] text-slate-500">
+                          <Phone className="w-3 h-3 text-slate-400 shrink-0" />
                           <span className="truncate">{contact.phone}</span>
-                          <span className="ml-auto inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-[#F1F5F9] text-[10px] text-[#64748B] shrink-0" style={{ fontWeight: 500 }}>
+                          <span className="ml-auto inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-muted text-[10px] text-slate-500 shrink-0" style={{ fontWeight: 500 }}>
                             <Users className="w-2.5 h-2.5" /> {contact.department}
                           </span>
                         </div>
-                        <div className="flex items-center gap-2 text-[11px] text-[#64748B]">
-                          <PhoneCall className="w-3 h-3 text-[#94A3B8] shrink-0" />
+                        <div className="flex items-center gap-2 text-[11px] text-slate-500">
+                          <PhoneCall className="w-3 h-3 text-slate-400 shrink-0" />
                           <span className="truncate">{contact.secondaryPhone}</span>
-                          {contact.secondaryPhoneExt && <span className="text-[#94A3B8]">Ext. {contact.secondaryPhoneExt}</span>}
+                          {contact.secondaryPhoneExt && <span className="text-slate-400">Ext. {contact.secondaryPhoneExt}</span>}
                         </div>
-                        <div className="flex items-center gap-2 text-[11px] text-[#64748B]">
-                          <Mail className="w-3 h-3 text-[#94A3B8] shrink-0" />
+                        <div className="flex items-center gap-2 text-[11px] text-slate-500">
+                          <Mail className="w-3 h-3 text-slate-400 shrink-0" />
                           <span className="truncate">{contact.email}</span>
                         </div>
                       </div>
@@ -8432,12 +8432,12 @@ function ConfigPageContent({
             </div>
           </div>
         ) : (
-          <div className="py-6 rounded-lg border-2 border-dashed border-[#E2E8F0] bg-white flex flex-col items-center justify-center text-center">
-            <div className="w-10 h-10 rounded-lg bg-[#F8FAFC] border border-[#E8ECF1] flex items-center justify-center mb-2.5">
-              <UserPlus className="w-5 h-5 text-[#94A3B8]" />
+          <div className="py-6 rounded-lg border-2 border-dashed border-border bg-white flex flex-col items-center justify-center text-center">
+            <div className="w-10 h-10 rounded-lg bg-slate-50 border border-[#E8ECF1] flex items-center justify-center mb-2.5">
+              <UserPlus className="w-5 h-5 text-slate-400" />
             </div>
-            <p className="text-sm text-[#94A3B8]" style={{ fontWeight: 500 }}>No contacts selected</p>
-            <p className="text-xs text-[#CBD5E1] mt-1.5 max-w-[280px]">
+            <p className="text-sm text-slate-400" style={{ fontWeight: 500 }}>No contacts selected</p>
+            <p className="text-xs text-slate-300 mt-1.5 max-w-[280px]">
               Select contacts from your Contact Directory or create a new one to get started.
             </p>
           </div>
@@ -8454,33 +8454,33 @@ function ConfigPageContent({
             <DialogDescription className="sr-only">Choose contacts from the Contact Directory to associate with this partner.</DialogDescription>
 
             {/* Modal Header */}
-            <div className="px-5 sm:px-6 pt-5 pb-4 shrink-0 border-b border-[#E2E8F0] bg-[#F8FAFC] rounded-t-none sm:rounded-t-2xl">
+            <div className="px-5 sm:px-6 pt-5 pb-4 shrink-0 border-b border-border bg-slate-50 rounded-t-none sm:rounded-t-2xl">
               <div className="flex items-center justify-between mb-1">
-                <h3 className="text-base sm:text-[17px] text-[#0F172A]" style={{ fontWeight: 700 }}>Select point of contact</h3>
+                <h3 className="text-base sm:text-[17px] text-foreground" style={{ fontWeight: 700 }}>Select point of contact</h3>
                 <button
                   onClick={() => setShowSelectPocModal(false)}
-                  className="w-8 h-8 rounded-lg hover:bg-[#E2E8F0] flex items-center justify-center transition-colors"
+                  className="w-8 h-8 rounded-lg hover:bg-border flex items-center justify-center transition-colors"
                 >
-                  <X className="w-4 h-4 text-[#64748B]" />
+                  <X className="w-4 h-4 text-slate-500" />
                 </button>
               </div>
-              <p className="text-xs text-[#64748B] mb-4" style={{ fontWeight: 400 }}>
+              <p className="text-xs text-slate-500 mb-4" style={{ fontWeight: 400 }}>
                 Choose from your saved contacts or create a new one to assign to this partner.
               </p>
 
               {/* Search + Create CTA */}
               <div className="flex items-center justify-between gap-3 mb-4">
                 <div className="relative w-[220px]">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                   <Input
                     value={pocSearch}
                     onChange={(e) => { setPocSearch(e.target.value); setPocPage(1); }}
                     placeholder="Search point of contact"
-                    className="pl-9 h-9 rounded-lg border-[#E2E8F0] bg-white text-sm"
+                    className="pl-9 h-9 rounded-lg border-border bg-white text-sm"
                   />
                 </div>
                 <button
-                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#EDF4FF] text-[#0A77FF] text-[13px] hover:bg-[#DBEAFE] transition-colors border border-[#DBEAFE] shrink-0"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-accent text-primary text-[13px] hover:bg-blue-100 transition-colors border border-blue-100 shrink-0"
                   style={{ fontWeight: 600 }}
                   onClick={handleOpenCreatePoc}
                 >
@@ -8504,8 +8504,8 @@ function ConfigPageContent({
                       onClick={() => { setPocCategoryFilter(tab.key); setPocPage(1); }}
                       className={`px-3 py-1.5 rounded-full text-xs transition-colors border ${
                         isActive
-                          ? "bg-white border-[#E2E8F0] text-[#0F172A] shadow-sm"
-                          : "bg-transparent border-transparent text-[#64748B] hover:bg-white/60"
+                          ? "bg-white border-border text-foreground shadow-sm"
+                          : "bg-transparent border-transparent text-slate-500 hover:bg-white/60"
                       }`}
                       style={{ fontWeight: isActive ? 600 : 500 }}
                     >
@@ -8520,11 +8520,11 @@ function ConfigPageContent({
             <div className="flex-1 overflow-y-auto px-5 sm:px-6 py-4">
               {pocPagedContacts.length === 0 ? (
                 <div className="py-16 flex flex-col items-center justify-center text-center">
-                  <div className="w-12 h-12 rounded-full bg-[#F1F5F9] flex items-center justify-center mb-3">
-                    <Search className="w-6 h-6 text-[#94A3B8]" />
+                  <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-3">
+                    <Search className="w-6 h-6 text-slate-400" />
                   </div>
-                  <p className="text-sm text-[#94A3B8]" style={{ fontWeight: 500 }}>No contacts found</p>
-                  <p className="text-xs text-[#CBD5E1] mt-1">Try adjusting your search or filter.</p>
+                  <p className="text-sm text-slate-400" style={{ fontWeight: 500 }}>No contacts found</p>
+                  <p className="text-xs text-slate-300 mt-1">Try adjusting your search or filter.</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -8536,13 +8536,13 @@ function ConfigPageContent({
                         onClick={() => handleTogglePocTemp(contact.id)}
                         className={`relative text-left rounded-xl border p-3.5 transition-all ${
                           isSelected
-                            ? "border-[#0A77FF] bg-[#FAFCFF] shadow-[0_0_0_1px_#0A77FF]"
-                            : "border-[#E2E8F0] bg-white hover:border-[#BFDBFE]"
+                            ? "border-primary bg-[#FAFCFF] shadow-[0_0_0_1px_#0A77FF]"
+                            : "border-border bg-white hover:border-blue-200"
                         }`}
                       >
                         {/* Checkbox */}
                         <div className={`absolute top-3 right-3 w-5 h-5 rounded border flex items-center justify-center transition-colors ${
-                          isSelected ? "bg-[#0A77FF] border-[#0A77FF]" : "border-[#D1D5DB] bg-white"
+                          isSelected ? "bg-primary border-primary" : "border-[#D1D5DB] bg-white"
                         }`}>
                           {isSelected && <Check className="w-3 h-3 text-white" />}
                         </div>
@@ -8556,28 +8556,28 @@ function ConfigPageContent({
                             {getInitials(contact.name)}
                           </div>
                           <div className="min-w-0 pr-5">
-                            <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{highlightMatch(contact.name, pocSearch)}</p>
-                            <p className="text-[11px] text-[#94A3B8] truncate">{highlightMatch(contact.company, pocSearch)}</p>
+                            <p className="text-[13px] text-foreground truncate" style={{ fontWeight: 600 }}>{highlightMatch(contact.name, pocSearch)}</p>
+                            <p className="text-[11px] text-slate-400 truncate">{highlightMatch(contact.company, pocSearch)}</p>
                           </div>
                         </div>
 
                         {/* Contact details */}
                         <div className="space-y-1.5">
-                          <div className="flex items-center gap-1.5 text-[11px] text-[#64748B]">
-                            <Phone className="w-3 h-3 text-[#94A3B8] shrink-0" />
+                          <div className="flex items-center gap-1.5 text-[11px] text-slate-500">
+                            <Phone className="w-3 h-3 text-slate-400 shrink-0" />
                             <span className="truncate">{contact.phone}</span>
-                            <span className="ml-auto inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-[#F1F5F9] text-[10px] text-[#64748B] shrink-0" style={{ fontWeight: 500 }}>
+                            <span className="ml-auto inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-muted text-[10px] text-slate-500 shrink-0" style={{ fontWeight: 500 }}>
                               <Users className="w-2.5 h-2.5" />
                               {contact.department.length > 15 ? contact.department.slice(0, 15) + "..." : contact.department}
                             </span>
                           </div>
-                          <div className="flex items-center gap-1.5 text-[11px] text-[#64748B]">
-                            <PhoneCall className="w-3 h-3 text-[#94A3B8] shrink-0" />
+                          <div className="flex items-center gap-1.5 text-[11px] text-slate-500">
+                            <PhoneCall className="w-3 h-3 text-slate-400 shrink-0" />
                             <span className="truncate">{contact.secondaryPhone}</span>
-                            {contact.secondaryPhoneExt && <span className="text-[#94A3B8]">Ext. {contact.secondaryPhoneExt}</span>}
+                            {contact.secondaryPhoneExt && <span className="text-slate-400">Ext. {contact.secondaryPhoneExt}</span>}
                           </div>
-                          <div className="flex items-center gap-1.5 text-[11px] text-[#64748B]">
-                            <Mail className="w-3 h-3 text-[#94A3B8] shrink-0" />
+                          <div className="flex items-center gap-1.5 text-[11px] text-slate-500">
+                            <Mail className="w-3 h-3 text-slate-400 shrink-0" />
                             <span className="truncate">{contact.email}</span>
                           </div>
                         </div>
@@ -8589,16 +8589,16 @@ function ConfigPageContent({
             </div>
 
             {/* Pagination */}
-            <div className="px-5 sm:px-6 py-3 border-t border-[#F1F5F9] flex items-center justify-between shrink-0">
-              <div className="flex items-center gap-2 text-xs text-[#64748B]">
+            <div className="px-5 sm:px-6 py-3 border-t border-muted flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-2 text-xs text-slate-500">
                 <span>Records per page</span>
-                <span className="px-2 py-1 rounded border border-[#E2E8F0] text-xs text-[#0F172A]" style={{ fontWeight: 500 }}>{POC_PER_PAGE}</span>
+                <span className="px-2 py-1 rounded border border-border text-xs text-foreground" style={{ fontWeight: 500 }}>{POC_PER_PAGE}</span>
               </div>
               <div className="flex items-center gap-1">
-                <button onClick={() => setPocPage(1)} disabled={pocPage === 1} className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-[#F1F5F9] disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
-                  <ChevronsLeft className="w-4 h-4 text-[#64748B]" />
+                <button onClick={() => setPocPage(1)} disabled={pocPage === 1} className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+                  <ChevronsLeft className="w-4 h-4 text-slate-500" />
                 </button>
-                <button onClick={() => setPocPage(Math.max(1, pocPage - 1))} disabled={pocPage === 1} className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-[#F1F5F9] disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-xs text-[#64748B]">
+                <button onClick={() => setPocPage(Math.max(1, pocPage - 1))} disabled={pocPage === 1} className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-xs text-slate-500">
                   <ChevronLeft className="w-4 h-4" />
                   <span className="ml-0.5">Prev</span>
                 </button>
@@ -8619,8 +8619,8 @@ function ConfigPageContent({
                       onClick={() => setPocPage(pageNum)}
                       className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs transition-colors ${
                         pocPage === pageNum
-                          ? "bg-[#0A77FF] text-white"
-                          : "text-[#64748B] hover:bg-[#F1F5F9]"
+                          ? "bg-primary text-white"
+                          : "text-slate-500 hover:bg-muted"
                       }`}
                       style={{ fontWeight: pocPage === pageNum ? 600 : 400 }}
                     >
@@ -8628,33 +8628,33 @@ function ConfigPageContent({
                     </button>
                   );
                 })}
-                <button onClick={() => setPocPage(Math.min(pocTotalPages, pocPage + 1))} disabled={pocPage === pocTotalPages} className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-[#F1F5F9] disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-xs text-[#64748B]">
+                <button onClick={() => setPocPage(Math.min(pocTotalPages, pocPage + 1))} disabled={pocPage === pocTotalPages} className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-xs text-slate-500">
                   <span className="mr-0.5">Next</span>
                   <ChevronRight className="w-4 h-4" />
                 </button>
-                <button onClick={() => setPocPage(pocTotalPages)} disabled={pocPage === pocTotalPages} className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-[#F1F5F9] disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
-                  <ChevronsRight className="w-4 h-4 text-[#64748B]" />
+                <button onClick={() => setPocPage(pocTotalPages)} disabled={pocPage === pocTotalPages} className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
+                  <ChevronsRight className="w-4 h-4 text-slate-500" />
                 </button>
               </div>
             </div>
 
             {/* Footer */}
-            <div className="px-5 sm:px-6 py-3.5 border-t border-[#E2E8F0] bg-[#FAFBFC] rounded-b-none sm:rounded-b-2xl flex items-center justify-between shrink-0">
-              <p className="text-sm text-[#0F172A]">
+            <div className="px-5 sm:px-6 py-3.5 border-t border-border bg-[#FAFBFC] rounded-b-none sm:rounded-b-2xl flex items-center justify-between shrink-0">
+              <p className="text-sm text-foreground">
                 <span style={{ fontWeight: 700 }}>{pocTempSelected.size}</span>{" "}
-                <span className="text-[#64748B]">point of contact{pocTempSelected.size !== 1 ? "s" : ""} selected</span>
+                <span className="text-slate-500">point of contact{pocTempSelected.size !== 1 ? "s" : ""} selected</span>
               </p>
               <div className="flex items-center gap-2.5">
                 <button
                   onClick={() => setShowSelectPocModal(false)}
-                  className="px-5 py-2.5 rounded-lg border border-[#E2E8F0] bg-white text-sm text-[#334155] hover:bg-[#F8FAFC] transition-colors"
+                  className="px-5 py-2.5 rounded-lg border border-border bg-white text-sm text-slate-700 hover:bg-slate-50 transition-colors"
                   style={{ fontWeight: 500 }}
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleConfirmPocSelection}
-                  className="px-5 py-2.5 rounded-lg bg-[#0A77FF] text-sm text-white hover:bg-[#0960D9] transition-colors"
+                  className="px-5 py-2.5 rounded-lg bg-primary text-sm text-white hover:bg-[#0960D9] transition-colors"
                   style={{ fontWeight: 600 }}
                 >
                   Confirm
@@ -8697,15 +8697,15 @@ function ConfigPageContent({
 
   // Default fallback
   return (
-    <div className="p-6 rounded-lg border-2 border-dashed border-[#E2E8F0] bg-white flex flex-col items-center justify-center text-center">
-      <div className="w-10 h-10 rounded-lg bg-[#F8FAFC] border border-[#E8ECF1] flex items-center justify-center mb-2.5">
-        <Settings2 className="w-5 h-5 text-[#94A3B8]" />
+    <div className="p-6 rounded-lg border-2 border-dashed border-border bg-white flex flex-col items-center justify-center text-center">
+      <div className="w-10 h-10 rounded-lg bg-slate-50 border border-[#E8ECF1] flex items-center justify-center mb-2.5">
+        <Settings2 className="w-5 h-5 text-slate-400" />
       </div>
-      <p className="text-sm text-[#64748B]" style={{ fontWeight: 600 }}>No configuration set</p>
-      <p className="text-xs text-[#94A3B8] mt-1.5 max-w-[300px]">
+      <p className="text-sm text-slate-500" style={{ fontWeight: 600 }}>No configuration set</p>
+      <p className="text-xs text-slate-400 mt-1.5 max-w-[300px]">
         Configure {currentSection.title.toLowerCase()} settings for this {configType}. These will be applied as defaults for all associated orders.
       </p>
-      <button className="inline-flex items-center gap-1.5 mt-4 px-4 py-2 rounded-lg border border-[#E2E8F0] bg-white text-sm text-[#334155] hover:bg-[#F8FAFC] transition-colors" style={{ fontWeight: 500 }}>
+      <button className="inline-flex items-center gap-1.5 mt-4 px-4 py-2 rounded-lg border border-border bg-white text-sm text-slate-700 hover:bg-slate-50 transition-colors" style={{ fontWeight: 500 }}>
         <Plus className="w-3.5 h-3.5" />
         Add Configuration
       </button>

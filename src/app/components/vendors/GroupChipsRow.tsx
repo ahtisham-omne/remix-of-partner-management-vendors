@@ -18,9 +18,9 @@ function GroupQuickViewCard({
   isPrimary: boolean;
 }) {
   return (
-    <div className="w-[280px] rounded-xl overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-[#E2E8F0]/60">
+    <div className="w-[280px] rounded-xl overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.12)] border border-border/60">
       {/* Dark gradient header */}
-      <div className="bg-gradient-to-br from-[#1E293B] to-[#334155] px-3.5 py-3 relative overflow-hidden">
+      <div className="bg-gradient-to-br from-slate-800 to-slate-700 px-3.5 py-3 relative overflow-hidden">
         {/* Decorative glow */}
         <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-white/[0.04]" />
         <div className="flex items-center justify-between relative">
@@ -35,29 +35,29 @@ function GroupQuickViewCard({
           </div>
           {isPrimary && (
             <span
-              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] bg-[#0A77FF]/25 text-[#60A5FA] shrink-0"
+              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] bg-primary/25 text-[#60A5FA] shrink-0"
               style={{ fontWeight: 600 }}
             >
               <Star className="w-2.5 h-2.5 fill-[#60A5FA]" /> Primary
             </span>
           )}
         </div>
-        <p className="text-[11px] text-[#94A3B8] mt-1.5 relative">
+        <p className="text-[11px] text-slate-400 mt-1.5 relative">
           {group.country} Region
         </p>
       </div>
       {/* Body */}
       <div className="bg-white px-3.5 py-3 space-y-3">
-        <p className="text-[12px] text-[#475569] leading-relaxed line-clamp-3">
+        <p className="text-[12px] text-muted-foreground leading-relaxed line-clamp-3">
           {group.description}
         </p>
-        <div className="flex items-center gap-4 pt-2 border-t border-[#F1F5F9]">
-          <div className="flex items-center gap-1.5 text-[11px] text-[#64748B]">
-            <Users className="w-3 h-3 text-[#94A3B8]" />
+        <div className="flex items-center gap-4 pt-2 border-t border-muted">
+          <div className="flex items-center gap-1.5 text-[11px] text-slate-500">
+            <Users className="w-3 h-3 text-slate-400" />
             <span style={{ fontWeight: 500 }}>{group.memberCount} partners</span>
           </div>
-          <div className="flex items-center gap-1.5 text-[11px] text-[#64748B]">
-            <Globe className="w-3 h-3 text-[#94A3B8]" />
+          <div className="flex items-center gap-1.5 text-[11px] text-slate-500">
+            <Globe className="w-3 h-3 text-slate-400" />
             <span style={{ fontWeight: 500 }}>{group.country}</span>
           </div>
         </div>
@@ -96,17 +96,17 @@ function GroupChipWithPopover({
         onMouseLeave={handleLeave}
         className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-lg text-[11px] border transition-colors cursor-default shrink-0 ${
           isPrimary
-            ? "bg-[#EDF4FF] text-[#0A77FF] border-[#0A77FF]/25"
-            : "bg-[#F8FAFC] text-[#475569] border-[#E2E8F0] hover:border-[#CBD5E1] hover:bg-[#F1F5F9]"
+            ? "bg-accent text-primary border-primary/25"
+            : "bg-slate-50 text-muted-foreground border-border hover:border-slate-300 hover:bg-muted"
         }`}
         style={{ fontWeight: 500 }}
       >
         {isPrimary && (
-          <Star className="w-2.5 h-2.5 fill-[#0A77FF] text-[#0A77FF]" />
+          <Star className="w-2.5 h-2.5 fill-primary text-primary" />
         )}
         {group.countryFlag} {group.name}
         <span
-          className="text-[10px] text-[#94A3B8]"
+          className="text-[10px] text-slate-400"
           style={{ fontWeight: 400 }}
         >
           · {group.memberCount}
@@ -167,7 +167,7 @@ function OverflowChip({
       <PopoverTrigger
         onMouseEnter={handleEnter}
         onMouseLeave={handleLeave}
-        className="inline-flex items-center px-2 py-1 rounded-lg text-[11px] border border-[#E2E8F0] bg-[#F8FAFC] text-[#64748B] hover:bg-[#F1F5F9] hover:text-[#475569] hover:border-[#CBD5E1] transition-colors cursor-default shrink-0"
+        className="inline-flex items-center px-2 py-1 rounded-lg text-[11px] border border-border bg-slate-50 text-slate-500 hover:bg-muted hover:text-muted-foreground hover:border-slate-300 transition-colors cursor-default shrink-0"
         style={{ fontWeight: 500 }}
       >
         +{overflowGroups.length} more
@@ -183,10 +183,10 @@ function OverflowChip({
       >
         <div className="flex items-start gap-2">
           {/* List panel */}
-          <div className="w-[240px] rounded-xl border border-[#E2E8F0]/60 bg-white shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden shrink-0">
-            <div className="px-3 py-2 border-b border-[#F1F5F9] bg-[#FAFBFC]">
+          <div className="w-[240px] rounded-xl border border-border/60 bg-white shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden shrink-0">
+            <div className="px-3 py-2 border-b border-muted bg-[#FAFBFC]">
               <span
-                className="text-[11px] text-[#64748B]"
+                className="text-[11px] text-slate-500"
                 style={{ fontWeight: 600 }}
               >
                 +{overflowGroups.length} more group
@@ -202,22 +202,22 @@ function OverflowChip({
                     key={g.id}
                     onMouseEnter={() => setHoveredGroup(g)}
                     className={`w-full flex items-center gap-2 px-3 py-2 transition-colors text-left cursor-default ${
-                      isHovered ? "bg-[#EDF4FF]" : "hover:bg-[#F8FAFC]"
+                      isHovered ? "bg-accent" : "hover:bg-slate-50"
                     }`}
                   >
                     <span className="shrink-0">{g.countryFlag}</span>
                     <span
                       className={`text-[12px] truncate ${
-                        isHovered ? "text-[#0A77FF]" : "text-[#334155]"
+                        isHovered ? "text-primary" : "text-slate-700"
                       }`}
                       style={{ fontWeight: 500 }}
                     >
                       {g.name}
                     </span>
                     {isPrimary && (
-                      <Star className="w-2.5 h-2.5 fill-[#0A77FF] text-[#0A77FF] shrink-0" />
+                      <Star className="w-2.5 h-2.5 fill-primary text-primary shrink-0" />
                     )}
-                    <span className="text-[10px] text-[#94A3B8] ml-auto shrink-0">
+                    <span className="text-[10px] text-slate-400 ml-auto shrink-0">
                       {g.memberCount}
                     </span>
                   </div>

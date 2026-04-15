@@ -13,18 +13,18 @@ export function QualifiedVendorsPage() {
   const statusColors: Record<string, { bg: string; text: string }> = {
     Qualified: { bg: "#F0FDF4", text: "#16A34A" },
     "Expiring Soon": { bg: "#FFF7ED", text: "#EA580C" },
-    Expired: { bg: "#FEF2F2", text: "#DC2626" },
+    Expired: { bg: "#FEF2F2", text: "hsl(var(--destructive))" },
   };
 
   const priorityColors: Record<string, { bg: string; text: string }> = {
-    Critical: { bg: "#FEF2F2", text: "#DC2626" },
+    Critical: { bg: "#FEF2F2", text: "hsl(var(--destructive))" },
     High: { bg: "#FFF7ED", text: "#EA580C" },
-    Medium: { bg: "#EDF4FF", text: "#0A77FF" },
-    Low: { bg: "#F1F5F9", text: "#64748B" },
+    Medium: { bg: "hsl(var(--accent))", text: "hsl(var(--primary))" },
+    Low: { bg: "hsl(var(--muted))", text: "#64748B" },
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#F8FAFC]">
+    <div className="flex flex-col h-full bg-slate-50">
       <div className="px-6 py-4 border-b border-border bg-card">
         <div className="flex items-center justify-between">
           <div>
@@ -37,7 +37,7 @@ export function QualifiedVendorsPage() {
           </div>
           <button
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-white text-[13px] transition-colors hover:opacity-90"
-            style={{ backgroundColor: "#0A77FF", fontWeight: 500 }}
+            style={{ backgroundColor: "hsl(var(--primary))", fontWeight: 500 }}
           >
             <Plus className="w-4 h-4" />
             Qualify Vendor
@@ -52,7 +52,7 @@ export function QualifiedVendorsPage() {
             <input
               type="text"
               placeholder="Search qualified vendors..."
-              className="w-full pl-9 pr-4 py-2 rounded-lg border border-border bg-card text-[13px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#0A77FF]/20 focus:border-[#0A77FF]"
+              className="w-full pl-9 pr-4 py-2 rounded-lg border border-border bg-card text-[13px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
             />
           </div>
           <button className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-border text-[13px] text-muted-foreground hover:bg-muted transition-colors">
@@ -82,8 +82,8 @@ export function QualifiedVendorsPage() {
                   <tr key={vendor.id} className="border-b border-border last:border-0 hover:bg-muted/50 transition-colors cursor-pointer">
                     <td className="px-5 py-3.5">
                       <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: "#EDF4FF" }}>
-                          <ShieldCheck className="w-4 h-4" style={{ color: "#0A77FF" }} />
+                        <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: "hsl(var(--accent))" }}>
+                          <ShieldCheck className="w-4 h-4" style={{ color: "hsl(var(--primary))" }} />
                         </div>
                         <span style={{ fontSize: "13px", fontWeight: 500, color: '#1E293B' }}>{vendor.name}</span>
                       </div>
@@ -109,11 +109,11 @@ export function QualifiedVendorsPage() {
                         {vendor.priority}
                       </span>
                     </td>
-                    <td className="px-5 py-3.5" style={{ fontSize: "13px", color: '#475569' }}>{vendor.expiry}</td>
+                    <td className="px-5 py-3.5" style={{ fontSize: "13px", color: "hsl(var(--muted-foreground))" }}>{vendor.expiry}</td>
                     <td className="px-5 py-3.5">
                       <div className="flex items-center gap-1.5">
                         {vendor.status === "Expiring Soon" && <AlertCircle className="w-3.5 h-3.5" style={{ color: "#EA580C" }} />}
-                        {vendor.status === "Expired" && <AlertCircle className="w-3.5 h-3.5" style={{ color: "#DC2626" }} />}
+                        {vendor.status === "Expired" && <AlertCircle className="w-3.5 h-3.5" style={{ color: "hsl(var(--destructive))" }} />}
                         <span
                           className="px-2.5 py-1 rounded-full"
                           style={{ fontSize: "11px", fontWeight: 500, backgroundColor: sColors.bg, color: sColors.text }}

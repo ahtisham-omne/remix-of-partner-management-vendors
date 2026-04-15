@@ -298,7 +298,7 @@ export function AppSidebar() {
                       onClick={() => toggleExpand(item.label)}
                       className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[13px] transition-all duration-150 ${
                         active
-                          ? "text-[#0A77FF]"
+                          ? "text-primary"
                           : "text-muted-foreground hover:bg-muted hover:text-foreground"
                       }`}
                       style={{
@@ -310,7 +310,7 @@ export function AppSidebar() {
                     >
                       <Icon
                         className={`w-[18px] h-[18px] shrink-0 ${
-                          active ? "text-[#0A77FF]" : ""
+                          active ? "text-primary" : ""
                         }`}
                       />
                       <span className="flex-1 text-left truncate">
@@ -321,7 +321,7 @@ export function AppSidebar() {
                           isExpanded ? "rotate-0" : "-rotate-90"
                         } ${
                           active
-                            ? "text-[#0A77FF]"
+                            ? "text-primary"
                             : "text-muted-foreground"
                         }`}
                       />
@@ -352,7 +352,7 @@ export function AppSidebar() {
                               }
                               className={`block px-2.5 py-1 rounded-md text-[13px] transition-all duration-150 ${
                                 linkActive
-                                  ? "text-[#0A77FF]"
+                                  ? "text-primary"
                                   : "text-muted-foreground hover:text-foreground hover:bg-muted"
                               }`}
                               style={{
@@ -392,7 +392,7 @@ export function AppSidebar() {
                   className={({ isActive: linkActive }) =>
                     `flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[13px] transition-all duration-150 ${
                       linkActive
-                        ? "text-[#0A77FF]"
+                        ? "text-primary"
                         : "text-muted-foreground hover:bg-muted hover:text-foreground"
                     }`
                   }
@@ -429,11 +429,11 @@ export function AppSidebar() {
             <div className="flex items-center gap-2 px-2.5 py-2 rounded-lg hover:bg-muted transition-colors cursor-pointer">
               <div
                 className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
-                style={{ backgroundColor: "#EDF4FF" }}
+                style={{ backgroundColor: "hsl(var(--accent))" }}
               >
                 <span
                   className="text-[11px]"
-                  style={{ fontWeight: 600, color: "#0A77FF" }}
+                  style={{ fontWeight: 600, color: "hsl(var(--primary))" }}
                 >
                   AA
                 </span>
@@ -467,7 +467,7 @@ export function AppSidebar() {
             <TooltipTrigger asChild>
               <button
                 onClick={() => setCollapsed(false)}
-                className="w-9 h-9 rounded-lg flex items-center justify-center transition-all hover:ring-2 hover:ring-[#0A77FF]/20"
+                className="w-9 h-9 rounded-lg flex items-center justify-center transition-all hover:ring-2 hover:ring-primary/20"
                 aria-label="Expand sidebar"
               >
                 <img src={logoIcon} alt="Omnesoft" className="w-7 h-7" />
@@ -493,7 +493,7 @@ export function AppSidebar() {
                     <div
                       className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors ${
                         active
-                          ? "text-[#0A77FF]"
+                          ? "text-primary"
                           : disabled
                           ? "text-muted-foreground/50 cursor-not-allowed"
                           : "text-muted-foreground hover:bg-muted hover:text-foreground cursor-pointer"
@@ -544,12 +544,12 @@ export function AppSidebar() {
             <Tooltip>
               <TooltipTrigger asChild>
                 <div
-                  className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 cursor-pointer hover:ring-2 hover:ring-[#0A77FF]/20 transition-all"
-                  style={{ backgroundColor: "#EDF4FF" }}
+                  className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 cursor-pointer hover:ring-2 hover:ring-primary/20 transition-all"
+                  style={{ backgroundColor: "hsl(var(--accent))" }}
                 >
                   <span
                     className="text-[11px]"
-                    style={{ fontWeight: 600, color: "#0A77FF" }}
+                    style={{ fontWeight: 600, color: "hsl(var(--primary))" }}
                   >
                     AA
                   </span>
@@ -623,8 +623,8 @@ export function AppSidebar() {
           <div
             className={`absolute inset-y-0 right-0 w-[2px] transition-colors duration-150 ${
               isResizing
-                ? "bg-[#0A77FF]"
-                : "bg-transparent group-hover:bg-[#0A77FF]/40"
+                ? "bg-primary"
+                : "bg-transparent group-hover:bg-primary/40"
             }`}
           />
         </div>

@@ -89,12 +89,12 @@ export function AddressAutocomplete({
   return (
     <div ref={wrapperRef} className="relative">
       {label && (
-        <Label htmlFor={id} className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>
+        <Label htmlFor={id} className="text-xs sm:text-[13px] text-foreground" style={{ fontWeight: 500 }}>
           {label}
         </Label>
       )}
       <div className="relative mt-1">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8] pointer-events-none z-[1]" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none z-[1]" />
         <Input
           id={id}
           placeholder={placeholder}
@@ -107,13 +107,13 @@ export function AddressAutocomplete({
             setFocused(true);
             if (selected) setSelected(false);
           }}
-          className="pl-9 pr-8 rounded-lg border-[#E2E8F0] bg-white !h-10 text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
+          className="pl-9 pr-8 rounded-lg border-border bg-white !h-10 text-sm text-foreground placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary/20"
         />
         {value.length > 0 && (
           <button
             type="button"
             onClick={handleClear}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-[#94A3B8] hover:text-[#64748B] transition-colors z-[1]"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-500 transition-colors z-[1]"
           >
             <X className="w-3.5 h-3.5" />
           </button>
@@ -122,7 +122,7 @@ export function AddressAutocomplete({
         {focused && suggestions.length > 0 && (
           <div
             ref={dropdownRef}
-            className="absolute left-0 right-0 top-full z-[100] rounded-lg border border-[#E2E8F0] bg-white overflow-hidden"
+            className="absolute left-0 right-0 top-full z-[100] rounded-lg border border-border bg-white overflow-hidden"
             style={{ boxShadow: "0 8px 24px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.04)" }}
           >
             {suggestions.map((suggestion, idx) => (
@@ -130,14 +130,14 @@ export function AddressAutocomplete({
                 key={idx}
                 type="button"
                 onClick={() => handleSelect(suggestion.main, suggestion.secondary)}
-                className="w-full flex items-start gap-3 px-3 py-2.5 text-left hover:bg-[#F0F7FF] transition-colors cursor-pointer border-b border-[#F1F5F9] last:border-b-0"
+                className="w-full flex items-start gap-3 px-3 py-2.5 text-left hover:bg-[#F0F7FF] transition-colors cursor-pointer border-b border-muted last:border-b-0"
               >
-                <div className="w-7 h-7 rounded-lg bg-[#F1F5F9] flex items-center justify-center shrink-0 mt-0.5">
-                  <MapPin className="w-3.5 h-3.5 text-[#0A77FF]" />
+                <div className="w-7 h-7 rounded-lg bg-muted flex items-center justify-center shrink-0 mt-0.5">
+                  <MapPin className="w-3.5 h-3.5 text-primary" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 500 }}>{suggestion.main}</div>
-                  <div className="text-[11px] text-[#94A3B8] truncate mt-0.5">{suggestion.secondary}</div>
+                  <div className="text-[13px] text-foreground truncate" style={{ fontWeight: 500 }}>{suggestion.main}</div>
+                  <div className="text-[11px] text-slate-400 truncate mt-0.5">{suggestion.secondary}</div>
                 </div>
               </button>
             ))}

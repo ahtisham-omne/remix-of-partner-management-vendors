@@ -35,7 +35,7 @@ export function ConfigUnifiedNav({
       <div className="sm:hidden shrink-0 border-b border-[#EEF2F6] bg-white overflow-x-auto scrollbar-hide">
         <nav className="flex flex-col">
           <div className="px-3 pt-2 pb-1">
-            <p className="text-[10px] text-[#94A3B8] uppercase tracking-wider" style={{ fontWeight: 600 }}>
+            <p className="text-[10px] text-slate-400 uppercase tracking-wider" style={{ fontWeight: 600 }}>
               Profiles · {enabledCount} active
             </p>
           </div>
@@ -49,29 +49,29 @@ export function ConfigUnifiedNav({
                   onClick={() => onSetActiveSubType(subType.id)}
                   className={`flex items-center gap-2 px-3 py-2 rounded-lg text-left transition-all whitespace-nowrap shrink-0 ${
                     isActive && isEnabled
-                      ? "bg-[#EDF4FF] text-[#0A77FF] ring-1 ring-[#0A77FF]/20"
+                      ? "bg-accent text-primary ring-1 ring-primary/20"
                       : isActive && !isEnabled
-                      ? "bg-[#F8FAFC] text-[#475569] ring-1 ring-[#E2E8F0]"
+                      ? "bg-slate-50 text-muted-foreground ring-1 ring-border"
                       : isEnabled
-                      ? "text-[#475569] hover:bg-[#F8FAFC]"
-                      : "text-[#94A3B8] hover:bg-[#F8FAFC]"
+                      ? "text-muted-foreground hover:bg-slate-50"
+                      : "text-slate-400 hover:bg-slate-50"
                   }`}
                 >
                   <div className={`w-6 h-6 rounded-md flex items-center justify-center shrink-0 ${
-                    isActive && isEnabled ? "bg-[#0A77FF] text-white" : isEnabled ? "bg-[#DBEAFE] text-[#0A77FF]" : "bg-[#F1F5F9] text-[#CBD5E1]"
+                    isActive && isEnabled ? "bg-primary text-white" : isEnabled ? "bg-blue-100 text-primary" : "bg-muted text-slate-300"
                   }`}>
                     {React.cloneElement(subType.icon as React.ReactElement, { className: "w-3.5 h-3.5" })}
                   </div>
                   <span className="text-xs" style={{ fontWeight: isActive ? 600 : 500 }}>{subType.label}</span>
                   {isEnabled && (
-                    <span className={`text-[9px] px-1.5 py-0.5 rounded-full ${isActive ? "bg-[#0A77FF]/10 text-[#0A77FF]" : "bg-[#DCFCE7] text-[#16A34A]"}`} style={{ fontWeight: 600 }}>ON</span>
+                    <span className={`text-[9px] px-1.5 py-0.5 rounded-full ${isActive ? "bg-primary/10 text-primary" : "bg-[#DCFCE7] text-green-600"}`} style={{ fontWeight: 600 }}>ON</span>
                   )}
                 </button>
               );
             })}
           </div>
           {selectedSubTypes.has(activeSubTypeTab) && (
-            <div className="flex px-3 pb-2 gap-1 min-w-max overflow-x-auto scrollbar-hide border-t border-[#F1F5F9] pt-1.5">
+            <div className="flex px-3 pb-2 gap-1 min-w-max overflow-x-auto scrollbar-hide border-t border-muted pt-1.5">
               {sections.map((section) => {
                 const isActive = section.id === activeSection;
                 return (
@@ -79,7 +79,7 @@ export function ConfigUnifiedNav({
                     key={section.id}
                     onClick={() => onActiveSectionChange(section.id)}
                     className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-[11px] transition-all whitespace-nowrap ${
-                      isActive ? "bg-[#0A77FF] text-white" : "text-[#64748B] hover:bg-[#F1F5F9]"
+                      isActive ? "bg-primary text-white" : "text-slate-500 hover:bg-muted"
                     }`}
                     style={{ fontWeight: isActive ? 600 : 500 }}
                   >
@@ -94,14 +94,14 @@ export function ConfigUnifiedNav({
 
       {/* Desktop: redesigned profile sidebar */}
       <div className="hidden sm:flex sm:flex-col w-[252px] lg:w-[272px] shrink-0 border-r border-[#EEF2F6] bg-white overflow-y-auto">
-        <div className="px-3.5 pt-3.5 pb-2 border-b border-[#F1F5F9]">
+        <div className="px-3.5 pt-3.5 pb-2 border-b border-muted">
           <div className="flex items-center justify-between">
-            <p className="text-[11px] text-[#64748B] uppercase tracking-wider" style={{ fontWeight: 600 }}>Profiles</p>
-            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#EDF4FF] text-[#0A77FF]" style={{ fontWeight: 600 }}>
+            <p className="text-[11px] text-slate-500 uppercase tracking-wider" style={{ fontWeight: 600 }}>Profiles</p>
+            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-accent text-primary" style={{ fontWeight: 600 }}>
               {enabledCount} of {subTypes.length} active
             </span>
           </div>
-          <p className="text-[10px] text-[#94A3B8] mt-0.5">Enable profiles to configure vendor capabilities</p>
+          <p className="text-[10px] text-slate-400 mt-0.5">Enable profiles to configure vendor capabilities</p>
         </div>
 
         <nav className="flex flex-col px-1.5 py-2 flex-1 gap-0.5">
@@ -117,9 +117,9 @@ export function ConfigUnifiedNav({
                   className={`group flex items-center gap-2.5 px-2.5 py-2 rounded-lg cursor-pointer transition-all duration-150 ${
                     isActive
                       ? isEnabled
-                        ? "bg-[#EDF4FF] ring-1 ring-[#0A77FF]/15"
-                        : "bg-[#F8FAFC] ring-1 ring-[#E2E8F0]"
-                      : "hover:bg-[#F8FAFC]"
+                        ? "bg-accent ring-1 ring-primary/15"
+                        : "bg-slate-50 ring-1 ring-border"
+                      : "hover:bg-slate-50"
                   }`}
                   onClick={() => {
                     onSetActiveSubType(subType.id);
@@ -130,24 +130,24 @@ export function ConfigUnifiedNav({
                 >
                   <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-all duration-150 ${
                     isActive && isEnabled
-                      ? "bg-[#0A77FF] text-white shadow-sm"
+                      ? "bg-primary text-white shadow-sm"
                       : isEnabled
-                      ? "bg-[#DBEAFE] text-[#0A77FF]"
-                      : "bg-[#F1F5F9] text-[#94A3B8]"
+                      ? "bg-blue-100 text-primary"
+                      : "bg-muted text-slate-400"
                   }`}>
                     {React.cloneElement(subType.icon as React.ReactElement, { className: "w-4 h-4" })}
                   </div>
 
                   <div className="flex-1 min-w-0">
                     <span className={`block text-[13px] truncate transition-colors duration-150 ${
-                      isActive ? "text-[#0F172A]" : isEnabled ? "text-[#1E293B]" : "text-[#64748B] group-hover:text-[#334155]"
+                      isActive ? "text-foreground" : isEnabled ? "text-slate-800" : "text-slate-500 group-hover:text-slate-700"
                     }`} style={{ fontWeight: isActive ? 600 : isEnabled ? 500 : 400 }}>
                       {subType.label}
                     </span>
-                    <span className={`text-[10px] ${isEnabled ? "text-[#16A34A]" : "text-[#94A3B8]"}`} style={{ fontWeight: 500 }}>
+                    <span className={`text-[10px] ${isEnabled ? "text-green-600" : "text-slate-400"}`} style={{ fontWeight: 500 }}>
                       {isEnabled ? "Active" : "Inactive"}
                       {isSeller && isEnabled && enabledCount === 1 && (
-                        <span className="text-[#CBD5E1] ml-1">· Default</span>
+                        <span className="text-slate-300 ml-1">· Default</span>
                       )}
                     </span>
                   </div>
@@ -162,7 +162,7 @@ export function ConfigUnifiedNav({
                     title={!canToggle && isEnabled ? "Enable another profile before disabling Seller" : undefined}
                   >
                     <div className={`relative w-8 h-[18px] rounded-full transition-colors duration-200 cursor-pointer ${
-                      isEnabled ? "bg-[#0A77FF]" : "bg-[#CBD5E1] hover:bg-[#94A3B8]"
+                      isEnabled ? "bg-primary" : "bg-slate-300 hover:bg-slate-400"
                     } ${!canToggle && isEnabled ? "opacity-50 cursor-not-allowed" : ""}`}>
                       <div className={`absolute top-[2px] w-[14px] h-[14px] rounded-full bg-white shadow-sm transition-transform duration-200 ${
                         isEnabled ? "left-[16px]" : "left-[2px]"
@@ -178,7 +178,7 @@ export function ConfigUnifiedNav({
                     opacity: isActive && isEnabled ? 1 : 0,
                   }}
                 >
-                  <div className="ml-[20px] pl-[12px] border-l-[1.5px] border-[#E2E8F0] py-1 mt-0.5">
+                  <div className="ml-[20px] pl-[12px] border-l-[1.5px] border-border py-1 mt-0.5">
                     {sections.map((section) => {
                       const isSectionActive = isActive && isEnabled && section.id === activeSection;
                       return (
@@ -186,16 +186,16 @@ export function ConfigUnifiedNav({
                           key={section.id}
                           onClick={() => onActiveSectionChange(section.id)}
                           className={`group/item w-full flex items-center gap-2 px-2.5 py-[7px] rounded-md text-left transition-colors duration-150 ${
-                            isSectionActive ? "bg-[#EDF4FF]" : "hover:bg-[#F1F5F9]/60"
+                            isSectionActive ? "bg-accent" : "hover:bg-muted/60"
                           }`}
                         >
                           <span className={`transition-colors duration-150 ${
-                            isSectionActive ? "text-[#0A77FF]" : "text-[#94A3B8] group-hover/item:text-[#64748B]"
+                            isSectionActive ? "text-primary" : "text-slate-400 group-hover/item:text-slate-500"
                           }`}>
                             {React.cloneElement(section.icon as React.ReactElement, { className: "w-3.5 h-3.5" })}
                           </span>
                           <span className={`text-[12.5px] truncate transition-colors duration-150 ${
-                            isSectionActive ? "text-[#0A77FF]" : "text-[#475569] group-hover/item:text-[#1E293B]"
+                            isSectionActive ? "text-primary" : "text-muted-foreground group-hover/item:text-slate-800"
                           }`} style={{ fontWeight: isSectionActive ? 600 : 400 }}>
                             {section.title}
                           </span>
@@ -209,8 +209,8 @@ export function ConfigUnifiedNav({
           })}
         </nav>
 
-        <div className="px-3.5 py-2.5 border-t border-[#F1F5F9]">
-          <p className="text-[10px] text-[#94A3B8] leading-relaxed">
+        <div className="px-3.5 py-2.5 border-t border-muted">
+          <p className="text-[10px] text-slate-400 leading-relaxed">
             <Info className="w-3 h-3 inline mr-1 -mt-0.5" />
             Seller profile is always required. Enable additional profiles to expand capabilities.
           </p>

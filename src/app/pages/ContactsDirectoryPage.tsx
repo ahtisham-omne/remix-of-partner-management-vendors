@@ -206,7 +206,7 @@ function DraggableContactDirectoryKpiCard({
     return (
       <div
         ref={ref}
-        className="rounded-lg border border-dashed border-[#0A77FF]/20 bg-[#0A77FF]/[0.02] min-h-[52px] pointer-events-none"
+        className="rounded-lg border border-dashed border-primary/20 bg-primary/[0.02] min-h-[52px] pointer-events-none"
       />
     );
   }
@@ -217,24 +217,24 @@ function DraggableContactDirectoryKpiCard({
       data-kpi-key={kpiKey}
       className={`border rounded-lg bg-white group relative min-w-0 transition-all duration-200 select-none overflow-hidden cursor-grab active:cursor-grabbing ${
         isOver
-          ? "border-[#0A77FF]/30 bg-[#0A77FF]/[0.03] shadow-[0_0_0_2px_rgba(10,119,255,0.08)] scale-[1.02]"
-          : "border-[#E2E8F0] hover:-translate-y-[1px] hover:border-[#93B8F7] hover:shadow-[0_2px_8px_-3px_rgba(10,119,255,0.06)]"
+          ? "border-primary/30 bg-primary/[0.03] shadow-[0_0_0_2px_rgba(10,119,255,0.08)] scale-[1.02]"
+          : "border-border hover:-translate-y-[1px] hover:border-[#93B8F7] hover:shadow-[0_2px_8px_-3px_rgba(10,119,255,0.06)]"
       }`}
     >
       {isOver && (
-        <div className="absolute inset-0 rounded-lg bg-[#0A77FF]/[0.02] pointer-events-none" />
+        <div className="absolute inset-0 rounded-lg bg-primary/[0.02] pointer-events-none" />
       )}
       <div className="px-3 py-2">
         {/* Drag handle — top-right pill, hover-revealed */}
-        <div className="absolute top-1.5 right-1.5 opacity-0 group-hover:opacity-100 transition-all duration-150 flex items-center bg-[#F1F5F9] rounded-md p-1 z-10 pointer-events-none">
-          <GripVertical className="w-3.5 h-3.5 text-[#64748B]" />
+        <div className="absolute top-1.5 right-1.5 opacity-0 group-hover:opacity-100 transition-all duration-150 flex items-center bg-muted rounded-md p-1 z-10 pointer-events-none">
+          <GripVertical className="w-3.5 h-3.5 text-slate-500" />
         </div>
         <div className="flex items-center justify-between gap-1 mb-1">
-          <p className="text-[10.5px] text-[#64748B] whitespace-nowrap" style={{ fontWeight: 500 }}>{label}</p>
+          <p className="text-[10.5px] text-slate-500 whitespace-nowrap" style={{ fontWeight: 500 }}>{label}</p>
           <Icon className="w-3.5 h-3.5 shrink-0" style={{ color: "#94A3B8" }} />
         </div>
         <div className="flex items-baseline gap-1.5">
-          <p className="text-[15px] text-[#334155] tracking-tight whitespace-nowrap" style={{ fontWeight: 600, lineHeight: 1.2 }}>{value}</p>
+          <p className="text-[15px] text-slate-700 tracking-tight whitespace-nowrap" style={{ fontWeight: 600, lineHeight: 1.2 }}>{value}</p>
         </div>
       </div>
       {/* Remove button — bottom-right, hover-revealed */}
@@ -244,7 +244,7 @@ function DraggableContactDirectoryKpiCard({
           className="absolute bottom-1 right-1 opacity-0 group-hover:opacity-100 transition-all duration-150 p-1 rounded cursor-pointer hover:bg-red-50 z-10"
           title={`Remove ${label}`}
         >
-          <Trash2 className="w-3 h-3 text-[#94A3B8] hover:text-[#EF4444]" />
+          <Trash2 className="w-3 h-3 text-slate-400 hover:text-red-500" />
         </button>
       )}
     </div>
@@ -335,8 +335,8 @@ function ContactInsightsPanel({ open, onOpenChange, allKpis, activeKeys, onToggl
         <div className="px-5 pt-5 pb-0 shrink-0">
           <div className="flex items-start justify-between">
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ backgroundColor: "#EDF4FF" }}>
-                <ChartColumn className="w-5 h-5" style={{ color: "#0A77FF" }} />
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ backgroundColor: "hsl(var(--accent))" }}>
+                <ChartColumn className="w-5 h-5" style={{ color: "hsl(var(--primary))" }} />
               </div>
               <div>
                 <h2 className="text-base text-foreground" style={{ fontWeight: 600 }}>Add Insights</h2>
@@ -362,15 +362,15 @@ function ContactInsightsPanel({ open, onOpenChange, allKpis, activeKeys, onToggl
               }}
               className={`flex items-center gap-1.5 text-[12px] px-3 py-1.5 rounded-full border transition-all duration-200 cursor-pointer ${
                 allActive
-                  ? "bg-[#EBF3FF] border-[#0A77FF]/25 text-[#0A77FF] hover:bg-[#DCEAFF] shadow-sm shadow-[#0A77FF]/10"
+                  ? "bg-[#EBF3FF] border-primary/25 text-primary hover:bg-[#DCEAFF] shadow-sm shadow-primary/10"
                   : noneActive
-                  ? "bg-[#F8FAFC] border-[#E2E8F0] text-[#94A3B8] hover:bg-[#F1F5F9] hover:text-[#64748B]"
-                  : "bg-[#F8FAFC] border-[#E2E8F0] text-[#64748B] hover:bg-[#EBF3FF] hover:border-[#0A77FF]/25 hover:text-[#0A77FF]"
+                  ? "bg-slate-50 border-border text-slate-400 hover:bg-muted hover:text-slate-500"
+                  : "bg-slate-50 border-border text-slate-500 hover:bg-[#EBF3FF] hover:border-primary/25 hover:text-primary"
               }`}
               style={{ fontWeight: 600 }}
             >
               {allActive ? (
-                <><ToggleRight className="w-4 h-4 text-[#0A77FF]" /><span>All On</span></>
+                <><ToggleRight className="w-4 h-4 text-primary" /><span>All On</span></>
               ) : noneActive ? (
                 <><ToggleLeft className="w-4 h-4" /><span>All Off</span></>
               ) : (
@@ -403,7 +403,7 @@ function ContactInsightsPanel({ open, onOpenChange, allKpis, activeKeys, onToggl
           ) : (
             <div className="mt-4">
               <div className="flex items-center gap-1.5 mb-2">
-                <Users className="w-3.5 h-3.5 text-[#94A3B8]" />
+                <Users className="w-3.5 h-3.5 text-slate-400" />
                 <span className="text-[12px] text-muted-foreground/70 uppercase tracking-wide" style={{ fontWeight: 600 }}>Contact Metrics</span>
               </div>
               <div className="grid grid-cols-2 gap-2">
@@ -416,14 +416,14 @@ function ContactInsightsPanel({ open, onOpenChange, allKpis, activeKeys, onToggl
                       onClick={() => onToggle(kpi.key)}
                       className={`relative text-left rounded-lg border px-3 py-2.5 transition-all duration-150 cursor-pointer group ${
                         isActive
-                          ? "border-[#0A77FF]/25 bg-[#0A77FF]/[0.04] shadow-[0_0_0_1px_rgba(10,119,255,0.08)]"
+                          ? "border-primary/25 bg-primary/[0.04] shadow-[0_0_0_1px_rgba(10,119,255,0.08)]"
                           : "border-border/60 bg-white hover:border-border hover:bg-muted/20 hover:shadow-sm"
                       }`}
                     >
                       {/* Top row: label + toggle icon */}
                       <div className="flex items-center justify-between gap-1">
                         <span
-                          className={`text-[11.5px] truncate transition-colors ${isActive ? "text-[#0A77FF]" : "text-muted-foreground/70"}`}
+                          className={`text-[11.5px] truncate transition-colors ${isActive ? "text-primary" : "text-muted-foreground/70"}`}
                           style={{ fontWeight: 500 }}
                           title={kpi.label}
                         >
@@ -431,7 +431,7 @@ function ContactInsightsPanel({ open, onOpenChange, allKpis, activeKeys, onToggl
                         </span>
                         <div className="shrink-0">
                           {isActive ? (
-                            <Check className="w-3.5 h-3.5" style={{ color: "#0A77FF" }} />
+                            <Check className="w-3.5 h-3.5" style={{ color: "hsl(var(--primary))" }} />
                           ) : (
                             <Plus className="w-3.5 h-3.5 text-muted-foreground/25 group-hover:text-muted-foreground/50 transition-colors" />
                           )}
@@ -854,14 +854,14 @@ export function ContactsDirectoryPage({
     const avgPartners = total > 0 ? (allContacts.reduce((sum, c) => sum + c.linkedPartners.length, 0) / total).toFixed(1) : "0";
     const totalPartners = allContacts.reduce((sum, c) => sum + c.linkedPartners.length, 0);
     return [
-      { key: "total", label: "Total Contacts", value: String(total), icon: Users, color: "#0A77FF", bg: "#EDF4FF", tooltip: "Total number of contacts in the directory" },
-      { key: "active", label: "Active Contacts", value: String(active), icon: UserCheck, color: "#059669", bg: "#ECFDF5", tooltip: "Contacts currently marked as active" },
-      { key: "inactive", label: "Inactive Contacts", value: String(inactive), icon: CircleSlash, color: "#D97706", bg: "#FFFBEB", tooltip: "Contacts currently marked as inactive" },
-      { key: "sales", label: "Sales Department", value: String(sales), icon: Briefcase, color: "#7C3AED", bg: "#F5F3FF", tooltip: "Contacts in the Sales department" },
-      { key: "supply_chain", label: "Supply Chain", value: String(supplyChain), icon: Truck, color: "#D97706", bg: "#FFFBEB", tooltip: "Contacts in Supply Chain Management" },
+      { key: "total", label: "Total Contacts", value: String(total), icon: Users, color: "hsl(var(--primary))", bg: "hsl(var(--accent))", tooltip: "Total number of contacts in the directory" },
+      { key: "active", label: "Active Contacts", value: String(active), icon: UserCheck, color: "hsl(var(--success))", bg: "#ECFDF5", tooltip: "Contacts currently marked as active" },
+      { key: "inactive", label: "Inactive Contacts", value: String(inactive), icon: CircleSlash, color: "hsl(var(--warning))", bg: "#FFFBEB", tooltip: "Contacts currently marked as inactive" },
+      { key: "sales", label: "Sales Department", value: String(sales), icon: Briefcase, color: "hsl(var(--violet))", bg: "#F5F3FF", tooltip: "Contacts in the Sales department" },
+      { key: "supply_chain", label: "Supply Chain", value: String(supplyChain), icon: Truck, color: "hsl(var(--warning))", bg: "#FFFBEB", tooltip: "Contacts in Supply Chain Management" },
       { key: "finance", label: "Finance Department", value: String(finance), icon: DollarSign, color: "#0891B2", bg: "#ECFEFF", tooltip: "Contacts in the Finance department" },
-      { key: "avg_partners", label: "Avg. Partners/Contact", value: avgPartners, icon: Link2, color: "#DC2626", bg: "#FEF2F2", tooltip: "Average number of linked partners per contact" },
-      { key: "total_partners", label: "Total Partner Links", value: String(totalPartners), icon: Users, color: "#0A77FF", bg: "#EDF4FF", tooltip: "Sum of all partner links across contacts" },
+      { key: "avg_partners", label: "Avg. Partners/Contact", value: avgPartners, icon: Link2, color: "hsl(var(--destructive))", bg: "#FEF2F2", tooltip: "Average number of linked partners per contact" },
+      { key: "total_partners", label: "Total Partner Links", value: String(totalPartners), icon: Users, color: "hsl(var(--primary))", bg: "hsl(var(--accent))", tooltip: "Sum of all partner links across contacts" },
     ];
   }, [allContacts]);
 
@@ -1130,7 +1130,7 @@ export function ContactsDirectoryPage({
                 </HoverCardTrigger>
                 <HoverCardContent side="bottom" align="start" className="w-[280px] p-0 rounded-xl border-0 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
                   {/* Header with gradient */}
-                  <div className="bg-gradient-to-br from-[#1E293B] to-[#334155] px-4 py-3 relative overflow-hidden">
+                  <div className="bg-gradient-to-br from-slate-800 to-slate-700 px-4 py-3 relative overflow-hidden">
                     <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-white/[0.04]" />
                     <div className="flex items-center gap-3 relative">
                       <div className="w-11 h-11 rounded-xl overflow-hidden border-2 border-white/20 shrink-0" style={{ backgroundColor: getPersonPhoto(contact.name) ? "transparent" : tint.bg }}>
@@ -1138,15 +1138,15 @@ export function ContactsDirectoryPage({
                       </div>
                       <div className="min-w-0">
                         <p className="text-[14px] text-white truncate" style={{ fontWeight: 600 }}>{contact.name}</p>
-                        <p className="text-[11px] text-[#94A3B8] truncate">{contact.department}</p>
+                        <p className="text-[11px] text-slate-400 truncate">{contact.department}</p>
                       </div>
                     </div>
                   </div>
                   {/* Body */}
                   <div className="bg-white px-4 py-3 space-y-2">
-                    <div className="flex items-center gap-2.5 text-[12px] text-[#334155]"><Mail className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" /><span className="truncate">{contact.email}</span></div>
-                    <div className="flex items-center gap-2.5 text-[12px] text-[#334155]"><Phone className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" /><span>{contact.phone}{contact.phoneExt ? ` ext. ${contact.phoneExt}` : ""}</span></div>
-                    <div className="flex items-center gap-2.5 text-[12px] text-[#334155]"><Building2 className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" /><span>{contact.company}</span></div>
+                    <div className="flex items-center gap-2.5 text-[12px] text-slate-700"><Mail className="w-3.5 h-3.5 text-slate-400 shrink-0" /><span className="truncate">{contact.email}</span></div>
+                    <div className="flex items-center gap-2.5 text-[12px] text-slate-700"><Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" /><span>{contact.phone}{contact.phoneExt ? ` ext. ${contact.phoneExt}` : ""}</span></div>
+                    <div className="flex items-center gap-2.5 text-[12px] text-slate-700"><Building2 className="w-3.5 h-3.5 text-slate-400 shrink-0" /><span>{contact.company}</span></div>
                   </div>
                 </HoverCardContent>
               </HoverCard>
@@ -1168,7 +1168,7 @@ export function ContactsDirectoryPage({
             <div className={`flex items-center ${isRelaxed ? "gap-1.5" : "gap-1"}`}>
               <span
                 className={`inline-flex items-center ${isRelaxed ? "px-2.5 py-1 text-xs" : "px-2 py-0.5 text-xs"} rounded-md border`}
-                style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#475569", borderColor: "#E2E8F0" }}
+                style={{ fontWeight: 500, backgroundColor: "hsl(var(--muted))", color: "hsl(var(--muted-foreground))", borderColor: "hsl(var(--border))" }}
               >
                 {shortDept(depts[0])}
               </span>
@@ -1181,7 +1181,7 @@ export function ContactsDirectoryPage({
                     subtitle: "",
                   }))}
                 >
-                  <span className="inline-flex items-center px-1.5 py-0.5 rounded-md text-xs border cursor-default" style={{ fontWeight: 600, backgroundColor: "#F1F5F9", color: "#475569", borderColor: "#E2E8F0" }}>+{depts.length - 1}</span>
+                  <span className="inline-flex items-center px-1.5 py-0.5 rounded-md text-xs border cursor-default" style={{ fontWeight: 600, backgroundColor: "hsl(var(--muted))", color: "hsl(var(--muted-foreground))", borderColor: "hsl(var(--border))" }}>+{depts.length - 1}</span>
                 </OverflowTooltip>
               )}
             </div>
@@ -1292,7 +1292,7 @@ export function ContactsDirectoryPage({
           <TableCell key={colKey}>
             <div className="min-w-0">
               <div className="flex items-center gap-1.5">
-                <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} text-foreground truncate cursor-pointer hover:text-[#0A77FF] hover:underline transition-colors`} style={{ fontWeight: 500 }}>{firstSocial.url}</span>
+                <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} text-foreground truncate cursor-pointer hover:text-primary hover:underline transition-colors`} style={{ fontWeight: 500 }}>{firstSocial.url}</span>
                 {socialExtra > 0 && (
                   <OverflowTooltip
                     category="Social Profiles"
@@ -1322,7 +1322,7 @@ export function ContactsDirectoryPage({
             <div className="min-w-0">
               <div className="flex items-center gap-1.5">
                 <span
-                  className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} text-foreground cursor-pointer hover:text-[#0A77FF] hover:underline transition-colors truncate`}
+                  className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} text-foreground cursor-pointer hover:text-primary hover:underline transition-colors truncate`}
                   style={{ fontWeight: 500 }}
                   onClick={(e) => { e.stopPropagation(); if (firstId) window.open(`/vendors/${firstId}`, "_blank"); else toast.info("Partner details — coming soon"); }}
                 >
@@ -1375,7 +1375,7 @@ export function ContactsDirectoryPage({
                 </HoverCardTrigger>
                 <HoverCardContent side="bottom" align="start" className="w-[280px] p-0 rounded-xl border-0 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
                   {/* Header with gradient */}
-                  <div className="bg-gradient-to-br from-[#1E293B] to-[#334155] px-4 py-3 relative overflow-hidden">
+                  <div className="bg-gradient-to-br from-slate-800 to-slate-700 px-4 py-3 relative overflow-hidden">
                     <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-white/[0.04]" />
                     <div className="flex items-center gap-3 relative">
                       <div className="w-11 h-11 rounded-full overflow-hidden border-2 border-white/20 shrink-0" style={{ backgroundColor: cbPhoto ? "transparent" : cbTint.bg }}>
@@ -1383,15 +1383,15 @@ export function ContactsDirectoryPage({
                       </div>
                       <div className="min-w-0">
                         <p className="text-[14px] text-white truncate" style={{ fontWeight: 600 }}>{contact.createdByName}</p>
-                        <p className="text-[11px] text-[#94A3B8] truncate">{cbRole}</p>
+                        <p className="text-[11px] text-slate-400 truncate">{cbRole}</p>
                       </div>
                     </div>
                   </div>
                   {/* Body */}
                   <div className="bg-white px-4 py-3 space-y-2">
-                    <div className="flex items-center gap-2.5 text-[12px] text-[#334155]"><Mail className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" /><span className="truncate">{cbEmail}</span></div>
-                    <div className="flex items-center gap-2.5 text-[12px] text-[#334155]"><Building2 className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" /><span>{cbDept}</span></div>
-                    <div className="flex items-center gap-2.5 text-[12px] text-[#334155]"><Phone className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" /><span>{cbPhone}</span></div>
+                    <div className="flex items-center gap-2.5 text-[12px] text-slate-700"><Mail className="w-3.5 h-3.5 text-slate-400 shrink-0" /><span className="truncate">{cbEmail}</span></div>
+                    <div className="flex items-center gap-2.5 text-[12px] text-slate-700"><Building2 className="w-3.5 h-3.5 text-slate-400 shrink-0" /><span>{cbDept}</span></div>
+                    <div className="flex items-center gap-2.5 text-[12px] text-slate-700"><Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" /><span>{cbPhone}</span></div>
                   </div>
                 </HoverCardContent>
               </HoverCard>
@@ -1438,7 +1438,7 @@ export function ContactsDirectoryPage({
   };
 
   return (
-    <div className={embedded ? "flex flex-col bg-transparent" : "flex flex-col h-full bg-[#F8FAFC]"}>
+    <div className={embedded ? "flex flex-col bg-transparent" : "flex flex-col h-full bg-slate-50"}>
       {/* Top Bar — hidden when embedded */}
       {!embedded && (
       <div className="flex items-center justify-between px-6 lg:px-8 h-12 border-b border-border bg-card shrink-0">
@@ -1462,8 +1462,8 @@ export function ContactsDirectoryPage({
             />
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: "#EDF4FF" }}>
-              <span className="text-[11px]" style={{ fontWeight: 600, color: "#0A77FF" }}>AA</span>
+            <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: "hsl(var(--accent))" }}>
+              <span className="text-[11px]" style={{ fontWeight: 600, color: "hsl(var(--primary))" }}>AA</span>
             </div>
             <div className="hidden sm:block">
               <p className="text-[13px]" style={{ fontWeight: 500 }}>Ahtisham Ahmad</p>
@@ -1481,8 +1481,8 @@ export function ContactsDirectoryPage({
           {!embedded && (
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 -mx-6 lg:-mx-8 -mt-6 px-6 lg:px-8 pt-3.5 pb-3.5 bg-white border-b border-border shrink-0">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: "#EDF4FF" }}>
-                <Users className="w-4 h-4" style={{ color: "#0A77FF" }} />
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: "hsl(var(--accent))" }}>
+                <Users className="w-4 h-4" style={{ color: "hsl(var(--primary))" }} />
               </div>
               <div>
                 <h1 className="font-bold text-[20px]">Contacts Directory</h1>
@@ -1540,7 +1540,7 @@ export function ContactsDirectoryPage({
                       >
                         <span className="text-sm">{opt.label}</span>
                         {insightsDateRange === opt.key && (
-                          <Check className="w-3.5 h-3.5" style={{ color: "#0A77FF" }} />
+                          <Check className="w-3.5 h-3.5" style={{ color: "hsl(var(--primary))" }} />
                         )}
                       </DropdownMenuItem>
                     ))}
@@ -1550,7 +1550,7 @@ export function ContactsDirectoryPage({
               <button
                 onClick={() => setInsightsPanelOpen(true)}
                 className="inline-flex items-center gap-1 text-[11px] hover:bg-muted/50 px-2 py-0.5 rounded-md transition-colors cursor-pointer"
-                style={{ fontWeight: 500, color: "#0A77FF" }}
+                style={{ fontWeight: 500, color: "hsl(var(--primary))" }}
               >
                 <Plus className="w-3 h-3" />
                 Add Insights
@@ -1655,7 +1655,7 @@ export function ContactsDirectoryPage({
                     {kpiData.length > 0 && (
                       <span
                         className="inline-flex items-center justify-center h-5 px-1.5 rounded-full text-[11px]"
-                        style={{ backgroundColor: "#EDF4FF", color: "#0A77FF", fontWeight: 600 }}
+                        style={{ backgroundColor: "hsl(var(--accent))", color: "hsl(var(--primary))", fontWeight: 600 }}
                       >
                         {kpiData.length}
                       </span>
@@ -1696,15 +1696,15 @@ export function ContactsDirectoryPage({
                             <div className="text-sm" style={{ fontWeight: 500 }}>{opt.label}</div>
                             <div className="text-xs text-muted-foreground">{opt.description}</div>
                           </div>
-                          {density === opt.key && <Check className="w-4 h-4 shrink-0" style={{ color: "#0A77FF" }} />}
+                          {density === opt.key && <Check className="w-4 h-4 shrink-0" style={{ color: "hsl(var(--primary))" }} />}
                         </DropdownMenuItem>
                       ))}
                       {/* Card size options — only when card view is active */}
                       {density === "card" && (
                         <>
-                          <div className="mx-2 my-1.5 border-t border-[#F1F5F9]" />
+                          <div className="mx-2 my-1.5 border-t border-muted" />
                           <div className="px-3 py-1.5">
-                            <p className="text-[10px] text-[#94A3B8] uppercase tracking-wide mb-2" style={{ fontWeight: 600 }}>Card Size</p>
+                            <p className="text-[10px] text-slate-400 uppercase tracking-wide mb-2" style={{ fontWeight: 600 }}>Card Size</p>
                             <div className="flex items-center gap-1.5">
                               {(["large", "medium", "small"] as const).map((size) => (
                                 <button
@@ -1712,8 +1712,8 @@ export function ContactsDirectoryPage({
                                   onClick={() => setCardSize(size)}
                                   className={`flex-1 py-1.5 rounded-md text-[11px] text-center transition-all cursor-pointer ${
                                     cardSize === size
-                                      ? "bg-[#0A77FF] text-white shadow-sm"
-                                      : "bg-[#F1F5F9] text-[#64748B] hover:bg-[#E2E8F0]"
+                                      ? "bg-primary text-white shadow-sm"
+                                      : "bg-muted text-slate-500 hover:bg-border"
                                   }`}
                                   style={{ fontWeight: cardSize === size ? 600 : 500 }}
                                 >
@@ -1751,12 +1751,12 @@ export function ContactsDirectoryPage({
                       }}
                       className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                         isActive
-                          ? "border-primary bg-[#EDF4FF] hover:bg-[#D6E8FF] active:bg-[#ADD1FF]"
+                          ? "border-primary bg-accent hover:bg-[#D6E8FF] active:bg-[#ADD1FF]"
                           : "border-border text-muted-foreground hover:bg-muted/60 hover:text-foreground hover:border-muted-foreground/30 active:bg-muted"
                       }`}
                       style={{
                         fontWeight: isActive ? 500 : 400,
-                        color: isActive ? "#0A77FF" : undefined,
+                        color: isActive ? "hsl(var(--primary))" : undefined,
                       }}
                     >
                       {filter.label}
@@ -1767,7 +1767,7 @@ export function ContactsDirectoryPage({
                           }`}
                           style={{
                             fontWeight: 600,
-                            color: isActive ? "#0A77FF" : "#475569",
+                            color: isActive ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))",
                           }}
                         >
                           {count}
@@ -1810,13 +1810,13 @@ export function ContactsDirectoryPage({
                           <div
                             key={contact.id}
                             onClick={() => navigate(`/partners/contacts/${contact.id}`)}
-                            className="rounded-xl border border-[#E8ECF1] bg-white relative group hover:border-[#BFDBFE] hover:shadow-[0_4px_16px_-4px_rgba(10,119,255,0.10)] transition-all shadow-[0_1px_2px_rgba(0,0,0,0.04)] cursor-pointer"
+                            className="rounded-xl border border-[#E8ECF1] bg-white relative group hover:border-blue-200 hover:shadow-[0_4px_16px_-4px_rgba(10,119,255,0.10)] transition-all shadow-[0_1px_2px_rgba(0,0,0,0.04)] cursor-pointer"
                           >
                             {/* 3-dot menu */}
                             <div className="absolute top-3 right-3 z-10">
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                                  <button className="h-7 w-7 rounded-md flex items-center justify-center text-[#94A3B8] opacity-0 group-hover:opacity-100 hover:text-[#334155] hover:bg-[#F1F5F9] transition-all cursor-pointer">
+                                  <button className="h-7 w-7 rounded-md flex items-center justify-center text-slate-400 opacity-0 group-hover:opacity-100 hover:text-slate-700 hover:bg-muted transition-all cursor-pointer">
                                     <MoreHorizontal className="w-3.5 h-3.5" />
                                   </button>
                                 </DropdownMenuTrigger>
@@ -1829,16 +1829,16 @@ export function ContactsDirectoryPage({
                                   </DropdownMenuItem>
                                   <DropdownMenuSeparator />
                                   {contact.status === "active" ? (
-                                    <DropdownMenuItem className="text-[#92400E] focus:text-[#92400E] focus:bg-[#FFFBEB]" onClick={() => setDeactivateContactId(contact.id)}>
-                                      <CircleSlash className="w-4 h-4 mr-2 text-[#92400E]" /> Deactivate
+                                    <DropdownMenuItem className="text-amber-800 focus:text-amber-800 focus:bg-amber-50" onClick={() => setDeactivateContactId(contact.id)}>
+                                      <CircleSlash className="w-4 h-4 mr-2 text-amber-800" /> Deactivate
                                     </DropdownMenuItem>
                                   ) : (
                                     <DropdownMenuItem onClick={() => toast.success("Contact activated")}>
                                       <CircleCheck className="w-4 h-4 mr-2" /> Activate
                                     </DropdownMenuItem>
                                   )}
-                                  <DropdownMenuItem className="text-[#DC2626] focus:text-[#DC2626] focus:bg-[#FEF2F2]" onClick={() => setArchiveContactId(contact.id)}>
-                                    <Archive className="w-4 h-4 mr-2 text-[#DC2626]" /> Archive
+                                  <DropdownMenuItem className="text-destructive focus:text-destructive focus:bg-red-50" onClick={() => setArchiveContactId(contact.id)}>
+                                    <Archive className="w-4 h-4 mr-2 text-destructive" /> Archive
                                   </DropdownMenuItem>
                                 </DropdownMenuContent>
                               </DropdownMenu>
@@ -1849,21 +1849,21 @@ export function ContactsDirectoryPage({
                               <div className="flex items-center gap-3 pr-6">
                                 <ContactAvatar name={contact.name} size="lg" />
                                 <div className="min-w-0 flex-1">
-                                  <p className="text-[13px] text-[#0F172A] truncate" style={{ fontWeight: 600 }}>{contact.name}</p>
-                                  <p className="text-[11px] text-[#334155] truncate" style={{ fontWeight: 500 }}>{shortDept} <span className="text-[#CBD5E1]">·</span> <span className="text-[#94A3B8]" style={{ fontWeight: 400 }}>{(contact.companies || [contact.company])[0]}{(contact.companies || [contact.company]).length > 1 ? ` +${(contact.companies || [contact.company]).length - 1}` : ""}</span></p>
+                                  <p className="text-[13px] text-foreground truncate" style={{ fontWeight: 600 }}>{contact.name}</p>
+                                  <p className="text-[11px] text-slate-700 truncate" style={{ fontWeight: 500 }}>{shortDept} <span className="text-slate-300">·</span> <span className="text-slate-400" style={{ fontWeight: 400 }}>{(contact.companies || [contact.company])[0]}{(contact.companies || [contact.company]).length > 1 ? ` +${(contact.companies || [contact.company]).length - 1}` : ""}</span></p>
                                 </div>
                                 <span className="inline-flex items-center text-[10px] px-2 py-[2px] rounded-full border shrink-0" style={{ fontWeight: 500, backgroundColor: sStyle.bg, color: sStyle.text, borderColor: sStyle.border }}>
                                   {contact.status === "active" ? "Active" : "Inactive"}
                                 </span>
                               </div>
                               {/* Contact details */}
-                              <div className="mt-2.5 pt-2.5 border-t border-[#F1F5F9] space-y-1">
-                                <div className="flex items-center gap-2 text-[11px] text-[#475569]">
-                                  <Mail className="w-3 h-3 text-[#94A3B8] shrink-0" />
+                              <div className="mt-2.5 pt-2.5 border-t border-muted space-y-1">
+                                <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                                  <Mail className="w-3 h-3 text-slate-400 shrink-0" />
                                   <span className="truncate">{(contact.emails && contact.emails.length > 0 ? contact.emails : [{ id: "fb", type: "Work" as const, address: contact.email }])[0].address}</span>
                                 </div>
-                                <div className="flex items-center gap-2 text-[11px] text-[#475569]">
-                                  <Phone className="w-3 h-3 text-[#94A3B8] shrink-0" />
+                                <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                                  <Phone className="w-3 h-3 text-slate-400 shrink-0" />
                                   <span>{(() => { const phoneList = contact.phones && contact.phones.length > 0 ? contact.phones : [{ id: "fb", type: "Office" as const, code: "+1", number: contact.phone, ext: contact.phoneExt || "" }]; return `${phoneList[0].code} ${phoneList[0].number}`; })()}</span>
                                 </div>
                               </div>
@@ -1883,7 +1883,7 @@ export function ContactsDirectoryPage({
                         density === "condensed" ? "[&>th]:h-8" : density === "comfort" ? "[&>th]:h-9" : ""
                       }`}>
                         {/* Checkbox column — sticky leftmost */}
-                        <TableHead className="sticky left-0 z-20 bg-[#f8fafc] w-[40px] min-w-[40px] max-w-[40px] !pl-2 !pr-0">
+                        <TableHead className="sticky left-0 z-20 bg-slate-50 w-[40px] min-w-[40px] max-w-[40px] !pl-2 !pr-0">
                           <Checkbox
                             checked={allPageSelected ? true : somePageSelected ? "indeterminate" : false}
                             onCheckedChange={handleSelectAll}
@@ -1912,7 +1912,7 @@ export function ContactsDirectoryPage({
                                   e.preventDefault();
                                 }
                               } : undefined}
-                              className={`whitespace-nowrap relative group/colheader ${isFrozen ? "sticky bg-[#f8fafc] z-20" : ""} ${isDraggable ? "cursor-grab" : ""}`}
+                              className={`whitespace-nowrap relative group/colheader ${isFrozen ? "sticky bg-slate-50 z-20" : ""} ${isDraggable ? "cursor-grab" : ""}`}
                               style={{
                                 width: `${width}px`, minWidth: `${width}px`, maxWidth: `${width}px`,
                                 overflow: "hidden",
@@ -1925,7 +1925,7 @@ export function ContactsDirectoryPage({
                             >
                               {/* Blue accent bar on top edge of dragged column header */}
                               {isBeingDragged && (
-                                <div className="absolute top-0 left-0 right-0 h-[2px] rounded-b-full" style={{ backgroundColor: "#0A77FF" }} />
+                                <div className="absolute top-0 left-0 right-0 h-[2px] rounded-b-full" style={{ backgroundColor: "hsl(var(--primary))" }} />
                               )}
                               {/* Drag grip icon */}
                               {isDraggable && (
@@ -1946,12 +1946,12 @@ export function ContactsDirectoryPage({
                                   isLocked={isLocked}
                                 >
                                   <div className="inline-flex items-center gap-1">
-                                    <span className="text-[13px]" style={currentColSort ? { color: "#0A77FF" } : undefined}>{def.label}</span>
+                                    <span className="text-[13px]" style={currentColSort ? { color: "hsl(var(--primary))" } : undefined}>{def.label}</span>
                                     {currentColSort === "asc" && (
-                                      <ArrowUp className="w-3 h-3 shrink-0" style={{ color: "#0A77FF" }} />
+                                      <ArrowUp className="w-3 h-3 shrink-0" style={{ color: "hsl(var(--primary))" }} />
                                     )}
                                     {currentColSort === "desc" && (
-                                      <ArrowDown className="w-3 h-3 shrink-0" style={{ color: "#0A77FF" }} />
+                                      <ArrowDown className="w-3 h-3 shrink-0" style={{ color: "hsl(var(--primary))" }} />
                                     )}
                                     {!currentColSort && def.sortable && (
                                       <ArrowUpDown className="w-3 h-3 shrink-0 text-muted-foreground opacity-0 group-hover/colheader:opacity-100 transition-opacity" />
@@ -1980,7 +1980,7 @@ export function ContactsDirectoryPage({
                           );
                         })}
                         {/* Actions column — sticky right */}
-                        <TableHead className="whitespace-nowrap w-[60px] sticky right-0 bg-[#f8fafc] z-20 !pl-2 !pr-2" style={{ boxShadow: "inset 1px 0 0 0 rgba(0,0,0,0.08)" }}>
+                        <TableHead className="whitespace-nowrap w-[60px] sticky right-0 bg-slate-50 z-20 !pl-2 !pr-2" style={{ boxShadow: "inset 1px 0 0 0 rgba(0,0,0,0.08)" }}>
                           <span className="text-[13px]">Actions</span>
                         </TableHead>
                       </TableRow>
@@ -2071,8 +2071,8 @@ export function ContactsDirectoryPage({
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
                                     {contact.status === "active" ? (
-                                      <DropdownMenuItem className="text-[#92400E] focus:text-[#92400E] focus:bg-[#FFFBEB]" onClick={() => setDeactivateContactId(contact.id)}>
-                                        <CircleSlash className="w-4 h-4 mr-2 text-[#92400E]" />
+                                      <DropdownMenuItem className="text-amber-800 focus:text-amber-800 focus:bg-amber-50" onClick={() => setDeactivateContactId(contact.id)}>
+                                        <CircleSlash className="w-4 h-4 mr-2 text-amber-800" />
                                         Deactivate
                                       </DropdownMenuItem>
                                     ) : (
@@ -2081,8 +2081,8 @@ export function ContactsDirectoryPage({
                                         Activate
                                       </DropdownMenuItem>
                                     )}
-                                    <DropdownMenuItem className="text-[#DC2626] focus:text-[#DC2626] focus:bg-[#FEF2F2]" onClick={() => setArchiveContactId(contact.id)}>
-                                      <Archive className="w-4 h-4 mr-2 text-[#DC2626]" />
+                                    <DropdownMenuItem className="text-destructive focus:text-destructive focus:bg-red-50" onClick={() => setArchiveContactId(contact.id)}>
+                                      <Archive className="w-4 h-4 mr-2 text-destructive" />
                                       Archive
                                     </DropdownMenuItem>
                                   </DropdownMenuContent>
@@ -2231,12 +2231,12 @@ export function ContactsDirectoryPage({
                   boxShadow: "0 1px 3px rgba(10,119,255,0.08), 0 6px 20px rgba(0,0,0,0.10)",
                 }}
               >
-                <GripVertical className="w-3 h-3 shrink-0" style={{ color: "#0A77FF" }} />
-                <span className="text-[13px]" style={{ color: "#0A77FF", fontWeight: 500 }}>
+                <GripVertical className="w-3 h-3 shrink-0" style={{ color: "hsl(var(--primary))" }} />
+                <span className="text-[13px]" style={{ color: "hsl(var(--primary))", fontWeight: 500 }}>
                   {colDef(draggingColumnKey)?.label}
                 </span>
-                {ghostSort === "asc" && <ArrowUp className="w-3 h-3 shrink-0" style={{ color: "#0A77FF" }} />}
-                {ghostSort === "desc" && <ArrowDown className="w-3 h-3 shrink-0" style={{ color: "#0A77FF" }} />}
+                {ghostSort === "asc" && <ArrowUp className="w-3 h-3 shrink-0" style={{ color: "hsl(var(--primary))" }} />}
+                {ghostSort === "desc" && <ArrowDown className="w-3 h-3 shrink-0" style={{ color: "hsl(var(--primary))" }} />}
               </div>
             );
           })()}
@@ -2294,7 +2294,7 @@ export function ContactsDirectoryPage({
           <div className="relative flex flex-col items-center pt-10 pb-6" style={{ background: "linear-gradient(180deg, #FEF2F2 0%, rgba(254,242,242,0.3) 70%, transparent 100%)" }}>
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[180px] h-[80px] rounded-full blur-[50px] opacity-25" style={{ backgroundColor: "#EF4444" }} />
             <div className="relative w-16 h-16 rounded-2xl flex items-center justify-center" style={{ backgroundColor: "#FEE2E2" }}>
-              <Archive className="w-8 h-8" style={{ color: "#DC2626" }} />
+              <Archive className="w-8 h-8" style={{ color: "hsl(var(--destructive))" }} />
             </div>
             <span
               className="mt-4 px-3 py-1 rounded-full text-[11px]"
@@ -2306,11 +2306,11 @@ export function ContactsDirectoryPage({
           {/* CTA: #DC2626 on #fff ≈ 4.0:1 AA-Large ✓ · Cancel: #334155 on #F1F5F9 ≈ 7.1:1 AAA ✓ */}
           <div className="flex flex-col items-center text-center px-8 pb-8">
             <AlertDialogHeader className="p-0 gap-0 text-center">
-              <AlertDialogTitle className="text-[18px] tracking-[-0.02em]" style={{ fontWeight: 600, color: "#0F172A" }}>
+              <AlertDialogTitle className="text-[18px] tracking-[-0.02em]" style={{ fontWeight: 600, color: "hsl(var(--foreground))" }}>
                 Archive this contact?
               </AlertDialogTitle>
             </AlertDialogHeader>
-            <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "#475569", lineHeight: "1.65" }}>
+            <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "hsl(var(--muted-foreground))", lineHeight: "1.65" }}>
               <span style={{ fontWeight: 600, color: "#1E293B" }}>
                 {allContacts.find(c => c.id === archiveContactId)?.name ?? "This contact"}
               </span>{" "}
@@ -2320,13 +2320,13 @@ export function ContactsDirectoryPage({
               <AlertDialogAction
                 onClick={() => { toast.success("Contact archived"); setArchiveContactId(null); }}
                 className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors hover:opacity-90"
-                style={{ fontWeight: 600, backgroundColor: "#DC2626", color: "#fff" }}
+                style={{ fontWeight: 600, backgroundColor: "hsl(var(--destructive))", color: "#fff" }}
               >
                 Archive Contact
               </AlertDialogAction>
               <AlertDialogCancel
                 className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors"
-                style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#334155" }}
+                style={{ fontWeight: 500, backgroundColor: "hsl(var(--muted))", color: "#334155" }}
               >
                 Cancel
               </AlertDialogCancel>
@@ -2345,7 +2345,7 @@ export function ContactsDirectoryPage({
           <div className="relative flex flex-col items-center pt-10 pb-6" style={{ background: "linear-gradient(180deg, #FEFCE8 0%, rgba(254,252,232,0.3) 70%, transparent 100%)" }}>
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[180px] h-[80px] rounded-full blur-[50px] opacity-25" style={{ backgroundColor: "#EAB308" }} />
             <div className="relative w-16 h-16 rounded-2xl flex items-center justify-center" style={{ backgroundColor: "#FEF3C7" }}>
-              <AlertTriangle className="w-8 h-8" style={{ color: "#D97706" }} />
+              <AlertTriangle className="w-8 h-8" style={{ color: "hsl(var(--warning))" }} />
             </div>
             <span
               className="mt-4 px-3 py-1 rounded-full text-[11px]"
@@ -2357,11 +2357,11 @@ export function ContactsDirectoryPage({
           {/* CTA: #F97316 on #fff ≈ 3.0:1 AA-Large ✓ · Cancel: #334155 on #F1F5F9 ≈ 7.1:1 AAA ✓ */}
           <div className="flex flex-col items-center text-center px-8 pb-8">
             <AlertDialogHeader className="p-0 gap-0 text-center">
-              <AlertDialogTitle className="text-[18px] tracking-[-0.02em]" style={{ fontWeight: 600, color: "#0F172A" }}>
+              <AlertDialogTitle className="text-[18px] tracking-[-0.02em]" style={{ fontWeight: 600, color: "hsl(var(--foreground))" }}>
                 Deactivate this contact?
               </AlertDialogTitle>
             </AlertDialogHeader>
-            <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "#475569", lineHeight: "1.65" }}>
+            <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "hsl(var(--muted-foreground))", lineHeight: "1.65" }}>
               <span style={{ fontWeight: 600, color: "#1E293B" }}>
                 {allContacts.find(c => c.id === deactivateContactId)?.name ?? "This contact"}
               </span>{" "}
@@ -2377,7 +2377,7 @@ export function ContactsDirectoryPage({
               </AlertDialogAction>
               <AlertDialogCancel
                 className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors"
-                style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#334155" }}
+                style={{ fontWeight: 500, backgroundColor: "hsl(var(--muted))", color: "#334155" }}
               >
                 Cancel
               </AlertDialogCancel>

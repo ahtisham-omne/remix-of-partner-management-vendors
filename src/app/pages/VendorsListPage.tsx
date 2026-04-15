@@ -1123,7 +1123,7 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
   };
 
   return (
-    <div className={embedded ? "flex flex-col min-h-[calc(100vh-360px)] pb-4 bg-transparent" : "flex flex-col h-full bg-[#F8FAFC]"}>
+    <div className={embedded ? "flex flex-col min-h-[calc(100vh-360px)] pb-4 bg-transparent" : "flex flex-col h-full bg-slate-50"}>
       {/* Top Bar — hidden when embedded */}
       {!embedded && (
       <div className="flex items-center justify-between px-6 lg:px-8 h-12 border-b border-border bg-card shrink-0">
@@ -1147,8 +1147,8 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
             />
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: '#EDF4FF' }}>
-              <span className="text-[11px]" style={{ fontWeight: 600, color: '#0A77FF' }}>AA</span>
+            <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: "hsl(var(--accent))" }}>
+              <span className="text-[11px]" style={{ fontWeight: 600, color: "hsl(var(--primary))" }}>AA</span>
             </div>
             <div className="hidden sm:block">
               <p className="text-[13px]" style={{ fontWeight: 500 }}>Ahtisham Ahmad</p>
@@ -1166,8 +1166,8 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
           {!embedded && (
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 -mx-6 lg:-mx-8 -mt-6 px-6 lg:px-8 pt-3.5 pb-3.5 bg-white border-b border-border shrink-0">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#EDF4FF' }}>
-                <Users className="w-4 h-4" style={{ color: '#0A77FF' }} />
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: "hsl(var(--accent))" }}>
+                <Users className="w-4 h-4" style={{ color: "hsl(var(--primary))" }} />
               </div>
               <div>
                 <h1 className="font-bold text-[20px]">Partners</h1>
@@ -1225,7 +1225,7 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                       >
                         <span className="text-sm">{opt.label}</span>
                         {insightsDateRange === opt.key && (
-                          <Check className="w-3.5 h-3.5" style={{ color: "#0A77FF" }} />
+                          <Check className="w-3.5 h-3.5" style={{ color: "hsl(var(--primary))" }} />
                         )}
                       </DropdownMenuItem>
                     ))}
@@ -1235,7 +1235,7 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
               <button
                 onClick={() => setInsightsPanelOpen(true)}
                 className="inline-flex items-center gap-1 text-[11px] hover:bg-muted/50 px-2 py-0.5 rounded-md transition-colors cursor-pointer"
-                style={{ fontWeight: 500, color: "#0A77FF" }}
+                style={{ fontWeight: 500, color: "hsl(var(--primary))" }}
               >
                 <Plus className="w-3 h-3" />
                 Add Insights
@@ -1343,7 +1343,7 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                     {activeFilterCount > 0 && (
                       <span
                         className="ml-0.5 min-w-[18px] h-5 rounded-full text-[11px] flex items-center justify-center px-1.5 text-white"
-                        style={{ backgroundColor: "#0A77FF", fontWeight: 600 }}
+                        style={{ backgroundColor: "hsl(var(--primary))", fontWeight: 600 }}
                       >
                         {activeFilterCount}
                       </span>
@@ -1393,7 +1393,7 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                     {activeKpiDefs.length > 0 && (
                       <span
                         className="inline-flex items-center justify-center h-5 px-1.5 rounded-full text-[11px]"
-                        style={{ backgroundColor: "#EDF4FF", color: "#0A77FF", fontWeight: 600 }}
+                        style={{ backgroundColor: "hsl(var(--accent))", color: "hsl(var(--primary))", fontWeight: 600 }}
                       >
                         {activeKpiDefs.length}
                       </span>
@@ -1432,15 +1432,15 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                             <div className="text-sm" style={{ fontWeight: 500 }}>{opt.label}</div>
                             <div className="text-xs text-muted-foreground">{opt.description}</div>
                           </div>
-                          {density === opt.key && <Check className="w-4 h-4 shrink-0" style={{ color: '#0A77FF' }} />}
+                          {density === opt.key && <Check className="w-4 h-4 shrink-0" style={{ color: "hsl(var(--primary))" }} />}
                         </DropdownMenuItem>
                       ))}
                       {/* Card size options — only when card view is active */}
                       {density === "card" && (
                         <>
-                          <div className="mx-2 my-1.5 border-t border-[#F1F5F9]" />
+                          <div className="mx-2 my-1.5 border-t border-muted" />
                           <div className="px-3 py-1.5">
-                            <p className="text-[10px] text-[#94A3B8] uppercase tracking-wide mb-2" style={{ fontWeight: 600 }}>Card Size</p>
+                            <p className="text-[10px] text-slate-400 uppercase tracking-wide mb-2" style={{ fontWeight: 600 }}>Card Size</p>
                             <div className="flex items-center gap-1.5">
                               {(["large", "medium", "small"] as const).map((size) => (
                                 <button
@@ -1448,8 +1448,8 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                                   onClick={() => setCardSize(size)}
                                   className={`flex-1 py-1.5 rounded-md text-[11px] text-center transition-all cursor-pointer ${
                                     cardSize === size
-                                      ? "bg-[#0A77FF] text-white shadow-sm"
-                                      : "bg-[#F1F5F9] text-[#64748B] hover:bg-[#E2E8F0]"
+                                      ? "bg-primary text-white shadow-sm"
+                                      : "bg-muted text-slate-500 hover:bg-border"
                                   }`}
                                   style={{ fontWeight: cardSize === size ? 600 : 500 }}
                                 >
@@ -1494,12 +1494,12 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                       }}
                       className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs transition-colors whitespace-nowrap shrink-0 cursor-pointer ${
                         isActive
-                          ? "border-primary bg-[#EDF4FF] hover:bg-[#D6E8FF] active:bg-[#ADD1FF]"
+                          ? "border-primary bg-accent hover:bg-[#D6E8FF] active:bg-[#ADD1FF]"
                           : "border-border text-muted-foreground hover:bg-muted/60 hover:text-foreground hover:border-muted-foreground/30 active:bg-muted"
                       }`}
                       style={{
                         fontWeight: isActive ? 500 : 400,
-                        color: isActive ? '#0A77FF' : undefined,
+                        color: isActive ? 'hsl(var(--primary))' : undefined,
                       }}
                     >
                       {filter.label}
@@ -1512,7 +1512,7 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                           }`}
                           style={{
                             fontWeight: 600,
-                            color: isActive ? '#0A77FF' : '#475569',
+                            color: isActive ? 'hsl(var(--primary))' : 'hsl(var(--muted-foreground))',
                           }}
                         >
                           {count}
@@ -1619,21 +1619,21 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                               ))}
                               {vendor.vendorSubTypes && vendor.vendorSubTypes.length > 0 && (
                                 <>
-                                  <span className="inline-flex items-center px-1.5 py-px rounded-full text-[9px] border" style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#475569", borderColor: "#E2E8F0" }}>
+                                  <span className="inline-flex items-center px-1.5 py-px rounded-full text-[9px] border" style={{ fontWeight: 500, backgroundColor: "hsl(var(--muted))", color: "hsl(var(--muted-foreground))", borderColor: "hsl(var(--border))" }}>
                                     {vendor.vendorSubTypes[0]}
                                   </span>
                                   {vendor.vendorSubTypes.length > 1 && (
-                                    <span className="inline-flex items-center px-1 py-px rounded-full text-[9px] border" style={{ fontWeight: 600, backgroundColor: "#F1F5F9", color: "#475569", borderColor: "#E2E8F0" }}>+{vendor.vendorSubTypes.length - 1}</span>
+                                    <span className="inline-flex items-center px-1 py-px rounded-full text-[9px] border" style={{ fontWeight: 600, backgroundColor: "hsl(var(--muted))", color: "hsl(var(--muted-foreground))", borderColor: "hsl(var(--border))" }}>+{vendor.vendorSubTypes.length - 1}</span>
                                   )}
                                 </>
                               )}
                               {vendor.customerSubTypes && vendor.customerSubTypes.length > 0 && (
                                 <>
-                                  <span className="inline-flex items-center px-1.5 py-px rounded-full text-[9px] border" style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#475569", borderColor: "#E2E8F0" }}>
+                                  <span className="inline-flex items-center px-1.5 py-px rounded-full text-[9px] border" style={{ fontWeight: 500, backgroundColor: "hsl(var(--muted))", color: "hsl(var(--muted-foreground))", borderColor: "hsl(var(--border))" }}>
                                     {vendor.customerSubTypes[0]}
                                   </span>
                                   {vendor.customerSubTypes.length > 1 && (
-                                    <span className="inline-flex items-center px-1 py-px rounded-full text-[9px] border" style={{ fontWeight: 600, backgroundColor: "#F1F5F9", color: "#475569", borderColor: "#E2E8F0" }}>+{vendor.customerSubTypes.length - 1}</span>
+                                    <span className="inline-flex items-center px-1 py-px rounded-full text-[9px] border" style={{ fontWeight: 600, backgroundColor: "hsl(var(--muted))", color: "hsl(var(--muted-foreground))", borderColor: "hsl(var(--border))" }}>+{vendor.customerSubTypes.length - 1}</span>
                                   )}
                                 </>
                               )}
@@ -1672,7 +1672,7 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                       }`}>
                         {/* Checkbox column — sticky leftmost */}
                         <TableHead
-                          className="sticky left-0 z-20 bg-[#f8fafc] w-[40px] min-w-[40px] max-w-[40px] !pl-2 !pr-0"
+                          className="sticky left-0 z-20 bg-slate-50 w-[40px] min-w-[40px] max-w-[40px] !pl-2 !pr-0"
                         >
                           <Checkbox
                             checked={allPageSelected ? true : somePageSelected ? "indeterminate" : false}
@@ -1703,7 +1703,7 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                                   e.preventDefault();
                                 }
                               } : undefined}
-                              className={`whitespace-nowrap relative group/colheader ${isFrozen ? "sticky bg-[#f8fafc] z-20" : ""} ${hasFilter && !isFrozen ? "bg-primary/[0.03]" : ""} ${isDraggable ? "cursor-grab" : ""} ${def.align === "right" ? "text-right" : ""}`}
+                              className={`whitespace-nowrap relative group/colheader ${isFrozen ? "sticky bg-slate-50 z-20" : ""} ${hasFilter && !isFrozen ? "bg-primary/[0.03]" : ""} ${isDraggable ? "cursor-grab" : ""} ${def.align === "right" ? "text-right" : ""}`}
                               style={{
                                 width: `${width}px`, minWidth: `${width}px`, maxWidth: `${width}px`,
                                 overflow: "hidden",
@@ -1716,7 +1716,7 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                             >
                               {/* Blue accent bar on top edge of dragged column header */}
                               {isBeingDragged && (
-                                <div className="absolute top-0 left-0 right-0 h-[2px] rounded-b-full" style={{ backgroundColor: "#0A77FF" }} />
+                                <div className="absolute top-0 left-0 right-0 h-[2px] rounded-b-full" style={{ backgroundColor: "hsl(var(--primary))" }} />
                               )}
                               {/* Drag grip icon — absolutely positioned so it never shifts the label */}
                               {isDraggable && (
@@ -1741,15 +1741,15 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                                   onFilterChange={handleColumnFilterChange}
                                 >
                                   <div className={`inline-flex items-center gap-1 ${def.align === "right" ? "w-full justify-end" : ""}`}>
-                                    <span className="text-[13px]" style={currentColSort || hasFilter ? { color: "#0A77FF" } : undefined}>{def.label}</span>
+                                    <span className="text-[13px]" style={currentColSort || hasFilter ? { color: "hsl(var(--primary))" } : undefined}>{def.label}</span>
                                     {hasFilter && !currentColSort && (
-                                      <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: "#0A77FF" }} />
+                                      <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: "hsl(var(--primary))" }} />
                                     )}
                                     {currentColSort === "asc" && (
-                                      <ArrowUp className="w-3 h-3 shrink-0" style={{ color: "#0A77FF" }} />
+                                      <ArrowUp className="w-3 h-3 shrink-0" style={{ color: "hsl(var(--primary))" }} />
                                     )}
                                     {currentColSort === "desc" && (
-                                      <ArrowDown className="w-3 h-3 shrink-0" style={{ color: "#0A77FF" }} />
+                                      <ArrowDown className="w-3 h-3 shrink-0" style={{ color: "hsl(var(--primary))" }} />
                                     )}
                                     {!currentColSort && !hasFilter && def.sortable && (
                                       <ArrowUpDown className="w-3 h-3 shrink-0 text-muted-foreground opacity-0 group-hover/colheader:opacity-100 transition-opacity" />
@@ -1777,7 +1777,7 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                             </TableHead>
                           );
                         })}
-                        <TableHead className="whitespace-nowrap w-[60px] sticky right-0 bg-[#f8fafc] z-20 !pl-2 !pr-2" style={{ boxShadow: "inset 1px 0 0 0 rgba(0,0,0,0.08)" }}><span className="text-[13px]">Actions</span></TableHead>
+                        <TableHead className="whitespace-nowrap w-[60px] sticky right-0 bg-slate-50 z-20 !pl-2 !pr-2" style={{ boxShadow: "inset 1px 0 0 0 rgba(0,0,0,0.08)" }}><span className="text-[13px]">Actions</span></TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -1847,7 +1847,7 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                                   <TableCell key={colKey}>
                                     {vst.length > 0 ? (
                                       <div className={`flex items-center ${isRelaxed ? "gap-1.5" : "gap-1"}`}>
-                                        <span className={`inline-flex items-center ${isRelaxed ? "px-2.5 py-1 text-xs" : "px-2 py-0.5 text-xs"} rounded-md border`} style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#475569", borderColor: "#E2E8F0" }}>
+                                        <span className={`inline-flex items-center ${isRelaxed ? "px-2.5 py-1 text-xs" : "px-2 py-0.5 text-xs"} rounded-md border`} style={{ fontWeight: 500, backgroundColor: "hsl(var(--muted))", color: "hsl(var(--muted-foreground))", borderColor: "hsl(var(--border))" }}>
                                           {vst[0]}
                                         </span>
                                         {vstExtra > 0 && (
@@ -1859,7 +1859,7 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                                               subtitle: "VENDOR SUB-TYPE",
                                             }))}
                                           >
-                                            <span className="inline-flex items-center px-1.5 py-0.5 rounded-md text-xs border cursor-default" style={{ fontWeight: 600, backgroundColor: "#F1F5F9", color: "#475569", borderColor: "#E2E8F0" }}>+{vstExtra}</span>
+                                            <span className="inline-flex items-center px-1.5 py-0.5 rounded-md text-xs border cursor-default" style={{ fontWeight: 600, backgroundColor: "hsl(var(--muted))", color: "hsl(var(--muted-foreground))", borderColor: "hsl(var(--border))" }}>+{vstExtra}</span>
                                           </OverflowTooltip>
                                         )}
                                       </div>
@@ -1874,7 +1874,7 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                                   <TableCell key={colKey}>
                                     {cst.length > 0 ? (
                                       <div className={`flex items-center ${isRelaxed ? "gap-1.5" : "gap-1"}`}>
-                                        <span className={`inline-flex items-center ${isRelaxed ? "px-2.5 py-1 text-xs" : "px-2 py-0.5 text-xs"} rounded-md border`} style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#475569", borderColor: "#E2E8F0" }}>
+                                        <span className={`inline-flex items-center ${isRelaxed ? "px-2.5 py-1 text-xs" : "px-2 py-0.5 text-xs"} rounded-md border`} style={{ fontWeight: 500, backgroundColor: "hsl(var(--muted))", color: "hsl(var(--muted-foreground))", borderColor: "hsl(var(--border))" }}>
                                           {cst[0]}
                                         </span>
                                         {cstExtra > 0 && (
@@ -1886,7 +1886,7 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                                               subtitle: "CUSTOMER SUB-TYPE",
                                             }))}
                                           >
-                                            <span className="inline-flex items-center px-1.5 py-0.5 rounded-md text-xs border cursor-default" style={{ fontWeight: 600, backgroundColor: "#F1F5F9", color: "#475569", borderColor: "#E2E8F0" }}>+{cstExtra}</span>
+                                            <span className="inline-flex items-center px-1.5 py-0.5 rounded-md text-xs border cursor-default" style={{ fontWeight: 600, backgroundColor: "hsl(var(--muted))", color: "hsl(var(--muted-foreground))", borderColor: "hsl(var(--border))" }}>+{cstExtra}</span>
                                           </OverflowTooltip>
                                         )}
                                       </div>
@@ -1909,7 +1909,7 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                                   <TableCell key={colKey}>
                                     <div className={`flex items-center ${isRelaxed ? "gap-2.5" : "gap-2"}`}>
                                       <div
-                                        className={`${isRelaxed ? "w-10 h-10" : "w-7 h-7"} rounded-md bg-[#F1F5F9] overflow-hidden shrink-0 border border-[#E8ECF1] cursor-zoom-in`}
+                                        className={`${isRelaxed ? "w-10 h-10" : "w-7 h-7"} rounded-md bg-muted overflow-hidden shrink-0 border border-[#E8ECF1] cursor-zoom-in`}
                                         onClick={(e) => { e.stopPropagation(); openLightbox({ src: itemPhotoUrl, name: itemCodes[0] || "Item", subtitle: vendor.displayName }); }}
                                       >
                                         <img src={itemPhotoUrl} alt="" className="w-full h-full object-cover" />
@@ -1921,7 +1921,7 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                                         onOpen={setQuickViewData}
                                         className="min-w-0 group/itemcode"
                                       >
-                                        <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} block truncate group-hover/itemcode:text-[#0A77FF] group-hover/itemcode:underline transition-colors`} style={{ fontWeight: 500 }}>{itemCodes[0] || "\u2013"}</span>
+                                        <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} block truncate group-hover/itemcode:text-primary group-hover/itemcode:underline transition-colors`} style={{ fontWeight: 500 }}>{itemCodes[0] || "\u2013"}</span>
                                         {isRelaxed && (() => {
                                           const FIRST_ITEM_DESCS = [
                                             "Zinc-plated hex head screw, industrial grade",
@@ -1994,7 +1994,7 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                                         const locPhoto = LOC_PHOTOS[Math.abs(lh) % LOC_PHOTOS.length];
                                         return (
                                           <div
-                                            className="w-10 h-10 rounded-md bg-[#F1F5F9] overflow-hidden shrink-0 border border-[#E8ECF1] cursor-zoom-in"
+                                            className="w-10 h-10 rounded-md bg-muted overflow-hidden shrink-0 border border-[#E8ECF1] cursor-zoom-in"
                                             onClick={(e) => { e.stopPropagation(); openLightbox({ src: locPhoto, name: partnerLocations[0] || "Location", subtitle: vendor.displayName }); }}
                                           >
                                             <img src={locPhoto} alt="" className="w-full h-full object-cover" />
@@ -2015,13 +2015,13 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                                               setQuickViewData({ type: "location", item: { id: `${vendor.id}-loc-0`, name: partnerLocations[0], subtitle: "LOCATION" }, vendorName: vendor.displayName });
                                             }}
                                           >
-                                            <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} block truncate group-hover/loc:text-[#0A77FF] group-hover/loc:underline transition-colors`} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{highlightText(partnerLocations[0] || "\u2013")}</span>
+                                            <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} block truncate group-hover/loc:text-primary group-hover/loc:underline transition-colors`} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{highlightText(partnerLocations[0] || "\u2013")}</span>
                                             {isRelaxed && (
                                               <a
                                                 href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(addr)}`}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="text-[10px] text-muted-foreground/50 block truncate hover:text-[#0A77FF] hover:underline transition-colors"
+                                                className="text-[10px] text-muted-foreground/50 block truncate hover:text-primary hover:underline transition-colors"
                                                 onClick={(e) => e.stopPropagation()}
                                               >{addr}</a>
                                             )}
@@ -2070,7 +2070,7 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                                             </HoverCardTrigger>
                                             <HoverCardContent side="bottom" align="start" className="w-[280px] p-0 rounded-xl border-0 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
                                               {/* Header with gradient */}
-                                              <div className="bg-gradient-to-br from-[#1E293B] to-[#334155] px-4 py-3 relative overflow-hidden">
+                                              <div className="bg-gradient-to-br from-slate-800 to-slate-700 px-4 py-3 relative overflow-hidden">
                                                 <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-white/[0.04]" />
                                                 <div className="flex items-center gap-3 relative">
                                                   <div className="w-11 h-11 rounded-full overflow-hidden border-2 border-white/20 shrink-0" style={{ backgroundColor: photoUrl ? "transparent" : poc?.bgColor || t.bg }}>
@@ -2078,15 +2078,15 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                                                   </div>
                                                   <div className="min-w-0">
                                                     <p className="text-[14px] text-white truncate" style={{ fontWeight: 600 }}>{poc?.name}</p>
-                                                    <p className="text-[11px] text-[#94A3B8] truncate">{cd.role}</p>
+                                                    <p className="text-[11px] text-slate-400 truncate">{cd.role}</p>
                                                   </div>
                                                 </div>
                                               </div>
                                               {/* Body */}
                                               <div className="bg-white px-4 py-3 space-y-2">
-                                                <div className="flex items-center gap-2.5 text-[12px] text-[#334155]"><Mail className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" /><span className="truncate">{cd.email}</span></div>
-                                                <div className="flex items-center gap-2.5 text-[12px] text-[#334155]"><Phone className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" /><span>{cd.phone}</span></div>
-                                                <div className="flex items-center gap-2.5 text-[12px] text-[#334155]"><Building2 className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" /><span>{cd.dept}</span></div>
+                                                <div className="flex items-center gap-2.5 text-[12px] text-slate-700"><Mail className="w-3.5 h-3.5 text-slate-400 shrink-0" /><span className="truncate">{cd.email}</span></div>
+                                                <div className="flex items-center gap-2.5 text-[12px] text-slate-700"><Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" /><span>{cd.phone}</span></div>
+                                                <div className="flex items-center gap-2.5 text-[12px] text-slate-700"><Building2 className="w-3.5 h-3.5 text-slate-400 shrink-0" /><span>{cd.dept}</span></div>
                                               </div>
                                             </HoverCardContent>
                                           </HoverCard>
@@ -2100,7 +2100,7 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                                               setQuickViewData({ type: "contact", item: { id: `${vendor.id}-poc-0`, name: poc?.name, subtitle: (poc as any)?.role || "CONTACT", initials: poc?.initials, avatarBg: t.bg, avatarFg: t.fg }, vendorName: vendor.displayName });
                                             }}
                                           >
-                                            <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} block truncate group-hover/poc:text-[#0A77FF] group-hover/poc:underline transition-colors`}>{highlightText(globalPointOfContacts[0]?.name)}</span>
+                                            <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} block truncate group-hover/poc:text-primary group-hover/poc:underline transition-colors`}>{highlightText(globalPointOfContacts[0]?.name)}</span>
                                             {isRelaxed && (globalPointOfContacts[0] as any)?.role && (
                                               <span className="text-xs text-muted-foreground/60 truncate block">{(globalPointOfContacts[0] as any)?.role}</span>
                                             )}
@@ -2155,20 +2155,20 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                                           <div className="cursor-pointer"><CarrierIcon carrier={vendor.defaultCarrierVendor} large={isRelaxed} /></div>
                                         </HoverCardTrigger>
                                         <HoverCardContent side="bottom" align="start" className="w-[280px] p-0 rounded-xl border-0 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
-                                          <div className="bg-gradient-to-br from-[#1E293B] to-[#334155] px-3.5 py-3 relative overflow-hidden">
+                                          <div className="bg-gradient-to-br from-slate-800 to-slate-700 px-3.5 py-3 relative overflow-hidden">
                                             <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-white/[0.04]" />
                                             <div className="flex items-center gap-3 relative">
                                               <div className="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center shrink-0 overflow-hidden"><CarrierIcon carrier={vendor.defaultCarrierVendor} /></div>
                                               <div className="min-w-0">
                                                 <p className="text-[14px] text-white truncate" style={{ fontWeight: 600 }}>{vendor.defaultCarrierVendor}</p>
-                                                <p className="text-[11px] text-[#94A3B8]">Primary Vendor Carrier</p>
+                                                <p className="text-[11px] text-slate-400">Primary Vendor Carrier</p>
                                               </div>
                                             </div>
                                           </div>
                                           <div className="bg-white px-3.5 py-3 space-y-2">
-                                            <div className="flex items-center justify-between text-[12px]"><span className="text-[#64748B]">Service Type</span><span className="text-[#334155]" style={{ fontWeight: 500 }}>Ground & Express</span></div>
-                                            <div className="flex items-center justify-between text-[12px]"><span className="text-[#64748B]">Avg. Delivery</span><span className="text-[#334155]" style={{ fontWeight: 500 }}>3–5 business days</span></div>
-                                            <div className="flex items-center justify-between text-[12px]"><span className="text-[#64748B]">Tracking</span><span className="text-[#059669]" style={{ fontWeight: 500 }}>Available</span></div>
+                                            <div className="flex items-center justify-between text-[12px]"><span className="text-slate-500">Service Type</span><span className="text-slate-700" style={{ fontWeight: 500 }}>Ground & Express</span></div>
+                                            <div className="flex items-center justify-between text-[12px]"><span className="text-slate-500">Avg. Delivery</span><span className="text-slate-700" style={{ fontWeight: 500 }}>3–5 business days</span></div>
+                                            <div className="flex items-center justify-between text-[12px]"><span className="text-slate-500">Tracking</span><span className="text-success" style={{ fontWeight: 500 }}>Available</span></div>
                                           </div>
                                         </HoverCardContent>
                                       </HoverCard>
@@ -2179,7 +2179,7 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                                           setQuickViewData({ type: "location", item: { id: `${vendor.id}-cv`, name: vendor.defaultCarrierVendor, subtitle: "Vendor Carrier" }, vendorName: vendor.displayName });
                                         }}
                                       >
-                                        <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} block truncate group-hover/cv:text-[#0A77FF] group-hover/cv:underline transition-colors`} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{vendor.defaultCarrierVendor}</span>
+                                        <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} block truncate group-hover/cv:text-primary group-hover/cv:underline transition-colors`} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{vendor.defaultCarrierVendor}</span>
                                         {isRelaxed && <span className="text-[10px] text-muted-foreground/50 block">Vendor Carrier</span>}
                                       </div>
                                     </div>
@@ -2194,20 +2194,20 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                                           <div className="cursor-pointer"><CarrierIcon carrier={vendor.defaultCarrierCustomer} large={isRelaxed} /></div>
                                         </HoverCardTrigger>
                                         <HoverCardContent side="bottom" align="start" className="w-[280px] p-0 rounded-xl border-0 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
-                                          <div className="bg-gradient-to-br from-[#1E293B] to-[#334155] px-3.5 py-3 relative overflow-hidden">
+                                          <div className="bg-gradient-to-br from-slate-800 to-slate-700 px-3.5 py-3 relative overflow-hidden">
                                             <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-white/[0.04]" />
                                             <div className="flex items-center gap-3 relative">
                                               <div className="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center shrink-0 overflow-hidden"><CarrierIcon carrier={vendor.defaultCarrierCustomer} /></div>
                                               <div className="min-w-0">
                                                 <p className="text-[14px] text-white truncate" style={{ fontWeight: 600 }}>{vendor.defaultCarrierCustomer}</p>
-                                                <p className="text-[11px] text-[#94A3B8]">Primary Customer Carrier</p>
+                                                <p className="text-[11px] text-slate-400">Primary Customer Carrier</p>
                                               </div>
                                             </div>
                                           </div>
                                           <div className="bg-white px-3.5 py-3 space-y-2">
-                                            <div className="flex items-center justify-between text-[12px]"><span className="text-[#64748B]">Service Type</span><span className="text-[#334155]" style={{ fontWeight: 500 }}>Standard & Priority</span></div>
-                                            <div className="flex items-center justify-between text-[12px]"><span className="text-[#64748B]">Avg. Delivery</span><span className="text-[#334155]" style={{ fontWeight: 500 }}>2–7 business days</span></div>
-                                            <div className="flex items-center justify-between text-[12px]"><span className="text-[#64748B]">Tracking</span><span className="text-[#059669]" style={{ fontWeight: 500 }}>Available</span></div>
+                                            <div className="flex items-center justify-between text-[12px]"><span className="text-slate-500">Service Type</span><span className="text-slate-700" style={{ fontWeight: 500 }}>Standard & Priority</span></div>
+                                            <div className="flex items-center justify-between text-[12px]"><span className="text-slate-500">Avg. Delivery</span><span className="text-slate-700" style={{ fontWeight: 500 }}>2–7 business days</span></div>
+                                            <div className="flex items-center justify-between text-[12px]"><span className="text-slate-500">Tracking</span><span className="text-success" style={{ fontWeight: 500 }}>Available</span></div>
                                           </div>
                                         </HoverCardContent>
                                       </HoverCard>
@@ -2218,7 +2218,7 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                                           setQuickViewData({ type: "location", item: { id: `${vendor.id}-cc`, name: vendor.defaultCarrierCustomer, subtitle: "Customer Carrier" }, vendorName: vendor.displayName });
                                         }}
                                       >
-                                        <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} block truncate group-hover/cc:text-[#0A77FF] group-hover/cc:underline transition-colors`} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{vendor.defaultCarrierCustomer}</span>
+                                        <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} block truncate group-hover/cc:text-primary group-hover/cc:underline transition-colors`} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{vendor.defaultCarrierCustomer}</span>
                                         {isRelaxed && <span className="text-[10px] text-muted-foreground/50 block">Customer Carrier</span>}
                                       </div>
                                     </div>
@@ -2252,7 +2252,7 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                                               <div className="cursor-pointer"><LogoAvatar logoUrl={photoUrl} initials={cb.initials || "?"} bg={t.bg} size={isRelaxed ? "lg" : "md"} type="person" personName={cb.name} /></div>
                                             </HoverCardTrigger>
                                             <HoverCardContent side="bottom" align="start" className="w-[280px] p-0 rounded-xl border-0 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
-                                              <div className="bg-gradient-to-br from-[#1E293B] to-[#334155] px-4 py-3 relative overflow-hidden">
+                                              <div className="bg-gradient-to-br from-slate-800 to-slate-700 px-4 py-3 relative overflow-hidden">
                                                 <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-white/[0.04]" />
                                                 <div className="flex items-center gap-3 relative">
                                                   <div className="w-11 h-11 rounded-full overflow-hidden border-2 border-white/20 shrink-0" style={{ backgroundColor: photoUrl ? "transparent" : cb.bgColor || t.bg }}>
@@ -2260,14 +2260,14 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                                                   </div>
                                                   <div className="min-w-0">
                                                     <p className="text-[14px] text-white truncate" style={{ fontWeight: 600 }}>{cb.name}</p>
-                                                    <p className="text-[11px] text-[#94A3B8] truncate">{cd.role}</p>
+                                                    <p className="text-[11px] text-slate-400 truncate">{cd.role}</p>
                                                   </div>
                                                 </div>
                                               </div>
                                               <div className="bg-white px-4 py-3 space-y-2">
-                                                <div className="flex items-center gap-2.5 text-[12px] text-[#334155]"><Mail className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" /><span className="truncate">{cd.email}</span></div>
-                                                <div className="flex items-center gap-2.5 text-[12px] text-[#334155]"><Building2 className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" /><span>{cd.dept}</span></div>
-                                                <div className="flex items-center gap-2.5 text-[12px] text-[#334155]"><Phone className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" /><span>{cd.phone}</span></div>
+                                                <div className="flex items-center gap-2.5 text-[12px] text-slate-700"><Mail className="w-3.5 h-3.5 text-slate-400 shrink-0" /><span className="truncate">{cd.email}</span></div>
+                                                <div className="flex items-center gap-2.5 text-[12px] text-slate-700"><Building2 className="w-3.5 h-3.5 text-slate-400 shrink-0" /><span>{cd.dept}</span></div>
+                                                <div className="flex items-center gap-2.5 text-[12px] text-slate-700"><Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" /><span>{cd.phone}</span></div>
                                               </div>
                                             </HoverCardContent>
                                           </HoverCard>
@@ -2281,7 +2281,7 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                                               setQuickViewData({ type: "contact", item: { id: `${vendor.id}-cb`, name: cb.name, subtitle: (cb as any).role || "Team Member", initials: cb.initials, avatarBg: t.bg, avatarFg: t.fg }, vendorName: vendor.displayName });
                                             }}
                                           >
-                                            <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} block truncate group-hover/cb:text-[#0A77FF] group-hover/cb:underline transition-colors`} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{highlightText(vendor.createdByContact.name)}</span>
+                                            <span className={`${isRelaxed ? "text-[13.5px]" : "text-sm"} block truncate group-hover/cb:text-primary group-hover/cb:underline transition-colors`} style={{ fontWeight: isRelaxed ? 500 : undefined }}>{highlightText(vendor.createdByContact.name)}</span>
                                             {isRelaxed && <span className="text-[10px] text-muted-foreground/50 truncate block">{(vendor.createdByContact as any).role || "Team Member"}</span>}
                                           </div>
                                         </>
@@ -2455,7 +2455,7 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                                           </DropdownMenuItem>
                                         )}
                                         <DropdownMenuItem variant="destructive" onClick={() => { setSelectedVendorId(vendor.id); setArchiveDialogOpen(true); }}>
-                                          <Archive className="w-4 h-4 mr-2 text-[#DC2626]" />
+                                          <Archive className="w-4 h-4 mr-2 text-destructive" />
                                           Archive
                                         </DropdownMenuItem>
                                       </>
@@ -2609,13 +2609,13 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
                   boxShadow: "0 1px 3px rgba(10,119,255,0.08), 0 6px 20px rgba(0,0,0,0.10)",
                 }}
               >
-                <GripVertical className="w-3 h-3 shrink-0" style={{ color: "#0A77FF" }} />
-                <span className="text-[13px]" style={{ color: "#0A77FF", fontWeight: 500 }}>
+                <GripVertical className="w-3 h-3 shrink-0" style={{ color: "hsl(var(--primary))" }} />
+                <span className="text-[13px]" style={{ color: "hsl(var(--primary))", fontWeight: 500 }}>
                   {colDef(draggingColumnKey)?.label}
                 </span>
-                {ghostSort === "asc" && <ArrowUp className="w-3 h-3 shrink-0" style={{ color: "#0A77FF" }} />}
-                {ghostSort === "desc" && <ArrowDown className="w-3 h-3 shrink-0" style={{ color: "#0A77FF" }} />}
-                {ghostFilter && !ghostSort && <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: "#0A77FF" }} />}
+                {ghostSort === "asc" && <ArrowUp className="w-3 h-3 shrink-0" style={{ color: "hsl(var(--primary))" }} />}
+                {ghostSort === "desc" && <ArrowDown className="w-3 h-3 shrink-0" style={{ color: "hsl(var(--primary))" }} />}
+                {ghostFilter && !ghostSort && <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: "hsl(var(--primary))" }} />}
               </div>
             );
           })()}
@@ -2663,11 +2663,11 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
           {/* CTA: #16A34A on #fff ≈ 3.3:1 AA-Large ✓ · Cancel: #334155 on #F1F5F9 ≈ 7.1:1 AAA ✓ · Desc: #475569 on #fff ≈ 7.1:1 AAA ✓ */}
           <div className="flex flex-col items-center text-center px-8 pb-8">
             <AlertDialogHeader className="p-0 gap-0 text-center">
-              <AlertDialogTitle className="text-[18px] tracking-[-0.02em]" style={{ fontWeight: 600, color: "#0F172A" }}>
+              <AlertDialogTitle className="text-[18px] tracking-[-0.02em]" style={{ fontWeight: 600, color: "hsl(var(--foreground))" }}>
                 Activate this partner?
               </AlertDialogTitle>
             </AlertDialogHeader>
-            <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "#475569", lineHeight: "1.65" }}>
+            <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "hsl(var(--muted-foreground))", lineHeight: "1.65" }}>
               <span style={{ fontWeight: 600, color: "#1E293B" }}>
                 {selectedVendorId ? (getVendor(selectedVendorId)?.displayName ?? "This partner") : "This partner"}
               </span>{" "}
@@ -2683,7 +2683,7 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
               </AlertDialogAction>
               <AlertDialogCancel
                 className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors"
-                style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#334155" }}
+                style={{ fontWeight: 500, backgroundColor: "hsl(var(--muted))", color: "#334155" }}
               >
                 Cancel
               </AlertDialogCancel>
@@ -2702,7 +2702,7 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
           <div className="relative flex flex-col items-center pt-10 pb-6" style={{ background: "linear-gradient(180deg, #FEFCE8 0%, rgba(254,252,232,0.3) 70%, transparent 100%)" }}>
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[180px] h-[80px] rounded-full blur-[50px] opacity-25" style={{ backgroundColor: "#EAB308" }} />
             <div className="relative w-16 h-16 rounded-2xl flex items-center justify-center" style={{ backgroundColor: "#FEF3C7" }}>
-              <AlertTriangle className="w-8 h-8" style={{ color: "#D97706" }} />
+              <AlertTriangle className="w-8 h-8" style={{ color: "hsl(var(--warning))" }} />
             </div>
             <span
               className="mt-4 px-3 py-1 rounded-full text-[11px]"
@@ -2714,11 +2714,11 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
           {/* CTA: #92400E on #FEF3C7 ≈ 5.8:1 AA ✓ · Cancel: #334155 on #F1F5F9 ≈ 7.1:1 AAA ✓ */}
           <div className="flex flex-col items-center text-center px-8 pb-8">
             <AlertDialogHeader className="p-0 gap-0 text-center">
-              <AlertDialogTitle className="text-[18px] tracking-[-0.02em]" style={{ fontWeight: 600, color: "#0F172A" }}>
+              <AlertDialogTitle className="text-[18px] tracking-[-0.02em]" style={{ fontWeight: 600, color: "hsl(var(--foreground))" }}>
                 Deactivate this partner?
               </AlertDialogTitle>
             </AlertDialogHeader>
-            <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "#475569", lineHeight: "1.65" }}>
+            <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "hsl(var(--muted-foreground))", lineHeight: "1.65" }}>
               <span style={{ fontWeight: 600, color: "#1E293B" }}>
                 {selectedVendorId ? (getVendor(selectedVendorId)?.displayName ?? "This partner") : "This partner"}
               </span>{" "}
@@ -2734,7 +2734,7 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
               </AlertDialogAction>
               <AlertDialogCancel
                 className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors"
-                style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#334155" }}
+                style={{ fontWeight: 500, backgroundColor: "hsl(var(--muted))", color: "#334155" }}
               >
                 Cancel
               </AlertDialogCancel>
@@ -2753,7 +2753,7 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
           <div className="relative flex flex-col items-center pt-10 pb-6" style={{ background: "linear-gradient(180deg, #FEF2F2 0%, rgba(254,242,242,0.3) 70%, transparent 100%)" }}>
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[180px] h-[80px] rounded-full blur-[50px] opacity-25" style={{ backgroundColor: "#EF4444" }} />
             <div className="relative w-16 h-16 rounded-2xl flex items-center justify-center" style={{ backgroundColor: "#FEE2E2" }}>
-              <Archive className="w-8 h-8" style={{ color: "#DC2626" }} />
+              <Archive className="w-8 h-8" style={{ color: "hsl(var(--destructive))" }} />
             </div>
             <span
               className="mt-4 px-3 py-1 rounded-full text-[11px]"
@@ -2765,11 +2765,11 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
           {/* CTA: #DC2626 on #fff ≈ 4.0:1 AA-Large ✓ · Cancel: #334155 on #F1F5F9 ≈ 7.1:1 AAA ✓ */}
           <div className="flex flex-col items-center text-center px-8 pb-8">
             <AlertDialogHeader className="p-0 gap-0 text-center">
-              <AlertDialogTitle className="text-[18px] tracking-[-0.02em]" style={{ fontWeight: 600, color: "#0F172A" }}>
+              <AlertDialogTitle className="text-[18px] tracking-[-0.02em]" style={{ fontWeight: 600, color: "hsl(var(--foreground))" }}>
                 Archive this partner?
               </AlertDialogTitle>
             </AlertDialogHeader>
-            <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "#475569", lineHeight: "1.65" }}>
+            <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "hsl(var(--muted-foreground))", lineHeight: "1.65" }}>
               <span style={{ fontWeight: 600, color: "#1E293B" }}>
                 {selectedVendorId ? (getVendor(selectedVendorId)?.displayName ?? "This partner") : "This partner"}
               </span>{" "}
@@ -2779,13 +2779,13 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
               <AlertDialogAction
                 onClick={handleArchive}
                 className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors hover:opacity-90"
-                style={{ fontWeight: 600, backgroundColor: "#DC2626", color: "#fff" }}
+                style={{ fontWeight: 600, backgroundColor: "hsl(var(--destructive))", color: "#fff" }}
               >
                 Archive Partner
               </AlertDialogAction>
               <AlertDialogCancel
                 className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors"
-                style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#334155" }}
+                style={{ fontWeight: 500, backgroundColor: "hsl(var(--muted))", color: "#334155" }}
               >
                 Cancel
               </AlertDialogCancel>
@@ -2803,7 +2803,7 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
           <div className="relative flex flex-col items-center pt-10 pb-6" style={{ background: "linear-gradient(180deg, #FEF2F2 0%, rgba(254,242,242,0.3) 70%, transparent 100%)" }}>
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[180px] h-[80px] rounded-full blur-[50px] opacity-25" style={{ backgroundColor: "#EF4444" }} />
             <div className="relative w-16 h-16 rounded-2xl flex items-center justify-center" style={{ backgroundColor: "#FEE2E2" }}>
-              <Archive className="w-8 h-8" style={{ color: "#DC2626" }} />
+              <Archive className="w-8 h-8" style={{ color: "hsl(var(--destructive))" }} />
             </div>
             <span
               className="mt-4 px-3 py-1 rounded-full text-[11px]"
@@ -2814,11 +2814,11 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
           </div>
           <div className="flex flex-col items-center text-center px-8 pb-8">
             <AlertDialogHeader className="p-0 gap-0 text-center">
-              <AlertDialogTitle className="text-[18px] tracking-[-0.02em]" style={{ fontWeight: 600, color: "#0F172A" }}>
+              <AlertDialogTitle className="text-[18px] tracking-[-0.02em]" style={{ fontWeight: 600, color: "hsl(var(--foreground))" }}>
                 Archive this partner?
               </AlertDialogTitle>
             </AlertDialogHeader>
-            <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "#475569", lineHeight: "1.65" }}>
+            <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "hsl(var(--muted-foreground))", lineHeight: "1.65" }}>
               <span style={{ fontWeight: 600, color: "#1E293B" }}>
                 {selectedVendorId ? (getVendor(selectedVendorId)?.displayName ?? "This partner") : "This partner"}
               </span>{" "}
@@ -2828,13 +2828,13 @@ export function VendorsListPage({ embedded, embeddedVendors, embeddedDefaultColu
               <AlertDialogAction
                 onClick={handleDelete}
                 className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors hover:opacity-90"
-                style={{ fontWeight: 600, backgroundColor: "#DC2626", color: "#fff" }}
+                style={{ fontWeight: 600, backgroundColor: "hsl(var(--destructive))", color: "#fff" }}
               >
                 Archive Partner
               </AlertDialogAction>
               <AlertDialogCancel
                 className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors"
-                style={{ fontWeight: 500, backgroundColor: "#F1F5F9", color: "#334155" }}
+                style={{ fontWeight: 500, backgroundColor: "hsl(var(--muted))", color: "#334155" }}
               >
                 Cancel
               </AlertDialogCancel>
@@ -2898,37 +2898,37 @@ function KpiRichTooltip({ data, children }: { data?: KpiTooltipData; children: R
   return (
     <Tooltip>
       <TooltipTrigger asChild>{children}</TooltipTrigger>
-      <TooltipContent side="bottom" sideOffset={8} className="p-0 w-[320px] max-w-[90vw] z-[400] !bg-white !border-[#E2E8F0] !shadow-[0_12px_40px_-8px_rgba(0,0,0,0.15),0_0_0_1px_rgba(0,0,0,0.04)]">
+      <TooltipContent side="bottom" sideOffset={8} className="p-0 w-[320px] max-w-[90vw] z-[400] !bg-white !border-border !shadow-[0_12px_40px_-8px_rgba(0,0,0,0.15),0_0_0_1px_rgba(0,0,0,0.04)]">
         <div className="p-4">
           {/* Header */}
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-5 h-5 rounded-md bg-[#EDF4FF] flex items-center justify-center shrink-0">
-              <Info className="w-3 h-3 text-[#0A77FF]" />
+            <div className="w-5 h-5 rounded-md bg-accent flex items-center justify-center shrink-0">
+              <Info className="w-3 h-3 text-primary" />
             </div>
-            <span className="text-[11px] text-[#334155] tracking-wide" style={{ fontWeight: 700 }}>{data.title}</span>
+            <span className="text-[11px] text-slate-700 tracking-wide" style={{ fontWeight: 700 }}>{data.title}</span>
           </div>
           {/* Description */}
-          <p className="text-[11px] text-[#64748B] leading-[1.6] mb-3">{data.description}</p>
+          <p className="text-[11px] text-slate-500 leading-[1.6] mb-3">{data.description}</p>
           {/* Divider */}
-          <div className="border-t border-[#F1F5F9] mb-3" />
+          <div className="border-t border-muted mb-3" />
           {/* Breakdown */}
           <div className="space-y-1.5">
             {data.breakdown.map((row, i) => (
               <div
                 key={i}
                 className={`flex items-center justify-between px-2.5 py-1.5 rounded-md text-[11px] ${
-                  row.isResult ? "bg-[#F0FDF4] border border-[#D1FAE5]" : ""
+                  row.isResult ? "bg-green-50 border border-[#D1FAE5]" : ""
                 }`}
               >
-                <span className={row.isResult ? "text-[#334155]" : "text-[#64748B]"} style={{ fontWeight: row.isResult ? 600 : 400 }}>{row.label}</span>
-                <span className={row.isResult ? "text-[#16A34A]" : "text-[#334155]"} style={{ fontWeight: row.isResult ? 700 : 500 }}>{row.value}</span>
+                <span className={row.isResult ? "text-slate-700" : "text-slate-500"} style={{ fontWeight: row.isResult ? 600 : 400 }}>{row.label}</span>
+                <span className={row.isResult ? "text-green-600" : "text-slate-700"} style={{ fontWeight: row.isResult ? 700 : 500 }}>{row.value}</span>
               </div>
             ))}
           </div>
           {/* Divider */}
-          <div className="border-t border-[#F1F5F9] my-3" />
+          <div className="border-t border-muted my-3" />
           {/* Formula */}
-          <div className="px-3 py-2 rounded-lg bg-[#F0F6FF] border border-[#DBEAFE]">
+          <div className="px-3 py-2 rounded-lg bg-[#F0F6FF] border border-blue-100">
             <code className="text-[10px] text-[#1D4ED8]" style={{ fontWeight: 500, fontFamily: "ui-monospace, monospace" }}>{data.formula}</code>
           </div>
         </div>
@@ -2954,7 +2954,7 @@ function LogoAvatar({ logoUrl, initials, bg, size = "md", type = "logo", personN
       {showImg ? (
         <img src={logoUrl} alt="" className={`w-full h-full ${isPerson ? "object-cover" : "object-contain p-1.5"}`} onError={() => setImgFailed(true)} />
       ) : (
-        <span className={`${textSize} text-[#334155]`} style={{ fontWeight: 700 }}>{initials}</span>
+        <span className={`${textSize} text-slate-700`} style={{ fontWeight: 700 }}>{initials}</span>
       )}
     </div>
   );
@@ -2995,8 +2995,8 @@ function CarrierIcon({ carrier, large }: { carrier: string; large?: boolean }) {
     <div
       className={`${large ? "w-10 h-10" : "w-7 h-7"} rounded-lg flex items-center justify-center shrink-0 overflow-hidden border border-[#E8ECF1]`}
       style={{
-        backgroundColor: carrierLogo ? "#FFFFFF" : "#F1F5F9",
-        color: "#475569",
+        backgroundColor: carrierLogo ? "#FFFFFF" : "hsl(var(--muted))",
+        color: "hsl(var(--muted-foreground))",
         fontSize: "9px",
         fontWeight: 700,
         letterSpacing: "-0.02em",
@@ -3050,7 +3050,7 @@ function DraggableListKpiCard({ index, kpiKey, label, value, iconName, tooltip, 
     return (
       <div
         ref={ref}
-        className="rounded-lg border border-dashed border-[#0A77FF]/20 bg-[#0A77FF]/[0.02] min-h-[52px] pointer-events-none"
+        className="rounded-lg border border-dashed border-primary/20 bg-primary/[0.02] min-h-[52px] pointer-events-none"
       />
     );
   }
@@ -3060,35 +3060,35 @@ function DraggableListKpiCard({ index, kpiKey, label, value, iconName, tooltip, 
       ref={ref}
       className={`border rounded-lg bg-white group relative min-w-0 transition-all duration-200 select-none overflow-hidden cursor-grab active:cursor-grabbing ${
         isOver
-          ? "border-[#0A77FF]/30 bg-[#0A77FF]/[0.03] shadow-[0_0_0_2px_rgba(10,119,255,0.08)] scale-[1.02]"
-          : "border-[#E2E8F0] hover:-translate-y-[1px] hover:border-[#93B8F7] hover:shadow-[0_2px_8px_-3px_rgba(10,119,255,0.06)]"
+          ? "border-primary/30 bg-primary/[0.03] shadow-[0_0_0_2px_rgba(10,119,255,0.08)] scale-[1.02]"
+          : "border-border hover:-translate-y-[1px] hover:border-[#93B8F7] hover:shadow-[0_2px_8px_-3px_rgba(10,119,255,0.06)]"
       }`}
     >
       {/* Drop zone overlay */}
       {isOver && (
-        <div className="absolute inset-0 rounded-lg bg-[#0A77FF]/[0.02] pointer-events-none" />
+        <div className="absolute inset-0 rounded-lg bg-primary/[0.02] pointer-events-none" />
       )}
       <div className="px-3 py-2">
         {/* Drag handle — top-right pill */}
-        <div className="absolute top-1.5 right-1.5 opacity-0 group-hover:opacity-100 transition-all duration-150 flex items-center bg-[#F1F5F9] rounded-md p-1 z-10 pointer-events-none">
-          <GripVertical className="w-3.5 h-3.5 text-[#64748B]" />
+        <div className="absolute top-1.5 right-1.5 opacity-0 group-hover:opacity-100 transition-all duration-150 flex items-center bg-muted rounded-md p-1 z-10 pointer-events-none">
+          <GripVertical className="w-3.5 h-3.5 text-slate-500" />
         </div>
         {/* Label row: label + info + icon */}
         <div className="flex items-center justify-between gap-1 mb-1">
           <div className="flex items-center gap-1 min-w-0">
-            <p className="text-[10.5px] text-[#64748B] whitespace-nowrap" style={{ fontWeight: 500 }}>{label}</p>
+            <p className="text-[10.5px] text-slate-500 whitespace-nowrap" style={{ fontWeight: 500 }}>{label}</p>
             {(KPI_TOOLTIP_DATA[kpiKey] || tooltip) && (
               KPI_TOOLTIP_DATA[kpiKey] ? (
                 <KpiRichTooltip data={KPI_TOOLTIP_DATA[kpiKey]}>
                   <button type="button" className="inline-flex shrink-0" tabIndex={-1} onClick={(e) => e.stopPropagation()}>
-                    <Info className="w-3 h-3 text-[#CBD5E1] hover:text-[#94A3B8] transition-colors cursor-help" />
+                    <Info className="w-3 h-3 text-slate-300 hover:text-slate-400 transition-colors cursor-help" />
                   </button>
                 </KpiRichTooltip>
               ) : (
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <button type="button" className="inline-flex shrink-0" tabIndex={-1} onClick={(e) => e.stopPropagation()}>
-                      <Info className="w-3 h-3 text-[#CBD5E1] hover:text-[#94A3B8] transition-colors cursor-help" />
+                      <Info className="w-3 h-3 text-slate-300 hover:text-slate-400 transition-colors cursor-help" />
                     </button>
                   </TooltipTrigger>
                   <TooltipContent side="bottom" sideOffset={6} className="max-w-[220px] text-[11px] z-[300]">
@@ -3102,7 +3102,7 @@ function DraggableListKpiCard({ index, kpiKey, label, value, iconName, tooltip, 
         </div>
         {/* Value */}
         <div className="flex items-baseline gap-1.5">
-          <p className="text-[15px] text-[#334155] tracking-tight whitespace-nowrap" style={{ fontWeight: 600, lineHeight: 1.2 }}>{value}</p>
+          <p className="text-[15px] text-slate-700 tracking-tight whitespace-nowrap" style={{ fontWeight: 600, lineHeight: 1.2 }}>{value}</p>
         </div>
       </div>
       {/* Remove button — bottom-right on hover */}
@@ -3112,7 +3112,7 @@ function DraggableListKpiCard({ index, kpiKey, label, value, iconName, tooltip, 
           className="absolute bottom-1 right-1 opacity-0 group-hover:opacity-100 transition-all duration-150 p-1 rounded cursor-pointer hover:bg-red-50 z-10"
           title={`Remove ${label}`}
         >
-          <Trash2 className="w-3 h-3 text-[#94A3B8] hover:text-[#EF4444]" />
+          <Trash2 className="w-3 h-3 text-slate-400 hover:text-red-500" />
         </button>
       )}
     </div>

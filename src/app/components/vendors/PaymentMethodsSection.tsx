@@ -21,7 +21,7 @@ import {
 } from "./partnerConstants";
 import { createEmptyPaymentEntry } from "./config-helpers";
 
-const inputCls = "mt-1.5 rounded-lg border-[#E2E8F0] !h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#CBD5E1] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20";
+const inputCls = "mt-1.5 rounded-lg border-border !h-10 bg-white text-sm text-foreground placeholder:text-slate-300 focus:border-primary focus:ring-1 focus:ring-primary/20";
 
 // ── Country banking format definitions ──
 interface CountryBankFormat {
@@ -150,18 +150,18 @@ function formatPhone(v: string, fmt: CountryBankFormat = DEFAULT_FORMAT): string
 }
 
 const catColor: Record<string, string> = {
-  Bank: "#0A77FF",
-  Traditional: "#7C3AED",
-  Card: "#D97706",
-  Digital: "#059669",
+  Bank: "hsl(var(--primary))",
+  Traditional: "hsl(var(--violet))",
+  Card: "hsl(var(--warning))",
+  Digital: "hsl(var(--success))",
   Other: "#64748B",
 };
 const catBg: Record<string, string> = {
-  Bank: "#EDF4FF",
+  Bank: "hsl(var(--accent))",
   Traditional: "#F0EBFF",
   Card: "#FEF3C7",
   Digital: "#ECFDF5",
-  Other: "#F1F5F9",
+  Other: "hsl(var(--muted))",
 };
 
 const categories: PaymentTypeCategory[] = ["Bank", "Card", "Digital", "Traditional", "Other"];
@@ -222,35 +222,35 @@ export function PhoneFieldWithCountry({ e, updateEntry, defaultFormat }: {
 
   return (
     <div>
-      <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Phone Number</Label>
+      <Label className="text-xs text-slate-500" style={{ fontWeight: 500 }}>Phone Number</Label>
       <div className="flex gap-0 mt-1.5">
         <Popover open={phoneCountryOpen} onOpenChange={setPhoneCountryOpen}>
           <PopoverTrigger asChild>
             <button
               type="button"
-              className={`flex items-center gap-1.5 px-3 h-10 border border-r-0 rounded-l-lg bg-white text-sm text-[#0F172A] shrink-0 cursor-pointer hover:bg-[#F8FAFC] transition-colors ${
-                phoneCountryOpen ? "border-[#0A77FF] bg-[#F8FAFC]" : "border-[#E2E8F0]"
+              className={`flex items-center gap-1.5 px-3 h-10 border border-r-0 rounded-l-lg bg-white text-sm text-foreground shrink-0 cursor-pointer hover:bg-slate-50 transition-colors ${
+                phoneCountryOpen ? "border-primary bg-slate-50" : "border-border"
               }`}
             >
               <span className="text-base">{activeFormat.flag}</span>
               <span style={{ fontWeight: 500 }}>{activeFormat.phoneCode}</span>
-              <ChevronDown className={`w-3 h-3 text-[#94A3B8] transition-transform ${phoneCountryOpen ? "rotate-180" : ""}`} />
+              <ChevronDown className={`w-3 h-3 text-slate-400 transition-transform ${phoneCountryOpen ? "rotate-180" : ""}`} />
             </button>
           </PopoverTrigger>
-          <PopoverContent className="w-[240px] p-0 rounded-xl border border-[#E2E8F0] shadow-lg z-[300]" align="start" sideOffset={4}>
+          <PopoverContent className="w-[240px] p-0 rounded-xl border border-border shadow-lg z-[300]" align="start" sideOffset={4}>
             <div className="p-2">
               <div className="relative">
-                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8]" />
+                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
                 <input
                   value={phoneSearch}
                   onChange={(ev) => setPhoneSearch(ev.target.value)}
                   placeholder="Search country..."
-                  className="w-full h-8 pl-8 pr-3 rounded-md border border-[#E2E8F0] bg-white text-[12px] text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-none focus:border-[#0A77FF]"
+                  className="w-full h-8 pl-8 pr-3 rounded-md border border-border bg-white text-[12px] text-foreground placeholder:text-slate-400 focus:outline-none focus:border-primary"
                   autoFocus
                 />
               </div>
             </div>
-            <div className="border-t border-[#F1F5F9]" style={{ maxHeight: 200, overflowY: "auto" }}>
+            <div className="border-t border-muted" style={{ maxHeight: 200, overflowY: "auto" }}>
               {filtered.map((c) => {
                 const isActive = activeFormat.phoneCode === c.phoneCode;
                 return (
@@ -263,12 +263,12 @@ export function PhoneFieldWithCountry({ e, updateEntry, defaultFormat }: {
                       setPhoneCountryOpen(false);
                       setPhoneSearch("");
                     }}
-                    className={`w-full flex items-center gap-2.5 px-3 py-2 text-left transition-colors hover:bg-[#F8FAFC] ${isActive ? "bg-[#EDF4FF]/50" : ""}`}
+                    className={`w-full flex items-center gap-2.5 px-3 py-2 text-left transition-colors hover:bg-slate-50 ${isActive ? "bg-accent/50" : ""}`}
                   >
                     <span className="text-base shrink-0">{c.flag}</span>
-                    <span className="text-[12px] text-[#0F172A] flex-1" style={{ fontWeight: 500 }}>{c.country}</span>
-                    <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>{c.phoneCode}</span>
-                    {isActive && <Check className="w-3.5 h-3.5 text-[#0A77FF] shrink-0" />}
+                    <span className="text-[12px] text-foreground flex-1" style={{ fontWeight: 500 }}>{c.country}</span>
+                    <span className="text-[11px] text-slate-400" style={{ fontWeight: 500 }}>{c.phoneCode}</span>
+                    {isActive && <Check className="w-3.5 h-3.5 text-primary shrink-0" />}
                   </button>
                 );
               })}
@@ -280,7 +280,7 @@ export function PhoneFieldWithCountry({ e, updateEntry, defaultFormat }: {
           onChange={(ev) => updateEntry(e.id, { phone: formatPhone(ev.target.value, activeFormat), countryCode: activeFormat.phoneCode })}
           placeholder={activeFormat.phonePlaceholder}
           inputMode="numeric"
-          className="rounded-l-none rounded-r-lg border-[#E2E8F0] !h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#CBD5E1] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
+          className="rounded-l-none rounded-r-lg border-border !h-10 bg-white text-sm text-foreground placeholder:text-slate-300 focus:border-primary focus:ring-1 focus:ring-primary/20"
         />
       </div>
     </div>
@@ -302,7 +302,7 @@ function PaymentFormFields({
     <>
       {/* Nickname */}
       <div>
-        <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Nickname</Label>
+        <Label className="text-xs text-slate-500" style={{ fontWeight: 500 }}>Nickname</Label>
         <Input value={e.nickname} onChange={(ev) => updateEntry(e.id, { nickname: ev.target.value })} placeholder="e.g. Primary ACH, Backup Wire" className={inputCls} />
       </div>
 
@@ -310,23 +310,23 @@ function PaymentFormFields({
       {e.type === "ach" && (
         <>
           <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Bank Name <span className="text-[#EF4444]">*</span></Label>
+            <Label className="text-xs text-slate-500" style={{ fontWeight: 500 }}>Bank Name <span className="text-red-500">*</span></Label>
             <Input value={e.bankName} onChange={(ev) => updateEntry(e.id, { bankName: ev.target.value })} placeholder="e.g. Chase Bank" className={inputCls} />
           </div>
           <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Account Title <span className="text-[#EF4444]">*</span></Label>
+            <Label className="text-xs text-slate-500" style={{ fontWeight: 500 }}>Account Title <span className="text-red-500">*</span></Label>
             <Input value={e.accountTitle} onChange={(ev) => updateEntry(e.id, { accountTitle: ev.target.value })} placeholder="Enter account holder name" className={inputCls} />
           </div>
           <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Account Number <span className="text-[#EF4444]">*</span></Label>
+            <Label className="text-xs text-slate-500" style={{ fontWeight: 500 }}>Account Number <span className="text-red-500">*</span></Label>
             <Input value={e.accountNumber} onChange={(ev) => updateEntry(e.id, { accountNumber: formatAccountNumber(ev.target.value, fmt) })} placeholder={fmt.accountPlaceholder} className={inputCls} inputMode="numeric" />
           </div>
           <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>{fmt.routingLabel} <span className="text-[#EF4444]">*</span></Label>
+            <Label className="text-xs text-slate-500" style={{ fontWeight: 500 }}>{fmt.routingLabel} <span className="text-red-500">*</span></Label>
             <Input value={e.routingNumber} onChange={(ev) => updateEntry(e.id, { routingNumber: formatRoutingNumber(ev.target.value, fmt) })} placeholder={fmt.routingPlaceholder} className={inputCls} inputMode={fmt.routingPlaceholder.match(/[A-Z]/) ? "text" : "numeric"} />
           </div>
           <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Account Type</Label>
+            <Label className="text-xs text-slate-500" style={{ fontWeight: 500 }}>Account Type</Label>
             <Select value={e.accountType} onValueChange={(v) => updateEntry(e.id, { accountType: v })}>
               <SelectTrigger className={`${inputCls} mt-1.5`}>
                 <SelectValue placeholder="Select account type" />
@@ -347,23 +347,23 @@ function PaymentFormFields({
       {e.type === "wire" && (
         <>
           <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Bank Name <span className="text-[#EF4444]">*</span></Label>
+            <Label className="text-xs text-slate-500" style={{ fontWeight: 500 }}>Bank Name <span className="text-red-500">*</span></Label>
             <Input value={e.bankName} onChange={(ev) => updateEntry(e.id, { bankName: ev.target.value })} placeholder="e.g. Chase Bank" className={inputCls} />
           </div>
           <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Account Title <span className="text-[#EF4444]">*</span></Label>
+            <Label className="text-xs text-slate-500" style={{ fontWeight: 500 }}>Account Title <span className="text-red-500">*</span></Label>
             <Input value={e.accountTitle} onChange={(ev) => updateEntry(e.id, { accountTitle: ev.target.value })} placeholder="Enter account holder name" className={inputCls} />
           </div>
           <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Account Number <span className="text-[#EF4444]">*</span></Label>
+            <Label className="text-xs text-slate-500" style={{ fontWeight: 500 }}>Account Number <span className="text-red-500">*</span></Label>
             <Input value={e.accountNumber} onChange={(ev) => updateEntry(e.id, { accountNumber: formatAccountNumber(ev.target.value, fmt) })} placeholder={fmt.accountPlaceholder} className={inputCls} inputMode="numeric" />
           </div>
           <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>{fmt.routingLabel} <span className="text-[#EF4444]">*</span></Label>
+            <Label className="text-xs text-slate-500" style={{ fontWeight: 500 }}>{fmt.routingLabel} <span className="text-red-500">*</span></Label>
             <Input value={e.routingNumber} onChange={(ev) => updateEntry(e.id, { routingNumber: formatRoutingNumber(ev.target.value, fmt) })} placeholder={fmt.routingPlaceholder} className={inputCls} inputMode={fmt.routingPlaceholder.match(/[A-Z]/) ? "text" : "numeric"} />
           </div>
           <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>{fmt.swiftLabel} <span className="text-[10px] text-[#94A3B8] font-normal">(optional — international wire only)</span></Label>
+            <Label className="text-xs text-slate-500" style={{ fontWeight: 500 }}>{fmt.swiftLabel} <span className="text-[10px] text-slate-400 font-normal">(optional — international wire only)</span></Label>
             <Input value={e.swiftCode} onChange={(ev) => updateEntry(e.id, { swiftCode: ev.target.value.toUpperCase() })} placeholder="e.g. CHASUS33" className={inputCls} />
           </div>
         </>
@@ -373,25 +373,25 @@ function PaymentFormFields({
       {e.type === "card" && (
         <>
           <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Cardholder Name <span className="text-[#EF4444]">*</span></Label>
+            <Label className="text-xs text-slate-500" style={{ fontWeight: 500 }}>Cardholder Name <span className="text-red-500">*</span></Label>
             <Input value={e.cardholderName} onChange={(ev) => updateEntry(e.id, { cardholderName: ev.target.value })} placeholder="Enter cardholder name" className={inputCls} />
           </div>
           <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Card Number <span className="text-[#EF4444]">*</span></Label>
+            <Label className="text-xs text-slate-500" style={{ fontWeight: 500 }}>Card Number <span className="text-red-500">*</span></Label>
             <Input value={e.cardNumber} onChange={(ev) => updateEntry(e.id, { cardNumber: formatCardNumber(ev.target.value) })} placeholder="0000 0000 0000 0000" className={inputCls} inputMode="numeric" />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Expiry Date <span className="text-[#EF4444]">*</span></Label>
+              <Label className="text-xs text-slate-500" style={{ fontWeight: 500 }}>Expiry Date <span className="text-red-500">*</span></Label>
               <Input value={e.expiryDate} onChange={(ev) => updateEntry(e.id, { expiryDate: formatExpiry(ev.target.value) })} placeholder="MM/YY" className={inputCls} inputMode="numeric" />
             </div>
             <div>
-              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>CVV <span className="text-[#EF4444]">*</span></Label>
+              <Label className="text-xs text-slate-500" style={{ fontWeight: 500 }}>CVV <span className="text-red-500">*</span></Label>
               <Input value={e.cvv} onChange={(ev) => updateEntry(e.id, { cvv: formatCVV(ev.target.value) })} placeholder="000" className={inputCls} inputMode="numeric" />
             </div>
           </div>
           <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Billing Address</Label>
+            <Label className="text-xs text-slate-500" style={{ fontWeight: 500 }}>Billing Address</Label>
             <Input value={e.billingAddress} onChange={(ev) => updateEntry(e.id, { billingAddress: ev.target.value })} placeholder="Enter billing address" className={inputCls} />
           </div>
         </>
@@ -401,11 +401,11 @@ function PaymentFormFields({
       {e.type === "digital_wallet" && (
         <>
           <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Wallet Provider <span className="text-[#EF4444]">*</span></Label>
+            <Label className="text-xs text-slate-500" style={{ fontWeight: 500 }}>Wallet Provider <span className="text-red-500">*</span></Label>
             <Input value={e.walletProvider} onChange={(ev) => updateEntry(e.id, { walletProvider: ev.target.value })} placeholder="e.g. PayPal, Venmo, Stripe" className={inputCls} />
           </div>
           <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Wallet ID / Email <span className="text-[#EF4444]">*</span></Label>
+            <Label className="text-xs text-slate-500" style={{ fontWeight: 500 }}>Wallet ID / Email <span className="text-red-500">*</span></Label>
             <Input value={e.walletId} onChange={(ev) => updateEntry(e.id, { walletId: ev.target.value })} placeholder="Enter wallet ID or email" className={inputCls} />
           </div>
         </>
@@ -415,11 +415,11 @@ function PaymentFormFields({
       {e.type === "check" && (
         <>
           <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Payee Name <span className="text-[#EF4444]">*</span></Label>
+            <Label className="text-xs text-slate-500" style={{ fontWeight: 500 }}>Payee Name <span className="text-red-500">*</span></Label>
             <Input value={e.payeeName} onChange={(ev) => updateEntry(e.id, { payeeName: ev.target.value })} placeholder="Enter payee name" className={inputCls} />
           </div>
           <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Mailing Address <span className="text-[#EF4444]">*</span></Label>
+            <Label className="text-xs text-slate-500" style={{ fontWeight: 500 }}>Mailing Address <span className="text-red-500">*</span></Label>
             <Input value={e.mailingAddress} onChange={(ev) => updateEntry(e.id, { mailingAddress: ev.target.value })} placeholder="Enter mailing address" className={inputCls} />
           </div>
         </>
@@ -429,11 +429,11 @@ function PaymentFormFields({
       {e.type === "cash" && (
         <>
           <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Recipient Name</Label>
+            <Label className="text-xs text-slate-500" style={{ fontWeight: 500 }}>Recipient Name</Label>
             <Input value={e.recipientName} onChange={(ev) => updateEntry(e.id, { recipientName: ev.target.value })} placeholder="Enter recipient name" className={inputCls} />
           </div>
           <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Collection Point</Label>
+            <Label className="text-xs text-slate-500" style={{ fontWeight: 500 }}>Collection Point</Label>
             <Input value={e.collectionPoint} onChange={(ev) => updateEntry(e.id, { collectionPoint: ev.target.value })} placeholder="Enter collection point or location" className={inputCls} />
           </div>
         </>
@@ -443,7 +443,7 @@ function PaymentFormFields({
       {e.type === "other" && (
         <>
           <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Method Name</Label>
+            <Label className="text-xs text-slate-500" style={{ fontWeight: 500 }}>Method Name</Label>
             <Input value={e.methodName} onChange={(ev) => updateEntry(e.id, { methodName: ev.target.value })} placeholder="e.g. Barter, Trade Credit" className={inputCls} />
           </div>
           <ExpandableTextarea
@@ -453,7 +453,7 @@ function PaymentFormFields({
             placeholder="Describe this payment arrangement..."
           />
           <div>
-            <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Document Attachment Link</Label>
+            <Label className="text-xs text-slate-500" style={{ fontWeight: 500 }}>Document Attachment Link</Label>
             <Input value={e.documentLink} onChange={(ev) => updateEntry(e.id, { documentLink: ev.target.value })} placeholder="Paste link to supporting document" className={inputCls} />
           </div>
         </>
@@ -467,37 +467,37 @@ function PaymentFormFields({
       {/* Special Instructions — skip for "other" since it has description */}
       {e.type !== "other" && (
         <div>
-          <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Special Instructions</Label>
+          <Label className="text-xs text-slate-500" style={{ fontWeight: 500 }}>Special Instructions</Label>
           <Input value={e.specialInstructions} onChange={(ev) => updateEntry(e.id, { specialInstructions: ev.target.value })} placeholder="Enter any special instructions or notes..." className={inputCls} />
         </div>
       )}
 
       {/* Discount */}
-      <div className="pt-1 border-t border-[#E2E8F0]">
+      <div className="pt-1 border-t border-border">
         <div
           className="flex items-center gap-2.5 cursor-pointer select-none pt-3 group/disc"
           onClick={() => updateEntry(e.id, { applyDiscount: !e.applyDiscount })}
         >
           <div
             className={`w-[16px] h-[16px] rounded-[4px] flex items-center justify-center shrink-0 transition-colors ${
-              e.applyDiscount ? "bg-[#0A77FF]" : "border-[1.5px] border-[#CBD5E1] bg-white group-hover/disc:border-[#94A3B8]"
+              e.applyDiscount ? "bg-primary" : "border-[1.5px] border-slate-300 bg-white group-hover/disc:border-slate-400"
             }`}
           >
             {e.applyDiscount && <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />}
           </div>
-          <span className="text-xs text-[#334155]" style={{ fontWeight: 500 }}>Apply Discount Terms or Additional Charges</span>
+          <span className="text-xs text-slate-700" style={{ fontWeight: 500 }}>Apply Discount Terms or Additional Charges</span>
         </div>
       </div>
       {e.applyDiscount && (
         <div className="grid grid-cols-2 gap-3">
           <div>
             <div className="flex items-center justify-between">
-              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Discount</Label>
-              <div className="inline-flex items-center h-[22px] rounded-full bg-[#F1F5F9] p-0.5">
+              <Label className="text-xs text-slate-500" style={{ fontWeight: 500 }}>Discount</Label>
+              <div className="inline-flex items-center h-[22px] rounded-full bg-muted p-0.5">
                 <button
                   type="button"
                   onClick={() => updateEntry(e.id, { discountMode: "percent" })}
-                  className={`px-2 h-[18px] rounded-full text-[10px] transition-all ${(e.discountMode ?? "percent") === "percent" ? "bg-white text-[#0A77FF] shadow-sm" : "text-[#64748B] hover:text-[#334155]"}`}
+                  className={`px-2 h-[18px] rounded-full text-[10px] transition-all ${(e.discountMode ?? "percent") === "percent" ? "bg-white text-primary shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
                   style={{ fontWeight: 600 }}
                 >
                   %
@@ -505,7 +505,7 @@ function PaymentFormFields({
                 <button
                   type="button"
                   onClick={() => updateEntry(e.id, { discountMode: "fixed" })}
-                  className={`px-2 h-[18px] rounded-full text-[10px] transition-all ${(e.discountMode ?? "percent") === "fixed" ? "bg-white text-[#0A77FF] shadow-sm" : "text-[#64748B] hover:text-[#334155]"}`}
+                  className={`px-2 h-[18px] rounded-full text-[10px] transition-all ${(e.discountMode ?? "percent") === "fixed" ? "bg-white text-primary shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
                   style={{ fontWeight: 600 }}
                 >
                   $
@@ -514,22 +514,22 @@ function PaymentFormFields({
             </div>
             <div className="relative mt-1.5">
               {(e.discountMode ?? "percent") === "fixed" && (
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#94A3B8]">$</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-400">$</span>
               )}
-              <Input value={e.discountPercent} onChange={(ev) => updateEntry(e.id, { discountPercent: ev.target.value })} placeholder={`e.g. ${(e.discountMode ?? "percent") === "percent" ? "5" : "25.00"}`} className={`rounded-lg border-[#E2E8F0] !h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#CBD5E1] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 ${(e.discountMode ?? "percent") === "fixed" ? "pl-7 pr-3" : "pr-8"}`} />
+              <Input value={e.discountPercent} onChange={(ev) => updateEntry(e.id, { discountPercent: ev.target.value })} placeholder={`e.g. ${(e.discountMode ?? "percent") === "percent" ? "5" : "25.00"}`} className={`rounded-lg border-border !h-10 bg-white text-sm text-foreground placeholder:text-slate-300 focus:border-primary focus:ring-1 focus:ring-primary/20 ${(e.discountMode ?? "percent") === "fixed" ? "pl-7 pr-3" : "pr-8"}`} />
               {(e.discountMode ?? "percent") === "percent" && (
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-[#94A3B8]">%</span>
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-slate-400">%</span>
               )}
             </div>
           </div>
           <div>
             <div className="flex items-center justify-between">
-              <Label className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>Add. Charges</Label>
-              <div className="inline-flex items-center h-[22px] rounded-full bg-[#F1F5F9] p-0.5">
+              <Label className="text-xs text-slate-500" style={{ fontWeight: 500 }}>Add. Charges</Label>
+              <div className="inline-flex items-center h-[22px] rounded-full bg-muted p-0.5">
                 <button
                   type="button"
                   onClick={() => updateEntry(e.id, { additionalChargesMode: "percent" })}
-                  className={`px-2 h-[18px] rounded-full text-[10px] transition-all ${(e.additionalChargesMode ?? "percent") === "percent" ? "bg-white text-[#0A77FF] shadow-sm" : "text-[#64748B] hover:text-[#334155]"}`}
+                  className={`px-2 h-[18px] rounded-full text-[10px] transition-all ${(e.additionalChargesMode ?? "percent") === "percent" ? "bg-white text-primary shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
                   style={{ fontWeight: 600 }}
                 >
                   %
@@ -537,7 +537,7 @@ function PaymentFormFields({
                 <button
                   type="button"
                   onClick={() => updateEntry(e.id, { additionalChargesMode: "fixed" })}
-                  className={`px-2 h-[18px] rounded-full text-[10px] transition-all ${(e.additionalChargesMode ?? "percent") === "fixed" ? "bg-white text-[#0A77FF] shadow-sm" : "text-[#64748B] hover:text-[#334155]"}`}
+                  className={`px-2 h-[18px] rounded-full text-[10px] transition-all ${(e.additionalChargesMode ?? "percent") === "fixed" ? "bg-white text-primary shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
                   style={{ fontWeight: 600 }}
                 >
                   $
@@ -546,11 +546,11 @@ function PaymentFormFields({
             </div>
             <div className="relative mt-1.5">
               {(e.additionalChargesMode ?? "percent") === "fixed" && (
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-[#94A3B8]">$</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-400">$</span>
               )}
-              <Input value={e.additionalCharges} onChange={(ev) => updateEntry(e.id, { additionalCharges: ev.target.value })} placeholder={`e.g. ${(e.additionalChargesMode ?? "percent") === "percent" ? "2" : "50.00"}`} className={`rounded-lg border-[#E2E8F0] !h-10 bg-white text-sm text-[#0F172A] placeholder:text-[#CBD5E1] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 ${(e.additionalChargesMode ?? "percent") === "fixed" ? "pl-7 pr-3" : "pr-8"}`} />
+              <Input value={e.additionalCharges} onChange={(ev) => updateEntry(e.id, { additionalCharges: ev.target.value })} placeholder={`e.g. ${(e.additionalChargesMode ?? "percent") === "percent" ? "2" : "50.00"}`} className={`rounded-lg border-border !h-10 bg-white text-sm text-foreground placeholder:text-slate-300 focus:border-primary focus:ring-1 focus:ring-primary/20 ${(e.additionalChargesMode ?? "percent") === "fixed" ? "pl-7 pr-3" : "pr-8"}`} />
               {(e.additionalChargesMode ?? "percent") === "percent" && (
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-[#94A3B8]">%</span>
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-slate-400">%</span>
               )}
             </div>
           </div>
@@ -648,7 +648,7 @@ export function PaymentMethodCard({
   const PeIcon = typeIcon(pe.type);
   const cat = typeCategory(pe.type);
   const color = catColor[cat] || "#64748B";
-  const bg = catBg[cat] || "#F1F5F9";
+  const bg = catBg[cat] || "hsl(var(--muted))";
   const dataRows = getEntryDataRows(pe);
 
   return (
@@ -656,8 +656,8 @@ export function PaymentMethodCard({
       onClick={onEdit}
       className={`bg-white rounded-xl group transition-all duration-200 flex flex-col relative cursor-pointer ${
         pe.isPrimary
-          ? "border-[1.5px] border-[#0A77FF]/40 shadow-[0_2px_12px_-4px_rgba(10,119,255,0.12)] hover:shadow-[0_4px_20px_-4px_rgba(10,119,255,0.18)]"
-          : "border border-[#E2E8F0] hover:border-[#CBD5E1] hover:shadow-[0_4px_16px_-4px_rgba(0,0,0,0.06)]"
+          ? "border-[1.5px] border-primary/40 shadow-[0_2px_12px_-4px_rgba(10,119,255,0.12)] hover:shadow-[0_4px_20px_-4px_rgba(10,119,255,0.18)]"
+          : "border border-border hover:border-slate-300 hover:shadow-[0_4px_16px_-4px_rgba(0,0,0,0.06)]"
       }`}
     >
       <div className="p-3 flex-1 flex flex-col gap-2">
@@ -668,7 +668,7 @@ export function PaymentMethodCard({
               <PeIcon className="w-3.5 h-3.5" style={{ color }} />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-xs text-[#0F172A] truncate leading-tight" style={{ fontWeight: 600 }}>{getEntrySummary(pe)}</p>
+              <p className="text-xs text-foreground truncate leading-tight" style={{ fontWeight: 600 }}>{getEntrySummary(pe)}</p>
               <div className="flex items-center gap-1.5 mt-0.5">
                 <span className="text-[9px] px-1.5 py-[1px] rounded-full" style={{ fontWeight: 600, color, backgroundColor: bg }}>
                   {typeLabel(pe.type)}
@@ -678,13 +678,13 @@ export function PaymentMethodCard({
           </div>
           <div className="flex items-center gap-1 shrink-0" onClick={(e) => e.stopPropagation()}>
             {pe.isPrimary ? (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#0A77FF] text-white text-[10px]" style={{ fontWeight: 600 }}>
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-primary text-white text-[10px]" style={{ fontWeight: 600 }}>
                 <Star className="w-2.5 h-2.5 fill-white" /> Primary
               </span>
             ) : (
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <button onClick={onSetPrimary} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md border border-[#E2E8F0] bg-white text-[10px] text-[#94A3B8] hover:text-[#0A77FF] hover:border-[#0A77FF]/30 hover:bg-[#EDF4FF] transition-all cursor-pointer opacity-0 group-hover:opacity-100" style={{ fontWeight: 600 }}>
+                  <button onClick={onSetPrimary} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md border border-border bg-white text-[10px] text-slate-400 hover:text-primary hover:border-primary/30 hover:bg-accent transition-all cursor-pointer opacity-0 group-hover:opacity-100" style={{ fontWeight: 600 }}>
                     <Star className="w-2.5 h-2.5" /> Primary
                   </button>
                 </TooltipTrigger>
@@ -693,8 +693,8 @@ export function PaymentMethodCard({
             )}
             <Tooltip>
               <TooltipTrigger asChild>
-                <button onClick={onDelete} className="p-1 rounded-md hover:bg-[#FEF2F2] transition-colors cursor-pointer opacity-0 group-hover:opacity-100">
-                  <Archive className="w-3 h-3 text-[#94A3B8] hover:text-[#DC2626]" />
+                <button onClick={onDelete} className="p-1 rounded-md hover:bg-red-50 transition-colors cursor-pointer opacity-0 group-hover:opacity-100">
+                  <Archive className="w-3 h-3 text-slate-400 hover:text-destructive" />
                 </button>
               </TooltipTrigger>
               <TooltipContent className="z-[300]"><p className="text-xs">Archive</p></TooltipContent>
@@ -704,7 +704,7 @@ export function PaymentMethodCard({
 
         {/* Data rows */}
         {dataRows.length > 0 && (
-          <div className="flex flex-col gap-[5px] py-1.5 px-2 rounded-lg bg-[#FAFBFC] border border-[#F1F5F9]">
+          <div className="flex flex-col gap-[5px] py-1.5 px-2 rounded-lg bg-[#FAFBFC] border border-muted">
             {dataRows.map((row, i) => (
               <DataRow key={i} icon={row.icon} label={row.label} value={row.value} sensitive={row.sensitive} />
             ))}
@@ -713,17 +713,17 @@ export function PaymentMethodCard({
 
         {/* Discount/charges strip */}
         {pe.applyDiscount && (
-          <div className="flex items-center justify-between px-2 py-1 rounded-md bg-[#FAFBFC] border border-[#F1F5F9]">
+          <div className="flex items-center justify-between px-2 py-1 rounded-md bg-[#FAFBFC] border border-muted">
             <div className="flex items-center gap-1">
-              <Percent className="w-2.5 h-2.5 text-[#0A77FF]" />
-              <span className="text-[10px] text-[#64748B]" style={{ fontWeight: 500 }}>Discount</span>
+              <Percent className="w-2.5 h-2.5 text-primary" />
+              <span className="text-[10px] text-slate-500" style={{ fontWeight: 500 }}>Discount</span>
             </div>
-            <span className="text-[10px] text-[#0F172A] tabular-nums" style={{ fontWeight: 600 }}>{(pe.discountMode ?? "percent") === "fixed" ? "$" : ""}{pe.discountPercent || "0"}{(pe.discountMode ?? "percent") === "percent" ? "%" : ""}</span>
+            <span className="text-[10px] text-foreground tabular-nums" style={{ fontWeight: 600 }}>{(pe.discountMode ?? "percent") === "fixed" ? "$" : ""}{pe.discountPercent || "0"}{(pe.discountMode ?? "percent") === "percent" ? "%" : ""}</span>
             {pe.additionalCharges && (
               <>
-                <span className="text-[10px] text-[#CBD5E1] mx-1">|</span>
-                <span className="text-[10px] text-[#64748B]" style={{ fontWeight: 500 }}>Charges</span>
-                <span className="text-[10px] text-[#0F172A] tabular-nums ml-1" style={{ fontWeight: 600 }}>{(pe.additionalChargesMode ?? "percent") === "fixed" ? "$" : ""}{pe.additionalCharges}{(pe.additionalChargesMode ?? "percent") === "percent" ? "%" : ""}</span>
+                <span className="text-[10px] text-slate-300 mx-1">|</span>
+                <span className="text-[10px] text-slate-500" style={{ fontWeight: 500 }}>Charges</span>
+                <span className="text-[10px] text-foreground tabular-nums ml-1" style={{ fontWeight: 600 }}>{(pe.additionalChargesMode ?? "percent") === "fixed" ? "$" : ""}{pe.additionalCharges}{(pe.additionalChargesMode ?? "percent") === "percent" ? "%" : ""}</span>
               </>
             )}
           </div>
@@ -731,11 +731,11 @@ export function PaymentMethodCard({
       </div>
 
       {/* Footer */}
-      <div className="flex items-center justify-between px-3 py-1.5 border-t border-[#F1F5F9] bg-[#FAFBFC] rounded-b-xl">
-        <span className="text-[9px] text-[#94A3B8]" style={{ fontWeight: 500 }}>{typeCategory(pe.type)}</span>
+      <div className="flex items-center justify-between px-3 py-1.5 border-t border-muted bg-[#FAFBFC] rounded-b-xl">
+        <span className="text-[9px] text-slate-400" style={{ fontWeight: 500 }}>{typeCategory(pe.type)}</span>
         <span
           className="px-1.5 py-[1px] rounded-full text-[9px] border"
-          style={{ fontWeight: 500, color: "#059669", backgroundColor: "#F0FDF4", borderColor: "#BBF7D0" }}
+          style={{ fontWeight: 500, color: "hsl(var(--success))", backgroundColor: "#F0FDF4", borderColor: "#BBF7D0" }}
         >
           Active
         </span>
@@ -830,10 +830,10 @@ export function PaymentMethodsSection({
     <div className="space-y-4">
       {/* Header */}
       <div>
-        <h4 className="text-sm text-[#0F172A]" style={{ fontWeight: 700 }}>Payment Methods</h4>
-        <p className="text-xs text-[#64748B] mt-0.5 leading-relaxed">
+        <h4 className="text-sm text-foreground" style={{ fontWeight: 700 }}>Payment Methods</h4>
+        <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">
           Configure payment methods for this {configType}. Add multiple methods across bank transfers, cards, digital wallets and more.{" "}
-          <span className="text-[#0A77FF] inline-flex items-center gap-0.5 cursor-pointer hover:underline" style={{ fontWeight: 500 }}>
+          <span className="text-primary inline-flex items-center gap-0.5 cursor-pointer hover:underline" style={{ fontWeight: 500 }}>
             Learn More <ExternalLink className="w-3 h-3" />
           </span>
         </p>
@@ -895,17 +895,17 @@ export function PaymentMethodsSection({
         </div>
         </div>
       ) : (
-        <div className="rounded-xl border-2 border-dashed border-[#E2E8F0] bg-[#FAFBFC] py-10 px-4 flex flex-col items-center justify-center text-center">
-          <div className="w-12 h-12 rounded-xl bg-[#EDF4FF] border border-[#DBEAFE] flex items-center justify-center mb-3">
-            <CreditCard className="w-6 h-6 text-[#0A77FF]" />
+        <div className="rounded-xl border-2 border-dashed border-border bg-[#FAFBFC] py-10 px-4 flex flex-col items-center justify-center text-center">
+          <div className="w-12 h-12 rounded-xl bg-accent border border-blue-100 flex items-center justify-center mb-3">
+            <CreditCard className="w-6 h-6 text-primary" />
           </div>
-          <p className="text-sm text-[#0F172A]" style={{ fontWeight: 600 }}>No payment methods added yet</p>
-          <p className="text-xs text-[#94A3B8] mt-1 max-w-[280px]">
+          <p className="text-sm text-foreground" style={{ fontWeight: 600 }}>No payment methods added yet</p>
+          <p className="text-xs text-slate-400 mt-1 max-w-[280px]">
             Add payment methods to define how this {configType} sends or receives payments. You can configure multiple methods.
           </p>
           <button
             onClick={openAddModal}
-            className="mt-4 px-4 py-2.5 rounded-lg bg-[#0A77FF] text-white text-xs hover:bg-[#0862D0] transition-colors inline-flex items-center gap-1.5 cursor-pointer shadow-sm"
+            className="mt-4 px-4 py-2.5 rounded-lg bg-primary text-white text-xs hover:bg-[#0862D0] transition-colors inline-flex items-center gap-1.5 cursor-pointer shadow-sm"
             style={{ fontWeight: 600 }}
           >
             <Plus className="w-3.5 h-3.5" />
@@ -917,7 +917,7 @@ export function PaymentMethodsSection({
       {/* Modal */}
       <Dialog open={pmModalOpen} onOpenChange={(open) => { if (!open) handleModalCancel(); }}>
         <DialogContent
-          className="!p-0 !gap-0 !bg-white overflow-hidden flex flex-col z-[250] !border-[#E2E8F0]/60"
+          className="!p-0 !gap-0 !bg-white overflow-hidden flex flex-col z-[250] !border-border/60"
           overlayClassName="!bg-black/20 !z-[250]"
           style={{ maxWidth: 580, width: "calc(100% - 2rem)", maxHeight: "85vh", borderRadius: 16, boxShadow: "0 24px 80px -12px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.05)" }}
           hideCloseButton
@@ -939,9 +939,9 @@ export function PaymentMethodsSection({
                       setPmModalStep("select");
                       setPmEditingEntryId(null);
                     }}
-                    className="p-1 rounded-md hover:bg-[#F1F5F9] transition-colors cursor-pointer"
+                    className="p-1 rounded-md hover:bg-muted transition-colors cursor-pointer"
                   >
-                    <ChevronLeft className="w-4 h-4 text-[#64748B]" />
+                    <ChevronLeft className="w-4 h-4 text-slate-500" />
                   </button>
                 )}
                 {pmModalStep === "form" && modalEntry ? (() => {
@@ -949,14 +949,14 @@ export function PaymentMethodsSection({
                   const cat = typeCategory(modalEntry.type);
                   return (
                     <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: catBg[cat] || "#F1F5F9" }}>
+                      <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: catBg[cat] || "hsl(var(--muted))" }}>
                         <Icon className="w-4 h-4" style={{ color: catColor[cat] || "#64748B" }} />
                       </div>
                       <div>
-                        <h3 className="text-sm text-[#0F172A]" style={{ fontWeight: 700 }}>
+                        <h3 className="text-sm text-foreground" style={{ fontWeight: 700 }}>
                           {modalEntry.isSaved ? `Edit ${typeLabel(modalEntry.type)}` : `New ${typeLabel(modalEntry.type)}`}
                         </h3>
-                        <span className="text-[10px] px-1.5 py-0.5 rounded-full" style={{ fontWeight: 600, color: catColor[cat] || "#64748B", backgroundColor: catBg[cat] || "#F1F5F9" }}>
+                        <span className="text-[10px] px-1.5 py-0.5 rounded-full" style={{ fontWeight: 600, color: catColor[cat] || "#64748B", backgroundColor: catBg[cat] || "hsl(var(--muted))" }}>
                           {typeCategory(modalEntry.type)}
                         </span>
                       </div>
@@ -964,13 +964,13 @@ export function PaymentMethodsSection({
                   );
                 })() : (
                   <div>
-                    <h3 className="text-sm text-[#0F172A]" style={{ fontWeight: 700 }}>Add Payment Method</h3>
-                    {pmModalStep === "select" && <p className="text-[11px] text-[#94A3B8] mt-0.5">Choose a payment method type to get started</p>}
+                    <h3 className="text-sm text-foreground" style={{ fontWeight: 700 }}>Add Payment Method</h3>
+                    {pmModalStep === "select" && <p className="text-[11px] text-slate-400 mt-0.5">Choose a payment method type to get started</p>}
                   </div>
                 )}
               </div>
-              <button onClick={handleModalCancel} className="p-1.5 rounded-md hover:bg-[#F1F5F9] transition-colors cursor-pointer">
-                <X className="w-4 h-4 text-[#64748B]" />
+              <button onClick={handleModalCancel} className="p-1.5 rounded-md hover:bg-muted transition-colors cursor-pointer">
+                <X className="w-4 h-4 text-slate-500" />
               </button>
             </div>
 
@@ -982,19 +982,19 @@ export function PaymentMethodsSection({
                     {filteredTypeCards.map((t) => {
                       const Icon = t.icon;
                       const color = catColor[t.category] || "#64748B";
-                      const bg = catBg[t.category] || "#F1F5F9";
+                      const bg = catBg[t.category] || "hsl(var(--muted))";
                       return (
                         <button
                           key={t.id}
                           onClick={() => selectTypeAndProceed(t.id)}
-                          className="flex items-start gap-2.5 p-3 rounded-xl border border-[#E8ECF1] bg-white text-left hover:border-[#BFDBFE] hover:shadow-[0_2px_8px_-2px_rgba(10,119,255,0.08)] transition-all group cursor-pointer"
+                          className="flex items-start gap-2.5 p-3 rounded-xl border border-[#E8ECF1] bg-white text-left hover:border-blue-200 hover:shadow-[0_2px_8px_-2px_rgba(10,119,255,0.08)] transition-all group cursor-pointer"
                         >
                           <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5" style={{ backgroundColor: bg }}>
                             <Icon className="w-4 h-4" style={{ color }} />
                           </div>
                           <div className="min-w-0 flex-1">
-                            <p className="text-[12px] text-[#0F172A] group-hover:text-[#0A77FF] transition-colors" style={{ fontWeight: 600 }}>{t.label}</p>
-                            <p className="text-[10px] text-[#94A3B8] mt-0.5 leading-relaxed">{t.description}</p>
+                            <p className="text-[12px] text-foreground group-hover:text-primary transition-colors" style={{ fontWeight: 600 }}>{t.label}</p>
+                            <p className="text-[10px] text-slate-400 mt-0.5 leading-relaxed">{t.description}</p>
                           </div>
                         </button>
                       );
@@ -1011,10 +1011,10 @@ export function PaymentMethodsSection({
             {/* Footer */}
             {pmModalStep === "form" && (
               <div className="flex items-center justify-end gap-2 px-5 py-3 border-t border-[#E8ECF1] bg-white shrink-0">
-                <button onClick={handleModalCancel} className="px-3.5 py-2 rounded-lg border border-[#E2E8F0] bg-white text-xs text-[#64748B] hover:bg-[#F1F5F9] transition-colors cursor-pointer" style={{ fontWeight: 500 }}>
+                <button onClick={handleModalCancel} className="px-3.5 py-2 rounded-lg border border-border bg-white text-xs text-slate-500 hover:bg-muted transition-colors cursor-pointer" style={{ fontWeight: 500 }}>
                   Cancel
                 </button>
-                <button onClick={handleModalSave} className="px-4 py-2 rounded-lg bg-[#0A77FF] text-white text-xs hover:bg-[#0960D0] transition-colors cursor-pointer" style={{ fontWeight: 600 }}>
+                <button onClick={handleModalSave} className="px-4 py-2 rounded-lg bg-primary text-white text-xs hover:bg-[#0960D0] transition-colors cursor-pointer" style={{ fontWeight: 600 }}>
                   {modalEntry?.isSaved ? "Update Method" : "Save Method"}
                 </button>
               </div>

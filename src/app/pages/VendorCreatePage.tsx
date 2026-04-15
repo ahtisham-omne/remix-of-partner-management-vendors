@@ -22,7 +22,7 @@ export function VendorCreatePage() {
   };
 
   return (
-    <div className="p-6 lg:p-8 overflow-y-auto flex-1 bg-[#F8FAFC]">
+    <div className="p-6 lg:p-8 overflow-y-auto flex-1 bg-slate-50">
       <Breadcrumb className="mb-6">
         <BreadcrumbList>
           <BreadcrumbItem>

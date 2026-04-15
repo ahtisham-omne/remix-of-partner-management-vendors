@@ -11,13 +11,13 @@ const AAA_COLOR_MAP: Record<string, string> = {
   "#0284c7": "#075985",
   // violet
   "#8b5cf6": "#6D28D9",
-  "#7c3aed": "#5B21B6",
+  "hsl(var(--violet))": "#5B21B6",
   // amber
   "#f59e0b": "#92400E",
-  "#d97706": "#92400E",
+  "hsl(var(--warning))": "#92400E",
   // emerald / green
   "#10b981": "#065F46",
-  "#059669": "#065F46",
+  "hsl(var(--success))": "#065F46",
   "#16a34a": "#166534",
   // red
   "#ef4444": "#991B1B",

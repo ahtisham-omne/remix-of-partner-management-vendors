@@ -11,13 +11,13 @@ export function PartnerGroupsPage() {
   ];
 
   const typeColors: Record<string, { bg: string; text: string }> = {
-    Family: { bg: "#EDF4FF", text: "#0A77FF" },
+    Family: { bg: "hsl(var(--accent))", text: "hsl(var(--primary))" },
     Group: { bg: "#F0FDF4", text: "#16A34A" },
     "Tax Class": { bg: "#FFF7ED", text: "#EA580C" },
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#F8FAFC]">
+    <div className="flex flex-col h-full bg-slate-50">
       <div className="px-5 py-3.5 border-b border-border bg-card">
         <div className="flex items-center justify-between">
           <div>
@@ -30,7 +30,7 @@ export function PartnerGroupsPage() {
           </div>
           <button
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-white text-[13px] transition-colors hover:opacity-90"
-            style={{ backgroundColor: "#0A77FF", fontWeight: 500 }}
+            style={{ backgroundColor: "hsl(var(--primary))", fontWeight: 500 }}
           >
             <Plus className="w-4 h-4" />
             New Group
@@ -45,7 +45,7 @@ export function PartnerGroupsPage() {
             <input
               type="text"
               placeholder="Search groups..."
-              className="w-full pl-9 pr-4 py-2 rounded-lg border border-border bg-card text-[13px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#0A77FF]/20 focus:border-[#0A77FF]"
+              className="w-full pl-9 pr-4 py-2 rounded-lg border border-border bg-card text-[13px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
             />
           </div>
           <button className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-border text-[13px] text-muted-foreground hover:bg-muted transition-colors">

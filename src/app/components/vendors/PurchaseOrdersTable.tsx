@@ -69,7 +69,7 @@ const PO_DATA = [
 
 const STATUS_STYLES: Record<string, { bg: string; text: string; border: string }> = {
   "Confirmed": { bg: "#ECFDF5", text: "#065F46", border: "#A7F3D0" },
-  "Draft": { bg: "#F1F5F9", text: "#475569", border: "#CBD5E1" },
+  "Draft": { bg: "hsl(var(--muted))", text: "hsl(var(--muted-foreground))", border: "#CBD5E1" },
   "Sent": { bg: "#EFF6FF", text: "#1E40AF", border: "#BFDBFE" },
   "Active with Cancellation": { bg: "#FFFBEB", text: "#92400E", border: "#FDE68A" },
   "Partially Received": { bg: "#F5F3FF", text: "#5B21B6", border: "#DDD6FE" },
@@ -95,7 +95,7 @@ function PersonHoverCard({ name, role, email, dept, phone, children }: { name: s
     <HoverCard>
       <HoverCardTrigger asChild>{children}</HoverCardTrigger>
       <HoverCardContent side="bottom" align="start" className="w-[280px] p-0 rounded-xl border-0 shadow-[0_8px_30px_rgba(0,0,0,0.12)] overflow-hidden" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
-        <div className="bg-gradient-to-br from-[#1E293B] to-[#334155] px-4 py-3 relative overflow-hidden">
+        <div className="bg-gradient-to-br from-slate-800 to-slate-700 px-4 py-3 relative overflow-hidden">
           <div className="absolute -top-4 -right-4 w-20 h-20 rounded-full bg-white/[0.04]" />
           <div className="flex items-center gap-3 relative">
             <div className="w-11 h-11 rounded-full overflow-hidden border-2 border-white/20 shrink-0" style={{ backgroundColor: tint.bg }}>
@@ -103,14 +103,14 @@ function PersonHoverCard({ name, role, email, dept, phone, children }: { name: s
             </div>
             <div className="min-w-0">
               <p className="text-[14px] text-white truncate" style={{ fontWeight: 600 }}>{name}</p>
-              <p className="text-[11px] text-[#94A3B8] truncate">{role}</p>
+              <p className="text-[11px] text-slate-400 truncate">{role}</p>
             </div>
           </div>
         </div>
         <div className="bg-white px-4 py-3 space-y-2">
-          {email && <div className="flex items-center gap-2.5 text-[12px] text-[#334155]"><Mail className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" /><span className="truncate">{email}</span></div>}
-          {dept && <div className="flex items-center gap-2.5 text-[12px] text-[#334155]"><Building2 className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" /><span>{dept}</span></div>}
-          {phone && <div className="flex items-center gap-2.5 text-[12px] text-[#334155]"><Phone className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" /><span>{phone}</span></div>}
+          {email && <div className="flex items-center gap-2.5 text-[12px] text-slate-700"><Mail className="w-3.5 h-3.5 text-slate-400 shrink-0" /><span className="truncate">{email}</span></div>}
+          {dept && <div className="flex items-center gap-2.5 text-[12px] text-slate-700"><Building2 className="w-3.5 h-3.5 text-slate-400 shrink-0" /><span>{dept}</span></div>}
+          {phone && <div className="flex items-center gap-2.5 text-[12px] text-slate-700"><Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" /><span>{phone}</span></div>}
         </div>
       </HoverCardContent>
     </HoverCard>
@@ -191,7 +191,7 @@ export function PurchaseOrdersTable() {
   const renderCell = (po: typeof PO_DATA[0], key: ColKey) => {
     const tint = getAvatarTint(po.vendor);
     switch (key) {
-      case "po_no": return (<div className="flex items-center gap-2"><span className="text-[10px] px-1.5 py-0.5 rounded bg-[#F1F5F9] text-[#64748B]" style={{ fontWeight: 600 }}>{po.version}</span><span className={`${sz} text-[#0A77FF] cursor-pointer hover:underline`} style={{ fontWeight: 500 }}>{po.id}</span></div>);
+      case "po_no": return (<div className="flex items-center gap-2"><span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-slate-500" style={{ fontWeight: 600 }}>{po.version}</span><span className={`${sz} text-primary cursor-pointer hover:underline`} style={{ fontWeight: 500 }}>{po.id}</span></div>);
       case "vendor": return (<div className={`flex items-center ${isRelaxed ? "gap-3" : "gap-2.5"}`}><div className={`${isRelaxed ? "w-8 h-8" : "w-7 h-7"} rounded-lg flex items-center justify-center shrink-0 text-[9px]`} style={{ backgroundColor: tint.bg, color: tint.fg, fontWeight: 700 }}>{po.vendorCode}</div><span className={`${sz} truncate`} style={{ fontWeight: 500, color: "#1E293B" }}>{po.vendor}</span></div>);
       case "status": { const ss = STATUS_STYLES[po.status] || STATUS_STYLES.Draft; return <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs whitespace-nowrap" style={{ fontWeight: 500, backgroundColor: ss.bg, color: ss.text, borderColor: ss.border }}>{po.status}</span>; }
       case "items": {
@@ -202,7 +202,7 @@ export function PurchaseOrdersTable() {
         }) : [];
         return (
           <div className="flex items-center gap-1.5">
-            <span className={`${sz} text-[#334155]`} style={{ fontWeight: 500 }}>{po.items}</span>
+            <span className={`${sz} text-slate-700`} style={{ fontWeight: 500 }}>{po.items}</span>
             {po.itemCount > 0 && (
               <OverflowTooltip category="Ordered Items" items={overflowItems}>
                 <span className="text-[11px] shrink-0 cursor-default leading-none" style={{ fontWeight: 600, color: "#085FCC" }}>+{po.itemCount} more</span>
@@ -217,26 +217,26 @@ export function PurchaseOrdersTable() {
             <div className={`${isRelaxed ? "w-10 h-10" : "w-6 h-6"} rounded-full shrink-0 overflow-hidden cursor-zoom-in`} style={{ backgroundColor: getAvatarTint(po.poc).bg }} onClick={(e) => { e.stopPropagation(); openLightbox({ src: getPhoto(po.poc), name: po.poc }); }}>
               <img src={getPhoto(po.poc)} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
             </div>
-            <span className={`${sz} text-[#334155] truncate`} style={{ fontWeight: 500 }}>{po.poc}</span>
+            <span className={`${sz} text-slate-700 truncate`} style={{ fontWeight: 500 }}>{po.poc}</span>
           </div>
         </PersonHoverCard>
       );
-      case "location": return <span className={`${sz} text-[#64748B] truncate block`}>{po.location}</span>;
+      case "location": return <span className={`${sz} text-slate-500 truncate block`}>{po.location}</span>;
       case "created_by": {
-        if (po.createdBy === "—") return <span className={`${sz} text-[#64748B]`}>—</span>;
+        if (po.createdBy === "—") return <span className={`${sz} text-slate-500`}>—</span>;
         return (
           <PersonHoverCard name={po.createdBy} role={po.cbRole} email={po.cbEmail} dept={po.cbDept} phone={po.cbPhone}>
             <div className={`flex items-center ${isRelaxed ? "gap-2.5" : "gap-2"} cursor-pointer`}>
               <div className={`${isRelaxed ? "w-10 h-10" : "w-6 h-6"} rounded-full shrink-0 overflow-hidden cursor-zoom-in`} style={{ backgroundColor: getAvatarTint(po.createdBy).bg }} onClick={(e) => { e.stopPropagation(); openLightbox({ src: getPhoto(po.createdBy), name: po.createdBy }); }}>
                 <img src={getPhoto(po.createdBy)} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
               </div>
-              <span className={`${sz} text-[#334155] truncate`} style={{ fontWeight: 500 }}>{po.createdBy}</span>
+              <span className={`${sz} text-slate-700 truncate`} style={{ fontWeight: 500 }}>{po.createdBy}</span>
             </div>
           </PersonHoverCard>
         );
       }
-      case "due_date": return <span className={`${sz} text-[#64748B]`}>{po.dueDate}</span>;
-      case "order_date": return <span className={`${sz} text-[#64748B]`}>{po.orderDate}</span>;
+      case "due_date": return <span className={`${sz} text-slate-500`}>{po.dueDate}</span>;
+      case "order_date": return <span className={`${sz} text-slate-500`}>{po.orderDate}</span>;
       default: return <span>—</span>;
     }
   };
@@ -246,16 +246,16 @@ export function PurchaseOrdersTable() {
       {/* Inner column — toolbar + tabs + table + pagination, sibling to the side drawer below */}
       <div className="flex-1 min-w-0 flex flex-col overflow-clip">
       {/* Toolbar */}
-      <div className="px-4 py-3 flex items-center gap-3 border-b border-[#F1F5F9] flex-wrap">
+      <div className="px-4 py-3 flex items-center gap-3 border-b border-muted flex-wrap">
         <div className="relative flex-1 max-w-xs"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70 pointer-events-none" /><Input placeholder="Search by PO, partner, item..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9 pr-8 h-9 text-sm bg-white border-border/80 shadow-sm placeholder:text-muted-foreground/50" />{search && <button onClick={() => setSearch("")} className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded-full hover:bg-muted/60 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"><X className="w-3.5 h-3.5" /></button>}</div>
         <button className="inline-flex items-center justify-center h-9 gap-1.5 px-3 rounded-lg border border-border/80 bg-white shadow-sm hover:bg-muted/50 transition-colors text-foreground cursor-pointer"><SlidersHorizontal className="w-3.5 h-3.5" /><span className="text-sm" style={{ fontWeight: 500 }}>Filters</span></button>
         <span className="text-sm tabular-nums ml-auto" style={{ fontWeight: 500 }}><span className="text-foreground">{filtered.length}</span><span className="text-muted-foreground/70"> records</span></span>
-        <DropdownMenu><DropdownMenuTrigger asChild><button className="inline-flex items-center justify-center h-9 gap-2 px-3 rounded-lg border border-border bg-white shadow-sm hover:bg-muted/40 transition-colors cursor-pointer">{density === "condensed" ? <AlignJustify className="w-[18px] h-[18px] text-muted-foreground/80" /> : <List className="w-[18px] h-[18px] text-muted-foreground/80" />}<span className="text-sm hidden md:inline" style={{ fontWeight: 500 }}>{density === "condensed" ? "Condensed" : "Comfort"}</span><ChevronDown className="w-3.5 h-3.5 text-muted-foreground/60" /></button></DropdownMenuTrigger><DropdownMenuContent align="end" className="w-[200px] p-1.5">{(["condensed", "comfort"] as const).map(d => (<DropdownMenuItem key={d} className="flex items-center gap-3 py-2.5 px-3 cursor-pointer rounded-md" onSelect={() => setDensity(d)}>{d === "condensed" ? <AlignJustify className="w-5 h-5 text-muted-foreground shrink-0" /> : <List className="w-5 h-5 text-muted-foreground shrink-0" />}<span className="text-sm flex-1" style={{ fontWeight: 500 }}>{d === "condensed" ? "Condensed" : "Comfort"}</span>{density === d && <Check className="w-4 h-4 shrink-0" style={{ color: "#0A77FF" }} />}</DropdownMenuItem>))}</DropdownMenuContent></DropdownMenu>
+        <DropdownMenu><DropdownMenuTrigger asChild><button className="inline-flex items-center justify-center h-9 gap-2 px-3 rounded-lg border border-border bg-white shadow-sm hover:bg-muted/40 transition-colors cursor-pointer">{density === "condensed" ? <AlignJustify className="w-[18px] h-[18px] text-muted-foreground/80" /> : <List className="w-[18px] h-[18px] text-muted-foreground/80" />}<span className="text-sm hidden md:inline" style={{ fontWeight: 500 }}>{density === "condensed" ? "Condensed" : "Comfort"}</span><ChevronDown className="w-3.5 h-3.5 text-muted-foreground/60" /></button></DropdownMenuTrigger><DropdownMenuContent align="end" className="w-[200px] p-1.5">{(["condensed", "comfort"] as const).map(d => (<DropdownMenuItem key={d} className="flex items-center gap-3 py-2.5 px-3 cursor-pointer rounded-md" onSelect={() => setDensity(d)}>{d === "condensed" ? <AlignJustify className="w-5 h-5 text-muted-foreground shrink-0" /> : <List className="w-5 h-5 text-muted-foreground shrink-0" />}<span className="text-sm flex-1" style={{ fontWeight: 500 }}>{d === "condensed" ? "Condensed" : "Comfort"}</span>{density === d && <Check className="w-4 h-4 shrink-0" style={{ color: "hsl(var(--primary))" }} />}</DropdownMenuItem>))}</DropdownMenuContent></DropdownMenu>
         <ColumnSelectorTrigger visibleCount={visibleColumns.length} active={columnDrawerOpen} onClick={() => setColumnDrawerOpen(!columnDrawerOpen)} />
         <button
           type="button"
           onClick={() => window.open(`${PO_MODULE_URL}?action=create`, "_blank", "noopener")}
-          className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-sm shadow-sm transition-colors cursor-pointer"
+          className="inline-flex items-center gap-1.5 h-9 px-3.5 rounded-lg bg-primary hover:bg-[#0862D0] text-white text-sm shadow-sm transition-colors cursor-pointer"
           style={{ fontWeight: 600 }}
         >
           <Plus className="w-3.5 h-3.5" />
@@ -264,23 +264,23 @@ export function PurchaseOrdersTable() {
       </div>
       {/* Status tabs */}
       <div className="px-4 py-2 flex items-center gap-2 overflow-x-auto scrollbar-hide">
-        {FILTER_TABS.map(tab => { const a = statusFilter === tab.key; const c = filterCounts[tab.key] || 0; return (<button key={tab.key} onClick={() => setStatusFilter(tab.key)} className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs transition-colors whitespace-nowrap shrink-0 cursor-pointer ${a ? "border-primary bg-[#EDF4FF]" : "border-border text-muted-foreground hover:bg-muted/60 hover:text-foreground"}`} style={{ fontWeight: a ? 500 : 400, color: a ? "#0A77FF" : undefined }}>{tab.label}<span className={`text-[10px] rounded-full px-1.5 py-px min-w-[18px] text-center ${a ? "bg-primary/10" : "bg-muted"}`} style={{ fontWeight: 600, color: a ? "#0A77FF" : "#475569" }}>{c}</span></button>); })}
+        {FILTER_TABS.map(tab => { const a = statusFilter === tab.key; const c = filterCounts[tab.key] || 0; return (<button key={tab.key} onClick={() => setStatusFilter(tab.key)} className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs transition-colors whitespace-nowrap shrink-0 cursor-pointer ${a ? "border-primary bg-accent" : "border-border text-muted-foreground hover:bg-muted/60 hover:text-foreground"}`} style={{ fontWeight: a ? 500 : 400, color: a ? "hsl(var(--primary))" : undefined }}>{tab.label}<span className={`text-[10px] rounded-full px-1.5 py-px min-w-[18px] text-center ${a ? "bg-primary/10" : "bg-muted"}`} style={{ fontWeight: 600, color: a ? "hsl(var(--primary))" : "hsl(var(--muted-foreground))" }}>{c}</span></button>); })}
       </div>
       {/* Table */}
       <div className={`min-h-0 overflow-auto flex-1 ${isResizing || draggingColumnKey ? "select-none" : ""}`}>
         <Table style={{ tableLayout: "fixed", width: `max(${totalW}px, 100%)` }}>
           <TableHeader className="sticky top-0 z-20 bg-card">
             <TableRow className={`bg-muted/30 hover:bg-muted/30 ${density === "condensed" ? "[&>th]:h-8" : "[&>th]:h-9"}`}>
-              <TableHead className="sticky left-0 z-20 bg-[#f8fafc]" style={{ width: CHECKBOX_W, minWidth: CHECKBOX_W, maxWidth: CHECKBOX_W, paddingLeft: 8, paddingRight: 0 }}><Checkbox checked={allSel ? true : someSel ? "indeterminate" : false} onCheckedChange={() => { if (allSel) setSelectedRows(new Set()); else setSelectedRows(new Set(filtered.map(r => r.id))); }} /></TableHead>
+              <TableHead className="sticky left-0 z-20 bg-slate-50" style={{ width: CHECKBOX_W, minWidth: CHECKBOX_W, maxWidth: CHECKBOX_W, paddingLeft: 8, paddingRight: 0 }}><Checkbox checked={allSel ? true : someSel ? "indeterminate" : false} onCheckedChange={() => { if (allSel) setSelectedRows(new Set()); else setSelectedRows(new Set(filtered.map(r => r.id))); }} /></TableHead>
               {visibleColumns.map(key => { const def = cDef(key); const w = getWidth(key); const isS = def.sticky === "left"; const isLS = key === lastStickyKey; const isD = draggingColumnKey === key; const isDbl = !def.locked; return (
-                <TableHead key={key} data-col-drag-key={key} onMouseDown={isDbl ? (e) => handleHeaderMouseDown(e, key) : undefined} onClickCapture={isDbl ? (e) => { if (suppressNextClickRef.current) { e.stopPropagation(); e.preventDefault(); } } : undefined} className={`whitespace-nowrap relative group/colheader ${isS ? "sticky z-20 bg-[#f8fafc]" : ""} ${def.align === "right" ? "text-right" : ""} ${isDbl ? "cursor-grab" : ""}`} style={{ width: w, minWidth: w, maxWidth: w, overflow: "hidden", ...(isS ? { left: stickyOffsets[key], ...(!isD && isLS ? { boxShadow: "inset -1px 0 0 0 rgba(0,0,0,0.08), 3px 0 6px -2px rgba(0,0,0,0.06)" } : {}) } : {}), ...(isD ? { background: "linear-gradient(180deg, rgba(10,119,255,0.08) 0%, rgba(10,119,255,0.03) 100%)" } : {}) }}>
-                  {isD && <div className="absolute top-0 left-0 right-0 h-[2px] rounded-b-full" style={{ backgroundColor: "#0A77FF" }} />}
+                <TableHead key={key} data-col-drag-key={key} onMouseDown={isDbl ? (e) => handleHeaderMouseDown(e, key) : undefined} onClickCapture={isDbl ? (e) => { if (suppressNextClickRef.current) { e.stopPropagation(); e.preventDefault(); } } : undefined} className={`whitespace-nowrap relative group/colheader ${isS ? "sticky z-20 bg-slate-50" : ""} ${def.align === "right" ? "text-right" : ""} ${isDbl ? "cursor-grab" : ""}`} style={{ width: w, minWidth: w, maxWidth: w, overflow: "hidden", ...(isS ? { left: stickyOffsets[key], ...(!isD && isLS ? { boxShadow: "inset -1px 0 0 0 rgba(0,0,0,0.08), 3px 0 6px -2px rgba(0,0,0,0.06)" } : {}) } : {}), ...(isD ? { background: "linear-gradient(180deg, rgba(10,119,255,0.08) 0%, rgba(10,119,255,0.03) 100%)" } : {}) }}>
+                  {isD && <div className="absolute top-0 left-0 right-0 h-[2px] rounded-b-full" style={{ backgroundColor: "hsl(var(--primary))" }} />}
                   {isDbl && <GripVertical className={`absolute left-1 top-1/2 -translate-y-1/2 w-3 h-3 transition-opacity z-[5] pointer-events-none ${isD ? "opacity-100 text-primary" : "opacity-0 group-hover/colheader:opacity-100 text-muted-foreground/40"}`} />}
                   <span className="text-[13px]">{def.label}</span>
                   <div onMouseDown={(e) => { e.stopPropagation(); handleResizeStart(e, key); }} onClick={(e) => e.stopPropagation()} onDoubleClick={(e) => { e.stopPropagation(); setColumnWidths(prev => ({ ...prev, [key]: def.defaultWidth })); }} className="absolute right-0 top-0 bottom-0 w-[5px] cursor-col-resize z-10 group/resize" style={{ touchAction: "none" }}><div className={`absolute right-0 top-1 bottom-1 w-[2px] rounded-full transition-colors ${resizingColumnKey === key ? "bg-primary" : "bg-transparent group-hover/resize:bg-primary/40"}`} /></div>
                 </TableHead>
               ); })}
-              <TableHead className="whitespace-nowrap sticky right-0 z-20 bg-[#f8fafc] !pl-2 !pr-2" style={{ width: ACTIONS_W, minWidth: ACTIONS_W, maxWidth: ACTIONS_W, boxShadow: "inset 1px 0 0 0 rgba(0,0,0,0.08)" }}><span className="text-[13px]">Actions</span></TableHead>
+              <TableHead className="whitespace-nowrap sticky right-0 z-20 bg-slate-50 !pl-2 !pr-2" style={{ width: ACTIONS_W, minWidth: ACTIONS_W, maxWidth: ACTIONS_W, boxShadow: "inset 1px 0 0 0 rgba(0,0,0,0.08)" }}><span className="text-[13px]">Actions</span></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -299,7 +299,7 @@ export function PurchaseOrdersTable() {
         </Table>
       </div>
       {/* Drag ghost */}
-      <div ref={ghostElRef} className="fixed top-0 left-0 z-[9999] pointer-events-none" style={{ opacity: draggingColumnKey ? 1 : 0 }}>{draggingColumnKey && <div className="bg-white/95 backdrop-blur-sm border border-[#0A77FF]/20 shadow-lg rounded-lg px-3 py-1.5 -translate-x-1/2 -translate-y-full" style={{ marginTop: -8 }}><span className="text-[12px] text-[#0A77FF]" style={{ fontWeight: 600 }}>{cDef(draggingColumnKey as ColKey)?.label}</span></div>}</div>
+      <div ref={ghostElRef} className="fixed top-0 left-0 z-[9999] pointer-events-none" style={{ opacity: draggingColumnKey ? 1 : 0 }}>{draggingColumnKey && <div className="bg-white/95 backdrop-blur-sm border border-primary/20 shadow-lg rounded-lg px-3 py-1.5 -translate-x-1/2 -translate-y-full" style={{ marginTop: -8 }}><span className="text-[12px] text-primary" style={{ fontWeight: 600 }}>{cDef(draggingColumnKey as ColKey)?.label}</span></div>}</div>
       {/* Pagination */}
       <div className="flex items-center justify-center px-4 py-3 border-t border-border gap-3 shrink-0">
         <span className="text-sm text-muted-foreground">Records per page</span><span className="text-sm px-2 py-1 border border-border rounded-md" style={{ fontWeight: 500 }}>20</span>

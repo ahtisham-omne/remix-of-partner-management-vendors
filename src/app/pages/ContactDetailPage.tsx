@@ -340,19 +340,19 @@ function DraggableContactKpi({ index, kpiKey, label, value, icon: Icon, change, 
   });
   preview(drop(ref));
   drag(ref);
-  if (isDragging) return <div ref={ref} className="rounded-lg border border-dashed border-[#0A77FF]/20 bg-[#0A77FF]/[0.02] min-h-[52px] pointer-events-none" />;
+  if (isDragging) return <div ref={ref} className="rounded-lg border border-dashed border-primary/20 bg-primary/[0.02] min-h-[52px] pointer-events-none" />;
   return (
-    <div ref={ref} className={`border rounded-lg bg-white group relative min-w-0 transition-all duration-200 select-none overflow-hidden cursor-grab active:cursor-grabbing ${isOver ? "border-[#0A77FF]/30 bg-[#0A77FF]/[0.03] shadow-[0_0_0_2px_rgba(10,119,255,0.08)] scale-[1.02]" : "border-[#E2E8F0] hover:-translate-y-[1px] hover:border-[#93B8F7] hover:shadow-[0_2px_8px_-3px_rgba(10,119,255,0.06)]"}`}>
-      {isOver && <div className="absolute inset-0 rounded-lg bg-[#0A77FF]/[0.02] pointer-events-none" />}
+    <div ref={ref} className={`border rounded-lg bg-white group relative min-w-0 transition-all duration-200 select-none overflow-hidden cursor-grab active:cursor-grabbing ${isOver ? "border-primary/30 bg-primary/[0.03] shadow-[0_0_0_2px_rgba(10,119,255,0.08)] scale-[1.02]" : "border-border hover:-translate-y-[1px] hover:border-[#93B8F7] hover:shadow-[0_2px_8px_-3px_rgba(10,119,255,0.06)]"}`}>
+      {isOver && <div className="absolute inset-0 rounded-lg bg-primary/[0.02] pointer-events-none" />}
       <div className="px-3 py-2">
-        <div className="absolute top-1.5 right-1.5 opacity-0 group-hover:opacity-100 transition-all duration-150 flex items-center bg-[#F1F5F9] rounded-md p-1 z-10 pointer-events-none"><GripVertical className="w-3.5 h-3.5 text-[#64748B]" /></div>
+        <div className="absolute top-1.5 right-1.5 opacity-0 group-hover:opacity-100 transition-all duration-150 flex items-center bg-muted rounded-md p-1 z-10 pointer-events-none"><GripVertical className="w-3.5 h-3.5 text-slate-500" /></div>
         <div className="flex items-center justify-between gap-1 mb-1">
-          <p className="text-[10.5px] text-[#64748B] whitespace-nowrap" style={{ fontWeight: 500 }}>{label}</p>
+          <p className="text-[10.5px] text-slate-500 whitespace-nowrap" style={{ fontWeight: 500 }}>{label}</p>
           <Icon className="w-3.5 h-3.5 shrink-0" style={{ color: "#94A3B8" }} />
         </div>
         <div className="flex items-baseline gap-1.5">
-          {change && <span className="text-[10px] shrink-0" style={{ fontWeight: 500, color: change.startsWith("\u2191") ? "#059669" : "#DC2626" }}>{change}</span>}
-          <p className="text-[15px] text-[#334155] tracking-tight whitespace-nowrap" style={{ fontWeight: 600, lineHeight: 1.2 }}>{value}</p>
+          {change && <span className="text-[10px] shrink-0" style={{ fontWeight: 500, color: change.startsWith("\u2191") ? "hsl(var(--success))" : "hsl(var(--destructive))" }}>{change}</span>}
+          <p className="text-[15px] text-slate-700 tracking-tight whitespace-nowrap" style={{ fontWeight: 600, lineHeight: 1.2 }}>{value}</p>
         </div>
       </div>
       {/* Remove button — bottom-right, hover-revealed (mirrors partner KPI card) */}
@@ -362,7 +362,7 @@ function DraggableContactKpi({ index, kpiKey, label, value, icon: Icon, change, 
           className="absolute bottom-1 right-1 opacity-0 group-hover:opacity-100 transition-all duration-150 p-1 rounded cursor-pointer hover:bg-red-50 z-10"
           title={`Remove ${label}`}
         >
-          <Trash2 className="w-3 h-3 text-[#94A3B8] hover:text-[#EF4444]" />
+          <Trash2 className="w-3 h-3 text-slate-400 hover:text-red-500" />
         </button>
       )}
     </div>
@@ -426,23 +426,23 @@ function ContactContentCard({ title, icon: Icon, count, children, currentSize, o
     <div
       className={`rounded-xl border bg-white overflow-hidden h-full flex flex-col transition-[box-shadow,border-color] duration-300 ${
         isOver && !isDragging
-          ? "border-[#0A77FF]/30 shadow-[0_0_0_2px_rgba(10,119,255,0.10)]"
-          : "border-[#E2E8F0] shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-[0_2px_8px_-2px_rgba(0,0,0,0.06)]"
+          ? "border-primary/30 shadow-[0_0_0_2px_rgba(10,119,255,0.10)]"
+          : "border-border shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-[0_2px_8px_-2px_rgba(0,0,0,0.06)]"
       }`}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
       {/* Header — entire bar is the drag handle */}
-      <div className="px-4 py-2.5 border-b border-[#F1F5F9] flex items-center justify-between shrink-0 cursor-grab active:cursor-grabbing select-none">
+      <div className="px-4 py-2.5 border-b border-muted flex items-center justify-between shrink-0 cursor-grab active:cursor-grabbing select-none">
         <div className="flex items-center gap-2 pointer-events-none">
           {Icon && (
-            <div className="w-7 h-7 rounded-lg bg-[#EDF4FF] flex items-center justify-center shrink-0">
-              <Icon className="w-3.5 h-3.5 text-[#0A77FF]" />
+            <div className="w-7 h-7 rounded-lg bg-accent flex items-center justify-center shrink-0">
+              <Icon className="w-3.5 h-3.5 text-primary" />
             </div>
           )}
-          <span className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>{title}</span>
+          <span className="text-[13px] text-foreground" style={{ fontWeight: 600 }}>{title}</span>
           {count != null && (
-            <span className="text-[10px] text-[#0A77FF] px-1.5 py-0.5 rounded-md bg-[#EDF4FF]" style={{ fontWeight: 600 }}>{count}</span>
+            <span className="text-[10px] text-primary px-1.5 py-0.5 rounded-md bg-accent" style={{ fontWeight: 600 }}>{count}</span>
           )}
         </div>
         {/* Size toggle — slides in on hover */}
@@ -452,15 +452,15 @@ function ContactContentCard({ title, icon: Icon, count, children, currentSize, o
           }`}
         >
           {onSizeChange && currentSize && (
-            <div className="flex items-center h-7 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] p-0.5 gap-0.5">
+            <div className="flex items-center h-7 rounded-lg border border-border bg-slate-50 p-0.5 gap-0.5">
               {(["sm", "md", "lg"] as const).map((s) => (
                 <button
                   key={s}
                   onClick={(e) => { e.stopPropagation(); onSizeChange(s); }}
                   className={`h-6 px-2.5 rounded-md text-[11px] cursor-pointer transition-all duration-150 ${
                     currentSize === s
-                      ? "bg-white text-[#0A77FF] shadow-sm border border-[#E2E8F0]"
-                      : "text-[#94A3B8] hover:text-[#334155] hover:bg-white/60 border border-transparent"
+                      ? "bg-white text-primary shadow-sm border border-border"
+                      : "text-slate-400 hover:text-slate-700 hover:bg-white/60 border border-transparent"
                   }`}
                   style={{ fontWeight: currentSize === s ? 600 : 500 }}
                 >
@@ -494,7 +494,7 @@ function ContactSidebarCard({ title, icon: Icon, count, children, defaultOpen = 
   }, [children]);
 
   return (
-    <div className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
+    <div className="rounded-xl border border-border bg-white overflow-hidden shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
       <button
         type="button"
         className="w-full px-3.5 py-2.5 flex items-center gap-2 cursor-pointer hover:bg-[#FAFBFC] transition-colors"
@@ -502,16 +502,16 @@ function ContactSidebarCard({ title, icon: Icon, count, children, defaultOpen = 
         onClick={() => setIsOpen((v) => !v)}
       >
         {Icon && (
-          <div className="w-6 h-6 rounded-md bg-[#EDF4FF] flex items-center justify-center shrink-0">
-            <Icon className="w-3 h-3 text-[#0A77FF]" />
+          <div className="w-6 h-6 rounded-md bg-accent flex items-center justify-center shrink-0">
+            <Icon className="w-3 h-3 text-primary" />
           </div>
         )}
-        <span className="text-[12px] text-[#334155] text-left" style={{ fontWeight: 600 }}>{title}</span>
+        <span className="text-[12px] text-slate-700 text-left" style={{ fontWeight: 600 }}>{title}</span>
         {count != null && (
-          <span className="text-[10px] text-[#0A77FF] px-1.5 py-0.5 rounded-md bg-[#EDF4FF]" style={{ fontWeight: 600 }}>{count}</span>
+          <span className="text-[10px] text-primary px-1.5 py-0.5 rounded-md bg-accent" style={{ fontWeight: 600 }}>{count}</span>
         )}
         <ChevronDown
-          className="w-3.5 h-3.5 text-[#94A3B8] shrink-0 ml-auto transition-transform duration-200"
+          className="w-3.5 h-3.5 text-slate-400 shrink-0 ml-auto transition-transform duration-200"
           style={{ transform: isOpen ? "rotate(0deg)" : "rotate(-90deg)" }}
         />
       </button>
@@ -531,13 +531,13 @@ function ContactSidebarCard({ title, icon: Icon, count, children, defaultOpen = 
 function ContactSidebarRow({ icon: Icon, label, value, isLink }: { icon: React.ElementType; label: string; value: string; isLink?: boolean }) {
   return (
     <div className="flex items-start gap-2.5">
-      <Icon className="w-3.5 h-3.5 text-[#94A3B8] mt-0.5 shrink-0" />
+      <Icon className="w-3.5 h-3.5 text-slate-400 mt-0.5 shrink-0" />
       <div className="min-w-0">
-        <p className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>{label}</p>
+        <p className="text-[10px] text-slate-400" style={{ fontWeight: 500 }}>{label}</p>
         {isLink ? (
-          <a href={`mailto:${value}`} className="text-[12px] text-[#0A77FF] hover:underline break-all" style={{ fontWeight: 500 }}>{value}</a>
+          <a href={`mailto:${value}`} className="text-[12px] text-primary hover:underline break-all" style={{ fontWeight: 500 }}>{value}</a>
         ) : (
-          <p className="text-[12px] text-[#334155] break-words" style={{ fontWeight: 500 }}>{value}</p>
+          <p className="text-[12px] text-slate-700 break-words" style={{ fontWeight: 500 }}>{value}</p>
         )}
       </div>
     </div>
@@ -546,12 +546,12 @@ function ContactSidebarRow({ icon: Icon, label, value, isLink }: { icon: React.E
 
 function ContactStatBox({ label, value, icon: Icon, color }: { label: string; value: string; icon: React.ElementType; color?: string }) {
   return (
-    <div className="rounded-lg bg-[#F8FAFC] border border-[#F1F5F9] p-2.5">
+    <div className="rounded-lg bg-slate-50 border border-muted p-2.5">
       <div className="flex items-center gap-1.5 mb-1">
         <Icon className="w-3 h-3" style={{ color: color || "#94A3B8" }} />
-        <span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>{label}</span>
+        <span className="text-[10px] text-slate-400" style={{ fontWeight: 500 }}>{label}</span>
       </div>
-      <p className="text-[14px] text-[#334155]" style={{ fontWeight: 700 }}>{value}</p>
+      <p className="text-[14px] text-slate-700" style={{ fontWeight: 700 }}>{value}</p>
     </div>
   );
 }
@@ -587,7 +587,7 @@ function DraggableContactWidget({ widgetKey, index, moveWidget, children }: {
   return (
     <div
       ref={ref}
-      className={`transition-all duration-300 ease-out rounded-xl ${isOver && !isDragging ? "ring-2 ring-[#0A77FF]/20 ring-offset-2 scale-[1.005]" : ""}`}
+      className={`transition-all duration-300 ease-out rounded-xl ${isOver && !isDragging ? "ring-2 ring-primary/20 ring-offset-2 scale-[1.005]" : ""}`}
       style={{ opacity: isDragging ? 0.3 : 1, transform: isDragging ? "scale(0.97) rotate(-0.5deg)" : undefined }}
     >
       {children(isDragging, isOver)}
@@ -603,12 +603,12 @@ function DraggableContactWidget({ widgetKey, index, moveWidget, children }: {
 function WidgetTypeVisual({ type, isActive }: { type: ContactWidgetDef["type"]; isActive: boolean }) {
   // Light pastel tints (Tailwind 200/300 family) used when active
   const C = {
-    blue:    isActive ? "#93C5FD" : "#E2E8F0",  // blue-300 / slate-200
-    orange:  isActive ? "#FDBA74" : "#E2E8F0",  // orange-300 / slate-200
-    purple:  isActive ? "#C4B5FD" : "#E2E8F0",  // purple-300 / slate-200
-    green:   isActive ? "#86EFAC" : "#E2E8F0",  // green-300 / slate-200
-    red:     isActive ? "#FCA5A5" : "#E2E8F0",  // red-300 / slate-200
-    slate:   isActive ? "#CBD5E1" : "#E2E8F0",  // slate-300 / slate-200
+    blue:    isActive ? "#93C5FD" : "hsl(var(--border))",  // blue-300 / slate-200
+    orange:  isActive ? "#FDBA74" : "hsl(var(--border))",  // orange-300 / slate-200
+    purple:  isActive ? "#C4B5FD" : "hsl(var(--border))",  // purple-300 / slate-200
+    green:   isActive ? "#86EFAC" : "hsl(var(--border))",  // green-300 / slate-200
+    red:     isActive ? "#FCA5A5" : "hsl(var(--border))",  // red-300 / slate-200
+    slate:   isActive ? "#CBD5E1" : "hsl(var(--border))",  // slate-300 / slate-200
     needle:  isActive ? "#64748B" : "#94A3B8",  // slate-500 / slate-400 — gauge needle
     lineFg:  isActive ? "#93C5FD" : "#CBD5E1",  // line stroke
   };
@@ -780,8 +780,8 @@ function ContactCustomizePanel({ open, onOpenChange, contactKpis, hiddenKpis, on
         <div className="px-5 pt-5 pb-0 shrink-0">
           <div className="flex items-start justify-between">
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ backgroundColor: "#EDF4FF" }}>
-                <Sliders className="w-5 h-5" style={{ color: "#0A77FF" }} />
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ backgroundColor: "hsl(var(--accent))" }}>
+                <Sliders className="w-5 h-5" style={{ color: "hsl(var(--primary))" }} />
               </div>
               <div>
                 <h2 className="text-base text-foreground" style={{ fontWeight: 600 }}>Customize Widgets</h2>
@@ -814,15 +814,15 @@ function ContactCustomizePanel({ open, onOpenChange, contactKpis, hiddenKpis, on
               }}
               className={`flex items-center gap-1.5 text-[12px] px-3 py-1.5 rounded-full border transition-all duration-200 cursor-pointer ${
                 activeItemsCount === allItems.length
-                  ? "bg-[#EBF3FF] border-[#0A77FF]/25 text-[#0A77FF] hover:bg-[#DCEAFF] hover:border-[#0A77FF]/40 shadow-sm shadow-[#0A77FF]/10"
+                  ? "bg-[#EBF3FF] border-primary/25 text-primary hover:bg-[#DCEAFF] hover:border-primary/40 shadow-sm shadow-primary/10"
                   : activeItemsCount === 0
-                  ? "bg-[#F8FAFC] border-[#E2E8F0] text-[#94A3B8] hover:bg-[#F1F5F9] hover:border-[#CBD5E1] hover:text-[#64748B]"
-                  : "bg-[#F8FAFC] border-[#E2E8F0] text-[#64748B] hover:bg-[#EBF3FF] hover:border-[#0A77FF]/25 hover:text-[#0A77FF]"
+                  ? "bg-slate-50 border-border text-slate-400 hover:bg-muted hover:border-slate-300 hover:text-slate-500"
+                  : "bg-slate-50 border-border text-slate-500 hover:bg-[#EBF3FF] hover:border-primary/25 hover:text-primary"
               }`}
               style={{ fontWeight: 600 }}
             >
               {activeItemsCount === allItems.length ? (
-                <><ToggleRight className="w-4 h-4 text-[#0A77FF]" /><span>All On</span></>
+                <><ToggleRight className="w-4 h-4 text-primary" /><span>All On</span></>
               ) : activeItemsCount === 0 ? (
                 <><ToggleLeft className="w-4 h-4" /><span>All Off</span></>
               ) : (
@@ -846,15 +846,15 @@ function ContactCustomizePanel({ open, onOpenChange, contactKpis, hiddenKpis, on
         </div>
 
         {/* Tab bar */}
-        <div className="flex items-center gap-0 px-5 border-b border-[#F1F5F9] shrink-0 mt-3">
+        <div className="flex items-center gap-0 px-5 border-b border-muted shrink-0 mt-3">
           {(["kpis", "widgets"] as const).map((t) => (
             <button
               key={t}
               onClick={() => setPanelTab(t)}
               className={`px-4 py-2.5 border-b-2 text-[13px] transition-all duration-200 cursor-pointer whitespace-nowrap ${
                 panelTab === t
-                  ? "border-[#0A77FF] text-[#0A77FF]"
-                  : "border-transparent text-[#64748B] hover:text-[#334155] hover:border-[#CBD5E1]"
+                  ? "border-primary text-primary"
+                  : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
               }`}
               style={{ fontWeight: panelTab === t ? 600 : 400 }}
             >
@@ -887,14 +887,14 @@ function ContactCustomizePanel({ open, onOpenChange, contactKpis, hiddenKpis, on
                           onClick={() => onToggleKpi(kpi.key)}
                           className={`relative text-left rounded-lg border px-3 py-2.5 transition-all duration-150 cursor-pointer group ${
                             isActive
-                              ? "border-[#0A77FF]/25 bg-[#0A77FF]/[0.04] shadow-[0_0_0_1px_rgba(10,119,255,0.08)]"
+                              ? "border-primary/25 bg-primary/[0.04] shadow-[0_0_0_1px_rgba(10,119,255,0.08)]"
                               : "border-border/60 bg-white hover:border-border hover:bg-muted/20 hover:shadow-sm"
                           }`}
                         >
                           <div className="flex items-center justify-between gap-1">
-                            <span className={`text-[11.5px] truncate transition-colors ${isActive ? "text-[#0A77FF]" : "text-muted-foreground/70"}`} style={{ fontWeight: 500 }} title={kpi.label}>{kpi.label}</span>
+                            <span className={`text-[11.5px] truncate transition-colors ${isActive ? "text-primary" : "text-muted-foreground/70"}`} style={{ fontWeight: 500 }} title={kpi.label}>{kpi.label}</span>
                             <div className="shrink-0">
-                              {isActive ? <Check className="w-3.5 h-3.5" style={{ color: "#0A77FF" }} /> : <Plus className="w-3.5 h-3.5 text-muted-foreground/25 group-hover:text-muted-foreground/50 transition-colors" />}
+                              {isActive ? <Check className="w-3.5 h-3.5" style={{ color: "hsl(var(--primary))" }} /> : <Plus className="w-3.5 h-3.5 text-muted-foreground/25 group-hover:text-muted-foreground/50 transition-colors" />}
                             </div>
                           </div>
                           <p className={`text-[15px] mt-1 transition-colors ${isActive ? "text-foreground" : "text-foreground/80"}`} style={{ fontWeight: 550 }}>{kpi.value}</p>
@@ -933,35 +933,35 @@ function ContactCustomizePanel({ open, onOpenChange, contactKpis, hiddenKpis, on
                             onClick={() => onToggleWidget(w.key)}
                             className={`relative text-left rounded-xl border overflow-hidden transition-all duration-150 cursor-pointer group ${
                               isActive
-                                ? "border-[#0A77FF]/30 bg-white shadow-[0_0_0_1px_rgba(10,119,255,0.08)]"
+                                ? "border-primary/30 bg-white shadow-[0_0_0_1px_rgba(10,119,255,0.08)]"
                                 : "border-border/60 bg-white hover:border-border hover:shadow-sm"
                             }`}
                           >
-                            <div className={`h-[68px] flex items-center justify-center transition-colors ${isActive ? "bg-[#F8FAFF]" : "bg-[#F8FAFC]"}`}>
+                            <div className={`h-[68px] flex items-center justify-center transition-colors ${isActive ? "bg-[#F8FAFF]" : "bg-slate-50"}`}>
                               <WidgetTypeVisual type={w.type} isActive={isActive} />
                             </div>
                             <div className="absolute top-1.5 right-1.5">
                               {isActive ? (
-                                <div className="w-5 h-5 rounded-full bg-[#0A77FF] flex items-center justify-center shadow-sm">
+                                <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center shadow-sm">
                                   <Check className="w-3 h-3 text-white" strokeWidth={3} />
                                 </div>
                               ) : (
-                                <div className="w-5 h-5 rounded-full bg-white border border-[#E2E8F0] flex items-center justify-center group-hover:border-[#CBD5E1] transition-colors">
-                                  <Plus className="w-3 h-3 text-[#94A3B8]" />
+                                <div className="w-5 h-5 rounded-full bg-white border border-border flex items-center justify-center group-hover:border-slate-300 transition-colors">
+                                  <Plus className="w-3 h-3 text-slate-400" />
                                 </div>
                               )}
                             </div>
-                            <div className="px-3 py-2.5 border-t border-[#F1F5F9]">
-                              <p className="text-[12.5px] text-[#0F172A] truncate" style={{ fontWeight: 600 }} title={w.label}>{w.label}</p>
-                              <p className="text-[11px] text-[#64748B] mt-0.5 line-clamp-2 leading-snug" title={w.description}>{w.description}</p>
+                            <div className="px-3 py-2.5 border-t border-muted">
+                              <p className="text-[12.5px] text-foreground truncate" style={{ fontWeight: 600 }} title={w.label}>{w.label}</p>
+                              <p className="text-[11px] text-slate-500 mt-0.5 line-clamp-2 leading-snug" title={w.description}>{w.description}</p>
                               {isActive && (
-                                <div className="mt-2 flex items-center h-6 rounded-md border border-[#E2E8F0] bg-[#F8FAFC] p-0.5 gap-0.5" onClick={(e) => e.stopPropagation()}>
+                                <div className="mt-2 flex items-center h-6 rounded-md border border-border bg-slate-50 p-0.5 gap-0.5" onClick={(e) => e.stopPropagation()}>
                                   {(["sm", "md", "lg"] as const).map((s) => (
                                     <button
                                       key={s}
                                       onClick={(e) => { e.stopPropagation(); onWidgetSizeChange(w.key, s); }}
                                       className={`flex-1 h-5 rounded text-[9.5px] transition-all duration-150 cursor-pointer ${
-                                        sz === s ? "bg-white text-[#0A77FF] shadow-sm" : "text-[#94A3B8] hover:text-[#334155]"
+                                        sz === s ? "bg-white text-primary shadow-sm" : "text-slate-400 hover:text-slate-700"
                                       }`}
                                       style={{ fontWeight: sz === s ? 600 : 500 }}
                                     >
@@ -1109,10 +1109,10 @@ export function ContactDetailPage() {
   if (!contact) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center gap-4 p-8">
-        <div className="w-16 h-16 rounded-2xl bg-[#F1F5F9] flex items-center justify-center">
-          <User className="w-8 h-8 text-[#94A3B8]" />
+        <div className="w-16 h-16 rounded-2xl bg-muted flex items-center justify-center">
+          <User className="w-8 h-8 text-slate-400" />
         </div>
-        <p className="text-[#64748B] text-sm">Contact not found.</p>
+        <p className="text-slate-500 text-sm">Contact not found.</p>
         <Button variant="outline" onClick={() => navigate("/partners/contacts")} className="gap-1.5">
           <ArrowLeft className="w-4 h-4" />
           Back to Contacts
@@ -1147,29 +1147,29 @@ export function ContactDetailPage() {
   const socialList: ContactSocial[] = contact.socials || [];
 
   return (
-    <div className="flex-1 flex flex-col min-h-0 bg-[#F8FAFC] overflow-y-auto">
+    <div className="flex-1 flex flex-col min-h-0 bg-slate-50 overflow-y-auto">
       {/* Top Nav Bar — breadcrumb + search + user profile */}
-      <div className="bg-white border-b border-[#E2E8F0] shrink-0 sticky top-0 z-30">
+      <div className="bg-white border-b border-border shrink-0 sticky top-0 z-30">
         <div className="flex items-center justify-between px-4 lg:px-6 h-11">
-          <div className="flex items-center gap-2 text-[13px] text-[#64748B]">
-            <button onClick={() => navigate("/partners")} className="hover:text-[#0F172A] transition-colors cursor-pointer" style={{ fontWeight: 500 }}>Partners Management</button>
-            <span className="text-[#CBD5E1]">/</span>
-            <button onClick={() => navigate("/partners/contacts")} className="hover:text-[#0F172A] transition-colors cursor-pointer" style={{ fontWeight: 500 }}>Contacts Directory</button>
-            <span className="text-[#CBD5E1]">/</span>
-            <span className="text-[#0F172A]" style={{ fontWeight: 500 }}>{contact.name}</span>
+          <div className="flex items-center gap-2 text-[13px] text-slate-500">
+            <button onClick={() => navigate("/partners")} className="hover:text-foreground transition-colors cursor-pointer" style={{ fontWeight: 500 }}>Partners Management</button>
+            <span className="text-slate-300">/</span>
+            <button onClick={() => navigate("/partners/contacts")} className="hover:text-foreground transition-colors cursor-pointer" style={{ fontWeight: 500 }}>Contacts Directory</button>
+            <span className="text-slate-300">/</span>
+            <span className="text-foreground" style={{ fontWeight: 500 }}>{contact.name}</span>
           </div>
           <div className="flex items-center gap-3">
             <div className="relative hidden md:block">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
-              <Input placeholder="Search contacts..." className="pl-9 w-[220px] h-8 bg-[#F8FAFC] border-[#E2E8F0] text-[13px] placeholder:text-[#94A3B8] rounded-lg" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <Input placeholder="Search contacts..." className="pl-9 w-[220px] h-8 bg-slate-50 border-border text-[13px] placeholder:text-slate-400 rounded-lg" />
             </div>
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden border-2 border-[#E2E8F0]" style={{ backgroundColor: "#0A77FF" }}>
+              <div className="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden border-2 border-border" style={{ backgroundColor: "hsl(var(--primary))" }}>
                 <span className="text-[11px] text-white" style={{ fontWeight: 600 }}>AA</span>
               </div>
               <div className="hidden sm:block">
-                <p className="text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>Ahtisham Ahmad</p>
-                <p className="text-[11px] text-[#94A3B8] leading-tight">Product Designer</p>
+                <p className="text-[13px] text-foreground" style={{ fontWeight: 500 }}>Ahtisham Ahmad</p>
+                <p className="text-[11px] text-slate-400 leading-tight">Product Designer</p>
               </div>
             </div>
           </div>
@@ -1180,15 +1180,15 @@ export function ContactDetailPage() {
       <div ref={sentinelRef} className="shrink-0 h-px" />
 
       {/* Sticky Header Card — VendorDetailsPage pattern */}
-      <div className="shrink-0 sticky top-[44px] z-20 bg-[#F8FAFC]">
+      <div className="shrink-0 sticky top-[44px] z-20 bg-slate-50">
         <div style={{ paddingTop: isCompact ? "8px" : "12px", paddingBottom: "4px", transition: "padding-top 250ms ease" }}>
           <div className={`mx-auto px-4 lg:px-6 xl:px-8 transition-all duration-300 ${isFullscreen ? "max-w-full" : "max-w-[1440px] 2xl:max-w-[1600px]"}`}>
-            <div className={`bg-white border border-[#E2E8F0] rounded-xl overflow-hidden transition-shadow duration-250 ${isCompact ? "shadow-[0_1px_3px_0_rgba(0,0,0,0.04),0_4px_12px_-4px_rgba(0,0,0,0.05)]" : "shadow-sm"}`}>
+            <div className={`bg-white border border-border rounded-xl overflow-hidden transition-shadow duration-250 ${isCompact ? "shadow-[0_1px_3px_0_rgba(0,0,0,0.04),0_4px_12px_-4px_rgba(0,0,0,0.05)]" : "shadow-sm"}`}>
               {/* Main header row */}
               <div className="flex items-start justify-between gap-4 transition-all duration-250 ease-in-out" style={{ padding: isCompact ? "8px 16px" : "18px 20px" }}>
                 <div className="flex items-start min-w-0 transition-all duration-250" style={{ gap: isCompact ? 10 : 16 }}>
-                  <button onClick={() => navigate("/partners/contacts")} className="rounded-xl border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] flex items-center justify-center shrink-0 cursor-pointer shadow-[0_1px_3px_0_rgba(0,0,0,0.04),0_1px_2px_-1px_rgba(0,0,0,0.03)] transition-all duration-250" style={{ width: isCompact ? 32 : 44, height: isCompact ? 32 : 44 }}>
-                    <ChevronLeft className="text-[#94A3B8] transition-all duration-250" style={{ width: isCompact ? 16 : 20, height: isCompact ? 16 : 20 }} />
+                  <button onClick={() => navigate("/partners/contacts")} className="rounded-xl border border-border bg-white hover:bg-slate-50 flex items-center justify-center shrink-0 cursor-pointer shadow-[0_1px_3px_0_rgba(0,0,0,0.04),0_1px_2px_-1px_rgba(0,0,0,0.03)] transition-all duration-250" style={{ width: isCompact ? 32 : 44, height: isCompact ? 32 : 44 }}>
+                    <ChevronLeft className="text-slate-400 transition-all duration-250" style={{ width: isCompact ? 16 : 20, height: isCompact ? 16 : 20 }} />
                   </button>
                   {/* Avatar — 120px expanded, 42px compact; click to open lightbox */}
                   <button
@@ -1202,12 +1202,12 @@ export function ContactDetailPage() {
                   <div className="min-w-0 flex-1">
                     {/* Row 1: Name + Status dropdown + Department badges */}
                     <div className="flex items-center flex-wrap transition-all duration-250" style={{ gap: isCompact ? 6 : 8 }}>
-                      <h1 className="text-[#0F172A] truncate transition-all duration-250" style={{ fontSize: isCompact ? 14 : 19, fontWeight: 700, lineHeight: 1.3 }}>{contact.name}</h1>
+                      <h1 className="text-foreground truncate transition-all duration-250" style={{ fontSize: isCompact ? 14 : 19, fontWeight: 700, lineHeight: 1.3 }}>{contact.name}</h1>
                       {/* Status pill — clickable dropdown to change status */}
                       <Popover open={statusDropdownOpen} onOpenChange={setStatusDropdownOpen}>
                         <PopoverTrigger asChild>
                           <button
-                            className={`inline-flex items-center rounded-full border cursor-pointer transition-all duration-150 hover:ring-2 hover:ring-offset-1 hover:ring-[#E2E8F0] ${isCompact ? "px-1.5 py-px text-[10px] gap-0.5" : "px-2 py-0.5 text-[11px] gap-1"}`}
+                            className={`inline-flex items-center rounded-full border cursor-pointer transition-all duration-150 hover:ring-2 hover:ring-offset-1 hover:ring-border ${isCompact ? "px-1.5 py-px text-[10px] gap-0.5" : "px-2 py-0.5 text-[11px] gap-1"}`}
                             style={{ fontWeight: 500, backgroundColor: currentStatus.bg, color: currentStatus.color, borderColor: currentStatus.border }}
                           >
                             {currentStatus.label}
@@ -1229,10 +1229,10 @@ export function ContactDetailPage() {
                                       setStatusDropdownOpen(false);
                                     }
                                   }}
-                                  className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg transition-colors cursor-pointer ${isCurrent ? "bg-[#F8FAFC]" : "hover:bg-[#F8FAFC]"}`}
+                                  className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg transition-colors cursor-pointer ${isCurrent ? "bg-slate-50" : "hover:bg-slate-50"}`}
                                 >
                                   <span className="inline-flex items-center rounded-full border px-2 py-0.5 text-[10px]" style={{ fontWeight: 500, backgroundColor: sc.bg, color: sc.color, borderColor: sc.border }}>{sc.label}</span>
-                                  {isCurrent && <Check className="w-3.5 h-3.5 ml-auto text-[#0A77FF]" />}
+                                  {isCurrent && <Check className="w-3.5 h-3.5 ml-auto text-primary" />}
                                 </button>
                               );
                             })}
@@ -1252,7 +1252,7 @@ export function ContactDetailPage() {
                             <PopoverTrigger
                               onMouseEnter={handleEnter}
                               onMouseLeave={handleLeave}
-                              className="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] border border-[#E2E8F0] bg-[#F1F5F9] text-[#0A77FF] cursor-default transition-colors hover:bg-[#E2E8F0]"
+                              className="inline-flex items-center px-1.5 py-0.5 rounded-md text-[10px] border border-border bg-muted text-primary cursor-default transition-colors hover:bg-border"
                               style={{ fontWeight: 600 }}
                             >
                               +{extraDepts.length} more
@@ -1266,7 +1266,7 @@ export function ContactDetailPage() {
                               onMouseEnter={handleEnter}
                               onMouseLeave={handleLeave}
                             >
-                              <p className="text-[10px] text-[#94A3B8] mb-2" style={{ fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em" }}>Additional Departments</p>
+                              <p className="text-[10px] text-slate-400 mb-2" style={{ fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em" }}>Additional Departments</p>
                               <div className="space-y-1.5">
                                 {extraDepts.map((d, i) => {
                                   const ds = DEPT_STYLES[d] || DEPT_STYLES.Sales;
@@ -1281,18 +1281,18 @@ export function ContactDetailPage() {
                       })()}
                     </div>
                     {/* Row 2: Role · Company — always visible */}
-                    <p className="text-[#64748B] truncate transition-all duration-250" style={{ fontSize: isCompact ? 11 : 13.5, marginTop: isCompact ? 1 : 4, fontWeight: 400 }}>
-                      {contact.role || "Contact"} <span className="text-[#CBD5E1] mx-0.5">·</span> {(contact.companies || [contact.company])[0]}
+                    <p className="text-slate-500 truncate transition-all duration-250" style={{ fontSize: isCompact ? 11 : 13.5, marginTop: isCompact ? 1 : 4, fontWeight: 400 }}>
+                      {contact.role || "Contact"} <span className="text-slate-300 mx-0.5">·</span> {(contact.companies || [contact.company])[0]}
                     </p>
                     {/* Row 3: Contact data — collapses on scroll */}
                     <div className="overflow-hidden transition-all duration-250 ease-in-out" style={{ maxHeight: isCompact ? 0 : 24, opacity: isCompact ? 0 : 1, marginTop: isCompact ? 0 : 8 }}>
                       <div className="flex items-center gap-3 flex-wrap">
                         {/* Email */}
                         <div className="flex items-center gap-1.5">
-                          <Mail className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" />
+                          <Mail className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                           <button
                             onClick={() => { setComposeTo(emailList[0].address); setComposeSubject(""); setComposeBody(""); setComposeOpen(true); setComposeMinimized(false); }}
-                            className="text-[11.5px] text-[#334155] hover:text-[#0A77FF] hover:underline transition-colors cursor-pointer bg-transparent border-0 p-0"
+                            className="text-[11.5px] text-slate-700 hover:text-primary hover:underline transition-colors cursor-pointer bg-transparent border-0 p-0"
                             style={{ fontWeight: 500 }}
                           >
                             {emailList[0].address}
@@ -1305,9 +1305,9 @@ export function ContactDetailPage() {
                               <TooltipContent side="bottom" className="z-[300] max-w-[300px]">
                                 <div className="space-y-1.5">
                                   {emailList.map((e) => (
-                                    <button key={e.id} onClick={() => { setComposeTo(e.address); setComposeSubject(""); setComposeBody(""); setComposeOpen(true); setComposeMinimized(false); }} className="w-full flex items-center gap-2 text-left hover:bg-[#F8FAFC] rounded px-1 py-0.5 transition-colors cursor-pointer bg-transparent border-0">
-                                      <span className="text-[10px] text-[#94A3B8] shrink-0" style={{ fontWeight: 500 }}>{e.type}</span>
-                                      <span className="text-[11px] hover:text-[#0A77FF] hover:underline transition-colors">{e.address}</span>
+                                    <button key={e.id} onClick={() => { setComposeTo(e.address); setComposeSubject(""); setComposeBody(""); setComposeOpen(true); setComposeMinimized(false); }} className="w-full flex items-center gap-2 text-left hover:bg-slate-50 rounded px-1 py-0.5 transition-colors cursor-pointer bg-transparent border-0">
+                                      <span className="text-[10px] text-slate-400 shrink-0" style={{ fontWeight: 500 }}>{e.type}</span>
+                                      <span className="text-[11px] hover:text-primary hover:underline transition-colors">{e.address}</span>
                                     </button>
                                   ))}
                                 </div>
@@ -1315,11 +1315,11 @@ export function ContactDetailPage() {
                             </Tooltip>
                           )}
                         </div>
-                        <div className="w-px h-3.5 bg-[#E2E8F0]" />
+                        <div className="w-px h-3.5 bg-border" />
                         {/* Phone */}
                         <div className="flex items-center gap-1.5">
-                          <Phone className="w-3.5 h-3.5 text-[#94A3B8] shrink-0" />
-                          <span className="text-[11.5px] text-[#334155]" style={{ fontWeight: 500 }}>{phoneList[0].code} {phoneList[0].number}{phoneList[0].ext ? ` ext. ${phoneList[0].ext}` : ""}</span>
+                          <Phone className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                          <span className="text-[11.5px] text-slate-700" style={{ fontWeight: 500 }}>{phoneList[0].code} {phoneList[0].number}{phoneList[0].ext ? ` ext. ${phoneList[0].ext}` : ""}</span>
                           {phoneList.length > 1 && (
                             <Tooltip>
                               <TooltipTrigger asChild>
@@ -1329,8 +1329,8 @@ export function ContactDetailPage() {
                                 <div className="space-y-1.5">
                                   {phoneList.slice(1).map((p) => (
                                     <div key={p.id} className="flex items-center gap-2">
-                                      <span className="text-[10px] text-[#94A3B8] shrink-0" style={{ fontWeight: 500 }}>{p.type}</span>
-                                      <span className="text-[11px] text-[#334155]">{p.code} {p.number}{p.ext ? ` ext. ${p.ext}` : ""}</span>
+                                      <span className="text-[10px] text-slate-400 shrink-0" style={{ fontWeight: 500 }}>{p.type}</span>
+                                      <span className="text-[11px] text-slate-700">{p.code} {p.number}{p.ext ? ` ext. ${p.ext}` : ""}</span>
                                     </div>
                                   ))}
                                 </div>
@@ -1341,13 +1341,13 @@ export function ContactDetailPage() {
                         {/* Socials — grey icons, brand color on hover */}
                         {socialList.length > 0 && (
                           <>
-                            <div className="w-px h-3.5 bg-[#E2E8F0]" />
+                            <div className="w-px h-3.5 bg-border" />
                             <div className="flex items-center gap-1.5">
                               {socialList.map((s) => {
                                 const socialMeta: Record<string, { icon: React.ElementType; color: string; label: string }> = {
                                   "LinkedIn": { icon: Linkedin, color: "#0A66C2", label: "LinkedIn" },
                                   "Twitter / X": { icon: Twitter, color: "#000000", label: "X (Twitter)" },
-                                  "Website": { icon: Globe, color: "#0A77FF", label: "Website" },
+                                  "Website": { icon: Globe, color: "hsl(var(--primary))", label: "Website" },
                                   "Skype": { icon: MessageCircle, color: "#00AFF0", label: "Skype" },
                                   "WhatsApp": { icon: MessageCircle, color: "#25D366", label: "WhatsApp" },
                                   "Other": { icon: ExternalLink, color: "#64748B", label: "Link" },
@@ -1357,8 +1357,8 @@ export function ContactDetailPage() {
                                 return (
                                   <Tooltip key={s.id}>
                                     <TooltipTrigger asChild>
-                                      <a href={s.url} target="_blank" rel="noopener noreferrer" className="group/social relative w-5 h-5 rounded flex items-center justify-center transition-all duration-150 hover:bg-[#F1F5F9]">
-                                        <SIcon className="w-3.5 h-3.5 text-[#94A3B8] group-hover/social:opacity-0 transition-opacity duration-150" />
+                                      <a href={s.url} target="_blank" rel="noopener noreferrer" className="group/social relative w-5 h-5 rounded flex items-center justify-center transition-all duration-150 hover:bg-muted">
+                                        <SIcon className="w-3.5 h-3.5 text-slate-400 group-hover/social:opacity-0 transition-opacity duration-150" />
                                         <SIcon className="w-3.5 h-3.5 absolute opacity-0 group-hover/social:opacity-100 transition-opacity duration-150" style={{ color: meta.color }} />
                                       </a>
                                     </TooltipTrigger>
@@ -1379,13 +1379,13 @@ export function ContactDetailPage() {
                     <TooltipTrigger asChild>
                       <button
                         onClick={() => setIsFullscreen(!isFullscreen)}
-                        className="rounded-lg border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] flex items-center justify-center cursor-pointer shadow-sm transition-all duration-250"
+                        className="rounded-lg border border-border bg-white hover:bg-slate-50 flex items-center justify-center cursor-pointer shadow-sm transition-all duration-250"
                         style={{ width: isCompact ? 32 : 36, height: isCompact ? 32 : 36 }}
                       >
                         {isFullscreen ? (
-                          <Minimize2 className="text-[#64748B] transition-all duration-250" style={{ width: isCompact ? 14 : 16, height: isCompact ? 14 : 16 }} />
+                          <Minimize2 className="text-slate-500 transition-all duration-250" style={{ width: isCompact ? 14 : 16, height: isCompact ? 14 : 16 }} />
                         ) : (
-                          <Maximize2 className="text-[#64748B] transition-all duration-250" style={{ width: isCompact ? 14 : 16, height: isCompact ? 14 : 16 }} />
+                          <Maximize2 className="text-slate-500 transition-all duration-250" style={{ width: isCompact ? 14 : 16, height: isCompact ? 14 : 16 }} />
                         )}
                       </button>
                     </TooltipTrigger>
@@ -1393,21 +1393,21 @@ export function ContactDetailPage() {
                   </Tooltip>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <button className={`rounded-lg border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] text-[#334155] inline-flex items-center gap-1.5 transition-all duration-200 cursor-pointer shadow-sm ${isCompact ? "h-8 px-3 text-[12px]" : "h-9 px-3.5 text-[13px]"}`} style={{ fontWeight: 500 }}>Actions <ChevronDown className="w-3.5 h-3.5 text-[#94A3B8]" /></button>
+                      <button className={`rounded-lg border border-border bg-white hover:bg-slate-50 text-slate-700 inline-flex items-center gap-1.5 transition-all duration-200 cursor-pointer shadow-sm ${isCompact ? "h-8 px-3 text-[12px]" : "h-9 px-3.5 text-[13px]"}`} style={{ fontWeight: 500 }}>Actions <ChevronDown className="w-3.5 h-3.5 text-slate-400" /></button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-[200px]">
                       <DropdownMenuItem onClick={() => { navigator.clipboard.writeText(window.location.href); toast.success("Link copied"); }}><Link2 className="w-4 h-4 mr-2" /> Copy Link</DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem className="text-[#92400E] focus:text-[#92400E] focus:bg-[#FFFBEB]" onClick={() => setShowDeactivateModal(true)}><CircleSlash className="w-4 h-4 mr-2 text-[#92400E]" /> {contact.status === "active" ? "Deactivate" : "Activate"}</DropdownMenuItem>
-                      <DropdownMenuItem className="text-[#DC2626] focus:text-[#DC2626] focus:bg-[#FEF2F2]" onClick={() => setShowArchiveModal(true)}><Archive className="w-4 h-4 mr-2 text-[#DC2626]" /> Archive</DropdownMenuItem>
+                      <DropdownMenuItem className="text-amber-800 focus:text-amber-800 focus:bg-amber-50" onClick={() => setShowDeactivateModal(true)}><CircleSlash className="w-4 h-4 mr-2 text-amber-800" /> {contact.status === "active" ? "Deactivate" : "Activate"}</DropdownMenuItem>
+                      <DropdownMenuItem className="text-destructive focus:text-destructive focus:bg-red-50" onClick={() => setShowArchiveModal(true)}><Archive className="w-4 h-4 mr-2 text-destructive" /> Archive</DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
-                  <button onClick={handleOpenEdit} className={`rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white inline-flex items-center gap-1.5 transition-all duration-200 cursor-pointer shadow-sm ${isCompact ? "h-8 px-3.5 text-[12px]" : "h-9 px-4 text-[13px]"}`} style={{ fontWeight: 600 }}><Pencil className={isCompact ? "w-3 h-3" : "w-3.5 h-3.5"} /> Edit Contact</button>
+                  <button onClick={handleOpenEdit} className={`rounded-lg bg-primary hover:bg-[#0862D0] text-white inline-flex items-center gap-1.5 transition-all duration-200 cursor-pointer shadow-sm ${isCompact ? "h-8 px-3.5 text-[12px]" : "h-9 px-4 text-[13px]"}`} style={{ fontWeight: 600 }}><Pencil className={isCompact ? "w-3 h-3" : "w-3.5 h-3.5"} /> Edit Contact</button>
                 </div>
               </div>
 
               {/* Tab bar — icons + labels */}
-              <div className="flex items-center gap-0 overflow-x-auto scrollbar-hide border-t border-[#F1F5F9] px-4 lg:px-5">
+              <div className="flex items-center gap-0 overflow-x-auto scrollbar-hide border-t border-muted px-4 lg:px-5">
                 {TABS.map((tab) => {
                   const isActive = activeTab === tab.id;
                   return (
@@ -1416,8 +1416,8 @@ export function ContactDetailPage() {
                       onClick={() => setActiveTab(tab.id)}
                       className={`border-b-2 transition-all duration-200 whitespace-nowrap cursor-pointer ${
                         isActive
-                          ? "border-[#0A77FF] text-[#0A77FF]"
-                          : "border-transparent text-[#64748B] hover:text-[#334155] hover:border-[#CBD5E1]"
+                          ? "border-primary text-primary"
+                          : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
                       }`}
                       style={{
                         padding: isCompact ? "7px 12px" : "9px 12px",
@@ -1462,85 +1462,85 @@ export function ContactDetailPage() {
           {activeTab === "_removed" && (
             <div className="grid grid-cols-2 gap-5">
               {/* Contact Information Card */}
-              <div className="bg-white border border-[#E2E8F0] rounded-xl p-5">
-                <h3 className="text-[13px] text-[#0F172A] mb-4" style={{ fontWeight: 600 }}>Contact Information</h3>
+              <div className="bg-white border border-border rounded-xl p-5">
+                <h3 className="text-[13px] text-foreground mb-4" style={{ fontWeight: 600 }}>Contact Information</h3>
                 <div className="space-y-3.5">
                   {/* Primary Phone */}
                   <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-[#F1F5F9] flex items-center justify-center shrink-0">
-                      <Phone className="w-4 h-4 text-[#64748B]" />
+                    <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                      <Phone className="w-4 h-4 text-slate-500" />
                     </div>
                     <div>
-                      <p className="text-[11px] text-[#94A3B8] mb-0.5" style={{ fontWeight: 500 }}>Primary Phone</p>
-                      <p className="text-[13px] text-[#334155]" style={{ fontWeight: 500 }}>
+                      <p className="text-[11px] text-slate-400 mb-0.5" style={{ fontWeight: 500 }}>Primary Phone</p>
+                      <p className="text-[13px] text-slate-700" style={{ fontWeight: 500 }}>
                         {contact.phone}
-                        {contact.phoneExt && <span className="text-[#94A3B8] ml-1.5">ext. {contact.phoneExt}</span>}
+                        {contact.phoneExt && <span className="text-slate-400 ml-1.5">ext. {contact.phoneExt}</span>}
                       </p>
                     </div>
                   </div>
                   {/* Secondary Phone */}
                   <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-[#F1F5F9] flex items-center justify-center shrink-0">
-                      <Phone className="w-4 h-4 text-[#64748B]" />
+                    <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                      <Phone className="w-4 h-4 text-slate-500" />
                     </div>
                     <div>
-                      <p className="text-[11px] text-[#94A3B8] mb-0.5" style={{ fontWeight: 500 }}>Secondary Phone</p>
-                      <p className="text-[13px] text-[#334155]" style={{ fontWeight: 500 }}>
+                      <p className="text-[11px] text-slate-400 mb-0.5" style={{ fontWeight: 500 }}>Secondary Phone</p>
+                      <p className="text-[13px] text-slate-700" style={{ fontWeight: 500 }}>
                         {contact.secondaryPhone}
-                        {contact.secondaryPhoneExt && <span className="text-[#94A3B8] ml-1.5">ext. {contact.secondaryPhoneExt}</span>}
+                        {contact.secondaryPhoneExt && <span className="text-slate-400 ml-1.5">ext. {contact.secondaryPhoneExt}</span>}
                       </p>
                     </div>
                   </div>
                   {/* Email */}
                   <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-[#F1F5F9] flex items-center justify-center shrink-0">
-                      <Mail className="w-4 h-4 text-[#64748B]" />
+                    <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                      <Mail className="w-4 h-4 text-slate-500" />
                     </div>
                     <div>
-                      <p className="text-[11px] text-[#94A3B8] mb-0.5" style={{ fontWeight: 500 }}>Email</p>
-                      <a href={`mailto:${contact.email}`} className="text-[13px] text-[#0A77FF] hover:underline" style={{ fontWeight: 500 }}>
+                      <p className="text-[11px] text-slate-400 mb-0.5" style={{ fontWeight: 500 }}>Email</p>
+                      <a href={`mailto:${contact.email}`} className="text-[13px] text-primary hover:underline" style={{ fontWeight: 500 }}>
                         {contact.email}
                       </a>
                     </div>
                   </div>
                   {/* Department */}
                   <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-[#F1F5F9] flex items-center justify-center shrink-0">
-                      <Users className="w-4 h-4 text-[#64748B]" />
+                    <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                      <Users className="w-4 h-4 text-slate-500" />
                     </div>
                     <div>
-                      <p className="text-[11px] text-[#94A3B8] mb-0.5" style={{ fontWeight: 500 }}>Department</p>
-                      <p className="text-[13px] text-[#334155]" style={{ fontWeight: 500 }}>{contact.department}</p>
+                      <p className="text-[11px] text-slate-400 mb-0.5" style={{ fontWeight: 500 }}>Department</p>
+                      <p className="text-[13px] text-slate-700" style={{ fontWeight: 500 }}>{contact.department}</p>
                     </div>
                   </div>
                   {/* Role / Title */}
                   <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-[#F1F5F9] flex items-center justify-center shrink-0">
-                      <User className="w-4 h-4 text-[#64748B]" />
+                    <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                      <User className="w-4 h-4 text-slate-500" />
                     </div>
                     <div>
-                      <p className="text-[11px] text-[#94A3B8] mb-0.5" style={{ fontWeight: 500 }}>Role / Title</p>
-                      <p className="text-[13px] text-[#334155]" style={{ fontWeight: 500 }}>{contact.role || `${contact.department} Representative`}</p>
+                      <p className="text-[11px] text-slate-400 mb-0.5" style={{ fontWeight: 500 }}>Role / Title</p>
+                      <p className="text-[13px] text-slate-700" style={{ fontWeight: 500 }}>{contact.role || `${contact.department} Representative`}</p>
                     </div>
                   </div>
                   {/* Company */}
                   <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-[#F1F5F9] flex items-center justify-center shrink-0">
-                      <Building2 className="w-4 h-4 text-[#64748B]" />
+                    <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                      <Building2 className="w-4 h-4 text-slate-500" />
                     </div>
                     <div>
-                      <p className="text-[11px] text-[#94A3B8] mb-0.5" style={{ fontWeight: 500 }}>Company</p>
-                      <p className="text-[13px] text-[#334155]" style={{ fontWeight: 500 }}>{contact.company}</p>
+                      <p className="text-[11px] text-slate-400 mb-0.5" style={{ fontWeight: 500 }}>Company</p>
+                      <p className="text-[13px] text-slate-700" style={{ fontWeight: 500 }}>{contact.company}</p>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Partner Information Card */}
-              <div className="bg-white border border-[#E2E8F0] rounded-xl p-5">
+              <div className="bg-white border border-border rounded-xl p-5">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Partner Information</h3>
-                  <span className="text-[11px] text-[#94A3B8] bg-[#F1F5F9] rounded-full px-2.5 py-0.5" style={{ fontWeight: 600 }}>
+                  <h3 className="text-[13px] text-foreground" style={{ fontWeight: 600 }}>Partner Information</h3>
+                  <span className="text-[11px] text-slate-400 bg-muted rounded-full px-2.5 py-0.5" style={{ fontWeight: 600 }}>
                     {contact.linkedPartners.length} linked
                   </span>
                 </div>
@@ -1552,7 +1552,7 @@ export function ContactDetailPage() {
                     return (
                       <div
                         key={idx}
-                        className={`flex items-center gap-3 p-2.5 rounded-lg border border-[#F1F5F9] hover:border-[#BFDBFE] hover:bg-[#F0F7FF] transition-all ${partnerId ? "cursor-pointer" : ""}`}
+                        className={`flex items-center gap-3 p-2.5 rounded-lg border border-muted hover:border-blue-200 hover:bg-[#F0F7FF] transition-all ${partnerId ? "cursor-pointer" : ""}`}
                         onClick={() => { if (partnerId) window.open(`/vendors/${partnerId}`, "_blank"); }}
                       >
                         <div
@@ -1561,7 +1561,7 @@ export function ContactDetailPage() {
                         >
                           <span className="text-[10px]" style={{ fontWeight: 700, color: pTint.fg }}>{pInitials}</span>
                         </div>
-                        <span className={`text-[13px] text-[#334155] ${partnerId ? "hover:text-[#0A77FF] hover:underline" : ""}`} style={{ fontWeight: 500 }}>{partner}</span>
+                        <span className={`text-[13px] text-slate-700 ${partnerId ? "hover:text-primary hover:underline" : ""}`} style={{ fontWeight: 500 }}>{partner}</span>
                       </div>
                     );
                   })}
@@ -1611,33 +1611,33 @@ export function ContactDetailPage() {
           })()}
 
           {activeTab === "communications" && (
-            <div className="bg-white border border-[#E2E8F0] rounded-xl overflow-hidden">
-              <div className="px-5 py-3 border-b border-[#F1F5F9] flex items-center justify-between">
-                <h3 className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Communications</h3>
+            <div className="bg-white border border-border rounded-xl overflow-hidden">
+              <div className="px-5 py-3 border-b border-muted flex items-center justify-between">
+                <h3 className="text-[13px] text-foreground" style={{ fontWeight: 600 }}>Communications</h3>
                 <span className="text-[11px] shrink-0" style={{ fontWeight: 600, color: "#085FCC" }}>{COMMUNICATIONS_DATA.length} records</span>
               </div>
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-[#F1F5F9]">
-                    <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>Type</th>
-                    <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>Subject</th>
-                    <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>From</th>
-                    <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>Date</th>
-                    <th className="text-left text-[11px] text-[#94A3B8] px-5 py-2" style={{ fontWeight: 600 }}>Status</th>
+                  <tr className="border-b border-muted">
+                    <th className="text-left text-[11px] text-slate-400 px-5 py-2" style={{ fontWeight: 600 }}>Type</th>
+                    <th className="text-left text-[11px] text-slate-400 px-5 py-2" style={{ fontWeight: 600 }}>Subject</th>
+                    <th className="text-left text-[11px] text-slate-400 px-5 py-2" style={{ fontWeight: 600 }}>From</th>
+                    <th className="text-left text-[11px] text-slate-400 px-5 py-2" style={{ fontWeight: 600 }}>Date</th>
+                    <th className="text-left text-[11px] text-slate-400 px-5 py-2" style={{ fontWeight: 600 }}>Status</th>
                   </tr>
                 </thead>
                 <tbody>
                   {COMMUNICATIONS_DATA.map((item) => (
-                    <tr key={item.id} className="border-b border-[#F1F5F9] last:border-b-0 hover:bg-[#F8FAFC] transition-colors cursor-pointer">
+                    <tr key={item.id} className="border-b border-muted last:border-b-0 hover:bg-slate-50 transition-colors cursor-pointer">
                       <td className="px-5 py-2.5">
                         <div className="flex items-center gap-1.5">
-                          {item.type === "Email" ? <Mail className="w-3.5 h-3.5 text-[#94A3B8]" /> : <Phone className="w-3.5 h-3.5 text-[#94A3B8]" />}
-                          <span className="text-[12px] text-[#334155]" style={{ fontWeight: 500 }}>{item.type}</span>
+                          {item.type === "Email" ? <Mail className="w-3.5 h-3.5 text-slate-400" /> : <Phone className="w-3.5 h-3.5 text-slate-400" />}
+                          <span className="text-[12px] text-slate-700" style={{ fontWeight: 500 }}>{item.type}</span>
                         </div>
                       </td>
-                      <td className="px-5 py-2.5"><span className="text-[12px] text-[#334155]" style={{ fontWeight: 500 }}>{item.subject}</span></td>
-                      <td className="px-5 py-2.5"><span className="text-[12px] text-[#64748B]">{item.from}</span></td>
-                      <td className="px-5 py-2.5"><span className="text-[12px] text-[#64748B]">{formatDate(item.date)}</span></td>
+                      <td className="px-5 py-2.5"><span className="text-[12px] text-slate-700" style={{ fontWeight: 500 }}>{item.subject}</span></td>
+                      <td className="px-5 py-2.5"><span className="text-[12px] text-slate-500">{item.from}</span></td>
+                      <td className="px-5 py-2.5"><span className="text-[12px] text-slate-500">{formatDate(item.date)}</span></td>
                       <td className="px-5 py-2.5">
                         <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] border" style={{ fontWeight: 500, ...(item.status === "Sent" ? { backgroundColor: "#EFF6FF", color: "#1E40AF", borderColor: "#BFDBFE" } : item.status === "Completed" ? { backgroundColor: "#ECFDF5", color: "#065F46", borderColor: "#A7F3D0" } : { backgroundColor: "#FFFBEB", color: "#92400E", borderColor: "#FDE68A" }) }}>{item.status}</span>
                       </td>
@@ -1715,21 +1715,21 @@ export function ContactDetailPage() {
       <AlertDialog open={showArchiveModal} onOpenChange={setShowArchiveModal}>
         <AlertDialogContent className="sm:max-w-[400px] p-0 gap-0 overflow-hidden rounded-2xl border-0 shadow-[0_24px_80px_-12px_rgba(0,0,0,0.25)]">
           <div className="flex flex-col items-center text-center px-6 pt-8 pb-6">
-            <div className="w-14 h-14 rounded-2xl bg-[#FEF2F2] flex items-center justify-center mb-4">
-              <Archive className="w-6 h-6 text-[#DC2626]" />
+            <div className="w-14 h-14 rounded-2xl bg-red-50 flex items-center justify-center mb-4">
+              <Archive className="w-6 h-6 text-destructive" />
             </div>
-            <AlertDialogTitle className="text-[16px] text-[#0F172A]" style={{ fontWeight: 700 }}>
+            <AlertDialogTitle className="text-[16px] text-foreground" style={{ fontWeight: 700 }}>
               Archive Contact
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "#475569", lineHeight: "1.65" }}>
+            <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "hsl(var(--muted-foreground))", lineHeight: "1.65" }}>
               Are you sure you want to archive <strong>{contact.name}</strong>? This contact will be removed from active listings but records will be preserved.
             </AlertDialogDescription>
           </div>
           <div className="px-6 pb-6 flex flex-col gap-2">
-            <button onClick={() => { toast.success("Contact archived"); setShowArchiveModal(false); navigate("/partners/contacts"); }} className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors hover:opacity-90" style={{ fontWeight: 600, backgroundColor: "#DC2626", color: "#fff" }}>
+            <button onClick={() => { toast.success("Contact archived"); setShowArchiveModal(false); navigate("/partners/contacts"); }} className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors hover:opacity-90" style={{ fontWeight: 600, backgroundColor: "hsl(var(--destructive))", color: "#fff" }}>
               Archive Contact
             </button>
-            <AlertDialogCancel className="w-full h-11 text-[14px] rounded-xl border border-[#E2E8F0] bg-white text-[#334155] hover:bg-[#F8FAFC] cursor-pointer" style={{ fontWeight: 500 }}>
+            <AlertDialogCancel className="w-full h-11 text-[14px] rounded-xl border border-border bg-white text-slate-700 hover:bg-slate-50 cursor-pointer" style={{ fontWeight: 500 }}>
               Cancel
             </AlertDialogCancel>
           </div>
@@ -1740,13 +1740,13 @@ export function ContactDetailPage() {
       <AlertDialog open={showDeactivateModal} onOpenChange={setShowDeactivateModal}>
         <AlertDialogContent className="sm:max-w-[400px] p-0 gap-0 overflow-hidden rounded-2xl border-0 shadow-[0_24px_80px_-12px_rgba(0,0,0,0.25)]">
           <div className="flex flex-col items-center text-center px-6 pt-8 pb-6">
-            <div className="w-14 h-14 rounded-2xl bg-[#FFFBEB] flex items-center justify-center mb-4">
+            <div className="w-14 h-14 rounded-2xl bg-amber-50 flex items-center justify-center mb-4">
               <CircleSlash className="w-6 h-6 text-[#F97316]" />
             </div>
-            <AlertDialogTitle className="text-[16px] text-[#0F172A]" style={{ fontWeight: 700 }}>
+            <AlertDialogTitle className="text-[16px] text-foreground" style={{ fontWeight: 700 }}>
               Deactivate Contact
             </AlertDialogTitle>
-            <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "#475569", lineHeight: "1.65" }}>
+            <AlertDialogDescription className="text-[13px] mt-2 max-w-[300px] mx-auto" style={{ color: "hsl(var(--muted-foreground))", lineHeight: "1.65" }}>
               Are you sure you want to deactivate <strong>{contact.name}</strong>? This contact will be marked as inactive and excluded from new assignments.
             </AlertDialogDescription>
           </div>
@@ -1754,7 +1754,7 @@ export function ContactDetailPage() {
             <button onClick={() => { toast.success("Contact deactivated"); setShowDeactivateModal(false); }} className="w-full h-11 text-[14px] rounded-xl border-0 cursor-pointer transition-colors hover:opacity-90" style={{ fontWeight: 600, backgroundColor: "#F97316", color: "#FFFFFF" }}>
               Deactivate Contact
             </button>
-            <AlertDialogCancel className="w-full h-11 text-[14px] rounded-xl border border-[#E2E8F0] bg-white text-[#334155] hover:bg-[#F8FAFC] cursor-pointer" style={{ fontWeight: 500 }}>
+            <AlertDialogCancel className="w-full h-11 text-[14px] rounded-xl border border-border bg-white text-slate-700 hover:bg-slate-50 cursor-pointer" style={{ fontWeight: 500 }}>
               Cancel
             </AlertDialogCancel>
           </div>
@@ -1808,22 +1808,22 @@ export function ContactDetailPage() {
             style={{ maxHeight: composeMinimized ? 0 : 340, opacity: composeMinimized ? 0 : 1 }}
           >
             {/* To */}
-            <div className="flex items-center border-b border-[#F1F5F9] px-4 h-9">
-              <span className="text-[12px] text-[#94A3B8] shrink-0 w-8" style={{ fontWeight: 500 }}>To</span>
+            <div className="flex items-center border-b border-muted px-4 h-9">
+              <span className="text-[12px] text-slate-400 shrink-0 w-8" style={{ fontWeight: 500 }}>To</span>
               <input
                 value={composeTo}
                 onChange={(e) => setComposeTo(e.target.value)}
-                className="flex-1 text-[13px] text-[#334155] bg-transparent border-0 outline-none placeholder:text-[#CBD5E1]"
+                className="flex-1 text-[13px] text-slate-700 bg-transparent border-0 outline-none placeholder:text-slate-300"
                 placeholder="recipient@email.com"
               />
             </div>
             {/* Subject */}
-            <div className="flex items-center border-b border-[#F1F5F9] px-4 h-9">
-              <span className="text-[12px] text-[#94A3B8] shrink-0 w-8" style={{ fontWeight: 500 }}>Sub</span>
+            <div className="flex items-center border-b border-muted px-4 h-9">
+              <span className="text-[12px] text-slate-400 shrink-0 w-8" style={{ fontWeight: 500 }}>Sub</span>
               <input
                 value={composeSubject}
                 onChange={(e) => setComposeSubject(e.target.value)}
-                className="flex-1 text-[13px] text-[#334155] bg-transparent border-0 outline-none placeholder:text-[#CBD5E1]"
+                className="flex-1 text-[13px] text-slate-700 bg-transparent border-0 outline-none placeholder:text-slate-300"
                 placeholder="Subject"
               />
             </div>
@@ -1831,14 +1831,14 @@ export function ContactDetailPage() {
             <textarea
               value={composeBody}
               onChange={(e) => setComposeBody(e.target.value)}
-              className="w-full h-[180px] px-4 py-3 text-[13px] text-[#334155] bg-transparent border-0 outline-none resize-none placeholder:text-[#CBD5E1]"
+              className="w-full h-[180px] px-4 py-3 text-[13px] text-slate-700 bg-transparent border-0 outline-none resize-none placeholder:text-slate-300"
               placeholder="Write your message..."
             />
             {/* Footer */}
-            <div className="flex items-center justify-between px-4 py-2 border-t border-[#F1F5F9]">
+            <div className="flex items-center justify-between px-4 py-2 border-t border-muted">
               <button
                 onClick={() => { toast.success(`Email sent to ${composeTo}`); setComposeOpen(false); }}
-                className="inline-flex items-center gap-1.5 h-8 px-4 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-[13px] transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1.5 h-8 px-4 rounded-lg bg-primary hover:bg-[#0862D0] text-white text-[13px] transition-colors cursor-pointer"
                 style={{ fontWeight: 600 }}
               >
                 <Send className="w-3.5 h-3.5" />
@@ -1846,7 +1846,7 @@ export function ContactDetailPage() {
               </button>
               <button
                 onClick={() => setComposeOpen(false)}
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-[#94A3B8] hover:text-[#DC2626] hover:bg-[#FEF2F2] transition-colors cursor-pointer"
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-destructive hover:bg-red-50 transition-colors cursor-pointer"
               >
                 <Trash2 className="w-3.5 h-3.5" />
               </button>
@@ -1877,10 +1877,10 @@ function ContactOverviewTab({ contact, sStyle, partnerNameToId, kpiOrder, hidden
   const CH: Record<string, number> = { sm: 140, md: 200, lg: 280 };
 
   const statRow = (stats: { label: string; value: string; color?: string }[], compact?: boolean) => (
-    <div className={`flex items-center ${compact ? "gap-3 mt-1.5 pt-1.5" : "gap-4 mt-2 pt-2"} border-t border-[#F1F5F9]`}>
+    <div className={`flex items-center ${compact ? "gap-3 mt-1.5 pt-1.5" : "gap-4 mt-2 pt-2"} border-t border-muted`}>
       {stats.map((s, i) => (
         <div key={i}>
-          <p className={`${compact ? "text-[9px]" : "text-[10px]"} text-[#94A3B8]`} style={{ fontWeight: 500 }}>{s.label}</p>
+          <p className={`${compact ? "text-[9px]" : "text-[10px]"} text-slate-400`} style={{ fontWeight: 500 }}>{s.label}</p>
           <p className={compact ? "text-[11px]" : "text-[13px]"} style={{ fontWeight: 700, color: s.color || "#334155" }}>{s.value}</p>
         </div>
       ))}
@@ -1911,11 +1911,11 @@ function ContactOverviewTab({ contact, sStyle, partnerNameToId, kpiOrder, hidden
             <div className="flex-1 min-h-0 -ml-3">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={barData} margin={{ top: 5, right: 10, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted))" vertical={false} />
                   <XAxis dataKey="day" tick={{ fontSize: isSmall ? 9 : 10, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
                   {!isSmall && <YAxis tick={{ fontSize: 10, fill: "#94A3B8" }} axisLine={false} tickLine={false} width={24} />}
                   <ReTooltip contentStyle={ttStyle} cursor={{ fill: "rgba(10,119,255,0.04)" }} />
-                  <Bar dataKey="emails" name="Emails" fill="#0A77FF" radius={[4, 4, 0, 0]} barSize={isSmall ? 14 : 24} />
+                  <Bar dataKey="emails" name="Emails" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} barSize={isSmall ? 14 : 24} />
                   <Bar dataKey="calls" name="Calls" fill="#F59E0B" radius={[4, 4, 0, 0]} barSize={isSmall ? 14 : 24} />
                 </BarChart>
               </ResponsiveContainer>
@@ -1945,15 +1945,15 @@ function ContactOverviewTab({ contact, sStyle, partnerNameToId, kpiOrder, hidden
                 <AreaChart data={trendData}>
                   <defs>
                     <linearGradient id="ctAreaGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#0A77FF" stopOpacity={0.15} />
-                      <stop offset="100%" stopColor="#0A77FF" stopOpacity={0.01} />
+                      <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.15} />
+                      <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0.01} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#F1F5F9" vertical={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted))" vertical={false} />
                   <XAxis dataKey="month" tick={{ fontSize: isSmall ? 9 : 10, fill: "#94A3B8" }} axisLine={false} tickLine={false} />
                   {!isSmall && <YAxis tick={{ fontSize: 10, fill: "#94A3B8" }} axisLine={false} tickLine={false} width={24} />}
                   <ReTooltip contentStyle={ttStyle} formatter={(v: number) => [`${v}`, "Interactions"]} />
-                  <Area type="monotone" dataKey="value" name="Interactions" stroke="#0A77FF" strokeWidth={2} fill="url(#ctAreaGrad)" dot={false} activeDot={{ r: 4, fill: "#0A77FF", stroke: "#fff", strokeWidth: 2 }} />
+                  <Area type="monotone" dataKey="value" name="Interactions" stroke="hsl(var(--primary))" strokeWidth={2} fill="url(#ctAreaGrad)" dot={false} activeDot={{ r: 4, fill: "hsl(var(--primary))", stroke: "#fff", strokeWidth: 2 }} />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
@@ -1981,18 +1981,18 @@ function ContactOverviewTab({ contact, sStyle, partnerNameToId, kpiOrder, hidden
           <>
             <div className="space-y-1 flex-1 min-h-0 overflow-hidden">
               {pos.slice(0, isSmall ? 4 : sz === "lg" ? 6 : 5).map((o) => (
-                <div key={o.id} className="flex items-center gap-3 px-2 py-1.5 rounded-lg hover:bg-[#F8FAFC] transition-all cursor-pointer">
-                  <div className="w-6 h-6 rounded-md bg-[#EDF4FF] flex items-center justify-center shrink-0">
-                    <ShoppingCart className="w-3 h-3 text-[#0A77FF]" />
+                <div key={o.id} className="flex items-center gap-3 px-2 py-1.5 rounded-lg hover:bg-slate-50 transition-all cursor-pointer">
+                  <div className="w-6 h-6 rounded-md bg-accent flex items-center justify-center shrink-0">
+                    <ShoppingCart className="w-3 h-3 text-primary" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-[11px] text-[#334155] truncate" style={{ fontWeight: 500 }}>{o.id} &middot; {o.vendor}</p>
-                    {!isSmall && <p className="text-[10px] text-[#94A3B8] mt-0.5">{o.date}</p>}
+                    <p className="text-[11px] text-slate-700 truncate" style={{ fontWeight: 500 }}>{o.id} &middot; {o.vendor}</p>
+                    {!isSmall && <p className="text-[10px] text-slate-400 mt-0.5">{o.date}</p>}
                   </div>
-                  <span className="text-[11px] text-[#334155] shrink-0" style={{ fontWeight: 600 }}>{o.amount}</span>
+                  <span className="text-[11px] text-slate-700 shrink-0" style={{ fontWeight: 600 }}>{o.amount}</span>
                   <span className={`text-[10px] px-2 py-0.5 rounded-md shrink-0 ${
-                    o.status === "Delivered" ? "bg-[#F0FDF4] text-[#166534]" :
-                    o.status === "Approved" ? "bg-[#EFF6FF] text-[#1E40AF]" : "bg-[#FFFBEB] text-[#92400E]"
+                    o.status === "Delivered" ? "bg-green-50 text-[#166534]" :
+                    o.status === "Approved" ? "bg-blue-50 text-blue-800" : "bg-amber-50 text-amber-800"
                   }`} style={{ fontWeight: 500 }}>{o.status}</span>
                 </div>
               ))}
@@ -2000,7 +2000,7 @@ function ContactOverviewTab({ contact, sStyle, partnerNameToId, kpiOrder, hidden
             <div className="shrink-0">{statRow([
               { label: "Total POs", value: "18" },
               { label: "Total Value", value: "$186.2K" },
-              ...(!isSmall ? [{ label: "Pending", value: "3", color: "#D97706" }] : []),
+              ...(!isSmall ? [{ label: "Pending", value: "3", color: "hsl(var(--warning))" }] : []),
             ], isSmall)}</div>
           </>
         );
@@ -2019,18 +2019,18 @@ function ContactOverviewTab({ contact, sStyle, partnerNameToId, kpiOrder, hidden
           <>
             <div className="space-y-1 flex-1 min-h-0 overflow-hidden">
               {sos.slice(0, isSmall ? 4 : sz === "lg" ? 6 : 5).map((o) => (
-                <div key={o.id} className="flex items-center gap-3 px-2 py-1.5 rounded-lg hover:bg-[#F8FAFC] transition-all cursor-pointer">
-                  <div className="w-6 h-6 rounded-md bg-[#F0FDF4] flex items-center justify-center shrink-0">
-                    <Receipt className="w-3 h-3 text-[#16A34A]" />
+                <div key={o.id} className="flex items-center gap-3 px-2 py-1.5 rounded-lg hover:bg-slate-50 transition-all cursor-pointer">
+                  <div className="w-6 h-6 rounded-md bg-green-50 flex items-center justify-center shrink-0">
+                    <Receipt className="w-3 h-3 text-green-600" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-[11px] text-[#334155] truncate" style={{ fontWeight: 500 }}>{o.id} &middot; {o.customer}</p>
-                    {!isSmall && <p className="text-[10px] text-[#94A3B8] mt-0.5">{o.date}</p>}
+                    <p className="text-[11px] text-slate-700 truncate" style={{ fontWeight: 500 }}>{o.id} &middot; {o.customer}</p>
+                    {!isSmall && <p className="text-[10px] text-slate-400 mt-0.5">{o.date}</p>}
                   </div>
-                  <span className="text-[11px] text-[#334155] shrink-0" style={{ fontWeight: 600 }}>{o.amount}</span>
+                  <span className="text-[11px] text-slate-700 shrink-0" style={{ fontWeight: 600 }}>{o.amount}</span>
                   <span className={`text-[10px] px-2 py-0.5 rounded-md shrink-0 ${
-                    o.status === "Fulfilled" ? "bg-[#F0FDF4] text-[#166534]" :
-                    o.status === "Shipped" ? "bg-[#EFF6FF] text-[#1E40AF]" : "bg-[#FFFBEB] text-[#92400E]"
+                    o.status === "Fulfilled" ? "bg-green-50 text-[#166534]" :
+                    o.status === "Shipped" ? "bg-blue-50 text-blue-800" : "bg-amber-50 text-amber-800"
                   }`} style={{ fontWeight: 500 }}>{o.status}</span>
                 </div>
               ))}
@@ -2038,7 +2038,7 @@ function ContactOverviewTab({ contact, sStyle, partnerNameToId, kpiOrder, hidden
             <div className="shrink-0">{statRow([
               { label: "Total SOs", value: "12" },
               { label: "Revenue", value: "$142.8K" },
-              ...(!isSmall ? [{ label: "Processing", value: "2", color: "#D97706" }] : []),
+              ...(!isSmall ? [{ label: "Processing", value: "2", color: "hsl(var(--warning))" }] : []),
             ], isSmall)}</div>
           </>
         );
@@ -2056,13 +2056,13 @@ function ContactOverviewTab({ contact, sStyle, partnerNameToId, kpiOrder, hidden
           <>
             <div className="space-y-1.5 flex-1 min-h-0 overflow-hidden">
               {comms.slice(0, isSmall ? 3 : sz === "lg" ? 5 : 4).map((c, i) => (
-                <div key={i} className="flex items-center gap-2.5 px-2 py-1.5 rounded-lg hover:bg-[#F8FAFC] transition-all cursor-pointer">
-                  <div className="w-6 h-6 rounded-md flex items-center justify-center shrink-0" style={{ backgroundColor: c.type === "email" ? "#EDF4FF" : "#FFF7ED" }}>
-                    {c.type === "email" ? <Mail className="w-3 h-3 text-[#0A77FF]" /> : <PhoneCall className="w-3 h-3 text-[#F59E0B]" />}
+                <div key={i} className="flex items-center gap-2.5 px-2 py-1.5 rounded-lg hover:bg-slate-50 transition-all cursor-pointer">
+                  <div className="w-6 h-6 rounded-md flex items-center justify-center shrink-0" style={{ backgroundColor: c.type === "email" ? "hsl(var(--accent))" : "#FFF7ED" }}>
+                    {c.type === "email" ? <Mail className="w-3 h-3 text-primary" /> : <PhoneCall className="w-3 h-3 text-amber-500" />}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-[11px] text-[#334155] truncate" style={{ fontWeight: 500 }}>{c.subject}</p>
-                    {!isSmall && <p className="text-[10px] text-[#94A3B8] mt-0.5">{c.from} &middot; {c.date}</p>}
+                    <p className="text-[11px] text-slate-700 truncate" style={{ fontWeight: 500 }}>{c.subject}</p>
+                    {!isSmall && <p className="text-[10px] text-slate-400 mt-0.5">{c.from} &middot; {c.date}</p>}
                   </div>
                 </div>
               ))}
@@ -2082,15 +2082,15 @@ function ContactOverviewTab({ contact, sStyle, partnerNameToId, kpiOrder, hidden
           <>
             <div className="space-y-1.5 flex-1 min-h-0 overflow-hidden">
               {orders.slice(0, isSmall ? 3 : 4).map((o, i) => (
-                <div key={i} className="flex items-center gap-3 px-2 py-1.5 rounded-lg hover:bg-[#F8FAFC] transition-all cursor-pointer">
+                <div key={i} className="flex items-center gap-3 px-2 py-1.5 rounded-lg hover:bg-slate-50 transition-all cursor-pointer">
                   <div className="min-w-0 flex-1">
-                    <p className="text-[11px] text-[#334155]" style={{ fontWeight: 500 }}>{o.id}</p>
-                    {!isSmall && <p className="text-[10px] text-[#94A3B8] mt-0.5">{o.date}</p>}
+                    <p className="text-[11px] text-slate-700" style={{ fontWeight: 500 }}>{o.id}</p>
+                    {!isSmall && <p className="text-[10px] text-slate-400 mt-0.5">{o.date}</p>}
                   </div>
-                  <span className="text-[11px] text-[#334155] shrink-0" style={{ fontWeight: 600 }}>{o.amount}</span>
+                  <span className="text-[11px] text-slate-700 shrink-0" style={{ fontWeight: 600 }}>{o.amount}</span>
                   <span className={`text-[10px] px-2 py-0.5 rounded-md shrink-0 ${
-                    o.status === "Delivered" ? "bg-[#F0FDF4] text-[#166534]" :
-                    o.status === "In Transit" ? "bg-[#EFF6FF] text-[#1E40AF]" : "bg-[#FFFBEB] text-[#92400E]"
+                    o.status === "Delivered" ? "bg-green-50 text-[#166534]" :
+                    o.status === "In Transit" ? "bg-blue-50 text-blue-800" : "bg-amber-50 text-amber-800"
                   }`} style={{ fontWeight: 500 }}>{o.status}</span>
                 </div>
               ))}
@@ -2108,12 +2108,12 @@ function ContactOverviewTab({ contact, sStyle, partnerNameToId, kpiOrder, hidden
           <div className="space-y-2.5 flex-1 min-h-0 overflow-hidden">
             {ACTIVITY_LOG.slice(0, isSmall ? 3 : sz === "lg" ? 6 : 4).map((e) => (
               <div key={e.id} className="flex items-start gap-2.5">
-                <div className="w-6 h-6 rounded-md bg-[#F1F5F9] flex items-center justify-center shrink-0 mt-0.5">
-                  {e.icon === "create" ? <User className="w-3 h-3 text-[#0A77FF]" /> : e.icon === "link" ? <Link2 className="w-3 h-3 text-[#7C3AED]" /> : <Pencil className="w-3 h-3 text-[#F59E0B]" />}
+                <div className="w-6 h-6 rounded-md bg-muted flex items-center justify-center shrink-0 mt-0.5">
+                  {e.icon === "create" ? <User className="w-3 h-3 text-primary" /> : e.icon === "link" ? <Link2 className="w-3 h-3 text-violet" /> : <Pencil className="w-3 h-3 text-amber-500" />}
                 </div>
                 <div className="min-w-0">
-                  <p className="text-[11px] text-[#334155]" style={{ fontWeight: 500 }}>{e.action}</p>
-                  <p className="text-[10px] text-[#94A3B8] mt-0.5">{!isSmall ? `${e.user} \u00B7 ` : ""}{formatDate(e.date)}</p>
+                  <p className="text-[11px] text-slate-700" style={{ fontWeight: 500 }}>{e.action}</p>
+                  <p className="text-[10px] text-slate-400 mt-0.5">{!isSmall ? `${e.user} \u00B7 ` : ""}{formatDate(e.date)}</p>
                 </div>
               </div>
             ))}
@@ -2124,20 +2124,20 @@ function ContactOverviewTab({ contact, sStyle, partnerNameToId, kpiOrder, hidden
         return (
           <div className="space-y-2.5 flex-1 min-h-0 overflow-hidden">
             {NOTES_DATA.slice(0, isSmall ? 1 : sz === "lg" ? 3 : 2).map((note) => (
-              <div key={note.id} className="px-3 py-2.5 rounded-lg border border-[#F1F5F9] hover:border-[#E2E8F0] transition-all">
+              <div key={note.id} className="px-3 py-2.5 rounded-lg border border-muted hover:border-border transition-all">
                 <div className="flex items-center gap-2 mb-1.5">
-                  <div className="w-5 h-5 rounded-full bg-[#F1F5F9] flex items-center justify-center"><User className="w-2.5 h-2.5 text-[#64748B]" /></div>
-                  <span className="text-[11px] text-[#334155]" style={{ fontWeight: 600 }}>{note.author}</span>
-                  <span className="text-[10px] text-[#94A3B8]">{formatDate(note.date)}</span>
+                  <div className="w-5 h-5 rounded-full bg-muted flex items-center justify-center"><User className="w-2.5 h-2.5 text-slate-500" /></div>
+                  <span className="text-[11px] text-slate-700" style={{ fontWeight: 600 }}>{note.author}</span>
+                  <span className="text-[10px] text-slate-400">{formatDate(note.date)}</span>
                 </div>
-                <p className={`text-[12px] text-[#64748B] leading-relaxed ${isSmall ? "line-clamp-2" : ""}`}>{note.text}</p>
+                <p className={`text-[12px] text-slate-500 leading-relaxed ${isSmall ? "line-clamp-2" : ""}`}>{note.text}</p>
               </div>
             ))}
           </div>
         );
 
       default:
-        return <p className="text-[12px] text-[#94A3B8]">Widget content</p>;
+        return <p className="text-[12px] text-slate-400">Widget content</p>;
     }
     })();
 
@@ -2179,19 +2179,19 @@ function ContactOverviewTab({ contact, sStyle, partnerNameToId, kpiOrder, hidden
     <div className="space-y-4">
       {/* Header bar */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 text-[12px] text-[#64748B]">
-          <span className="text-sm text-[#334155]" style={{ fontWeight: 500 }}>Overview</span>
-          <button className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] text-[#64748B] hover:bg-[#F1F5F9] hover:text-[#334155] transition-colors cursor-pointer" style={{ fontWeight: 500 }}>
+        <div className="flex items-center gap-2 text-[12px] text-slate-500">
+          <span className="text-sm text-slate-700" style={{ fontWeight: 500 }}>Overview</span>
+          <button className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] text-slate-500 hover:bg-muted hover:text-slate-700 transition-colors cursor-pointer" style={{ fontWeight: 500 }}>
             <Calendar className="w-3 h-3" /> Last 30 days <ChevronDown className="w-2.5 h-2.5" />
           </button>
-          <span className="text-[#CBD5E1]">|</span>
-          <span className="text-[11px] text-[#94A3B8]">Updated {new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}</span>
-          <button className="inline-flex items-center gap-1 text-[11px] text-[#0A77FF] hover:text-[#0862D4] transition-colors cursor-pointer" style={{ fontWeight: 500 }} onClick={() => toast.success("Refreshed")}>
+          <span className="text-slate-300">|</span>
+          <span className="text-[11px] text-slate-400">Updated {new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}</span>
+          <button className="inline-flex items-center gap-1 text-[11px] text-primary hover:text-[#0862D4] transition-colors cursor-pointer" style={{ fontWeight: 500 }} onClick={() => toast.success("Refreshed")}>
             <RefreshCw className="w-3 h-3" /> Refresh
           </button>
         </div>
-        <button className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border border-[#E2E8F0] bg-white hover:bg-[#F8FAFC] text-[#334155] text-[12px] shadow-sm transition-all cursor-pointer" style={{ fontWeight: 500 }} onClick={() => setCustomizeOpen(true)}>
-          <Sliders className="w-3.5 h-3.5 text-[#94A3B8]" /> Customize Widgets
+        <button className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border border-border bg-white hover:bg-slate-50 text-slate-700 text-[12px] shadow-sm transition-all cursor-pointer" style={{ fontWeight: 500 }} onClick={() => setCustomizeOpen(true)}>
+          <Sliders className="w-3.5 h-3.5 text-slate-400" /> Customize Widgets
         </button>
       </div>
 
@@ -2253,28 +2253,28 @@ function ContactOverviewTab({ contact, sStyle, partnerNameToId, kpiOrder, hidden
                 <ContactSidebarRow icon={Phone} label="Secondary" value={contact.secondaryPhone} />
               )}
               <ContactSidebarRow icon={Mail} label="Email" value={contact.email} isLink />
-              <div className="pt-2.5 mt-2.5 border-t border-[#F1F5F9] space-y-2.5">
+              <div className="pt-2.5 mt-2.5 border-t border-muted space-y-2.5">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Status</span>
+                  <span className="text-[10px] text-slate-400" style={{ fontWeight: 500 }}>Status</span>
                   <span className="inline-flex items-center text-[11px] px-2 py-0.5 rounded-md border" style={{ fontWeight: 500, backgroundColor: sStyle.bg, color: sStyle.text, borderColor: sStyle.border }}>
                     {contact.status === "active" ? "Active" : "Inactive"}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Last Active</span>
-                  <span className="text-[12px] text-[#334155]" style={{ fontWeight: 500 }}>Mar 01, 2026</span>
+                  <span className="text-[10px] text-slate-400" style={{ fontWeight: 500 }}>Last Active</span>
+                  <span className="text-[12px] text-slate-700" style={{ fontWeight: 500 }}>Mar 01, 2026</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Created On</span>
-                  <span className="text-[12px] text-[#334155]" style={{ fontWeight: 500 }}>{contact.createdOn}</span>
+                  <span className="text-[10px] text-slate-400" style={{ fontWeight: 500 }}>Created On</span>
+                  <span className="text-[12px] text-slate-700" style={{ fontWeight: 500 }}>{contact.createdOn}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] text-[#94A3B8]" style={{ fontWeight: 500 }}>Created By</span>
+                  <span className="text-[10px] text-slate-400" style={{ fontWeight: 500 }}>Created By</span>
                   <div className="flex items-center gap-1.5">
-                    <div className="w-5 h-5 rounded-full flex items-center justify-center text-white text-[8px] shrink-0" style={{ backgroundColor: "#0A77FF", fontWeight: 600 }}>
+                    <div className="w-5 h-5 rounded-full flex items-center justify-center text-white text-[8px] shrink-0" style={{ backgroundColor: "hsl(var(--primary))", fontWeight: 600 }}>
                       {contact.createdByInitials}
                     </div>
-                    <span className="text-[12px] text-[#334155]" style={{ fontWeight: 500 }}>{contact.createdByName}</span>
+                    <span className="text-[12px] text-slate-700" style={{ fontWeight: 500 }}>{contact.createdByName}</span>
                   </div>
                 </div>
               </div>
@@ -2285,9 +2285,9 @@ function ContactOverviewTab({ contact, sStyle, partnerNameToId, kpiOrder, hidden
           <ContactSidebarCard title="Quick Stats" icon={BarChart3}>
             <div className="grid grid-cols-2 gap-2.5">
               <ContactStatBox label="Total Orders" value="24" icon={Package} />
-              <ContactStatBox label="Email Sent" value="156" icon={Mail} color="#0A77FF" />
+              <ContactStatBox label="Email Sent" value="156" icon={Mail} color="hsl(var(--primary))" />
               <ContactStatBox label="Satisfaction" value="4.8/5" icon={Star} color="#F59E0B" />
-              <ContactStatBox label="Avg Response" value="4.2 hrs" icon={Clock} color="#059669" />
+              <ContactStatBox label="Avg Response" value="4.2 hrs" icon={Clock} color="hsl(var(--success))" />
             </div>
           </ContactSidebarCard>
 
@@ -2303,15 +2303,15 @@ function ContactOverviewTab({ contact, sStyle, partnerNameToId, kpiOrder, hidden
                     <div className="w-7 h-7 rounded-full flex items-center justify-center text-[9px] shrink-0" style={{ backgroundColor: pTint.bg, color: pTint.fg, fontWeight: 700 }}>
                       {pI}
                     </div>
-                    <span className="text-[12px] text-[#334155] truncate" style={{ fontWeight: 500 }}>{partner}</span>
+                    <span className="text-[12px] text-slate-700 truncate" style={{ fontWeight: 500 }}>{partner}</span>
                     {idx === 0 && (
-                      <span className="text-[10px] text-[#0A77FF] px-1.5 py-0.5 rounded-md bg-[#EDF4FF] ml-auto shrink-0" style={{ fontWeight: 600 }}>PRIMARY</span>
+                      <span className="text-[10px] text-primary px-1.5 py-0.5 rounded-md bg-accent ml-auto shrink-0" style={{ fontWeight: 600 }}>PRIMARY</span>
                     )}
                   </div>
                 );
               })}
               {contact.linkedPartners.length > 5 && (
-                <p className="text-xs text-[#0A77FF] hover:text-[#0862D0] transition-colors cursor-pointer mt-1" style={{ fontWeight: 500 }}>
+                <p className="text-xs text-primary hover:text-[#0862D0] transition-colors cursor-pointer mt-1" style={{ fontWeight: 500 }}>
                   +{contact.linkedPartners.length - 5} more
                 </p>
               )}
@@ -2326,11 +2326,11 @@ function ContactOverviewTab({ contact, sStyle, partnerNameToId, kpiOrder, hidden
 /* ─── Activity Tab ─── */
 function ActivityTab() {
   const iconMap: Record<string, React.ElementType> = { create: CircleCheck, link: Link2, edit: Pencil, email: Mail };
-  const colorMap: Record<string, { bg: string; fg: string }> = { create: { bg: "#ECFDF5", fg: "#059669" }, link: { bg: "#EFF6FF", fg: "#2563EB" }, edit: { bg: "#FFFBEB", fg: "#D97706" }, email: { bg: "#EDF4FF", fg: "#0A77FF" } };
+  const colorMap: Record<string, { bg: string; fg: string }> = { create: { bg: "#ECFDF5", fg: "hsl(var(--success))" }, link: { bg: "#EFF6FF", fg: "#2563EB" }, edit: { bg: "#FFFBEB", fg: "hsl(var(--warning))" }, email: { bg: "hsl(var(--accent))", fg: "hsl(var(--primary))" } };
   return (
-    <div className="bg-white border border-[#E2E8F0] rounded-xl overflow-hidden">
-      <div className="px-5 py-3 border-b border-[#F1F5F9] flex items-center justify-between">
-        <h3 className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Activity History</h3>
+    <div className="bg-white border border-border rounded-xl overflow-hidden">
+      <div className="px-5 py-3 border-b border-muted flex items-center justify-between">
+        <h3 className="text-[13px] text-foreground" style={{ fontWeight: 600 }}>Activity History</h3>
         <span className="text-[11px] shrink-0" style={{ fontWeight: 600, color: "#085FCC" }}>{ACTIVITY_LOG.length} events</span>
       </div>
       <div className="px-5 py-2">
@@ -2340,16 +2340,16 @@ function ActivityTab() {
           return (
             <div key={item.id} className="flex items-start gap-3 relative" style={{ paddingBottom: idx === ACTIVITY_LOG.length - 1 ? 8 : 0 }}>
               {/* Timeline line */}
-              {idx < ACTIVITY_LOG.length - 1 && <div className="absolute left-[15px] top-[32px] bottom-0 w-px bg-[#E2E8F0]" />}
+              {idx < ACTIVITY_LOG.length - 1 && <div className="absolute left-[15px] top-[32px] bottom-0 w-px bg-border" />}
               <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-2.5 z-10" style={{ backgroundColor: color.bg }}>
                 <Icon className="w-3.5 h-3.5" style={{ color: color.fg }} />
               </div>
-              <div className="flex-1 min-w-0 py-2.5 border-b border-[#F1F5F9] last:border-b-0" style={{ borderBottom: idx === ACTIVITY_LOG.length - 1 ? "none" : undefined }}>
-                <p className="text-[12px] text-[#334155]" style={{ fontWeight: 500 }}>{item.action}</p>
+              <div className="flex-1 min-w-0 py-2.5 border-b border-muted last:border-b-0" style={{ borderBottom: idx === ACTIVITY_LOG.length - 1 ? "none" : undefined }}>
+                <p className="text-[12px] text-slate-700" style={{ fontWeight: 500 }}>{item.action}</p>
                 <div className="flex items-center gap-2 mt-1">
-                  <span className="text-[11px] text-[#94A3B8]" style={{ fontWeight: 500 }}>{item.user}</span>
-                  <span className="text-[11px] text-[#CBD5E1]">·</span>
-                  <span className="text-[11px] text-[#94A3B8]">{formatDateTime(item.date)}</span>
+                  <span className="text-[11px] text-slate-400" style={{ fontWeight: 500 }}>{item.user}</span>
+                  <span className="text-[11px] text-slate-300">·</span>
+                  <span className="text-[11px] text-slate-400">{formatDateTime(item.date)}</span>
                 </div>
               </div>
             </div>
@@ -2366,21 +2366,21 @@ function NotesTab() {
   return (
     <div className="space-y-4">
       {/* Add note input */}
-      <div className="bg-white border border-[#E2E8F0] rounded-xl overflow-hidden">
-        <div className="px-5 py-3 border-b border-[#F1F5F9]">
-          <h3 className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Add a Note</h3>
+      <div className="bg-white border border-border rounded-xl overflow-hidden">
+        <div className="px-5 py-3 border-b border-muted">
+          <h3 className="text-[13px] text-foreground" style={{ fontWeight: 600 }}>Add a Note</h3>
         </div>
         <div className="p-4">
           <textarea
             value={newNote}
             onChange={(e) => setNewNote(e.target.value)}
             placeholder="Write a note..."
-            className="w-full h-[80px] px-3 py-2.5 text-[13px] text-[#334155] bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg outline-none resize-none placeholder:text-[#94A3B8] focus:border-[#0A77FF]/40 focus:ring-2 focus:ring-[#0A77FF]/10 transition-colors"
+            className="w-full h-[80px] px-3 py-2.5 text-[13px] text-slate-700 bg-slate-50 border border-border rounded-lg outline-none resize-none placeholder:text-slate-400 focus:border-primary/40 focus:ring-2 focus:ring-primary/10 transition-colors"
           />
           <div className="flex justify-end mt-2">
             <button
               onClick={() => { if (newNote.trim()) { toast.success("Note added"); setNewNote(""); } }}
-              className="h-8 px-4 rounded-lg bg-[#0A77FF] hover:bg-[#0862D0] text-white text-[12px] cursor-pointer transition-colors"
+              className="h-8 px-4 rounded-lg bg-primary hover:bg-[#0862D0] text-white text-[12px] cursor-pointer transition-colors"
               style={{ fontWeight: 600 }}
             >
               Add Note
@@ -2389,22 +2389,22 @@ function NotesTab() {
         </div>
       </div>
       {/* Existing notes */}
-      <div className="bg-white border border-[#E2E8F0] rounded-xl overflow-hidden">
-        <div className="px-5 py-3 border-b border-[#F1F5F9] flex items-center justify-between">
-          <h3 className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Notes</h3>
+      <div className="bg-white border border-border rounded-xl overflow-hidden">
+        <div className="px-5 py-3 border-b border-muted flex items-center justify-between">
+          <h3 className="text-[13px] text-foreground" style={{ fontWeight: 600 }}>Notes</h3>
           <span className="text-[11px] shrink-0" style={{ fontWeight: 600, color: "#085FCC" }}>{NOTES_DATA.length} notes</span>
         </div>
-        <div className="divide-y divide-[#F1F5F9]">
+        <div className="divide-y divide-muted">
           {NOTES_DATA.map((note) => {
             const noteInitials = note.author.split(" ").map(w => w[0]).join("").toUpperCase();
             return (
-              <div key={note.id} className="px-5 py-3.5 hover:bg-[#F8FAFC] transition-colors">
+              <div key={note.id} className="px-5 py-3.5 hover:bg-slate-50 transition-colors">
                 <div className="flex items-center gap-2.5 mb-2">
-                  <div className="w-6 h-6 rounded-full flex items-center justify-center text-[8px] text-white shrink-0" style={{ backgroundColor: "#0A77FF", fontWeight: 700 }}>{noteInitials}</div>
-                  <span className="text-[12px] text-[#334155]" style={{ fontWeight: 600 }}>{note.author}</span>
-                  <span className="text-[11px] text-[#94A3B8]">{formatDate(note.date)}</span>
+                  <div className="w-6 h-6 rounded-full flex items-center justify-center text-[8px] text-white shrink-0" style={{ backgroundColor: "hsl(var(--primary))", fontWeight: 700 }}>{noteInitials}</div>
+                  <span className="text-[12px] text-slate-700" style={{ fontWeight: 600 }}>{note.author}</span>
+                  <span className="text-[11px] text-slate-400">{formatDate(note.date)}</span>
                 </div>
-                <p className="text-[12px] text-[#64748B] leading-relaxed pl-[34px]">{note.text}</p>
+                <p className="text-[12px] text-slate-500 leading-relaxed pl-[34px]">{note.text}</p>
               </div>
             );
           })}

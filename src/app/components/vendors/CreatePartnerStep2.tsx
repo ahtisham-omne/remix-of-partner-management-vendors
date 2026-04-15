@@ -132,7 +132,7 @@ export function Step2PartnerForm({
   const [gSaveAndCreateAnother, setGSaveAndCreateAnother] = useState(false);
 
   const AVATAR_COLORS_G = useMemo(() => [
-    "#0A77FF", "#7C3AED", "#059669", "#DC2626", "#D97706",
+    "hsl(var(--primary))", "hsl(var(--violet))", "hsl(var(--success))", "hsl(var(--destructive))", "hsl(var(--warning))",
     "#0891B2", "#4F46E5", "#BE185D", "#65A30D", "#EA580C",
   ], []);
 
@@ -328,33 +328,33 @@ export function Step2PartnerForm({
       {/* ── Selected Partner Groups Banner — sticky at top ── */}
       {allSelectedGroups.length > 0 && (
         <div className="sticky top-0 z-10 bg-[#FAFBFC] pb-2 -mt-1">
-          <div className="rounded-lg bg-white border border-[#0A77FF]/25 shadow-[0_1px_4px_rgba(10,119,255,0.06),0_4px_12px_-2px_rgba(0,0,0,0.06)] overflow-hidden">
+          <div className="rounded-lg bg-white border border-primary/25 shadow-[0_1px_4px_rgba(10,119,255,0.06),0_4px_12px_-2px_rgba(0,0,0,0.06)] overflow-hidden">
             {/* Header row */}
             <div className="flex items-center justify-between gap-2 px-2.5 sm:px-3 py-2">
               <div className="flex items-center gap-2 min-w-0">
-                <div className="w-6 h-6 rounded-md bg-[#0A77FF]/8 flex items-center justify-center shrink-0">
-                  <Users className="w-3.5 h-3.5 text-[#0A77FF]" />
+                <div className="w-6 h-6 rounded-md bg-primary/8 flex items-center justify-center shrink-0">
+                  <Users className="w-3.5 h-3.5 text-primary" />
                 </div>
                 <div className="min-w-0">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>
+                    <span className="text-xs sm:text-[13px] text-foreground" style={{ fontWeight: 600 }}>
                       {allSelectedGroups.length} Group{allSelectedGroups.length !== 1 ? "s" : ""} Selected
                     </span>
                     {selectedGroup && (
-                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] bg-[#0A77FF]/8 text-[#0A77FF]" style={{ fontWeight: 600 }}>
-                        <Star className="w-2.5 h-2.5 fill-[#0A77FF]" />
+                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] bg-primary/8 text-primary" style={{ fontWeight: 600 }}>
+                        <Star className="w-2.5 h-2.5 fill-primary" />
                         Primary: {selectedGroup.name}
                       </span>
                     )}
                   </div>
-                  <p className="text-[11px] text-[#94A3B8] mt-0.5">
+                  <p className="text-[11px] text-slate-400 mt-0.5">
                     Configuration inherits from the primary group
                   </p>
                 </div>
               </div>
               <button
                 onClick={onEditGroup}
-                className="group inline-flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-[#475569] hover:border-[#0A77FF] hover:text-[#0A77FF] hover:bg-[#EDF4FF] transition-all shrink-0 text-[11px] sm:text-xs cursor-pointer"
+                className="group inline-flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg border border-border bg-white text-muted-foreground hover:border-primary hover:text-primary hover:bg-accent transition-all shrink-0 text-[11px] sm:text-xs cursor-pointer"
                 style={{ fontWeight: 600 }}
               >
                 <Pencil className="w-3 h-3" />
@@ -371,14 +371,14 @@ export function Step2PartnerForm({
       )}
 
       {/* ── Partner Details — boxed card ── */}
-      <div className="rounded-lg border border-[#E2E8F0] bg-white shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
+      <div className="rounded-lg border border-border bg-white shadow-[0_1px_2px_rgba(0,0,0,0.03)]">
         <div className="px-3 sm:px-4 py-2 sm:py-2.5 border-b border-[#EEF2F6] flex items-center gap-2 bg-[#FAFBFC] rounded-t-lg">
-          <div className="w-6 h-6 rounded-md bg-[#0A77FF]/8 flex items-center justify-center shrink-0">
-            <Info className="w-3.5 h-3.5 text-[#0A77FF]" />
+          <div className="w-6 h-6 rounded-md bg-primary/8 flex items-center justify-center shrink-0">
+            <Info className="w-3.5 h-3.5 text-primary" />
           </div>
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Partner Details</span>
-            <span className="text-[9px] sm:text-[10px] text-[#94A3B8] tracking-wider uppercase hidden min-[480px]:inline" style={{ fontWeight: 500 }}>Required</span>
+            <span className="text-xs sm:text-[13px] text-foreground" style={{ fontWeight: 600 }}>Partner Details</span>
+            <span className="text-[9px] sm:text-[10px] text-slate-400 tracking-wider uppercase hidden min-[480px]:inline" style={{ fontWeight: 500 }}>Required</span>
           </div>
         </div>
         <div className="px-2.5 sm:px-3 pt-2 sm:pt-2.5 pb-1.5 sm:pb-2">
@@ -400,38 +400,38 @@ export function Step2PartnerForm({
               onClick={() => profileInputRef.current?.click()}
               className={`relative w-14 h-14 rounded-xl cursor-pointer shrink-0 transition-all ${
                 profileImage
-                  ? "ring-2 ring-[#E2E8F0]"
-                  : "border-2 border-dashed border-[#CBD5E1] bg-[#F8FAFC]"
+                  ? "ring-2 ring-border"
+                  : "border-2 border-dashed border-slate-300 bg-slate-50"
               }`}
             >
               {profileImage ? (
                 <img src={profileImage} alt="Profile" className="w-full h-full rounded-xl object-cover" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
-                  <Camera className="w-5 h-5 text-[#94A3B8]" />
+                  <Camera className="w-5 h-5 text-slate-400" />
                 </div>
               )}
             </div>
             <div className="min-w-0">
-              <p className="text-xs text-[#0F172A]" style={{ fontWeight: 500 }}>
+              <p className="text-xs text-foreground" style={{ fontWeight: 500 }}>
                 {profileImage ? "Profile photo" : "Add a photo"}
               </p>
               <div className="flex items-center gap-2 mt-0.5">
                 <button
                   type="button"
                   onClick={() => profileInputRef.current?.click()}
-                  className="text-[11px] text-[#0A77FF]"
+                  className="text-[11px] text-primary"
                   style={{ fontWeight: 500 }}
                 >
                   {profileImage ? "Change" : "Upload"}
                 </button>
                 {profileImage && (
                   <>
-                    <span className="text-[#E2E8F0] text-[11px]">&middot;</span>
+                    <span className="text-border text-[11px]">&middot;</span>
                     <button
                       type="button"
                       onClick={() => onProfileImageChange(null)}
-                      className="text-[11px] text-[#EF4444]"
+                      className="text-[11px] text-red-500"
                       style={{ fontWeight: 500 }}
                     >
                       Remove
@@ -469,10 +469,10 @@ export function Step2PartnerForm({
                 }}
                 className={`relative w-full aspect-square rounded-xl cursor-pointer group transition-all ${
                   profileImage
-                    ? "ring-2 ring-[#E2E8F0] hover:ring-[#0A77FF]/30"
+                    ? "ring-2 ring-border hover:ring-primary/30"
                     : profileDragOver
-                    ? "border-2 border-dashed border-[#0A77FF] bg-[#EDF4FF]"
-                    : "border-2 border-dashed border-[#CBD5E1] hover:border-[#0A77FF]/50 bg-[#F8FAFC] hover:bg-[#EDF4FF]/50"
+                    ? "border-2 border-dashed border-primary bg-accent"
+                    : "border-2 border-dashed border-slate-300 hover:border-primary/50 bg-slate-50 hover:bg-accent/50"
                 }`}
               >
                 {profileImage ? (
@@ -488,11 +488,11 @@ export function Step2PartnerForm({
                   </>
                 ) : (
                   <div className="w-full h-full flex flex-col items-center justify-center gap-1.5">
-                    <div className="w-10 h-10 rounded-lg bg-[#F1F5F9] group-hover:bg-[#EDF4FF] flex items-center justify-center transition-colors">
-                      <Camera className="w-5 h-5 text-[#94A3B8] group-hover:text-[#0A77FF] transition-colors" />
+                    <div className="w-10 h-10 rounded-lg bg-muted group-hover:bg-accent flex items-center justify-center transition-colors">
+                      <Camera className="w-5 h-5 text-slate-400 group-hover:text-primary transition-colors" />
                     </div>
-                    <span className="text-[11px] text-[#94A3B8] group-hover:text-[#0A77FF] transition-colors" style={{ fontWeight: 500 }}>Upload photo</span>
-                    <span className="text-[9px] text-[#CBD5E1]">Max 5 MB</span>
+                    <span className="text-[11px] text-slate-400 group-hover:text-primary transition-colors" style={{ fontWeight: 500 }}>Upload photo</span>
+                    <span className="text-[9px] text-slate-300">Max 5 MB</span>
                   </div>
                 )}
               </div>
@@ -501,16 +501,16 @@ export function Step2PartnerForm({
                   <button
                     type="button"
                     onClick={() => profileInputRef.current?.click()}
-                    className="text-[11px] text-[#0A77FF] hover:text-[#0862D0] transition-colors cursor-pointer"
+                    className="text-[11px] text-primary hover:text-[#0862D0] transition-colors cursor-pointer"
                     style={{ fontWeight: 500 }}
                   >
                     Change
                   </button>
-                  <span className="text-[#E2E8F0] text-[11px]">&middot;</span>
+                  <span className="text-border text-[11px]">&middot;</span>
                   <button
                     type="button"
                     onClick={(e) => { e.stopPropagation(); onProfileImageChange(null); }}
-                    className="text-[11px] text-[#EF4444] hover:text-[#DC2626] transition-colors cursor-pointer"
+                    className="text-[11px] text-red-500 hover:text-destructive transition-colors cursor-pointer"
                     style={{ fontWeight: 500 }}
                   >
                     Remove
@@ -523,43 +523,43 @@ export function Step2PartnerForm({
             <div className="grid grid-cols-1 min-[480px]:grid-cols-2 gap-x-3 sm:gap-x-4 gap-y-2.5 sm:gap-y-3">
               {/* Row 1 Left: Partner Name */}
               <div>
-                <Label htmlFor="create-partner-name" className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>
-                  Partner Name<span className="text-[#EF4444]">*</span>
+                <Label htmlFor="create-partner-name" className="text-xs sm:text-[13px] text-foreground" style={{ fontWeight: 500 }}>
+                  Partner Name<span className="text-red-500">*</span>
                 </Label>
                 <Input
                   id="create-partner-name"
                   placeholder="e.g. Acme Supply Co."
                   value={partnerName}
                   onChange={(e) => onPartnerNameChange(e.target.value)}
-                  className="mt-1 rounded-lg border-[#E2E8F0] bg-white !h-10 text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
+                  className="mt-1 rounded-lg border-border bg-white !h-10 text-sm text-foreground placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary/20"
                 />
                 {errors.partnerName && (
-                  <p className="text-[#EF4444] text-xs mt-1">{errors.partnerName}</p>
+                  <p className="text-red-500 text-xs mt-1">{errors.partnerName}</p>
                 )}
               </div>
 
               {/* Row 1 Right: Status */}
               <div>
-                <Label className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>Status</Label>
+                <Label className="text-xs sm:text-[13px] text-foreground" style={{ fontWeight: 500 }}>Status</Label>
                 <Select value={status} onValueChange={(val: string) => setStatus(val as "Active" | "Inactive")}>
-                  <SelectTrigger className="mt-1 !h-10 rounded-lg border-[#E2E8F0] bg-white text-sm hover:border-[#CBD5E1] transition-colors focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 [&>svg]:text-[#94A3B8]">
+                  <SelectTrigger className="mt-1 !h-10 rounded-lg border-border bg-white text-sm hover:border-slate-300 transition-colors focus:border-primary focus:ring-1 focus:ring-primary/20 [&>svg]:text-slate-400">
                     <SelectValue>
                       <div className="flex items-center gap-2">
                         <div className="w-2 h-2 rounded-full" style={{ backgroundColor: statusConfig[status].color }} />
-                        <span className="text-[#0F172A]">{statusConfig[status].label}</span>
+                        <span className="text-foreground">{statusConfig[status].label}</span>
                       </div>
                     </SelectValue>
                   </SelectTrigger>
                   <SelectContent className="z-[250] rounded-lg">
                     <SelectItem value="Active">
                       <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-[#10B981]" />
+                        <div className="w-2 h-2 rounded-full bg-emerald-500" />
                         Active
                       </div>
                     </SelectItem>
                     <SelectItem value="Inactive">
                       <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-[#EF4444]" />
+                        <div className="w-2 h-2 rounded-full bg-red-500" />
                         Inactive
                       </div>
                     </SelectItem>
@@ -569,7 +569,7 @@ export function Step2PartnerForm({
 
               {/* Row 2 Left: Phone Number */}
               <div>
-                <Label htmlFor="create-partner-phone" className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>
+                <Label htmlFor="create-partner-phone" className="text-xs sm:text-[13px] text-foreground" style={{ fontWeight: 500 }}>
                   Phone Number
                 </Label>
                 <div className="flex items-center gap-0 mt-1">
@@ -577,23 +577,23 @@ export function Step2PartnerForm({
                     <PopoverTrigger asChild>
                       <button
                         type="button"
-                        className="flex items-center gap-1.5 pl-2.5 pr-1.5 !h-10 rounded-l-lg border border-r-0 border-[#E2E8F0] bg-white text-sm shrink-0 cursor-pointer hover:border-[#CBD5E1] transition-colors focus:outline-none focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
+                        className="flex items-center gap-1.5 pl-2.5 pr-1.5 !h-10 rounded-l-lg border border-r-0 border-border bg-white text-sm shrink-0 cursor-pointer hover:border-slate-300 transition-colors focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
                       >
                         <span className="text-base leading-none">{selectedCountry.flag}</span>
-                        <span className="text-xs text-[#334155]" style={{ fontWeight: 600 }}>{phoneCountryCode}</span>
-                        <ChevronDown className="w-3 h-3 text-[#94A3B8]" />
+                        <span className="text-xs text-slate-700" style={{ fontWeight: 600 }}>{phoneCountryCode}</span>
+                        <ChevronDown className="w-3 h-3 text-slate-400" />
                       </button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-64 p-0 z-[200] rounded-xl shadow-lg border border-[#E2E8F0]" align="start" sideOffset={4}>
-                      <div className="p-2 border-b border-[#F1F5F9]">
+                    <PopoverContent className="w-64 p-0 z-[200] rounded-xl shadow-lg border border-border" align="start" sideOffset={4}>
+                      <div className="p-2 border-b border-muted">
                         <div className="relative">
-                          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8]" />
+                          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
                           <input
                             type="text"
                             placeholder="Search country..."
                             value={countrySearch}
                             onChange={(e) => setCountrySearch(e.target.value)}
-                            className="w-full pl-8 pr-3 py-2 text-sm rounded-lg border border-[#E2E8F0] bg-white text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-none focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
+                            className="w-full pl-8 pr-3 py-2 text-sm rounded-lg border border-border bg-white text-foreground placeholder:text-slate-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20"
                           />
                         </div>
                       </div>
@@ -609,20 +609,20 @@ export function Step2PartnerForm({
                             }}
                             className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-left transition-colors ${
                               phoneCountryCode === c.code && selectedCountry.country === c.country
-                                ? "bg-[#EDF4FF] text-[#0A77FF]"
-                                : "hover:bg-[#F8FAFC] text-[#334155]"
+                                ? "bg-accent text-primary"
+                                : "hover:bg-slate-50 text-slate-700"
                             }`}
                           >
                             <span className="text-base">{c.flag}</span>
                             <span className="text-sm flex-1 truncate" style={{ fontWeight: 500 }}>{c.country}</span>
-                            <span className="text-xs text-[#64748B]" style={{ fontWeight: 500 }}>{c.code}</span>
+                            <span className="text-xs text-slate-500" style={{ fontWeight: 500 }}>{c.code}</span>
                             {phoneCountryCode === c.code && selectedCountry.country === c.country && (
-                              <Check className="w-3.5 h-3.5 text-[#0A77FF] shrink-0" />
+                              <Check className="w-3.5 h-3.5 text-primary shrink-0" />
                             )}
                           </button>
                         ))}
                         {filteredCountries.length === 0 && (
-                          <p className="text-xs text-[#94A3B8] text-center py-4">No countries found</p>
+                          <p className="text-xs text-slate-400 text-center py-4">No countries found</p>
                         )}
                       </div>
                     </PopoverContent>
@@ -632,14 +632,14 @@ export function Step2PartnerForm({
                     placeholder="(555) 123-4567"
                     value={partnerPhone}
                     onChange={(e) => onPartnerPhoneChange(e.target.value)}
-                    className="rounded-l-none rounded-r-lg border-[#E2E8F0] bg-white !h-10 text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
+                    className="rounded-l-none rounded-r-lg border-border bg-white !h-10 text-sm text-foreground placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary/20"
                   />
                 </div>
               </div>
 
               {/* Row 2 Right: Website */}
               <div>
-                <Label htmlFor="create-partner-website" className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 500 }}>
+                <Label htmlFor="create-partner-website" className="text-xs sm:text-[13px] text-foreground" style={{ fontWeight: 500 }}>
                   Website
                 </Label>
                 <Input
@@ -647,7 +647,7 @@ export function Step2PartnerForm({
                   placeholder="https://example.com"
                   value={website}
                   onChange={(e) => onWebsiteChange(e.target.value)}
-                  className="mt-1 rounded-lg border-[#E2E8F0] bg-white !h-10 text-sm text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20"
+                  className="mt-1 rounded-lg border-border bg-white !h-10 text-sm text-foreground placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary/20"
                 />
               </div>
 
@@ -670,12 +670,12 @@ export function Step2PartnerForm({
       {/* ── Partner Type Selection ── */}
       <div>
         <div className="flex items-center gap-2 mb-2.5">
-          <div className="w-6 h-6 rounded-md bg-[#0A77FF]/8 flex items-center justify-center shrink-0">
-            <Users className="w-3.5 h-3.5 text-[#0A77FF]" />
+          <div className="w-6 h-6 rounded-md bg-primary/8 flex items-center justify-center shrink-0">
+            <Users className="w-3.5 h-3.5 text-primary" />
           </div>
           <div>
-            <span className="text-xs sm:text-[13px] text-[#0F172A] block" style={{ fontWeight: 600 }}>Partner Type</span>
-            <span className="text-[10px] sm:text-[11px] text-[#94A3B8] block mt-px">Select one or more partner classifications</span>
+            <span className="text-xs sm:text-[13px] text-foreground block" style={{ fontWeight: 600 }}>Partner Type</span>
+            <span className="text-[10px] sm:text-[11px] text-slate-400 block mt-px">Select one or more partner classifications</span>
           </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -685,28 +685,28 @@ export function Step2PartnerForm({
             className={`group relative rounded-xl overflow-hidden border transition-all duration-200 cursor-pointer ${
               selectedPartnerTypes.has("vendor")
                 ? "border-[#93C5FD]/70 bg-white shadow-[0_1px_4px_rgba(10,119,255,0.06)]"
-                : "border-[#E2E8F0] bg-white hover:border-[#BFDBFE] hover:shadow-[0_4px_16px_-4px_rgba(10,119,255,0.12)]"
+                : "border-border bg-white hover:border-blue-200 hover:shadow-[0_4px_16px_-4px_rgba(10,119,255,0.12)]"
             }`}
           >
             <div className={`absolute inset-0 transition-all duration-300 pointer-events-none ${
               selectedPartnerTypes.has("vendor")
-                ? "bg-gradient-to-br from-[#EFF6FF]/50 to-transparent"
-                : "bg-gradient-to-br from-[#EDF4FF]/0 to-[#EDF4FF]/0 group-hover:from-[#EDF4FF]/60 group-hover:to-transparent"
+                ? "bg-gradient-to-br from-blue-50/50 to-transparent"
+                : "bg-gradient-to-br from-accent/0 to-accent/0 group-hover:from-accent/60 group-hover:to-transparent"
             }`} />
             <div className="relative flex items-center gap-3 pl-3.5 pr-3 py-3">
               <div className={`w-9 h-9 rounded-[10px] flex items-center justify-center shrink-0 transition-all duration-200 ${
                 selectedPartnerTypes.has("vendor")
-                  ? "bg-gradient-to-br from-[#DBEAFE] to-[#BFDBFE] text-[#2563EB]"
-                  : "bg-gradient-to-br from-[#EDF4FF] to-[#DBEAFE] text-[#0A77FF] group-hover:scale-105"
+                  ? "bg-gradient-to-br from-blue-100 to-blue-200 text-[#2563EB]"
+                  : "bg-gradient-to-br from-accent to-blue-100 text-primary group-hover:scale-105"
               }`}>
                 <Truck className="w-[18px] h-[18px]" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className={`text-[13px] transition-colors duration-150 ${
-                  selectedPartnerTypes.has("vendor") ? "text-[#1E40AF]" : "text-[#0F172A] group-hover:text-[#1E293B]"
+                  selectedPartnerTypes.has("vendor") ? "text-blue-800" : "text-foreground group-hover:text-slate-800"
                 }`} style={{ fontWeight: 600 }}>Vendor</p>
                 <p className={`text-[11px] mt-0.5 truncate transition-colors duration-150 ${
-                  selectedPartnerTypes.has("vendor") ? "text-[#60A5FA]" : "text-[#94A3B8]"
+                  selectedPartnerTypes.has("vendor") ? "text-[#60A5FA]" : "text-slate-400"
                 }`}>Supplies goods or services</p>
               </div>
               <div className="flex items-center gap-1.5 shrink-0">
@@ -740,28 +740,28 @@ export function Step2PartnerForm({
             className={`group relative rounded-xl overflow-hidden border transition-all duration-200 cursor-pointer ${
               selectedPartnerTypes.has("customer")
                 ? "border-[#C4B5FD]/70 bg-white shadow-[0_1px_4px_rgba(139,92,246,0.06)]"
-                : "border-[#E2E8F0] bg-white hover:border-[#D5D3EC] hover:shadow-[0_4px_16px_-4px_rgba(124,58,237,0.10)]"
+                : "border-border bg-white hover:border-[#D5D3EC] hover:shadow-[0_4px_16px_-4px_rgba(124,58,237,0.10)]"
             }`}
           >
             <div className={`absolute inset-0 transition-all duration-300 pointer-events-none ${
               selectedPartnerTypes.has("customer")
-                ? "bg-gradient-to-br from-[#F5F3FF]/50 to-transparent"
-                : "bg-gradient-to-br from-[#F5F3FF]/0 to-[#F5F3FF]/0 group-hover:from-[#F5F3FF]/60 group-hover:to-transparent"
+                ? "bg-gradient-to-br from-violet-50/50 to-transparent"
+                : "bg-gradient-to-br from-violet-50/0 to-violet-50/0 group-hover:from-violet-50/60 group-hover:to-transparent"
             }`} />
             <div className="relative flex items-center gap-3 pl-3.5 pr-3 py-3">
               <div className={`w-9 h-9 rounded-[10px] flex items-center justify-center shrink-0 transition-all duration-200 ${
                 selectedPartnerTypes.has("customer")
-                  ? "bg-gradient-to-br from-[#EDE9FE] to-[#DDD6FE] text-[#7C3AED]"
-                  : "bg-gradient-to-br from-[#F5F3FF] to-[#EDE9FE] text-[#8B5CF6] group-hover:scale-105"
+                  ? "bg-gradient-to-br from-[#EDE9FE] to-[#DDD6FE] text-violet"
+                  : "bg-gradient-to-br from-violet-50 to-[#EDE9FE] text-violet-500 group-hover:scale-105"
               }`}>
                 <ShoppingCart className="w-[18px] h-[18px]" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className={`text-[13px] transition-colors duration-150 ${
-                  selectedPartnerTypes.has("customer") ? "text-[#5B21B6]" : "text-[#0F172A] group-hover:text-[#1E293B]"
+                  selectedPartnerTypes.has("customer") ? "text-[#5B21B6]" : "text-foreground group-hover:text-slate-800"
                 }`} style={{ fontWeight: 600 }}>Customer</p>
                 <p className={`text-[11px] mt-0.5 truncate transition-colors duration-150 ${
-                  selectedPartnerTypes.has("customer") ? "text-[#A78BFA]" : "text-[#94A3B8]"
+                  selectedPartnerTypes.has("customer") ? "text-[#A78BFA]" : "text-slate-400"
                 }`}>Purchases goods or services</p>
               </div>
               <div className="flex items-center gap-1.5 shrink-0">
@@ -771,7 +771,7 @@ export function Step2PartnerForm({
                       e.stopPropagation();
                       onOpenConfigure("customer");
                     }}
-                    className="inline-flex items-center gap-1 px-2 py-[5px] rounded-md bg-white/80 border border-[#C4B5FD]/40 text-[#7C3AED] text-[11px] hover:bg-white hover:border-[#C4B5FD]/70 hover:shadow-sm transition-all duration-150 shrink-0"
+                    className="inline-flex items-center gap-1 px-2 py-[5px] rounded-md bg-white/80 border border-[#C4B5FD]/40 text-violet text-[11px] hover:bg-white hover:border-[#C4B5FD]/70 hover:shadow-sm transition-all duration-150 shrink-0"
                     style={{ fontWeight: 500 }}
                   >
                     <Settings2 className="w-3 h-3" />
@@ -780,7 +780,7 @@ export function Step2PartnerForm({
                 )}
                 <div className={`w-5 h-5 rounded-full flex items-center justify-center transition-all duration-200 shrink-0 ${
                   selectedPartnerTypes.has("customer")
-                    ? "bg-[#8B5CF6] shadow-[0_0_0_2px_rgba(139,92,246,0.15)]"
+                    ? "bg-violet-500 shadow-[0_0_0_2px_rgba(139,92,246,0.15)]"
                     : "border-[1.5px] border-[#D1D5DB] bg-white group-hover:border-[#C4B5FD]"
                 }`}>
                   {selectedPartnerTypes.has("customer") && <Check className="w-3 h-3 text-white" strokeWidth={2.5} />}
@@ -794,16 +794,16 @@ export function Step2PartnerForm({
       {/* ── Global Point of Contact (Partner-Level) — compact card ── */}
       <div>
         <div className="flex items-center gap-2 mb-2.5">
-          <div className="w-6 h-6 rounded-md bg-[#0A77FF]/8 flex items-center justify-center shrink-0">
-            <Globe className="w-3.5 h-3.5 text-[#0A77FF]" />
+          <div className="w-6 h-6 rounded-md bg-primary/8 flex items-center justify-center shrink-0">
+            <Globe className="w-3.5 h-3.5 text-primary" />
           </div>
           <div>
-            <span className="text-xs sm:text-[13px] text-[#0F172A] block" style={{ fontWeight: 600 }}>Point of Contact</span>
-            <span className="text-[10px] sm:text-[11px] text-[#94A3B8] block mt-px">Assign partner-level contacts across all locations</span>
+            <span className="text-xs sm:text-[13px] text-foreground block" style={{ fontWeight: 600 }}>Point of Contact</span>
+            <span className="text-[10px] sm:text-[11px] text-slate-400 block mt-px">Assign partner-level contacts across all locations</span>
           </div>
         </div>
         {selectedGlobalPocContacts.length > 0 ? (
-          <div className="rounded-xl border border-[#E2E8F0] bg-white overflow-hidden relative">
+          <div className="rounded-xl border border-border bg-white overflow-hidden relative">
             <PocPillsRow contacts={selectedGlobalPocContacts} onManage={handleOpenSelectGlobalPoc} />
           </div>
         ) : (
@@ -811,32 +811,32 @@ export function Step2PartnerForm({
             {/* Select from Contact Directory */}
             <button
               onClick={handleOpenSelectGlobalPoc}
-              className="group relative rounded-xl overflow-hidden border border-[#E2E8F0] bg-white text-left transition-all duration-200 hover:border-[#BFDBFE] hover:shadow-[0_4px_16px_-4px_rgba(10,119,255,0.12)] cursor-pointer"
+              className="group relative rounded-xl overflow-hidden border border-border bg-white text-left transition-all duration-200 hover:border-blue-200 hover:shadow-[0_4px_16px_-4px_rgba(10,119,255,0.12)] cursor-pointer"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-[#EDF4FF]/0 to-[#EDF4FF]/0 group-hover:from-[#EDF4FF]/60 group-hover:to-transparent transition-all duration-300 pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-br from-accent/0 to-accent/0 group-hover:from-accent/60 group-hover:to-transparent transition-all duration-300 pointer-events-none" />
               <div className="relative flex items-center gap-3 pl-3.5 pr-3 py-3">
-                <div className="w-9 h-9 rounded-[10px] bg-gradient-to-br from-[#EDF4FF] to-[#DBEAFE] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform duration-200">
-                  <Users className="w-[18px] h-[18px] text-[#0A77FF]" />
+                <div className="w-9 h-9 rounded-[10px] bg-gradient-to-br from-accent to-blue-100 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform duration-200">
+                  <Users className="w-[18px] h-[18px] text-primary" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Select from Contact Directory</p>
-                  <p className="text-[11px] text-[#94A3B8] mt-0.5 truncate">Browse and pick from saved contacts</p>
+                  <p className="text-[13px] text-foreground" style={{ fontWeight: 600 }}>Select from Contact Directory</p>
+                  <p className="text-[11px] text-slate-400 mt-0.5 truncate">Browse and pick from saved contacts</p>
                 </div>
               </div>
             </button>
             {/* Create new contact */}
             <button
               onClick={handleOpenCreateGlobalPoc}
-              className="group relative rounded-xl overflow-hidden border border-[#E2E8F0] bg-white text-left transition-all duration-200 hover:border-[#D5D3EC] hover:shadow-[0_4px_16px_-4px_rgba(124,58,237,0.10)] cursor-pointer"
+              className="group relative rounded-xl overflow-hidden border border-border bg-white text-left transition-all duration-200 hover:border-[#D5D3EC] hover:shadow-[0_4px_16px_-4px_rgba(124,58,237,0.10)] cursor-pointer"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-[#F5F3FF]/0 to-[#F5F3FF]/0 group-hover:from-[#F5F3FF]/60 group-hover:to-transparent transition-all duration-300 pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-br from-violet-50/0 to-violet-50/0 group-hover:from-violet-50/60 group-hover:to-transparent transition-all duration-300 pointer-events-none" />
               <div className="relative flex items-center gap-3 pl-3.5 pr-3 py-3">
-                <div className="w-9 h-9 rounded-[10px] bg-gradient-to-br from-[#F5F3FF] to-[#EDE9FE] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform duration-200">
-                  <UserPlus className="w-[18px] h-[18px] text-[#7C3AED]" />
+                <div className="w-9 h-9 rounded-[10px] bg-gradient-to-br from-violet-50 to-[#EDE9FE] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform duration-200">
+                  <UserPlus className="w-[18px] h-[18px] text-violet" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Create new contact</p>
-                  <p className="text-[11px] text-[#94A3B8] mt-0.5 truncate">Add a new point of contact directly</p>
+                  <p className="text-[13px] text-foreground" style={{ fontWeight: 600 }}>Create new contact</p>
+                  <p className="text-[11px] text-slate-400 mt-0.5 truncate">Add a new point of contact directly</p>
                 </div>
               </div>
             </button>
@@ -922,33 +922,33 @@ export function PartnerTypeCard({
       onClick={onSelect}
       className={`rounded-lg border transition-all cursor-pointer ${
         isSelected
-          ? "border-[#0A77FF] bg-[#F8FAFF] shadow-[0_0_0_3px_rgba(10,119,255,0.06)]"
-          : "border-[#E2E8F0] bg-white hover:border-[#CBD5E1] hover:bg-[#FAFBFC]"
+          ? "border-primary bg-[#F8FAFF] shadow-[0_0_0_3px_rgba(10,119,255,0.06)]"
+          : "border-border bg-white hover:border-slate-300 hover:bg-[#FAFBFC]"
       }`}
     >
       <div className="flex items-center gap-2 sm:gap-2.5 px-2.5 sm:px-3 py-2.5 sm:py-2.5">
         <div
           className={`w-[18px] h-[18px] rounded flex items-center justify-center border-[1.5px] transition-all duration-150 shrink-0 ${
-            isSelected ? "border-[#0A77FF] bg-[#0A77FF] shadow-[0_0_0_2px_rgba(10,119,255,0.12)]" : "border-[#CBD5E1] bg-white"
+            isSelected ? "border-primary bg-primary shadow-[0_0_0_2px_rgba(10,119,255,0.12)]" : "border-slate-300 bg-white"
           }`}
         >
           {isSelected && <Check className="w-3 h-3 text-white" />}
         </div>
         <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center shrink-0 ${
-          isSelected ? "bg-[#D6E8FF] text-[#0A77FF]" : "bg-[#F1F5F9] text-[#64748B]"
+          isSelected ? "bg-[#D6E8FF] text-primary" : "bg-muted text-slate-500"
         }`}>
           {React.cloneElement(icon as React.ReactElement, { className: "w-4 h-4 sm:w-5 sm:h-5" })}
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
-            <p className={`text-xs sm:text-[13px] ${isSelected ? "text-[#0A77FF]" : "text-[#0F172A]"}`} style={{ fontWeight: 600 }}>{label}</p>
+            <p className={`text-xs sm:text-[13px] ${isSelected ? "text-primary" : "text-foreground"}`} style={{ fontWeight: 600 }}>{label}</p>
             {isSelected && (
-              <span className="inline-flex items-center px-1.5 py-px rounded-full bg-[#EDF4FF] text-[#0A77FF] text-[9px] sm:text-[10px]" style={{ fontWeight: 600 }}>
+              <span className="inline-flex items-center px-1.5 py-px rounded-full bg-accent text-primary text-[9px] sm:text-[10px]" style={{ fontWeight: 600 }}>
                 Selected
               </span>
             )}
           </div>
-          <p className="text-[10px] sm:text-[11px] text-[#64748B] mt-px hidden min-[400px]:block">{description}</p>
+          <p className="text-[10px] sm:text-[11px] text-slate-500 mt-px hidden min-[400px]:block">{description}</p>
         </div>
         {isSelected && (
           <button
@@ -956,10 +956,10 @@ export function PartnerTypeCard({
               e.stopPropagation();
               onConfigure();
             }}
-            className="inline-flex items-center gap-1 px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-md border border-[#E2E8F0] text-[#0F172A] bg-white text-[11px] sm:text-xs hover:bg-[#F8FAFC] hover:border-[#CBD5E1] transition-colors shrink-0"
+            className="inline-flex items-center gap-1 px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-md border border-border text-foreground bg-white text-[11px] sm:text-xs hover:bg-slate-50 hover:border-slate-300 transition-colors shrink-0"
             style={{ fontWeight: 500 }}
           >
-            <Settings2 className="w-3 h-3 text-[#64748B]" />
+            <Settings2 className="w-3 h-3 text-slate-500" />
             <span className="hidden min-[480px]:inline">Configure</span>
           </button>
         )}
@@ -1012,13 +1012,13 @@ function AttachmentsSection() {
   return (
     <div>
       <div className="flex items-center gap-2 mb-2.5">
-        <div className="w-6 h-6 rounded-md bg-[#0A77FF]/8 flex items-center justify-center shrink-0">
-          <Paperclip className="w-3.5 h-3.5 text-[#0A77FF]" />
+        <div className="w-6 h-6 rounded-md bg-primary/8 flex items-center justify-center shrink-0">
+          <Paperclip className="w-3.5 h-3.5 text-primary" />
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-xs sm:text-[13px] text-[#0F172A]" style={{ fontWeight: 600 }}>Attachments</span>
+          <span className="text-xs sm:text-[13px] text-foreground" style={{ fontWeight: 600 }}>Attachments</span>
           {files.length > 0 && (
-            <span className="text-[10px] text-[#64748B] bg-[#F1F5F9] px-1.5 py-0.5 rounded-full" style={{ fontWeight: 500 }}>{files.length}</span>
+            <span className="text-[10px] text-slate-500 bg-muted px-1.5 py-0.5 rounded-full" style={{ fontWeight: 500 }}>{files.length}</span>
           )}
         </div>
       </div>
@@ -1031,8 +1031,8 @@ function AttachmentsSection() {
         onClick={() => fileInputRef.current?.click()}
         className={`rounded-lg border-2 border-dashed p-3 sm:p-4 text-center cursor-pointer transition-all ${
           dragActive
-            ? "border-[#0A77FF] bg-[#EDF4FF]/30"
-            : "border-[#E2E8F0] bg-white hover:border-[#CBD5E1] hover:bg-[#FAFBFC]"
+            ? "border-primary bg-accent/30"
+            : "border-border bg-white hover:border-slate-300 hover:bg-[#FAFBFC]"
         }`}
       >
         <input
@@ -1044,15 +1044,15 @@ function AttachmentsSection() {
         />
         <div className="flex flex-col items-center gap-2">
           <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-            dragActive ? "bg-[#D6E8FF] text-[#0A77FF]" : "bg-[#F1F5F9] text-[#94A3B8]"
+            dragActive ? "bg-[#D6E8FF] text-primary" : "bg-muted text-slate-400"
           }`}>
             <Upload className="w-5 h-5" />
           </div>
           <div>
-            <p className="text-xs sm:text-sm text-[#0F172A]" style={{ fontWeight: 500 }}>
-              <span className="text-[#0A77FF]">Click to upload</span><span className="hidden sm:inline"> or drag and drop</span>
+            <p className="text-xs sm:text-sm text-foreground" style={{ fontWeight: 500 }}>
+              <span className="text-primary">Click to upload</span><span className="hidden sm:inline"> or drag and drop</span>
             </p>
-            <p className="text-[10px] sm:text-xs text-[#94A3B8] mt-0.5">PDF, DOC, XLS, PNG, JPG up to 10MB</p>
+            <p className="text-[10px] sm:text-xs text-slate-400 mt-0.5">PDF, DOC, XLS, PNG, JPG up to 10MB</p>
           </div>
         </div>
       </div>
@@ -1063,17 +1063,17 @@ function AttachmentsSection() {
           {files.map((file) => (
             <div
               key={file.id}
-              className="flex items-center gap-2.5 px-3 py-2 rounded-md border border-[#E2E8F0] bg-white hover:bg-[#FAFBFC] transition-colors group"
+              className="flex items-center gap-2.5 px-3 py-2 rounded-md border border-border bg-white hover:bg-[#FAFBFC] transition-colors group"
             >
               <span className="text-base">{getFileIcon(file.type)}</span>
               <div className="flex-1 min-w-0">
-                <p className="text-sm text-[#0F172A] truncate" style={{ fontWeight: 500 }}>{file.name}</p>
-                <p className="text-[11px] text-[#94A3B8]">{file.size}</p>
+                <p className="text-sm text-foreground truncate" style={{ fontWeight: 500 }}>{file.name}</p>
+                <p className="text-[11px] text-slate-400">{file.size}</p>
               </div>
               <button
                 type="button"
                 onClick={() => handleRemove(file.id)}
-                className="w-7 h-7 rounded-md flex items-center justify-center text-[#94A3B8] hover:text-[#EF4444] hover:bg-[#FEF2F2] transition-colors sm:opacity-0 sm:group-hover:opacity-100"
+                className="w-7 h-7 rounded-md flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors sm:opacity-0 sm:group-hover:opacity-100"
               >
                 <Trash2 className="w-3.5 h-3.5" />
               </button>

@@ -33,10 +33,10 @@ function formatDate(dateStr: string): string {
 function getFileTypeInfo(type: string, name: string) {
   const ext = name.split(".").pop()?.toUpperCase() || "";
   switch (type) {
-    case "pdf": return { color: "#DC2626", bg: "#FEF2F2", label: "PDF", Icon: FileText };
+    case "pdf": return { color: "hsl(var(--destructive))", bg: "#FEF2F2", label: "PDF", Icon: FileText };
     case "doc": return { color: "#2563EB", bg: "#EFF6FF", label: "DOC", Icon: FileText };
-    case "img": return { color: "#7C3AED", bg: "#F5F3FF", label: ext, Icon: ImageIcon };
-    case "xlsx": return { color: "#059669", bg: "#ECFDF5", label: "XLSX", Icon: FileSpreadsheet };
+    case "img": return { color: "hsl(var(--violet))", bg: "#F5F3FF", label: ext, Icon: ImageIcon };
+    case "xlsx": return { color: "hsl(var(--success))", bg: "#ECFDF5", label: "XLSX", Icon: FileSpreadsheet };
     default: return { color: "#64748B", bg: "#F8FAFC", label: ext, Icon: FileText };
   }
 }
@@ -62,9 +62,9 @@ export function AttachmentsTab() {
   const isCard = density === "card";
 
   return (
-    <div className="bg-white border border-[#E2E8F0] rounded-xl overflow-hidden flex flex-col flex-1 min-h-[calc(100vh-260px)]">
+    <div className="bg-white border border-border rounded-xl overflow-hidden flex flex-col flex-1 min-h-[calc(100vh-260px)]">
       {/* Toolbar */}
-      <div className="px-4 py-3 flex items-center gap-3 border-b border-[#F1F5F9] shrink-0">
+      <div className="px-4 py-3 flex items-center gap-3 border-b border-muted shrink-0">
         <div className="relative flex-1 max-w-xs">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50 pointer-events-none" />
           <Input
@@ -107,17 +107,17 @@ export function AttachmentsTab() {
                   <div className="text-sm" style={{ fontWeight: 500 }}>{opt.label}</div>
                   <div className="text-xs text-muted-foreground">{opt.description}</div>
                 </div>
-                {density === opt.key && <Check className="w-4 h-4 shrink-0" style={{ color: "#0A77FF" }} />}
+                {density === opt.key && <Check className="w-4 h-4 shrink-0" style={{ color: "hsl(var(--primary))" }} />}
               </DropdownMenuItem>
             ))}
             {isCard && (
               <>
-                <div className="mx-2 my-1.5 border-t border-[#F1F5F9]" />
+                <div className="mx-2 my-1.5 border-t border-muted" />
                 <div className="px-3 py-1.5">
-                  <p className="text-[10px] text-[#94A3B8] uppercase tracking-wide mb-2" style={{ fontWeight: 600 }}>Card Size</p>
+                  <p className="text-[10px] text-slate-400 uppercase tracking-wide mb-2" style={{ fontWeight: 600 }}>Card Size</p>
                   <div className="flex items-center gap-1.5">
                     {(["large", "medium", "small"] as const).map((size) => (
-                      <button key={size} onClick={() => setCardSize(size)} className={`flex-1 py-1.5 rounded-md text-[11px] text-center transition-all cursor-pointer ${cardSize === size ? "bg-[#0A77FF] text-white shadow-sm" : "bg-[#F1F5F9] text-[#64748B] hover:bg-[#E2E8F0]"}`} style={{ fontWeight: cardSize === size ? 600 : 500 }}>
+                      <button key={size} onClick={() => setCardSize(size)} className={`flex-1 py-1.5 rounded-md text-[11px] text-center transition-all cursor-pointer ${cardSize === size ? "bg-primary text-white shadow-sm" : "bg-muted text-slate-500 hover:bg-border"}`} style={{ fontWeight: cardSize === size ? 600 : 500 }}>
                         {size === "large" ? "Large" : size === "medium" ? "Medium" : "Small"}
                       </button>
                     ))}
@@ -153,7 +153,7 @@ export function AttachmentsTab() {
               const previewH = cardSize === "large" ? "h-[160px]" : cardSize === "small" ? "h-[100px]" : "h-[130px]";
               const iconSz = cardSize === "large" ? "w-12 h-12" : cardSize === "small" ? "w-8 h-8" : "w-10 h-10";
               return (
-                <div key={file.id} className={`group rounded-xl border border-[#E2E8F0] overflow-hidden hover:shadow-md hover:border-[#CBD5E1] transition-all`}>
+                <div key={file.id} className={`group rounded-xl border border-border overflow-hidden hover:shadow-md hover:border-slate-300 transition-all`}>
                   <div className={`relative ${previewH} flex items-center justify-center`} style={{ backgroundColor: info.bg }}>
                     <info.Icon className={iconSz} style={{ color: info.color, opacity: 0.35 }} />
                     <span className="absolute top-2.5 right-2.5 px-1.5 py-0.5 rounded text-[9px] tracking-wide" style={{ fontWeight: 700, color: info.color, backgroundColor: `${info.color}15`, border: `1px solid ${info.color}25` }}>
@@ -162,13 +162,13 @@ export function AttachmentsTab() {
                   </div>
                   <div className={cardSize === "large" ? "px-4 pt-3 pb-3.5" : cardSize === "small" ? "px-2.5 pt-2 pb-2.5" : "px-3 pt-2.5 pb-3"}>
                     <div className="flex items-start justify-between gap-1 mb-1">
-                      <span className={`${cardSize === "small" ? "text-[11px]" : "text-[12px]"} text-[#0F172A] truncate leading-tight`} style={{ fontWeight: 500 }}>{file.name}</span>
+                      <span className={`${cardSize === "small" ? "text-[11px]" : "text-[12px]"} text-foreground truncate leading-tight`} style={{ fontWeight: 500 }}>{file.name}</span>
                       <button className="shrink-0 p-0.5 rounded hover:bg-muted/60 text-muted-foreground/50 hover:text-foreground transition-colors cursor-pointer opacity-0 group-hover:opacity-100">
                         <MoreVertical className="w-3.5 h-3.5" />
                       </button>
                     </div>
-                    <p className={`${cardSize === "small" ? "text-[10px]" : "text-[11px]"} text-[#94A3B8] leading-tight`}>{formatDate(file.date)}</p>
-                    <p className={`${cardSize === "small" ? "text-[10px]" : "text-[11px]"} text-[#94A3B8] leading-tight`}>{file.size} · {file.uploadedBy}</p>
+                    <p className={`${cardSize === "small" ? "text-[10px]" : "text-[11px]"} text-slate-400 leading-tight`}>{formatDate(file.date)}</p>
+                    <p className={`${cardSize === "small" ? "text-[10px]" : "text-[11px]"} text-slate-400 leading-tight`}>{file.size} · {file.uploadedBy}</p>
                   </div>
                 </div>
               );
@@ -178,14 +178,14 @@ export function AttachmentsTab() {
 
         {/* Condensed List View */}
         {isCondensed && (
-          <div className="border border-[#E2E8F0] rounded-xl overflow-hidden">
+          <div className="border border-border rounded-xl overflow-hidden">
             <table className="w-full">
               <thead>
-                <tr className="bg-[#F8FAFC] border-b border-[#F1F5F9]">
-                  <th className="text-left text-[11px] text-[#94A3B8] px-4 py-2" style={{ fontWeight: 600 }}>File Name</th>
-                  <th className="text-left text-[11px] text-[#94A3B8] px-4 py-2 w-[80px]" style={{ fontWeight: 600 }}>Size</th>
-                  <th className="text-left text-[11px] text-[#94A3B8] px-4 py-2 hidden md:table-cell" style={{ fontWeight: 600 }}>Date</th>
-                  <th className="text-left text-[11px] text-[#94A3B8] px-4 py-2 hidden md:table-cell" style={{ fontWeight: 600 }}>Uploaded By</th>
+                <tr className="bg-slate-50 border-b border-muted">
+                  <th className="text-left text-[11px] text-slate-400 px-4 py-2" style={{ fontWeight: 600 }}>File Name</th>
+                  <th className="text-left text-[11px] text-slate-400 px-4 py-2 w-[80px]" style={{ fontWeight: 600 }}>Size</th>
+                  <th className="text-left text-[11px] text-slate-400 px-4 py-2 hidden md:table-cell" style={{ fontWeight: 600 }}>Date</th>
+                  <th className="text-left text-[11px] text-slate-400 px-4 py-2 hidden md:table-cell" style={{ fontWeight: 600 }}>Uploaded By</th>
                   <th className="w-[36px]" />
                 </tr>
               </thead>
@@ -193,18 +193,18 @@ export function AttachmentsTab() {
                 {filtered.map((file) => {
                   const info = getFileTypeInfo(file.type, file.name);
                   return (
-                    <tr key={file.id} className="border-b border-[#F1F5F9] last:border-b-0 hover:bg-[#F8FAFC] transition-colors group">
+                    <tr key={file.id} className="border-b border-muted last:border-b-0 hover:bg-slate-50 transition-colors group">
                       <td className="px-4 py-1.5">
                         <div className="flex items-center gap-2.5">
                           <div className="w-7 h-7 rounded-md flex items-center justify-center shrink-0" style={{ backgroundColor: info.bg }}>
                             <info.Icon className="w-3.5 h-3.5" style={{ color: info.color }} />
                           </div>
-                          <span className="text-[12px] text-[#334155] truncate" style={{ fontWeight: 500 }}>{file.name}</span>
+                          <span className="text-[12px] text-slate-700 truncate" style={{ fontWeight: 500 }}>{file.name}</span>
                         </div>
                       </td>
-                      <td className="px-4 py-1.5"><span className="text-[11.5px] text-[#64748B]">{file.size}</span></td>
-                      <td className="px-4 py-1.5 hidden md:table-cell"><span className="text-[11.5px] text-[#64748B]">{formatDate(file.date)}</span></td>
-                      <td className="px-4 py-1.5 hidden md:table-cell"><span className="text-[11.5px] text-[#64748B]">{file.uploadedBy}</span></td>
+                      <td className="px-4 py-1.5"><span className="text-[11.5px] text-slate-500">{file.size}</span></td>
+                      <td className="px-4 py-1.5 hidden md:table-cell"><span className="text-[11.5px] text-slate-500">{formatDate(file.date)}</span></td>
+                      <td className="px-4 py-1.5 hidden md:table-cell"><span className="text-[11.5px] text-slate-500">{file.uploadedBy}</span></td>
                       <td className="px-2 py-1.5">
                         <button className="p-1 rounded hover:bg-muted/60 text-muted-foreground/40 hover:text-foreground transition-colors cursor-pointer opacity-0 group-hover:opacity-100">
                           <MoreVertical className="w-3.5 h-3.5" />
@@ -220,14 +220,14 @@ export function AttachmentsTab() {
 
         {/* Comfort List View */}
         {isComfort && (
-          <div className="border border-[#E2E8F0] rounded-xl overflow-hidden">
+          <div className="border border-border rounded-xl overflow-hidden">
             <table className="w-full">
               <thead>
-                <tr className="bg-[#F8FAFC] border-b border-[#F1F5F9]">
-                  <th className="text-left text-[11px] text-[#94A3B8] px-4 py-2.5" style={{ fontWeight: 600 }}>File Name</th>
-                  <th className="text-left text-[11px] text-[#94A3B8] px-4 py-2.5 w-[80px]" style={{ fontWeight: 600 }}>Size</th>
-                  <th className="text-left text-[11px] text-[#94A3B8] px-4 py-2.5 hidden md:table-cell" style={{ fontWeight: 600 }}>Date</th>
-                  <th className="text-left text-[11px] text-[#94A3B8] px-4 py-2.5 hidden md:table-cell" style={{ fontWeight: 600 }}>Uploaded By</th>
+                <tr className="bg-slate-50 border-b border-muted">
+                  <th className="text-left text-[11px] text-slate-400 px-4 py-2.5" style={{ fontWeight: 600 }}>File Name</th>
+                  <th className="text-left text-[11px] text-slate-400 px-4 py-2.5 w-[80px]" style={{ fontWeight: 600 }}>Size</th>
+                  <th className="text-left text-[11px] text-slate-400 px-4 py-2.5 hidden md:table-cell" style={{ fontWeight: 600 }}>Date</th>
+                  <th className="text-left text-[11px] text-slate-400 px-4 py-2.5 hidden md:table-cell" style={{ fontWeight: 600 }}>Uploaded By</th>
                   <th className="w-[40px]" />
                 </tr>
               </thead>
@@ -235,21 +235,21 @@ export function AttachmentsTab() {
                 {filtered.map((file) => {
                   const info = getFileTypeInfo(file.type, file.name);
                   return (
-                    <tr key={file.id} className="border-b border-[#F1F5F9] last:border-b-0 hover:bg-[#F8FAFC] transition-colors group">
+                    <tr key={file.id} className="border-b border-muted last:border-b-0 hover:bg-slate-50 transition-colors group">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style={{ backgroundColor: info.bg }}>
                             <info.Icon className="w-4.5 h-4.5" style={{ color: info.color }} />
                           </div>
                           <div className="min-w-0">
-                            <span className="text-[12.5px] text-[#334155] truncate block" style={{ fontWeight: 500 }}>{file.name}</span>
-                            <span className="text-[11px] text-[#94A3B8]">{file.size}</span>
+                            <span className="text-[12.5px] text-slate-700 truncate block" style={{ fontWeight: 500 }}>{file.name}</span>
+                            <span className="text-[11px] text-slate-400">{file.size}</span>
                           </div>
                         </div>
                       </td>
-                      <td className="px-4 py-3"><span className="text-[12px] text-[#64748B]">{file.size}</span></td>
-                      <td className="px-4 py-3 hidden md:table-cell"><span className="text-[12px] text-[#64748B]">{formatDate(file.date)}</span></td>
-                      <td className="px-4 py-3 hidden md:table-cell"><span className="text-[12px] text-[#64748B]">{file.uploadedBy}</span></td>
+                      <td className="px-4 py-3"><span className="text-[12px] text-slate-500">{file.size}</span></td>
+                      <td className="px-4 py-3 hidden md:table-cell"><span className="text-[12px] text-slate-500">{formatDate(file.date)}</span></td>
+                      <td className="px-4 py-3 hidden md:table-cell"><span className="text-[12px] text-slate-500">{file.uploadedBy}</span></td>
                       <td className="px-2 py-3">
                         <button className="p-1 rounded hover:bg-muted/60 text-muted-foreground/40 hover:text-foreground transition-colors cursor-pointer opacity-0 group-hover:opacity-100">
                           <MoreVertical className="w-4 h-4" />

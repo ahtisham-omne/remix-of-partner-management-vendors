@@ -16,19 +16,19 @@ const statusStyles: Record<VendorStatus, { bg: string; text: string; border: str
     bg: "#ECFDF5",
     text: "#065F46",
     border: "#A7F3D0",
-    dot: "#059669",
+    dot: "hsl(var(--success))",
   },
   inactive: {
     bg: "#FFFBEB",
     text: "#92400E",
     border: "#FDE68A",
-    dot: "#D97706",
+    dot: "hsl(var(--warning))",
   },
   archived: {
     bg: "#FEF2F2",
     text: "#991B1B",
     border: "#FECACA",
-    dot: "#DC2626",
+    dot: "hsl(var(--destructive))",
   },
 };
 

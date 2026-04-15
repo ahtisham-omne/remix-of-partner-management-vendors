@@ -39,8 +39,8 @@ const modules: ModuleCard[] = [
     title: "Partners",
     description: "Manage vendors, customers, and partner details.",
     icon: Users,
-    iconColor: "#0A77FF",
-    iconBg: "#EDF4FF",
+    iconColor: "hsl(var(--primary))",
+    iconBg: "hsl(var(--accent))",
     path: "/vendors",
     enabled: true,
   },
@@ -57,7 +57,7 @@ const modules: ModuleCard[] = [
     title: "Contacts Directory",
     description: "Browse contacts across all organizations.",
     icon: Contact,
-    iconColor: "#7C3AED",
+    iconColor: "hsl(var(--violet))",
     iconBg: "#F5F3FF",
     path: "/partners/contacts",
     enabled: false,
@@ -66,7 +66,7 @@ const modules: ModuleCard[] = [
     title: "Credit Management",
     description: "Monitor credit limits and balance usage.",
     icon: CreditCard,
-    iconColor: "#059669",
+    iconColor: "hsl(var(--success))",
     iconBg: "#ECFDF5",
     path: "/partners/credit",
     enabled: false,
@@ -93,7 +93,7 @@ const modules: ModuleCard[] = [
     title: "Qualified Vendors",
     description: "Track approved vendors and lead times.",
     icon: ShieldCheck,
-    iconColor: "#059669",
+    iconColor: "hsl(var(--success))",
     iconBg: "#ECFDF5",
     path: "/partners/qualified",
     enabled: false,
@@ -102,8 +102,8 @@ const modules: ModuleCard[] = [
     title: "Reports & Analytics",
     description: "View performance metrics and insights.",
     icon: TrendingUp,
-    iconColor: "#0A77FF",
-    iconBg: "#EDF4FF",
+    iconColor: "hsl(var(--primary))",
+    iconBg: "hsl(var(--accent))",
     path: "/partners/reports",
     enabled: false,
   },
@@ -123,15 +123,15 @@ const recommendedActions: RecommendedAction[] = [
     title: "Add New Partner",
     description: "Create a new vendor or customer.",
     icon: Plus,
-    iconColor: "#0A77FF",
-    iconBg: "#EDF4FF",
+    iconColor: "hsl(var(--primary))",
+    iconBg: "hsl(var(--accent))",
     path: "/vendors/create",
   },
   {
     title: "Import Partners",
     description: "Bulk import from a spreadsheet.",
     icon: Upload,
-    iconColor: "#7C3AED",
+    iconColor: "hsl(var(--violet))",
     iconBg: "#F5F3FF",
   },
   {
@@ -151,10 +151,10 @@ interface ActivityItem {
 }
 
 const recentActivity: ActivityItem[] = [
-  { label: "New Partner: Toyota International", time: "2h ago", dotColor: "#0A77FF" },
-  { label: "Credit Updated: UPS Corp", time: "4h ago", dotColor: "#059669" },
-  { label: "Partner Archived: Nissan NA", time: "1d ago", dotColor: "#475569" },
-  { label: "New Contact: Tanya Bailey", time: "1d ago", dotColor: "#7C3AED" },
+  { label: "New Partner: Toyota International", time: "2h ago", dotColor: "hsl(var(--primary))" },
+  { label: "Credit Updated: UPS Corp", time: "4h ago", dotColor: "hsl(var(--success))" },
+  { label: "Partner Archived: Nissan NA", time: "1d ago", dotColor: "hsl(var(--muted-foreground))" },
+  { label: "New Contact: Tanya Bailey", time: "1d ago", dotColor: "hsl(var(--violet))" },
   { label: "Group Assigned: PG-1-1", time: "2d ago", dotColor: "#EA580C" },
 ];
 
@@ -281,7 +281,7 @@ function DraggableModuleCard({
       <div className="absolute top-2.5 right-2.5 flex items-center gap-2 opacity-0 group-hover/card:opacity-100 transition-opacity z-10">
         <span
           className="inline-flex items-center gap-0.5 text-[11px]"
-          style={{ color: "#0A77FF", fontWeight: 500 }}
+          style={{ color: "hsl(var(--primary))", fontWeight: 500 }}
         >
           Open
           <ArrowRight className="w-3 h-3" />
@@ -353,7 +353,7 @@ export function PartnersHomePage() {
   const orderedModules = moduleOrder.map((i) => modules[i]).filter(Boolean);
 
   return (
-    <div className="flex flex-col h-full bg-[#F8FAFC]">
+    <div className="flex flex-col h-full bg-slate-50">
       {/* Top Bar */}
       <div className="flex items-center justify-between px-6 lg:px-8 h-12 border-b border-border bg-card shrink-0">
         <div className="flex items-center gap-2 text-[13px] text-muted-foreground">
@@ -377,11 +377,11 @@ export function PartnersHomePage() {
           <div className="flex items-center gap-2">
             <div
               className="w-8 h-8 rounded-full flex items-center justify-center"
-              style={{ backgroundColor: "#EDF4FF" }}
+              style={{ backgroundColor: "hsl(var(--accent))" }}
             >
               <span
                 className="text-[11px]"
-                style={{ fontWeight: 600, color: "#0A77FF" }}
+                style={{ fontWeight: 600, color: "hsl(var(--primary))" }}
               >
                 AA
               </span>
@@ -412,7 +412,7 @@ export function PartnersHomePage() {
                     <button
                       onClick={saveLayout}
                       className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-lg border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors cursor-pointer"
-                      style={{ color: "#0A77FF", fontWeight: 500 }}
+                      style={{ color: "hsl(var(--primary))", fontWeight: 500 }}
                     >
                       <Save className="w-3 h-3" />
                       Save Layout
@@ -432,7 +432,7 @@ export function PartnersHomePage() {
                 Manage your vendors, customers, and partner operations.{" "}
                 <button
                   className="inline-flex items-center gap-1 text-xs sm:text-sm hover:underline"
-                  style={{ color: "#0A77FF", fontWeight: 500 }}
+                  style={{ color: "hsl(var(--primary))", fontWeight: 500 }}
                 >
                   Learn more
                   <ExternalLink className="w-3 h-3" />
@@ -512,7 +512,7 @@ export function PartnersHomePage() {
                   </h4>
                   <button
                     className="text-xs hover:underline"
-                    style={{ color: "#0A77FF", fontWeight: 500 }}
+                    style={{ color: "hsl(var(--primary))", fontWeight: 500 }}
                   >
                     View more
                   </button>

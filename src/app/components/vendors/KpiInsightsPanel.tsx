@@ -47,8 +47,8 @@ export const ALL_KPI_DEFINITIONS: KpiDefinition[] = [
     label: "Total Partners",
     category: "Partner Overview",
     iconName: "Users",
-    iconBg: "#EDF4FF",
-    iconColor: "#0A77FF",
+    iconBg: "hsl(var(--accent))",
+    iconColor: "hsl(var(--primary))",
     subtitle: "All partners in system",
   },
   {
@@ -75,8 +75,8 @@ export const ALL_KPI_DEFINITIONS: KpiDefinition[] = [
     label: "Total Credit Limit",
     category: "Financial",
     iconName: "TrendingUp",
-    iconBg: "#EDF4FF",
-    iconColor: "#0A77FF",
+    iconBg: "hsl(var(--accent))",
+    iconColor: "hsl(var(--primary))",
     subtitle: "Total credit exposure",
     tooltip: "The combined credit limit across all active partners. Represents total credit exposure your organization has extended.",
   },
@@ -86,7 +86,7 @@ export const ALL_KPI_DEFINITIONS: KpiDefinition[] = [
     category: "Financial",
     iconName: "CreditCard",
     iconBg: "#F5F3FF",
-    iconColor: "#7C3AED",
+    iconColor: "hsl(var(--violet))",
     subtitle: "Average per partner",
     tooltip: "Total credit limit divided by number of partners. Helps benchmark individual credit allocations against the portfolio average.",
   },
@@ -106,7 +106,7 @@ export const ALL_KPI_DEFINITIONS: KpiDefinition[] = [
     category: "Financial",
     iconName: "Wallet",
     iconBg: "#FEF2F2",
-    iconColor: "#DC2626",
+    iconColor: "hsl(var(--destructive))",
     subtitle: "Total outstanding",
     tooltip: "Total unpaid balance across all partners. Includes invoices pending payment, overdue amounts, and scheduled disbursements.",
   },
@@ -125,7 +125,7 @@ export const ALL_KPI_DEFINITIONS: KpiDefinition[] = [
     category: "Financial",
     iconName: "TrendingUp",
     iconBg: "#ECFDF5",
-    iconColor: "#059669",
+    iconColor: "hsl(var(--success))",
     subtitle: "Average profit margin",
     tooltip: "Average net profit margin calculated across all partner transactions. Factors in revenue, cost of goods, and operational expenses per partner.",
   },
@@ -144,7 +144,7 @@ export const ALL_KPI_DEFINITIONS: KpiDefinition[] = [
     label: "Inactive Partners",
     category: "Status",
     iconName: "UserX",
-    iconBg: "#F1F5F9",
+    iconBg: "hsl(var(--muted))",
     iconColor: "#64748B",
     subtitle: "Currently inactive",
   },
@@ -154,7 +154,7 @@ export const ALL_KPI_DEFINITIONS: KpiDefinition[] = [
     category: "Status",
     iconName: "ArchiveRestore",
     iconBg: "#F8FAFC",
-    iconColor: "#475569",
+    iconColor: "hsl(var(--muted-foreground))",
     subtitle: "In archive",
   },
   // Operational
@@ -163,8 +163,8 @@ export const ALL_KPI_DEFINITIONS: KpiDefinition[] = [
     label: "Total Orders",
     category: "Operational",
     iconName: "Package",
-    iconBg: "#EDF4FF",
-    iconColor: "#0A77FF",
+    iconBg: "hsl(var(--accent))",
+    iconColor: "hsl(var(--primary))",
     subtitle: "All partner orders",
   },
   {
@@ -173,7 +173,7 @@ export const ALL_KPI_DEFINITIONS: KpiDefinition[] = [
     category: "Operational",
     iconName: "Star",
     iconBg: "#FFFBEB",
-    iconColor: "#D97706",
+    iconColor: "hsl(var(--warning))",
     subtitle: "Average partner rating",
     tooltip: "Weighted average of all partner performance ratings. Based on delivery reliability, quality, communication, and compliance scores.",
   },
@@ -365,9 +365,9 @@ export function KpiInsightsPanel({
             <div className="flex items-start gap-3">
               <div
                 className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-                style={{ backgroundColor: "#EDF4FF" }}
+                style={{ backgroundColor: "hsl(var(--accent))" }}
               >
-                <Sliders className="w-5 h-5" style={{ color: "#0A77FF" }} />
+                <Sliders className="w-5 h-5" style={{ color: "hsl(var(--primary))" }} />
               </div>
               <div>
                 <h2 className="text-base text-foreground" style={{ fontWeight: 600 }}>
@@ -404,16 +404,16 @@ export function KpiInsightsPanel({
               }}
               className={`flex items-center gap-1.5 text-[12px] px-3 py-1.5 rounded-full border transition-all duration-200 cursor-pointer ${
                 ALL_KPI_DEFINITIONS.every(k => activeKpis.includes(k.key))
-                  ? "bg-[#EBF3FF] border-[#0A77FF]/25 text-[#0A77FF] hover:bg-[#DCEAFF] hover:border-[#0A77FF]/40 shadow-sm shadow-[#0A77FF]/10"
+                  ? "bg-[#EBF3FF] border-primary/25 text-primary hover:bg-[#DCEAFF] hover:border-primary/40 shadow-sm shadow-primary/10"
                   : activeKpis.length === 0
-                  ? "bg-[#F8FAFC] border-[#E2E8F0] text-[#94A3B8] hover:bg-[#F1F5F9] hover:border-[#CBD5E1] hover:text-[#64748B]"
-                  : "bg-[#F8FAFC] border-[#E2E8F0] text-[#64748B] hover:bg-[#EBF3FF] hover:border-[#0A77FF]/25 hover:text-[#0A77FF]"
+                  ? "bg-slate-50 border-border text-slate-400 hover:bg-muted hover:border-slate-300 hover:text-slate-500"
+                  : "bg-slate-50 border-border text-slate-500 hover:bg-[#EBF3FF] hover:border-primary/25 hover:text-primary"
               }`}
               style={{ fontWeight: 600 }}
             >
               {ALL_KPI_DEFINITIONS.every(k => activeKpis.includes(k.key)) ? (
                 <>
-                  <ToggleRight className="w-4 h-4 text-[#0A77FF]" />
+                  <ToggleRight className="w-4 h-4 text-primary" />
                   <span>All On</span>
                 </>
               ) : activeKpis.length === 0 ? (
@@ -445,7 +445,7 @@ export function KpiInsightsPanel({
         </div>
 
         {/* Separator — matches DashboardCustomizePanel tab bar bottom border */}
-        <div className="border-b border-[#F1F5F9] mt-3 shrink-0" />
+        <div className="border-b border-muted mt-3 shrink-0" />
 
         {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto px-4 pb-4 scrollbar-hide">
@@ -481,7 +481,7 @@ export function KpiInsightsPanel({
                       onClick={() => onToggleKpi(kpi.key)}
                       className={`relative text-left rounded-lg border px-3 py-2.5 transition-all duration-150 cursor-pointer group ${
                         isActive
-                          ? "border-[#0A77FF]/25 bg-[#0A77FF]/[0.04] shadow-[0_0_0_1px_rgba(10,119,255,0.08)]"
+                          ? "border-primary/25 bg-primary/[0.04] shadow-[0_0_0_1px_rgba(10,119,255,0.08)]"
                           : "border-border/60 bg-white hover:border-border hover:bg-muted/20 hover:shadow-sm"
                       }`}
                     >
@@ -489,7 +489,7 @@ export function KpiInsightsPanel({
                       <div className="flex items-center justify-between gap-1">
                         <span
                           className={`text-[11.5px] truncate transition-colors ${
-                            isActive ? "text-[#0A77FF]" : "text-muted-foreground/70"
+                            isActive ? "text-primary" : "text-muted-foreground/70"
                           }`}
                           style={{ fontWeight: 500 }}
                           title={kpi.label}
@@ -498,7 +498,7 @@ export function KpiInsightsPanel({
                         </span>
                         <div className="shrink-0">
                           {isActive ? (
-                            <Check className="w-3.5 h-3.5" style={{ color: "#0A77FF" }} />
+                            <Check className="w-3.5 h-3.5" style={{ color: "hsl(var(--primary))" }} />
                           ) : (
                             <Plus className="w-3.5 h-3.5 text-muted-foreground/25 group-hover:text-muted-foreground/50 transition-colors" />
                           )}

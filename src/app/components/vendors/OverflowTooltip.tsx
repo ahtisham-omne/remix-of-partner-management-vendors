@@ -43,8 +43,8 @@ function getCategoryColor(category: string): { bg: string; fg: string } {
   const c = category.toLowerCase();
   if (c.includes("item")) return { bg: "#EFF6FF", fg: "#2563EB" };
   if (c.includes("location")) return { bg: "#F0FDF4", fg: "#16A34A" };
-  if (c.includes("contact")) return { bg: "#F5F3FF", fg: "#7C3AED" };
-  return { bg: "#F1F5F9", fg: "#64748B" };
+  if (c.includes("contact")) return { bg: "#F5F3FF", fg: "hsl(var(--violet))" };
+  return { bg: "hsl(var(--muted))", fg: "#64748B" };
 }
 
 function getMaxVisible(): number {
@@ -171,7 +171,7 @@ export function OverflowTooltip({ items, category, children, onItemClick }: Over
                   className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-md transition-colors hover:bg-primary/[0.04] cursor-pointer text-left"
                 >
                   {item.imageUrl ? (
-                    <div className="w-7 h-7 rounded-md overflow-hidden shrink-0 bg-[#F1F5F9] border border-[#E8ECF1]">
+                    <div className="w-7 h-7 rounded-md overflow-hidden shrink-0 bg-muted border border-[#E8ECF1]">
                       <img src={item.imageUrl} alt="" className="w-full h-full object-cover" />
                     </div>
                   ) : item.initials ? (

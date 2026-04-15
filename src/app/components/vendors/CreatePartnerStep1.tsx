@@ -36,10 +36,10 @@ export function StepTab({
       <div
         className={`w-5 h-5 sm:w-[22px] sm:h-[22px] rounded-full flex items-center justify-center text-[10px] sm:text-[11px] shrink-0 transition-all duration-200 ${
           isCompleted
-            ? "bg-[#10B981] text-white shadow-[0_0_0_2px_rgba(16,185,129,0.15)]"
+            ? "bg-emerald-500 text-white shadow-[0_0_0_2px_rgba(16,185,129,0.15)]"
             : isActive
-            ? "bg-[#0A77FF] text-white shadow-[0_0_0_2px_rgba(10,119,255,0.15)]"
-            : "bg-[#EEF2F6] text-[#94A3B8]"
+            ? "bg-primary text-white shadow-[0_0_0_2px_rgba(10,119,255,0.15)]"
+            : "bg-[#EEF2F6] text-slate-400"
         }`}
         style={{ fontWeight: 700 }}
       >
@@ -49,10 +49,10 @@ export function StepTab({
       <span
         className={`text-xs sm:text-[13px] whitespace-nowrap transition-colors ${
           isCompleted
-            ? "text-[#10B981]"
+            ? "text-emerald-500"
             : isActive
-            ? "text-[#0F172A]"
-            : "text-[#94A3B8]"
+            ? "text-foreground"
+            : "text-slate-400"
         }`}
         style={{ fontWeight: isActive || isCompleted ? 600 : 400 }}
       >
@@ -62,7 +62,7 @@ export function StepTab({
       {/* Active underline bar */}
       {(isActive || isCompleted) && (
         <div className={`absolute bottom-0 left-0 right-0 h-[2px] rounded-t-full transition-all ${
-          isCompleted ? "bg-[#10B981]" : "bg-[#0A77FF]"
+          isCompleted ? "bg-emerald-500" : "bg-primary"
         }`} />
       )}
     </div>
@@ -103,19 +103,19 @@ export function Step1GroupSelection({
         {/* Section label */}
         <div className="mb-2">
           <h4 className="text-[13px] sm:text-sm text-foreground" style={{ fontWeight: 600 }}>Select Partner Groups</h4>
-          <p className="text-[11px] sm:text-xs text-[#94A3B8] mt-0.5">
+          <p className="text-[11px] sm:text-xs text-slate-400 mt-0.5">
             Choose one or more partner groups. Mark one as primary to inherit its configuration.
           </p>
         </div>
 
         {/* Search */}
         <div className="relative mb-2">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94A3B8]" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <Input
             placeholder="Search partner groups..."
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="pl-9 bg-white border-[#E2E8F0] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 h-8 sm:h-9 text-sm"
+            className="pl-9 bg-white border-border focus:border-primary focus:ring-1 focus:ring-primary/20 h-8 sm:h-9 text-sm"
           />
           {search && (
             <button
@@ -137,12 +137,12 @@ export function Step1GroupSelection({
                   key={g.id}
                   className={`inline-flex items-center gap-1.5 pl-2 pr-1 py-1 rounded-lg text-[12px] border transition-colors ${
                     isPrimary
-                      ? "bg-[#EDF4FF] text-[#0A77FF] border-[#0A77FF]/30"
-                      : "bg-[#F8FAFC] text-[#334155] border-[#E2E8F0]"
+                      ? "bg-accent text-primary border-primary/30"
+                      : "bg-slate-50 text-slate-700 border-border"
                   }`}
                   style={{ fontWeight: 500 }}
                 >
-                  {isPrimary && <Star className="w-3 h-3 fill-[#0A77FF] text-[#0A77FF]" />}
+                  {isPrimary && <Star className="w-3 h-3 fill-primary text-primary" />}
                   {g.name}
                   <button
                     onClick={() => onSelectGroup(g)}
@@ -164,7 +164,7 @@ export function Step1GroupSelection({
         </p>
 
         {/* Bottom edge line */}
-        <div className="absolute bottom-0 left-0 right-0 h-px bg-[#E2E8F0]/60" />
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-border/60" />
       </div>
 
       {/* Scrollable grid area */}
@@ -195,11 +195,11 @@ export function Step1GroupSelection({
 
         {groups.length === 0 && (
           <div className="py-10 sm:py-14 text-center">
-            <div className="w-11 h-11 rounded-xl bg-[#F1F5F9] flex items-center justify-center mx-auto mb-3">
-              <Search className="w-5 h-5 text-[#94A3B8]" />
+            <div className="w-11 h-11 rounded-xl bg-muted flex items-center justify-center mx-auto mb-3">
+              <Search className="w-5 h-5 text-slate-400" />
             </div>
-            <p className="text-[13px] text-[#334155]" style={{ fontWeight: 600 }}>No groups found</p>
-            <p className="text-xs text-[#94A3B8] mt-1">
+            <p className="text-[13px] text-slate-700" style={{ fontWeight: 600 }}>No groups found</p>
+            <p className="text-xs text-slate-400 mt-1">
               Try adjusting your search terms.
             </p>
           </div>
@@ -226,7 +226,7 @@ function highlightMatch(text: string, query: string): React.ReactNode {
   if (parts.length === 1) return text;
   return parts.map((part, i) =>
     regex.test(part) ? (
-      <mark key={i} className="bg-[#FDE68A] text-inherit rounded-[2px] px-[1px]">{part}</mark>
+      <mark key={i} className="bg-amber-200 text-inherit rounded-[2px] px-[1px]">{part}</mark>
     ) : (
       part
     )
@@ -269,7 +269,7 @@ function GroupCard({
       onMouseLeave={() => setIsHovered(false)}
       className="group relative text-left p-2.5 sm:p-3 rounded-lg border transition-all duration-150"
       style={{
-        borderColor: isSelected ? "#0A77FF" : isHovered ? "#CBD5E1" : "#E2E8F0",
+        borderColor: isSelected ? "hsl(var(--primary))" : isHovered ? "#CBD5E1" : "hsl(var(--border))",
         backgroundColor: isSelected ? "#F5F9FF" : isHovered ? "#FAFCFF" : "#FFFFFF",
         boxShadow: isSelected
           ? "0 0 0 1px rgba(10,119,255,0.15), 0 1px 3px rgba(10,119,255,0.06)"
@@ -284,7 +284,7 @@ function GroupCard({
           <>
             <div
               onClick={(e) => { e.stopPropagation(); onQuickView(e); }}
-              className="w-6 h-6 rounded-full flex items-center justify-center text-[#94A3B8] hover:text-[#64748B] hover:bg-white/80 transition-colors cursor-pointer"
+              className="w-6 h-6 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-500 hover:bg-white/80 transition-colors cursor-pointer"
             >
               <Eye className="w-3.5 h-3.5" />
             </div>
@@ -292,12 +292,12 @@ function GroupCard({
               onClick={handlePrimaryClick}
               className={`w-6 h-6 rounded-full flex items-center justify-center transition-colors cursor-pointer ${
                 isPrimary
-                  ? "text-[#0A77FF] hover:bg-white/80"
-                  : "text-[#94A3B8] hover:text-[#F59E0B] hover:bg-white/80"
+                  ? "text-primary hover:bg-white/80"
+                  : "text-slate-400 hover:text-amber-500 hover:bg-white/80"
               }`}
               title={isPrimary ? "Primary group" : "Set as primary"}
             >
-              <Star className={`w-3.5 h-3.5 ${isPrimary ? "fill-[#0A77FF]" : ""}`} />
+              <Star className={`w-3.5 h-3.5 ${isPrimary ? "fill-primary" : ""}`} />
             </div>
           </>
         )}
@@ -306,7 +306,7 @@ function GroupCard({
           <>
             <div
               onClick={(e) => { e.stopPropagation(); onQuickView(e); }}
-              className="w-6 h-6 rounded-full flex items-center justify-center text-[#94A3B8] hover:text-[#64748B] hover:bg-[#F1F5F9] transition-colors cursor-pointer"
+              className="w-6 h-6 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-500 hover:bg-muted transition-colors cursor-pointer"
             >
               <Eye className="w-3.5 h-3.5" />
             </div>
@@ -314,37 +314,37 @@ function GroupCard({
         )}
 
         {isPrimary && !isHovered && (
-          <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-[#0A77FF] text-white text-[10px]" style={{ fontWeight: 600 }}>
+          <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-primary text-white text-[10px]" style={{ fontWeight: 600 }}>
             Primary
           </span>
         )}
 
         {isSelected && (
-          <div className="w-5 h-5 rounded-full bg-[#0A77FF] flex items-center justify-center">
+          <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center">
             <Check className="w-3 h-3 text-white" />
           </div>
         )}
 
         {!isSelected && isHovered && (
-          <div className="w-5 h-5 rounded-full border-2 border-[#CBD5E1] bg-white" />
+          <div className="w-5 h-5 rounded-full border-2 border-slate-300 bg-white" />
         )}
       </div>
 
       {/* Icon */}
       <div className={`w-7 h-7 rounded-md flex items-center justify-center mb-1.5 transition-colors ${
-        isSelected ? "bg-[#D6E8FF]" : "bg-[#F1F5F9]"
+        isSelected ? "bg-[#D6E8FF]" : "bg-muted"
       }`}>
         <Building2 className={`w-4 h-4 transition-colors ${
-          isSelected ? "text-primary" : "text-[#64748B]"
+          isSelected ? "text-primary" : "text-slate-500"
         }`} />
       </div>
 
       <p className="text-[13px] text-foreground pr-16 break-words" style={{ fontWeight: isSelected ? 600 : 500 }}>{highlightMatch(group.name, searchQuery || "")}</p>
-      <p className="text-[11px] text-[#94A3B8] mt-0.5 line-clamp-2 pr-2 break-words">
+      <p className="text-[11px] text-slate-400 mt-0.5 line-clamp-2 pr-2 break-words">
         {highlightMatch(group.description, searchQuery || "")}
       </p>
 
-      <div className="flex items-center gap-1 mt-1.5 text-[11px] text-[#94A3B8]">
+      <div className="flex items-center gap-1 mt-1.5 text-[11px] text-slate-400">
         <Users className="w-3 h-3" />
         <span>{group.memberCount} partner{group.memberCount !== 1 ? "s" : ""}</span>
       </div>
@@ -423,8 +423,8 @@ function GroupQuickViewOverlay({
   }, [onClose]);
 
   const statusStyles: Record<string, { bg: string; text: string; border: string; dot: string }> = {
-    Active: { bg: "#ECFDF5", text: "#065F46", border: "#A7F3D0", dot: "#059669" },
-    Inactive: { bg: "#FFFBEB", text: "#92400E", border: "#FDE68A", dot: "#D97706" },
+    Active: { bg: "#ECFDF5", text: "#065F46", border: "#A7F3D0", dot: "hsl(var(--success))" },
+    Inactive: { bg: "#FFFBEB", text: "#92400E", border: "#FDE68A", dot: "hsl(var(--warning))" },
   };
 
   const getStatusStyle = (status: GroupVendor["status"]) =>
@@ -442,31 +442,31 @@ function GroupQuickViewOverlay({
     <div className="fixed inset-0 z-[250] flex items-center justify-center bg-black/50">
       <div
         ref={overlayRef}
-        className="bg-white rounded-xl shadow-2xl border border-[#E2E8F0] w-[calc(100%-1rem)] sm:w-full max-w-[700px] max-h-[85vh] sm:max-h-[600px] flex flex-col animate-modal-pop mx-auto"
+        className="bg-white rounded-xl shadow-2xl border border-border w-[calc(100%-1rem)] sm:w-full max-w-[700px] max-h-[85vh] sm:max-h-[600px] flex flex-col animate-modal-pop mx-auto"
       >
         {/* Header */}
         <div className="px-4 sm:px-5 pt-4 sm:pt-5 pb-3 shrink-0">
           <div className="flex items-center justify-between gap-3">
             <div className="min-w-0">
-              <h3 className="text-[13px] sm:text-sm text-[#0F172A] truncate" style={{ fontWeight: 600 }}>
+              <h3 className="text-[13px] sm:text-sm text-foreground truncate" style={{ fontWeight: 600 }}>
                 {group.name} — Associated Vendors
               </h3>
-              <p className="text-[11px] sm:text-xs text-[#94A3B8] mt-0.5">
+              <p className="text-[11px] sm:text-xs text-slate-400 mt-0.5">
                 {allVendors.length} vendor{allVendors.length !== 1 ? "s" : ""} in this group
               </p>
             </div>
             <button
               onClick={onClose}
-              className="shrink-0 w-7 h-7 rounded-lg flex items-center justify-center hover:bg-[#F1F5F9] transition-colors cursor-pointer"
+              className="shrink-0 w-7 h-7 rounded-lg flex items-center justify-center hover:bg-muted transition-colors cursor-pointer"
             >
-              <X className="w-4 h-4 text-[#94A3B8]" />
+              <X className="w-4 h-4 text-slate-400" />
             </button>
           </div>
 
           {/* Search + Status Tabs */}
           <div className="mt-3 flex flex-col sm:flex-row sm:items-center gap-2">
             <div className="relative flex-1">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#94A3B8] pointer-events-none" />
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" />
               <input
                 type="text"
                 placeholder="Search…"
@@ -477,14 +477,14 @@ function GroupQuickViewOverlay({
                   const text = e.clipboardData.getData("text").trim();
                   if (text) setSearch(text);
                 }}
-                className="w-full h-8 pl-8 pr-8 rounded-lg border border-[#E2E8F0] bg-[#F8FAFC] text-xs text-[#0F172A] placeholder:text-[#94A3B8] focus:border-[#0A77FF] focus:ring-1 focus:ring-[#0A77FF]/20 focus:outline-none transition-colors cursor-default"
+                className="w-full h-8 pl-8 pr-8 rounded-lg border border-border bg-slate-50 text-xs text-foreground placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary/20 focus:outline-none transition-colors cursor-default"
               />
               {search && (
                 <button
                   onClick={() => setSearch("")}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-[#E2E8F0] hover:bg-[#CBD5E1] flex items-center justify-center transition-colors cursor-pointer"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-border hover:bg-slate-300 flex items-center justify-center transition-colors cursor-pointer"
                 >
-                  <X className="w-2.5 h-2.5 text-[#64748B]" />
+                  <X className="w-2.5 h-2.5 text-slate-500" />
                 </button>
               )}
             </div>
@@ -495,8 +495,8 @@ function GroupQuickViewOverlay({
                   onClick={() => setStatusTab(tab)}
                   className={`px-2 py-1 rounded-md text-[11px] border transition-colors cursor-pointer ${
                     statusTab === tab
-                      ? "bg-[#EDF4FF] text-[#0A77FF] border-[#ADD1FF]"
-                      : "bg-[#F8FAFC] text-[#64748B] border-transparent hover:bg-[#F1F5F9]"
+                      ? "bg-accent text-primary border-[#ADD1FF]"
+                      : "bg-slate-50 text-slate-500 border-transparent hover:bg-muted"
                   }`}
                   style={{ fontWeight: 500 }}
                 >
@@ -511,10 +511,10 @@ function GroupQuickViewOverlay({
         {/* Table header */}
         <div className="shrink-0 border-y border-[#EEF2F6] bg-[#FAFBFC] px-4 sm:px-5">
           <div className="grid grid-cols-[72px_1fr_72px] sm:grid-cols-[80px_1.2fr_1.5fr_76px] gap-2 h-8 items-center">
-            <span className="text-[10px] text-[#94A3B8] uppercase tracking-wider" style={{ fontWeight: 600 }}>ID</span>
-            <span className="text-[10px] text-[#94A3B8] uppercase tracking-wider" style={{ fontWeight: 600 }}>Vendor Name</span>
-            <span className="text-[10px] text-[#94A3B8] uppercase tracking-wider hidden sm:block" style={{ fontWeight: 600 }}>Address</span>
-            <span className="text-[10px] text-[#94A3B8] uppercase tracking-wider text-right" style={{ fontWeight: 600 }}>Status</span>
+            <span className="text-[10px] text-slate-400 uppercase tracking-wider" style={{ fontWeight: 600 }}>ID</span>
+            <span className="text-[10px] text-slate-400 uppercase tracking-wider" style={{ fontWeight: 600 }}>Vendor Name</span>
+            <span className="text-[10px] text-slate-400 uppercase tracking-wider hidden sm:block" style={{ fontWeight: 600 }}>Address</span>
+            <span className="text-[10px] text-slate-400 uppercase tracking-wider text-right" style={{ fontWeight: 600 }}>Status</span>
           </div>
         </div>
 
@@ -529,10 +529,10 @@ function GroupQuickViewOverlay({
               {visible.map((vendor) => (
                 <div
                   key={vendor.id}
-                  className="grid grid-cols-[72px_1fr_72px] sm:grid-cols-[80px_1.2fr_1.5fr_76px] gap-2 items-center py-2.5 border-b border-[#F1F5F9] last:border-b-0 hover:bg-[#F8FAFC] transition-colors -mx-4 sm:-mx-5 px-4 sm:px-5"
+                  className="grid grid-cols-[72px_1fr_72px] sm:grid-cols-[80px_1.2fr_1.5fr_76px] gap-2 items-center py-2.5 border-b border-muted last:border-b-0 hover:bg-slate-50 transition-colors -mx-4 sm:-mx-5 px-4 sm:px-5"
                   style={{ minHeight: VENDOR_ROW_HEIGHT }}
                 >
-                  <span className="text-[11px] text-[#0A77FF] tabular-nums truncate" style={{ fontWeight: 600 }}>
+                  <span className="text-[11px] text-primary tabular-nums truncate" style={{ fontWeight: 600 }}>
                     {vendor.id}
                   </span>
                   <div className="min-w-0 flex items-center gap-2">
@@ -546,11 +546,11 @@ function GroupQuickViewOverlay({
                     >
                       {vendor.name.charAt(0)}
                     </div>
-                    <span className="text-[12px] text-[#0F172A] truncate" style={{ fontWeight: 500 }}>
+                    <span className="text-[12px] text-foreground truncate" style={{ fontWeight: 500 }}>
                       {vendor.name}
                     </span>
                   </div>
-                  <span className="text-[11px] text-[#64748B] truncate hidden sm:block">
+                  <span className="text-[11px] text-slate-500 truncate hidden sm:block">
                     {vendor.address}
                   </span>
                   <div className="flex justify-end">
@@ -571,7 +571,7 @@ function GroupQuickViewOverlay({
               ))}
               {visibleCount < filtered.length && (
                 <div className="py-3 text-center">
-                  <span className="text-[11px] text-[#94A3B8]">
+                  <span className="text-[11px] text-slate-400">
                     Showing {visibleCount} of {filtered.length} — scroll for more
                   </span>
                 </div>
@@ -579,17 +579,17 @@ function GroupQuickViewOverlay({
             </div>
           ) : (
             <div className="py-10 text-center">
-              <div className="w-10 h-10 rounded-xl bg-[#F1F5F9] flex items-center justify-center mx-auto mb-2.5">
+              <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center mx-auto mb-2.5">
                 {search ? (
-                  <Search className="w-5 h-5 text-[#94A3B8]" />
+                  <Search className="w-5 h-5 text-slate-400" />
                 ) : (
-                  <Users className="w-5 h-5 text-[#94A3B8]" />
+                  <Users className="w-5 h-5 text-slate-400" />
                 )}
               </div>
-              <p className="text-[13px] text-[#334155]" style={{ fontWeight: 600 }}>
+              <p className="text-[13px] text-slate-700" style={{ fontWeight: 600 }}>
                 {search ? "No matching vendors" : "No vendors yet"}
               </p>
-              <p className="text-xs text-[#94A3B8] mt-1">
+              <p className="text-xs text-slate-400 mt-1">
                 {search
                   ? "Try adjusting your search or filter."
                   : "This group doesn't have any associated vendors."}
@@ -600,14 +600,14 @@ function GroupQuickViewOverlay({
 
         {/* Footer */}
         <div className="shrink-0 border-t border-[#EEF2F6] px-4 sm:px-5 py-2.5 flex items-center justify-between bg-[#FAFBFC] rounded-b-xl">
-          <span className="text-[11px] text-[#94A3B8]">
+          <span className="text-[11px] text-slate-400">
             {filtered.length === allVendors.length
               ? `${allVendors.length} total`
               : `${filtered.length} of ${allVendors.length} shown`}
           </span>
           <button
             onClick={onClose}
-            className="px-3.5 py-1.5 rounded-lg text-xs text-[#0F172A] bg-white border border-[#E2E8F0] hover:bg-[#F1F5F9] transition-colors cursor-pointer"
+            className="px-3.5 py-1.5 rounded-lg text-xs text-foreground bg-white border border-border hover:bg-muted transition-colors cursor-pointer"
             style={{ fontWeight: 500 }}
           >
             Close
