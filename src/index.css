@@ -4,97 +4,156 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ═══════════════════════════════════════════════════════════════════════
+   Omne Design System v2.0 — Token Bridge
+   Source of truth: Figma DS v2.0 (4XilIqpnxtWLQis7bRwvOc)
+   
+   Mapping: Figma M3 tokens → ShadCN CSS variables
+   ───────────────────────────────────────────────────────────────────
+   Figma base/surface             → --background
+   Figma base/on-surface          → --foreground
+   Figma base/surface-container   → --card, --popover
+   Figma base/on-surface-container→ --card-foreground, --popover-foreground
+   Figma base/primary             → --primary
+   Figma base/on-primary          → --primary-foreground
+   Figma base/secondary           → --secondary
+   Figma base/on-secondary        → --secondary-foreground
+   Figma base/surface-variant     → --muted
+   Figma base/on-surface-variant  → --muted-foreground
+   Figma base/error               → --destructive
+   Figma base/on-error            → --destructive-foreground
+   Figma base/outline             → --border, --input
+   Figma base/focus-indicator     → --ring
+   Figma Colors/blue/50           → --accent (derived from primary)
+   Figma Colors/blue/700          → --accent-foreground (derived)
+   Figma radius/lg (10px)         → --radius (base)
+   ═══════════════════════════════════════════════════════════════════════ */
+
 @layer base {
   :root {
     --font-size: 16px;
 
-    /* Surfaces */
-    --background: 218 20% 97%;
-    --foreground: 222 47% 11%;
+    /* ─── Surfaces (Figma: base/surface, base/surface-container) ─── */
+    --background: 0 0% 98%;
+    --foreground: 0 0% 4%;
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card-foreground: 0 0% 4%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover-foreground: 0 0% 4%;
 
-    /* Primary — #0A77FF */
-    --primary: 212 100% 52%;
-    --primary-foreground: 0 0% 100%;
+    /* ─── Primary (Figma: base/primary = Colors/blue/500) ─── */
+    --primary: 213 100% 52%;
+    --primary-foreground: 0 0% 98%;
 
-    /* Secondary */
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222 47% 11%;
+    /* ─── Secondary (Figma: base/secondary = neutral/100) ─── */
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 9%;
 
-    /* Muted */
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 19% 35%;
+    /* ─── Muted (Figma: base/surface-variant = neutral/100) ─── */
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
 
-    /* Accent — tints of primary */
-    --accent: 214 100% 96%;
-    --accent-foreground: 213 89% 33%;
+    /* ─── Accent (Derived: Colors/blue/50, Colors/blue/700) ─── */
+    --accent: 211 100% 96%;
+    --accent-foreground: 214 93% 41%;
 
-    /* Destructive */
-    --destructive: 0 72% 51%;
-    --destructive-foreground: 0 0% 100%;
+    /* ─── Destructive (Figma: base/error = Colors/red/600) ─── */
+    --destructive: 351 60% 49%;
+    --destructive-foreground: 353 81% 96%;
 
-    /* Borders & inputs */
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 212 100% 74%;
+    /* ─── Borders & Inputs (Figma: base/outline = neutral/200) ─── */
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 0 0% 64%;
 
-    /* Charts */
-    --chart-1: 212 100% 52%;
+    /* ─── Charts (Figma primitive palette) ─── */
+    --chart-1: 213 100% 52%;
     --chart-2: 160 84% 39%;
-    --chart-3: 38 92% 50%;
-    --chart-4: 263 70% 50%;
-    --chart-5: 0 84% 60%;
+    --chart-3: 35 68% 50%;
+    --chart-4: 262 83% 58%;
+    --chart-5: 351 60% 49%;
 
-    /* Radius */
-    --radius: 0.5rem;
+    /* ─── Radius (Figma: radius/lg=10px → --radius) ─── */
+    /* ShadCN derives: lg=var(--radius)=10px, md=8px, sm=6px */
+    --radius: 0.625rem;
 
-    /* Sidebar */
+    /* ─── Sidebar (Derived from Figma surface tokens) ─── */
     --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 222 47% 11%;
-    --sidebar-primary: 212 100% 52%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 214 100% 96%;
-    --sidebar-accent-foreground: 213 94% 41%;
-    --sidebar-border: 214 32% 91%;
-    --sidebar-ring: 212 100% 74%;
+    --sidebar-foreground: 0 0% 4%;
+    --sidebar-primary: 213 100% 52%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 211 100% 96%;
+    --sidebar-accent-foreground: 214 93% 41%;
+    --sidebar-border: 0 0% 90%;
+    --sidebar-ring: 0 0% 64%;
+
+    /* ─── Omne Extended Semantic Tokens (Figma: base/* ) ─── */
+    --success: 159 60% 33%;
+    --warning: 35 68% 50%;
+    --orange: 24 83% 47%;
+    --purple: 243 71% 59%;
+    --violet: 262 83% 58%;
+    --fuchsia: 293 69% 49%;
   }
 
   .dark {
-    --background: 222 47% 9%;
-    --foreground: 210 40% 96%;
-    --card: 220 38% 15%;
-    --card-foreground: 210 40% 96%;
-    --popover: 220 38% 15%;
-    --popover-foreground: 210 40% 96%;
-    --primary: 212 100% 62%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 217 33% 17%;
-    --secondary-foreground: 210 40% 96%;
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 25% 63%;
-    --accent: 212 89% 19%;
-    --accent-foreground: 212 100% 74%;
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 215 26% 24%;
-    --input: 215 26% 24%;
-    --ring: 212 100% 62%;
-    --chart-1: 212 100% 62%;
-    --chart-2: 160 72% 51%;
-    --chart-3: 43 96% 56%;
-    --chart-4: 263 83% 76%;
-    --chart-5: 0 91% 71%;
-    --sidebar-background: 220 38% 15%;
-    --sidebar-foreground: 210 40% 96%;
-    --sidebar-primary: 212 100% 62%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 212 89% 19%;
-    --sidebar-accent-foreground: 212 100% 74%;
-    --sidebar-border: 215 26% 24%;
-    --sidebar-ring: 212 100% 62%;
+    /* ─── Surfaces ─── */
+    --background: 0 0% 4%;
+    --foreground: 0 0% 98%;
+    --card: 0 0% 9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 0 0% 9%;
+    --popover-foreground: 0 0% 98%;
+
+    /* ─── Primary ─── */
+    --primary: 213 100% 52%;
+    --primary-foreground: 0 0% 98%;
+
+    /* ─── Secondary ─── */
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 0 0% 98%;
+
+    /* ─── Muted ─── */
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 64%;
+
+    /* ─── Accent (Derived: dark blue tint) ─── */
+    --accent: 213 80% 15%;
+    --accent-foreground: 210 100% 75%;
+
+    /* ─── Destructive ─── */
+    --destructive: 353 78% 63%;
+    --destructive-foreground: 353 81% 96%;
+
+    /* ─── Borders & Inputs ─── */
+    --border: 0 0% 15%;
+    --input: 0 0% 15%;
+    --ring: 0 0% 45%;
+
+    /* ─── Charts ─── */
+    --chart-1: 213 100% 52%;
+    --chart-2: 163 48% 51%;
+    --chart-3: 36 92% 62%;
+    --chart-4: 255 92% 76%;
+    --chart-5: 353 78% 63%;
+
+    /* ─── Sidebar ─── */
+    --sidebar-background: 0 0% 9%;
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-primary: 213 100% 52%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 213 80% 15%;
+    --sidebar-accent-foreground: 210 100% 75%;
+    --sidebar-border: 0 0% 15%;
+    --sidebar-ring: 0 0% 45%;
+
+    /* ─── Extended Semantic ─── */
+    --success: 163 48% 51%;
+    --warning: 36 92% 62%;
+    --orange: 22 100% 62%;
+    --purple: 244 93% 72%;
+    --violet: 255 92% 76%;
+    --fuchsia: 292 91% 73%;
   }
 }
 
@@ -117,13 +176,15 @@
     font-size: var(--font-size);
   }
 
-  h1 { font-size: 1.5rem; font-weight: 500; line-height: 1.5; letter-spacing: -0.025em; }
-  h2 { font-size: 1.25rem; font-weight: 500; line-height: 1.5; letter-spacing: -0.02em; }
-  h3 { font-size: 1.125rem; font-weight: 500; line-height: 1.5; letter-spacing: -0.015em; }
-  h4 { font-size: 1rem; font-weight: 500; line-height: 1.5; letter-spacing: -0.01em; }
-  label { font-size: 1rem; font-weight: 500; line-height: 1.5; }
-  button { font-size: 1rem; font-weight: 500; line-height: 1.5; }
-  input { font-size: 1rem; font-weight: 400; line-height: 1.5; }
+  /* Typography scale — aligned with Figma text/* tokens */
+  /* Figma: text/2xl = 24px/32px, text/xl = 20px/28px, text/lg = 18px/28px, text/base = 16px/24px */
+  h1 { font-size: 1.5rem; font-weight: 500; line-height: 2rem; letter-spacing: -0.025em; }
+  h2 { font-size: 1.25rem; font-weight: 500; line-height: 1.75rem; letter-spacing: -0.02em; }
+  h3 { font-size: 1.125rem; font-weight: 500; line-height: 1.75rem; letter-spacing: -0.015em; }
+  h4 { font-size: 1rem; font-weight: 500; line-height: 1.5rem; letter-spacing: -0.01em; }
+  label { font-size: 1rem; font-weight: 500; line-height: 1.5rem; }
+  button { font-size: 1rem; font-weight: 500; line-height: 1.5rem; }
+  input { font-size: 1rem; font-weight: 400; line-height: 1.5rem; }
 
   table td, table th, .tabular-nums {
     font-variant-numeric: tabular-nums;
@@ -245,8 +306,6 @@ input[type="number"] {
 .animate-coming-soon-orbit { animation: comingSoonOrbit 8s linear infinite; }
 
 /* ─── Elevated z-index context for nested modals ─── */
-/* When PartnerItemsTab is inside a high-z modal (e.g. pricing rule detail z-220),
-   all portalled radix content (dropdowns, popovers, tooltips, dialogs) needs z > 220 */
 .elevated-z [data-radix-popper-content-wrapper] {
   z-index: 230 !important;
 }
